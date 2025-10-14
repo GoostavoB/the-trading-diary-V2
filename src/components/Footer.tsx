@@ -11,16 +11,16 @@ const Footer = () => {
           </div>
           
           <nav className="flex gap-8">
-            <a href="#" className="text-muted-foreground hover:text-neon-green transition-colors">
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
               Features
             </a>
-            <a href="#" className="text-muted-foreground hover:text-neon-green transition-colors">
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
               Pricing
             </a>
-            <a href="#" className="text-muted-foreground hover:text-neon-green transition-colors">
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
               Blog
             </a>
-            <a href="#" className="text-muted-foreground hover:text-neon-green transition-colors">
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
               FAQ
             </a>
           </nav>

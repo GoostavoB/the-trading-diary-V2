@@ -53,12 +53,12 @@ const Features = () => {
             return (
               <Card 
                 key={index}
-                className="p-8 bg-card border-border hover:border-neon-green/50 transition-all duration-300 group"
+                className="p-8 bg-card border-border hover:border-primary/50 transition-all duration-300 group"
               >
                 <div className="mb-4 inline-block p-3 bg-gradient-neon rounded-lg">
                   <Icon className="text-primary-foreground" size={32} />
                 </div>
-                <h3 className="text-2xl font-semibold mb-3 group-hover:text-neon-green transition-colors">
+                <h3 className="text-2xl font-semibold mb-3 group-hover:text-primary transition-colors">
                   {feature.title}
                 </h3>
                 <p className="text-muted-foreground">

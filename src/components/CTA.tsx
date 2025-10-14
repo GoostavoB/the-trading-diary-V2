@@ -5,10 +5,10 @@ const CTA = () => {
   return (
     <section className="py-24 px-6">
       <div className="container mx-auto">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card to-muted p-12 md:p-20 border-2 border-neon-green/30">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card to-muted p-12 md:p-20 border-2 border-primary/30">
           {/* Glow Effects */}
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-neon-green/20 rounded-full blur-[100px]"></div>
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-neon-cyan/20 rounded-full blur-[100px]"></div>
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-neon-red/20 rounded-full blur-[100px]"></div>
           
           <div className="relative z-10 text-center">
             <h2 className="text-5xl md:text-6xl font-bold mb-6">

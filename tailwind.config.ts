@@ -49,12 +49,17 @@ export default {
         },
         neon: {
           green: "hsl(var(--neon-green))",
-          cyan: "hsl(var(--neon-cyan))",
+          red: "hsl(var(--neon-red))",
+        },
+        purple: {
+          dark: "hsl(var(--purple-dark))",
+          mid: "hsl(var(--purple-mid))",
         },
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-neon': 'linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)))',
+        'gradient-neon': 'linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-red)))',
+        'gradient-purple': 'linear-gradient(135deg, hsl(var(--purple-mid)), hsl(var(--primary)))',
       },
       borderRadius: {
         lg: "var(--radius)",
