@@ -16,7 +16,7 @@ const CTA = () => {
               Your Trading?
             </h2>
             <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-              Join thousands of traders who are already using BullBear Journal to track, 
+              Join thousands of traders who are already using The Trade Diary to track, 
               analyze, and improve their trading performance.
             </p>
             <Button 

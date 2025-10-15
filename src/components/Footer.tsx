@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <TrendingUp className="text-foreground" size={32} />
-            <span className="text-2xl font-bold">BullBear Journal</span>
+            <span className="text-2xl font-bold">The Trade Diary</span>
           </div>
           
           <nav className="flex gap-8">
@@ -30,7 +30,7 @@ const Footer = () => {
           </nav>
           
           <p className="text-muted-foreground text-sm">
-            © 2025 BullBear Journal. All rights reserved.
+            © 2025 The Trade Diary. All rights reserved.
           </p>
         </div>
       </div>

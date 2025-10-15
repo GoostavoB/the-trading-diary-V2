@@ -46,7 +46,7 @@ const Auth = () => {
       <Card className="w-full max-w-md p-8 bg-card border-border">
         <div className="flex items-center justify-center gap-2 mb-8">
           <TrendingUp className="text-foreground" size={32} />
-          <h1 className="text-3xl font-bold">BullBear Journal</h1>
+          <h1 className="text-3xl font-bold">The Trade Diary</h1>
         </div>
 
         <h2 className="text-2xl font-semibold mb-6 text-center">
