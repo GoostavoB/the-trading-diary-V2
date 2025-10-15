@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -7,12 +7,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Upload as UploadIcon, X } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 
 const Upload = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get('edit');
   const [loading, setLoading] = useState(false);
+  const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     asset: '',
     setup: '',
@@ -24,6 +30,85 @@ const Upload = () => {
     notes: '',
     duration_minutes: ''
   });
+
+  useEffect(() => {
+    if (editId) {
+      fetchTrade(editId);
+    }
+  }, [editId]);
+
+  const fetchTrade = async (id: string) => {
+    const { data, error } = await supabase
+      .from('trades')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      toast.error('Failed to load trade');
+      return;
+    }
+
+    if (data) {
+      setFormData({
+        asset: data.asset,
+        setup: data.setup || '',
+        broker: data.broker || '',
+        entry_price: data.entry_price.toString(),
+        exit_price: data.exit_price.toString(),
+        position_size: data.position_size.toString(),
+        emotional_tag: data.emotional_tag || '',
+        notes: data.notes || '',
+        duration_minutes: data.duration_minutes?.toString() || ''
+      });
+      if (data.screenshot_url) {
+        setScreenshotPreview(data.screenshot_url);
+      }
+    }
+  };
+
+  const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Screenshot must be less than 5MB');
+        return;
+      }
+      setScreenshot(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setScreenshotPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeScreenshot = () => {
+    setScreenshot(null);
+    setScreenshotPreview(null);
+  };
+
+  const uploadScreenshot = async (tradeId: string): Promise<string | null> => {
+    if (!screenshot || !user) return null;
+
+    const fileExt = screenshot.name.split('.').pop();
+    const fileName = `${user.id}/${tradeId}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('trade-screenshots')
+      .upload(fileName, screenshot, { upsert: true });
+
+    if (uploadError) {
+      console.error('Screenshot upload error:', uploadError);
+      return null;
+    }
+
+    const { data } = supabase.storage
+      .from('trade-screenshots')
+      .getPublicUrl(fileName);
+
+    return data.publicUrl;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +123,7 @@ const Upload = () => {
     const pnl = (exit - entry) * size;
     const roi = ((exit - entry) / entry) * 100;
 
-    const { error } = await supabase.from('trades').insert({
+    const tradeData = {
       user_id: user.id,
       asset: formData.asset,
       setup: formData.setup,
@@ -52,14 +137,46 @@ const Upload = () => {
       notes: formData.notes,
       duration_minutes: parseInt(formData.duration_minutes) || 0,
       trade_date: new Date().toISOString()
-    });
+    };
+
+    let error;
+    let tradeId = editId;
+
+    if (editId) {
+      // Update existing trade
+      const { error: updateError } = await supabase
+        .from('trades')
+        .update(tradeData)
+        .eq('id', editId);
+      error = updateError;
+    } else {
+      // Insert new trade
+      const { data, error: insertError } = await supabase
+        .from('trades')
+        .insert(tradeData)
+        .select()
+        .single();
+      error = insertError;
+      tradeId = data?.id;
+    }
+
+    // Upload screenshot if provided
+    if (screenshot && tradeId) {
+      const screenshotUrl = await uploadScreenshot(tradeId);
+      if (screenshotUrl) {
+        await supabase
+          .from('trades')
+          .update({ screenshot_url: screenshotUrl })
+          .eq('id', tradeId);
+      }
+    }
 
     setLoading(false);
 
     if (error) {
       toast.error('Failed to save trade');
     } else {
-      toast.success('Trade added successfully!');
+      toast.success(editId ? 'Trade updated successfully!' : 'Trade added successfully!');
       navigate('/dashboard');
     }
   };
@@ -68,7 +185,7 @@ const Upload = () => {
     <AppLayout>
       <div className="max-w-2xl mx-auto space-y-6">
         <div>
-          <h1 className="text-4xl font-bold mb-2">Upload Trade</h1>
+          <h1 className="text-4xl font-bold mb-2">{editId ? 'Edit Trade' : 'Upload Trade'}</h1>
           <p className="text-muted-foreground">Record your trading activity</p>
         </div>
 
@@ -168,8 +285,9 @@ const Upload = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium">Notes</label>
+              <Label htmlFor="notes">Notes</Label>
               <Textarea
+                id="notes"
                 value={formData.notes}
                 onChange={(e) => setFormData({...formData, notes: e.target.value})}
                 placeholder="Trade notes, observations..."
@@ -178,12 +296,53 @@ const Upload = () => {
               />
             </div>
 
+            <div>
+              <Label htmlFor="screenshot">Trade Screenshot (Optional)</Label>
+              <div className="mt-2">
+                {screenshotPreview ? (
+                  <div className="relative">
+                    <img
+                      src={screenshotPreview}
+                      alt="Screenshot preview"
+                      className="w-full h-48 object-cover rounded-md border border-border"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2"
+                      onClick={removeScreenshot}
+                    >
+                      <X size={16} />
+                    </Button>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="screenshot"
+                    className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-border rounded-md cursor-pointer hover:border-foreground/50 transition-colors"
+                  >
+                    <UploadIcon className="w-8 h-8 text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground">
+                      Click to upload screenshot (max 5MB)
+                    </p>
+                    <Input
+                      id="screenshot"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleScreenshotChange}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+
             <Button
               type="submit"
               disabled={loading}
               className="w-full bg-foreground text-background hover:bg-foreground/90"
             >
-              {loading ? 'Saving...' : 'Save Trade'}
+              {loading ? 'Saving...' : editId ? 'Update Trade' : 'Save Trade'}
             </Button>
           </form>
         </Card>

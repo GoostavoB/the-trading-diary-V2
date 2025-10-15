@@ -4,6 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
 import { TrendingUp, TrendingDown, DollarSign, Target } from 'lucide-react';
+import { DashboardCharts } from '@/components/DashboardCharts';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TradeHistory } from '@/components/TradeHistory';
 
 interface TradeStats {
   total_pnl: number;
@@ -12,9 +15,17 @@ interface TradeStats {
   avg_duration: number;
 }
 
+interface Trade {
+  id: string;
+  trade_date: string;
+  pnl: number;
+  roi: number;
+}
+
 const Dashboard = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState<TradeStats | null>(null);
+  const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,6 +41,7 @@ const Dashboard = () => {
       .eq('user_id', user.id);
 
     if (trades) {
+      setTrades(trades);
       const totalPnl = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
       const winningTrades = trades.filter(t => (t.pnl || 0) > 0).length;
       const avgDuration = trades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (trades.length || 1);
@@ -100,7 +112,7 @@ const Dashboard = () => {
               />
             </div>
 
-            {stats && stats.total_trades === 0 && (
+            {stats && stats.total_trades === 0 ? (
               <Card className="p-8 text-center bg-card border-border">
                 <h3 className="text-xl font-semibold mb-2">No trades yet</h3>
                 <p className="text-muted-foreground mb-4">
@@ -110,6 +122,21 @@ const Dashboard = () => {
                   Upload Trade →
                 </a>
               </Card>
+            ) : (
+              <Tabs defaultValue="analytics" className="space-y-6">
+                <TabsList>
+                  <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                  <TabsTrigger value="history">Trade History</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="analytics" className="space-y-6">
+                  <DashboardCharts trades={trades} />
+                </TabsContent>
+
+                <TabsContent value="history">
+                  <TradeHistory />
+                </TabsContent>
+              </Tabs>
             )}
           </>
         )}
