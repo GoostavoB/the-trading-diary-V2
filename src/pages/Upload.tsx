@@ -544,11 +544,6 @@ const Upload = () => {
                                 </>
                               )}
                             </Button>
-                            {extracting && (
-                              <p className="text-sm text-muted-foreground text-center mt-2 animate-pulse">
-                                Please wait while AI reads your trades...
-                              </p>
-                            )}
                           </>
                         )}
                       </div>
@@ -588,20 +583,20 @@ const Upload = () => {
                 </div>
 
                 {extracting && (
-                  <div className="flex items-center justify-center py-12">
+                  <Card className="p-8 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/30">
                     <div className="flex flex-col items-center space-y-4">
                       <div className="relative">
-                        <Sparkles className="w-12 h-12 animate-pulse text-primary" />
+                        <Sparkles className="w-16 h-16 animate-pulse text-primary" />
                         <div className="absolute inset-0 animate-ping">
-                          <Sparkles className="w-12 h-12 text-primary/30" />
+                          <Sparkles className="w-16 h-16 text-primary/30" />
                         </div>
                       </div>
                       <div className="text-center space-y-2">
-                        <p className="text-base font-medium">Analyzing your trade screenshot...</p>
-                        <p className="text-sm text-muted-foreground">AI is extracting trade information</p>
+                        <p className="text-xl font-semibold">🤖 AI is reading your trades...</p>
+                        <p className="text-base text-muted-foreground">This may take a few seconds</p>
                       </div>
                     </div>
-                  </div>
+                  </Card>
                 )}
 
                 {extractedTrades.length > 0 && !extracting && (
