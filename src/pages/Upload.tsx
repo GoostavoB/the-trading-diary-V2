@@ -526,7 +526,7 @@ const Upload = () => {
         const totalEntryValue = tradesData.reduce((sum, t) => sum + (t.entry_price * t.position_size), 0);
         const mostRecentTrade = insertedTrades?.[0];
 
-        await supabase.from('upload_batches').insert({
+        const { error: batchError } = await supabase.from('upload_batches').insert({
           user_id: user.id,
           trade_count: extractedTrades.length,
           assets: assets,
@@ -536,7 +536,14 @@ const Upload = () => {
           most_recent_trade_value: mostRecentTrade?.profit_loss
         });
 
-        toast.success(`All ${extractedTrades.length} trades saved successfully!`);
+        if (batchError) {
+          console.error('Batch creation error:', batchError);
+        }
+
+        toast.success(`✅ ${extractedTrades.length} trade${extractedTrades.length > 1 ? 's' : ''} saved to database!`, {
+          description: 'Your trades are now in the upload history below',
+          duration: 4000
+        });
         
         // Clear the extraction image and trades
         setExtractionImage(null);
