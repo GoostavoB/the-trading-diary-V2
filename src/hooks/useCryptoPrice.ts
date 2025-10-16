@@ -6,7 +6,10 @@ interface CryptoPrice {
   displaySymbol: string;
 }
 
-export const useCryptoPrice = (symbols: string[] = ['BTCUSDT', 'ETHUSDT']) => {
+export const useCryptoPrice = (symbols: string[] = [
+  'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT',
+  'DOGEUSDT', 'TRXUSDT', 'TONUSDT', 'ADAUSDT', 'AVAXUSDT'
+]) => {
   const [prices, setPrices] = useState<CryptoPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

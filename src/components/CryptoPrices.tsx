@@ -1,5 +1,4 @@
 import { useCryptoPrice } from '@/hooks/useCryptoPrice';
-import { Card } from '@/components/ui/card';
 import { TrendingUp } from 'lucide-react';
 
 interface CryptoPricesProps {
@@ -12,38 +11,38 @@ export const CryptoPrices = ({ className = '', symbols }: CryptoPricesProps) => 
 
   if (loading) {
     return (
-      <Card className={`p-4 bg-card/50 border-border ${className}`}>
-        <p className="text-sm text-muted-foreground">Loading prices...</p>
-      </Card>
+      <div className={`bg-card/30 backdrop-blur-sm border-b border-border ${className}`}>
+        <div className="container mx-auto px-6 py-2">
+          <p className="text-xs text-muted-foreground">Loading prices...</p>
+        </div>
+      </div>
     );
   }
 
   if (error) {
-    return (
-      <Card className={`p-4 bg-card/50 border-border ${className}`}>
-        <p className="text-sm text-neon-red">{error}</p>
-      </Card>
-    );
+    return null; // Don't show error bar at top
   }
 
   return (
-    <Card className={`p-4 bg-card/50 border-border ${className}`}>
-      <div className="flex items-center gap-2 mb-3">
-        <TrendingUp className="text-neon-green" size={20} />
-        <h3 className="text-sm font-semibold">Live Prices (Binance)</h3>
-      </div>
-      <div className="flex flex-wrap gap-4">
-        {prices.map((price) => (
-          <div key={price.symbol} className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-foreground">
-              {price.displaySymbol}:
-            </span>
-            <span className="text-sm font-mono text-neon-green">
-              ${price.price}
-            </span>
+    <div className={`bg-card/30 backdrop-blur-sm border-b border-border ${className}`}>
+      <div className="container mx-auto px-6 py-2">
+        <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <TrendingUp className="text-neon-green" size={16} />
+            <span className="text-xs font-semibold text-muted-foreground">LIVE:</span>
           </div>
-        ))}
+          {prices.map((price) => (
+            <div key={price.symbol} className="flex items-center gap-1.5 flex-shrink-0">
+              <span className="text-xs font-semibold text-foreground">
+                {price.displaySymbol}
+              </span>
+              <span className="text-xs font-mono text-neon-green">
+                ${price.price}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
-    </Card>
+    </div>
   );
 };

@@ -11,16 +11,14 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="absolute top-6 right-6 z-50">
+      <CryptoPrices />
+      <div className="absolute top-14 right-6 z-50">
         <Button
           onClick={() => navigate('/auth')}
           className="bg-foreground text-background hover:bg-foreground/90"
         >
           Sign In
         </Button>
-      </div>
-      <div className="container mx-auto px-6 pt-24">
-        <CryptoPrices />
       </div>
       <Hero />
       <Features />
