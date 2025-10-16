@@ -42,10 +42,11 @@ export const CryptoPrices = ({ className = '', symbols }: CryptoPricesProps) => 
         <div className="flex items-center gap-6 overflow-x-auto scrollbar-hide">
           <div className="flex items-center gap-3 flex-shrink-0">
             <TrendingUp className="text-neon-green" size={24} />
-            <span className="text-base font-semibold text-muted-foreground">LIVE:</span>
+            <span className="text-base font-semibold text-muted-foreground">LIVE (24h):</span>
           </div>
           {prices.map((price) => {
             const priceColor = price.priceChangePercent >= 0 ? 'text-neon-green' : 'text-neon-red';
+            const changeSign = price.priceChangePercent >= 0 ? '+' : '';
             return (
               <div key={price.symbol} className="flex items-center gap-2 flex-shrink-0">
                 <span className={`text-base font-semibold ${cryptoColors[price.displaySymbol] || 'text-foreground'}`}>
@@ -53,6 +54,9 @@ export const CryptoPrices = ({ className = '', symbols }: CryptoPricesProps) => 
                 </span>
                 <span className={`text-base font-mono font-bold drop-shadow-[0_0_8px_currentColor] ${priceColor}`}>
                   ${price.price}
+                </span>
+                <span className={`text-xs font-mono ${priceColor}`}>
+                  ({changeSign}{price.priceChangePercent.toFixed(2)}%)
                 </span>
               </div>
             );
