@@ -6,6 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import bullNeon from "@/assets/bull-neon.png";
+import bearNeon from "@/assets/bear-neon.png";
+import bullBearFight from "@/assets/bull-bear-fight-neon.png";
 
 interface BinanceLongShortData {
   symbol: string;
@@ -137,6 +140,22 @@ const LongShortRatio = () => {
   const latestBybitData = bybitData[bybitData.length - 1];
   const latestCombinedData = combinedChartData[combinedChartData.length - 1];
 
+  // Helper function to determine market sentiment image
+  const getMarketSentimentImage = (longPercent: number, shortPercent: number) => {
+    const diff = Math.abs(longPercent - shortPercent);
+    
+    if (diff < 2) {
+      // Approximately equal (within 2%) - show fighting image
+      return bullBearFight;
+    } else if (longPercent > shortPercent) {
+      // More longs - show bull
+      return bullNeon;
+    } else {
+      // More shorts - show bear
+      return bearNeon;
+    }
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -235,7 +254,23 @@ const LongShortRatio = () => {
           </Card>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Market Sentiment</CardTitle>
+                  <CardDescription>Visual indicator</CardDescription>
+                </CardHeader>
+                <CardContent className="flex items-center justify-center">
+                  {latestCombinedData && (
+                    <img 
+                      src={getMarketSentimentImage(latestCombinedData.longAccount, latestCombinedData.shortAccount)} 
+                      alt="Market sentiment"
+                      className="w-24 h-24 object-contain"
+                    />
+                  )}
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Avg Long/Short Ratio</CardTitle>
@@ -421,7 +456,26 @@ const LongShortRatio = () => {
           </Card>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Market Sentiment</CardTitle>
+                  <CardDescription>Visual indicator</CardDescription>
+                </CardHeader>
+                <CardContent className="flex items-center justify-center">
+                  {latestBinanceData && (
+                    <img 
+                      src={getMarketSentimentImage(
+                        parseFloat(latestBinanceData.longAccount) * 100, 
+                        parseFloat(latestBinanceData.shortAccount) * 100
+                      )} 
+                      alt="Market sentiment"
+                      className="w-24 h-24 object-contain"
+                    />
+                  )}
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Long/Short Ratio</CardTitle>
@@ -612,7 +666,26 @@ const LongShortRatio = () => {
           </Card>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Market Sentiment</CardTitle>
+                  <CardDescription>Visual indicator</CardDescription>
+                </CardHeader>
+                <CardContent className="flex items-center justify-center">
+                  {latestBybitData && (
+                    <img 
+                      src={getMarketSentimentImage(
+                        parseFloat(latestBybitData.buyRatio) * 100, 
+                        parseFloat(latestBybitData.sellRatio) * 100
+                      )} 
+                      alt="Market sentiment"
+                      className="w-24 h-24 object-contain"
+                    />
+                  )}
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Long/Short Ratio</CardTitle>
