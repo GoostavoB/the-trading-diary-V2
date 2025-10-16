@@ -13,10 +13,11 @@ interface UploadBatch {
   created_at: string;
   trade_count: number;
   assets: string[];
-  total_pnl: number;
+  total_pnl?: number;
   trades?: BatchTrade[];
   position_types?: string[];
   brokers?: string[];
+  most_recent_trade_date?: string;
 }
 
 interface BatchTrade {
@@ -51,9 +52,9 @@ export const UploadHistory = () => {
             filter: `user_id=eq.${user.id}`
           },
           (payload) => {
-            const newBatch = payload.new as UploadBatch;
-            setBatches(prev => [newBatch, ...prev]);
-            setNewBatchId(newBatch.id);
+            // Refresh the entire list when a new batch is added
+            fetchBatches();
+            setNewBatchId(payload.new.id as string);
             
             // Remove the animation class after animation completes
             setTimeout(() => {
@@ -76,51 +77,57 @@ export const UploadHistory = () => {
       .from('upload_batches')
       .select('*')
       .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
       .limit(50);
 
-    if (!error && data) {
-      // Sort by most recent trade and fetch additional info
-      const batchesWithMostRecentTrade = await Promise.all(
-        data.map(async (batch) => {
-          const { data: trades } = await supabase
-            .from('trades')
-            .select('trade_date, position_type, broker')
-            .eq('user_id', user.id)
-            .gte('created_at', new Date(new Date(batch.created_at).getTime() - 5000).toISOString())
-            .lte('created_at', new Date(new Date(batch.created_at).getTime() + 5000).toISOString())
-            .order('trade_date', { ascending: false });
-
-          const positionTypes = trades ? [...new Set(trades.map(t => t.position_type).filter(Boolean))] : [];
-          const brokers = trades ? [...new Set(trades.map(t => t.broker).filter(Boolean))] : [];
-          const mostRecentTradeDate = trades && trades.length > 0 ? trades[0].trade_date : batch.created_at;
-          
-          // Calculate total P&L from trades
-          const { data: pnlTrades } = await supabase
-            .from('trades')
-            .select('profit_loss')
-            .eq('user_id', user.id)
-            .gte('created_at', new Date(new Date(batch.created_at).getTime() - 5000).toISOString())
-            .lte('created_at', new Date(new Date(batch.created_at).getTime() + 5000).toISOString());
-          
-          const totalPnl = pnlTrades ? pnlTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) : 0;
-
-          return {
-            ...batch,
-            most_recent_trade_date: mostRecentTradeDate,
-            position_types: positionTypes as string[],
-            brokers: brokers as string[],
-            total_pnl: totalPnl
-          };
-        })
-      );
-
-      // Sort by most recent trade date
-      batchesWithMostRecentTrade.sort((a, b) => 
-        new Date(b.most_recent_trade_date).getTime() - new Date(a.most_recent_trade_date).getTime()
-      );
-
-      setBatches(batchesWithMostRecentTrade.slice(0, 20));
+    if (error) {
+      console.error('Error fetching batches:', error);
+      return;
     }
+
+    if (!data) {
+      setBatches([]);
+      return;
+    }
+
+    // Fetch additional info for each batch
+    const enrichedBatches = await Promise.all(
+      data.map(async (batch) => {
+        // Fetch trades for this batch (within 5 seconds of batch creation)
+        const { data: trades } = await supabase
+          .from('trades')
+          .select('trade_date, position_type, broker, profit_loss')
+          .eq('user_id', user.id)
+          .gte('created_at', new Date(new Date(batch.created_at).getTime() - 5000).toISOString())
+          .lte('created_at', new Date(new Date(batch.created_at).getTime() + 5000).toISOString())
+          .order('trade_date', { ascending: false });
+
+        // Get unique position types and brokers
+        const positionTypes = trades ? [...new Set(trades.map(t => t.position_type).filter(Boolean))] : [];
+        const brokers = trades ? [...new Set(trades.map(t => t.broker).filter(Boolean))] : [];
+        
+        // Calculate total P&L
+        const totalPnl = trades ? trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) : 0;
+        
+        // Get most recent trade date
+        const mostRecentTradeDate = trades && trades.length > 0 ? trades[0].trade_date : batch.created_at;
+
+        return {
+          ...batch,
+          most_recent_trade_date: mostRecentTradeDate,
+          position_types: positionTypes as string[],
+          brokers: brokers as string[],
+          total_pnl: totalPnl
+        };
+      })
+    );
+
+    // Sort by most recent trade date
+    enrichedBatches.sort((a, b) => 
+      new Date(b.most_recent_trade_date).getTime() - new Date(a.most_recent_trade_date).getTime()
+    );
+
+    setBatches(enrichedBatches.slice(0, 20));
   };
 
   const fetchBatchTrades = async (batchId: string, createdAt: string) => {
@@ -266,8 +273,8 @@ export const UploadHistory = () => {
                     </div>
                     <div>
                       <span className="text-muted-foreground">Total P&L: </span>
-                      <span className={`font-medium ${batch.total_pnl >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
-                        ${batch.total_pnl.toFixed(2)}
+                      <span className={`font-medium ${(batch.total_pnl || 0) >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+                        ${(batch.total_pnl || 0).toFixed(2)}
                       </span>
                     </div>
                   </div>
