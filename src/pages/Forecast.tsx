@@ -98,11 +98,25 @@ const Forecast = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                   <div className="p-4 bg-muted/50 rounded-lg">
                     <p className="text-sm text-muted-foreground mb-1">Avg Daily P&L</p>
-                    <p className="text-2xl font-bold">${avgDailyPnl.toFixed(2)}</p>
+                    <p className={`text-2xl font-bold ${
+                      avgDailyPnl === 0 
+                        ? 'text-foreground' 
+                        : avgDailyPnl > 0 
+                        ? 'text-neon-green' 
+                        : 'text-neon-red'
+                    }`}>
+                      ${avgDailyPnl.toFixed(2)}
+                    </p>
                   </div>
                   <div className="p-4 bg-muted/50 rounded-lg">
                     <p className="text-sm text-muted-foreground mb-1">Projected Equity</p>
-                    <p className="text-2xl font-bold text-neon-green">
+                    <p className={`text-2xl font-bold ${
+                      projectedEquity === 0 
+                        ? 'text-foreground' 
+                        : projectedEquity > 0 
+                        ? 'text-neon-green' 
+                        : 'text-neon-red'
+                    }`}>
                       ${projectedEquity.toFixed(2)}
                     </p>
                   </div>
