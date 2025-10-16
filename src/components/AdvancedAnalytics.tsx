@@ -14,6 +14,7 @@ import {
 import { TrendingUp, TrendingDown, Target, DollarSign, Edit } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import bullBearImage from '@/assets/bull-bear-realistic.png';
 
 interface Trade {
   id: string;
@@ -22,6 +23,7 @@ interface Trade {
   roi: number;
   setup: string;
   trade_date: string;
+  position_type?: 'long' | 'short';
 }
 
 interface AdvancedAnalyticsProps {
@@ -166,6 +168,25 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
   const topSetupByROI = topSetupByROIEntry?.setup || 'N/A';
   const topSetupByROIAvg = topSetupByROIEntry?.avgROI || 0;
 
+  // Short vs Long statistics
+  const totalShorts = trades.filter(t => t.position_type === 'short').length;
+  const totalLongs = trades.filter(t => t.position_type === 'long').length;
+  
+  // Current month statistics
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
+  const currentMonthTrades = trades.filter(t => {
+    const tradeDate = new Date(t.trade_date);
+    return tradeDate.getMonth() === currentMonth && tradeDate.getFullYear() === currentYear;
+  });
+  const monthShorts = currentMonthTrades.filter(t => t.position_type === 'short').length;
+  const monthLongs = currentMonthTrades.filter(t => t.position_type === 'long').length;
+  const totalMonthTrades = currentMonthTrades.length;
+  const monthShortPercentage = totalMonthTrades > 0 ? (monthShorts / totalMonthTrades) * 100 : 0;
+  const monthLongPercentage = totalMonthTrades > 0 ? (monthLongs / totalMonthTrades) * 100 : 0;
+  const isShortDominant = monthShortPercentage > monthLongPercentage;
+
   const StatCard = ({ title, value, subtitle, icon: Icon, trend }: any) => (
     <Card className="p-6 bg-card border-border hover:border-foreground/20 transition-all duration-300">
       <div className="flex items-center justify-between mb-2">
@@ -264,6 +285,77 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
             icon={DollarSign}
             trend={avgRevenuePerDay > 0 ? 'up' : 'down'}
           />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {/* Short/Long Totals */}
+          <Card className="p-6 bg-card border-border">
+            <h3 className="text-lg font-semibold mb-4">Position Types</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Total Shorts</p>
+                <p className="text-3xl font-bold text-neon-red">{totalShorts}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Total Longs</p>
+                <p className="text-3xl font-bold text-neon-green">{totalLongs}</p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Monthly Dominance Card */}
+          <Card className="p-6 bg-card border-border relative overflow-hidden">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold mb-4">This Month's Dominance</h3>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-neon-red">Short</span>
+                    <span className="text-sm font-bold text-neon-red">{monthShortPercentage.toFixed(1)}%</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2 mb-3">
+                    <div 
+                      className="bg-neon-red h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${monthShortPercentage}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-neon-green">Long</span>
+                    <span className="text-sm font-bold text-neon-green">{monthLongPercentage.toFixed(1)}%</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div 
+                      className="bg-neon-green h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${monthLongPercentage}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="ml-6 flex items-center justify-center">
+                  <div className={`w-20 h-20 rounded-full flex items-center justify-center border-2 ${
+                    isShortDominant 
+                      ? 'border-neon-red bg-neon-red/10' 
+                      : 'border-neon-green bg-neon-green/10'
+                  } transition-all duration-500`}>
+                    <img 
+                      src={bullBearImage} 
+                      alt={isShortDominant ? "Bear Market" : "Bull Market"}
+                      className={`w-14 h-14 object-contain transition-all duration-500 ${
+                        isShortDominant ? 'rotate-180 opacity-80' : 'opacity-80'
+                      }`}
+                      style={{
+                        filter: isShortDominant 
+                          ? 'hue-rotate(0deg) saturate(1.5) brightness(1.2)' 
+                          : 'hue-rotate(90deg) saturate(1.5) brightness(1.2)'
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                {totalMonthTrades} trades this month
+              </p>
+            </div>
+          </Card>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
