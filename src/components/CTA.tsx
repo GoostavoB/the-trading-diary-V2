@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const CTA = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="py-24 px-6">
       <div className="container mx-auto">
@@ -21,6 +24,7 @@ const CTA = () => {
             </p>
             <Button 
               size="lg"
+              onClick={() => navigate('/auth')}
               className="text-lg px-10 py-7 bg-foreground text-background hover:bg-foreground/90 font-semibold group relative overflow-hidden"
             >
               <span className="relative z-10 flex items-center">

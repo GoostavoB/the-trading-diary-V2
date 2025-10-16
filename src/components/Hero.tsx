@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { TrendingUp, BarChart3, LineChart } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import bullBearRealistic from "@/assets/bull-bear-realistic.png";
 
 const Hero = () => {
   const [scrollY, setScrollY] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -70,7 +72,8 @@ const Hero = () => {
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Button 
-            size="lg" 
+            size="lg"
+            onClick={() => navigate('/auth')}
             className="text-lg px-8 py-6 bg-foreground text-background hover:bg-foreground/90 font-semibold group relative overflow-hidden"
           >
             <span className="relative z-10">Start Trading Smarter</span>
@@ -79,9 +82,10 @@ const Hero = () => {
           <Button 
             size="lg" 
             variant="outline"
+            disabled
             className="text-lg px-8 py-6 border-2 border-border text-foreground hover:border-foreground/50 hover:bg-foreground/5 transition-all duration-300"
           >
-            View Demo
+            View Demo <span className="ml-2 text-sm opacity-70">(Coming Soon)</span>
           </Button>
         </div>
 
