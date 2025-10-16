@@ -1,65 +1,13 @@
 import { useCryptoPrice } from '@/hooks/useCryptoPrice';
 import { TrendingUp } from 'lucide-react';
-import { useState, useEffect } from 'react';
 
 interface CryptoPricesProps {
   className?: string;
   symbols?: string[];
 }
 
-const cryptoColors: Record<string, string> = {
-  'BTC': 'orange',
-  'ETH': 'slate',
-  'BNB': 'yellow',
-  'SOL': 'purple',
-  'XRP': 'gray',
-  'ADA': 'blue',
-};
-
 export const CryptoPrices = ({ className = '', symbols }: CryptoPricesProps) => {
   const { prices, loading, error } = useCryptoPrice(symbols);
-  const [neonIntensity, setNeonIntensity] = useState(50);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('crypto-neon-intensity');
-    if (saved) setNeonIntensity(parseInt(saved));
-  }, []);
-
-  const handleIntensityChange = (value: number) => {
-    setNeonIntensity(value);
-    localStorage.setItem('crypto-neon-intensity', value.toString());
-  };
-
-  // Calculate opacity and saturation based on intensity (0-100 -> more range)
-  const getOpacity = (baseOpacity: number) => {
-    // Range from 0.4 to 1.0 (instead of 0.3-1.0)
-    return baseOpacity * (0.4 + (neonIntensity / 100) * 0.6);
-  };
-
-  const getColorClass = (color: string, shade: number) => {
-    // At max intensity, use more saturated colors
-    const actualShade = neonIntensity > 70 ? Math.max(400, shade - 100) : shade;
-    return `text-${color}-${actualShade}`;
-  };
-
-  const getTickerColor = (symbol: string) => {
-    const colorBase = cryptoColors[symbol] || 'gray';
-    // Use more saturated base colors
-    return getColorClass(colorBase, 500);
-  };
-
-  const getPriceColor = (isPositive: boolean) => {
-    // Use more vibrant greens and reds
-    return isPositive ? getColorClass('emerald', 500) : getColorClass('red', 500);
-  };
-
-  const getGlowEffect = () => {
-    // Add glow effect at high intensity
-    if (neonIntensity > 70) {
-      return 'drop-shadow-[0_0_8px_currentColor]';
-    }
-    return '';
-  };
 
   if (loading) {
     return (
@@ -78,70 +26,30 @@ export const CryptoPrices = ({ className = '', symbols }: CryptoPricesProps) => 
   return (
     <div className={`bg-card/30 backdrop-blur-sm border-b border-border ${className}`}>
       <div className="px-6 py-4">
-        <div className="flex items-center justify-between gap-6">
-          {/* Left side - Ticker prices */}
-          <div className="flex items-center gap-6 flex-wrap flex-1">
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <TrendingUp 
-                className="text-emerald-500" 
-                size={24} 
-                style={{ opacity: getOpacity(0.8) }}
-              />
-              <span className="text-base font-semibold text-muted-foreground">LIVE (24h):</span>
-            </div>
-            {prices.map((price) => {
-              const isPositive = price.priceChangePercent >= 0;
-              const priceColor = getPriceColor(isPositive);
-              const changeSign = isPositive ? '+' : '';
-              const glowClass = getGlowEffect();
-              
-              return (
-                <div key={price.symbol} className="flex items-center gap-2 flex-shrink-0">
-                  <span 
-                    className={`text-base font-semibold ${getTickerColor(price.displaySymbol)} ${glowClass}`}
-                    style={{ opacity: getOpacity(1.0) }}
-                  >
-                    {price.displaySymbol}
-                  </span>
-                  <span 
-                    className={`text-base font-mono ${priceColor} ${glowClass}`}
-                    style={{ opacity: getOpacity(0.9) }}
-                  >
-                    ${price.price}
-                  </span>
-                  <span 
-                    className={`text-xs font-mono ${priceColor}`}
-                    style={{ opacity: getOpacity(0.7) }}
-                  >
-                    ({changeSign}{price.priceChangePercent.toFixed(2)}%)
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Right side - Neon intensity slider */}
+        <div className="flex items-center justify-center gap-6 flex-wrap">
           <div className="flex items-center gap-3 flex-shrink-0">
-            <span className="text-xs text-muted-foreground whitespace-nowrap">Neon:</span>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">-</span>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={neonIntensity}
-                onChange={(e) => handleIntensityChange(parseInt(e.target.value))}
-                className="w-20 h-1 bg-muted rounded-lg appearance-none cursor-pointer
-                  [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 
-                  [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full 
-                  [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer
-                  [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 
-                  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-primary 
-                  [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-0"
-              />
-              <span className="text-xs text-muted-foreground">+</span>
-            </div>
+            <TrendingUp className="text-emerald-500/80" size={24} />
+            <span className="text-base font-semibold text-muted-foreground">LIVE (24h):</span>
           </div>
+          {prices.map((price) => {
+            const isPositive = price.priceChangePercent >= 0;
+            const priceColor = isPositive ? 'text-emerald-500/70' : 'text-red-500/70';
+            const changeSign = isPositive ? '+' : '';
+            
+            return (
+              <div key={price.symbol} className="flex items-center gap-2 flex-shrink-0">
+                <span className="text-base font-semibold text-white">
+                  {price.displaySymbol}
+                </span>
+                <span className={`text-base font-mono ${priceColor}`}>
+                  ${price.price}
+                </span>
+                <span className={`text-xs font-mono ${priceColor} opacity-70`}>
+                  ({changeSign}{price.priceChangePercent.toFixed(2)}%)
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
