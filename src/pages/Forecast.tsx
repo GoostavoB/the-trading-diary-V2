@@ -14,6 +14,21 @@ const Forecast = () => {
 
   useEffect(() => {
     fetchAvgPnl();
+    
+    // Set up realtime subscription for trades changes
+    const channel = supabase
+      .channel('trades-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'trades', filter: `user_id=eq.${user?.id}` },
+        () => {
+          fetchAvgPnl();
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   useEffect(() => {
@@ -32,6 +47,8 @@ const Forecast = () => {
       const totalPnl = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
       const uniqueDays = new Set(trades.map(t => new Date(t.trade_date).toDateString())).size;
       setAvgDailyPnl(totalPnl / (uniqueDays || 1));
+    } else {
+      setAvgDailyPnl(0);
     }
     setLoading(false);
   };

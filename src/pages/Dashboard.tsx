@@ -41,6 +41,21 @@ const Dashboard = () => {
   useEffect(() => {
     fetchStats();
     fetchInitialInvestment();
+    
+    // Set up realtime subscription for trades changes
+    const channel = supabase
+      .channel('trades-changes-dashboard')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'trades', filter: `user_id=eq.${user?.id}` },
+        () => {
+          fetchStats();
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const fetchStats = async () => {
@@ -178,9 +193,9 @@ const Dashboard = () => {
                   />
                 </TabsContent>
 
-                <TabsContent value="history">
-                  <TradeHistory />
-                </TabsContent>
+              <TabsContent value="history">
+                <TradeHistory onTradesChange={fetchStats} />
+              </TabsContent>
               </Tabs>
             )}
           </>

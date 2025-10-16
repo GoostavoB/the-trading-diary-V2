@@ -79,7 +79,11 @@ const DEFAULT_COLUMNS: ColumnConfig[] = [
   { key: 'tradingFee', label: 'Trading Fee', visible: true },
 ];
 
-export const TradeHistory = () => {
+interface TradeHistoryProps {
+  onTradesChange?: () => void;
+}
+
+export const TradeHistory = ({ onTradesChange }: TradeHistoryProps = {}) => {
   const { user } = useAuth();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [filteredTrades, setFilteredTrades] = useState<Trade[]>([]);
@@ -155,6 +159,7 @@ export const TradeHistory = () => {
       toast.success(`${selectedTradeIds.size} trade(s) deleted successfully`);
       setSelectedTradeIds(new Set());
       fetchTrades();
+      onTradesChange?.();
     }
   };
 
@@ -223,6 +228,7 @@ export const TradeHistory = () => {
     } else {
       toast.success('Trade deleted');
       fetchTrades();
+      onTradesChange?.();
     }
   };
 
