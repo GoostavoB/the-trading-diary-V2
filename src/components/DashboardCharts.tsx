@@ -71,6 +71,11 @@ export const DashboardCharts = ({ trades }: DashboardChartsProps) => {
                   borderRadius: '6px',
                 }}
                 labelStyle={{ color: 'hsl(var(--foreground))' }}
+                formatter={(value: any) => {
+                  const numValue = Number(value);
+                  const color = numValue === 0 ? 'hsl(var(--foreground))' : numValue > 0 ? 'hsl(var(--neon-green))' : 'hsl(var(--neon-red))';
+                  return [<span style={{ color }}>${numValue.toFixed(2)}</span>, 'pnl'];
+                }}
               />
               <Area
                 type="monotone"

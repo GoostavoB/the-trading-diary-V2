@@ -269,7 +269,9 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
                 size={24} 
               />
             </div>
-            <p className="text-2xl font-bold mb-1">{totalROI.toFixed(2)}%</p>
+            <p className={`text-2xl font-bold mb-1 ${totalROI === 0 ? 'text-foreground' : totalROI > 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+              {totalROI.toFixed(2)}%
+            </p>
             <p className="text-xs text-muted-foreground mb-3">
               Based on initial investment of ${initialInvestment.toFixed(2)}
             </p>
@@ -327,18 +329,30 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
               </DialogContent>
             </Dialog>
           </Card>
-          <StatCard
-            title="Average ROI per Trade"
-            value={`${avgROI.toFixed(2)}%`}
-            icon={TrendingUp}
-            trend="neutral"
-          />
-          <StatCard
-            title="Avg Revenue per Day"
-            value={`$${avgRevenuePerDay.toFixed(2)}`}
-            icon={DollarSign}
-            trend={avgRevenuePerDay > 0 ? 'up' : 'down'}
-          />
+          <Card className="p-6 bg-card border-border hover:border-foreground/20 transition-all duration-300">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-muted-foreground">Average ROI per Trade</p>
+              <TrendingUp 
+                className={avgROI > 0 ? 'text-neon-green' : avgROI < 0 ? 'text-neon-red' : 'text-foreground'} 
+                size={24} 
+              />
+            </div>
+            <p className={`text-2xl font-bold ${avgROI === 0 ? 'text-foreground' : avgROI > 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+              {avgROI.toFixed(2)}%
+            </p>
+          </Card>
+          <Card className="p-6 bg-card border-border hover:border-foreground/20 transition-all duration-300">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-muted-foreground">Avg Revenue per Day</p>
+              <DollarSign 
+                className={avgRevenuePerDay > 0 ? 'text-neon-green' : avgRevenuePerDay < 0 ? 'text-neon-red' : 'text-foreground'} 
+                size={24} 
+              />
+            </div>
+            <p className={`text-2xl font-bold ${avgRevenuePerDay === 0 ? 'text-foreground' : avgRevenuePerDay > 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+              ${avgRevenuePerDay.toFixed(2)}
+            </p>
+          </Card>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -589,7 +603,7 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
               </div>
               <div className="pt-3 border-t border-border/50">
                 <p className="text-xs text-muted-foreground mb-1">Average ROI</p>
-                <p className={`text-lg font-bold ${mostTradedROI >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+                <p className={`text-lg font-bold ${mostTradedROI === 0 ? 'text-foreground' : mostTradedROI > 0 ? 'text-neon-green' : 'text-neon-red'}`}>
                   {mostTradedROI >= 0 ? '+' : ''}{mostTradedROI.toFixed(2)}%
                 </p>
               </div>
@@ -653,7 +667,7 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
                 <p className="text-sm text-muted-foreground mb-1">Top Setup by Wins</p>
                 <p className="text-xl font-medium mb-1">{topSetupByWins}</p>
                 <p className="text-sm font-medium">
-                  Avg ROI: <span className={topSetupByWinsROI >= 0 ? 'text-neon-green' : 'text-neon-red'}>
+                  Avg ROI: <span className={topSetupByWinsROI === 0 ? 'text-foreground' : topSetupByWinsROI > 0 ? 'text-neon-green' : 'text-neon-red'}>
                     {topSetupByWinsROI >= 0 ? '+' : ''}{topSetupByWinsROI.toFixed(2)}%
                   </span>
                 </p>
@@ -662,7 +676,7 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
                 <p className="text-sm text-muted-foreground mb-1">Top Setup by ROI</p>
                 <p className="text-xl font-medium mb-1">{topSetupByROI}</p>
                 <p className="text-sm font-medium">
-                  Avg ROI: <span className={topSetupByROIAvg >= 0 ? 'text-neon-green' : 'text-neon-red'}>
+                  Avg ROI: <span className={topSetupByROIAvg === 0 ? 'text-foreground' : topSetupByROIAvg > 0 ? 'text-neon-green' : 'text-neon-red'}>
                     {topSetupByROIAvg >= 0 ? '+' : ''}{topSetupByROIAvg.toFixed(2)}%
                   </span>
                 </p>

@@ -516,28 +516,40 @@ export const TradeHistory = ({ onTradesChange }: TradeHistoryProps = {}) => {
                   )}
                   {isColumnVisible('pnl') && (
                     <TableCell>
-                      <span className={trade.pnl >= 0 ? 'text-neon-green' : 'text-neon-red'}>
+                      <span className={trade.pnl === 0 ? 'text-foreground' : trade.pnl > 0 ? 'text-neon-green' : 'text-neon-red'}>
                         ${trade.pnl.toFixed(2)}
                       </span>
                     </TableCell>
                   )}
                   {isColumnVisible('roi') && (
                     <TableCell>
-                      <Badge variant={trade.roi >= 0 ? 'default' : 'destructive'}>
+                      <span className={trade.roi === 0 ? 'text-foreground' : trade.roi > 0 ? 'text-neon-green' : 'text-neon-red'}>
                         {trade.roi.toFixed(2)}%
-                      </Badge>
+                      </span>
                     </TableCell>
                   )}
                   {isColumnVisible('fundingFee') && (
                     <TableCell>
-                      <span className="text-muted-foreground">
+                      <span className={
+                        (trade.funding_fee || 0) === 0 
+                          ? 'text-foreground' 
+                          : (trade.funding_fee || 0) > 0 
+                          ? 'text-neon-green' 
+                          : 'text-neon-red'
+                      }>
                         ${(trade.funding_fee || 0).toFixed(2)}
                       </span>
                     </TableCell>
                   )}
                   {isColumnVisible('tradingFee') && (
                     <TableCell>
-                      <span className="text-muted-foreground">
+                      <span className={
+                        (trade.trading_fee || 0) === 0 
+                          ? 'text-foreground' 
+                          : (trade.trading_fee || 0) > 0 
+                          ? 'text-neon-green' 
+                          : 'text-neon-red'
+                      }>
                         ${(trade.trading_fee || 0).toFixed(2)}
                       </span>
                     </TableCell>
@@ -664,23 +676,39 @@ export const TradeHistory = ({ onTradesChange }: TradeHistoryProps = {}) => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">P&L</p>
-                  <p className={`font-medium ${selectedTrade.pnl >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+                  <p className={`font-medium ${selectedTrade.pnl === 0 ? 'text-foreground' : selectedTrade.pnl > 0 ? 'text-neon-green' : 'text-neon-red'}`}>
                     ${selectedTrade.pnl.toFixed(2)}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">ROI</p>
-                  <p className={`font-medium ${selectedTrade.roi >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+                  <p className={`font-medium ${selectedTrade.roi === 0 ? 'text-foreground' : selectedTrade.roi > 0 ? 'text-neon-green' : 'text-neon-red'}`}>
                     {selectedTrade.roi.toFixed(2)}%
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Funding Fee</p>
-                  <p className="font-medium">${(selectedTrade.funding_fee || 0).toFixed(2)}</p>
+                  <p className={`font-medium ${
+                    (selectedTrade.funding_fee || 0) === 0 
+                      ? 'text-foreground' 
+                      : (selectedTrade.funding_fee || 0) > 0 
+                      ? 'text-neon-green' 
+                      : 'text-neon-red'
+                  }`}>
+                    ${(selectedTrade.funding_fee || 0).toFixed(2)}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Trading Fee</p>
-                  <p className="font-medium">${(selectedTrade.trading_fee || 0).toFixed(2)}</p>
+                  <p className={`font-medium ${
+                    (selectedTrade.trading_fee || 0) === 0 
+                      ? 'text-foreground' 
+                      : (selectedTrade.trading_fee || 0) > 0 
+                      ? 'text-neon-green' 
+                      : 'text-neon-red'
+                  }`}>
+                    ${(selectedTrade.trading_fee || 0).toFixed(2)}
+                  </p>
                 </div>
               </div>
               {selectedTrade.notes && (
