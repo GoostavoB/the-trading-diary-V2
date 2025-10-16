@@ -32,6 +32,7 @@ const TIMEZONES = [
   { value: "America/Chicago", label: "Central Time (CT)" },
   { value: "America/Denver", label: "Mountain Time (MT)" },
   { value: "America/Los_Angeles", label: "Pacific Time (PT)" },
+  { value: "America/Sao_Paulo", label: "Brazil (BRT)" },
   { value: "Europe/London", label: "London (GMT/BST)" },
   { value: "Europe/Paris", label: "Paris (CET/CEST)" },
   { value: "Asia/Tokyo", label: "Tokyo (JST)" },
