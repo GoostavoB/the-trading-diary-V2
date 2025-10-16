@@ -674,11 +674,15 @@ const Upload = () => {
                               </div>
                               <div>
                                 <span className="text-muted-foreground">Funding Fee:</span>
-                                <p className="font-medium">${trade.funding_fee.toFixed(2)}</p>
+                                <p className="font-medium text-neon-red">
+                                  -${Math.abs(trade.funding_fee).toFixed(2)}
+                                </p>
                               </div>
                               <div>
                                 <span className="text-muted-foreground">Trading Fee:</span>
-                                <p className="font-medium">${trade.trading_fee.toFixed(2)}</p>
+                                <p className="font-medium text-neon-red">
+                                  -${Math.abs(trade.trading_fee).toFixed(2)}
+                                </p>
                               </div>
                               <div>
                                 <span className="text-muted-foreground">Duration:</span>
