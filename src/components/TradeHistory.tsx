@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -18,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Pencil, Trash2, Eye, Search, Settings2 } from 'lucide-react';
+import { Pencil, Trash2, Eye, Search, Settings2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import {
@@ -36,6 +37,14 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 
 interface Trade {
   id: string;
@@ -58,7 +67,7 @@ interface Trade {
   leverage?: number;
 }
 
-type ColumnKey = 'date' | 'asset' | 'setup' | 'type' | 'entry' | 'exit' | 'size' | 'pnl' | 'roi' | 'fundingFee' | 'tradingFee';
+type ColumnKey = 'date' | 'asset' | 'setup' | 'broker' | 'type' | 'entry' | 'exit' | 'size' | 'pnl' | 'roi' | 'fundingFee' | 'tradingFee';
 
 interface ColumnConfig {
   key: ColumnKey;
@@ -70,6 +79,7 @@ const DEFAULT_COLUMNS: ColumnConfig[] = [
   { key: 'date', label: 'Date', visible: true },
   { key: 'asset', label: 'Asset', visible: true },
   { key: 'setup', label: 'Setup', visible: true },
+  { key: 'broker', label: 'Broker', visible: true },
   { key: 'type', label: 'Type', visible: true },
   { key: 'entry', label: 'Entry', visible: true },
   { key: 'exit', label: 'Exit', visible: true },
@@ -86,6 +96,7 @@ interface TradeHistoryProps {
 
 export const TradeHistory = ({ onTradesChange }: TradeHistoryProps = {}) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [filteredTrades, setFilteredTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,9 +111,19 @@ export const TradeHistory = ({ onTradesChange }: TradeHistoryProps = {}) => {
     const saved = localStorage.getItem('tradeHistoryColumns');
     return saved ? JSON.parse(saved) : DEFAULT_COLUMNS;
   });
+  const [userSetups, setUserSetups] = useState<string[]>([]);
+  const [editingSetup, setEditingSetup] = useState<string | null>(null);
+  const [setupSearch, setSetupSearch] = useState('');
+  const [setupPopoverOpen, setSetupPopoverOpen] = useState(false);
+  const [editingBroker, setEditingBroker] = useState<string | null>(null);
+  const [brokerSearch, setBrokerSearch] = useState('');
+  const [brokerPopoverOpen, setBrokerPopoverOpen] = useState(false);
+  const [userBrokers, setUserBrokers] = useState<string[]>([]);
 
   useEffect(() => {
     fetchTrades();
+    fetchUserSetups();
+    fetchUserBrokers();
   }, [user, showDeleted]);
 
   useEffect(() => {
@@ -342,6 +363,83 @@ export const TradeHistory = ({ onTradesChange }: TradeHistoryProps = {}) => {
     setViewDialogOpen(true);
   };
 
+  const fetchUserSetups = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from('user_setups')
+      .select('name')
+      .eq('user_id', user.id);
+    
+    if (data) {
+      setUserSetups(data.map(s => s.name));
+    }
+  };
+
+  const fetchUserBrokers = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from('trades')
+      .select('broker')
+      .eq('user_id', user.id)
+      .not('broker', 'is', null);
+    
+    if (data) {
+      const uniqueBrokers = [...new Set(data.map(t => t.broker).filter(Boolean))];
+      setUserBrokers(uniqueBrokers as string[]);
+    }
+  };
+
+  const handleSetupUpdate = async (tradeId: string, setup: string) => {
+    const { error } = await supabase
+      .from('trades')
+      .update({ setup })
+      .eq('id', tradeId);
+
+    if (error) {
+      toast.error('Failed to update setup');
+    } else {
+      // Check if setup exists in user_setups, if not create it
+      if (setup && !userSetups.includes(setup)) {
+        const { error: setupError } = await supabase
+          .from('user_setups')
+          .insert({ user_id: user?.id, name: setup });
+        
+        if (!setupError) {
+          setUserSetups([...userSetups, setup]);
+        }
+      }
+      
+      setTrades(trades.map(t => t.id === tradeId ? { ...t, setup } : t));
+      toast.success('Setup updated');
+      setEditingSetup(null);
+      setSetupSearch('');
+      onTradesChange?.();
+    }
+  };
+
+  const handleBrokerUpdate = async (tradeId: string, broker: string) => {
+    const { error } = await supabase
+      .from('trades')
+      .update({ broker })
+      .eq('id', tradeId);
+
+    if (error) {
+      toast.error('Failed to update broker');
+    } else {
+      if (broker && !userBrokers.includes(broker)) {
+        setUserBrokers([...userBrokers, broker]);
+      }
+      
+      setTrades(trades.map(t => t.id === tradeId ? { ...t, broker } : t));
+      toast.success('Broker updated');
+      setEditingBroker(null);
+      setBrokerSearch('');
+      onTradesChange?.();
+    }
+  };
+
   if (loading) {
     return <div className="text-center py-8">Loading trades...</div>;
   }
@@ -485,6 +583,7 @@ export const TradeHistory = ({ onTradesChange }: TradeHistoryProps = {}) => {
                 {isColumnVisible('date') && <TableHead>Date</TableHead>}
                 {isColumnVisible('asset') && <TableHead>Asset</TableHead>}
                 {isColumnVisible('setup') && <TableHead>Setup</TableHead>}
+                {isColumnVisible('broker') && <TableHead>Broker</TableHead>}
                 {isColumnVisible('type') && <TableHead>Type</TableHead>}
                 {isColumnVisible('entry') && <TableHead>Entry</TableHead>}
                 {isColumnVisible('exit') && <TableHead>Exit</TableHead>}
@@ -512,7 +611,148 @@ export const TradeHistory = ({ onTradesChange }: TradeHistoryProps = {}) => {
                     <TableCell className="font-medium">{trade.asset}</TableCell>
                   )}
                   {isColumnVisible('setup') && (
-                    <TableCell>{trade.setup || '-'}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span>{trade.setup || '-'}</span>
+                        <Popover 
+                          open={setupPopoverOpen && editingSetup === trade.id} 
+                          onOpenChange={(open) => {
+                            setSetupPopoverOpen(open);
+                            if (!open) {
+                              setEditingSetup(null);
+                              setSetupSearch('');
+                            }
+                          }}
+                        >
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => {
+                                setEditingSetup(trade.id);
+                                setSetupSearch(trade.setup || '');
+                                setSetupPopoverOpen(true);
+                              }}
+                            >
+                              <Pencil size={12} />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[200px] p-0 bg-card border-border z-50" align="start">
+                            <Command>
+                              <CommandInput 
+                                placeholder="Search or add setup..." 
+                                value={setupSearch}
+                                onValueChange={setSetupSearch}
+                              />
+                              <CommandList>
+                                <CommandEmpty>
+                                  <button
+                                    className="w-full text-left px-2 py-1.5 text-sm hover:bg-accent rounded-sm"
+                                    onClick={() => {
+                                      if (setupSearch.trim()) {
+                                        handleSetupUpdate(trade.id, setupSearch.trim());
+                                      }
+                                    }}
+                                  >
+                                    + Add "{setupSearch}"
+                                  </button>
+                                </CommandEmpty>
+                                {userSetups.filter(s => 
+                                  s.toLowerCase().includes(setupSearch.toLowerCase())
+                                ).length > 0 && (
+                                  <CommandGroup heading="Existing Setups">
+                                    {userSetups
+                                      .filter(s => s.toLowerCase().includes(setupSearch.toLowerCase()))
+                                      .map(setup => (
+                                        <CommandItem
+                                          key={setup}
+                                          onSelect={() => handleSetupUpdate(trade.id, setup)}
+                                        >
+                                          {setup}
+                                        </CommandItem>
+                                      ))
+                                    }
+                                  </CommandGroup>
+                                )}
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </TableCell>
+                  )}
+                  {isColumnVisible('broker') && (
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span>{trade.broker || '-'}</span>
+                        <Popover 
+                          open={brokerPopoverOpen && editingBroker === trade.id} 
+                          onOpenChange={(open) => {
+                            setBrokerPopoverOpen(open);
+                            if (!open) {
+                              setEditingBroker(null);
+                              setBrokerSearch('');
+                            }
+                          }}
+                        >
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => {
+                                setEditingBroker(trade.id);
+                                setBrokerSearch(trade.broker || '');
+                                setBrokerPopoverOpen(true);
+                              }}
+                            >
+                              <Pencil size={12} />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[200px] p-0 bg-card border-border z-50" align="start">
+                            <Command>
+                              <CommandInput 
+                                placeholder="Search or add broker..." 
+                                value={brokerSearch}
+                                onValueChange={setBrokerSearch}
+                              />
+                              <CommandList>
+                                <CommandEmpty>
+                                  <button
+                                    className="w-full text-left px-2 py-1.5 text-sm hover:bg-accent rounded-sm"
+                                    onClick={() => {
+                                      if (brokerSearch.trim()) {
+                                        handleBrokerUpdate(trade.id, brokerSearch.trim());
+                                      }
+                                    }}
+                                  >
+                                    + Add "{brokerSearch}"
+                                  </button>
+                                </CommandEmpty>
+                                {userBrokers.filter(b => 
+                                  b.toLowerCase().includes(brokerSearch.toLowerCase())
+                                ).length > 0 && (
+                                  <CommandGroup heading="Existing Brokers">
+                                    {userBrokers
+                                      .filter(b => b.toLowerCase().includes(brokerSearch.toLowerCase()))
+                                      .map(broker => (
+                                        <CommandItem
+                                          key={broker}
+                                          onSelect={() => handleBrokerUpdate(trade.id, broker)}
+                                        >
+                                          {broker}
+                                        </CommandItem>
+                                      ))
+                                    }
+                                  </CommandGroup>
+                                )}
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </TableCell>
                   )}
                   {isColumnVisible('type') && (
                     <TableCell>
@@ -613,7 +853,7 @@ export const TradeHistory = ({ onTradesChange }: TradeHistoryProps = {}) => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => window.location.href = `/upload?edit=${trade.id}`}
+                            onClick={() => navigate(`/upload?edit=${trade.id}`)}
                           >
                             <Pencil size={16} />
                           </Button>
