@@ -45,6 +45,9 @@ interface Trade {
   duration_minutes: number;
   trade_date: string;
   screenshot_url: string | null;
+  position_type?: 'long' | 'short';
+  funding_fee?: number;
+  trading_fee?: number;
 }
 
 export const TradeHistory = () => {
@@ -78,7 +81,10 @@ export const TradeHistory = () => {
     if (error) {
       toast.error('Failed to load trades');
     } else {
-      setTrades(data || []);
+      setTrades((data || []).map(trade => ({
+        ...trade,
+        position_type: trade.position_type as 'long' | 'short' | undefined
+      })));
     }
     setLoading(false);
   };
@@ -188,11 +194,14 @@ export const TradeHistory = () => {
                 <TableHead>Date</TableHead>
                 <TableHead>Asset</TableHead>
                 <TableHead>Setup</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Entry</TableHead>
                 <TableHead>Exit</TableHead>
                 <TableHead>Size</TableHead>
                 <TableHead>P&L</TableHead>
                 <TableHead>ROI</TableHead>
+                <TableHead>Funding Fee</TableHead>
+                <TableHead>Trading Fee</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -202,6 +211,16 @@ export const TradeHistory = () => {
                   <TableCell>{format(new Date(trade.trade_date), 'MMM dd, yyyy')}</TableCell>
                   <TableCell className="font-medium">{trade.asset}</TableCell>
                   <TableCell>{trade.setup || '-'}</TableCell>
+                  <TableCell>
+                    {trade.position_type ? (
+                      <Badge 
+                        variant="outline" 
+                        className={trade.position_type === 'long' ? 'border-neon-green text-neon-green' : 'border-neon-red text-neon-red'}
+                      >
+                        {trade.position_type.toUpperCase()}
+                      </Badge>
+                    ) : '-'}
+                  </TableCell>
                   <TableCell>${trade.entry_price.toFixed(2)}</TableCell>
                   <TableCell>${trade.exit_price.toFixed(2)}</TableCell>
                   <TableCell>{trade.position_size}</TableCell>
@@ -214,6 +233,16 @@ export const TradeHistory = () => {
                     <Badge variant={trade.roi >= 0 ? 'default' : 'destructive'}>
                       {trade.roi.toFixed(2)}%
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-muted-foreground">
+                      ${(trade.funding_fee || 0).toFixed(2)}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-muted-foreground">
+                      ${(trade.trading_fee || 0).toFixed(2)}
+                    </span>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
@@ -263,6 +292,19 @@ export const TradeHistory = () => {
                   <p className="font-medium">{selectedTrade.asset}</p>
                 </div>
                 <div>
+                  <p className="text-sm text-muted-foreground">Position Type</p>
+                  <p className="font-medium">
+                    {selectedTrade.position_type ? (
+                      <Badge 
+                        variant="outline" 
+                        className={selectedTrade.position_type === 'long' ? 'border-neon-green text-neon-green' : 'border-neon-red text-neon-red'}
+                      >
+                        {selectedTrade.position_type.toUpperCase()}
+                      </Badge>
+                    ) : '-'}
+                  </p>
+                </div>
+                <div>
                   <p className="text-sm text-muted-foreground">Setup</p>
                   <p className="font-medium">{selectedTrade.setup || '-'}</p>
                 </div>
@@ -301,6 +343,14 @@ export const TradeHistory = () => {
                   <p className={`font-medium ${selectedTrade.roi >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
                     {selectedTrade.roi.toFixed(2)}%
                   </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Funding Fee</p>
+                  <p className="font-medium">${(selectedTrade.funding_fee || 0).toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Trading Fee</p>
+                  <p className="font-medium">${(selectedTrade.trading_fee || 0).toFixed(2)}</p>
                 </div>
               </div>
               {selectedTrade.notes && (
