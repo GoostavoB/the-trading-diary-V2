@@ -126,6 +126,26 @@ const Upload = () => {
     duration_minutes: ''
   });
 
+  // Rotating quotes shown during analysis
+  const quotes = [
+    { text: "The stock market is a device for transferring money from the impatient to the patient.", author: "Warren Buffett" },
+    { text: "Profits take time to develop.", author: "Jesse Livermore" },
+    { text: "You need patience to wait for the right trade and courage to take it when it comes.", author: "Paul Tudor Jones" },
+    { text: "Patience and conviction are equally important.", author: "Stanley Druckenmiller" },
+  ];
+  const [quoteIndex, setQuoteIndex] = useState(0);
+
+  useEffect(() => {
+    if (extracting) {
+      const id = setInterval(() => {
+        setQuoteIndex((i) => (i + 1) % quotes.length);
+      }, 4000);
+      return () => clearInterval(id);
+    } else {
+      setQuoteIndex(0);
+    }
+  }, [extracting]);
+
   useEffect(() => {
     if (editId) {
       fetchTrade(editId);
@@ -642,12 +662,15 @@ const Upload = () => {
                                 </>
                               )}
                             </Button>
-                            {extracting && (
-                              <div className="mt-3 flex items-center justify-center gap-2 text-sm font-medium">
-                                <div className="w-4 h-4 border-2 border-foreground/30 border-t-foreground rounded-full animate-spin" />
-                                <span>AI is reading your trades... This may take a few seconds</span>
+                              <div className="mt-6 flex items-center justify-center">
+                                <div className="flex items-center gap-4">
+                                  <div className="h-8 w-8 rounded-full border-2 border-foreground/30 border-t-primary animate-spin" aria-label="Loading" />
+                                  <div className="max-w-2xl text-center">
+                                    <p className="text-sm md:text-base font-medium">"{quotes[quoteIndex].text}"</p>
+                                    <p className="text-xs md:text-sm text-muted-foreground mt-1">— {quotes[quoteIndex].author}</p>
+                                  </div>
+                                </div>
                               </div>
-                            )}
                           </>
                         )}
                       </div>
@@ -686,22 +709,6 @@ const Upload = () => {
                   </div>
                 </div>
 
-                {extracting && (
-                  <Card className="p-8 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/30">
-                    <div className="flex flex-col items-center space-y-4">
-                      <div className="relative">
-                        <Sparkles className="w-16 h-16 animate-pulse text-primary" />
-                        <div className="absolute inset-0 animate-ping">
-                          <Sparkles className="w-16 h-16 text-primary/30" />
-                        </div>
-                      </div>
-                      <div className="text-center space-y-2">
-                        <p className="text-xl font-semibold">🤖 AI is reading your trades...</p>
-                        <p className="text-base text-muted-foreground">This may take a few seconds</p>
-                      </div>
-                    </div>
-                  </Card>
-                )}
 
                 {extractedTrades.length > 0 && !extracting && (
                   <div className="space-y-4">
