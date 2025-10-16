@@ -29,6 +29,9 @@ interface ExtractedTrade {
   duration_days: number;
   duration_hours: number;
   duration_minutes: number;
+  setup?: string;
+  notes?: string;
+  emotional_tag?: string;
 }
 
 const Upload = () => {
@@ -45,6 +48,7 @@ const Upload = () => {
   const [extractedTrades, setExtractedTrades] = useState<ExtractedTrade[]>([]);
   const [savingTrades, setSavingTrades] = useState<Set<number>>(new Set());
   const [isDragging, setIsDragging] = useState(false);
+  const [tradeEdits, setTradeEdits] = useState<Record<number, Partial<ExtractedTrade>>>({});
   
   const [formData, setFormData] = useState({
     asset: '',
@@ -244,32 +248,48 @@ const Upload = () => {
     return data.publicUrl;
   };
 
+  const updateTradeField = (index: number, field: keyof ExtractedTrade, value: string) => {
+    setTradeEdits(prev => ({
+      ...prev,
+      [index]: {
+        ...prev[index],
+        [field]: value
+      }
+    }));
+  };
+
   const saveExtractedTrade = async (trade: ExtractedTrade, index: number) => {
     if (!user) return;
 
     setSavingTrades(prev => new Set(prev).add(index));
 
+    const edits = tradeEdits[index] || {};
+    const finalTrade = { ...trade, ...edits };
+
     try {
       const tradeData = {
         user_id: user.id,
-        asset: trade.asset,
-        entry_price: trade.entry_price,
-        exit_price: trade.exit_price,
-        position_size: trade.position_size,
-        position_type: trade.position_type,
-        profit_loss: trade.profit_loss,
-        funding_fee: trade.funding_fee,
-        trading_fee: trade.trading_fee,
-        roi: trade.roi,
-        margin: trade.margin,
-        opened_at: trade.opened_at,
-        closed_at: trade.closed_at,
-        period_of_day: trade.period_of_day,
-        duration_days: trade.duration_days,
-        duration_hours: trade.duration_hours,
-        duration_minutes: trade.duration_minutes,
-        pnl: trade.profit_loss,
-        trade_date: trade.opened_at
+        asset: finalTrade.asset,
+        entry_price: finalTrade.entry_price,
+        exit_price: finalTrade.exit_price,
+        position_size: finalTrade.position_size,
+        position_type: finalTrade.position_type,
+        profit_loss: finalTrade.profit_loss,
+        funding_fee: finalTrade.funding_fee,
+        trading_fee: finalTrade.trading_fee,
+        roi: finalTrade.roi,
+        margin: finalTrade.margin,
+        opened_at: finalTrade.opened_at,
+        closed_at: finalTrade.closed_at,
+        period_of_day: finalTrade.period_of_day,
+        duration_days: finalTrade.duration_days,
+        duration_hours: finalTrade.duration_hours,
+        duration_minutes: finalTrade.duration_minutes,
+        pnl: finalTrade.profit_loss,
+        trade_date: finalTrade.opened_at,
+        setup: finalTrade.setup || null,
+        notes: finalTrade.notes || null,
+        emotional_tag: finalTrade.emotional_tag || null
       };
 
       const { error } = await supabase
@@ -301,27 +321,35 @@ const Upload = () => {
     setLoading(true);
 
     try {
-      const tradesData = extractedTrades.map(trade => ({
-        user_id: user.id,
-        asset: trade.asset,
-        entry_price: trade.entry_price,
-        exit_price: trade.exit_price,
-        position_size: trade.position_size,
-        position_type: trade.position_type,
-        profit_loss: trade.profit_loss,
-        funding_fee: trade.funding_fee,
-        trading_fee: trade.trading_fee,
-        roi: trade.roi,
-        margin: trade.margin,
-        opened_at: trade.opened_at,
-        closed_at: trade.closed_at,
-        period_of_day: trade.period_of_day,
-        duration_days: trade.duration_days,
-        duration_hours: trade.duration_hours,
-        duration_minutes: trade.duration_minutes,
-        pnl: trade.profit_loss,
-        trade_date: trade.opened_at
-      }));
+      const tradesData = extractedTrades.map((trade, index) => {
+        const edits = tradeEdits[index] || {};
+        const finalTrade = { ...trade, ...edits };
+        
+        return {
+          user_id: user.id,
+          asset: finalTrade.asset,
+          entry_price: finalTrade.entry_price,
+          exit_price: finalTrade.exit_price,
+          position_size: finalTrade.position_size,
+          position_type: finalTrade.position_type,
+          profit_loss: finalTrade.profit_loss,
+          funding_fee: finalTrade.funding_fee,
+          trading_fee: finalTrade.trading_fee,
+          roi: finalTrade.roi,
+          margin: finalTrade.margin,
+          opened_at: finalTrade.opened_at,
+          closed_at: finalTrade.closed_at,
+          period_of_day: finalTrade.period_of_day,
+          duration_days: finalTrade.duration_days,
+          duration_hours: finalTrade.duration_hours,
+          duration_minutes: finalTrade.duration_minutes,
+          pnl: finalTrade.profit_loss,
+          trade_date: finalTrade.opened_at,
+          setup: finalTrade.setup || null,
+          notes: finalTrade.notes || null,
+          emotional_tag: finalTrade.emotional_tag || null
+        };
+      });
 
       const { error } = await supabase
         .from('trades')
@@ -571,74 +599,116 @@ const Upload = () => {
                     </div>
 
                     <div className="grid gap-4">
-                      {extractedTrades.map((trade, index) => (
-                        <Card key={index} className="p-4 bg-muted/50 border-border">
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">Asset:</span>
-                              <p className="font-medium">{trade.asset}</p>
+                      {extractedTrades.map((trade, index) => {
+                        const edits = tradeEdits[index] || {};
+                        return (
+                          <Card key={index} className="p-4 bg-muted/50 border-border space-y-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                              <div>
+                                <span className="text-muted-foreground">Asset:</span>
+                                <p className="font-medium">{trade.asset}</p>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Position:</span>
+                                <p className="font-medium capitalize">{trade.position_type}</p>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Entry:</span>
+                                <p className="font-medium">{trade.entry_price.toFixed(2)}</p>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Exit:</span>
+                                <p className="font-medium">{trade.exit_price.toFixed(2)}</p>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Size:</span>
+                                <p className="font-medium">{trade.position_size}</p>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">P&L:</span>
+                                <p className={`font-medium ${trade.profit_loss >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+                                  {trade.profit_loss >= 0 ? '+' : ''}{trade.profit_loss.toFixed(2)}
+                                </p>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">ROI:</span>
+                                <p className={`font-medium ${trade.roi >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+                                  {trade.roi >= 0 ? '+' : ''}{trade.roi.toFixed(2)}%
+                                </p>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Funding Fee:</span>
+                                <p className="font-medium">${trade.funding_fee.toFixed(2)}</p>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Trading Fee:</span>
+                                <p className="font-medium">${trade.trading_fee.toFixed(2)}</p>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Duration:</span>
+                                <p className="font-medium">
+                                  {formatDuration(trade.duration_days, trade.duration_hours, trade.duration_minutes)}
+                                </p>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Period:</span>
+                                <p className="font-medium capitalize">{trade.period_of_day}</p>
+                              </div>
                             </div>
-                            <div>
-                              <span className="text-muted-foreground">Position:</span>
-                              <p className="font-medium capitalize">{trade.position_type}</p>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Setup</Label>
+                                <Input
+                                  placeholder="Breakout, Reversal..."
+                                  value={edits.setup ?? trade.setup ?? ''}
+                                  onChange={(e) => updateTradeField(index, 'setup', e.target.value)}
+                                  className="mt-1 h-8 text-sm"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Emotional Tag</Label>
+                                <Input
+                                  placeholder="Confident, Fearful..."
+                                  value={edits.emotional_tag ?? trade.emotional_tag ?? ''}
+                                  onChange={(e) => updateTradeField(index, 'emotional_tag', e.target.value)}
+                                  className="mt-1 h-8 text-sm"
+                                />
+                              </div>
+                              <div className="md:col-span-1">
+                                <Label className="text-xs text-muted-foreground">Notes</Label>
+                                <Input
+                                  placeholder="Trade observations..."
+                                  value={edits.notes ?? trade.notes ?? ''}
+                                  onChange={(e) => updateTradeField(index, 'notes', e.target.value)}
+                                  className="mt-1 h-8 text-sm"
+                                />
+                              </div>
                             </div>
-                            <div>
-                              <span className="text-muted-foreground">Entry:</span>
-                              <p className="font-medium">{trade.entry_price.toFixed(2)}</p>
+
+                            <div className="pt-3 border-t border-border">
+                              <Button
+                                onClick={() => saveExtractedTrade(trade, index)}
+                                disabled={savingTrades.has(index)}
+                                size="sm"
+                                className="w-full"
+                              >
+                                {savingTrades.has(index) ? (
+                                  <>
+                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Saving...
+                                  </>
+                                ) : (
+                                  'Save This Trade'
+                                )}
+                              </Button>
                             </div>
-                            <div>
-                              <span className="text-muted-foreground">Exit:</span>
-                              <p className="font-medium">{trade.exit_price.toFixed(2)}</p>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Size:</span>
-                              <p className="font-medium">{trade.position_size}</p>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">P&L:</span>
-                              <p className={`font-medium ${trade.profit_loss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {trade.profit_loss >= 0 ? '+' : ''}{trade.profit_loss.toFixed(2)}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">ROI:</span>
-                              <p className={`font-medium ${trade.roi >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {trade.roi >= 0 ? '+' : ''}{trade.roi.toFixed(2)}%
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Duration:</span>
-                              <p className="font-medium">
-                                {formatDuration(trade.duration_days, trade.duration_hours, trade.duration_minutes)}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Period:</span>
-                              <p className="font-medium capitalize">{trade.period_of_day}</p>
-                            </div>
-                          </div>
-                          <div className="mt-3 pt-3 border-t border-border">
-                            <Button
-                              onClick={() => saveExtractedTrade(trade, index)}
-                              disabled={savingTrades.has(index)}
-                              size="sm"
-                              className="w-full"
-                            >
-                              {savingTrades.has(index) ? (
-                                <>
-                                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                  </svg>
-                                  Saving...
-                                </>
-                              ) : (
-                                'Save This Trade'
-                              )}
-                            </Button>
-                          </div>
-                        </Card>
-                      ))}
+                          </Card>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

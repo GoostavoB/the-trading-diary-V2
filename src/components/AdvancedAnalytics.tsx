@@ -24,6 +24,10 @@ interface Trade {
   setup: string;
   trade_date: string;
   position_type?: 'long' | 'short';
+  notes?: string | null;
+  emotional_tag?: string | null;
+  funding_fee?: number | null;
+  trading_fee?: number | null;
 }
 
 interface AdvancedAnalyticsProps {

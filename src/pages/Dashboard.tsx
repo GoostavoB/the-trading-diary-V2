@@ -23,6 +23,11 @@ interface Trade {
   roi: number;
   asset: string;
   setup: string | null;
+  notes: string | null;
+  emotional_tag: string | null;
+  position_type: 'long' | 'short' | null;
+  funding_fee: number | null;
+  trading_fee: number | null;
 }
 
 const Dashboard = () => {
@@ -46,7 +51,10 @@ const Dashboard = () => {
       .eq('user_id', user.id);
 
     if (trades) {
-      setTrades(trades);
+      setTrades(trades.map(trade => ({
+        ...trade,
+        position_type: trade.position_type as 'long' | 'short' | null
+      })));
       const totalPnl = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
       const winningTrades = trades.filter(t => (t.pnl || 0) > 0).length;
       const avgDuration = trades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (trades.length || 1);
