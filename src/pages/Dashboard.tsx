@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TradeHistory } from '@/components/TradeHistory';
 import { AdvancedAnalytics } from '@/components/AdvancedAnalytics';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 interface TradeStats {
   total_pnl: number;
@@ -38,6 +40,7 @@ const Dashboard = () => {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
   const [initialInvestment, setInitialInvestment] = useState(0);
+  const [includeFeesInPnL, setIncludeFeesInPnL] = useState(true);
 
   useEffect(() => {
     fetchStats();
@@ -57,7 +60,7 @@ const Dashboard = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, includeFeesInPnL]); // Added includeFeesInPnL to dependencies
 
   const fetchStats = async () => {
     if (!user) return;
@@ -73,12 +76,23 @@ const Dashboard = () => {
         ...trade,
         position_type: trade.position_type as 'long' | 'short' | null
       })));
-      const totalPnl = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+      
+      // Calculate P&L without fees
+      const totalPnlWithoutFees = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+      
+      // Calculate P&L with fees (subtract fees from profit)
+      const totalPnlWithFees = trades.reduce((sum, t) => {
+        const pnl = t.pnl || 0;
+        const fundingFee = t.funding_fee || 0;
+        const tradingFee = t.trading_fee || 0;
+        return sum + (pnl - Math.abs(fundingFee) - Math.abs(tradingFee));
+      }, 0);
+      
       const winningTrades = trades.filter(t => (t.pnl || 0) > 0).length;
       const avgDuration = trades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (trades.length || 1);
 
       setStats({
-        total_pnl: totalPnl,
+        total_pnl: includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees,
         win_rate: trades.length > 0 ? (winningTrades / trades.length) * 100 : 0,
         total_trades: trades.length,
         avg_duration: avgDuration
@@ -154,19 +168,32 @@ const Dashboard = () => {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard
-                title="Total P&L"
-                value={`$${stats?.total_pnl.toFixed(2) || 0}`}
-                icon={DollarSign}
-                trend={stats && stats.total_pnl > 0 ? 'up' : stats && stats.total_pnl < 0 ? 'down' : 'neutral'}
-                valueColor={
-                  stats && stats.total_pnl > 0 
-                    ? 'text-neon-green' 
-                    : stats && stats.total_pnl < 0 
-                    ? 'text-neon-red' 
-                    : 'text-foreground'
-                }
-              />
+              <div className="relative">
+                <StatCard
+                  title="Total P&L"
+                  value={`$${stats?.total_pnl.toFixed(2) || 0}`}
+                  icon={DollarSign}
+                  trend={stats && stats.total_pnl > 0 ? 'up' : stats && stats.total_pnl < 0 ? 'down' : 'neutral'}
+                  valueColor={
+                    stats && stats.total_pnl > 0 
+                      ? 'text-neon-green' 
+                      : stats && stats.total_pnl < 0 
+                      ? 'text-neon-red' 
+                      : 'text-foreground'
+                  }
+                />
+                <div className="absolute top-2 right-2 flex items-center gap-2 bg-card/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-border">
+                  <Label htmlFor="fees-toggle" className="text-xs cursor-pointer">
+                    {includeFeesInPnL ? 'Com Fees' : 'Sem Fees'}
+                  </Label>
+                  <Switch
+                    id="fees-toggle"
+                    checked={includeFeesInPnL}
+                    onCheckedChange={setIncludeFeesInPnL}
+                    className="scale-75"
+                  />
+                </div>
+              </div>
               <StatCard
                 title="Win Rate"
                 value={
