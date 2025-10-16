@@ -257,10 +257,37 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
     </Card>
   );
 
+  // Calculate Total Assets
+  const totalAssets = initialInvestment + totalPnl;
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-4">Advanced Analytics</h2>
+        
+        {/* Total Assets - Prominent Display */}
+        <Card className="p-8 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-sm text-muted-foreground mb-2">Total Assets</p>
+              <p className={`text-5xl font-bold ${totalAssets === 0 ? 'text-foreground' : totalAssets > initialInvestment ? 'text-neon-green' : 'text-neon-red'}`}>
+                ${totalAssets.toFixed(2)}
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Initial Capital: ${initialInvestment.toFixed(2)} + Total P&L: ${totalPnl.toFixed(2)}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground mb-2">ROI</p>
+              <p className={`text-3xl font-bold ${totalROI === 0 ? 'text-foreground' : totalROI > 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+                {totalROI > 0 ? '+' : ''}{totalROI.toFixed(2)}%
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                From initial capital
+              </p>
+            </div>
+          </div>
+        </Card>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <Card className="p-6 bg-card border-border hover:border-foreground/20 transition-all duration-300">
