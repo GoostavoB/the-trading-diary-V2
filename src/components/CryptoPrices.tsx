@@ -12,8 +12,8 @@ export const CryptoPrices = ({ className = '', symbols }: CryptoPricesProps) => 
   if (loading) {
     return (
       <div className={`bg-card/30 backdrop-blur-sm border-b border-border ${className}`}>
-        <div className="container mx-auto px-6 py-2">
-          <p className="text-xs text-muted-foreground">Loading prices...</p>
+        <div className="container mx-auto px-6 py-4">
+          <p className="text-sm text-muted-foreground">Loading prices...</p>
         </div>
       </div>
     );
@@ -25,18 +25,18 @@ export const CryptoPrices = ({ className = '', symbols }: CryptoPricesProps) => 
 
   return (
     <div className={`bg-card/30 backdrop-blur-sm border-b border-border ${className}`}>
-      <div className="container mx-auto px-6 py-2">
-        <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide">
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <TrendingUp className="text-neon-green" size={16} />
-            <span className="text-xs font-semibold text-muted-foreground">LIVE:</span>
+      <div className="container mx-auto px-6 py-4">
+        <div className="flex items-center gap-6 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <TrendingUp className="text-neon-green" size={24} />
+            <span className="text-base font-semibold text-muted-foreground">LIVE:</span>
           </div>
           {prices.map((price) => (
-            <div key={price.symbol} className="flex items-center gap-1.5 flex-shrink-0">
-              <span className="text-xs font-semibold text-foreground">
+            <div key={price.symbol} className="flex items-center gap-2 flex-shrink-0">
+              <span className="text-base font-semibold text-foreground">
                 {price.displaySymbol}
               </span>
-              <span className="text-xs font-mono text-neon-green">
+              <span className="text-base font-mono text-neon-green">
                 ${price.price}
               </span>
             </div>
