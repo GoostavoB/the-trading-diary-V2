@@ -4,6 +4,7 @@ import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { CryptoPrices } from "@/components/CryptoPrices";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -17,6 +18,9 @@ const Index = () => {
         >
           Sign In
         </Button>
+      </div>
+      <div className="container mx-auto px-6 pt-24">
+        <CryptoPrices />
       </div>
       <Hero />
       <Features />

@@ -15,6 +15,7 @@ import { TrendingUp, TrendingDown, Target, DollarSign, Edit } from 'lucide-react
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import bullBearImage from '@/assets/bull-bear-realistic.png';
+import { CryptoPrices } from '@/components/CryptoPrices';
 
 interface Trade {
   id: string;
@@ -257,6 +258,7 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
 
   return (
     <div className="space-y-6">
+      <CryptoPrices className="mb-6" />
       <div>
         <h2 className="text-2xl font-bold mb-4">Advanced Analytics</h2>
         
