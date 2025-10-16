@@ -175,6 +175,10 @@ const Upload = () => {
   const handleConfirmExtraction = async () => {
     if (!extractionImage || extracting) return;
     setExtracting(true);
+    toast.info('🔍 Starting AI extraction...', {
+      description: 'Analyzing your trade screenshot',
+      duration: 2000
+    });
     try {
       await extractTradeInfo(extractionImage);
     } catch (error) {
@@ -191,27 +195,43 @@ const Upload = () => {
       reader.onloadend = async () => {
         const base64Image = reader.result as string;
 
+        toast.loading('🤖 AI is reading your trades...', {
+          description: 'This may take a few seconds',
+          id: 'extraction-loading'
+        });
+
         const { data, error } = await supabase.functions.invoke('extract-trade-info', {
           body: { imageBase64: base64Image }
         });
 
+        toast.dismiss('extraction-loading');
+
         if (error) {
           console.error('Extraction error:', error);
-          toast.error('Failed to extract trade information');
+          toast.error('Failed to extract trade information', {
+            description: 'Please try again or enter manually'
+          });
           return;
         }
 
         if (data?.trades && data.trades.length > 0) {
           setExtractedTrades(data.trades);
-          toast.success(`Extracted ${data.trades.length} trade(s) from image!`);
+          toast.success(`✅ Extracted ${data.trades.length} trade(s) from image!`, {
+            description: 'Review and save your trades below'
+          });
         } else {
-          toast.error('No trades found in the image');
+          toast.error('No trades found in the image', {
+            description: 'Please check if the image is clear and contains trade information'
+          });
         }
       };
       reader.readAsDataURL(file);
     } catch (error) {
       console.error('Error extracting trade info:', error);
-      toast.error('Failed to extract trade information');
+      toast.dismiss('extraction-loading');
+      toast.error('Failed to extract trade information', {
+        description: 'An unexpected error occurred'
+      });
     } finally {
       setExtracting(false);
     }
@@ -502,26 +522,34 @@ const Upload = () => {
                           </Button>
                         </div>
                         {extractedTrades.length === 0 && (
-                          <Button
-                            onClick={handleConfirmExtraction}
-                            className="w-full bg-primary text-primary-foreground transition-all duration-200 active:scale-95"
-                            disabled={extracting}
-                          >
-                            {extracting ? (
-                              <>
-                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <span className="animate-pulse">Extracting trades...</span>
-                              </>
-                            ) : (
-                              <>
-                                <Sparkles className="w-4 h-4 mr-2" />
-                                Confirm & Extract Trade Information
-                              </>
+                          <>
+                            <Button
+                              onClick={handleConfirmExtraction}
+                              className="w-full bg-primary text-primary-foreground transition-all duration-200 active:scale-95 hover:scale-[1.02]"
+                              disabled={extracting}
+                              size="lg"
+                            >
+                              {extracting ? (
+                                <>
+                                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span className="animate-pulse font-medium">AI is analyzing your screenshot...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Sparkles className="w-5 h-5 mr-2" />
+                                  <span className="font-medium">Confirm & Extract Trade Information</span>
+                                </>
+                              )}
+                            </Button>
+                            {extracting && (
+                              <p className="text-sm text-muted-foreground text-center mt-2 animate-pulse">
+                                Please wait while AI reads your trades...
+                              </p>
                             )}
-                          </Button>
+                          </>
                         )}
                       </div>
                     ) : (
