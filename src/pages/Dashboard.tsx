@@ -11,6 +11,7 @@ import { AdvancedAnalytics } from '@/components/AdvancedAnalytics';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface TradeStats {
   total_pnl: number;
@@ -42,6 +43,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [initialInvestment, setInitialInvestment] = useState(0);
   const [includeFeesInPnL, setIncludeFeesInPnL] = useState(true);
+  const [beastModeDays, setBeastModeDays] = useState(0);
 
   useEffect(() => {
     fetchStats();
@@ -91,6 +93,22 @@ const Dashboard = () => {
       
       const winningTrades = trades.filter(t => (t.pnl || 0) > 0).length;
       const avgDuration = trades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (trades.length || 1);
+
+      // Calculate Beast Mode days (days with >70% win rate)
+      const tradesByDate = trades.reduce((acc, trade) => {
+        const date = new Date(trade.trade_date).toDateString();
+        if (!acc[date]) acc[date] = [];
+        acc[date].push(trade);
+        return acc;
+      }, {} as Record<string, typeof trades>);
+
+      const daysWithBeastMode = Object.values(tradesByDate).filter(dayTrades => {
+        const wins = dayTrades.filter(t => (t.pnl || 0) > 0).length;
+        const winRate = (wins / dayTrades.length) * 100;
+        return winRate > 70;
+      }).length;
+
+      setBeastModeDays(daysWithBeastMode);
 
       setStats({
         total_pnl: includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees,
@@ -146,19 +164,32 @@ const Dashboard = () => {
             <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
             <p className="text-muted-foreground">Track your trading performance and analytics</p>
           </div>
-          {stats && stats.win_rate > 70 && (
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-neon-green/20 to-primary/20 blur-xl animate-pulse"></div>
-              <div className="relative flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-neon-green/10 to-primary/10 border-2 border-neon-green/30 rounded-lg shadow-lg">
-                <span className="text-4xl animate-bounce">👹</span>
-                <div>
-                  <div className="text-xs font-medium text-neon-green uppercase tracking-wider">Unlocked</div>
-                  <div className="text-2xl font-bold bg-gradient-to-r from-neon-green to-primary bg-clip-text text-transparent">
-                    BEAST MODE
+          {beastModeDays > 0 && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="relative cursor-help">
+                    <div className="absolute inset-0 bg-gradient-to-r from-neon-green/20 to-primary/20 blur-xl animate-pulse"></div>
+                    <div className="relative flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-neon-green/10 to-primary/10 border-2 border-neon-green/30 rounded-lg shadow-lg">
+                      <span className="text-4xl animate-bounce">👹</span>
+                      <div>
+                        <div className="text-xs font-medium text-neon-green uppercase tracking-wider">Unlocked</div>
+                        <div className="text-2xl font-bold bg-gradient-to-r from-neon-green to-primary bg-clip-text text-transparent">
+                          BEAST MODE
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-0.5">
+                          {beastModeDays} {beastModeDays === 1 ? 'day' : 'days'}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  <p className="font-semibold mb-1">Beast Mode Days 👹</p>
+                  <p className="text-sm">Days where you achieved over 70% win rate. Keep pushing for consistency!</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
 
