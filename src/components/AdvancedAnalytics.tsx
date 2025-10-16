@@ -14,7 +14,9 @@ import {
 import { TrendingUp, TrendingDown, Target, DollarSign, Edit } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import bullBearImage from '@/assets/bull-bear-realistic.png';
+import bullNeon from '@/assets/bull-neon.png';
+import bearNeon from '@/assets/bear-neon.png';
+import bullBearFight from '@/assets/bull-bear-fight-neon.png';
 
 interface Trade {
   id: string;
@@ -482,22 +484,17 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
                   </div>
                 </div>
                 <div className="ml-6 flex items-center justify-center">
-                  <div className={`w-20 h-20 rounded-full flex items-center justify-center border-2 ${
-                    isShortDominant 
-                      ? 'border-neon-red bg-neon-red/10' 
-                      : 'border-neon-green bg-neon-green/10'
+                  <div className={`w-20 h-20 rounded-full overflow-hidden flex items-center justify-center border-2 ${
+                    (monthLongs === monthShorts)
+                      ? 'border-foreground bg-card'
+                      : isShortDominant 
+                        ? 'border-neon-red bg-neon-red/10' 
+                        : 'border-neon-green bg-neon-green/10'
                   } transition-all duration-500`}>
                     <img 
-                      src={bullBearImage} 
-                      alt={isShortDominant ? "Bear Market" : "Bull Market"}
-                      className={`w-14 h-14 object-contain transition-all duration-500 ${
-                        isShortDominant ? 'rotate-180 opacity-80' : 'opacity-80'
-                      }`}
-                      style={{
-                        filter: isShortDominant 
-                          ? 'hue-rotate(0deg) saturate(1.5) brightness(1.2)' 
-                          : 'hue-rotate(90deg) saturate(1.5) brightness(1.2)'
-                      }}
+                      src={(monthLongs === monthShorts) ? bullBearFight : (isShortDominant ? bearNeon : bullNeon)} 
+                      alt={(monthLongs === monthShorts) ? "Balanced Market" : (isShortDominant ? "Bear Market" : "Bull Market")}
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 </div>
