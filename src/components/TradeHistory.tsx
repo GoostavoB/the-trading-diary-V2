@@ -48,7 +48,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 interface Trade {
   id: string;
-  asset: string;
+  symbol: string;
   entry_price: number;
   exit_price: number;
   position_size: number;
@@ -61,13 +61,13 @@ interface Trade {
   duration_minutes: number;
   trade_date: string;
   screenshot_url: string | null;
-  position_type?: 'long' | 'short';
+  side?: 'long' | 'short';
   funding_fee?: number;
   trading_fee?: number;
   leverage?: number;
 }
 
-type ColumnKey = 'date' | 'asset' | 'setup' | 'broker' | 'type' | 'entry' | 'exit' | 'size' | 'pnl' | 'roi' | 'fundingFee' | 'tradingFee';
+type ColumnKey = 'date' | 'symbol' | 'setup' | 'broker' | 'type' | 'entry' | 'exit' | 'size' | 'pnl' | 'roi' | 'fundingFee' | 'tradingFee';
 
 interface ColumnConfig {
   key: ColumnKey;
