@@ -235,11 +235,11 @@ const Dashboard = () => {
                 <TooltipTrigger asChild>
                   <div className="relative cursor-help">
                     <div className="absolute inset-0 bg-gradient-to-r from-neon-green/20 to-primary/20 blur-xl animate-pulse"></div>
-                    <div className="relative flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-neon-green/10 to-primary/10 border-2 border-neon-green/30 rounded-lg shadow-lg">
-                      <span className="text-4xl animate-bounce">👹</span>
+                    <div className="relative flex items-center gap-3 px-6 py-3 glass-strong border-2 border-neon-green/30 rounded-xl shadow-lg">
+                      <Flame className="w-8 h-8 text-neon-green" />
                       <div>
                         <div className="text-xs font-medium text-neon-green uppercase tracking-wider">Unlocked</div>
-                        <div className="text-2xl font-bold bg-gradient-to-r from-neon-green to-primary bg-clip-text text-transparent">
+                        <div className="text-xl font-bold text-neon-green">
                           BEAST MODE
                         </div>
                         <div className="text-xs text-muted-foreground mt-0.5">
@@ -250,7 +250,7 @@ const Dashboard = () => {
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="max-w-xs">
-                  <p className="font-semibold mb-1">Beast Mode Days 👹</p>
+                  <p className="font-semibold mb-1">Beast Mode Days</p>
                   <p className="text-sm">Days where you achieved over 70% win rate. Keep pushing for consistency!</p>
                 </TooltipContent>
               </Tooltip>
@@ -312,16 +312,11 @@ const Dashboard = () => {
               <StatCard
                 title="Win Rate"
                 value={
-                  <div className="flex items-center gap-2">
-                    <AnimatedCounter 
-                      value={stats?.win_rate || 0}
-                      suffix="%"
-                      decimals={1}
-                    />
-                    {stats && stats.win_rate > 70 && (
-                      <span className="text-xl">👹</span>
-                    )}
-                  </div>
+                  <AnimatedCounter 
+                    value={stats?.win_rate || 0}
+                    suffix="%"
+                    decimals={1}
+                  />
                 }
                 animated
                 numericValue={stats?.win_rate || 0}
@@ -373,16 +368,26 @@ const Dashboard = () => {
             ) : (
               <ResponsiveGridLayout
                 className="layout"
-                layouts={{ lg: layout.filter(item => isCustomizing || isWidgetVisible(item.i)) }}
+                layouts={{ 
+                  lg: layout.filter(item => isCustomizing || isWidgetVisible(item.i)),
+                  md: layout.filter(item => isCustomizing || isWidgetVisible(item.i)),
+                  sm: layout.filter(item => isCustomizing || isWidgetVisible(item.i)),
+                  xs: layout.filter(item => isCustomizing || isWidgetVisible(item.i)),
+                  xxs: layout.filter(item => isCustomizing || isWidgetVisible(item.i))
+                }}
                 breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
                 cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-                rowHeight={80}
+                rowHeight={70}
                 isDraggable={isCustomizing}
                 isResizable={isCustomizing}
-                onLayoutChange={(newLayout) => updateLayout(newLayout)}
+                onLayoutChange={(newLayout) => {
+                  if (isCustomizing) updateLayout(newLayout);
+                }}
                 draggableHandle=".drag-handle"
                 compactType="vertical"
+                preventCollision={false}
                 margin={[16, 16]}
+                containerPadding={[0, 0]}
               >
                 {/* Stats Widget */}
                 {(isCustomizing || isWidgetVisible('stats')) && (
@@ -421,11 +426,10 @@ const Dashboard = () => {
                         
                         <div className="p-3 rounded-xl glass-subtle">
                           <div className="text-xs text-muted-foreground mb-1">Win Rate</div>
-                          <div className={`text-xl font-bold flex items-center gap-2 ${
+                          <div className={`text-xl font-bold ${
                             stats && stats.win_rate > 70 ? 'text-neon-green' : 'text-foreground'
                           }`}>
                             <AnimatedCounter value={stats?.win_rate || 0} suffix="%" decimals={1} />
-                            {stats && stats.win_rate > 70 && <span className="text-base">👹</span>}
                           </div>
                         </div>
                         

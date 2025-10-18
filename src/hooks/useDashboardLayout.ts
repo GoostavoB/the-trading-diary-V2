@@ -16,6 +16,8 @@ export interface LayoutItem {
   h: number;
   minW?: number;
   minH?: number;
+  maxW?: number;
+  maxH?: number;
 }
 
 interface DashboardLayout {
@@ -30,9 +32,9 @@ const DEFAULT_WIDGETS: WidgetConfig[] = [
 ];
 
 const DEFAULT_LAYOUT: LayoutItem[] = [
-  { i: 'stats', x: 0, y: 0, w: 12, h: 2, minW: 6, minH: 2 },
-  { i: 'heatmap', x: 0, y: 2, w: 12, h: 3, minW: 6, minH: 2 },
-  { i: 'charts', x: 0, y: 5, w: 12, h: 4, minW: 6, minH: 3 },
+  { i: 'stats', x: 0, y: 0, w: 12, h: 2, minW: 6, minH: 2, maxH: 4 },
+  { i: 'heatmap', x: 0, y: 2, w: 12, h: 4, minW: 6, minH: 3, maxH: 8 },
+  { i: 'charts', x: 0, y: 6, w: 12, h: 5, minW: 6, minH: 4, maxH: 10 },
 ];
 
 export function useDashboardLayout() {

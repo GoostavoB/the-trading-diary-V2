@@ -118,10 +118,10 @@ export function CustomizeDashboardControls({
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
             >
-              <Card className="p-4 glass border-amber-500/30">
+              <Card className="p-4 glass border-muted-foreground/20">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-xl bg-amber-500/10">
-                    <EyeOff className="w-4 h-4 text-amber-500" />
+                  <div className="p-2 rounded-xl bg-muted">
+                    <EyeOff className="w-4 h-4 text-muted-foreground" />
                   </div>
                   <div className="flex-1">
                     <h4 className="font-semibold text-sm mb-1 flex items-center gap-2">
