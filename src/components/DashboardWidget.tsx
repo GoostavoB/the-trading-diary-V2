@@ -63,7 +63,7 @@ export function DashboardWidget({
       </CardHeader>
 
       {/* Widget Content */}
-      <CardContent className={cn("pb-4", !isVisible && isCustomizing && "pointer-events-none")}>
+      <CardContent className={cn("pb-4 overflow-hidden", !isVisible && isCustomizing && "pointer-events-none")}>
         {children}
       </CardContent>
 
