@@ -30,9 +30,9 @@ const DEFAULT_WIDGETS: WidgetConfig[] = [
 ];
 
 const DEFAULT_LAYOUT: LayoutItem[] = [
-  { i: 'stats', x: 0, y: 0, w: 12, h: 1, minW: 6, minH: 1 },
-  { i: 'heatmap', x: 0, y: 1, w: 12, h: 2, minW: 6, minH: 2 },
-  { i: 'charts', x: 0, y: 3, w: 12, h: 3, minW: 6, minH: 2 },
+  { i: 'stats', x: 0, y: 0, w: 12, h: 2, minW: 6, minH: 2 },
+  { i: 'heatmap', x: 0, y: 2, w: 12, h: 3, minW: 6, minH: 2 },
+  { i: 'charts', x: 0, y: 5, w: 12, h: 4, minW: 6, minH: 3 },
 ];
 
 export function useDashboardLayout() {

@@ -58,6 +58,7 @@ const Dashboard = () => {
   const [filteredTrades, setFilteredTrades] = useState<Trade[]>([]);
   
   const {
+    widgets,
     layout,
     isCustomizing,
     hasChanges,
@@ -185,11 +186,11 @@ const Dashboard = () => {
   };
 
   const StatCard = ({ title, value, icon: Icon, trend, valueColor, animated = false, numericValue }: any) => (
-    <Card className="p-6 bg-card border-border hover:border-foreground/20 transition-all duration-300 hover:shadow-lg">
+    <Card className="p-5 glass hover-lift transition-all duration-300">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-muted-foreground mb-1">{title}</p>
-          <div className={`text-3xl font-bold ${valueColor || ''}`}>
+          <div className={`text-2xl font-bold ${valueColor || ''}`}>
             {animated && typeof numericValue === 'number' ? (
               value
             ) : (
@@ -197,10 +198,12 @@ const Dashboard = () => {
             )}
           </div>
         </div>
-        <Icon 
-          className={trend === 'up' ? 'text-neon-green' : trend === 'down' ? 'text-neon-red' : 'text-foreground'} 
-          size={32} 
-        />
+        <div className="p-2.5 rounded-xl bg-primary/10">
+          <Icon 
+            className={trend === 'up' ? 'text-neon-green' : trend === 'down' ? 'text-neon-red' : 'text-primary'} 
+            size={24} 
+          />
+        </div>
       </div>
     </Card>
   );
@@ -263,6 +266,8 @@ const Dashboard = () => {
           onSave={saveLayout}
           onCancel={cancelCustomization}
           onReset={resetLayout}
+          widgets={widgets}
+          onToggleWidget={toggleWidgetVisibility}
         />
 
         {loading ? (
@@ -292,7 +297,7 @@ const Dashboard = () => {
                       : 'text-foreground'
                   }
                 />
-                <div className="flex items-center justify-center gap-2 bg-card/50 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-border">
+                <div className="flex items-center justify-center gap-2 glass-subtle px-3 py-1.5 rounded-lg">
                   <Label htmlFor="fees-toggle" className="text-xs cursor-pointer text-muted-foreground">
                     {includeFeesInPnL ? 'With Fees' : 'Without Fees'}
                   </Label>
@@ -356,114 +361,122 @@ const Dashboard = () => {
             </div>
 
             {stats && stats.total_trades === 0 ? (
-              <Card className="p-8 text-center bg-card border-border">
+              <Card className="p-8 text-center glass">
                 <h3 className="text-xl font-semibold mb-2">No trades yet</h3>
                 <p className="text-muted-foreground mb-4">
                   Start by uploading your first trade to see analytics and insights
                 </p>
-                <a href="/upload" className="text-foreground hover:underline">
+                <a href="/upload" className="text-primary hover:underline">
                   Upload Trade →
                 </a>
               </Card>
             ) : (
               <ResponsiveGridLayout
                 className="layout"
-                layouts={{ lg: layout }}
+                layouts={{ lg: layout.filter(item => isCustomizing || isWidgetVisible(item.i)) }}
                 breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
                 cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-                rowHeight={100}
+                rowHeight={80}
                 isDraggable={isCustomizing}
                 isResizable={isCustomizing}
                 onLayoutChange={(newLayout) => updateLayout(newLayout)}
                 draggableHandle=".drag-handle"
+                compactType="vertical"
+                margin={[16, 16]}
               >
                 {/* Stats Widget */}
-                <div key="stats">
-                  <DashboardWidget
-                    id="stats"
-                    title="Statistics Overview"
-                    isCustomizing={isCustomizing}
-                    isVisible={isWidgetVisible('stats')}
-                    onToggleVisibility={toggleWidgetVisibility}
-                  >
-                    <div className="grid grid-cols-4 gap-4">
-                      {/* Stats Cards Content */}
-                      <div className="space-y-2">
-                        <div className="p-3 rounded-lg bg-muted/50">
-                          <div className="text-xs text-muted-foreground mb-1">Total P&L</div>
-                          <div className={`text-2xl font-bold ${
-                            stats && stats.total_pnl > 0 ? 'text-neon-green' : 
-                            stats && stats.total_pnl < 0 ? 'text-neon-red' : 'text-foreground'
-                          }`}>
-                            <AnimatedCounter value={stats?.total_pnl || 0} prefix="$" decimals={2} />
+                {(isCustomizing || isWidgetVisible('stats')) && (
+                  <div key="stats">
+                    <DashboardWidget
+                      id="stats"
+                      title="Statistics Overview"
+                      isCustomizing={isCustomizing}
+                      isVisible={isWidgetVisible('stats')}
+                      onToggleVisibility={toggleWidgetVisibility}
+                    >
+                      <div className="grid grid-cols-4 gap-3">
+                        {/* Stats Cards Content */}
+                        <div className="space-y-2">
+                          <div className="p-3 rounded-xl glass-subtle">
+                            <div className="text-xs text-muted-foreground mb-1">Total P&L</div>
+                            <div className={`text-xl font-bold ${
+                              stats && stats.total_pnl > 0 ? 'text-neon-green' : 
+                              stats && stats.total_pnl < 0 ? 'text-neon-red' : 'text-foreground'
+                            }`}>
+                              <AnimatedCounter value={stats?.total_pnl || 0} prefix="$" decimals={2} />
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-center gap-2 px-2 py-1 rounded-lg glass-subtle text-xs">
+                            <Label htmlFor="fees-toggle-grid" className="cursor-pointer text-muted-foreground">
+                              {includeFeesInPnL ? 'With Fees' : 'Without Fees'}
+                            </Label>
+                            <Switch
+                              id="fees-toggle-grid"
+                              checked={includeFeesInPnL}
+                              onCheckedChange={setIncludeFeesInPnL}
+                              className="scale-75"
+                            />
                           </div>
                         </div>
-                        <div className="flex items-center justify-center gap-2 px-2 py-1 rounded bg-card/50 border border-border">
-                          <Label htmlFor="fees-toggle-grid" className="text-xs cursor-pointer">
-                            {includeFeesInPnL ? 'With Fees' : 'Without Fees'}
-                          </Label>
-                          <Switch
-                            id="fees-toggle-grid"
-                            checked={includeFeesInPnL}
-                            onCheckedChange={setIncludeFeesInPnL}
-                            className="scale-75"
-                          />
+                        
+                        <div className="p-3 rounded-xl glass-subtle">
+                          <div className="text-xs text-muted-foreground mb-1">Win Rate</div>
+                          <div className={`text-xl font-bold flex items-center gap-2 ${
+                            stats && stats.win_rate > 70 ? 'text-neon-green' : 'text-foreground'
+                          }`}>
+                            <AnimatedCounter value={stats?.win_rate || 0} suffix="%" decimals={1} />
+                            {stats && stats.win_rate > 70 && <span className="text-base">👹</span>}
+                          </div>
+                        </div>
+                        
+                        <div className="p-3 rounded-xl glass-subtle">
+                          <div className="text-xs text-muted-foreground mb-1">Total Trades</div>
+                          <div className="text-xl font-bold">
+                            <AnimatedCounter value={stats?.total_trades || 0} decimals={0} />
+                          </div>
+                        </div>
+                        
+                        <div className="p-3 rounded-xl glass-subtle">
+                          <div className="text-xs text-muted-foreground mb-1">Avg Duration</div>
+                          <div className="text-xl font-bold">
+                            <AnimatedCounter value={Math.round(stats?.avg_duration || 0)} decimals={0} />
+                            <span className="text-sm ml-0.5">m</span>
+                          </div>
                         </div>
                       </div>
-                      
-                      <div className="p-3 rounded-lg bg-muted/50">
-                        <div className="text-xs text-muted-foreground mb-1">Win Rate</div>
-                        <div className={`text-2xl font-bold flex items-center gap-2 ${
-                          stats && stats.win_rate > 70 ? 'text-neon-green' : 'text-foreground'
-                        }`}>
-                          <AnimatedCounter value={stats?.win_rate || 0} suffix="%" decimals={1} />
-                          {stats && stats.win_rate > 70 && <span className="text-xl">👹</span>}
-                        </div>
-                      </div>
-                      
-                      <div className="p-3 rounded-lg bg-muted/50">
-                        <div className="text-xs text-muted-foreground mb-1">Total Trades</div>
-                        <div className="text-2xl font-bold">
-                          <AnimatedCounter value={stats?.total_trades || 0} decimals={0} />
-                        </div>
-                      </div>
-                      
-                      <div className="p-3 rounded-lg bg-muted/50">
-                        <div className="text-xs text-muted-foreground mb-1">Avg Duration</div>
-                        <div className="text-2xl font-bold">
-                          <AnimatedCounter value={Math.round(stats?.avg_duration || 0)} decimals={0} />
-                          <span className="text-sm">m</span>
-                        </div>
-                      </div>
-                    </div>
-                  </DashboardWidget>
-                </div>
+                    </DashboardWidget>
+                  </div>
+                )}
 
                 {/* Heatmap Widget */}
-                <div key="heatmap">
-                  <DashboardWidget
-                    id="heatmap"
-                    title="Trading Success Heatmap"
-                    isCustomizing={isCustomizing}
-                    isVisible={isWidgetVisible('heatmap')}
-                    onToggleVisibility={toggleWidgetVisibility}
-                  >
-                    <TradingHeatmap trades={filteredTrades.length > 0 ? filteredTrades : trades} />
-                  </DashboardWidget>
-                </div>
+                {(isCustomizing || isWidgetVisible('heatmap')) && (
+                  <div key="heatmap">
+                    <DashboardWidget
+                      id="heatmap"
+                      title="Trading Success Heatmap"
+                      isCustomizing={isCustomizing}
+                      isVisible={isWidgetVisible('heatmap')}
+                      onToggleVisibility={toggleWidgetVisibility}
+                    >
+                      <TradingHeatmap trades={filteredTrades.length > 0 ? filteredTrades : trades} />
+                    </DashboardWidget>
+                  </div>
+                )}
 
                 {/* Charts Widget */}
-                <div key="charts">
-                  <DashboardWidget
-                    id="charts"
-                    title="Performance Charts"
-                    isCustomizing={isCustomizing}
-                    isVisible={isWidgetVisible('charts')}
-                    onToggleVisibility={toggleWidgetVisibility}
-                  >
-                    <DashboardCharts trades={filteredTrades.length > 0 ? filteredTrades : trades} />
-                  </DashboardWidget>
-                </div>
+                {(isCustomizing || isWidgetVisible('charts')) && (
+                  <div key="charts">
+                    <DashboardWidget
+                      id="charts"
+                      title="Performance Charts"
+                      isCustomizing={isCustomizing}
+                      isVisible={isWidgetVisible('charts')}
+                      onToggleVisibility={toggleWidgetVisibility}
+                    >
+                      <DashboardCharts trades={filteredTrades.length > 0 ? filteredTrades : trades} />
+                    </DashboardWidget>
+                  </div>
+                )}
               </ResponsiveGridLayout>
             )}
 
