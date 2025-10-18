@@ -49,7 +49,7 @@ const Hero = () => {
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 text-center">
-        <div className="flex justify-center mb-6 gap-4">
+        <div className="hidden md:flex justify-center mb-6 gap-4">
           <TrendingUp className="text-foreground/70 hover:text-neon-green transition-colors duration-300" size={48} />
           <BarChart3 className="text-foreground/70" size={48} />
           <LineChart className="text-foreground/70 hover:text-neon-red transition-colors duration-300" size={48} />
