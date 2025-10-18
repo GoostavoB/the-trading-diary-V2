@@ -14,6 +14,74 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_analysis_cache: {
+        Row: {
+          analysis_type: string
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          request_hash: string
+          result: Json
+          trade_id: string | null
+          user_id: string
+        }
+        Insert: {
+          analysis_type: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          request_hash: string
+          result: Json
+          trade_id?: string | null
+          user_id: string
+        }
+        Update: {
+          analysis_type?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          request_hash?: string
+          result?: Json
+          trade_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_analysis_cache_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_chat_history: {
+        Row: {
+          context: Json | null
+          created_at: string | null
+          id: string
+          message: string
+          response: string
+          user_id: string
+        }
+        Insert: {
+          context?: Json | null
+          created_at?: string | null
+          id?: string
+          message: string
+          response: string
+          user_id: string
+        }
+        Update: {
+          context?: Json | null
+          created_at?: string | null
+          id?: string
+          message?: string
+          response?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       event_reminders: {
         Row: {
           created_at: string | null
@@ -97,50 +165,268 @@ export type Database = {
           },
         ]
       }
+      post_comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          post_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          post_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "social_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_likes: {
+        Row: {
+          created_at: string | null
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "social_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           accepted_privacy_at: string | null
           accepted_terms_at: string | null
           avatar_url: string | null
+          bio: string | null
           country: string | null
           created_at: string | null
           email: string | null
+          followers_count: number | null
+          following_count: number | null
           full_name: string | null
           id: string
           marketing_consent: boolean | null
+          profile_visibility: string | null
           provider: string | null
+          public_stats: Json | null
           terms_accepted_at: string | null
           updated_at: string | null
+          username: string | null
         }
         Insert: {
           accepted_privacy_at?: string | null
           accepted_terms_at?: string | null
           avatar_url?: string | null
+          bio?: string | null
           country?: string | null
           created_at?: string | null
           email?: string | null
+          followers_count?: number | null
+          following_count?: number | null
           full_name?: string | null
           id: string
           marketing_consent?: boolean | null
+          profile_visibility?: string | null
           provider?: string | null
+          public_stats?: Json | null
           terms_accepted_at?: string | null
           updated_at?: string | null
+          username?: string | null
         }
         Update: {
           accepted_privacy_at?: string | null
           accepted_terms_at?: string | null
           avatar_url?: string | null
+          bio?: string | null
           country?: string | null
           created_at?: string | null
           email?: string | null
+          followers_count?: number | null
+          following_count?: number | null
           full_name?: string | null
           id?: string
           marketing_consent?: boolean | null
+          profile_visibility?: string | null
           provider?: string | null
+          public_stats?: Json | null
           terms_accepted_at?: string | null
           updated_at?: string | null
+          username?: string | null
         }
         Relationships: []
+      }
+      shared_strategies: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          likes_count: number | null
+          performance_stats: Json | null
+          rules: Json
+          setup_type: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+          uses_count: number | null
+          visibility: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          likes_count?: number | null
+          performance_stats?: Json | null
+          rules: Json
+          setup_type?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+          uses_count?: number | null
+          visibility?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          likes_count?: number | null
+          performance_stats?: Json | null
+          rules?: Json
+          setup_type?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+          uses_count?: number | null
+          visibility?: string | null
+        }
+        Relationships: []
+      }
+      social_posts: {
+        Row: {
+          comments_count: number | null
+          content: string
+          created_at: string | null
+          id: string
+          likes_count: number | null
+          post_type: string
+          shares_count: number | null
+          trade_id: string | null
+          updated_at: string | null
+          user_id: string
+          visibility: string | null
+        }
+        Insert: {
+          comments_count?: number | null
+          content: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          post_type: string
+          shares_count?: number | null
+          trade_id?: string | null
+          updated_at?: string | null
+          user_id: string
+          visibility?: string | null
+        }
+        Update: {
+          comments_count?: number | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          post_type?: string
+          shares_count?: number | null
+          trade_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+          visibility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trade_annotations: {
+        Row: {
+          annotation_type: string
+          created_at: string | null
+          id: string
+          note: string | null
+          price: number | null
+          timestamp: string
+          trade_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          annotation_type: string
+          created_at?: string | null
+          id?: string
+          note?: string | null
+          price?: number | null
+          timestamp: string
+          trade_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          annotation_type?: string
+          created_at?: string | null
+          id?: string
+          note?: string | null
+          price?: number | null
+          timestamp?: string
+          trade_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_annotations_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "trades"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trades: {
         Row: {
@@ -358,6 +644,27 @@ export type Database = {
           total_entry_value?: number
           trade_count?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_follows: {
+        Row: {
+          created_at: string | null
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string | null
+          follower_id?: string
+          following_id?: string
+          id?: string
         }
         Relationships: []
       }
