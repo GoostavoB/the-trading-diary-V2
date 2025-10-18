@@ -15,7 +15,15 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { AnimatedCounter } from '@/components/AnimatedCounter';
 import { DateRangeFilter, DateRange } from '@/components/DateRangeFilter';
 import { TradingHeatmap } from '@/components/TradingHeatmap';
+import { DashboardWidget } from '@/components/DashboardWidget';
+import { CustomizeDashboardControls } from '@/components/CustomizeDashboardControls';
+import { useDashboardLayout } from '@/hooks/useDashboardLayout';
 import type { Trade } from '@/types/trade';
+import { Responsive, WidthProvider } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
 interface TradeStats {
   total_pnl: number;
@@ -34,6 +42,19 @@ const Dashboard = () => {
   const [beastModeDays, setBeastModeDays] = useState(0);
   const [dateRange, setDateRange] = useState<DateRange>(undefined);
   const [filteredTrades, setFilteredTrades] = useState<Trade[]>([]);
+  
+  const {
+    layout,
+    isCustomizing,
+    hasChanges,
+    setIsCustomizing,
+    toggleWidgetVisibility,
+    updateLayout,
+    saveLayout,
+    resetLayout,
+    cancelCustomization,
+    isWidgetVisible,
+  } = useDashboardLayout();
 
   useEffect(() => {
     if (user) {
@@ -217,6 +238,16 @@ const Dashboard = () => {
           )}
         </div>
 
+        {/* Customize Dashboard Controls */}
+        <CustomizeDashboardControls
+          isCustomizing={isCustomizing}
+          hasChanges={hasChanges}
+          onStartCustomize={() => setIsCustomizing(true)}
+          onSave={saveLayout}
+          onCancel={cancelCustomization}
+          onReset={resetLayout}
+        />
+
         {loading ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">Loading your stats...</p>
@@ -320,20 +351,124 @@ const Dashboard = () => {
                 </a>
               </Card>
             ) : (
-              <Tabs defaultValue="analytics" className="space-y-6">
+              <ResponsiveGridLayout
+                className="layout"
+                layouts={{ lg: layout }}
+                breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+                cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+                rowHeight={100}
+                isDraggable={isCustomizing}
+                isResizable={isCustomizing}
+                onLayoutChange={(newLayout) => updateLayout(newLayout)}
+                draggableHandle=".drag-handle"
+              >
+                {/* Stats Widget */}
+                <div key="stats">
+                  <DashboardWidget
+                    id="stats"
+                    title="Statistics Overview"
+                    isCustomizing={isCustomizing}
+                    isVisible={isWidgetVisible('stats')}
+                    onToggleVisibility={toggleWidgetVisibility}
+                  >
+                    <div className="grid grid-cols-4 gap-4">
+                      {/* Stats Cards Content */}
+                      <div className="space-y-2">
+                        <div className="p-3 rounded-lg bg-muted/50">
+                          <div className="text-xs text-muted-foreground mb-1">Total P&L</div>
+                          <div className={`text-2xl font-bold ${
+                            stats && stats.total_pnl > 0 ? 'text-neon-green' : 
+                            stats && stats.total_pnl < 0 ? 'text-neon-red' : 'text-foreground'
+                          }`}>
+                            <AnimatedCounter value={stats?.total_pnl || 0} prefix="$" decimals={2} />
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-center gap-2 px-2 py-1 rounded bg-card/50 border border-border">
+                          <Label htmlFor="fees-toggle-grid" className="text-xs cursor-pointer">
+                            {includeFeesInPnL ? 'With Fees' : 'Without Fees'}
+                          </Label>
+                          <Switch
+                            id="fees-toggle-grid"
+                            checked={includeFeesInPnL}
+                            onCheckedChange={setIncludeFeesInPnL}
+                            className="scale-75"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 rounded-lg bg-muted/50">
+                        <div className="text-xs text-muted-foreground mb-1">Win Rate</div>
+                        <div className={`text-2xl font-bold flex items-center gap-2 ${
+                          stats && stats.win_rate > 70 ? 'text-neon-green' : 'text-foreground'
+                        }`}>
+                          <AnimatedCounter value={stats?.win_rate || 0} suffix="%" decimals={1} />
+                          {stats && stats.win_rate > 70 && <span className="text-xl">👹</span>}
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 rounded-lg bg-muted/50">
+                        <div className="text-xs text-muted-foreground mb-1">Total Trades</div>
+                        <div className="text-2xl font-bold">
+                          <AnimatedCounter value={stats?.total_trades || 0} decimals={0} />
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 rounded-lg bg-muted/50">
+                        <div className="text-xs text-muted-foreground mb-1">Avg Duration</div>
+                        <div className="text-2xl font-bold">
+                          <AnimatedCounter value={Math.round(stats?.avg_duration || 0)} decimals={0} />
+                          <span className="text-sm">m</span>
+                        </div>
+                      </div>
+                    </div>
+                  </DashboardWidget>
+                </div>
+
+                {/* Heatmap Widget */}
+                <div key="heatmap">
+                  <DashboardWidget
+                    id="heatmap"
+                    title="Trading Success Heatmap"
+                    isCustomizing={isCustomizing}
+                    isVisible={isWidgetVisible('heatmap')}
+                    onToggleVisibility={toggleWidgetVisibility}
+                  >
+                    <div className="overflow-x-auto">
+                      {/* Heatmap content - will be extracted from TradingHeatmap component internals */}
+                      <div className="text-sm text-muted-foreground mb-4">
+                        Your performance by day and time. Hover for details.
+                      </div>
+                      <div className="text-center text-muted-foreground py-8">
+                        Heatmap visualization coming soon
+                      </div>
+                    </div>
+                  </DashboardWidget>
+                </div>
+
+                {/* Charts Widget */}
+                <div key="charts">
+                  <DashboardWidget
+                    id="charts"
+                    title="Performance Charts"
+                    isCustomizing={isCustomizing}
+                    isVisible={isWidgetVisible('charts')}
+                    onToggleVisibility={toggleWidgetVisibility}
+                  >
+                    <DashboardCharts trades={filteredTrades.length > 0 ? filteredTrades : trades} />
+                  </DashboardWidget>
+                </div>
+              </ResponsiveGridLayout>
+            )}
+
+            {stats && stats.total_trades > 0 && (
+              <Tabs defaultValue="advanced" className="space-y-6 mt-6">
                 <TabsList>
-                  <TabsTrigger value="analytics">Analytics</TabsTrigger>
-                  <TabsTrigger value="advanced">Advanced</TabsTrigger>
+                  <TabsTrigger value="advanced">Advanced Analytics</TabsTrigger>
                   <TabsTrigger value="history">Trade History</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="analytics" className="space-y-6">
-                  <TradingHeatmap trades={filteredTrades.length > 0 ? filteredTrades : trades} />
-                  <DashboardCharts trades={filteredTrades.length > 0 ? filteredTrades : trades} />
-                </TabsContent>
-
                 <TabsContent value="advanced" className="space-y-6">
-                  <AdvancedAnalytics 
+                  <AdvancedAnalytics
                     trades={filteredTrades.length > 0 ? filteredTrades : trades}
                     initialInvestment={initialInvestment}
                     userId={user?.id || ''}
