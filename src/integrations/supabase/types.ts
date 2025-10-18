@@ -200,6 +200,45 @@ export type Database = {
         }
         Relationships: []
       }
+      trading_goals: {
+        Row: {
+          created_at: string
+          current_value: number
+          deadline: string | null
+          goal_type: string
+          id: string
+          period: string
+          target_value: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_value?: number
+          deadline?: string | null
+          goal_type: string
+          id?: string
+          period: string
+          target_value: number
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_value?: number
+          deadline?: string | null
+          goal_type?: string
+          id?: string
+          period?: string
+          target_value?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       upload_batches: {
         Row: {
           assets: string[]
