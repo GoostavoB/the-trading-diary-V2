@@ -10,6 +10,7 @@ import { TradeHistory } from '@/components/TradeHistory';
 import { AdvancedAnalytics } from '@/components/AdvancedAnalytics';
 import { PerformanceInsights } from '@/components/PerformanceInsights';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
+import { ExportTradesDialog } from '@/components/ExportTradesDialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -210,6 +211,9 @@ const Dashboard = () => {
           </div>
           <div className="flex items-center gap-4">
             <DateRangeFilter dateRange={dateRange} onDateRangeChange={setDateRange} />
+            {trades.length > 0 && (
+              <ExportTradesDialog trades={filteredTrades.length > 0 ? filteredTrades : trades} />
+            )}
           </div>
           {beastModeDays > 0 && (
             <TooltipProvider>

@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ForecastScenarioCard } from '@/components/forecast/ForecastScenarioCard';
 import { CalculationModal } from '@/components/forecast/CalculationModal';
 import { GoalSimulator } from '@/components/forecast/GoalSimulator';
+import { ForecastChart } from '@/components/forecast/ForecastChart';
 import { calculateAdvancedStats, AdvancedStats } from '@/lib/forecastCalculations';
 import { Sparkles } from 'lucide-react';
 
@@ -184,6 +185,15 @@ const Forecast = () => {
 
               {advancedStats ? (
                 <>
+                  {/* Growth Chart */}
+                  <ForecastChart
+                    currentBalance={currentBalance}
+                    dailyGrowthBase={advancedStats.daily_growth_base}
+                    dailyGrowthOptimistic={advancedStats.daily_growth_optimistic}
+                    dailyGrowthConservative={advancedStats.daily_growth_conservative}
+                    selectedPeriod={days[0]}
+                  />
+
                   {/* Three Scenario Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <ForecastScenarioCard
