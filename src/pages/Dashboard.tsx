@@ -14,6 +14,7 @@ import { GoalsTracker } from '@/components/GoalsTracker';
 import { AchievementBadges } from '@/components/AchievementBadges';
 import { WeeklyReview } from '@/components/WeeklyReview';
 import { ExpenseTracker } from '@/components/ExpenseTracker';
+import { MonthlyReport } from '@/components/MonthlyReport';
 import { ExportTradesDialog } from '@/components/ExportTradesDialog';
 import { StatisticsComparison } from '@/components/StatisticsComparison';
 import { TradingStreaks } from '@/components/TradingStreaks';
@@ -22,6 +23,7 @@ import { Switch } from '@/components/ui/switch';
 import { SetupManager } from '@/components/SetupManager';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { DrawdownAnalysis } from '@/components/DrawdownAnalysis';
 import { AnimatedCounter } from '@/components/AnimatedCounter';
 import { DateRangeFilter, DateRange } from '@/components/DateRangeFilter';
 import { TradingHeatmap } from '@/components/TradingHeatmap';
@@ -474,6 +476,9 @@ const Dashboard = () => {
                 </TabsList>
 
                 <TabsContent value="insights" className="space-y-6">
+                  <MonthlyReport 
+                    trades={filteredTrades.length > 0 ? filteredTrades : trades}
+                  />
                   <WeeklyReview 
                     trades={filteredTrades.length > 0 ? filteredTrades : trades}
                   />
@@ -497,6 +502,10 @@ const Dashboard = () => {
                 </TabsContent>
 
                 <TabsContent value="advanced" className="space-y-6">
+                  <DrawdownAnalysis
+                    trades={filteredTrades.length > 0 ? filteredTrades : trades}
+                    initialInvestment={initialInvestment}
+                  />
                   <SetupManager
                     trades={filteredTrades.length > 0 ? filteredTrades : trades}
                   />
