@@ -16,6 +16,8 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from "@/lib/utils";
 import { UploadHistory } from '@/components/UploadHistory';
+import { UploadProgress, getRandomThinkingPhrase } from '@/components/UploadProgress';
+import { DuplicateTradeDialog } from '@/components/DuplicateTradeDialog';
 
 interface ExtractedTrade {
   symbol: string;
@@ -92,6 +94,13 @@ const Upload = () => {
   const editId = searchParams.get('edit');
   const [loading, setLoading] = useState(false);
   const [extracting, setExtracting] = useState(false);
+  const [uploadStep, setUploadStep] = useState<1 | 2 | 3 | 4>(1);
+  const [processingMessage, setProcessingMessage] = useState('');
+  const [duplicateDialog, setDuplicateDialog] = useState<{
+    open: boolean;
+    trade?: ExtractedTrade & { existingDate?: string; existingSymbol?: string; existingPnl?: number };
+    index?: number;
+  }>({ open: false });
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [extractionImage, setExtractionImage] = useState<File | null>(null);
@@ -348,10 +357,14 @@ const Upload = () => {
   const handleConfirmExtraction = async () => {
     if (!extractionPreview || extracting) return;
     setExtracting(true);
+    setUploadStep(1);
+    setProcessingMessage(getRandomThinkingPhrase());
+    
     toast.info('🔍 Starting AI extraction...', {
       description: 'Analyzing your trade screenshot',
       duration: 2000
     });
+    
     try {
       await extractTradeInfo();
     } catch (error) {
@@ -364,7 +377,15 @@ const Upload = () => {
     setExtractedTrades([]);
 
     try {
-      // Use the already-compressed preview
+      // Step 1: Uploading
+      setUploadStep(1);
+      setProcessingMessage('Preparing your image...');
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Step 2: Extracting data
+      setUploadStep(2);
+      setProcessingMessage(getRandomThinkingPhrase());
+      
       const { data, error } = await supabase.functions.invoke('extract-trade-info', {
         body: { imageBase64: extractionPreview }
       });
@@ -386,7 +407,19 @@ const Upload = () => {
       }
 
       if (data?.trades && data.trades.length > 0) {
+        // Step 3: Checking duplicates
+        setUploadStep(3);
+        setProcessingMessage('Scanning for duplicate trades...');
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        // Step 4: Complete
+        setUploadStep(4);
+        setProcessingMessage('Trade extraction complete!');
+        
         setExtractedTrades(data.trades);
+        
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         toast.success(`✅ Extracted ${data.trades.length} trade(s) from image!`, {
           description: 'Review and save your trades below'
         });
@@ -481,9 +514,13 @@ const Upload = () => {
     setLoading(true);
 
     try {
+      // Check for duplicates before saving
       const tradesData = extractedTrades.map((trade, index) => {
         const edits = tradeEdits[index] || {};
         const finalTrade = { ...trade, ...edits };
+        
+        // Create trade hash for duplicate detection
+        const tradeHash = `${finalTrade.symbol}_${finalTrade.opened_at}_${finalTrade.roi}_${finalTrade.profit_loss}`;
         
         return {
           user_id: user.id,
@@ -511,10 +548,40 @@ const Upload = () => {
           duration_minutes: finalTrade.duration_minutes,
           pnl: finalTrade.profit_loss,
           trade_date: finalTrade.opened_at,
-          notes: finalTrade.notes || null
+          notes: finalTrade.notes || null,
+          trade_hash: tradeHash
         };
       });
 
+      // Check for duplicates
+      const hashes = tradesData.map(t => t.trade_hash);
+      const { data: existingTrades } = await supabase
+        .from('trades')
+        .select('trade_hash, symbol, trade_date, pnl')
+        .eq('user_id', user.id)
+        .in('trade_hash', hashes);
+
+      if (existingTrades && existingTrades.length > 0) {
+        // Found duplicates - show dialog
+        const firstDuplicate = existingTrades[0];
+        const duplicateTradeIndex = tradesData.findIndex(t => t.trade_hash === firstDuplicate.trade_hash);
+        
+        setDuplicateDialog({
+          open: true,
+          trade: {
+            ...extractedTrades[duplicateTradeIndex],
+            existingDate: firstDuplicate.trade_date,
+            existingSymbol: firstDuplicate.symbol,
+            existingPnl: firstDuplicate.pnl
+          },
+          index: duplicateTradeIndex
+        });
+        
+        setLoading(false);
+        return;
+      }
+
+      // No duplicates, proceed with save
       const { data: insertedTrades, error } = await supabase
         .from('trades')
         .insert(tradesData)
@@ -724,9 +791,12 @@ const Upload = () => {
                             </Button>
 
                             {extracting && (
-                              <div className="mt-6 text-center max-w-2xl mx-auto">
-                                <p className="text-sm md:text-base font-medium">"{quotes[quoteIndex].text}"</p>
-                                <p className="text-xs md:text-sm text-muted-foreground mt-1">— {quotes[quoteIndex].author}</p>
+                              <div className="mt-6 space-y-6">
+                                <UploadProgress step={uploadStep} processingMessage={processingMessage} />
+                                <div className="text-center max-w-2xl mx-auto">
+                                  <p className="text-sm md:text-base font-medium">"{quotes[quoteIndex].text}"</p>
+                                  <p className="text-xs md:text-sm text-muted-foreground mt-1">— {quotes[quoteIndex].author}</p>
+                                </div>
                               </div>
                             )}
                           </>
@@ -1499,6 +1569,90 @@ const Upload = () => {
 
         <UploadHistory />
       </div>
+
+      {/* Duplicate Trade Detection Dialog */}
+      <DuplicateTradeDialog
+        open={duplicateDialog.open}
+        onOpenChange={(open) => setDuplicateDialog({ open })}
+        onContinue={async () => {
+          setDuplicateDialog({ open: false });
+          // Continue with save, ignoring duplicate check
+          if (!user || extractedTrades.length === 0) return;
+          
+          setLoading(true);
+          
+          try {
+            const tradesData = extractedTrades.map((trade, index) => {
+              const edits = tradeEdits[index] || {};
+              const finalTrade = { ...trade, ...edits };
+              const tradeHash = `${finalTrade.symbol}_${finalTrade.opened_at}_${finalTrade.roi}_${finalTrade.profit_loss}`;
+              
+              return {
+                user_id: user.id,
+                symbol: finalTrade.symbol,
+                symbol_temp: finalTrade.symbol,
+                broker: finalTrade.broker || null,
+                setup: finalTrade.setup || null,
+                emotional_tag: finalTrade.emotional_tag || null,
+                entry_price: finalTrade.entry_price,
+                exit_price: finalTrade.exit_price,
+                position_size: finalTrade.position_size,
+                side: finalTrade.side,
+                side_temp: finalTrade.side,
+                leverage: finalTrade.leverage || 1,
+                profit_loss: finalTrade.profit_loss,
+                funding_fee: finalTrade.funding_fee,
+                trading_fee: finalTrade.trading_fee,
+                roi: finalTrade.roi,
+                margin: finalTrade.margin,
+                opened_at: finalTrade.opened_at,
+                closed_at: finalTrade.closed_at,
+                period_of_day: finalTrade.period_of_day,
+                duration_days: finalTrade.duration_days,
+                duration_hours: finalTrade.duration_hours,
+                duration_minutes: finalTrade.duration_minutes,
+                pnl: finalTrade.profit_loss,
+                trade_date: finalTrade.opened_at,
+                notes: finalTrade.notes || null,
+                trade_hash: tradeHash
+              };
+            });
+
+            const { data: insertedTrades, error } = await supabase
+              .from('trades')
+              .insert(tradesData)
+              .select('id, symbol, profit_loss');
+
+            if (!error) {
+              const assets = [...new Set(tradesData.map(t => t.symbol))];
+              const totalEntryValue = tradesData.reduce((sum, t) => sum + (t.entry_price * t.position_size), 0);
+              const mostRecentTrade = insertedTrades?.[0];
+
+              await supabase.from('upload_batches').insert({
+                user_id: user.id,
+                trade_count: extractedTrades.length,
+                assets: assets,
+                total_entry_value: totalEntryValue,
+                most_recent_trade_id: mostRecentTrade?.id,
+                most_recent_trade_asset: mostRecentTrade?.symbol,
+                most_recent_trade_value: mostRecentTrade?.profit_loss
+              });
+
+              toast.success(`✅ ${extractedTrades.length} trade${extractedTrades.length > 1 ? 's' : ''} saved!`);
+              setExtractedTrades([]);
+              setTradeEdits({});
+              removeExtractionImage();
+            } else {
+              toast.error('Failed to save trades');
+            }
+          } finally {
+            setLoading(false);
+          }
+        }}
+        duplicateDate={duplicateDialog.trade?.existingDate}
+        duplicateSymbol={duplicateDialog.trade?.existingSymbol}
+        duplicatePnl={duplicateDialog.trade?.existingPnl}
+      />
     </AppLayout>
   );
 };

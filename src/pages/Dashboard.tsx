@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AnimatedCounter } from '@/components/AnimatedCounter';
 import { DateRangeFilter, DateRange } from '@/components/DateRangeFilter';
+import { TradingHeatmap } from '@/components/TradingHeatmap';
 import type { Trade } from '@/types/trade';
 
 interface TradeStats {
@@ -327,6 +328,7 @@ const Dashboard = () => {
                 </TabsList>
 
                 <TabsContent value="analytics" className="space-y-6">
+                  <TradingHeatmap trades={filteredTrades.length > 0 ? filteredTrades : trades} />
                   <DashboardCharts trades={filteredTrades.length > 0 ? filteredTrades : trades} />
                 </TabsContent>
 
