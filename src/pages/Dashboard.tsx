@@ -224,7 +224,8 @@ const Dashboard = () => {
     }
   };
 
-  const calculateCurrentStreak = (trades: Trade[]) => {
+  // Memoize helper functions for performance
+  const calculateCurrentStreak = useCallback((trades: Trade[]) => {
     if (trades.length === 0) return 0;
     const sorted = [...trades].sort((a, b) => new Date(b.trade_date).getTime() - new Date(a.trade_date).getTime());
     let streak = 0;
@@ -237,15 +238,15 @@ const Dashboard = () => {
       }
     }
     return streak;
-  };
+  }, []);
 
-  const calculateStreakType = (trades: Trade[]): 'winning' | 'losing' => {
+  const calculateStreakType = useCallback((trades: Trade[]): 'winning' | 'losing' => {
     if (trades.length === 0) return 'winning';
     const sorted = [...trades].sort((a, b) => new Date(b.trade_date).getTime() - new Date(a.trade_date).getTime());
     return sorted[0].pnl > 0 ? 'winning' : 'losing';
-  };
+  }, []);
 
-  const getBestAsset = (trades: Trade[]) => {
+  const getBestAsset = useCallback((trades: Trade[]) => {
     if (trades.length === 0) return 'N/A';
     const assetPnL: Record<string, number> = {};
     trades.forEach(t => {
@@ -254,7 +255,16 @@ const Dashboard = () => {
     });
     const best = Object.entries(assetPnL).sort((a, b) => b[1] - a[1])[0];
     return best ? best[0] : 'N/A';
-  };
+  }, []);
+
+  // Memoize handlers
+  const handleDateRangeChange = useCallback((range: DateRange) => {
+    setDateRange(range);
+  }, []);
+
+  const handleStartCustomize = useCallback(() => {
+    setIsCustomizing(true);
+  }, [setIsCustomizing]);
 
   const StatCard = ({ title, value, icon: Icon, trend, valueColor, animated = false, numericValue }: any) => (
     <Card className="p-5 glass hover-lift transition-all duration-300">
@@ -335,7 +345,7 @@ const Dashboard = () => {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <AccentColorPicker />
-            <DateRangeFilter dateRange={dateRange} onDateRangeChange={setDateRange} />
+            <DateRangeFilter dateRange={dateRange} onDateRangeChange={handleDateRangeChange} />
             {trades.length > 0 && (
               <ExportTradesDialog trades={processedTrades} />
             )}
@@ -346,7 +356,7 @@ const Dashboard = () => {
         <CustomizeDashboardControls
           isCustomizing={isCustomizing}
           hasChanges={hasChanges}
-          onStartCustomize={() => setIsCustomizing(true)}
+          onStartCustomize={handleStartCustomize}
           onSave={saveLayout}
           onCancel={cancelCustomization}
           onReset={resetLayout}

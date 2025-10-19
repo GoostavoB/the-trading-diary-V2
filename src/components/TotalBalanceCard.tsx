@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { GlassCard } from "@/components/ui/glass-card";
 import { DollarSign, TrendingUp, TrendingDown } from "lucide-react";
 import { AnimatedCounter } from "./AnimatedCounter";
@@ -15,7 +16,7 @@ interface TotalBalanceCardProps {
   className?: string;
 }
 
-export const TotalBalanceCard = ({ 
+export const TotalBalanceCard = memo(({ 
   balance, 
   change, 
   changePercent, 
@@ -113,4 +114,6 @@ export const TotalBalanceCard = ({
       </div>
     </GlassCard>
   );
-};
+});
+
+TotalBalanceCard.displayName = 'TotalBalanceCard';

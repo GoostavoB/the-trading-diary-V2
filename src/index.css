@@ -141,9 +141,33 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
-  /* Hover lift effect */
+  /* Standardized shadow levels */
+  .shadow-level-1 {
+    @apply shadow-sm;
+  }
+
+  .shadow-level-2 {
+    @apply shadow-md;
+  }
+
+  .shadow-level-3 {
+    @apply shadow-lg;
+  }
+
+  /* Hover lift effect with consistent shadow */
   .hover-lift {
-    @apply transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl;
+    @apply transition-all duration-300 hover:-translate-y-0.5 hover:shadow-level-2;
+  }
+
+  /* Widget card standardization */
+  .widget-card {
+    @apply rounded-xl p-6;
+  }
+
+  @media (max-width: 768px) {
+    .widget-card {
+      @apply p-4;
+    }
   }
 
   /* Animations */
@@ -400,15 +424,46 @@ textarea:focus-visible {
   background-color: hsl(var(--negative) / 0.1);
 }
 
-/* Consistent visual spacing */
+/* Consistent visual spacing system */
 .section-spacing {
-  @apply space-y-6 md:space-y-8;
+  @apply space-y-6;
+}
+
+@media (min-width: 768px) {
+  .section-spacing {
+    @apply space-y-8;
+  }
 }
 
 .card-padding {
-  @apply p-4 md:p-6;
+  @apply p-4;
+}
+
+@media (min-width: 1024px) {
+  .card-padding {
+    @apply p-6;
+  }
+}
+
+.card-header {
+  @apply mb-4;
 }
 
 .card-gap {
-  @apply gap-4 md:gap-6;
+  @apply gap-4;
+}
+
+@media (min-width: 768px) {
+  .card-gap {
+    @apply gap-6;
+  }
+}
+
+/* Chart container standardization */
+.chart-wrapper {
+  @apply w-full;
+}
+
+.chart-header {
+  @apply flex items-center justify-between mb-4;
 }

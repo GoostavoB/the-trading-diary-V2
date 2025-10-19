@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { Plus, Upload, BarChart3 } from "lucide-react";
@@ -7,7 +8,7 @@ interface QuickActionCardProps {
   className?: string;
 }
 
-export const QuickActionCard = ({ className }: QuickActionCardProps) => {
+export const QuickActionCard = memo(({ className }: QuickActionCardProps) => {
   const navigate = useNavigate();
 
   const actions = [
@@ -57,4 +58,6 @@ export const QuickActionCard = ({ className }: QuickActionCardProps) => {
       </div>
     </GlassCard>
   );
-};
+});
+
+QuickActionCard.displayName = 'QuickActionCard';

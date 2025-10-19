@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format } from 'date-fns';
@@ -17,40 +18,52 @@ interface DashboardChartsProps {
   chartType?: 'cumulative' | 'winsLosses';
 }
 
-export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => {
+export const DashboardCharts = memo(({ trades, chartType }: DashboardChartsProps) => {
   const { isMobile, optimizeDataPoints, formatNumberMobile } = useMobileOptimization();
   const { openWithPrompt } = useAIAssistant();
   
-  // Calculate cumulative P&L over time
-  const cumulativePnLRaw = trades
-    .sort((a, b) => new Date(a.trade_date).getTime() - new Date(b.trade_date).getTime())
-    .map((trade, index, arr) => {
-      const cumulative = arr.slice(0, index + 1).reduce((sum, t) => sum + t.pnl, 0);
-      return {
-        date: format(new Date(trade.trade_date), 'MMM dd'),
-        pnl: cumulative,
-      };
-    });
+  // Memoize cumulative P&L calculation
+  const cumulativePnLRaw = useMemo(() => 
+    trades
+      .sort((a, b) => new Date(a.trade_date).getTime() - new Date(b.trade_date).getTime())
+      .map((trade, index, arr) => {
+        const cumulative = arr.slice(0, index + 1).reduce((sum, t) => sum + t.pnl, 0);
+        return {
+          date: format(new Date(trade.trade_date), 'MMM dd'),
+          pnl: cumulative,
+        };
+      }),
+    [trades]
+  );
 
   // Optimize data points for mobile
-  const cumulativePnL = optimizeDataPoints(cumulativePnLRaw, isMobile ? 15 : 50);
+  const cumulativePnL = useMemo(() => 
+    optimizeDataPoints(cumulativePnLRaw, isMobile ? 15 : 50),
+    [cumulativePnLRaw, isMobile, optimizeDataPoints]
+  );
 
-  // Group trades by date for wins/losses
-  const tradesByDate = trades.reduce((acc, trade) => {
-    const date = format(new Date(trade.trade_date), 'MMM dd');
-    if (!acc[date]) {
-      acc[date] = { date, wins: 0, losses: 0 };
-    }
-    if (trade.pnl > 0) {
-      acc[date].wins += 1;
-    } else {
-      acc[date].losses += 1;
-    }
-    return acc;
-  }, {} as Record<string, { date: string; wins: number; losses: number }>);
+  // Memoize wins/losses aggregation
+  const tradesByDate = useMemo(() => 
+    trades.reduce((acc, trade) => {
+      const date = format(new Date(trade.trade_date), 'MMM dd');
+      if (!acc[date]) {
+        acc[date] = { date, wins: 0, losses: 0 };
+      }
+      if (trade.pnl > 0) {
+        acc[date].wins += 1;
+      } else {
+        acc[date].losses += 1;
+      }
+      return acc;
+    }, {} as Record<string, { date: string; wins: number; losses: number }>),
+    [trades]
+  );
 
-  const winsLossesDataRaw = Object.values(tradesByDate);
-  const winsLossesData = optimizeDataPoints(winsLossesDataRaw, isMobile ? 10 : 30);
+  const winsLossesDataRaw = useMemo(() => Object.values(tradesByDate), [tradesByDate]);
+  const winsLossesData = useMemo(() => 
+    optimizeDataPoints(winsLossesDataRaw, isMobile ? 10 : 30),
+    [winsLossesDataRaw, isMobile, optimizeDataPoints]
+  );
 
   // Render specific chart if chartType is provided
   if (chartType === 'cumulative') {
@@ -335,4 +348,6 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
       </Card>
     </div>
   );
-};
+});
+
+DashboardCharts.displayName = 'DashboardCharts';
