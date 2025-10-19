@@ -340,7 +340,20 @@ const Dashboard = () => {
                     
                     {/* Stats Cards Grid - Mobile optimized */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-                      <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center items-start min-h-[80px] lg:min-h-[100px]">
+                      <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center items-start min-h-[80px] lg:min-h-[100px] relative">
+                        {/* Fees Toggle - Minimalistic in top right */}
+                        <div className="absolute top-2 right-2 flex items-center gap-1">
+                          <Label htmlFor="fees-toggle-grid" className="cursor-pointer text-[10px] text-muted-foreground hidden lg:inline">
+                            {includeFeesInPnL ? 'w/ Fees' : 'w/o Fees'}
+                          </Label>
+                          <Switch
+                            id="fees-toggle-grid"
+                            checked={includeFeesInPnL}
+                            onCheckedChange={setIncludeFeesInPnL}
+                            className="scale-75"
+                          />
+                        </div>
+                        
                         <div className="text-xs lg:text-sm text-muted-foreground mb-1 lg:mb-2 w-full">Total P&L</div>
                         <div className={`text-lg lg:text-2xl font-bold w-full ${
                           stats && stats.total_pnl > 0 ? 'text-neon-green' : 
@@ -372,20 +385,6 @@ const Dashboard = () => {
                           <AnimatedCounter value={Math.round(stats?.avg_duration || 0)} decimals={0} />
                           <span className="text-sm lg:text-base ml-1">m</span>
                         </div>
-                      </div>
-                    </div>
-                    
-                    {/* Fees Toggle - Mobile optimized */}
-                    <div className="flex justify-center">
-                      <div className="flex items-center gap-2 px-3 lg:px-4 py-2 rounded-lg glass-subtle">
-                        <Label htmlFor="fees-toggle-grid" className="cursor-pointer text-xs lg:text-sm text-muted-foreground">
-                          {includeFeesInPnL ? 'Including Fees' : 'Excluding Fees'}
-                        </Label>
-                        <Switch
-                          id="fees-toggle-grid"
-                          checked={includeFeesInPnL}
-                          onCheckedChange={setIncludeFeesInPnL}
-                        />
                       </div>
                     </div>
                   </div>
