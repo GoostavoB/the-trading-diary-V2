@@ -179,23 +179,36 @@
     line-height: 1.4;
   }
 
-/* Global Widget Card Alignment Rules */
-.glass, .glass-strong, .glass-subtle {
+/* Global Widget Card Alignment Rules - Auto-size cards to content */
+.widget-card {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   min-height: auto !important;
   height: auto !important;
 }
 
-.glass > *, .glass-strong > *, .glass-subtle > * {
+.widget-card > * {
   width: 100%;
 }
 
-/* Chart Container Responsiveness */
-.recharts-wrapper,
-.recharts-surface,
-canvas,
-svg {
+/* Chart Wrapper - Centers charts and makes them responsive */
+.chart-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
+}
+
+/* Chart Container Responsiveness - ONLY inside .chart-wrapper or .chart-container */
+.chart-wrapper .recharts-wrapper,
+.chart-wrapper .recharts-surface,
+.chart-container .recharts-wrapper,
+.chart-container .recharts-surface,
+.chart-wrapper canvas,
+.chart-container canvas {
   width: 100% !important;
   height: auto !important;
   max-width: 100%;

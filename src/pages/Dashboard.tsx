@@ -359,8 +359,8 @@ const Dashboard = () => {
 
             {/* Charts Section - Flexible Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              <div className="glass rounded-2xl p-6 hover-lift">
-                <div className="flex items-center justify-between mb-4">
+              <div className="glass rounded-2xl p-6 hover-lift widget-card">
+                <div className="flex items-center justify-between mb-4 w-full">
                   <h3 className="text-lg font-semibold">Cumulative P&L</h3>
                   <TooltipProvider>
                     <Tooltip>
@@ -378,11 +378,13 @@ const Dashboard = () => {
                     </Tooltip>
                   </TooltipProvider>
                 </div>
-                <DashboardCharts trades={filteredTrades.length > 0 ? filteredTrades : trades} chartType="cumulative" />
+                <div className="chart-wrapper">
+                  <DashboardCharts trades={filteredTrades.length > 0 ? filteredTrades : trades} chartType="cumulative" />
+                </div>
               </div>
               
-              <div className="glass rounded-2xl p-6 hover-lift">
-                <div className="flex items-center justify-between mb-4">
+              <div className="glass rounded-2xl p-6 hover-lift widget-card">
+                <div className="flex items-center justify-between mb-4 w-full">
                   <h3 className="text-lg font-semibold">Wins vs Losses</h3>
                   <TooltipProvider>
                     <Tooltip>
@@ -400,14 +402,16 @@ const Dashboard = () => {
                     </Tooltip>
                   </TooltipProvider>
                 </div>
-                <DashboardCharts trades={filteredTrades.length > 0 ? filteredTrades : trades} chartType="winsLosses" />
+                <div className="chart-wrapper">
+                  <DashboardCharts trades={filteredTrades.length > 0 ? filteredTrades : trades} chartType="winsLosses" />
+                </div>
               </div>
             </div>
 
             {/* Trading Heatmap */}
             {stats && stats.total_trades > 0 && (
-              <div className="glass rounded-2xl p-6 hover-lift">
-                <div className="flex items-center justify-between mb-4">
+              <div className="glass rounded-2xl p-6 hover-lift widget-card">
+                <div className="flex items-center justify-between mb-4 w-full">
                   <h3 className="text-lg font-semibold">Trading Heatmap</h3>
                   <TooltipProvider>
                     <Tooltip>
@@ -425,7 +429,7 @@ const Dashboard = () => {
                     </Tooltip>
                   </TooltipProvider>
                 </div>
-                <div className="flex justify-center items-center w-full">
+                <div className="chart-wrapper">
                   <TradingHeatmap trades={filteredTrades.length > 0 ? filteredTrades : trades} />
                 </div>
               </div>
