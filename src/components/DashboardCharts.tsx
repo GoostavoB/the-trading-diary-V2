@@ -69,13 +69,14 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
               />
               <Tooltip
+                cursor={{ strokeDasharray: '3 3', stroke: 'hsl(var(--border))', fill: 'transparent' }}
                 contentStyle={{
-                  backgroundColor: 'hsl(var(--background) / 0.8)',
+                  backgroundColor: 'hsl(var(--background) / 0.95)',
                   backdropFilter: 'blur(12px)',
                   WebkitBackdropFilter: 'blur(12px)',
                   border: '1px solid hsl(var(--border) / 0.5)',
                   borderRadius: '8px',
-                  boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.1)',
+                  boxShadow: '0 4px 12px 0 rgba(0, 0, 0, 0.1)',
                 }}
                 labelStyle={{ color: 'hsl(var(--foreground))' }}
                 formatter={(value: any) => {
@@ -91,6 +92,7 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
                 strokeWidth={2}
                 fillOpacity={1}
                 fill="url(#colorPnl)"
+                animationDuration={500}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -123,18 +125,31 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
               />
               <Tooltip
+                cursor={{ fill: 'transparent' }}
                 contentStyle={{
-                  backgroundColor: 'hsl(var(--background) / 0.8)',
+                  backgroundColor: 'hsl(var(--background) / 0.95)',
                   backdropFilter: 'blur(12px)',
                   WebkitBackdropFilter: 'blur(12px)',
                   border: '1px solid hsl(var(--border) / 0.5)',
                   borderRadius: '8px',
-                  boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.1)',
+                  boxShadow: '0 4px 12px 0 rgba(0, 0, 0, 0.1)',
                 }}
                 labelStyle={{ color: 'hsl(var(--foreground))' }}
               />
-              <Bar dataKey="wins" fill="hsl(var(--neon-green))" />
-              <Bar dataKey="losses" fill="hsl(var(--neon-red))" />
+              <Bar 
+                dataKey="wins" 
+                fill="hsl(var(--neon-green))" 
+                radius={[4, 4, 0, 0]}
+                animationDuration={300}
+                className="transition-opacity hover:opacity-90"
+              />
+              <Bar 
+                dataKey="losses" 
+                fill="hsl(var(--neon-red))" 
+                radius={[4, 4, 0, 0]}
+                animationDuration={300}
+                className="transition-opacity hover:opacity-90"
+              />
             </BarChart>
           </ResponsiveContainer>
         ) : (
