@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
+import { useBadgeNotifications } from '@/hooks/useBadgeNotifications';
 import type { Trade } from '@/types/trade';
 
 const AchievementBadges = lazy(() => import('@/components/AchievementBadges').then(m => ({ default: m.AchievementBadges })));
@@ -35,6 +36,9 @@ const Achievements = () => {
 
     fetchTrades();
   }, [user]);
+
+  // Enable badge notifications
+  useBadgeNotifications(trades);
 
   return (
     <AppLayout>

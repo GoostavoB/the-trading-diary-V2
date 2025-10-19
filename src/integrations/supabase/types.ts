@@ -611,6 +611,30 @@ export type Database = {
         }
         Relationships: []
       }
+      unlocked_badges: {
+        Row: {
+          badge_id: string
+          id: string
+          notified: boolean
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          id?: string
+          notified?: boolean
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          id?: string
+          notified?: boolean
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       upload_batches: {
         Row: {
           assets: string[]

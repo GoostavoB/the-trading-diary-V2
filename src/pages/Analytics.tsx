@@ -11,11 +11,15 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Trade } from "@/types/trade";
 import { BarChart3, TrendingUp, Clock, Target } from "lucide-react";
+import { useBadgeNotifications } from "@/hooks/useBadgeNotifications";
 
 export default function Analytics() {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTrades, setSelectedTrades] = useState<Trade[]>([]);
+
+  // Enable badge notifications
+  useBadgeNotifications(trades);
 
   const fetchTrades = useCallback(async () => {
     try {

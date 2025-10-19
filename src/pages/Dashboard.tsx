@@ -32,6 +32,7 @@ import { PremiumCTACard } from '@/components/PremiumCTACard';
 import { useDashboardLayout } from '@/hooks/useDashboardLayout';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
+import { useBadgeNotifications } from '@/hooks/useBadgeNotifications';
 import { LazyChart } from '@/components/LazyChart';
 import { formatNumber, formatPercent, formatCurrency } from '@/utils/formatNumber';
 import type { Trade } from '@/types/trade';
@@ -83,6 +84,9 @@ const Dashboard = () => {
 
   // Memoize dashboard stats calculations
   const dashboardStats = useDashboardStats(processedTrades);
+
+  // Enable badge notifications
+  useBadgeNotifications(processedTrades);
   
   const handleTabChange = useCallback((val: string) => {
     const container = tabsContainerRef.current?.closest('main') as HTMLElement | null;
