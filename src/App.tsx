@@ -25,6 +25,7 @@ import Social from "./pages/Social";
 import AITools from "./pages/AITools";
 import Achievements from "./pages/Achievements";
 import NotFound from "./pages/NotFound";
+import CustomPage from "./pages/CustomPage";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ const App = () => (
                   <Route path="/blog" element={<ProtectedRoute><Blog /></ProtectedRoute>} />
                   <Route path="/blog/:slug" element={<ProtectedRoute><BlogPost /></ProtectedRoute>} />
                   <Route path="/faq" element={<ProtectedRoute><FAQ /></ProtectedRoute>} />
+                  <Route path="/custom/:pageId" element={<ProtectedRoute><CustomPage /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <PerformanceMonitor />

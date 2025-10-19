@@ -115,6 +115,109 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_dashboard_widgets: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_config: Json
+          height: number
+          id: string
+          menu_item_id: string | null
+          position_x: number
+          position_y: number
+          query_config: Json
+          title: string
+          updated_at: string
+          user_id: string
+          widget_type: string
+          width: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_config?: Json
+          height?: number
+          id?: string
+          menu_item_id?: string | null
+          position_x?: number
+          position_y?: number
+          query_config?: Json
+          title: string
+          updated_at?: string
+          user_id: string
+          widget_type: string
+          width?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_config?: Json
+          height?: number
+          id?: string
+          menu_item_id?: string | null
+          position_x?: number
+          position_y?: number
+          query_config?: Json
+          title?: string
+          updated_at?: string
+          user_id?: string
+          widget_type?: string
+          width?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_dashboard_widgets_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "custom_menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custom_menu_items: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          label: string
+          order_index: number
+          parent_id: string | null
+          route: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label: string
+          order_index?: number
+          parent_id?: string | null
+          route?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label?: string
+          order_index?: number
+          parent_id?: string | null
+          route?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_menu_items_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "custom_menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_reminders: {
         Row: {
           created_at: string | null

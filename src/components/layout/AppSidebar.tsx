@@ -1,5 +1,7 @@
-import { BarChart3, Upload, TrendingUp, Settings, BookOpen, HelpCircle, LogOut, TrendingDown, Calendar, Scale, Wrench, Users, Brain, Trophy } from 'lucide-react';
+import { BarChart3, Upload, TrendingUp, Settings, BookOpen, HelpCircle, LogOut, TrendingDown, Calendar, Scale, Wrench, Users, Brain, Trophy, Circle } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import * as LucideIcons from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -14,6 +16,8 @@ import {
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/contexts/AuthContext';
 import { SidebarCryptoWidget } from '@/components/SidebarCryptoWidget';
+import { MenuCustomizationDialog } from '@/components/menu/MenuCustomizationDialog';
+import { supabase } from '@/integrations/supabase/client';
 
 const mainItems = [
   { title: 'Dashboard', url: '/dashboard', icon: BarChart3 },
@@ -38,6 +42,25 @@ export function AppSidebar() {
   const { open } = useSidebar();
   const location = useLocation();
   const { signOut } = useAuth();
+  const [customMenuItems, setCustomMenuItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    loadCustomMenuItems();
+  }, []);
+
+  const loadCustomMenuItems = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('custom_menu_items')
+        .select('*')
+        .order('order_index');
+
+      if (error) throw error;
+      setCustomMenuItems(data || []);
+    } catch (error) {
+      console.error('Error loading custom menu items:', error);
+    }
+  };
 
   const isActive = (path: string) => location.pathname === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
@@ -86,6 +109,37 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Custom Menu Items */}
+        {customMenuItems.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Custom</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {customMenuItems.map((item) => {
+                  const IconComponent = (LucideIcons as any)[item.icon] || Circle;
+                  return (
+                    <SidebarMenuItem key={item.id}>
+                      <SidebarMenuButton asChild tooltip={item.label}>
+                        <NavLink to={item.route} end className={getNavCls}>
+                          <IconComponent className="mr-2 h-4 w-4" />
+                          <span>{item.label}</span>
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {/* Menu Customization */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <MenuCustomizationDialog />
           </SidebarGroupContent>
         </SidebarGroup>
 
