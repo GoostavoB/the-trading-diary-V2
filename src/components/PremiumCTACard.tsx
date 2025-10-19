@@ -10,7 +10,7 @@ interface PremiumCTACardProps {
 export const PremiumCTACard = memo(({ className }: PremiumCTACardProps) => {
   return (
     <GlassCard className={className} role="article" aria-labelledby="premium-cta-title">
-      <div className="space-y-4 text-center">
+      <div className="space-y-4 text-center p-6 md:p-8 pb-8">
         <div className="inline-flex p-3 rounded-full bg-gradient-to-br from-primary/20 to-primary/10">
           <Sparkles className="h-6 w-6 text-primary" />
         </div>

@@ -21,7 +21,7 @@ export const RecentTransactionsCard = memo(({ trades, className }: RecentTransac
 
   return (
     <GlassCard className={className} role="article" aria-labelledby="recent-transactions-title">
-      <div className="space-y-4">
+      <div className="space-y-4 p-6 md:p-8">
         <div className="flex items-center justify-between">
           <h3 id="recent-transactions-title" className="text-lg font-semibold">Recent Transactions</h3>
           <div className="flex items-center gap-2">

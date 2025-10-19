@@ -46,7 +46,7 @@ const TopMoversCardComponent = ({ trades, className }: TopMoversCardProps) => {
 
   return (
     <GlassCard className={className} role="region" aria-labelledby="top-movers-title">
-      <div className="space-y-4">
+      <div className="space-y-4 p-6 md:p-8">
         <div className="flex items-center justify-between">
           <h3 id="top-movers-title" className="text-lg font-semibold">Top Movers</h3>
           <ExplainMetricButton 

@@ -41,7 +41,7 @@ export const TotalBalanceCard = memo(({
 
   return (
     <GlassCard hover className={className} role="article" aria-labelledby="total-balance-title">
-      <div className="space-y-4">
+      <div className="space-y-4 p-6 md:p-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-xl bg-primary/10" aria-hidden="true">
@@ -84,7 +84,7 @@ export const TotalBalanceCard = memo(({
 
         {/* Mini Timeline Chart */}
         {sparklineData.length > 0 && (
-          <div className="h-16 w-full">
+          <div className="h-20 w-full overflow-hidden">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={sparklineData}>
                 <Line 
