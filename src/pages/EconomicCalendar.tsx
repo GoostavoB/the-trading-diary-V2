@@ -61,7 +61,10 @@ const EconomicCalendar = () => {
     try {
       // Using Trading Economics API
       // Get your free API key at https://tradingeconomics.com/api
-      const apiKey = "guest:guest"; // Replace with your API key
+      // WARNING: DO NOT replace with a real API key here!
+      // Real API keys must be stored server-side in backend functions and accessed securely.
+      // This demo key is for testing only.
+      const apiKey = "guest:guest";
       
       // Get current date and 30 days ahead
       const today = new Date();
