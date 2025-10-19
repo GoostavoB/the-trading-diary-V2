@@ -17,23 +17,32 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.png', 'robots.txt'],
       manifest: {
-        name: 'Trading Journal Pro',
-        short_name: 'TradeJournal',
-        description: 'Professional trading journal with AI-powered insights',
-        theme_color: '#8B5CF6',
-        background_color: '#000000',
+        name: 'Trading Analytics Pro',
+        short_name: 'TradingPro',
+        description: 'Professional-grade trading analytics dashboard with AI insights, customizable widgets, and real-time performance tracking',
+        theme_color: '#4A90E2',
+        background_color: '#f9f9fb',
         display: 'standalone',
+        orientation: 'portrait-primary',
         start_url: '/',
+        categories: ['finance', 'business', 'productivity'],
         icons: [
           {
             src: '/favicon.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any maskable'
+          },
+          {
+            src: '/favicon.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
           }
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
@@ -41,12 +50,29 @@ export default defineConfig(({ mode }) => ({
             options: {
               cacheName: 'supabase-cache',
               expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 7
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /\.(woff|woff2|ttf|eot)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'fonts-cache',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 * 365
               }
             }
           }
         ]
+      },
+      devOptions: {
+        enabled: true
       }
     })
   ].filter(Boolean),

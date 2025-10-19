@@ -1,4 +1,6 @@
-import { CheckCircle, TrendingUp, Award } from 'lucide-react';
+import { CheckCircle, TrendingUp, Award, Info } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { Trade } from '@/types/trade';
 import { startOfMonth, endOfMonth } from 'date-fns';
 
@@ -85,12 +87,26 @@ export const MonthSummaryInsights = ({ trades }: MonthSummaryInsightsProps) => {
         return (
           <div
             key={idx}
-            className="p-3 lg:p-4 rounded-xl bg-muted/30 backdrop-blur-sm flex items-start gap-3 transition-all hover:bg-muted/40"
+            className="p-3 lg:p-4 rounded-xl bg-muted/30 backdrop-blur-sm flex items-start gap-3 transition-all hover:bg-muted/40 relative group"
           >
             <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${insight.color}`} />
             <p className="text-xs lg:text-sm text-muted-foreground leading-relaxed">
               {insight.text}
             </p>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6 absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Info className="h-3 w-3 text-muted-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left" className="glass-strong max-w-xs">
+                  <p className="font-semibold mb-1">Performance Insight</p>
+                  <p className="text-xs mb-2">AI-generated analysis based on your trading patterns this month.</p>
+                  <p className="text-xs text-accent">Why it matters: Helps identify strengths and areas for improvement.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         );
       })}

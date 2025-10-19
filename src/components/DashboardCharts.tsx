@@ -50,23 +50,28 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
           Track your cumulative profit and loss over time.
         </p>
         {cumulativePnL.length > 0 ? (
-          <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={cumulativePnL}>
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart data={cumulativePnL} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
               <defs>
                 <linearGradient id="colorPnl" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--neon-green))" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(var(--neon-green))" stopOpacity={0} />
+                  <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
               <XAxis 
                 dataKey="date" 
                 stroke="hsl(var(--muted-foreground))"
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                tickMargin={8}
+                interval="preserveStartEnd"
               />
               <YAxis 
                 stroke="hsl(var(--muted-foreground))"
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                tickMargin={8}
+                width={60}
+                tickFormatter={(value) => `$${value.toFixed(0)}`}
               />
               <Tooltip
                 cursor={{ strokeDasharray: '3 3', stroke: 'hsl(var(--border))', fill: 'transparent' }}
@@ -77,22 +82,24 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
                   border: '1px solid hsl(var(--border) / 0.5)',
                   borderRadius: '8px',
                   boxShadow: '0 4px 12px 0 rgba(0, 0, 0, 0.1)',
+                  padding: '8px 12px'
                 }}
-                labelStyle={{ color: 'hsl(var(--foreground))' }}
+                labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 500, marginBottom: '4px' }}
                 formatter={(value: any) => {
                   const numValue = Number(value);
                   const color = numValue === 0 ? 'hsl(var(--foreground))' : numValue > 0 ? 'hsl(var(--neon-green))' : 'hsl(var(--neon-red))';
-                  return [<span style={{ color }}>${numValue.toFixed(2)}</span>, 'pnl'];
+                  return [<span style={{ color, fontWeight: 600 }}>${numValue.toFixed(2)}</span>, 'Cumulative P&L'];
                 }}
               />
               <Area
                 type="monotone"
                 dataKey="pnl"
-                stroke="hsl(var(--neon-green))"
-                strokeWidth={2}
+                stroke="hsl(var(--accent))"
+                strokeWidth={2.5}
                 fillOpacity={1}
                 fill="url(#colorPnl)"
-                animationDuration={500}
+                animationDuration={800}
+                animationEasing="ease-in-out"
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -112,20 +119,25 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
           Compare your winning and losing trades by date.
         </p>
         {winsLossesData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={winsLossesData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={winsLossesData} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
               <XAxis 
                 dataKey="date"
                 stroke="hsl(var(--muted-foreground))"
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                tickMargin={8}
+                interval="preserveStartEnd"
               />
               <YAxis 
                 stroke="hsl(var(--muted-foreground))"
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                tickMargin={8}
+                width={40}
+                allowDecimals={false}
               />
               <Tooltip
-                cursor={{ fill: 'transparent' }}
+                cursor={{ fill: 'hsl(var(--accent) / 0.1)' }}
                 contentStyle={{
                   backgroundColor: 'hsl(var(--background) / 0.95)',
                   backdropFilter: 'blur(12px)',
@@ -133,22 +145,28 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
                   border: '1px solid hsl(var(--border) / 0.5)',
                   borderRadius: '8px',
                   boxShadow: '0 4px 12px 0 rgba(0, 0, 0, 0.1)',
+                  padding: '8px 12px'
                 }}
-                labelStyle={{ color: 'hsl(var(--foreground))' }}
+                labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 500, marginBottom: '4px' }}
+                formatter={(value: any, name: string) => {
+                  const color = name === 'wins' ? 'hsl(var(--neon-green))' : 'hsl(var(--neon-red))';
+                  const label = name === 'wins' ? 'Wins' : 'Losses';
+                  return [<span style={{ color, fontWeight: 600 }}>{value}</span>, label];
+                }}
               />
               <Bar 
                 dataKey="wins" 
                 fill="hsl(var(--neon-green))" 
-                radius={[4, 4, 0, 0]}
-                animationDuration={300}
-                className="transition-opacity hover:opacity-90"
+                radius={[6, 6, 0, 0]}
+                animationDuration={800}
+                animationEasing="ease-in-out"
               />
               <Bar 
                 dataKey="losses" 
                 fill="hsl(var(--neon-red))" 
-                radius={[4, 4, 0, 0]}
-                animationDuration={300}
-                className="transition-opacity hover:opacity-90"
+                radius={[6, 6, 0, 0]}
+                animationDuration={800}
+                animationEasing="ease-in-out"
               />
             </BarChart>
           </ResponsiveContainer>

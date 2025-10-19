@@ -360,12 +360,46 @@ const Dashboard = () => {
             {/* Charts Section - Flexible Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               <div className="glass rounded-2xl p-6 hover-lift">
-                <h3 className="text-lg font-semibold mb-4">Cumulative P&L</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Cumulative P&L</h3>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="left" className="glass-strong max-w-xs">
+                        <p className="font-semibold mb-1">Cumulative Profit & Loss</p>
+                        <p className="text-xs mb-2">Running total of all profits and losses over time, showing your account growth trajectory.</p>
+                        <p className="text-xs text-muted-foreground">Formula: Sum of all P&L values up to each point in time</p>
+                        <p className="text-xs text-accent mt-2">Why it matters: Visualizes your overall trading performance trend and consistency.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
                 <DashboardCharts trades={filteredTrades.length > 0 ? filteredTrades : trades} chartType="cumulative" />
               </div>
               
               <div className="glass rounded-2xl p-6 hover-lift">
-                <h3 className="text-lg font-semibold mb-4">Wins vs Losses</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Wins vs Losses</h3>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="left" className="glass-strong max-w-xs">
+                        <p className="font-semibold mb-1">Wins vs Losses Distribution</p>
+                        <p className="text-xs mb-2">Compares the number and magnitude of profitable trades against losing trades.</p>
+                        <p className="text-xs text-muted-foreground">Shows: Count and total value of winning vs losing positions</p>
+                        <p className="text-xs text-accent mt-2">Why it matters: Helps identify if losses are balanced by wins and guides risk management.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
                 <DashboardCharts trades={filteredTrades.length > 0 ? filteredTrades : trades} chartType="winsLosses" />
               </div>
             </div>
@@ -373,7 +407,24 @@ const Dashboard = () => {
             {/* Trading Heatmap */}
             {stats && stats.total_trades > 0 && (
               <div className="glass rounded-2xl p-6 hover-lift mb-6">
-                <h3 className="text-lg font-semibold mb-4">Trading Heatmap</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Trading Heatmap</h3>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="left" className="glass-strong max-w-xs">
+                        <p className="font-semibold mb-1">Trading Activity Heatmap</p>
+                        <p className="text-xs mb-2">Visual representation of trading frequency and profitability by day and time.</p>
+                        <p className="text-xs text-muted-foreground">Shows: Color-coded cells indicating P&L intensity across different time periods</p>
+                        <p className="text-xs text-accent mt-2">Why it matters: Identifies your most and least profitable trading times, helping optimize your schedule.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
                 <TradingHeatmap trades={filteredTrades.length > 0 ? filteredTrades : trades} />
               </div>
             )}

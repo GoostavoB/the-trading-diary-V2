@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
 import { UserMenu } from './UserMenu';
 import { useReminderNotifications } from '@/hooks/useReminderNotifications';
+import { useSidebarState } from '@/hooks/useSidebarState';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { KeyboardShortcutsHelp } from '@/components/KeyboardShortcutsHelp';
 import { MobileNav } from '@/components/mobile/MobileNav';
@@ -16,9 +17,10 @@ interface AppLayoutProps {
 const AppLayout = ({ children }: AppLayoutProps) => {
   // Enable reminder notifications
   useReminderNotifications();
+  const { isCollapsed, setIsCollapsed } = useSidebarState();
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={!isCollapsed} onOpenChange={setIsCollapsed}>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-secondary/30 to-background mobile-safe">
         <AppSidebar />
         <div className="flex-1 flex flex-col mobile-safe">

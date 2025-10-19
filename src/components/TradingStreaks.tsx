@@ -1,4 +1,6 @@
-import { CheckCircle2, AlertCircle, Trophy, Target } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Trophy, Target, Info } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { Trade } from '@/types/trade';
 
 interface TradingStreaksProps {
@@ -79,7 +81,7 @@ export const TradingStreaks = ({ trades }: TradingStreaksProps) => {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
       {/* Current Streak */}
-      <div className={`p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02]`}>
+      <div className={`p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02] relative group`}>
         <div className="flex items-center gap-2 mb-2">
           {currentStreakType === 'win' ? (
             <CheckCircle2 className="w-4 h-4 text-neon-green" />
@@ -98,10 +100,24 @@ export const TradingStreaks = ({ trades }: TradingStreaksProps) => {
             {currentStreakType === 'win' ? 'wins' : 'losses'}
           </span>
         </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-6 w-6 absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Info className="h-3 w-3 text-muted-foreground" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="glass-strong max-w-xs">
+              <p className="font-semibold mb-1">Current Streak</p>
+              <p className="text-xs mb-2">Number of consecutive winning or losing trades from your most recent positions.</p>
+              <p className="text-xs text-accent">Why it matters: Helps track momentum and emotional state in your trading.</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       {/* Longest Win Streak */}
-      <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02]">
+      <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02] relative group">
         <div className="flex items-center gap-2 mb-2">
           <Trophy className="w-4 h-4 text-neon-green" />
           <span className="text-xs text-muted-foreground">Best Streak</span>
@@ -110,10 +126,24 @@ export const TradingStreaks = ({ trades }: TradingStreaksProps) => {
           <span className="text-2xl lg:text-3xl font-bold text-neon-green">{longestWinStreak}</span>
           <span className="text-xs text-muted-foreground">wins</span>
         </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-6 w-6 absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Info className="h-3 w-3 text-muted-foreground" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="glass-strong max-w-xs">
+              <p className="font-semibold mb-1">Best Win Streak</p>
+              <p className="text-xs mb-2">Your longest run of consecutive profitable trades.</p>
+              <p className="text-xs text-accent">Why it matters: Represents your peak performance and strategy effectiveness.</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       {/* Longest Loss Streak */}
-      <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02]">
+      <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02] relative group">
         <div className="flex items-center gap-2 mb-2">
           <AlertCircle className="w-4 h-4 text-neon-red" />
           <span className="text-xs text-muted-foreground">Max Drawdown</span>
@@ -122,10 +152,24 @@ export const TradingStreaks = ({ trades }: TradingStreaksProps) => {
           <span className="text-2xl lg:text-3xl font-bold text-neon-red">{longestLossStreak}</span>
           <span className="text-xs text-muted-foreground">losses</span>
         </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-6 w-6 absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Info className="h-3 w-3 text-muted-foreground" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="glass-strong max-w-xs">
+              <p className="font-semibold mb-1">Maximum Drawdown Streak</p>
+              <p className="text-xs mb-2">Your longest run of consecutive losing trades.</p>
+              <p className="text-xs text-accent">Why it matters: Critical for risk management and maintaining discipline during tough periods.</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       {/* Consecutive Trading Days */}
-      <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02]">
+      <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02] relative group">
         <div className="flex items-center gap-2 mb-2">
           <Target className="w-4 h-4 text-primary" />
           <span className="text-xs text-muted-foreground">Trading Days</span>
@@ -134,6 +178,20 @@ export const TradingStreaks = ({ trades }: TradingStreaksProps) => {
           <span className="text-2xl lg:text-3xl font-bold text-primary">{maxConsecutiveDays}</span>
           <span className="text-xs text-muted-foreground">days</span>
         </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-6 w-6 absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Info className="h-3 w-3 text-muted-foreground" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="glass-strong max-w-xs">
+              <p className="font-semibold mb-1">Consecutive Trading Days</p>
+              <p className="text-xs mb-2">Your longest streak of back-to-back trading days.</p>
+              <p className="text-xs text-accent">Why it matters: Shows consistency and commitment to your trading routine.</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </div>
   );

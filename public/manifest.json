@@ -1,12 +1,13 @@
 {
-  "name": "Trading Journal Pro",
-  "short_name": "TradeJournal",
-  "description": "Professional trading journal with AI-powered insights",
+  "name": "Trading Analytics Pro",
+  "short_name": "TradingPro",
+  "description": "Professional-grade trading analytics dashboard with AI insights, customizable widgets, and real-time performance tracking",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#8B5CF6",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
+  "background_color": "#f9f9fb",
+  "theme_color": "#4A90E2",
+  "categories": ["finance", "business", "productivity"],
   "icons": [
     {
       "src": "/favicon.png",
@@ -21,8 +22,28 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["finance", "productivity", "business"],
-  "screenshots": [],
-  "related_applications": [],
-  "prefer_related_applications": false
+  "screenshots": [
+    {
+      "src": "/favicon.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your trading dashboard",
+      "url": "/dashboard",
+      "icons": [{ "src": "/favicon.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Upload Trade",
+      "short_name": "Upload",
+      "description": "Upload new trade data",
+      "url": "/upload",
+      "icons": [{ "src": "/favicon.png", "sizes": "96x96" }]
+    }
+  ]
 }
