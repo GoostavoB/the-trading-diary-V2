@@ -323,10 +323,10 @@ const Dashboard = () => {
                       onToggleVisibility={toggleWidgetVisibility}
                     >
                       {/* Stats Cards Grid - Mobile optimized */}
-                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 items-stretch">
-                        <div className="p-3 lg:p-4 rounded-xl glass-subtle">
-                          <div className="text-xs lg:text-sm text-muted-foreground mb-1 lg:mb-2">Total P&L</div>
-                          <div className={`text-lg lg:text-2xl font-bold ${
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+                        <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center items-start min-h-[80px] lg:min-h-[100px]">
+                          <div className="text-xs lg:text-sm text-muted-foreground mb-1 lg:mb-2 w-full">Total P&L</div>
+                          <div className={`text-lg lg:text-2xl font-bold w-full ${
                             stats && stats.total_pnl > 0 ? 'text-neon-green' : 
                             stats && stats.total_pnl < 0 ? 'text-neon-red' : 'text-foreground'
                           }`}>
@@ -334,25 +334,25 @@ const Dashboard = () => {
                           </div>
                         </div>
                         
-                        <div className="p-3 lg:p-4 rounded-xl glass-subtle">
-                          <div className="text-xs lg:text-sm text-muted-foreground mb-1 lg:mb-2">Win Rate</div>
-                          <div className={`text-lg lg:text-2xl font-bold ${
+                        <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center items-start min-h-[80px] lg:min-h-[100px]">
+                          <div className="text-xs lg:text-sm text-muted-foreground mb-1 lg:mb-2 w-full">Win Rate</div>
+                          <div className={`text-lg lg:text-2xl font-bold w-full ${
                             stats && stats.win_rate > 70 ? 'text-neon-green' : 'text-foreground'
                           }`}>
                             <AnimatedCounter value={stats?.win_rate || 0} suffix="%" decimals={1} />
                           </div>
                         </div>
                         
-                        <div className="p-3 lg:p-4 rounded-xl glass-subtle">
-                          <div className="text-xs lg:text-sm text-muted-foreground mb-1 lg:mb-2">Total Trades</div>
-                          <div className="text-lg lg:text-2xl font-bold">
+                        <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center items-start min-h-[80px] lg:min-h-[100px]">
+                          <div className="text-xs lg:text-sm text-muted-foreground mb-1 lg:mb-2 w-full">Total Trades</div>
+                          <div className="text-lg lg:text-2xl font-bold w-full">
                             <AnimatedCounter value={stats?.total_trades || 0} decimals={0} />
                           </div>
                         </div>
                         
-                        <div className="p-3 lg:p-4 rounded-xl glass-subtle">
-                          <div className="text-xs lg:text-sm text-muted-foreground mb-1 lg:mb-2">Avg Duration</div>
-                          <div className="text-lg lg:text-2xl font-bold">
+                        <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center items-start min-h-[80px] lg:min-h-[100px]">
+                          <div className="text-xs lg:text-sm text-muted-foreground mb-1 lg:mb-2 w-full">Avg Duration</div>
+                          <div className="text-lg lg:text-2xl font-bold w-full">
                             <AnimatedCounter value={Math.round(stats?.avg_duration || 0)} decimals={0} />
                             <span className="text-sm lg:text-base ml-1">m</span>
                           </div>
