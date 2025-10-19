@@ -33,8 +33,13 @@ import { DashboardWidget } from '@/components/DashboardWidget';
 import { CustomizeDashboardControls } from '@/components/CustomizeDashboardControls';
 import { AccentColorPicker } from '@/components/AccentColorPicker';
 import { AIAssistant } from '@/components/AIAssistant';
+import { WinsByHourChart } from '@/components/charts/WinsByHourChart';
+import { MaxDrawdownCard } from '@/components/MaxDrawdownCard';
+import { TopAssetsByWinRate } from '@/components/TopAssetsByWinRate';
+import { CurrentStreakCard } from '@/components/CurrentStreakCard';
 import { useDashboardLayout } from '@/hooks/useDashboardLayout';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { formatNumber, formatPercent, formatCurrency } from '@/utils/formatNumber';
 import type { Trade } from '@/types/trade';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
@@ -197,6 +202,38 @@ const Dashboard = () => {
     if (data) {
       setInitialInvestment(data.initial_investment || 0);
     }
+  };
+
+  const calculateCurrentStreak = (trades: Trade[]) => {
+    if (trades.length === 0) return 0;
+    const sorted = [...trades].sort((a, b) => new Date(b.trade_date).getTime() - new Date(a.trade_date).getTime());
+    let streak = 0;
+    const isWinning = sorted[0].pnl > 0;
+    for (const trade of sorted) {
+      if ((isWinning && trade.pnl > 0) || (!isWinning && trade.pnl <= 0)) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    return streak;
+  };
+
+  const calculateStreakType = (trades: Trade[]): 'winning' | 'losing' => {
+    if (trades.length === 0) return 'winning';
+    const sorted = [...trades].sort((a, b) => new Date(b.trade_date).getTime() - new Date(a.trade_date).getTime());
+    return sorted[0].pnl > 0 ? 'winning' : 'losing';
+  };
+
+  const getBestAsset = (trades: Trade[]) => {
+    if (trades.length === 0) return 'N/A';
+    const assetPnL: Record<string, number> = {};
+    trades.forEach(t => {
+      const symbol = t.symbol || 'Unknown';
+      assetPnL[symbol] = (assetPnL[symbol] || 0) + (t.pnl || 0);
+    });
+    const best = Object.entries(assetPnL).sort((a, b) => b[1] - a[1])[0];
+    return best ? best[0] : 'N/A';
   };
 
   const StatCard = ({ title, value, icon: Icon, trend, valueColor, animated = false, numericValue }: any) => (
@@ -425,7 +462,7 @@ const Dashboard = () => {
 
             {/* Trading Heatmap */}
             {stats && stats.total_trades > 0 && (
-              <div className="glass rounded-2xl p-6 hover-lift widget-card">
+              <div className="glass rounded-2xl p-6 hover-lift widget-card mb-6">
                 <div className="flex items-center justify-between mb-4 w-full">
                   <h3 className="text-lg font-semibold">Trading Heatmap</h3>
                   <TooltipProvider>
@@ -447,6 +484,13 @@ const Dashboard = () => {
                 <div className="chart-wrapper">
                   <TradingHeatmap trades={filteredTrades.length > 0 ? filteredTrades : trades} />
                 </div>
+              </div>
+            )}
+
+            {/* Wins by Hour Chart */}
+            {stats && stats.total_trades > 0 && (
+              <div className="mb-6">
+                <WinsByHourChart trades={filteredTrades.length > 0 ? filteredTrades : trades} />
               </div>
             )}
 
@@ -592,6 +636,19 @@ const Dashboard = () => {
               </TabsContent>
 
               <TabsContent value="analytics" className="space-y-4 md:space-y-6 relative glass rounded-2xl p-6">
+                {/* Additional Cards Row */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <MaxDrawdownCard value={3500} percentage={12.5} />
+                  <CurrentStreakCard 
+                    streak={calculateCurrentStreak(filteredTrades.length > 0 ? filteredTrades : trades)}
+                    type={calculateStreakType(filteredTrades.length > 0 ? filteredTrades : trades)}
+                  />
+                  <div className="p-5 glass rounded-2xl">
+                    <p className="text-sm text-muted-foreground mb-2">Best Asset</p>
+                    <p className="text-2xl font-bold">{getBestAsset(filteredTrades.length > 0 ? filteredTrades : trades)}</p>
+                  </div>
+                </div>
+
                 <DrawdownAnalysis
                   trades={filteredTrades.length > 0 ? filteredTrades : trades}
                   initialInvestment={initialInvestment}

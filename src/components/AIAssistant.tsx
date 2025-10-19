@@ -29,15 +29,68 @@ export const AIAssistant = () => {
     setInput('');
     setIsLoading(true);
 
-    // Simulate AI response (replace with actual AI integration)
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: 'I understand your question. This feature will be connected to Lovable AI to provide intelligent insights about your trading data.',
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-dashboard-assistant`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ messages: [...messages, userMessage] }),
+      });
+
+      if (!response.ok || !response.body) {
+        throw new Error('Failed to get AI response');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let assistantMessage = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') continue;
+
+            try {
+              const parsed = JSON.parse(data);
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                assistantMessage += content;
+                setMessages((prev) => {
+                  const newMessages = [...prev];
+                  const lastMsg = newMessages[newMessages.length - 1];
+                  if (lastMsg?.role === 'assistant') {
+                    newMessages[newMessages.length - 1] = { role: 'assistant', content: assistantMessage };
+                  } else {
+                    newMessages.push({ role: 'assistant', content: assistantMessage });
+                  }
+                  return newMessages;
+                });
+              }
+            } catch (e) {
+              // Ignore parsing errors for incomplete JSON
+            }
+          }
+        }
+      }
+
       setIsLoading(false);
-    }, 1000);
+    } catch (error) {
+      console.error('AI Assistant error:', error);
+      setMessages((prev) => [...prev, {
+        role: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.'
+      }]);
+      setIsLoading(false);
+    }
   };
 
   return (

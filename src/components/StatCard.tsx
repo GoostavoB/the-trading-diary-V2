@@ -1,6 +1,7 @@
 import { GlassCard } from "@/components/ui/glass-card";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
 interface StatCardProps {
   title: string;
@@ -10,6 +11,7 @@ interface StatCardProps {
     value: number;
     isPositive: boolean;
   };
+  sparklineData?: number[];
   className?: string;
   valueClassName?: string;
 }
@@ -19,9 +21,11 @@ export const StatCard = ({
   value,
   icon: Icon,
   trend,
+  sparklineData,
   className,
   valueClassName,
 }: StatCardProps) => {
+  const chartData = sparklineData?.map((val, idx) => ({ value: val, index: idx })) || [];
   return (
     <GlassCard hover className={cn("p-5", className)}>
       <div className="space-y-3">
@@ -53,6 +57,22 @@ export const StatCard = ({
             </div>
           )}
         </div>
+        
+        {sparklineData && sparklineData.length > 0 && (
+          <div className="mt-3 h-12">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
     </GlassCard>
   );

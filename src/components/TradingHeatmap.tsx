@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Info } from 'lucide-react';
+import { Info, Star } from 'lucide-react';
+import { useThemeMode } from '@/hooks/useThemeMode';
 
 interface Trade {
   trade_date: string;
@@ -16,6 +17,7 @@ const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
 export function TradingHeatmap({ trades }: TradingHeatmapProps) {
+  const { colors, isClassic } = useThemeMode();
   const [selectedCell, setSelectedCell] = useState<string | null>(null);
   const heatmapData = useMemo(() => {
     const data: Record<string, { wins: number; total: number; pnl: number; roi: number }> = {};
@@ -49,10 +51,19 @@ export function TradingHeatmap({ trades }: TradingHeatmapProps) {
 
     const winRate = cell.wins / cell.total;
 
-    if (winRate >= 0.7) return 'hsl(var(--neon-green))';
-    if (winRate >= 0.5) return 'hsl(142 71% 35%)';
-    if (winRate >= 0.4) return 'hsl(45 93% 47%)';
-    return 'hsl(var(--neon-red))';
+    if (isClassic) {
+      // Classic mode: Green for wins, Red for losses
+      if (winRate >= 0.7) return colors.positive;
+      if (winRate >= 0.5) return 'hsl(142 71% 45%)';
+      if (winRate >= 0.4) return 'hsl(45 93% 47%)';
+      return colors.negative;
+    } else {
+      // Default mode: Primary (blue) for high, Secondary (gray) for low
+      if (winRate >= 0.7) return colors.positive;
+      if (winRate >= 0.5) return 'hsl(var(--primary) / 0.7)';
+      if (winRate >= 0.4) return 'hsl(var(--secondary) / 0.6)';
+      return colors.negative;
+    }
   };
 
   const getBestSlot = () => {
@@ -163,8 +174,9 @@ export function TradingHeatmap({ trades }: TradingHeatmapProps) {
                                   </span>
                                 </div>
                                 {isBest && (
-                                  <div className="text-accent font-semibold pt-1.5 border-t border-border/50 mt-1.5 text-center">
-                                    ⭐ Best Time Slot
+                                  <div className="text-accent font-semibold pt-1.5 border-t border-border/50 mt-1.5 text-center flex items-center justify-center gap-1">
+                                    <Star className="h-3 w-3 fill-accent" />
+                                    Best Time Slot
                                   </div>
                                 )}
                               </div>
@@ -184,7 +196,7 @@ export function TradingHeatmap({ trades }: TradingHeatmapProps) {
           {/* Legend - Compact */}
           <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 mt-2 pt-2 border-t border-border/30">
             <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: 'hsl(var(--neon-green))' }}></div>
+              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: colors.positive }}></div>
               <span className="text-[10px] text-muted-foreground font-medium">High (≥70%)</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -192,7 +204,7 @@ export function TradingHeatmap({ trades }: TradingHeatmapProps) {
               <span className="text-[10px] text-muted-foreground font-medium">Medium (40-70%)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: 'hsl(var(--neon-red))' }}></div>
+              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: colors.negative }}></div>
               <span className="text-[10px] text-muted-foreground font-medium">Low (&lt;40%)</span>
             </div>
           </div>

@@ -3,6 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Palette } from 'lucide-react';
 import { toast } from 'sonner';
+import { useThemeMode, ThemeMode } from '@/hooks/useThemeMode';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const PRESET_COLORS = [
   { name: 'Blue', value: '#4A90E2', hsl: '210 79% 58%' },
@@ -16,6 +19,7 @@ const PRESET_COLORS = [
 export const AccentColorPicker = () => {
   const [accentColor, setAccentColor] = useState(PRESET_COLORS[0].value);
   const [isOpen, setIsOpen] = useState(false);
+  const { themeMode, setThemeMode } = useThemeMode();
 
   useEffect(() => {
     const saved = localStorage.getItem('theme:accent');
@@ -48,10 +52,29 @@ export const AccentColorPicker = () => {
           <Palette className="h-4 w-4" style={{ color: accentColor }} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto glass-strong backdrop-blur-xl border-accent/20 rounded-2xl">
-        <div className="space-y-3">
-          <p className="text-sm font-semibold">Accent Color</p>
-          <div className="grid grid-cols-3 gap-2">
+      <PopoverContent className="w-80 glass-strong backdrop-blur-xl border-accent/20 rounded-2xl">
+        <div className="space-y-4">
+          <div className="space-y-3">
+            <p className="text-sm font-semibold">Theme Mode</p>
+            <RadioGroup value={themeMode} onValueChange={(value) => setThemeMode(value as ThemeMode)}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="default" id="default" />
+                <Label htmlFor="default" className="cursor-pointer text-sm">
+                  Blue vs Gray (Default)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="classic" id="classic" />
+                <Label htmlFor="classic" className="cursor-pointer text-sm">
+                  Classic P&L (Green vs Red)
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+          
+          <div className="border-t border-border/20 pt-4 space-y-3">
+            <p className="text-sm font-semibold">Accent Color</p>
+            <div className="grid grid-cols-3 gap-2">
             {PRESET_COLORS.map((preset) => (
               <button
                 key={preset.name}
@@ -71,10 +94,11 @@ export const AccentColorPicker = () => {
                 )}
               </button>
             ))}
+            </div>
+            <p className="text-xs text-muted-foreground text-center pt-2 border-t border-border/20">
+              Theme applies globally
+            </p>
           </div>
-          <p className="text-xs text-muted-foreground text-center pt-2 border-t border-border/20">
-            Theme applies globally
-          </p>
         </div>
       </PopoverContent>
     </Popover>
