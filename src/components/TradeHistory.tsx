@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useRequestCache } from '@/hooks/useRequestCache';
 import {
   Table,
   TableBody,
@@ -47,6 +49,9 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Trade } from '@/types/trade';
 import { ShareTradeCard } from '@/components/ShareTradeCard';
+import { TradeFilters } from '@/components/trade-history/TradeFilters';
+import { TradeTableRow } from '@/components/trade-history/TradeTableRow';
+import { BulkActionsToolbar } from '@/components/trade-history/BulkActionsToolbar';
 
 type ColumnKey = 'date' | 'symbol' | 'setup' | 'broker' | 'type' | 'entry' | 'exit' | 'size' | 'pnl' | 'roi' | 'fundingFee' | 'tradingFee';
 
@@ -75,12 +80,12 @@ interface TradeHistoryProps {
   onTradesChange?: () => void;
 }
 
-export const TradeHistory = ({ onTradesChange }: TradeHistoryProps = {}) => {
+export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) => {
   const { user } = useAuth();
   const [trades, setTrades] = useState<Trade[]>([]);
-  const [filteredTrades, setFilteredTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [sortBy, setSortBy] = useState<'date' | 'pnl' | 'roi'>('date');
   const [filterType, setFilterType] = useState<'all' | 'wins' | 'losses'>('all');
   const [showDeleted, setShowDeleted] = useState(false);
@@ -261,24 +266,31 @@ export const TradeHistory = ({ onTradesChange }: TradeHistoryProps = {}) => {
     setLoading(false);
   };
 
-  const filterAndSortTrades = () => {
+  const filterAndSortTrades = useCallback(() => {
     let filtered = [...trades];
 
-    // Filter by search term
-    if (searchTerm) {
+    // Filter by deleted status
+    if (showDeleted) {
+      filtered = filtered.filter(t => t.deleted_at !== null);
+    } else {
+      filtered = filtered.filter(t => t.deleted_at === null);
+    }
+
+    // Filter by search term (using debounced value)
+    if (debouncedSearchTerm) {
       filtered = filtered.filter(
         (t) =>
-          t.symbol?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          t.setup?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          t.broker?.toLowerCase().includes(searchTerm.toLowerCase())
+          t.symbol?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+          t.setup?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+          t.broker?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
       );
     }
 
     // Filter by type
     if (filterType === 'wins') {
-      filtered = filtered.filter((t) => t.pnl > 0);
+      filtered = filtered.filter((t) => (t.pnl || 0) > 0);
     } else if (filterType === 'losses') {
-      filtered = filtered.filter((t) => t.pnl <= 0);
+      filtered = filtered.filter((t) => (t.pnl || 0) <= 0);
     }
 
     // Sort
@@ -286,15 +298,18 @@ export const TradeHistory = ({ onTradesChange }: TradeHistoryProps = {}) => {
       if (sortBy === 'date') {
         return new Date(b.trade_date).getTime() - new Date(a.trade_date).getTime();
       } else if (sortBy === 'pnl') {
-        return b.pnl - a.pnl;
+        return (b.pnl || 0) - (a.pnl || 0);
       } else if (sortBy === 'roi') {
-        return b.roi - a.roi;
+        return (b.roi || 0) - (a.roi || 0);
       }
       return 0;
     });
 
-    setFilteredTrades(filtered);
-  };
+    return filtered;
+  }, [trades, debouncedSearchTerm, filterType, sortBy, showDeleted]);
+
+  // Memoized filtered trades
+  const filteredTrades = useMemo(() => filterAndSortTrades(), [filterAndSortTrades]);
 
   const handleDelete = async (id: string) => {
     if (showDeleted) {
@@ -478,77 +493,21 @@ export const TradeHistory = ({ onTradesChange }: TradeHistoryProps = {}) => {
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-          <Input
-            placeholder="Search by symbol, setup, or broker..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-
-        <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
-          <SelectTrigger className="w-full md:w-[180px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="date">Sort by Date</SelectItem>
-            <SelectItem value="pnl">Sort by P&L</SelectItem>
-            <SelectItem value="roi">Sort by ROI</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select value={filterType} onValueChange={(v: any) => setFilterType(v)}>
-          <SelectTrigger className="w-full md:w-[180px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Trades</SelectItem>
-            <SelectItem value="wins">Wins Only</SelectItem>
-            <SelectItem value="losses">Losses Only</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Button
-          variant={showDeleted ? "default" : "outline"}
-          onClick={() => {
-            setShowDeleted(!showDeleted);
-            setSelectedTradeIds(new Set());
+        <TradeFilters
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          filterType={filterType}
+          onFilterChange={setFilterType}
+          showDeleted={showDeleted}
+          onShowDeletedChange={setShowDeleted}
+          columns={columns}
+          onColumnsChange={(newColumns) => {
+            setColumns(newColumns);
+            localStorage.setItem('tradeHistoryColumns', JSON.stringify(newColumns));
           }}
-        >
-          {showDeleted ? "Show Active" : "Show Deleted"}
-        </Button>
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="icon">
-              <Settings2 className="h-4 w-4" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-64 bg-card border-border z-50">
-            <div className="space-y-4">
-              <h4 className="font-medium text-sm">Customize Columns</h4>
-              <div className="space-y-2">
-                {columns.map((column) => (
-                  <div key={column.key} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={column.key}
-                      checked={column.visible}
-                      onCheckedChange={() => toggleColumn(column.key)}
-                    />
-                    <Label
-                      htmlFor={column.key}
-                      className="text-sm font-normal cursor-pointer"
-                    >
-                      {column.label}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
+        />
       </div>
 
       {showDeleted && (
@@ -1201,4 +1160,6 @@ export const TradeHistory = ({ onTradesChange }: TradeHistoryProps = {}) => {
       />
     </div>
   );
-};
+});
+
+TradeHistory.displayName = 'TradeHistory';
