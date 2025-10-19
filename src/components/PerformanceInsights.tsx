@@ -4,12 +4,15 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, Trophy, Target } from 'lucide-react';
 import type { Trade } from '@/types/trade';
 import { formatCurrency, formatPercent } from '@/utils/formatNumber';
+import { ExplainMetricButton } from '@/components/ExplainMetricButton';
+import { useAIAssistant } from '@/contexts/AIAssistantContext';
 
 interface PerformanceInsightsProps {
   trades: Trade[];
 }
 
 export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) => {
+  const { openWithPrompt } = useAIAssistant();
   if (!trades.length) return null;
 
   // Calculate insights
@@ -156,8 +159,15 @@ export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) =
                   <Icon className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center justify-between gap-2 mb-1">
                     <h4 id={`insight-${index}-title`} className="font-semibold text-sm">{insight.title}</h4>
+                    <ExplainMetricButton
+                      metricName={insight.title}
+                      metricValue=""
+                      context={insight.message}
+                      onExplain={openWithPrompt}
+                      className="flex-shrink-0"
+                    />
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {insight.message}
@@ -172,9 +182,17 @@ export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) =
       {/* Best & Worst Trade Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <Card className="p-4 bg-gradient-to-br from-neon-green/10 to-transparent border-neon-green/30">
-          <div className="flex items-center gap-2 mb-2">
-            <Trophy className="w-4 h-4 text-neon-green" />
-            <h4 className="font-semibold text-sm">Best Trade</h4>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-neon-green" aria-hidden="true" />
+              <h4 className="font-semibold text-sm">Best Trade</h4>
+            </div>
+            <ExplainMetricButton
+              metricName="Best Trade"
+              metricValue={formatCurrency(bestTrade.pnl || 0)}
+              context={`${bestTrade.symbol} with ${formatPercent(bestTrade.roi || 0)} ROI`}
+              onExplain={openWithPrompt}
+            />
           </div>
           <div className="space-y-1">
             <div className="flex items-center justify-between">
@@ -197,9 +215,17 @@ export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) =
         </Card>
 
         <Card className="p-4 bg-gradient-to-br from-neon-red/10 to-transparent border-neon-red/30">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertCircle className="w-4 h-4 text-neon-red" />
-            <h4 className="font-semibold text-sm">Worst Trade</h4>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-neon-red" aria-hidden="true" />
+              <h4 className="font-semibold text-sm">Worst Trade</h4>
+            </div>
+            <ExplainMetricButton
+              metricName="Worst Trade"
+              metricValue={formatCurrency(worstTrade.pnl || 0)}
+              context={`${worstTrade.symbol} with ${formatPercent(worstTrade.roi || 0)} ROI`}
+              onExplain={openWithPrompt}
+            />
           </div>
           <div className="space-y-1">
             <div className="flex items-center justify-between">

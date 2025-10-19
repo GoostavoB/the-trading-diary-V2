@@ -2,6 +2,8 @@ import { Card } from '@/components/ui/card';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format } from 'date-fns';
 import { useMobileOptimization } from '@/hooks/useMobileOptimization';
+import { ExplainMetricButton } from '@/components/ExplainMetricButton';
+import { useAIAssistant } from '@/contexts/AIAssistantContext';
 
 interface Trade {
   id: string;
@@ -17,6 +19,7 @@ interface DashboardChartsProps {
 
 export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => {
   const { isMobile, optimizeDataPoints, formatNumberMobile } = useMobileOptimization();
+  const { openWithPrompt } = useAIAssistant();
   
   // Calculate cumulative P&L over time
   const cumulativePnLRaw = trades
@@ -51,11 +54,21 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
 
   // Render specific chart if chartType is provided
   if (chartType === 'cumulative') {
+    const totalPnL = cumulativePnL[cumulativePnL.length - 1]?.pnl || 0;
     return (
       <div className="w-full">
-        <p className="text-xs lg:text-sm text-muted-foreground mb-2 lg:mb-3">
-          Track your cumulative profit and loss over time.
-        </p>
+        <div className="flex items-center justify-between mb-2 lg:mb-3">
+          <p className="text-xs lg:text-sm text-muted-foreground">
+            Track your cumulative profit and loss over time.
+          </p>
+          <ExplainMetricButton
+            metricName="Cumulative P&L Chart"
+            metricValue={`$${totalPnL.toFixed(2)}`}
+            context={`Total of ${trades.length} trades over time`}
+            onExplain={openWithPrompt}
+            className="flex-shrink-0"
+          />
+        </div>
         {cumulativePnL.length > 0 ? (
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={cumulativePnL} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
@@ -122,11 +135,22 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
   }
 
   if (chartType === 'winsLosses') {
+    const totalWins = winsLossesData.reduce((sum, d) => sum + d.wins, 0);
+    const totalLosses = winsLossesData.reduce((sum, d) => sum + d.losses, 0);
     return (
       <div className="w-full">
-        <p className="text-xs lg:text-sm text-muted-foreground mb-2 lg:mb-3">
-          Compare your winning and losing trades by date.
-        </p>
+        <div className="flex items-center justify-between mb-2 lg:mb-3">
+          <p className="text-xs lg:text-sm text-muted-foreground">
+            Compare your winning and losing trades by date.
+          </p>
+          <ExplainMetricButton
+            metricName="Wins vs Losses Chart"
+            metricValue={`${totalWins}W / ${totalLosses}L`}
+            context={`${trades.length} total trades`}
+            onExplain={openWithPrompt}
+            className="flex-shrink-0"
+          />
+        </div>
         {winsLossesData.length > 0 ? (
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={winsLossesData} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
@@ -189,10 +213,22 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
   }
 
   // Default: render both charts (legacy support)
+  const totalPnL = cumulativePnL[cumulativePnL.length - 1]?.pnl || 0;
+  const totalWins = winsLossesData.reduce((sum, d) => sum + d.wins, 0);
+  const totalLosses = winsLossesData.reduce((sum, d) => sum + d.losses, 0);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
       <Card className="p-4 lg:p-6 bg-card border-border">
-        <h3 className="text-base lg:text-lg font-semibold mb-3 lg:mb-4">Cumulative P&L</h3>
+        <div className="flex items-center justify-between mb-3 lg:mb-4">
+          <h3 className="text-base lg:text-lg font-semibold">Cumulative P&L</h3>
+          <ExplainMetricButton
+            metricName="Cumulative P&L"
+            metricValue={`$${totalPnL.toFixed(2)}`}
+            context={`${trades.length} trades over time`}
+            onExplain={openWithPrompt}
+          />
+        </div>
         {cumulativePnL.length > 0 ? (
           <ResponsiveContainer width="100%" height={250}>
             <AreaChart data={cumulativePnL}>
@@ -246,7 +282,15 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
       </Card>
 
       <Card className="p-4 lg:p-6 bg-card border-border">
-        <h3 className="text-base lg:text-lg font-semibold mb-3 lg:mb-4">Wins vs Losses</h3>
+        <div className="flex items-center justify-between mb-3 lg:mb-4">
+          <h3 className="text-base lg:text-lg font-semibold">Wins vs Losses</h3>
+          <ExplainMetricButton
+            metricName="Wins vs Losses"
+            metricValue={`${totalWins}W / ${totalLosses}L`}
+            context={`${trades.length} total trades`}
+            onExplain={openWithPrompt}
+          />
+        </div>
         {winsLossesData.length > 0 ? (
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={winsLossesData}>

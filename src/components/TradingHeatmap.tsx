@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info, Star } from 'lucide-react';
 import { useThemeMode } from '@/hooks/useThemeMode';
+import { ExplainMetricButton } from '@/components/ExplainMetricButton';
+import { useAIAssistant } from '@/contexts/AIAssistantContext';
 
 interface Trade {
   trade_date: string;
@@ -18,6 +20,7 @@ const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
 export function TradingHeatmap({ trades }: TradingHeatmapProps) {
   const { colors, isClassic } = useThemeMode();
+  const { openWithPrompt } = useAIAssistant();
   const [selectedCell, setSelectedCell] = useState<string | null>(null);
   const heatmapData = useMemo(() => {
     const data: Record<string, { wins: number; total: number; pnl: number; roi: number }> = {};
@@ -80,14 +83,24 @@ export function TradingHeatmap({ trades }: TradingHeatmapProps) {
   };
 
   const bestSlot = getBestSlot();
+  const bestSlotInfo = bestSlot.key ? `Best slot: ${DAYS[parseInt(bestSlot.key.split('-')[0])]} ${bestSlot.key.split('-')[1]}:00 (${(bestSlot.winRate * 100).toFixed(0)}% win rate)` : '';
 
   return (
     <div className="w-full">
-      <div className="flex items-center gap-2 mb-2">
-        <Info className="w-3 h-3 text-muted-foreground" />
-        <p className="text-[10px] text-muted-foreground">
-          Click cells to view details • Color indicates win rate
-        </p>
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <div className="flex items-center gap-2">
+          <Info className="w-3 h-3 text-muted-foreground" aria-hidden="true" />
+          <p className="text-[10px] text-muted-foreground">
+            Click cells to view details • Color indicates win rate
+          </p>
+        </div>
+        <ExplainMetricButton
+          metricName="Trading Heatmap"
+          metricValue={`${trades.length} trades`}
+          context={bestSlotInfo}
+          onExplain={openWithPrompt}
+          className="flex-shrink-0"
+        />
       </div>
       
       <TooltipProvider>

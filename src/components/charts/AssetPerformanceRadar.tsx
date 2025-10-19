@@ -1,5 +1,8 @@
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { Card } from "@/components/ui/card";
+import { useMobileOptimization } from "@/hooks/useMobileOptimization";
+import { ExplainMetricButton } from "@/components/ExplainMetricButton";
+import { useAIAssistant } from "@/contexts/AIAssistantContext";
 
 interface AssetPerformanceRadarProps {
   data: Array<{
@@ -12,10 +15,13 @@ interface AssetPerformanceRadarProps {
 }
 
 export const AssetPerformanceRadar = ({ data }: AssetPerformanceRadarProps) => {
-  // Limit to top 5 assets by win rate
+  const { isMobile } = useMobileOptimization();
+  const { openWithPrompt } = useAIAssistant();
+
+  // Limit to top 3 assets on mobile, 5 on desktop
   const topAssets = data
     .sort((a, b) => b.winRate - a.winRate)
-    .slice(0, 5);
+    .slice(0, isMobile ? 3 : 5);
 
   // Normalize data for radar chart with 5 metrics (scale 0-100)
   const normalizedData = topAssets.map(item => ({
@@ -27,20 +33,31 @@ export const AssetPerformanceRadar = ({ data }: AssetPerformanceRadarProps) => {
     'Consistency': Math.min((item.tradeCount * item.winRate) / 100, 100), // Calculated metric
   }));
 
+  const topAssetNames = topAssets.map(a => a.asset).join(', ');
+  const chartSummary = `Performance comparison of top ${topAssets.length} assets: ${topAssetNames}`;
+
   return (
-    <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4">Asset Performance Radar</h3>
-      <ResponsiveContainer width="100%" height={400}>
+    <Card className="p-4 lg:p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base lg:text-lg font-semibold">Asset Performance Radar</h3>
+        <ExplainMetricButton
+          metricName="Asset Performance Radar"
+          metricValue={`${topAssets.length} top assets`}
+          context={chartSummary}
+          onExplain={openWithPrompt}
+        />
+      </div>
+      <ResponsiveContainer width="100%" height={isMobile ? 280 : 400}>
         <RadarChart data={normalizedData}>
           <PolarGrid stroke="hsl(var(--border))" />
           <PolarAngleAxis 
             dataKey="asset" 
-            tick={{ fill: 'hsl(var(--foreground))', fontSize: 12 }}
+            tick={{ fill: 'hsl(var(--foreground))', fontSize: isMobile ? 9 : 12 }}
           />
           <PolarRadiusAxis 
             angle={90} 
             domain={[0, 100]}
-            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
+            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: isMobile ? 8 : 10 }}
           />
           <Radar 
             name="Win Rate" 
@@ -48,7 +65,7 @@ export const AssetPerformanceRadar = ({ data }: AssetPerformanceRadarProps) => {
             stroke="hsl(var(--primary))" 
             fill="hsl(var(--primary))" 
             fillOpacity={0.18}
-            strokeWidth={2}
+            strokeWidth={isMobile ? 1.5 : 2}
           />
           <Radar 
             name="ROI" 
@@ -56,7 +73,7 @@ export const AssetPerformanceRadar = ({ data }: AssetPerformanceRadarProps) => {
             stroke="hsl(var(--secondary))" 
             fill="hsl(var(--secondary))" 
             fillOpacity={0.18}
-            strokeWidth={2}
+            strokeWidth={isMobile ? 1.5 : 2}
           />
           <Radar 
             name="Trade Volume" 
@@ -64,7 +81,7 @@ export const AssetPerformanceRadar = ({ data }: AssetPerformanceRadarProps) => {
             stroke="hsl(var(--accent))" 
             fill="hsl(var(--accent))" 
             fillOpacity={0.18}
-            strokeWidth={2}
+            strokeWidth={isMobile ? 1.5 : 2}
           />
           <Radar 
             name="Avg Profit" 
@@ -72,7 +89,7 @@ export const AssetPerformanceRadar = ({ data }: AssetPerformanceRadarProps) => {
             stroke="hsl(var(--chart-4))" 
             fill="hsl(var(--chart-4))" 
             fillOpacity={0.18}
-            strokeWidth={2}
+            strokeWidth={isMobile ? 1.5 : 2}
           />
           <Radar 
             name="Consistency" 
@@ -80,16 +97,20 @@ export const AssetPerformanceRadar = ({ data }: AssetPerformanceRadarProps) => {
             stroke="hsl(var(--chart-5))" 
             fill="hsl(var(--chart-5))" 
             fillOpacity={0.18}
-            strokeWidth={2}
+            strokeWidth={isMobile ? 1.5 : 2}
           />
           <Tooltip 
             contentStyle={{
               backgroundColor: 'hsl(var(--card))',
               border: '1px solid hsl(var(--border))',
-              borderRadius: '8px'
+              borderRadius: '8px',
+              fontSize: isMobile ? '11px' : '13px'
             }}
           />
-          <Legend />
+          <Legend 
+            wrapperStyle={{ fontSize: isMobile ? '10px' : '12px' }}
+            iconSize={isMobile ? 8 : 10}
+          />
         </RadarChart>
       </ResponsiveContainer>
     </Card>
