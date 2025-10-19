@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Palette } from 'lucide-react';
+import { Palette, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useThemeMode, ThemeMode } from '@/hooks/useThemeMode';
 import { Label } from '@/components/ui/label';
@@ -36,6 +36,11 @@ export const AccentColorPicker = () => {
   const [secondaryColor, setSecondaryColor] = useState(SECONDARY_COLORS[0].value); // Gray default
   const [isOpen, setIsOpen] = useState(false);
   const { themeMode, setThemeMode } = useThemeMode();
+  
+  // Refs for color inputs
+  const primaryColorInputRef = useRef<HTMLInputElement>(null);
+  const secondaryColorInputRef = useRef<HTMLInputElement>(null);
+  const accentColorInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const savedAccent = localStorage.getItem('theme:accent');
@@ -67,21 +72,51 @@ export const AccentColorPicker = () => {
     }
   }, []);
 
-  const applyAccentColor = (color: string, hsl: string) => {
-    document.documentElement.style.setProperty('--accent', hsl);
-    document.documentElement.style.setProperty('--chart-1', hsl);
+  // Helper to convert hex to HSL
+  const hexToHsl = (hex: string): string => {
+    hex = hex.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16) / 255;
+    const g = parseInt(hex.substring(2, 4), 16) / 255;
+    const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0;
+    let s = 0;
+    const l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / d + 2) / 6; break;
+        case b: h = ((r - g) / d + 4) / 6; break;
+      }
+    }
+
+    return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+  };
+
+  const applyAccentColor = (color: string, hsl?: string) => {
+    const hslValue = hsl || hexToHsl(color);
+    document.documentElement.style.setProperty('--accent', hslValue);
+    document.documentElement.style.setProperty('--chart-1', hslValue);
     localStorage.setItem('theme:accent', color);
   };
 
-  const applyPrimaryColor = (color: string, hsl: string) => {
-    document.documentElement.style.setProperty('--primary', hsl);
-    document.documentElement.style.setProperty('--chart-2', hsl);
+  const applyPrimaryColor = (color: string, hsl?: string) => {
+    const hslValue = hsl || hexToHsl(color);
+    document.documentElement.style.setProperty('--primary', hslValue);
+    document.documentElement.style.setProperty('--chart-2', hslValue);
     localStorage.setItem('theme:primary', color);
   };
 
-  const applySecondaryColor = (color: string, hsl: string) => {
-    document.documentElement.style.setProperty('--secondary', hsl);
-    document.documentElement.style.setProperty('--chart-3', hsl);
+  const applySecondaryColor = (color: string, hsl?: string) => {
+    const hslValue = hsl || hexToHsl(color);
+    document.documentElement.style.setProperty('--secondary', hslValue);
+    document.documentElement.style.setProperty('--chart-3', hslValue);
     localStorage.setItem('theme:secondary', color);
   };
 
@@ -101,6 +136,28 @@ export const AccentColorPicker = () => {
     setSecondaryColor(preset.value);
     applySecondaryColor(preset.value, preset.hsl);
     toast.success(`Secondary color changed to ${preset.name}`);
+  };
+
+  // Custom color handlers
+  const handleCustomPrimary = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const color = e.target.value;
+    setPrimaryColor(color);
+    applyPrimaryColor(color);
+    toast.success('Custom primary color applied');
+  };
+
+  const handleCustomSecondary = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const color = e.target.value;
+    setSecondaryColor(color);
+    applySecondaryColor(color);
+    toast.success('Custom secondary color applied');
+  };
+
+  const handleCustomAccent = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const color = e.target.value;
+    setAccentColor(color);
+    applyAccentColor(color);
+    toast.success('Custom accent color applied');
   };
 
   return (
@@ -131,8 +188,28 @@ export const AccentColorPicker = () => {
           </div>
           
           <div className="border-t border-border/20 pt-4 space-y-3">
-            <p className="text-sm font-semibold">Primary Color</p>
-            <p className="text-xs text-muted-foreground">Main UI and positive values</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold">Primary Color</p>
+                <p className="text-xs text-muted-foreground">Main UI and positive values</p>
+              </div>
+              <button
+                onClick={() => primaryColorInputRef.current?.click()}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors"
+                title="Choose custom color"
+              >
+                <Plus className="h-3 w-3" />
+                Custom
+              </button>
+              <input
+                ref={primaryColorInputRef}
+                type="color"
+                value={primaryColor}
+                onChange={handleCustomPrimary}
+                className="sr-only"
+                aria-label="Choose custom primary color"
+              />
+            </div>
             <div className="grid grid-cols-4 gap-2">
             {PRIMARY_COLORS.map((preset) => (
               <button
@@ -145,6 +222,7 @@ export const AccentColorPicker = () => {
                 }`}
                 style={{ backgroundColor: preset.value }}
                 title={preset.name}
+                aria-label={`Select ${preset.name} as primary color`}
               >
                 {primaryColor === preset.value && (
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -157,8 +235,28 @@ export const AccentColorPicker = () => {
           </div>
 
           <div className="border-t border-border/20 pt-4 space-y-3">
-            <p className="text-sm font-semibold">Secondary Color</p>
-            <p className="text-xs text-muted-foreground">Subtle elements and negative values</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold">Secondary Color</p>
+                <p className="text-xs text-muted-foreground">Subtle elements and negative values</p>
+              </div>
+              <button
+                onClick={() => secondaryColorInputRef.current?.click()}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-secondary/10 hover:bg-secondary/20 text-secondary transition-colors"
+                title="Choose custom color"
+              >
+                <Plus className="h-3 w-3" />
+                Custom
+              </button>
+              <input
+                ref={secondaryColorInputRef}
+                type="color"
+                value={secondaryColor}
+                onChange={handleCustomSecondary}
+                className="sr-only"
+                aria-label="Choose custom secondary color"
+              />
+            </div>
             <div className="grid grid-cols-4 gap-2">
             {SECONDARY_COLORS.map((preset) => (
               <button
@@ -171,6 +269,7 @@ export const AccentColorPicker = () => {
                 }`}
                 style={{ backgroundColor: preset.value }}
                 title={preset.name}
+                aria-label={`Select ${preset.name} as secondary color`}
               >
                 {secondaryColor === preset.value && (
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -183,8 +282,28 @@ export const AccentColorPicker = () => {
           </div>
           
           <div className="border-t border-border/20 pt-4 space-y-3">
-            <p className="text-sm font-semibold">Accent Color</p>
-            <p className="text-xs text-muted-foreground">Highlights and interactive elements</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold">Accent Color</p>
+                <p className="text-xs text-muted-foreground">Highlights and interactive elements</p>
+              </div>
+              <button
+                onClick={() => accentColorInputRef.current?.click()}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-accent/10 hover:bg-accent/20 text-accent transition-colors"
+                title="Choose custom color"
+              >
+                <Plus className="h-3 w-3" />
+                Custom
+              </button>
+              <input
+                ref={accentColorInputRef}
+                type="color"
+                value={accentColor}
+                onChange={handleCustomAccent}
+                className="sr-only"
+                aria-label="Choose custom accent color"
+              />
+            </div>
             <div className="grid grid-cols-3 gap-2">
             {PRESET_COLORS.map((preset) => (
               <button
@@ -197,6 +316,7 @@ export const AccentColorPicker = () => {
                 }`}
                 style={{ backgroundColor: preset.value }}
                 title={preset.name}
+                aria-label={`Select ${preset.name} as accent color`}
               >
                 {accentColor === preset.value && (
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -206,9 +326,12 @@ export const AccentColorPicker = () => {
               </button>
             ))}
             </div>
-            <p className="text-xs text-muted-foreground text-center pt-2 border-t border-border/20">
-              Colors apply globally to all charts and UI
-            </p>
+            <div className="flex items-center justify-center gap-2 pt-2 border-t border-border/20">
+              <Palette className="h-3 w-3 text-muted-foreground" />
+              <p className="text-xs text-muted-foreground text-center">
+                Click <span className="font-semibold text-primary">+ Custom</span> to choose any color
+              </p>
+            </div>
           </div>
         </div>
       </PopoverContent>
