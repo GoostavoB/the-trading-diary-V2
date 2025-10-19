@@ -402,6 +402,13 @@ const Dashboard = () => {
               </ResponsiveGridLayout>
             </div>
 
+            {/* Trading Streaks */}
+            {stats && stats.total_trades > 0 && (
+              <div className="mb-4">
+                <TradingStreaks trades={filteredTrades.length > 0 ? filteredTrades : trades} />
+              </div>
+            )}
+
             {/* Analytics Row - Charts and Heatmap side by side */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mb-6 -mt-2">
               {/* Cumulative P&L Chart */}
@@ -477,10 +484,7 @@ const Dashboard = () => {
                   <StatisticsComparison 
                     trades={filteredTrades.length > 0 ? filteredTrades : trades}
                   />
-                  <TradingStreaks 
-                    trades={filteredTrades.length > 0 ? filteredTrades : trades}
-                  />
-                  <PerformanceInsights 
+                  <PerformanceInsights
                     trades={filteredTrades.length > 0 ? filteredTrades : trades}
                   />
                 </TabsContent>
