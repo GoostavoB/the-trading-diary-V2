@@ -19,7 +19,7 @@ const testimonials = [
   {
     name: "Marcus Rodriguez",
     role: "Swing Trader",
-    image: "👨‍🚀",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
     rating: 5,
     text: "AI extraction saves me 2 hours per week. Upload screenshots, done. The analytics show me exactly which setups work and which to avoid. Worth every penny.",
   },

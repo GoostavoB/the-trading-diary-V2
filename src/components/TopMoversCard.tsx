@@ -2,6 +2,8 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { formatPercent, formatCurrency } from "@/utils/formatNumber";
 import { Trade } from "@/types/trade";
+import { ExplainMetricButton } from "@/components/ExplainMetricButton";
+import { useAIAssistant } from '@/contexts/AIAssistantContext';
 
 interface AssetMover {
   symbol: string;
@@ -16,6 +18,8 @@ interface TopMoversCardProps {
 }
 
 export const TopMoversCard = ({ trades, className }: TopMoversCardProps) => {
+  const { openWithPrompt } = useAIAssistant();
+  
   // Calculate top movers by total P&L
   const assetData: Record<string, AssetMover> = {};
   
@@ -40,7 +44,15 @@ export const TopMoversCard = ({ trades, className }: TopMoversCardProps) => {
   return (
     <GlassCard className={className}>
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Top Movers</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Top Movers</h3>
+          <ExplainMetricButton 
+            metricName="Top Movers"
+            metricValue={`${topMovers.length} assets`}
+            context={topMovers.length > 0 ? `Biggest mover: ${topMovers[0].symbol} at ${formatCurrency(topMovers[0].pnl)}` : ''}
+            onExplain={openWithPrompt}
+          />
+        </div>
         
         <div className="space-y-2">
           {topMovers.length > 0 ? (

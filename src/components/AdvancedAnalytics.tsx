@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { TrendingUp, TrendingDown, Target, DollarSign, Edit } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target, DollarSign, Edit, Trophy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import bullNeon from '@/assets/bull-neon.png';
@@ -524,7 +524,10 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           {/* Best Days by Win Rate */}
           <Card className="p-6 bg-card border-border">
-            <h3 className="text-lg font-semibold mb-4">🏆 Best Days by Win Rate</h3>
+            <div className="flex items-center gap-2 mb-4">
+              <Trophy className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">Best Days by Win Rate</h3>
+            </div>
             <div className="space-y-3">
               {topDaysByWinRate.length > 0 ? topDaysByWinRate.map((stat, index) => (
                 <div key={stat.day} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
@@ -559,7 +562,10 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
 
           {/* Best Days by ROI */}
           <Card className="p-6 bg-card border-border">
-            <h3 className="text-lg font-semibold mb-4">💰 Best Days by Avg ROI</h3>
+            <div className="flex items-center gap-2 mb-4">
+              <DollarSign className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">Best Days by Avg ROI</h3>
+            </div>
             <div className="space-y-3">
               {topDaysByROI.length > 0 ? topDaysByROI.map((stat, index) => (
                 <div key={stat.day} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">

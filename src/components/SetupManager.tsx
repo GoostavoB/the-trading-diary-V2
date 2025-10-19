@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { Layers, Plus, Edit2, Trash2, TrendingUp, Target, DollarSign, BarChart3 } from 'lucide-react';
+import { Layers, Plus, Edit2, Trash2, TrendingUp, Target, DollarSign, BarChart3, Trophy } from 'lucide-react';
 import type { Trade } from '@/types/trade';
 
 interface SetupPerformance {
@@ -285,7 +285,7 @@ export const SetupManager = ({ trades }: SetupManagerProps) => {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-2">
                         {idx === 0 && perf.totalPnl > 0 && (
-                          <span className="text-2xl">🏆</span>
+                          <Trophy className="h-5 w-5 text-primary" />
                         )}
                         <h5 className="font-semibold">{perf.name}</h5>
                         <Badge variant="outline" className="text-xs">

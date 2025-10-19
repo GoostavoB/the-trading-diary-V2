@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, TrendingUp, TrendingDown, Target, DollarSign, BarChart3 } from 'lucide-react';
+import { Calendar, TrendingUp, TrendingDown, Target, DollarSign, BarChart3, ThumbsUp, Zap, Scale } from 'lucide-react';
 import { format, startOfWeek, endOfWeek, subWeeks, addWeeks } from 'date-fns';
 import type { Trade } from '@/types/trade';
 
@@ -316,17 +316,17 @@ export const WeeklyReview = ({ trades }: WeeklyReviewProps) => {
               )}
               
               {weeklyStats.winRate >= 70 ? (
-                <p>🎯 Excellent {weeklyStats.winRate.toFixed(1)}% win rate! You're in the zone.</p>
+                <p><Target className="inline h-4 w-4 mr-1 text-primary" />Excellent {weeklyStats.winRate.toFixed(1)}% win rate! You're in the zone.</p>
               ) : weeklyStats.winRate >= 50 ? (
-                <p>👍 Solid {weeklyStats.winRate.toFixed(1)}% win rate. Focus on improving risk/reward.</p>
+                <p><ThumbsUp className="inline h-4 w-4 mr-1 text-primary" />Solid {weeklyStats.winRate.toFixed(1)}% win rate. Focus on improving risk/reward.</p>
               ) : (
-                <p>📉 Win rate at {weeklyStats.winRate.toFixed(1)}%. Time to review your setups and cut losses faster.</p>
+                <p><TrendingDown className="inline h-4 w-4 mr-1 text-secondary" />Win rate at {weeklyStats.winRate.toFixed(1)}%. Time to review your setups and cut losses faster.</p>
               )}
               
               {weeklyStats.avgWin > weeklyStats.avgLoss * 2 ? (
-                <p>💪 Your average wins are more than 2x your average losses. Excellent risk management!</p>
+                <p><Zap className="inline h-4 w-4 mr-1 text-primary" />Your average wins are more than 2x your average losses. Excellent risk management!</p>
               ) : (
-                <p>⚖️ Work on letting winners run. Your average win should be at least 2x your average loss.</p>
+                <p><Scale className="inline h-4 w-4 mr-1 text-muted-foreground" />Work on letting winners run. Your average win should be at least 2x your average loss.</p>
               )}
             </div>
           </Card>

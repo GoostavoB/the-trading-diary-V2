@@ -4,6 +4,8 @@ import { formatCurrency } from "@/utils/formatNumber";
 import { Trade } from "@/types/trade";
 import { format } from "date-fns";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { ExplainMetricButton } from "@/components/ExplainMetricButton";
+import { useAIAssistant } from '@/contexts/AIAssistantContext';
 
 interface RecentTransactionsCardProps {
   trades: Trade[];
@@ -11,6 +13,7 @@ interface RecentTransactionsCardProps {
 }
 
 export const RecentTransactionsCard = ({ trades, className }: RecentTransactionsCardProps) => {
+  const { openWithPrompt } = useAIAssistant();
   const recentTrades = trades
     .sort((a, b) => new Date(b.trade_date).getTime() - new Date(a.trade_date).getTime())
     .slice(0, 5);
@@ -20,9 +23,17 @@ export const RecentTransactionsCard = ({ trades, className }: RecentTransactions
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">Recent Transactions</h3>
-          <a href="/dashboard" className="text-xs text-primary hover:underline">
-            View all
-          </a>
+          <div className="flex items-center gap-2">
+            <ExplainMetricButton 
+              metricName="Recent Transactions"
+              metricValue={`${recentTrades.length} trades`}
+              context={recentTrades.length > 0 ? `Latest: ${recentTrades[0].symbol} (${formatCurrency(recentTrades[0].pnl || 0)})` : ''}
+              onExplain={openWithPrompt}
+            />
+            <a href="/dashboard" className="text-xs text-primary hover:underline">
+              View all
+            </a>
+          </div>
         </div>
         
         <div className="space-y-2">

@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp } from "lucide-react";
 import { formatPercent } from "@/utils/formatNumber";
+import { ExplainMetricButton } from "@/components/ExplainMetricButton";
+import { useAIAssistant } from '@/contexts/AIAssistantContext';
 
 interface AssetStats {
   asset: string;
@@ -15,6 +17,7 @@ interface TopAssetsByWinRateProps {
 }
 
 export const TopAssetsByWinRate = ({ assets, limit = 5 }: TopAssetsByWinRateProps) => {
+  const { openWithPrompt } = useAIAssistant();
   const sortedAssets = [...assets]
     .sort((a, b) => b.winRate - a.winRate)
     .slice(0, limit);
@@ -22,9 +25,17 @@ export const TopAssetsByWinRate = ({ assets, limit = 5 }: TopAssetsByWinRateProp
   return (
     <Card className="glass-card">
       <CardHeader>
-        <div className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-primary" />
-          <CardTitle className="text-lg font-semibold">Top Assets by Win Rate</CardTitle>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-primary" />
+            <CardTitle className="text-lg font-semibold">Top Assets by Win Rate</CardTitle>
+          </div>
+          <ExplainMetricButton 
+            metricName="Top Assets by Win Rate"
+            metricValue={`${sortedAssets.length} assets`}
+            context={`Best performer: ${sortedAssets[0]?.asset} at ${formatPercent(sortedAssets[0]?.winRate)}`}
+            onExplain={openWithPrompt}
+          />
         </div>
       </CardHeader>
       <CardContent>

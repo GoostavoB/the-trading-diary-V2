@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, Calculator, AlertTriangle, TrendingUp, DollarSign } from 'lucide-react';
+import { Shield, Calculator, AlertTriangle, TrendingUp, DollarSign, CheckCircle2, ThumbsUp } from 'lucide-react';
 
 export const RiskCalculator = () => {
   // Position Size Calculator
@@ -265,10 +265,10 @@ export const RiskCalculator = () => {
               <div className="mt-4 p-3 bg-primary/10 border border-primary/30 rounded-lg">
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {rrCalc.ratio >= 2
-                    ? '✅ Excellent risk/reward ratio! This trade setup has strong potential.'
+                    ? <span className="flex items-center gap-1"><CheckCircle2 className="h-4 w-4 text-primary" />Excellent risk/reward ratio! This trade setup has strong potential.</span>
                     : rrCalc.ratio >= 1.5
-                    ? '👍 Good risk/reward ratio. Consider taking this trade.'
-                    : '⚠️ Low risk/reward ratio. Consider waiting for better setups with at least 1:2 R/R.'}
+                    ? <span className="flex items-center gap-1"><ThumbsUp className="h-4 w-4 text-primary" />Good risk/reward ratio. Consider taking this trade.</span>
+                    : <span className="flex items-center gap-1"><AlertTriangle className="h-4 w-4 text-yellow-500" />Low risk/reward ratio. Consider waiting for better setups with at least 1:2 R/R.</span>}
                 </p>
               </div>
             </Card>

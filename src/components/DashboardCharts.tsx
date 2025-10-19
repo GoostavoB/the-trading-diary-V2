@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format } from 'date-fns';
+import { useMobileOptimization } from '@/hooks/useMobileOptimization';
 
 interface Trade {
   id: string;
@@ -15,8 +16,10 @@ interface DashboardChartsProps {
 }
 
 export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => {
+  const { isMobile, optimizeDataPoints, formatNumberMobile } = useMobileOptimization();
+  
   // Calculate cumulative P&L over time
-  const cumulativePnL = trades
+  const cumulativePnLRaw = trades
     .sort((a, b) => new Date(a.trade_date).getTime() - new Date(b.trade_date).getTime())
     .map((trade, index, arr) => {
       const cumulative = arr.slice(0, index + 1).reduce((sum, t) => sum + t.pnl, 0);
@@ -25,6 +28,9 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
         pnl: cumulative,
       };
     });
+
+  // Optimize data points for mobile
+  const cumulativePnL = optimizeDataPoints(cumulativePnLRaw, isMobile ? 15 : 50);
 
   // Group trades by date for wins/losses
   const tradesByDate = trades.reduce((acc, trade) => {
@@ -40,7 +46,8 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
     return acc;
   }, {} as Record<string, { date: string; wins: number; losses: number }>);
 
-  const winsLossesData = Object.values(tradesByDate);
+  const winsLossesDataRaw = Object.values(tradesByDate);
+  const winsLossesData = optimizeDataPoints(winsLossesDataRaw, isMobile ? 10 : 30);
 
   // Render specific chart if chartType is provided
   if (chartType === 'cumulative') {
@@ -62,16 +69,16 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
               <XAxis 
                 dataKey="date" 
                 stroke="hsl(var(--muted-foreground))"
-                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: isMobile ? 9 : 11 }}
                 tickMargin={8}
-                interval="preserveStartEnd"
+                interval={isMobile ? 2 : "preserveStartEnd"}
               />
               <YAxis 
                 stroke="hsl(var(--muted-foreground))"
-                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: isMobile ? 9 : 11 }}
                 tickMargin={8}
-                width={60}
-                tickFormatter={(value) => `$${value.toFixed(0)}`}
+                width={isMobile ? 45 : 60}
+                tickFormatter={(value) => isMobile ? formatNumberMobile(value, 0) : `$${value.toFixed(0)}`}
               />
               <Tooltip
                 cursor={{ strokeDasharray: '3 3', stroke: 'hsl(var(--border))', fill: 'transparent' }}
@@ -82,13 +89,15 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
                   border: '1px solid hsl(var(--border) / 0.5)',
                   borderRadius: '8px',
                   boxShadow: '0 4px 12px 0 rgba(0, 0, 0, 0.1)',
-                  padding: '8px 12px'
+                  padding: isMobile ? '6px 10px' : '8px 12px',
+                  fontSize: isMobile ? '11px' : '13px'
                 }}
                 labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 500, marginBottom: '4px' }}
                 formatter={(value: any) => {
                   const numValue = Number(value);
                   const color = numValue === 0 ? 'hsl(var(--foreground))' : numValue > 0 ? 'hsl(var(--primary))' : 'hsl(var(--secondary))';
-                  return [<span style={{ color, fontWeight: 600 }}>${numValue.toFixed(2)}</span>, 'Cumulative P&L'];
+                  const formatted = isMobile ? `$${formatNumberMobile(numValue, 1)}` : `$${numValue.toFixed(2)}`;
+                  return [<span style={{ color, fontWeight: 600 }}>{formatted}</span>, 'P&L'];
                 }}
               />
               <Area

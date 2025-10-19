@@ -322,9 +322,9 @@ export const DrawdownAnalysis = ({ trades, initialInvestment }: DrawdownAnalysis
               )}
               
               {currentDrawdown ? (
-                <p>📉 You're currently {currentDrawdown.daysInDrawdown} days into a drawdown. Consider taking a break or reducing your position sizes until you find your edge again.</p>
+                <p><TrendingDown className="inline h-4 w-4 mr-1 text-secondary" />You're currently {currentDrawdown.daysInDrawdown} days into a drawdown. Consider taking a break or reducing your position sizes until you find your edge again.</p>
               ) : (
-                <p>📈 You're trading at or near peak equity. Stay disciplined and stick to your strategy!</p>
+                <p><TrendingUp className="inline h-4 w-4 mr-1 text-primary" />You're trading at or near peak equity. Stay disciplined and stick to your strategy!</p>
               )}
               
               {drawdowns.length > 3 && (
