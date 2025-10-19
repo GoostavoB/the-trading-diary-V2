@@ -257,7 +257,7 @@ const LongShortRatio = () => {
           <>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Card className="glass">
-                <CardContent className="flex items-center gap-2 p-4">
+                <CardContent className="flex items-center gap-2 py-2 px-4">
                   <span className="text-sm font-medium text-muted-foreground">
                     Market Sentiment:
                   </span>
@@ -461,24 +461,19 @@ const LongShortRatio = () => {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Market Sentiment</CardTitle>
-                  <CardDescription>Visual indicator</CardDescription>
-                </CardHeader>
-                <CardContent className="flex items-center justify-center">
+              <Card className="glass">
+                <CardContent className="flex items-center gap-2 py-2 px-4">
+                  <span className="text-sm font-medium text-muted-foreground">
+                    Market Sentiment:
+                  </span>
                   {latestBinanceData && (
-                    <div className="w-24 h-24 rounded-full overflow-hidden bg-black flex items-center justify-center">
-                      <img 
-                        src={getMarketSentimentImage(
-                          parseFloat(latestBinanceData.longAccount) * 100, 
-                          parseFloat(latestBinanceData.shortAccount) * 100
-                        )} 
-                        alt="Market sentiment"
-                        className="w-full h-full object-cover"
-                        style={{ mixBlendMode: 'lighten' }}
-                      />
-                    </div>
+                    <span className={`text-sm font-bold ${
+                      parseFloat(latestBinanceData.longAccount) > parseFloat(latestBinanceData.shortAccount)
+                        ? 'text-neon-green' 
+                        : 'text-neon-red'
+                    }`}>
+                      {parseFloat(latestBinanceData.longAccount) > parseFloat(latestBinanceData.shortAccount) ? 'Bullish' : 'Bearish'}
+                    </span>
                   )}
                 </CardContent>
               </Card>
@@ -674,24 +669,19 @@ const LongShortRatio = () => {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Market Sentiment</CardTitle>
-                  <CardDescription>Visual indicator</CardDescription>
-                </CardHeader>
-                <CardContent className="flex items-center justify-center">
+              <Card className="glass">
+                <CardContent className="flex items-center gap-2 py-2 px-4">
+                  <span className="text-sm font-medium text-muted-foreground">
+                    Market Sentiment:
+                  </span>
                   {latestBybitData && (
-                    <div className="w-24 h-24 rounded-full overflow-hidden bg-black flex items-center justify-center">
-                      <img 
-                        src={getMarketSentimentImage(
-                          parseFloat(latestBybitData.buyRatio) * 100, 
-                          parseFloat(latestBybitData.sellRatio) * 100
-                        )} 
-                        alt="Market sentiment"
-                        className="w-full h-full object-cover"
-                        style={{ mixBlendMode: 'lighten' }}
-                      />
-                    </div>
+                    <span className={`text-sm font-bold ${
+                      parseFloat(latestBybitData.buyRatio) > parseFloat(latestBybitData.sellRatio)
+                        ? 'text-neon-green' 
+                        : 'text-neon-red'
+                    }`}>
+                      {parseFloat(latestBybitData.buyRatio) > parseFloat(latestBybitData.sellRatio) ? 'Bullish' : 'Bearish'}
+                    </span>
                   )}
                 </CardContent>
               </Card>
