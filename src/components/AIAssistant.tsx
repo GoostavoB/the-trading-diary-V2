@@ -111,10 +111,10 @@ export const AIAssistant = () => {
       <SheetTrigger asChild>
         <Button
           size="lg"
-          className="fixed bottom-6 right-6 rounded-full h-16 w-16 shadow-2xl shadow-accent/50 glass-strong hover:scale-110 transition-all duration-300 z-[100] animate-pulse-subtle"
+          className="fixed bottom-6 right-6 rounded-full h-16 w-16 z-[100] bg-gradient-to-br from-accent via-accent to-accent/80 hover:from-accent/90 hover:via-accent hover:to-accent text-accent-foreground shadow-[0_0_30px_hsl(var(--accent)/0.5),0_0_60px_hsl(var(--accent)/0.3),0_10px_40px_-10px_hsl(var(--accent)/0.6)] hover:shadow-[0_0_40px_hsl(var(--accent)/0.7),0_0_80px_hsl(var(--accent)/0.4),0_10px_50px_-10px_hsl(var(--accent)/0.8)] hover:scale-110 transition-all duration-300 animate-pulse-glow before:absolute before:inset-0 before:rounded-full before:animate-breathing-ring"
           aria-label="Open AI Assistant"
         >
-          <Bot className="h-7 w-7" />
+          <Bot className="h-7 w-7 relative z-10" />
         </Button>
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-md glass-strong backdrop-blur-xl border-accent/20">
