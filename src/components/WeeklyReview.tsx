@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo, useMemo, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,15 +23,10 @@ interface WeeklyStats {
   weekEnd: Date;
 }
 
-export const WeeklyReview = ({ trades }: WeeklyReviewProps) => {
+const WeeklyReviewComponent = ({ trades }: WeeklyReviewProps) => {
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
-  const [weeklyStats, setWeeklyStats] = useState<WeeklyStats | null>(null);
 
-  useEffect(() => {
-    calculateWeeklyStats();
-  }, [trades, currentWeekOffset]);
-
-  const calculateWeeklyStats = () => {
+  const weeklyStats = useMemo(() => {
     const today = new Date();
     const targetDate = addWeeks(today, currentWeekOffset);
     const weekStart = startOfWeek(targetDate, { weekStartsOn: 1 }); // Monday
@@ -43,7 +38,7 @@ export const WeeklyReview = ({ trades }: WeeklyReviewProps) => {
     });
 
     if (weekTrades.length === 0) {
-      setWeeklyStats({
+      return {
         totalPnl: 0,
         winRate: 0,
         totalTrades: 0,
@@ -54,8 +49,7 @@ export const WeeklyReview = ({ trades }: WeeklyReviewProps) => {
         topAsset: { symbol: '', pnl: 0 },
         weekStart,
         weekEnd,
-      });
-      return;
+      };
     }
 
     const totalPnl = weekTrades.reduce((sum, t) => sum + (t.pnl || 0), 0);
@@ -97,7 +91,7 @@ export const WeeklyReview = ({ trades }: WeeklyReviewProps) => {
       pnl > top.pnl ? { symbol, pnl } : top
     , { symbol: '', pnl: -Infinity });
 
-    setWeeklyStats({
+    return {
       totalPnl,
       winRate,
       totalTrades: weekTrades.length,
@@ -108,12 +102,12 @@ export const WeeklyReview = ({ trades }: WeeklyReviewProps) => {
       topAsset: topAsset.pnl !== -Infinity ? topAsset : { symbol: '', pnl: 0 },
       weekStart,
       weekEnd,
-    });
-  };
+    };
+  }, [trades, currentWeekOffset]);
 
-  const goToPreviousWeek = () => setCurrentWeekOffset(prev => prev - 1);
-  const goToNextWeek = () => setCurrentWeekOffset(prev => prev + 1);
-  const goToCurrentWeek = () => setCurrentWeekOffset(0);
+  const goToPreviousWeek = useCallback(() => setCurrentWeekOffset(prev => prev - 1), []);
+  const goToNextWeek = useCallback(() => setCurrentWeekOffset(prev => prev + 1), []);
+  const goToCurrentWeek = useCallback(() => setCurrentWeekOffset(0), []);
 
   if (!weeklyStats) return null;
 
@@ -335,3 +329,5 @@ export const WeeklyReview = ({ trades }: WeeklyReviewProps) => {
     </Card>
   );
 };
+
+export const WeeklyReview = memo(WeeklyReviewComponent);

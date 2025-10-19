@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Trophy, Target, TrendingUp, Flame, Award, Star, Zap, Crown } from 'lucide-react';
@@ -18,46 +19,51 @@ interface Achievement {
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
 }
 
-export const AchievementBadges = ({ trades }: AchievementBadgesProps) => {
-  // Calculate stats
-  const totalTrades = trades.length;
-  const winningTrades = trades.filter(t => (t.pnl || 0) > 0);
-  const winRate = totalTrades > 0 ? (winningTrades.length / totalTrades) * 100 : 0;
-  const totalPnl = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
-  
-  // Calculate streaks
-  const sortedTrades = [...trades].sort((a, b) => 
-    new Date(a.trade_date).getTime() - new Date(b.trade_date).getTime()
-  );
-  
-  let maxWinStreak = 0;
-  let currentWinStreak = 0;
-  
-  sortedTrades.forEach(trade => {
-    if ((trade.pnl || 0) > 0) {
-      currentWinStreak++;
-      maxWinStreak = Math.max(maxWinStreak, currentWinStreak);
-    } else {
-      currentWinStreak = 0;
-    }
-  });
+const AchievementBadgesComponent = ({ trades }: AchievementBadgesProps) => {
+  const stats = useMemo(() => {
+    const totalTrades = trades.length;
+    const winningTrades = trades.filter(t => (t.pnl || 0) > 0);
+    const winRate = totalTrades > 0 ? (winningTrades.length / totalTrades) * 100 : 0;
+    const totalPnl = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+    
+    // Calculate streaks
+    const sortedTrades = [...trades].sort((a, b) => 
+      new Date(a.trade_date).getTime() - new Date(b.trade_date).getTime()
+    );
+    
+    let maxWinStreak = 0;
+    let currentWinStreak = 0;
+    
+    sortedTrades.forEach(trade => {
+      if ((trade.pnl || 0) > 0) {
+        currentWinStreak++;
+        maxWinStreak = Math.max(maxWinStreak, currentWinStreak);
+      } else {
+        currentWinStreak = 0;
+      }
+    });
 
-  // Beast mode days (days with >70% win rate)
-  const tradesByDate = trades.reduce((acc, trade) => {
-    const date = new Date(trade.trade_date).toDateString();
-    if (!acc[date]) acc[date] = [];
-    acc[date].push(trade);
-    return acc;
-  }, {} as Record<string, Trade[]>);
+    // Beast mode days (days with >70% win rate)
+    const tradesByDate = trades.reduce((acc, trade) => {
+      const date = new Date(trade.trade_date).toDateString();
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(trade);
+      return acc;
+    }, {} as Record<string, Trade[]>);
 
-  const beastModeDays = Object.values(tradesByDate).filter(dayTrades => {
-    const wins = dayTrades.filter(t => (t.pnl || 0) > 0).length;
-    const dayWinRate = (wins / dayTrades.length) * 100;
-    return dayWinRate > 70;
-  }).length;
+    const beastModeDays = Object.values(tradesByDate).filter(dayTrades => {
+      const wins = dayTrades.filter(t => (t.pnl || 0) > 0).length;
+      const dayWinRate = (wins / dayTrades.length) * 100;
+      return dayWinRate > 70;
+    }).length;
+
+    return { totalTrades, winRate, totalPnl, maxWinStreak, beastModeDays };
+  }, [trades]);
+
+  const { totalTrades, winRate, totalPnl, maxWinStreak, beastModeDays } = stats;
 
   // Define achievements
-  const achievements: Achievement[] = [
+  const achievements: Achievement[] = useMemo(() => [
     {
       id: 'first_trade',
       title: 'First Trade',
@@ -166,9 +172,12 @@ export const AchievementBadges = ({ trades }: AchievementBadgesProps) => {
       maxProgress: 5,
       rarity: 'epic',
     },
-  ];
+  ], [totalTrades, winRate, totalPnl, maxWinStreak, beastModeDays]);
 
-  const unlockedCount = achievements.filter(a => a.unlocked).length;
+  const unlockedCount = useMemo(() => 
+    achievements.filter(a => a.unlocked).length,
+    [achievements]
+  );
 
   const getRarityStyles = (rarity: Achievement['rarity']) => {
     switch (rarity) {
@@ -294,3 +303,5 @@ export const AchievementBadges = ({ trades }: AchievementBadgesProps) => {
     </Card>
   );
 };
+
+export const AchievementBadges = memo(AchievementBadgesComponent);
