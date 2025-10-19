@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
-import { TrendingUp, TrendingDown, DollarSign, Target, Flame, Eye, EyeOff, Info, GripVertical } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Target, Eye, EyeOff, Info, GripVertical } from 'lucide-react';
 import { DashboardCharts } from '@/components/DashboardCharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PerformanceInsights } from '@/components/PerformanceInsights';
@@ -72,7 +72,6 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [initialInvestment, setInitialInvestment] = useState(0);
   const [includeFeesInPnL, setIncludeFeesInPnL] = useState(true);
-  const [beastModeDays, setBeastModeDays] = useState(0); // Actually used for "Monstro Mode"
   const [dateRange, setDateRange] = useState<DateRange>(undefined);
   const [filteredTrades, setFilteredTrades] = useState<Trade[]>([]);
   const [activeTab, setActiveTab] = useState<string>('insights');
@@ -184,22 +183,6 @@ const Dashboard = () => {
       const winningTrades = trades.filter(t => (t.pnl || 0) > 0).length;
       const avgDuration = trades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (trades.length || 1);
 
-      // Calculate Monstro Mode days (days with >70% win rate)
-      const tradesByDate = trades.reduce((acc, trade) => {
-        const date = new Date(trade.trade_date).toDateString();
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(trade);
-        return acc;
-      }, {} as Record<string, typeof trades>);
-
-      const daysWithMonstroMode = Object.values(tradesByDate).filter(dayTrades => {
-        const wins = dayTrades.filter(t => (t.pnl || 0) > 0).length;
-        const winRate = (wins / dayTrades.length) * 100;
-        return winRate > 70;
-      }).length;
-
-      setBeastModeDays(daysWithMonstroMode);
-
       setStats({
         total_pnl: includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees,
         win_rate: trades.length > 0 ? (winningTrades / trades.length) * 100 : 0,
@@ -306,42 +289,9 @@ const Dashboard = () => {
 
       <div id="main-dashboard-content" className="space-y-6 mobile-safe animate-fade-in">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
-          <div className="flex items-center gap-4">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-1 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Dashboard</h1>
-              <p className="text-sm text-muted-foreground/80">Track your trading performance and analytics</p>
-            </div>
-            {beastModeDays > 0 && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div 
-                      className="flex items-center gap-2 px-4 py-2.5 glass-strong rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 cursor-help"
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.85)',
-                        backdropFilter: 'blur(20px)',
-                        WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.5)'
-                      }}
-                    >
-                      <Flame className="w-5 h-5 text-primary flex-shrink-0" />
-                      <div>
-                        <div className="text-sm font-semibold text-primary tracking-wide">
-                          Monstro Mode
-                        </div>
-                        <div className="text-[10px] text-muted-foreground">
-                          {beastModeDays} {beastModeDays === 1 ? 'day' : 'days'}
-                        </div>
-                      </div>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="max-w-xs glass-strong">
-                    <p className="font-semibold mb-1">Monstro Mode</p>
-                    <p className="text-sm">Activates when your win rate and profit exceed target thresholds for 3+ consecutive days. Days shown: {beastModeDays}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold mb-1 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Dashboard</h1>
+            <p className="text-sm text-muted-foreground/80">Track your trading performance and analytics</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <AccentColorPicker />

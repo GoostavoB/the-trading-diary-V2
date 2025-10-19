@@ -618,11 +618,12 @@ const Upload = () => {
         setSavedTradesCount(extractedTrades.length);
         setShowSuccess(true);
         
-        // Clear the extraction data
-        setExtractionImage(null);
-        setExtractionPreview(null);
-        setExtractedTrades([]);
-        setTradeEdits({});
+        toast.success(`Successfully saved ${extractedTrades.length} trade(s)!`);
+        
+        // Wait for success animation then navigate
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
       }
     } catch (error) {
       console.error('Error saving trades:', error);
