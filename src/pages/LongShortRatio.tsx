@@ -255,24 +255,7 @@ const LongShortRatio = () => {
           </Card>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="glass">
-                <CardContent className="flex items-center gap-2 py-2 px-4">
-                  <span className="text-sm font-medium text-muted-foreground">
-                    Market Sentiment:
-                  </span>
-                  {latestCombinedData && (
-                    <span className={`text-sm font-bold ${
-                      latestCombinedData.longAccount > latestCombinedData.shortAccount 
-                        ? 'text-neon-green' 
-                        : 'text-neon-red'
-                    }`}>
-                      {latestCombinedData.longAccount > latestCombinedData.shortAccount ? 'Bullish' : 'Bearish'}
-                    </span>
-                  )}
-                </CardContent>
-              </Card>
-
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card className="glass">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm">Avg Long/Short Ratio</CardTitle>
@@ -460,24 +443,7 @@ const LongShortRatio = () => {
           </Card>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="glass">
-                <CardContent className="flex items-center gap-2 py-2 px-4">
-                  <span className="text-sm font-medium text-muted-foreground">
-                    Market Sentiment:
-                  </span>
-                  {latestBinanceData && (
-                    <span className={`text-sm font-bold ${
-                      parseFloat(latestBinanceData.longAccount) > parseFloat(latestBinanceData.shortAccount)
-                        ? 'text-neon-green' 
-                        : 'text-neon-red'
-                    }`}>
-                      {parseFloat(latestBinanceData.longAccount) > parseFloat(latestBinanceData.shortAccount) ? 'Bullish' : 'Bearish'}
-                    </span>
-                  )}
-                </CardContent>
-              </Card>
-
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Long/Short Ratio</CardTitle>
@@ -668,24 +634,7 @@ const LongShortRatio = () => {
           </Card>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="glass">
-                <CardContent className="flex items-center gap-2 py-2 px-4">
-                  <span className="text-sm font-medium text-muted-foreground">
-                    Market Sentiment:
-                  </span>
-                  {latestBybitData && (
-                    <span className={`text-sm font-bold ${
-                      parseFloat(latestBybitData.buyRatio) > parseFloat(latestBybitData.sellRatio)
-                        ? 'text-neon-green' 
-                        : 'text-neon-red'
-                    }`}>
-                      {parseFloat(latestBybitData.buyRatio) > parseFloat(latestBybitData.sellRatio) ? 'Bullish' : 'Bearish'}
-                    </span>
-                  )}
-                </CardContent>
-              </Card>
-
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Long/Short Ratio</CardTitle>
