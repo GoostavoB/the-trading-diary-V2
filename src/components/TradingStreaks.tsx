@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { CheckCircle2, AlertCircle, Trophy, Target, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -7,7 +8,7 @@ interface TradingStreaksProps {
   trades: Trade[];
 }
 
-export const TradingStreaks = ({ trades }: TradingStreaksProps) => {
+export const TradingStreaks = memo(({ trades }: TradingStreaksProps) => {
   if (trades.length === 0) return null;
 
   // Sort trades by date
@@ -79,14 +80,18 @@ export const TradingStreaks = ({ trades }: TradingStreaksProps) => {
   }
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4" role="region" aria-label="Trading streaks statistics">
       {/* Current Streak */}
-      <div className={`p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02] relative group`}>
+      <div 
+        className={`p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02] relative group`}
+        role="article"
+        aria-label={`Current ${currentStreakType} streak: ${currentStreak} trades`}
+      >
         <div className="flex items-center gap-2 mb-2">
           {currentStreakType === 'win' ? (
-            <CheckCircle2 className="w-4 h-4 text-neon-green" />
+            <CheckCircle2 className="w-4 h-4 text-neon-green" aria-hidden="true" />
           ) : (
-            <AlertCircle className="w-4 h-4 text-neon-red" />
+            <AlertCircle className="w-4 h-4 text-neon-red" aria-hidden="true" />
           )}
           <span className="text-xs text-muted-foreground">Current Streak</span>
         </div>
@@ -103,7 +108,12 @@ export const TradingStreaks = ({ trades }: TradingStreaksProps) => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6 absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6 absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label="More information about current streak"
+              >
                 <Info className="h-3 w-3 text-muted-foreground" />
               </Button>
             </TooltipTrigger>
@@ -117,9 +127,13 @@ export const TradingStreaks = ({ trades }: TradingStreaksProps) => {
       </div>
 
       {/* Longest Win Streak */}
-      <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02] relative group">
+      <div 
+        className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02] relative group"
+        role="article"
+        aria-label={`Best win streak: ${longestWinStreak} wins`}
+      >
         <div className="flex items-center gap-2 mb-2">
-          <Trophy className="w-4 h-4 text-neon-green" />
+          <Trophy className="w-4 h-4 text-neon-green" aria-hidden="true" />
           <span className="text-xs text-muted-foreground">Best Streak</span>
         </div>
         <div className="flex items-baseline gap-2">
@@ -143,9 +157,13 @@ export const TradingStreaks = ({ trades }: TradingStreaksProps) => {
       </div>
 
       {/* Longest Loss Streak */}
-      <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02] relative group">
+      <div 
+        className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02] relative group"
+        role="article"
+        aria-label={`Maximum loss streak: ${longestLossStreak} losses`}
+      >
         <div className="flex items-center gap-2 mb-2">
-          <AlertCircle className="w-4 h-4 text-neon-red" />
+          <AlertCircle className="w-4 h-4 text-neon-red" aria-hidden="true" />
           <span className="text-xs text-muted-foreground">Max Drawdown</span>
         </div>
         <div className="flex items-baseline gap-2">
@@ -169,9 +187,13 @@ export const TradingStreaks = ({ trades }: TradingStreaksProps) => {
       </div>
 
       {/* Consecutive Trading Days */}
-      <div className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02] relative group">
+      <div 
+        className="p-3 lg:p-4 rounded-xl glass-subtle flex flex-col justify-center min-h-[80px] lg:min-h-[90px] transition-all hover:scale-[1.02] relative group"
+        role="article"
+        aria-label={`Consecutive trading days: ${maxConsecutiveDays} days`}
+      >
         <div className="flex items-center gap-2 mb-2">
-          <Target className="w-4 h-4 text-primary" />
+          <Target className="w-4 h-4 text-primary" aria-hidden="true" />
           <span className="text-xs text-muted-foreground">Trading Days</span>
         </div>
         <div className="flex items-baseline gap-2">
@@ -195,4 +217,6 @@ export const TradingStreaks = ({ trades }: TradingStreaksProps) => {
       </div>
     </div>
   );
-};
+});
+
+TradingStreaks.displayName = 'TradingStreaks';

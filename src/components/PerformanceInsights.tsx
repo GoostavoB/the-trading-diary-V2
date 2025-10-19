@@ -1,13 +1,15 @@
+import { memo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, Trophy, Target } from 'lucide-react';
 import type { Trade } from '@/types/trade';
+import { formatCurrency, formatPercent } from '@/utils/formatNumber';
 
 interface PerformanceInsightsProps {
   trades: Trade[];
 }
 
-export const PerformanceInsights = ({ trades }: PerformanceInsightsProps) => {
+export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) => {
   if (!trades.length) return null;
 
   // Calculate insights
@@ -49,21 +51,21 @@ export const PerformanceInsights = ({ trades }: PerformanceInsightsProps) => {
       type: 'success',
       icon: Trophy,
       title: 'Excellent Win Rate',
-      message: `You're crushing it with a ${winRate.toFixed(1)}% win rate! Keep your discipline.`
+      message: `You're crushing it with a ${formatPercent(winRate)} win rate! Keep your discipline.`
     });
   } else if (winRate >= 50) {
     insights.push({
       type: 'info',
       icon: Target,
       title: 'Solid Win Rate',
-      message: `${winRate.toFixed(1)}% win rate shows consistency. Focus on risk management.`
+      message: `${formatPercent(winRate)} win rate shows consistency. Focus on risk management.`
     });
   } else {
     insights.push({
       type: 'warning',
       icon: AlertCircle,
       title: 'Win Rate Below 50%',
-      message: `At ${winRate.toFixed(1)}%, review your strategy and cut losses faster.`
+      message: `At ${formatPercent(winRate)}, review your strategy and cut losses faster.`
     });
   }
 
@@ -97,14 +99,14 @@ export const PerformanceInsights = ({ trades }: PerformanceInsightsProps) => {
       type: 'success',
       icon: TrendingUp,
       title: 'Profitable Overall',
-      message: `Total P&L of $${totalPnl.toFixed(2)}. Stay consistent with your winning strategy.`
+      message: `Total P&L of ${formatCurrency(totalPnl)}. Stay consistent with your winning strategy.`
     });
   } else if (totalPnl < 0) {
     insights.push({
       type: 'danger',
       icon: TrendingDown,
       title: 'Drawdown Alert',
-      message: `Down $${Math.abs(totalPnl).toFixed(2)}. Take a break, review your trades, and refocus.`
+      message: `Down ${formatCurrency(Math.abs(totalPnl))}. Take a break, review your trades, and refocus.`
     });
   }
 
@@ -136,7 +138,7 @@ export const PerformanceInsights = ({ trades }: PerformanceInsightsProps) => {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Performance Insights</h3>
+      <h3 className="text-lg font-semibold" id="performance-insights">Performance Insights</h3>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {insights.map((insight, index) => {
@@ -146,14 +148,16 @@ export const PerformanceInsights = ({ trades }: PerformanceInsightsProps) => {
               key={index}
               className={`p-4 ${getTypeStyles(insight.type)} border-2 transition-all duration-300 hover:scale-[1.02] animate-fade-in`}
               style={{ animationDelay: `${index * 100}ms` }}
+              role="article"
+              aria-labelledby={`insight-${index}-title`}
             >
               <div className="flex gap-3">
-                <div className={`flex-shrink-0 ${getIconStyles(insight.type)}`}>
+                <div className={`flex-shrink-0 ${getIconStyles(insight.type)}`} aria-hidden="true">
                   <Icon className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-semibold text-sm">{insight.title}</h4>
+                    <h4 id={`insight-${index}-title`} className="font-semibold text-sm">{insight.title}</h4>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {insight.message}
@@ -180,13 +184,13 @@ export const PerformanceInsights = ({ trades }: PerformanceInsightsProps) => {
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">P&L</span>
               <span className="text-sm font-bold text-neon-green">
-                ${(bestTrade.pnl || 0).toFixed(2)}
+                {formatCurrency(bestTrade.pnl || 0)}
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">ROI</span>
               <span className="text-sm font-bold text-neon-green">
-                +{(bestTrade.roi || 0).toFixed(2)}%
+                +{formatPercent(bestTrade.roi || 0)}
               </span>
             </div>
           </div>
@@ -205,13 +209,13 @@ export const PerformanceInsights = ({ trades }: PerformanceInsightsProps) => {
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">P&L</span>
               <span className="text-sm font-bold text-neon-red">
-                ${(worstTrade.pnl || 0).toFixed(2)}
+                {formatCurrency(worstTrade.pnl || 0)}
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">ROI</span>
               <span className="text-sm font-bold text-neon-red">
-                {(worstTrade.roi || 0).toFixed(2)}%
+                {formatPercent(worstTrade.roi || 0)}
               </span>
             </div>
           </div>
@@ -219,4 +223,6 @@ export const PerformanceInsights = ({ trades }: PerformanceInsightsProps) => {
       </div>
     </div>
   );
-};
+});
+
+PerformanceInsights.displayName = 'PerformanceInsights';
