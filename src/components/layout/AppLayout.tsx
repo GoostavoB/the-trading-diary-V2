@@ -21,10 +21,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <SidebarProvider defaultOpen={!isCollapsed} onOpenChange={setIsCollapsed}>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-secondary/30 to-background mobile-safe">
+      <div className="min-h-screen flex w-full mobile-safe">
         <AppSidebar />
         <div className="flex-1 flex flex-col mobile-safe">
-          <header className="h-14 border-b border-border/50 backdrop-blur-xl bg-card/50 flex items-center justify-between gap-2 px-3 md:px-6">
+          <header className="h-14 border-b border-border/50 backdrop-blur-xl glass-subtle flex items-center justify-between gap-2 px-3 md:px-6">
             <div className="flex items-center gap-2 md:gap-3">
               <SidebarTrigger className="hover:bg-muted/50 rounded-lg p-2 transition-colors" />
             </div>

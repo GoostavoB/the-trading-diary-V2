@@ -46,8 +46,8 @@ export const StatCard = ({
             <div className={cn(
               "flex items-center gap-1 text-sm font-semibold px-2 py-1 rounded-lg",
               trend.isPositive
-                ? "bg-neon-green/10 text-neon-green"
-                : "bg-neon-red/10 text-neon-red"
+                ? "bg-primary/10 text-primary"
+                : "bg-secondary/10 text-secondary"
             )}>
               <span>{trend.isPositive ? "+" : ""}{trend.value}%</span>
             </div>

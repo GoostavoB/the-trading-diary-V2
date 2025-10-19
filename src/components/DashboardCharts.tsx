@@ -54,8 +54,8 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
             <AreaChart data={cumulativePnL} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
               <defs>
                 <linearGradient id="colorPnl" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0} />
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
@@ -87,15 +87,15 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
                 labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 500, marginBottom: '4px' }}
                 formatter={(value: any) => {
                   const numValue = Number(value);
-                  const color = numValue === 0 ? 'hsl(var(--foreground))' : numValue > 0 ? 'hsl(var(--neon-green))' : 'hsl(var(--neon-red))';
+                  const color = numValue === 0 ? 'hsl(var(--foreground))' : numValue > 0 ? 'hsl(var(--primary))' : 'hsl(var(--secondary))';
                   return [<span style={{ color, fontWeight: 600 }}>${numValue.toFixed(2)}</span>, 'Cumulative P&L'];
                 }}
               />
               <Area
                 type="monotone"
                 dataKey="pnl"
-                stroke="hsl(var(--accent))"
-                strokeWidth={2.5}
+                stroke="hsl(var(--primary))"
+                strokeWidth={2}
                 fillOpacity={1}
                 fill="url(#colorPnl)"
                 animationDuration={800}
@@ -137,7 +137,7 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
                 allowDecimals={false}
               />
               <Tooltip
-                cursor={{ fill: 'hsl(var(--accent) / 0.1)' }}
+                cursor={{ fill: 'hsl(var(--primary) / 0.1)' }}
                 contentStyle={{
                   backgroundColor: 'hsl(var(--background) / 0.95)',
                   backdropFilter: 'blur(12px)',
@@ -149,21 +149,21 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
                 }}
                 labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 500, marginBottom: '4px' }}
                 formatter={(value: any, name: string) => {
-                  const color = name === 'wins' ? 'hsl(var(--neon-green))' : 'hsl(var(--neon-red))';
+                  const color = name === 'wins' ? 'hsl(var(--primary))' : 'hsl(var(--secondary))';
                   const label = name === 'wins' ? 'Wins' : 'Losses';
                   return [<span style={{ color, fontWeight: 600 }}>{value}</span>, label];
                 }}
               />
               <Bar 
                 dataKey="wins" 
-                fill="hsl(var(--neon-green))" 
+                fill="hsl(var(--primary))" 
                 radius={[6, 6, 0, 0]}
                 animationDuration={800}
                 animationEasing="ease-in-out"
               />
               <Bar 
                 dataKey="losses" 
-                fill="hsl(var(--neon-red))" 
+                fill="hsl(var(--secondary))" 
                 radius={[6, 6, 0, 0]}
                 animationDuration={800}
                 animationEasing="ease-in-out"
@@ -189,8 +189,8 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
             <AreaChart data={cumulativePnL}>
               <defs>
                 <linearGradient id="colorPnl" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--neon-green))" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(var(--neon-green))" stopOpacity={0} />
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -215,14 +215,14 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
                 labelStyle={{ color: 'hsl(var(--foreground))' }}
                 formatter={(value: any) => {
                   const numValue = Number(value);
-                  const color = numValue === 0 ? 'hsl(var(--foreground))' : numValue > 0 ? 'hsl(var(--neon-green))' : 'hsl(var(--neon-red))';
+                  const color = numValue === 0 ? 'hsl(var(--foreground))' : numValue > 0 ? 'hsl(var(--primary))' : 'hsl(var(--secondary))';
                   return [<span style={{ color }}>${numValue.toFixed(2)}</span>, 'pnl'];
                 }}
               />
               <Area
                 type="monotone"
                 dataKey="pnl"
-                stroke="hsl(var(--neon-green))"
+                stroke="hsl(var(--primary))"
                 strokeWidth={2}
                 fillOpacity={1}
                 fill="url(#colorPnl)"
@@ -262,8 +262,8 @@ export const DashboardCharts = ({ trades, chartType }: DashboardChartsProps) => 
                 }}
                 labelStyle={{ color: 'hsl(var(--foreground))' }}
               />
-              <Bar dataKey="wins" fill="hsl(var(--neon-green))" />
-              <Bar dataKey="losses" fill="hsl(var(--neon-red))" />
+              <Bar dataKey="wins" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="losses" fill="hsl(var(--secondary))" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         ) : (

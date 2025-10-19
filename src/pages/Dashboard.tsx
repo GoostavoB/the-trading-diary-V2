@@ -314,36 +314,46 @@ const Dashboard = () => {
                   />
                 </div>
                 
-                <div className="text-xs lg:text-sm text-muted-foreground/70 mb-2 font-medium">Total P&L</div>
+                <div className="flex items-center gap-2 mb-2">
+                  <DollarSign className="h-4 w-4 text-primary" />
+                  <div className="text-xs lg:text-sm text-muted-foreground font-medium">Total P&L</div>
+                </div>
                 <div className={`text-2xl lg:text-3xl font-bold ${
-                  stats && stats.total_pnl > 0 ? 'text-[#00B87C]' : 
-                  stats && stats.total_pnl < 0 ? 'text-[#E05D5D]' : 'text-foreground'
+                  stats && stats.total_pnl > 0 ? 'text-primary' : 
+                  stats && stats.total_pnl < 0 ? 'text-secondary' : 'text-foreground'
                 }`}>
                   <AnimatedCounter value={stats?.total_pnl || 0} prefix="$" decimals={2} />
                 </div>
               </div>
               
               <div className="glass rounded-2xl p-5 hover-lift cursor-default">
-                <div className="text-xs lg:text-sm text-muted-foreground/70 mb-2 font-medium">Win Rate</div>
-                <div className={`text-2xl lg:text-3xl font-bold ${
-                  stats && stats.win_rate > 70 ? 'text-[#00B87C]' : 'text-foreground'
-                }`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  <div className="text-xs lg:text-sm text-muted-foreground font-medium">Win Rate</div>
+                </div>
+                <div className="text-2xl lg:text-3xl font-bold text-foreground">
                   <AnimatedCounter value={stats?.win_rate || 0} suffix="%" decimals={1} />
                 </div>
               </div>
               
               <div className="glass rounded-2xl p-5 hover-lift cursor-default">
-                <div className="text-xs lg:text-sm text-muted-foreground/70 mb-2 font-medium">Total Trades</div>
-                <div className="text-2xl lg:text-3xl font-bold">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <div className="text-xs lg:text-sm text-muted-foreground font-medium">Total Trades</div>
+                </div>
+                <div className="text-2xl lg:text-3xl font-bold text-foreground">
                   <AnimatedCounter value={stats?.total_trades || 0} decimals={0} />
                 </div>
               </div>
               
               <div className="glass rounded-2xl p-5 hover-lift cursor-default">
-                <div className="text-xs lg:text-sm text-muted-foreground/70 mb-2 font-medium">Avg Duration</div>
-                <div className="text-2xl lg:text-3xl font-bold">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingDown className="h-4 w-4 text-primary" />
+                  <div className="text-xs lg:text-sm text-muted-foreground font-medium">Avg Duration</div>
+                </div>
+                <div className="text-2xl lg:text-3xl font-bold text-foreground">
                   <AnimatedCounter value={Math.round(stats?.avg_duration || 0)} decimals={0} />
-                  <span className="text-base ml-1 text-muted-foreground/70">m</span>
+                  <span className="text-base ml-1 text-muted-foreground">m</span>
                 </div>
               </div>
             </div>
