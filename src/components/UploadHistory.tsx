@@ -248,31 +248,31 @@ export const UploadHistory = () => {
           return (
             <Card
               key={batch.id}
-              className={`glass rounded-2xl p-5 cursor-pointer hover-lift transition-all ${
+              className={`group glass backdrop-blur-[12px] rounded-2xl p-5 cursor-pointer hover-lift transition-all shadow-sm ${
                 isNew ? 'animate-slide-in-top' : ''
               }`}
               onClick={() => toggleExpand(batch.id, batch.created_at)}
             >
               {/* Header */}
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <span className="text-base font-medium text-foreground">
+                  <span className="text-base font-semibold text-foreground">
                     {format(new Date(batch.created_at), 'MMM dd, yyyy')}
                   </span>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-xs text-muted-foreground font-medium px-2 py-0.5 rounded-full bg-muted/50">
                     {format(new Date(batch.created_at), 'HH:mm')}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   {isExpanded ? (
-                    <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                    <ChevronUp className="w-5 h-5 text-primary transition-colors" />
                   ) : (
-                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                    <ChevronDown className="w-5 h-5 text-muted-foreground transition-colors" />
                   )}
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive transition-opacity"
+                    className="h-8 w-8 opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive transition-all duration-200"
                     onClick={(e) => handleDeleteBatch(batch.id, e)}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -281,18 +281,16 @@ export const UploadHistory = () => {
               </div>
 
               {/* Body */}
-              <div className="space-y-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  {batch.brokers && batch.brokers.length > 0 && (
-                    <span className="text-sm">
-                      <span className="text-muted-foreground">Broker:</span>{' '}
-                      <span className="font-medium text-foreground">{batch.brokers.join(', ')}</span>
-                    </span>
-                  )}
-                </div>
+              <div className="space-y-2.5">
+                {batch.brokers && batch.brokers.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">Broker:</span>
+                    <span className="text-sm font-medium text-foreground">{batch.brokers.join(', ')}</span>
+                  </div>
+                )}
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className="text-xs font-medium">
+                  <Badge variant="outline" className="text-xs font-medium px-2 py-0.5">
                     {batch.trade_count} {batch.trade_count === 1 ? 'trade' : 'trades'}
                   </Badge>
                   {batch.position_types && batch.position_types.length > 0 && (
@@ -300,10 +298,10 @@ export const UploadHistory = () => {
                       {batch.position_types.map((type) => (
                         <Badge
                           key={type}
-                          className={`text-xs font-medium ${
+                          className={`text-xs font-semibold px-2.5 py-0.5 ${
                             type === 'long'
-                              ? 'bg-neon-green/10 text-neon-green border-neon-green/20'
-                              : 'bg-neon-red/10 text-neon-red border-neon-red/20'
+                              ? 'bg-neon-green/10 text-neon-green border-neon-green/30 hover:bg-neon-green/20'
+                              : 'bg-neon-red/10 text-neon-red border-neon-red/30 hover:bg-neon-red/20'
                           }`}
                         >
                           {type.toUpperCase()}
@@ -313,49 +311,54 @@ export const UploadHistory = () => {
                   )}
                 </div>
 
-                <div className="text-sm">
-                  <span className="text-muted-foreground">Assets:</span>{' '}
-                  <span className="font-medium text-foreground break-words">
-                    {batch.assets.join(', ')}
-                  </span>
-                </div>
+                {batch.assets && batch.assets.length > 0 && (
+                  <div className="text-xs">
+                    <span className="text-muted-foreground">Assets:</span>{' '}
+                    <span className="font-medium text-foreground break-words">
+                      {batch.assets.join(', ')}
+                    </span>
+                  </div>
+                )}
 
                 {/* Footer */}
-                <div className="flex items-center justify-between pt-3 border-t border-border/50">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-3 mt-3 border-t border-border/30">
                   <div>
-                    <span className="text-sm text-muted-foreground">Total P&L: </span>
-                    <span className={`text-base font-semibold ${(batch.total_pnl || 0) >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+                    <span className="text-xs text-muted-foreground">Total P&L: </span>
+                    <span className={`text-lg font-bold ${(batch.total_pnl || 0) >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
                       ${(batch.total_pnl || 0).toFixed(2)}
                     </span>
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    {format(new Date(batch.created_at), 'MM/dd/yyyy HH:mm')}
+                  <span className="text-[10px] text-muted-foreground font-medium">
+                    Uploaded {format(new Date(batch.created_at), 'MM/dd/yyyy')} at {format(new Date(batch.created_at), 'HH:mm')}
                   </span>
                 </div>
               </div>
               
               {isExpanded && batchTrades[batch.id] && (
-                <div className="mt-4 pt-4 border-t border-border/50 space-y-2 animate-fade-in">
+                <div className="mt-4 pt-4 border-t border-border/30 space-y-2 animate-fade-in">
+                  <div className="text-xs font-semibold text-muted-foreground mb-2 px-1">
+                    Trade Details ({batchTrades[batch.id].length})
+                  </div>
                   {batchTrades[batch.id].map((trade) => (
                     <div
                       key={trade.id}
-                      className="flex items-center justify-between py-3 px-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
+                      className="flex items-center justify-between py-2.5 px-3 rounded-xl glass-subtle hover:glass transition-all duration-200"
                     >
-                      <div className="flex items-center gap-4 flex-1 flex-wrap">
-                        <span className="font-semibold text-foreground min-w-[100px]">{trade.symbol}</span>
-                        <span className="text-sm text-muted-foreground">${trade.entry_price.toFixed(2)}</span>
+                      <div className="flex items-center gap-3 flex-1 flex-wrap">
+                        <span className="font-semibold text-foreground text-sm min-w-[80px]">{trade.symbol}</span>
+                        <span className="text-xs text-muted-foreground font-medium">${trade.entry_price.toFixed(2)}</span>
                         <Badge
-                          className={`text-xs ${
+                          className={`text-[10px] font-semibold px-2 py-0.5 ${
                             trade.side === 'long'
-                              ? 'bg-neon-green/10 text-neon-green border-neon-green/20'
-                              : 'bg-neon-red/10 text-neon-red border-neon-red/20'
+                              ? 'bg-neon-green/10 text-neon-green border-neon-green/30'
+                              : 'bg-neon-red/10 text-neon-red border-neon-red/30'
                           }`}
                         >
                           {trade.side?.toUpperCase()}
                         </Badge>
                       </div>
                       <span
-                        className={`font-semibold text-sm ${
+                        className={`font-bold text-sm ${
                           trade.profit_loss >= 0 ? 'text-neon-green' : 'text-neon-red'
                         }`}
                       >
