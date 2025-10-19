@@ -257,19 +257,18 @@ const LongShortRatio = () => {
           <>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Card className="glass">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm">Market Sentiment</CardTitle>
-                  <CardDescription className="text-xs">Visual indicator</CardDescription>
-                </CardHeader>
-                <CardContent className="flex items-center justify-center py-4">
+                <CardContent className="flex items-center gap-2 p-4">
+                  <span className="text-sm font-medium text-muted-foreground">
+                    Market Sentiment:
+                  </span>
                   {latestCombinedData && (
-                    <p className={`text-2xl font-bold ${
+                    <span className={`text-sm font-bold ${
                       latestCombinedData.longAccount > latestCombinedData.shortAccount 
                         ? 'text-neon-green' 
                         : 'text-neon-red'
                     }`}>
                       {latestCombinedData.longAccount > latestCombinedData.shortAccount ? 'Bullish' : 'Bearish'}
-                    </p>
+                    </span>
                   )}
                 </CardContent>
               </Card>
