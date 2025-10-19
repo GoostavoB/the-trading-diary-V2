@@ -65,7 +65,8 @@ export function DashboardWidget({
       {/* Widget Content */}
       <CardContent className={cn(
         "pb-4",
-        !isVisible && isCustomizing && "pointer-events-none"
+        !isVisible && isCustomizing && "pointer-events-none",
+        id === 'heatmap' && "pb-[26px]"
       )}>
         {children}
       </CardContent>
