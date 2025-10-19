@@ -290,7 +290,7 @@ const Dashboard = () => {
         ) : (
           <>
             {/* Grid Layout Container - Isolated stacking context */}
-            <div className="relative w-full mb-6">
+            <div className="relative w-full mb-3">
               <ResponsiveGridLayout
                 className="layout"
                 layouts={{
@@ -405,14 +405,14 @@ const Dashboard = () => {
 
             {/* Month Summary Insights */}
             {stats && stats.total_trades > 0 && (
-              <div className="mb-4">
+              <div className="mb-2">
                 <MonthSummaryInsights trades={filteredTrades.length > 0 ? filteredTrades : trades} />
               </div>
             )}
 
             {/* Trading Streaks */}
             {stats && stats.total_trades > 0 && (
-              <div className="mb-4">
+              <div className="mb-2">
                 <TradingStreaks trades={filteredTrades.length > 0 ? filteredTrades : trades} />
               </div>
             )}
