@@ -54,14 +54,14 @@ export const ExportTradesDialog = ({ trades, trigger }: ExportTradesDialogProps)
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Export Trades</DialogTitle>
           <DialogDescription>
             Choose a format to export your {trades.length} trade{trades.length !== 1 ? 's' : ''}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-3 py-4">
+        <div className="space-y-3 py-4 overflow-y-auto">
           <Button
             variant="outline"
             className="w-full justify-start gap-3 h-auto py-4"
