@@ -1,98 +1,82 @@
 import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Palette } from 'lucide-react';
 import { toast } from 'sonner';
-import { Check } from 'lucide-react';
 
-const ACCENT_COLORS = [
-  { name: 'Blue', value: '#3B82F6', hsl: '217 91% 60%' },
-  { name: 'Green', value: '#22C55E', hsl: '142 71% 45%' },
-  { name: 'Purple', value: '#8B5CF6', hsl: '258 90% 66%' },
-  { name: 'Red', value: '#EF4444', hsl: '0 84% 60%' },
+const PRESET_COLORS = [
+  { name: 'Blue', value: '#4A90E2', hsl: '210 79% 58%' },
+  { name: 'Green', value: '#00B87C', hsl: '162 100% 36%' },
+  { name: 'Purple', value: '#A18CFF', hsl: '251 100% 77%' },
+  { name: 'Orange', value: '#FF6B35', hsl: '14 100% 60%' },
+  { name: 'Teal', value: '#2DD4BF', hsl: '172 69% 51%' },
+  { name: 'Pink', value: '#EC4899', hsl: '330 81% 60%' },
 ];
 
-export function AccentColorPicker() {
-  const { user } = useAuth();
-  const [selectedColor, setSelectedColor] = useState(ACCENT_COLORS[0].value);
-  const [loading, setLoading] = useState(false);
+export const AccentColorPicker = () => {
+  const [accentColor, setAccentColor] = useState(PRESET_COLORS[0].value);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    fetchAccentColor();
-  }, [user]);
-
-  const fetchAccentColor = async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from('user_settings')
-      .select('accent_color')
-      .eq('user_id', user.id)
-      .single();
-    
-    if (data?.accent_color) {
-      setSelectedColor(data.accent_color);
+    const saved = localStorage.getItem('theme:accent');
+    if (saved) {
+      const preset = PRESET_COLORS.find(c => c.value === saved);
+      if (preset) {
+        setAccentColor(preset.value);
+        applyAccentColor(preset.value, preset.hsl);
+      }
     }
+  }, []);
+
+  const applyAccentColor = (color: string, hsl: string) => {
+    document.documentElement.style.setProperty('--accent', hsl);
+    document.documentElement.style.setProperty('--chart-1', hsl);
+    localStorage.setItem('theme:accent', color);
   };
 
-  const handleColorChange = async (color: string, hsl: string) => {
-    if (!user) return;
-    
-    setSelectedColor(color);
-    setLoading(true);
-
-    const { error } = await supabase
-      .from('user_settings')
-      .update({ accent_color: color })
-      .eq('user_id', user.id);
-
-    setLoading(false);
-
-    if (error) {
-      toast.error('Failed to update accent color');
-    } else {
-      // Update CSS variable
-      document.documentElement.style.setProperty('--accent', hsl);
-      document.documentElement.style.setProperty('--chart-1', hsl);
-      toast.success('Accent color updated!');
-    }
+  const handleColorChange = (preset: typeof PRESET_COLORS[0]) => {
+    setAccentColor(preset.value);
+    applyAccentColor(preset.value, preset.hsl);
+    toast.success(`Theme changed to ${preset.name}`);
+    setIsOpen(false);
   };
 
   return (
-    <Card className="p-6 bg-card border-border">
-      <h2 className="text-xl font-semibold mb-2">Accent Color</h2>
-      <p className="text-sm text-muted-foreground mb-4">
-        Choose your preferred accent color for charts, buttons, and highlights
-      </p>
-      
-      <div className="grid grid-cols-4 gap-4">
-        {ACCENT_COLORS.map((color) => (
-          <button
-            key={color.value}
-            onClick={() => handleColorChange(color.value, color.hsl)}
-            disabled={loading}
-            className="relative flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover:scale-105 disabled:opacity-50"
-            style={{
-              borderColor: selectedColor === color.value ? color.value : 'transparent',
-              backgroundColor: selectedColor === color.value ? `${color.value}10` : 'transparent'
-            }}
-          >
-            <div
-              className="w-12 h-12 rounded-full transition-transform"
-              style={{ backgroundColor: color.value }}
-            />
-            {selectedColor === color.value && (
-              <div
-                className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: color.value }}
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="icon" className="glass hover-lift">
+          <Palette className="h-4 w-4" style={{ color: accentColor }} />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto glass-strong backdrop-blur-xl border-accent/20 rounded-2xl">
+        <div className="space-y-3">
+          <p className="text-sm font-semibold">Accent Color</p>
+          <div className="grid grid-cols-3 gap-2">
+            {PRESET_COLORS.map((preset) => (
+              <button
+                key={preset.name}
+                onClick={() => handleColorChange(preset)}
+                className={`group relative w-12 h-12 rounded-xl border-2 transition-all hover:scale-110 ${
+                  accentColor === preset.value 
+                    ? 'border-foreground scale-110 shadow-lg' 
+                    : 'border-border/20 hover:border-foreground/50'
+                }`}
+                style={{ backgroundColor: preset.value }}
+                title={preset.name}
               >
-                <Check className="w-4 h-4 text-white" />
-              </div>
-            )}
-            <span className="text-sm font-medium">{color.name}</span>
-          </button>
-        ))}
-      </div>
-    </Card>
+                {accentColor === preset.value && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-2 h-2 bg-white rounded-full shadow-md" />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground text-center pt-2 border-t border-border/20">
+            Theme applies globally
+          </p>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
-}
+};

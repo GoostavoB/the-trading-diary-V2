@@ -27,14 +27,18 @@ interface DashboardLayout {
 
 const DEFAULT_WIDGETS: WidgetConfig[] = [
   { id: 'stats', visible: true },
+  { id: 'insights', visible: true },
+  { id: 'streaks', visible: true },
   { id: 'heatmap', visible: true },
   { id: 'charts', visible: true },
 ];
 
 const DEFAULT_LAYOUT: LayoutItem[] = [
-  { i: 'stats', x: 0, y: 0, w: 12, h: 3, minW: 6, minH: 3, maxH: 5 },
-  { i: 'heatmap', x: 0, y: 3, w: 12, h: 4, minW: 6, minH: 3, maxH: 8 },
-  { i: 'charts', x: 0, y: 7, w: 12, h: 5, minW: 6, minH: 4, maxH: 10 },
+  { i: 'stats', x: 0, y: 0, w: 12, h: 4, minW: 6, minH: 3, maxH: 6 },
+  { i: 'insights', x: 0, y: 4, w: 12, h: 2, minW: 6, minH: 2, maxH: 4 },
+  { i: 'streaks', x: 0, y: 6, w: 12, h: 2, minW: 6, minH: 2, maxH: 4 },
+  { i: 'heatmap', x: 0, y: 8, w: 12, h: 4, minW: 6, minH: 3, maxH: 8 },
+  { i: 'charts', x: 0, y: 12, w: 12, h: 5, minW: 6, minH: 4, maxH: 10 },
 ];
 
 export function useDashboardLayout() {

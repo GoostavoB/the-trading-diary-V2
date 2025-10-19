@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
-import { TrendingUp, TrendingDown, DollarSign, Target, Flame, Eye, EyeOff } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Target, Flame, Eye, EyeOff, Info, GripVertical } from 'lucide-react';
 import { DashboardCharts } from '@/components/DashboardCharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TradeHistory } from '@/components/TradeHistory';
@@ -31,6 +31,8 @@ import { DateRangeFilter, DateRange } from '@/components/DateRangeFilter';
 import { TradingHeatmap } from '@/components/TradingHeatmap';
 import { DashboardWidget } from '@/components/DashboardWidget';
 import { CustomizeDashboardControls } from '@/components/CustomizeDashboardControls';
+import { AccentColorPicker } from '@/components/AccentColorPicker';
+import { AIAssistant } from '@/components/AIAssistant';
 import { useDashboardLayout } from '@/hooks/useDashboardLayout';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import type { Trade } from '@/types/trade';
@@ -224,42 +226,45 @@ const Dashboard = () => {
     <AppLayout>
       <div className="space-y-6 mobile-safe animate-fade-in">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-1 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Dashboard</h1>
-            <p className="text-sm text-muted-foreground/80">Track your trading performance and analytics</p>
+          <div className="flex items-center gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-1 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Dashboard</h1>
+              <p className="text-sm text-muted-foreground/80">Track your trading performance and analytics</p>
+            </div>
+            {beastModeDays > 0 && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="relative cursor-help">
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5 blur-lg"></div>
+                      <div className="relative flex items-center gap-2 px-4 py-2.5 glass-strong rounded-3xl shadow-md hover:shadow-lg transition-all duration-300 animate-glow">
+                        <Flame className="w-5 h-5 text-accent flex-shrink-0" />
+                        <div>
+                          <div className="text-sm font-semibold text-accent tracking-wide">
+                            Monstro Mode
+                          </div>
+                          <div className="text-[10px] text-muted-foreground">
+                            {beastModeDays} {beastModeDays === 1 ? 'day' : 'days'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs glass-strong">
+                    <p className="font-semibold mb-1">Monstro Mode</p>
+                    <p className="text-sm">Activates when your win rate and profit exceed target thresholds for 3+ consecutive days. Days shown: {beastModeDays}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
-          <div className="flex items-center gap-2 md:gap-4 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap">
+            <AccentColorPicker />
             <DateRangeFilter dateRange={dateRange} onDateRangeChange={setDateRange} />
             {trades.length > 0 && (
               <ExportTradesDialog trades={filteredTrades.length > 0 ? filteredTrades : trades} />
             )}
           </div>
-          {beastModeDays > 0 && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="relative cursor-help w-full md:w-auto">
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5 blur-lg"></div>
-                    <div className="relative flex items-center gap-2 px-4 py-2.5 glass-strong rounded-3xl shadow-md hover:shadow-lg transition-all duration-300">
-                      <Flame className="w-5 h-5 text-primary flex-shrink-0" />
-                      <div>
-                        <div className="text-sm font-semibold text-primary tracking-wide">
-                          Monstro Mode
-                        </div>
-                        <div className="text-[10px] text-muted-foreground">
-                          {beastModeDays} {beastModeDays === 1 ? 'day' : 'days'}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs glass-strong">
-                  <p className="font-semibold mb-1">Monstro Mode</p>
-                  <p className="text-sm">Activates when your win rate and profit exceed target thresholds for 3+ consecutive days. Days shown: {beastModeDays}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
         </div>
 
         {/* Customize Dashboard Controls */}
@@ -556,6 +561,9 @@ const Dashboard = () => {
             </Tabs>
           </>
         )}
+        
+        {/* AI Assistant */}
+        <AIAssistant />
       </div>
     </AppLayout>
   );
