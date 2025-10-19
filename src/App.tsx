@@ -14,16 +14,14 @@ import Dashboard from "./pages/Dashboard";
 import Upload from "./pages/Upload";
 import Analytics from "./pages/Analytics";
 import Forecast from "./pages/Forecast";
-import EconomicCalendar from "./pages/EconomicCalendar";
-import LongShortRatio from "./pages/LongShortRatio";
+import Achievements from "./pages/Achievements";
+import MarketData from "./pages/MarketData";
 import Settings from "./pages/Settings";
-import Tools from "./pages/Tools";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import FAQ from "./pages/FAQ";
 import Social from "./pages/Social";
 import AITools from "./pages/AITools";
-import Achievements from "./pages/Achievements";
 import NotFound from "./pages/NotFound";
 import CustomPage from "./pages/CustomPage";
 
@@ -61,9 +59,7 @@ const App = () => (
                   <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
                   <Route path="/forecast" element={<ProtectedRoute><Forecast /></ProtectedRoute>} />
                   <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
-                  <Route path="/tools" element={<ProtectedRoute><Tools /></ProtectedRoute>} />
-                  <Route path="/economic-calendar" element={<ProtectedRoute><EconomicCalendar /></ProtectedRoute>} />
-                  <Route path="/long-short-ratio" element={<ProtectedRoute><LongShortRatio /></ProtectedRoute>} />
+                  <Route path="/market-data" element={<ProtectedRoute><MarketData /></ProtectedRoute>} />
                   <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                   <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} />
                   <Route path="/ai-tools" element={<ProtectedRoute><AITools /></ProtectedRoute>} />

@@ -1,4 +1,4 @@
-import { BarChart3, Upload, TrendingUp, Settings, BookOpen, HelpCircle, LogOut, TrendingDown, Calendar, Scale, Wrench, Users, Brain, Trophy, Circle, Star, PieChart, Activity, Target, Zap, Sparkles, LineChart, DollarSign } from 'lucide-react';
+import { BarChart3, Upload, TrendingUp, TrendingDown, Target, Users, Brain, Trophy, Settings, BookOpen, HelpCircle, LineChart, LogOut, Circle, Star, PieChart, Activity, Zap, Sparkles, DollarSign } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import * as LucideIcons from 'lucide-react';
@@ -23,13 +23,11 @@ const mainItems = [
   { title: 'Dashboard', url: '/dashboard', icon: BarChart3 },
   { title: 'Add Trade', url: '/upload', icon: Upload },
   { title: 'Analytics', url: '/analytics', icon: TrendingUp },
+  { title: 'Market Data', url: '/market-data', icon: LineChart },
   { title: 'Forecast & Goals', url: '/forecast', icon: Target },
   { title: 'Community', url: '/social', icon: Users },
   { title: 'AI Assistant', url: '/ai-tools', icon: Brain },
-  { title: 'Tools', url: '/tools', icon: Wrench },
   { title: 'Achievements', url: '/achievements', icon: Trophy },
-  { title: 'Economic Calendar', url: '/economic-calendar', icon: Calendar },
-  { title: 'BTC Long/Short Ratio', url: '/long-short-ratio', icon: Scale },
   { title: 'Settings', url: '/settings', icon: Settings },
 ];
 
