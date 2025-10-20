@@ -44,6 +44,11 @@ interface TradeStats {
   win_rate: number;
   total_trades: number;
   avg_duration: number;
+  avg_pnl_per_trade: number;
+  avg_pnl_per_day: number;
+  trading_days: number;
+  current_roi: number;
+  avg_roi_per_trade: number;
 }
 
 const Dashboard = () => {
@@ -220,11 +225,42 @@ const Dashboard = () => {
       const winningTrades = trades.filter(t => (t.pnl || 0) > 0).length;
       const avgDuration = trades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (trades.length || 1);
 
+      // Calculate unique trading days
+      const uniqueDays = new Set(trades.map(t => new Date(t.trade_date).toDateString())).size;
+      
+      // Calculate average P&L per trade
+      const avgPnLPerTrade = trades.length > 0 
+        ? (includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees) / trades.length 
+        : 0;
+      
+      // Calculate average P&L per day
+      const avgPnLPerDay = uniqueDays > 0 
+        ? (includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees) / uniqueDays 
+        : 0;
+      
+      // Calculate current balance
+      const currentBalance = initialInvestment + (includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees);
+      
+      // Calculate current ROI from initial capital
+      const currentROI = initialInvestment > 0 
+        ? ((currentBalance - initialInvestment) / initialInvestment) * 100 
+        : 0;
+      
+      // Calculate average ROI per trade
+      const avgROIPerTrade = trades.length > 0 
+        ? trades.reduce((sum, t) => sum + (t.roi || 0), 0) / trades.length 
+        : 0;
+
       setStats({
         total_pnl: includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees,
         win_rate: trades.length > 0 ? (winningTrades / trades.length) * 100 : 0,
         total_trades: trades.length,
-        avg_duration: avgDuration
+        avg_duration: avgDuration,
+        avg_pnl_per_trade: avgPnLPerTrade,
+        avg_pnl_per_day: avgPnLPerDay,
+        trading_days: uniqueDays,
+        current_roi: currentROI,
+        avg_roi_per_trade: avgROIPerTrade,
       });
     }
     setLoading(false);
@@ -402,6 +438,22 @@ const Dashboard = () => {
         break;
       case 'quickActions':
         // No additional props needed
+        break;
+      case 'avgPnLPerTrade':
+        widgetProps.avgPnLPerTrade = stats?.avg_pnl_per_trade || 0;
+        break;
+      case 'avgPnLPerDay':
+        widgetProps.avgPnLPerDay = stats?.avg_pnl_per_day || 0;
+        widgetProps.tradingDays = stats?.trading_days || 0;
+        break;
+      case 'currentROI':
+        widgetProps.currentROI = stats?.current_roi || 0;
+        widgetProps.initialInvestment = initialInvestment;
+        widgetProps.currentBalance = initialInvestment + (stats?.total_pnl || 0);
+        break;
+      case 'avgROIPerTrade':
+        widgetProps.avgROIPerTrade = stats?.avg_roi_per_trade || 0;
+        widgetProps.totalTrades = stats?.total_trades || 0;
         break;
     }
 
