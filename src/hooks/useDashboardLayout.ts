@@ -80,13 +80,35 @@ export function useDashboardLayout() {
 
       if (error) throw error;
 
-      if (data?.layout_json && typeof data.layout_json === 'object') {
-        const savedLayout = data.layout_json as unknown as DashboardLayout;
-        if (savedLayout.widgets) setWidgets(savedLayout.widgets);
-        if (savedLayout.layout) setLayout(savedLayout.layout);
+      // Check if layout_json exists and has valid data
+      const savedLayout = data?.layout_json as unknown as DashboardLayout;
+      const hasValidLayout = savedLayout?.widgets?.length > 0 && savedLayout?.layout?.length > 0;
+
+      if (hasValidLayout) {
+        setWidgets(savedLayout.widgets);
+        setLayout(savedLayout.layout);
+      } else {
+        // Initialize with defaults and save to database
+        console.log('No valid layout found, initializing defaults...');
+        setWidgets(DEFAULT_WIDGETS);
+        setLayout(DEFAULT_LAYOUT);
+        
+        // Save defaults to database immediately
+        const layoutData: DashboardLayout = {
+          widgets: DEFAULT_WIDGETS,
+          layout: DEFAULT_LAYOUT,
+        };
+
+        await supabase
+          .from('user_settings')
+          .update({ layout_json: layoutData as any })
+          .eq('user_id', user.id);
       }
     } catch (error) {
       console.error('Error loading layout:', error);
+      // On error, use defaults
+      setWidgets(DEFAULT_WIDGETS);
+      setLayout(DEFAULT_LAYOUT);
     } finally {
       setLoading(false);
     }
