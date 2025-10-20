@@ -513,8 +513,8 @@ const Dashboard = () => {
                     cols={12}
                     rowHeight={120}
                     width={containerWidth}
-                    margin={[16, 16]}
-                    containerPadding={[24, 24]}
+                    margin={[20, 20]}
+                    containerPadding={[0, 0]}
                     isDraggable={isCustomizing}
                     isResizable={isCustomizing}
                     onLayoutChange={updateLayout}

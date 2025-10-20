@@ -477,10 +477,15 @@ textarea:focus-visible {
 }
 
 .dashboard-grid > div {
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-/* Grid item styles */
+/* Clean spacing - no visible grid lines */
+.dashboard-grid {
+  background: transparent;
+}
+
+/* Grid item styles - clean, seamless layout */
 .react-grid-item {
   transition: all 200ms ease;
   transition-property: left, top, width, height;
@@ -491,6 +496,7 @@ textarea:focus-visible {
   transition: none;
   z-index: 100;
   will-change: transform;
+  opacity: 0.8;
 }
 
 /* Allow proper content flow */
@@ -502,20 +508,16 @@ textarea:focus-visible {
 
 /* Widget content scrolling */
 .react-grid-item > div > * {
-  overflow: auto;
+  overflow: visible;
   flex: 1;
 }
 
 .dash-card {
-  @apply bg-background/50 backdrop-blur-sm border border-border/50 rounded-2xl shadow-lg;
-  padding: clamp(0.75rem, 2vw, 1.5rem);
-  min-height: 200px;
   height: 100%;
   display: flex;
   flex-direction: column;
   position: relative;
   box-sizing: border-box;
-  transition: all 0.3s ease;
   overflow: hidden;
 }
 
@@ -598,7 +600,7 @@ textarea:focus-visible {
   }
 }
 
-/* React Grid Layout - prevent overlap */
+/* React Grid Layout - clean, seamless layout */
 .react-grid-layout {
   position: relative;
   min-height: 100px;
@@ -609,9 +611,12 @@ textarea:focus-visible {
   box-sizing: border-box;
 }
 
+/* Dragging placeholder - subtle indicator */
 .react-grid-item.react-grid-placeholder {
-  background: rgba(var(--primary), 0.1);
-  opacity: 0.2;
+  background: hsl(var(--primary) / 0.08);
+  opacity: 0.5;
   transition-duration: 100ms;
   z-index: 2;
+  border-radius: 1rem;
+  border: 2px dashed hsl(var(--primary) / 0.3);
 }
