@@ -9,6 +9,7 @@ import { ConnectExchangeModal } from '@/components/exchanges/ConnectExchangeModa
 import { SyncHistoryWidget } from '@/components/exchanges/SyncHistoryWidget';
 import { TradePreviewModal } from '@/components/exchanges/TradePreviewModal';
 import { formatDistanceToNow } from 'date-fns';
+import AppLayout from '@/components/layout/AppLayout';
 
 interface ExchangeConnection {
   id: string;
@@ -197,7 +198,8 @@ export default function ExchangeConnections() {
   }
 
   return (
-    <div className="container max-w-7xl mx-auto p-6 space-y-8">
+    <AppLayout>
+      <div className="container max-w-7xl mx-auto p-6 space-y-8">
       <div>
         <h1 className="text-3xl font-bold">Exchange Connections</h1>
         <p className="text-muted-foreground mt-2">
@@ -318,6 +320,7 @@ export default function ExchangeConnections() {
           setPreviewConnectionId(null);
         }}
       />
-    </div>
+      </div>
+    </AppLayout>
   );
 }
