@@ -35,13 +35,13 @@ export const AIForecastCommentary = ({
   const isHighRisk = volatility > 0.15 || winRate < 0.5;
 
   return (
-    <Card className={`p-6 ${isHighRisk ? 'border-amber-500/30 bg-amber-500/5' : 'border-blue-500/30 bg-blue-500/5'} glass-strong`}>
+    <Card className={`p-6 ${isHighRisk ? 'border-amber-500/30 bg-amber-500/5' : 'border-primary/30 bg-primary/5'} glass-strong`}>
       <div className="flex items-start gap-3">
-        <div className={`p-2 rounded-xl ${isHighRisk ? 'bg-amber-500/10' : 'bg-blue-500/10'}`}>
+        <div className={`p-2 rounded-xl ${isHighRisk ? 'bg-amber-500/10' : 'bg-primary/10'}`}>
           {isHighRisk ? (
             <AlertTriangle className="h-5 w-5 text-amber-500" />
           ) : (
-            <Sparkles className="h-5 w-5 text-blue-500" />
+            <Sparkles className="h-5 w-5 text-primary" />
           )}
         </div>
         <div className="flex-1">

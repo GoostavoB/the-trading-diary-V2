@@ -92,8 +92,8 @@ export const CalculationModal = ({ open, onOpenChange }: CalculationModalProps) 
                   </p>
                 </div>
 
-                <div className="bg-blue-500/10 p-4 rounded-lg border border-blue-500/30">
-                  <h4 className="font-semibold text-blue-500 mb-1">Base Scenario</h4>
+                <div className="bg-primary/10 p-4 rounded-lg border border-primary/30">
+                  <h4 className="font-semibold text-primary mb-1">Base Scenario</h4>
                   <p className="text-sm text-muted-foreground">
                     Uses your current average performance as calculated by the geometric expectancy
                     formula. This represents your most likely outcome if you maintain current

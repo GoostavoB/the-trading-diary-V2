@@ -34,9 +34,9 @@ const scenarioConfig: Record<
     title: 'Base Scenario',
     description: 'Reflects your current average consistency.',
     icon: Activity,
-    borderColor: 'border-blue-500/30',
-    iconColor: 'text-blue-500',
-    bgColor: 'bg-blue-500/5',
+    borderColor: 'border-primary/30',
+    iconColor: 'text-primary',
+    bgColor: 'bg-primary/5',
   },
   optimistic: {
     title: 'Optimistic Scenario',

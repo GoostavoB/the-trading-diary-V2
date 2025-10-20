@@ -182,7 +182,7 @@ export const GoalSimulator = ({
                 </div>
               </div>
 
-              <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+              <div className="p-4 bg-primary/10 border border-primary/30 rounded-lg">
                 <p className="text-sm text-muted-foreground">
                   <strong>Interpretation:</strong> To reach ${dailyGoal} per day with {tradesPerDay}{' '}
                   trades, you need to risk approximately{' '}

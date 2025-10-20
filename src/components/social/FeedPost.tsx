@@ -59,7 +59,7 @@ export const FeedPost = ({ post, onLike }: FeedPostProps) => {
 
   const getPostTypeColor = (type: string) => {
     switch (type) {
-      case 'trade_share': return 'bg-blue-500/10 text-blue-500';
+      case 'trade_share': return 'bg-primary/10 text-primary';
       case 'strategy': return 'bg-purple-500/10 text-purple-500';
       case 'milestone': return 'bg-green-500/10 text-green-500';
       case 'tip': return 'bg-amber-500/10 text-amber-500';
