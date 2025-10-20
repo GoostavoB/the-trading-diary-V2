@@ -15,6 +15,7 @@ import { ExportTradesDialog } from '@/components/ExportTradesDialog';
 import { TradingStreaks } from '@/components/TradingStreaks';
 import { DateRangeFilter, DateRange } from '@/components/DateRangeFilter';
 import { AccentColorPicker } from '@/components/AccentColorPicker';
+import { DashboardInsightBanner } from '@/components/DashboardInsightBanner';
 import { useWidgetLayout } from '@/hooks/useWidgetLayout';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
@@ -506,6 +507,15 @@ const Dashboard = () => {
             )}
           </div>
         </div>
+
+        {/* AI Insight Banner with Binance LSR */}
+        {!loading && stats && (
+          <DashboardInsightBanner
+            totalPnL={stats.total_pnl}
+            winRate={stats.win_rate}
+            totalTrades={stats.total_trades}
+          />
+        )}
 
         {/* Customize Dashboard Controls */}
         {!loading && stats && stats.total_trades > 0 && (
