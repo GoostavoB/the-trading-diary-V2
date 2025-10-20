@@ -93,9 +93,9 @@ export const CurrentROIWidget = memo(({
             <TrendingDown className="h-5 w-5 text-loss" />
           )}
         </div>
-        <div className="space-y-1 text-sm text-muted-foreground">
-          <div className="flex items-center justify-between group">
-            <span>Initial:</span>
+        <div className="space-y-1 text-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Initial capital</span>
             <div className="flex items-center gap-2">
               <span className="font-medium">{formatCurrency(initialInvestment)}</span>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -103,10 +103,10 @@ export const CurrentROIWidget = memo(({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="h-6 w-6 p-0"
                     onClick={() => setCapitalValue(initialInvestment.toString())}
                   >
-                    <Edit2 className="h-3 w-3" />
+                    <Edit2 className="h-3 w-3 text-muted-foreground hover:text-primary transition-colors" />
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
@@ -155,7 +155,7 @@ export const CurrentROIWidget = memo(({
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <span>Current:</span>
+            <span className="text-muted-foreground">Current capital</span>
             <span className="font-medium">{formatCurrency(currentBalance)}</span>
           </div>
         </div>
