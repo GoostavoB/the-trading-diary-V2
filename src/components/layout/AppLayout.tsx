@@ -38,9 +38,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <SidebarProvider defaultOpen={!isCollapsed} onOpenChange={setIsCollapsed}>
-      <div className="min-h-screen flex w-full mobile-safe">
+      <div className="min-h-screen flex w-full mobile-safe overflow-hidden">
         <AppSidebar />
-        <div className="flex-1 flex flex-col mobile-safe">
+        <div className="flex-1 flex flex-col mobile-safe overflow-hidden h-screen">
           {/* Desktop Header */}
           <header className="hidden md:flex h-16 border-b border-border/50 backdrop-blur-xl glass-subtle items-center justify-between gap-4 px-6 sticky top-0 z-30">
             {/* Left: Sidebar trigger */}
