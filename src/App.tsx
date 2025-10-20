@@ -25,6 +25,7 @@ import AITools from "./pages/AITools";
 import NotFound from "./pages/NotFound";
 import CustomPage from "./pages/CustomPage";
 import ExchangeConnections from "./pages/ExchangeConnections";
+import SpotWallet from "./pages/SpotWallet";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,7 @@ const App = () => (
                   <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} />
                   <Route path="/ai-tools" element={<ProtectedRoute><AITools /></ProtectedRoute>} />
                   <Route path="/exchanges" element={<ProtectedRoute><ExchangeConnections /></ProtectedRoute>} />
+                  <Route path="/spot-wallet" element={<ProtectedRoute><SpotWallet /></ProtectedRoute>} />
                   <Route path="/blog" element={<ProtectedRoute><Blog /></ProtectedRoute>} />
                   <Route path="/blog/:slug" element={<ProtectedRoute><BlogPost /></ProtectedRoute>} />
                   <Route path="/faq" element={<ProtectedRoute><FAQ /></ProtectedRoute>} />

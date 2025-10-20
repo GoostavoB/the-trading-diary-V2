@@ -823,6 +823,101 @@ export type Database = {
           },
         ]
       }
+      spot_holdings: {
+        Row: {
+          created_at: string
+          exchange: string | null
+          id: string
+          notes: string | null
+          purchase_date: string | null
+          purchase_price: number | null
+          quantity: number
+          token_name: string
+          token_symbol: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          exchange?: string | null
+          id?: string
+          notes?: string | null
+          purchase_date?: string | null
+          purchase_price?: number | null
+          quantity?: number
+          token_name: string
+          token_symbol: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          exchange?: string | null
+          id?: string
+          notes?: string | null
+          purchase_date?: string | null
+          purchase_price?: number | null
+          quantity?: number
+          token_name?: string
+          token_symbol?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      spot_transactions: {
+        Row: {
+          created_at: string
+          exchange: string | null
+          holding_id: string | null
+          id: string
+          notes: string | null
+          price: number
+          quantity: number
+          token_symbol: string
+          total_value: number
+          transaction_date: string
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          exchange?: string | null
+          holding_id?: string | null
+          id?: string
+          notes?: string | null
+          price: number
+          quantity: number
+          token_symbol: string
+          total_value: number
+          transaction_date?: string
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          exchange?: string | null
+          holding_id?: string | null
+          id?: string
+          notes?: string | null
+          price?: number
+          quantity?: number
+          token_symbol?: string
+          total_value?: number
+          transaction_date?: string
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spot_transactions_holding_id_fkey"
+            columns: ["holding_id"]
+            isOneToOne: false
+            referencedRelation: "spot_holdings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trade_annotations: {
         Row: {
           annotation_type: string
@@ -1235,6 +1330,33 @@ export type Database = {
           id?: string
           name?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wallet_snapshots: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          snapshot_data: Json
+          total_value: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          snapshot_data: Json
+          total_value: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          snapshot_data?: Json
+          total_value?: number
           user_id?: string
         }
         Relationships: []
