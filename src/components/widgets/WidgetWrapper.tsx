@@ -54,34 +54,29 @@ export const WidgetWrapper = memo(({
         </div>
       )}
 
-      {/* Header */}
-      {title && (
-        <div className={cn(
-          "flex items-center justify-between px-6 pt-3 pb-2",
-          isEditMode && "pt-12"
-        )}>
-          <h3 className="text-lg font-semibold">{title}</h3>
-          <div className="flex items-center gap-2">
-            {headerActions}
-            {onExpand && !isEditMode && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7"
-                onClick={onExpand}
-              >
-                <Maximize2 className="h-3.5 w-3.5" />
-              </Button>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* Content */}
       <div className={cn(
         "flex-1 overflow-visible",
-        title ? "px-6 pb-5" : "p-6"
+        "px-6 py-4"
       )}>
+        {title && (
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-semibold">{title}</h3>
+            <div className="flex items-center gap-2">
+              {headerActions}
+              {onExpand && !isEditMode && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={onExpand}
+                >
+                  <Maximize2 className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
         {children}
       </div>
     </GlassCard>
