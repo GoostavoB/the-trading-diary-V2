@@ -295,11 +295,34 @@ const Dashboard = () => {
     }, 100);
   }, [layout, saveLayout]);
 
+  // Auto-fit widget heights based on rendered content
+  useEffect(() => {
+    if (!layout?.length) return;
+
+    // Measure after paint
+    const id = requestAnimationFrame(() => {
+      let changed = false;
+      const updated = layout.map((item: any) => {
+        const el = itemRefs.current[item.i];
+        if (!el) return item;
+        const contentHeight = el.scrollHeight; // includes overflowed content
+        const desiredH = Math.max(item.minH || 1, Math.ceil(contentHeight / ROW_HEIGHT_PX));
+        if (desiredH !== item.h) {
+          changed = true;
+          return { ...item, h: desiredH };
+        }
+        return item;
+      });
+      if (changed) {
+        updateLayout(updated);
+      }
+    });
+
+    return () => cancelAnimationFrame(id);
+  }, [containerWidth, isCustomizing, layout, updateLayout]);
   const handleCancelCustomize = useCallback(() => {
     setIsCustomizing(false);
   }, []);
-
-  // Prepare widget data
   const spotWalletTotal = useMemo(() => {
     return holdings.reduce((sum, holding) => {
       const price = Number(prices[holding.token_symbol] || 0);
@@ -326,6 +349,9 @@ const Dashboard = () => {
   }, [trades, capitalLog, initialInvestment]);
 
   // Dynamic widget renderer
+  const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const ROW_HEIGHT_PX = 120;
+
   const renderWidget = useCallback((layoutItem: any) => {
     const widgetConfig = WIDGET_CATALOG[layoutItem.i];
     if (!widgetConfig) return null;
@@ -380,7 +406,11 @@ const Dashboard = () => {
     }
 
     return (
-      <div key={layoutItem.i} className="dash-card">
+      <div
+        key={layoutItem.i}
+        className="dash-card"
+        ref={(el) => { itemRefs.current[layoutItem.i] = el; }}
+      >
         <WidgetComponent {...widgetProps} />
       </div>
     );
@@ -481,7 +511,7 @@ const Dashboard = () => {
                     className="dashboard-grid"
                     layout={layout}
                     cols={12}
-                    rowHeight={1}
+                    rowHeight={120}
                     width={containerWidth}
                     margin={[16, 16]}
                     containerPadding={[24, 24]}
@@ -492,8 +522,6 @@ const Dashboard = () => {
                     compactType="vertical"
                     preventCollision={true}
                     isBounded={true}
-                    autoSize={true}
-                    useCSSTransforms={true}
                   >
                     {layout.map(renderWidget)}
                   </GridLayout>
