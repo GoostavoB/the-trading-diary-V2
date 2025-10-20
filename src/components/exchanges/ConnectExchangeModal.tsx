@@ -85,19 +85,19 @@ export function ConnectExchangeModal({
   const exchangeInfo: Record<string, { name: string; docsUrl: string }> = {
     binance: {
       name: 'Binance',
-      docsUrl: 'https://www.binance.com/en/support/faq/how-to-create-api-keys-on-binance-360002502072',
+      docsUrl: 'https://www.binance.com/en/support/faq/detail/360002502072',
     },
     bingx: {
       name: 'BingX',
-      docsUrl: 'https://bingx.com/en-us/support/articles/360039749673',
+      docsUrl: 'https://bingx.com/en/wiki/detail/api',
     },
     bybit: {
       name: 'Bybit',
-      docsUrl: 'https://www.bybit.com/en/help-center/article/How-to-Create-a-New-API-Key',
+      docsUrl: 'https://www.bybit.com/en/help-center/article/How-to-create-your-API-key',
     },
     mexc: {
       name: 'MEXC',
-      docsUrl: 'https://www.mexc.com/support/articles/360051385112',
+      docsUrl: 'https://www.mexc.com/user/openapi',
     },
   };
 
