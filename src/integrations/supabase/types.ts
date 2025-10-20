@@ -301,6 +301,170 @@ export type Database = {
           },
         ]
       }
+      lsr_alert_daily_stats: {
+        Row: {
+          alerts_clicked: number
+          alerts_dismissed: number
+          alerts_triggered: number
+          id: string
+          stat_date: string
+          user_id: string
+        }
+        Insert: {
+          alerts_clicked?: number
+          alerts_dismissed?: number
+          alerts_triggered?: number
+          id?: string
+          stat_date?: string
+          user_id: string
+        }
+        Update: {
+          alerts_clicked?: number
+          alerts_dismissed?: number
+          alerts_triggered?: number
+          id?: string
+          stat_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lsr_alert_history: {
+        Row: {
+          alert_id: string
+          alert_type: string
+          change_percentage: number | null
+          clicked: boolean
+          clicked_at: string | null
+          direction: string | null
+          id: string
+          long_account: number | null
+          notification_sent_at: string | null
+          notified: boolean
+          previous_value: number | null
+          ratio_value: number
+          short_account: number | null
+          symbol: string
+          triggered_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_id: string
+          alert_type: string
+          change_percentage?: number | null
+          clicked?: boolean
+          clicked_at?: string | null
+          direction?: string | null
+          id?: string
+          long_account?: number | null
+          notification_sent_at?: string | null
+          notified?: boolean
+          previous_value?: number | null
+          ratio_value: number
+          short_account?: number | null
+          symbol: string
+          triggered_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_id?: string
+          alert_type?: string
+          change_percentage?: number | null
+          clicked?: boolean
+          clicked_at?: string | null
+          direction?: string | null
+          id?: string
+          long_account?: number | null
+          notification_sent_at?: string | null
+          notified?: boolean
+          previous_value?: number | null
+          ratio_value?: number
+          short_account?: number | null
+          symbol?: string
+          triggered_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lsr_alert_history_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "lsr_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lsr_alerts: {
+        Row: {
+          alert_type: string
+          cooldown_minutes: number | null
+          created_at: string
+          direction: string | null
+          id: string
+          is_enabled: boolean
+          last_triggered_at: string | null
+          symbol: string
+          threshold_percentage: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          cooldown_minutes?: number | null
+          created_at?: string
+          direction?: string | null
+          id?: string
+          is_enabled?: boolean
+          last_triggered_at?: string | null
+          symbol?: string
+          threshold_percentage?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          cooldown_minutes?: number | null
+          created_at?: string
+          direction?: string | null
+          id?: string
+          is_enabled?: boolean
+          last_triggered_at?: string | null
+          symbol?: string
+          threshold_percentage?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lsr_latest_values: {
+        Row: {
+          binance_ratio: number | null
+          bybit_ratio: number | null
+          long_account: number
+          ratio_value: number
+          short_account: number
+          symbol: string
+          updated_at: string
+        }
+        Insert: {
+          binance_ratio?: number | null
+          bybit_ratio?: number | null
+          long_account: number
+          ratio_value: number
+          short_account: number
+          symbol: string
+          updated_at?: string
+        }
+        Update: {
+          binance_ratio?: number | null
+          bybit_ratio?: number | null
+          long_account?: number
+          ratio_value?: number
+          short_account?: number
+          symbol?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       post_comments: {
         Row: {
           content: string
@@ -970,6 +1134,10 @@ export type Database = {
       }
     }
     Functions: {
+      check_daily_alert_cap: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
       cleanup_deleted_trades: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -980,6 +1148,21 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_daily_alert_count: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
+      update_lsr_latest_value: {
+        Args: {
+          p_binance_ratio?: number
+          p_bybit_ratio?: number
+          p_long_account: number
+          p_ratio_value: number
+          p_short_account: number
+          p_symbol: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
