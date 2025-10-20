@@ -5,6 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
 import { TrendingUp, TrendingDown, DollarSign, Target, Eye, EyeOff, Info, GripVertical } from 'lucide-react';
+import GridLayout from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 import { DashboardCharts } from '@/components/DashboardCharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PerformanceInsights } from '@/components/PerformanceInsights';
@@ -366,7 +369,18 @@ const Dashboard = () => {
               {/* Overview Tab - Main Dashboard Grid */}
               <TabsContent value="overview" className="space-y-6">
                 {/* Dashboard Grid */}
-                <div className="dashboard-grid">
+                <GridLayout
+                  className="dashboard-grid"
+                  layout={layout}
+                  cols={12}
+                  rowHeight={30}
+                  width={1200}
+                  isDraggable={isCustomizing}
+                  isResizable={isCustomizing}
+                  onLayoutChange={updateLayout}
+                  draggableHandle=".drag-handle"
+                  compactType="vertical"
+                >
               {/* Total Balance Card */}
               {(isCustomizing || isWidgetVisible('totalBalance')) && (
                 <div className={`dash-card ${isCustomizing && !isWidgetVisible('totalBalance') ? 'opacity-50' : ''}`}>

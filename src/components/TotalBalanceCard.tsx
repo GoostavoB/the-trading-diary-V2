@@ -101,7 +101,7 @@ export const TotalBalanceCard = memo(({
         {/* Mini Timeline Chart */}
         {sparklineData.length > 0 && (
           <div 
-            className="h-20 w-full overflow-hidden"
+            className="min-h-[120px] flex-1 w-full overflow-hidden"
             role="img"
             aria-label={`Balance trend chart showing ${sparklineData.length} data points`}
           >
