@@ -32,14 +32,9 @@
     --neon-purple: 270 67% 62%;
     --neon-yellow: 45 93% 57%;
 
-    /* Semantic colors */
-    --positive: var(--neon-green);
-    --negative: var(--neon-red);
-    --neutral: 220 9% 46%;
-    --info: var(--neon-blue);
-    --warning: var(--neon-yellow);
-    --success: var(--neon-green);
-    --error: var(--neon-red);
+    /* Profit/Loss colors - controlled by color modes */
+    --profit: 210 90% 58%;
+    --loss: 215 16% 47%;
 
     /* Glass effects - light mode */
     --glass-bg: rgba(255, 255, 255, 0.7);
@@ -94,9 +89,9 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
     
-    /* Glass effects - dark mode */
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    /* Profit/Loss colors - controlled by color modes */
+    --profit: 142 76% 58%;
+    --loss: 0 91% 61%;
     
     /* Shadows - dark mode */
     --shadow-elegant: 0 10px 30px -10px rgba(0, 0, 0, 0.3);

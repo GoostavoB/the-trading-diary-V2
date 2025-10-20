@@ -1,53 +1,191 @@
 import { useState, useEffect } from 'react';
 
-export type ThemeMode = 'default' | 'classic';
+export type ThemeMode = 'default' | 'classic' | string;
 
-interface ThemeColors {
-  positive: string;
-  negative: string;
-  positiveBg: string;
-  negativeBg: string;
+export interface ColorMode {
+  id: string;
+  name: string;
+  primary: string;
+  secondary: string;
+  accent: string;
+  profit: string;
+  loss: string;
 }
 
-const THEME_MODE_KEY = 'theme:mode';
+const PRESET_MODES: ColorMode[] = [
+  {
+    id: 'default',
+    name: 'Blue vs Gray (Default)',
+    primary: '210 90% 58%',
+    secondary: '215 16% 47%',
+    accent: '251 100% 77%',
+    profit: '210 90% 58%',
+    loss: '215 16% 47%',
+  },
+  {
+    id: 'classic',
+    name: 'Classic P&L (Green vs Red)',
+    primary: '142 76% 58%',
+    secondary: '0 91% 61%',
+    accent: '251 100% 77%',
+    profit: '142 76% 58%',
+    loss: '0 91% 61%',
+  },
+];
 
 export function useThemeMode() {
-  const [themeMode, setThemeModeState] = useState<ThemeMode>(() => {
-    const saved = localStorage.getItem(THEME_MODE_KEY);
-    return (saved as ThemeMode) || 'default';
-  });
+  const [currentMode, setCurrentMode] = useState<string>('default');
+  const [customModes, setCustomModes] = useState<ColorMode[]>([]);
 
   useEffect(() => {
-    localStorage.setItem(THEME_MODE_KEY, themeMode);
-  }, [themeMode]);
+    loadColorModes();
+  }, []);
 
-  const getColors = (): ThemeColors => {
-    if (themeMode === 'classic') {
-      return {
-        positive: 'hsl(var(--positive))',
-        negative: 'hsl(var(--negative))',
-        positiveBg: 'hsl(var(--positive) / 0.1)',
-        negativeBg: 'hsl(var(--negative) / 0.1)',
-      };
+  const loadColorModes = () => {
+    const savedMode = localStorage.getItem('theme:mode');
+    const savedCustomModes = localStorage.getItem('theme:custom-modes');
+
+    if (savedCustomModes) {
+      try {
+        const parsedModes = JSON.parse(savedCustomModes);
+        setCustomModes(parsedModes);
+        
+        if (savedMode) {
+          applyMode(savedMode, parsedModes);
+        } else {
+          applyMode('default', parsedModes);
+        }
+      } catch (e) {
+        console.error('Failed to parse custom modes', e);
+        applyMode('default', []);
+      }
+    } else if (savedMode) {
+      setCurrentMode(savedMode);
+      applyMode(savedMode, []);
+    } else {
+      applyMode('default', []);
     }
-    
-    // Default: Blue vs Gray
-    return {
-      positive: 'hsl(var(--primary))',
-      negative: 'hsl(var(--secondary))',
-      positiveBg: 'hsl(var(--primary) / 0.1)',
-      negativeBg: 'hsl(var(--secondary) / 0.1)',
-    };
   };
 
-  const setThemeMode = (mode: ThemeMode) => {
-    setThemeModeState(mode);
+  const applyMode = (modeId: string, customModesList?: ColorMode[]) => {
+    const customList = customModesList || customModes;
+    const allModes = [...PRESET_MODES, ...customList];
+    const mode = allModes.find(m => m.id === modeId);
+
+    if (mode) {
+      setCurrentMode(modeId);
+      document.documentElement.style.setProperty('--primary', mode.primary);
+      document.documentElement.style.setProperty('--secondary', mode.secondary);
+      document.documentElement.style.setProperty('--accent', mode.accent);
+      document.documentElement.style.setProperty('--profit', mode.profit);
+      document.documentElement.style.setProperty('--loss', mode.loss);
+      document.documentElement.style.setProperty('--chart-1', mode.accent);
+      document.documentElement.style.setProperty('--chart-2', mode.primary);
+      document.documentElement.style.setProperty('--chart-3', mode.secondary);
+      
+      // Update neon colors to match profit/loss
+      document.documentElement.style.setProperty('--neon-green', mode.profit);
+      document.documentElement.style.setProperty('--neon-red', mode.loss);
+    }
+  };
+
+  const setThemeMode = (modeId: string) => {
+    applyMode(modeId);
+    localStorage.setItem('theme:mode', modeId);
+  };
+
+  const addCustomMode = (mode: Omit<ColorMode, 'id'>) => {
+    if (customModes.length >= 3) {
+      throw new Error('Maximum 3 custom modes allowed');
+    }
+
+    const newMode: ColorMode = {
+      ...mode,
+      id: `custom-${Date.now()}`,
+    };
+
+    const updatedModes = [...customModes, newMode];
+    setCustomModes(updatedModes);
+    localStorage.setItem('theme:custom-modes', JSON.stringify(updatedModes));
+    
+    return newMode;
+  };
+
+  const deleteCustomMode = (modeId: string) => {
+    const updatedModes = customModes.filter(m => m.id !== modeId);
+    setCustomModes(updatedModes);
+    localStorage.setItem('theme:custom-modes', JSON.stringify(updatedModes));
+
+    if (currentMode === modeId) {
+      setThemeMode('default');
+    }
+  };
+
+  const updateCustomMode = (modeId: string, updates: Partial<ColorMode>) => {
+    const updatedModes = customModes.map(m => 
+      m.id === modeId ? { ...m, ...updates } : m
+    );
+    setCustomModes(updatedModes);
+    localStorage.setItem('theme:custom-modes', JSON.stringify(updatedModes));
+
+    if (currentMode === modeId) {
+      applyMode(modeId, updatedModes);
+    }
   };
 
   return {
-    themeMode,
+    themeMode: currentMode,
     setThemeMode,
-    colors: getColors(),
-    isClassic: themeMode === 'classic',
+    presetModes: PRESET_MODES,
+    customModes,
+    addCustomMode,
+    deleteCustomMode,
+    updateCustomMode,
+    allModes: [...PRESET_MODES, ...customModes],
+    isClassic: currentMode === 'classic',
+    colors: {
+      positive: 'hsl(var(--profit))',
+      negative: 'hsl(var(--loss))',
+      positiveBg: 'hsl(var(--profit) / 0.1)',
+      negativeBg: 'hsl(var(--loss) / 0.1)',
+    },
   };
+}
+
+// Helper function to convert hex to HSL
+export function hexToHsl(hex: string): string {
+  hex = hex.replace('#', '');
+  
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    
+    switch (max) {
+      case r:
+        h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        break;
+      case g:
+        h = ((b - r) / d + 2) / 6;
+        break;
+      case b:
+        h = ((r - g) / d + 4) / 6;
+        break;
+    }
+  }
+
+  h = Math.round(h * 360);
+  s = Math.round(s * 100);
+  const lPercent = Math.round(l * 100);
+
+  return `${h} ${s}% ${lPercent}%`;
 }
