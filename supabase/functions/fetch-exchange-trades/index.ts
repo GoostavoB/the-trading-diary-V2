@@ -88,6 +88,48 @@ async function fetchBinanceSpotTrades(
   return allTrades;
 }
 
+async function fetchBinanceFuturesTrades(
+  apiKey: string,
+  apiSecret: string,
+  startTime?: number,
+  endTime?: number
+): Promise<any[]> {
+  const allTrades: any[] = [];
+  const symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'ADAUSDT', 'SOLUSDT'];
+  
+  for (const symbol of symbols) {
+    const timestamp = Date.now().toString();
+    let queryString = `symbol=${symbol}&timestamp=${timestamp}`;
+    
+    if (startTime) queryString += `&startTime=${startTime}`;
+    if (endTime) queryString += `&endTime=${endTime}`;
+    
+    const signature = createHmac('sha256', apiSecret)
+      .update(queryString)
+      .digest('hex');
+    
+    const url = `https://fapi.binance.com/fapi/v1/userTrades?${queryString}&signature=${signature}`;
+    
+    try {
+      const response = await fetch(url, {
+        headers: { 'X-MBX-APIKEY': apiKey },
+      });
+      
+      const data = await response.json();
+      
+      if (Array.isArray(data)) {
+        allTrades.push(...data);
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 100));
+    } catch (error) {
+      console.error(`Error fetching ${symbol} futures:`, error);
+    }
+  }
+  
+  return allTrades;
+}
+
 async function fetchBingXSpotTrades(
   apiKey: string,
   apiSecret: string,
@@ -179,6 +221,24 @@ function normalizeBinanceSpotTrade(trade: any, userId: string): any {
     exchange_source: 'binance',
     exchange_trade_id: trade.id.toString(),
     broker: 'Binance',
+  };
+}
+
+function normalizeBinanceFuturesTrade(trade: any, userId: string): any {
+  return {
+    user_id: userId,
+    symbol: trade.symbol,
+    side: trade.positionSide ? trade.positionSide.toLowerCase() : (trade.side === 'BUY' ? 'long' : 'short'),
+    entry_price: parseFloat(trade.price),
+    position_size: parseFloat(trade.qty),
+    trading_fee: parseFloat(trade.commission || 0),
+    profit_loss: parseFloat(trade.realizedPnl || 0),
+    pnl: parseFloat(trade.realizedPnl || 0),
+    opened_at: new Date(trade.time).toISOString(),
+    trade_date: new Date(trade.time).toISOString().split('T')[0],
+    exchange_source: 'binance',
+    exchange_trade_id: trade.id.toString(),
+    broker: 'Binance Futures',
   };
 }
 
@@ -348,8 +408,14 @@ Deno.serve(async (req) => {
     // Fetch trades based on exchange
     let allTrades: any[] = [];
     if (connection.exchange_name === 'binance') {
-      const spotTrades = await fetchBinanceSpotTrades(apiKey, apiSecret, startTime, endTime);
-      allTrades = spotTrades.map(t => normalizeBinanceSpotTrade(t, user.id));
+      const [spotTrades, futuresTrades] = await Promise.all([
+        fetchBinanceSpotTrades(apiKey, apiSecret, startTime, endTime),
+        fetchBinanceFuturesTrades(apiKey, apiSecret, startTime, endTime),
+      ]);
+
+      const normalizedSpot = spotTrades.map(t => normalizeBinanceSpotTrade(t, user.id));
+      const normalizedFutures = futuresTrades.map(t => normalizeBinanceFuturesTrade(t, user.id));
+      allTrades = [...normalizedSpot, ...normalizedFutures];
     } else if (connection.exchange_name === 'bingx') {
       const [spotTrades, futuresTrades] = await Promise.all([
         fetchBingXSpotTrades(apiKey, apiSecret, startTime, endTime),
