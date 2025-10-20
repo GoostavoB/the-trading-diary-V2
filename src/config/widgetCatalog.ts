@@ -113,9 +113,9 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'medium',
     defaultLayout: {
       w: 6,
-      h: 5,
+      h: 6,
       minW: 6,
-      minH: 4,
+      minH: 5,
       maxW: 12,
       maxH: 8,
     },
@@ -132,9 +132,9 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     defaultLayout: {
       w: 3,
-      h: 4,
+      h: 5,
       minW: 3,
-      minH: 3,
+      minH: 4,
       maxW: 6,
       maxH: 6,
     },
@@ -151,9 +151,9 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     defaultLayout: {
       w: 3,
-      h: 4,
+      h: 5,
       minW: 3,
-      minH: 3,
+      minH: 4,
       maxW: 6,
       maxH: 6,
     },
@@ -170,9 +170,9 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'medium',
     defaultLayout: {
       w: 6,
-      h: 5,
+      h: 6,
       minW: 6,
-      minH: 4,
+      minH: 5,
       maxW: 12,
       maxH: 8,
     },
@@ -210,13 +210,13 @@ export const DEFAULT_DASHBOARD_LAYOUT = [
   { i: 'totalTrades', x: 9, y: 0, w: 3, h: 3 },
   
   // Row 2: Portfolio Overview (6) + Top Movers (3) + Quick Actions (3)
-  { i: 'portfolioOverview', x: 0, y: 3, w: 6, h: 5 },
-  { i: 'topMovers', x: 6, y: 3, w: 3, h: 4 },
+  { i: 'portfolioOverview', x: 0, y: 3, w: 6, h: 6 },
+  { i: 'topMovers', x: 6, y: 3, w: 3, h: 5 },
   { i: 'quickActions', x: 9, y: 3, w: 3, h: 3 },
   
   // Row 3: Recent Transactions (6) + AI Insights (6)
-  { i: 'recentTransactions', x: 0, y: 8, w: 6, h: 5 },
-  { i: 'aiInsights', x: 6, y: 8, w: 6, h: 4 },
+  { i: 'recentTransactions', x: 0, y: 9, w: 6, h: 6 },
+  { i: 'aiInsights', x: 6, y: 9, w: 6, h: 5 },
 ];
 
 /**

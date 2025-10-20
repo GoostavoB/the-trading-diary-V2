@@ -493,10 +493,17 @@ textarea:focus-visible {
   will-change: transform;
 }
 
-/* Prevent content overflow */
+/* Allow proper content flow */
 .react-grid-item > div {
   height: 100%;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Widget content scrolling */
+.react-grid-item > div > * {
+  overflow: auto;
+  flex: 1;
 }
 
 .dash-card {

@@ -33,7 +33,7 @@ export const PortfolioOverviewWidget = memo(({
         </div>
 
         {data && data.length > 0 && (
-          <div className="h-[200px] w-full">
+          <div className="flex-1 min-h-[180px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data}>
                 <XAxis 

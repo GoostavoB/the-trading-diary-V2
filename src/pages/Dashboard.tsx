@@ -289,8 +289,10 @@ const Dashboard = () => {
   const handleSaveLayout = useCallback(() => {
     saveLayout(layout);
     setIsCustomizing(false);
-    // Force browser reflow
-    window.dispatchEvent(new Event('resize'));
+    // Force charts to recalculate dimensions
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 100);
   }, [layout, saveLayout]);
 
   const handleCancelCustomize = useCallback(() => {
