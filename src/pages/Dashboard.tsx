@@ -289,6 +289,8 @@ const Dashboard = () => {
   const handleSaveLayout = useCallback(() => {
     saveLayout(layout);
     setIsCustomizing(false);
+    // Force browser reflow
+    window.dispatchEvent(new Event('resize'));
   }, [layout, saveLayout]);
 
   const handleCancelCustomize = useCallback(() => {
@@ -356,10 +358,10 @@ const Dashboard = () => {
         widgetProps.totalTrades = stats?.total_trades || 0;
         break;
       case 'spotWallet':
-        widgetProps.totalValue = spotWalletTotal;
-        widgetProps.change24h = 0; // TODO: Calculate from snapshots
+        widgetProps.totalValue = spotWalletTotal || 0;
+        widgetProps.change24h = 0;
         widgetProps.changePercent24h = 0;
-        widgetProps.tokenCount = holdings.length;
+        widgetProps.tokenCount = holdings?.length || 0;
         break;
       case 'portfolioOverview':
         widgetProps.data = portfolioChartData;
@@ -416,14 +418,15 @@ const Dashboard = () => {
         {!loading && stats && stats.total_trades > 0 && (
           <div className="flex items-center gap-2 flex-wrap">
             {!isCustomizing ? (
+              <Button
+                onClick={handleStartCustomize}
+                variant="outline"
+                className="glass"
+              >
+                Customize Dashboard
+              </Button>
+            ) : (
               <>
-                <Button
-                  onClick={handleStartCustomize}
-                  variant="outline"
-                  className="glass"
-                >
-                  Customize Dashboard
-                </Button>
                 <Button
                   onClick={() => setShowWidgetLibrary(true)}
                   variant="outline"
@@ -432,9 +435,6 @@ const Dashboard = () => {
                   <Plus className="w-4 h-4 mr-2" />
                   Add Widget
                 </Button>
-              </>
-            ) : (
-              <>
                 <Button onClick={handleSaveLayout} variant="default">
                   Save Layout
                 </Button>
@@ -479,14 +479,17 @@ const Dashboard = () => {
                     className="dashboard-grid"
                     layout={layout}
                     cols={12}
-                    rowHeight={30}
+                    rowHeight={80}
                     width={containerWidth}
-                    margin={[20, 20]}
+                    margin={[16, 16]}
+                    containerPadding={[24, 24]}
                     isDraggable={isCustomizing}
                     isResizable={isCustomizing}
                     onLayoutChange={updateLayout}
                     draggableHandle=".drag-handle"
                     compactType="vertical"
+                    preventCollision={true}
+                    isBounded={true}
                   >
                     {layout.map(renderWidget)}
                   </GridLayout>
