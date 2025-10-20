@@ -481,7 +481,7 @@ const Dashboard = () => {
                     className="dashboard-grid"
                     layout={layout}
                     cols={12}
-                    rowHeight={80}
+                    rowHeight={1}
                     width={containerWidth}
                     margin={[16, 16]}
                     containerPadding={[24, 24]}
@@ -492,6 +492,8 @@ const Dashboard = () => {
                     compactType="vertical"
                     preventCollision={true}
                     isBounded={true}
+                    autoSize={true}
+                    useCSSTransforms={true}
                   >
                     {layout.map(renderWidget)}
                   </GridLayout>

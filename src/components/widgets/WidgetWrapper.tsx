@@ -28,11 +28,12 @@ export const WidgetWrapper = memo(({
   return (
     <GlassCard 
       className={cn(
-        "relative h-full flex flex-col min-h-[200px]",
+        "relative flex flex-col",
         "transition-all duration-200",
         isEditMode && "ring-2 ring-primary/20 hover:ring-primary/40",
         className
       )}
+      style={{ height: 'auto', minHeight: 'fit-content' }}
     >
       {/* Edit Mode Controls */}
       {isEditMode && (
@@ -78,7 +79,7 @@ export const WidgetWrapper = memo(({
 
       {/* Content */}
       <div className={cn(
-        "flex-1 overflow-auto",
+        "overflow-visible",
         title ? "px-6 pb-5" : "p-6"
       )}>
         {children}
