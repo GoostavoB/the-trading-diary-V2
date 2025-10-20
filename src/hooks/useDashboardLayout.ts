@@ -85,8 +85,43 @@ export function useDashboardLayout() {
       const hasValidLayout = savedLayout?.widgets?.length > 0 && savedLayout?.layout?.length > 0;
 
       if (hasValidLayout) {
-        setWidgets(savedLayout.widgets);
-        setLayout(savedLayout.layout);
+        // Sanitize: keep only known widget IDs and ensure missing defaults are added
+        const knownIds = new Set(DEFAULT_LAYOUT.map((l) => l.i));
+        const defaultLayoutMap = new Map(DEFAULT_LAYOUT.map((l) => [l.i, l] as const));
+        const defaultWidgetMap = new Map(DEFAULT_WIDGETS.map((w) => [w.id, w] as const));
+
+        let filteredLayout = (savedLayout.layout || []).filter((item) => knownIds.has(item.i));
+        for (const id of knownIds) {
+          if (!filteredLayout.some((i) => i.i === id)) {
+            const def = defaultLayoutMap.get(id);
+            if (def) filteredLayout.push(def);
+          }
+        }
+
+        let filteredWidgets = (savedLayout.widgets || []).filter((w) => knownIds.has(w.id));
+        for (const id of knownIds) {
+          if (!filteredWidgets.some((w) => w.id === id)) {
+            const def = defaultWidgetMap.get(id);
+            if (def) filteredWidgets.push(def);
+          }
+        }
+
+        // If after filtering we still have no layout, fall back to defaults
+        if (filteredLayout.length === 0) {
+          filteredLayout = DEFAULT_LAYOUT;
+        }
+        if (filteredWidgets.length === 0) {
+          filteredWidgets = DEFAULT_WIDGETS;
+        }
+
+        setWidgets(filteredWidgets);
+        setLayout(filteredLayout);
+
+        // Persist sanitized layout back to the backend
+        await supabase
+          .from('user_settings')
+          .update({ layout_json: { widgets: filteredWidgets, layout: filteredLayout } as any })
+          .eq('user_id', user.id);
       } else {
         // Initialize with defaults and save to database
         console.log('No valid layout found, initializing defaults...');

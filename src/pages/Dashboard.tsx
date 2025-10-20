@@ -383,7 +383,7 @@ const Dashboard = () => {
                 >
               {/* Total Balance Card */}
               {(isCustomizing || isWidgetVisible('totalBalance')) && (
-                <div className={`dash-card ${isCustomizing && !isWidgetVisible('totalBalance') ? 'opacity-50' : ''}`}>
+                <div key="totalBalance" className={`dash-card ${isCustomizing && !isWidgetVisible('totalBalance') ? 'opacity-50' : ''}`}>
                   {isCustomizing && (
                     <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
                       <Button
@@ -408,7 +408,7 @@ const Dashboard = () => {
 
               {/* Stats Overview */}
               {(isCustomizing || isWidgetVisible('stats')) && (
-                <div className={`dash-card ${isCustomizing && !isWidgetVisible('stats') ? 'opacity-50' : ''}`}>
+                <div key="stats" className={`dash-card ${isCustomizing && !isWidgetVisible('stats') ? 'opacity-50' : ''}`}>
                   {isCustomizing && (
                     <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
                       <Button
@@ -518,7 +518,7 @@ const Dashboard = () => {
 
               {/* Portfolio Overview */}
               {(isCustomizing || isWidgetVisible('portfolio')) && (
-                <div className={`dash-card ${isCustomizing && !isWidgetVisible('portfolio') ? 'opacity-50' : ''}`}>
+                <div key="portfolio" className={`dash-card ${isCustomizing && !isWidgetVisible('portfolio') ? 'opacity-50' : ''}`}>
                   {isCustomizing && (
                     <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
                       <Button
@@ -553,7 +553,7 @@ const Dashboard = () => {
 
               {/* Top Movers */}
               {(isCustomizing || isWidgetVisible('topMovers')) && (
-                <div className={`dash-card ${isCustomizing && !isWidgetVisible('topMovers') ? 'opacity-50' : ''}`}>
+                <div key="topMovers" className={`dash-card ${isCustomizing && !isWidgetVisible('topMovers') ? 'opacity-50' : ''}`}>
                   {isCustomizing && (
                     <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
                       <Button
@@ -573,7 +573,7 @@ const Dashboard = () => {
 
               {/* Quick Actions */}
               {(isCustomizing || isWidgetVisible('quickActions')) && (
-                <div className={`dash-card ${isCustomizing && !isWidgetVisible('quickActions') ? 'opacity-50' : ''}`}>
+                <div key="quickActions" className={`dash-card ${isCustomizing && !isWidgetVisible('quickActions') ? 'opacity-50' : ''}`}>
                   {isCustomizing && (
                     <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
                       <Button
@@ -593,7 +593,7 @@ const Dashboard = () => {
 
               {/* Recent Transactions */}
               {(isCustomizing || isWidgetVisible('recentTransactions')) && (
-                <div className={`dash-card ${isCustomizing && !isWidgetVisible('recentTransactions') ? 'opacity-50' : ''}`}>
+                <div key="recentTransactions" className={`dash-card ${isCustomizing && !isWidgetVisible('recentTransactions') ? 'opacity-50' : ''}`}>
                   {isCustomizing && (
                     <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
                       <Button
@@ -613,7 +613,7 @@ const Dashboard = () => {
 
               {/* AI Insight */}
               {(isCustomizing || isWidgetVisible('insights')) && (
-                <div className={`dash-card ${isCustomizing && !isWidgetVisible('insights') ? 'opacity-50' : ''}`}>
+                <div key="insights" className={`dash-card ${isCustomizing && !isWidgetVisible('insights') ? 'opacity-50' : ''}`}>
                   {isCustomizing && (
                     <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
                       <Button
@@ -637,7 +637,7 @@ const Dashboard = () => {
 
               {/* Premium CTA */}
               {(isCustomizing || isWidgetVisible('premiumCTA')) && (
-                <div className={`dash-card ${isCustomizing && !isWidgetVisible('premiumCTA') ? 'opacity-50' : ''}`}>
+                <div key="premiumCTA" className={`dash-card ${isCustomizing && !isWidgetVisible('premiumCTA') ? 'opacity-50' : ''}`}>
                   {isCustomizing && (
                     <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
                       <Button
