@@ -491,7 +491,7 @@ const Dashboard = () => {
 
   // Dynamic widget renderer
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const ROW_HEIGHT_PX = 80;
+  const ROW_HEIGHT_PX = 60;
 
   const renderWidget = useCallback((layoutItem: any) => {
     const widgetConfig = WIDGET_CATALOG[layoutItem.i];

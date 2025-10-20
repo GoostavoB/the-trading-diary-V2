@@ -553,6 +553,15 @@ textarea:focus-visible {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
   will-change: transform, width, height;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.react-grid-item > * {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .react-grid-item.react-dragging {
