@@ -79,7 +79,7 @@ export const WidgetWrapper = memo(({
 
       {/* Content */}
       <div className={cn(
-        "overflow-visible",
+        "flex-1 overflow-visible",
         title ? "px-6 pb-5" : "p-6"
       )}>
         {children}
