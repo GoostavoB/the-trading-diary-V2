@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { WidgetLayout } from '@/types/widget';
 import { DEFAULT_DASHBOARD_LAYOUT, WIDGET_CATALOG } from '@/config/widgetCatalog';
 import { toast } from 'sonner';
 
 export const useWidgetLayout = (userId: string | undefined) => {
-  const [layout, setLayout] = useState<WidgetLayout[]>(DEFAULT_DASHBOARD_LAYOUT);
+  const [widgetOrder, setWidgetOrder] = useState<string[]>(DEFAULT_DASHBOARD_LAYOUT);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -30,12 +29,27 @@ export const useWidgetLayout = (userId: string | undefined) => {
         }
 
         if (data?.layout_json) {
-          // Handle both array format and object format with layout property
           const layoutData = data.layout_json as any;
-          if (Array.isArray(layoutData)) {
-            setLayout(layoutData as WidgetLayout[]);
-          } else if (layoutData.layout && Array.isArray(layoutData.layout)) {
-            setLayout(layoutData.layout as WidgetLayout[]);
+          
+          // Handle new format (array of widget IDs)
+          if (Array.isArray(layoutData) && layoutData.length > 0 && typeof layoutData[0] === 'string') {
+            setWidgetOrder(layoutData);
+          }
+          // Handle old format (array of layout objects with i, x, y, w, h)
+          else if (Array.isArray(layoutData) && layoutData.length > 0 && layoutData[0].i) {
+            const order = layoutData.map((item: any) => item.i);
+            setWidgetOrder(order);
+          }
+          // Handle wrapped format
+          else if (layoutData.layout) {
+            if (Array.isArray(layoutData.layout) && layoutData.layout.length > 0) {
+              if (typeof layoutData.layout[0] === 'string') {
+                setWidgetOrder(layoutData.layout);
+              } else if (layoutData.layout[0].i) {
+                const order = layoutData.layout.map((item: any) => item.i);
+                setWidgetOrder(order);
+              }
+            }
           }
         }
       } catch (error) {
@@ -49,7 +63,7 @@ export const useWidgetLayout = (userId: string | undefined) => {
   }, [userId]);
 
   // Save layout to database
-  const saveLayout = useCallback(async (newLayout: WidgetLayout[]) => {
+  const saveLayout = useCallback(async (newOrder: string[]) => {
     if (!userId) return;
 
     setIsSaving(true);
@@ -57,7 +71,7 @@ export const useWidgetLayout = (userId: string | undefined) => {
       const { error } = await supabase
         .from('user_settings')
         .update({
-          layout_json: { layout: newLayout } as any,
+          layout_json: newOrder as any,
           updated_at: new Date().toISOString(),
         })
         .eq('user_id', userId);
@@ -76,116 +90,48 @@ export const useWidgetLayout = (userId: string | undefined) => {
   }, [userId]);
 
   // Update layout without saving
-  const updateLayout = useCallback((newLayout: WidgetLayout[]) => {
-    setLayout(newLayout);
+  const updateLayout = useCallback((newOrder: string[]) => {
+    setWidgetOrder(newOrder);
   }, []);
 
-  // Add widget to layout with smart positioning
+  // Add widget to layout
   const addWidget = useCallback((widgetId: string) => {
     const widget = WIDGET_CATALOG[widgetId];
     if (!widget) return;
 
-    // Check if widget already exists
-    if (layout.some(item => item.i === widgetId)) {
+    if (widgetOrder.includes(widgetId)) {
       toast.info('Widget already added');
       return;
     }
 
-    const widgetWidth = widget.defaultLayout.w;
-    const widgetHeight = widget.defaultLayout.h;
-    
-    // Max columns for grid (assumes 12 columns for desktop)
-    const maxColumns = 12;
-    
-    let bestX = 0;
-    let bestY = 0;
-
-    // If layout is empty, start at origin
-    if (layout.length === 0) {
-      bestX = 0;
-      bestY = 0;
-    } else {
-      // Sort existing widgets by position (top to bottom, left to right)
-      const sortedLayout = [...layout].sort((a, b) => {
-        if (a.y !== b.y) return a.y - b.y;
-        return a.x - b.x;
-      });
-
-      // Get unique Y levels
-      const yLevels = [...new Set(sortedLayout.map(item => item.y))].sort((a, b) => a - b);
-      
-      let found = false;
-      
-      // Try to fit widget in existing rows first
-      for (const y of yLevels) {
-        const itemsInRow = sortedLayout.filter(item => item.y === y);
-        
-        // Check for gaps in this row
-        let currentX = 0;
-        for (const item of itemsInRow.sort((a, b) => a.x - b.x)) {
-          if (item.x - currentX >= widgetWidth) {
-            // Found a gap!
-            bestX = currentX;
-            bestY = y;
-            found = true;
-            break;
-          }
-          currentX = item.x + item.w;
-        }
-        
-        if (found) break;
-        
-        // Check if there's space at the end of the row
-        if (currentX + widgetWidth <= maxColumns) {
-          bestX = currentX;
-          bestY = y;
-          found = true;
-          break;
-        }
-      }
-      
-      // If no gap found, add to a new row
-      if (!found) {
-        bestX = 0;
-        bestY = Math.max(...sortedLayout.map(item => item.y + item.h), 0);
-      }
-    }
-    
-    const newItem: WidgetLayout = {
-      i: widgetId,
-      x: bestX,
-      y: bestY,
-      ...widget.defaultLayout,
-    };
-
-    const newLayout = [...layout, newItem];
-    setLayout(newLayout);
-    saveLayout(newLayout);
+    const newOrder = [...widgetOrder, widgetId];
+    setWidgetOrder(newOrder);
+    saveLayout(newOrder);
     toast.success(`${widget.title} added`);
-  }, [layout, saveLayout]);
+  }, [widgetOrder, saveLayout]);
 
   // Remove widget from layout
   const removeWidget = useCallback((widgetId: string) => {
-    const newLayout = layout.filter(item => item.i !== widgetId);
-    setLayout(newLayout);
-    saveLayout(newLayout);
+    const newOrder = widgetOrder.filter(id => id !== widgetId);
+    setWidgetOrder(newOrder);
+    saveLayout(newOrder);
     
     const widget = WIDGET_CATALOG[widgetId];
     toast.success(`${widget?.title || 'Widget'} removed`);
-  }, [layout, saveLayout]);
+  }, [widgetOrder, saveLayout]);
 
   // Reset to default layout
   const resetLayout = useCallback(() => {
-    setLayout(DEFAULT_DASHBOARD_LAYOUT);
+    setWidgetOrder(DEFAULT_DASHBOARD_LAYOUT);
     saveLayout(DEFAULT_DASHBOARD_LAYOUT);
     toast.success('Dashboard reset to default');
   }, [saveLayout]);
 
   // Get active widget IDs
-  const activeWidgets = layout.map(item => item.i);
+  const activeWidgets = widgetOrder;
 
   return {
-    layout,
+    layout: widgetOrder,
     isLoading,
     isSaving,
     updateLayout,

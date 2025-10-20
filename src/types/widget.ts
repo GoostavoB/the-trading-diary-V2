@@ -21,7 +21,7 @@ export interface WidgetConfig {
   category: WidgetCategory;
   icon: LucideIcon;
   defaultSize: WidgetSize;
-  defaultLayout: Pick<WidgetLayout, 'w' | 'h' | 'minW' | 'minH' | 'maxW' | 'maxH'>;
+  defaultLayout?: Pick<WidgetLayout, 'w' | 'h' | 'minW' | 'minH' | 'maxW' | 'maxH'>;
   component: React.ComponentType<WidgetProps>;
   isPremium?: boolean;
   requiresData?: string[]; // Dependencies like 'trades', 'holdings'

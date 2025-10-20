@@ -5,9 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
 import { Plus } from 'lucide-react';
-import GridLayout from 'react-grid-layout';
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy } from '@dnd-kit/sortable';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PerformanceInsights } from '@/components/PerformanceInsights';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
@@ -27,6 +26,7 @@ import { formatCurrency } from '@/utils/formatNumber';
 import type { Trade } from '@/types/trade';
 import { WIDGET_CATALOG } from '@/config/widgetCatalog';
 import { WidgetLibrary } from '@/components/widgets/WidgetLibrary';
+import { SortableWidget } from '@/components/widgets/SortableWidget';
 import { toast } from 'sonner';
 
 // Lazy load heavy components
@@ -67,11 +67,6 @@ const Dashboard = () => {
   const [filteredTrades, setFilteredTrades] = useState<Trade[]>([]);
   const [activeTab, setActiveTab] = useState<string>('overview');
   const tabsContainerRef = useRef<HTMLDivElement>(null);
-  const gridContainerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(1200);
-  
-  // Responsive layout configuration
-  const responsiveLayout = useResponsiveLayout(containerWidth);
   
   // Memoize processed trades to prevent unnecessary recalculations
   const processedTrades = useMemo(() => 
@@ -96,7 +91,7 @@ const Dashboard = () => {
   }, []);
   // Widget system
   const {
-    layout,
+    layout: widgetOrder,
     isLoading: isLayoutLoading,
     updateLayout,
     saveLayout,
@@ -108,6 +103,14 @@ const Dashboard = () => {
 
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [showWidgetLibrary, setShowWidgetLibrary] = useState(false);
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Spot wallet data for widget
   const { holdings, isLoading: isSpotWalletLoading } = useSpotWallet();
@@ -129,21 +132,6 @@ const Dashboard = () => {
     }
   };
 
-  // Measure grid container width for responsive layout
-  useEffect(() => {
-    const container = gridContainerRef.current;
-    if (!container) return;
-
-    const updateWidth = () => {
-      setContainerWidth(container.offsetWidth);
-    };
-
-    updateWidth();
-    const resizeObserver = new ResizeObserver(updateWidth);
-    resizeObserver.observe(container);
-
-    return () => resizeObserver.disconnect();
-  }, []);
 
   useEffect(() => {
     if (user) {
@@ -329,141 +317,29 @@ const Dashboard = () => {
   }, []);
 
   const handleSaveLayout = useCallback(() => {
-    saveLayout(layout);
+    saveLayout(widgetOrder);
     setIsCustomizing(false);
     // Force charts to recalculate dimensions
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
     }, 100);
-  }, [layout, saveLayout]);
+  }, [widgetOrder, saveLayout]);
 
-  // Auto-compact layout to create masonry brick effect
-  useEffect(() => {
-    if (!layout?.length || isCustomizing) return;
+  // Handle drag end
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
 
-    // Masonry-style compaction algorithm
-    const compactMasonryLayout = (items: any[]) => {
-      const sorted = [...items].sort((a, b) => {
-        if (a.y !== b.y) return a.y - b.y;
-        return a.x - b.x;
-      });
-
-      const compacted: any[] = [];
-      const cols = responsiveLayout.columns;
-      const grid: boolean[][] = [];
-      
-      for (const item of sorted) {
-        let placed = false;
-        
-        // Try to place widget starting from y=0, scanning all rows
-        for (let y = 0; !placed && y < 1000; y++) {
-          for (let x = 0; x <= cols - item.w; x++) {
-            let canPlace = true;
-            
-            for (let dy = 0; dy < item.h; dy++) {
-              for (let dx = 0; dx < item.w; dx++) {
-                if (grid[y + dy]?.[x + dx]) {
-                  canPlace = false;
-                  break;
-                }
-              }
-              if (!canPlace) break;
-            }
-            
-            if (canPlace) {
-              for (let dy = 0; dy < item.h; dy++) {
-                if (!grid[y + dy]) grid[y + dy] = [];
-                for (let dx = 0; dx < item.w; dx++) {
-                  grid[y + dy][x + dx] = true;
-                }
-              }
-              
-              compacted.push({ ...item, x, y });
-              placed = true;
-              break;
-            }
-          }
-        }
-        
-        if (!placed) {
-          const maxY = Math.max(0, ...compacted.map(c => c.y + c.h));
-          compacted.push({ ...item, x: 0, y: maxY });
-        }
-      }
-
-      return compacted;
-    };
-
-    const compacted = compactMasonryLayout(layout);
-    const hasChanges = layout.some((item) => {
-      const compact = compacted.find(c => c.i === item.i);
-      return compact && (item.x !== compact.x || item.y !== compact.y);
-    });
-    
-    if (hasChanges) {
-      updateLayout(compacted);
+    if (over && active.id !== over.id) {
+      const oldIndex = widgetOrder.indexOf(active.id as string);
+      const newIndex = widgetOrder.indexOf(over.id as string);
+      const newOrder = arrayMove(widgetOrder, oldIndex, newIndex);
+      updateLayout(newOrder);
     }
-  }, [layout, isCustomizing, updateLayout, responsiveLayout.columns]);
+  }, [widgetOrder, updateLayout]);
   const handleCancelCustomize = useCallback(() => {
     setIsCustomizing(false);
   }, []);
 
-  const handleOptimizeLayout = useCallback(() => {
-    // Masonry-style compaction to remove ALL gaps
-    const compactMasonryLayout = (items: any[]) => {
-      const cols = responsiveLayout.columns;
-      const sorted = [...items].sort((a, b) => {
-        if (a.y !== b.y) return a.y - b.y;
-        return a.x - b.x;
-      });
-
-      const compacted: any[] = [];
-      const grid: boolean[][] = [];
-      
-      for (const item of sorted) {
-        let placed = false;
-        
-        // Find the first available spot starting from top-left
-        for (let y = 0; !placed && y < 1000; y++) {
-          for (let x = 0; x <= cols - item.w; x++) {
-            let canPlace = true;
-            
-            // Check if all cells are free
-            for (let dy = 0; dy < item.h; dy++) {
-              for (let dx = 0; dx < item.w; dx++) {
-                if (grid[y + dy]?.[x + dx]) {
-                  canPlace = false;
-                  break;
-                }
-              }
-              if (!canPlace) break;
-            }
-            
-            if (canPlace) {
-              // Occupy the cells
-              for (let dy = 0; dy < item.h; dy++) {
-                if (!grid[y + dy]) grid[y + dy] = [];
-                for (let dx = 0; dx < item.w; dx++) {
-                  grid[y + dy][x + dx] = true;
-                }
-              }
-              
-              compacted.push({ ...item, x, y });
-              placed = true;
-              break;
-            }
-          }
-        }
-      }
-      
-      return compacted;
-    };
-
-    const optimized = compactMasonryLayout(layout);
-    updateLayout(optimized);
-    saveLayout(optimized);
-    toast.success('Layout optimized - widgets packed like bricks!');
-  }, [layout, updateLayout, saveLayout, responsiveLayout.columns]);
   const spotWalletTotal = useMemo(() => {
     return holdings.reduce((sum, holding) => {
       const price = Number(prices[holding.token_symbol] || 0);
@@ -490,21 +366,17 @@ const Dashboard = () => {
   }, [trades, capitalLog, initialInvestment]);
 
   // Dynamic widget renderer
-  const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const ROW_HEIGHT_PX = 60;
-
-  const renderWidget = useCallback((layoutItem: any) => {
-    const widgetConfig = WIDGET_CATALOG[layoutItem.i];
+  const renderWidget = useCallback((widgetId: string) => {
+    const widgetConfig = WIDGET_CATALOG[widgetId];
     if (!widgetConfig) return null;
 
     const WidgetComponent = widgetConfig.component;
-    const widgetId = layoutItem.i;
 
     // Prepare props based on widget ID
     const widgetProps: any = {
       id: widgetId,
       isEditMode: isCustomizing,
-      isCompact: responsiveLayout.isCompact,
+      isCompact: false,
       onRemove: () => removeWidget(widgetId),
     };
 
@@ -573,13 +445,14 @@ const Dashboard = () => {
     }
 
     return (
-      <div
-        key={layoutItem.i}
-        className="dash-card"
-        ref={(el) => { itemRefs.current[layoutItem.i] = el; }}
+      <SortableWidget
+        key={widgetId}
+        id={widgetId}
+        isEditMode={isCustomizing}
+        onRemove={() => removeWidget(widgetId)}
       >
         <WidgetComponent {...widgetProps} />
-      </div>
+      </SortableWidget>
     );
   }, [isCustomizing, removeWidget, stats, processedTrades, initialInvestment, spotWalletTotal, holdings, portfolioChartData]);
 
@@ -626,22 +499,13 @@ const Dashboard = () => {
         {!loading && stats && stats.total_trades > 0 && (
           <div className="flex items-center gap-2 flex-wrap">
             {!isCustomizing ? (
-              <>
-                <Button
-                  onClick={handleStartCustomize}
-                  variant="outline"
-                  className="glass"
-                >
-                  Customize Dashboard
-                </Button>
-                <Button
-                  onClick={handleOptimizeLayout}
-                  variant="outline"
-                  className="glass"
-                >
-                  Optimize Layout
-                </Button>
-              </>
+              <Button
+                onClick={handleStartCustomize}
+                variant="outline"
+                className="glass"
+              >
+                Customize Dashboard
+              </Button>
             ) : (
               <>
                 <Button
@@ -657,9 +521,6 @@ const Dashboard = () => {
                 </Button>
                 <Button onClick={handleCancelCustomize} variant="outline">
                   Cancel
-                </Button>
-                <Button onClick={handleOptimizeLayout} variant="outline">
-                  Optimize Layout
                 </Button>
                 <Button onClick={resetLayout} variant="ghost">
                   Reset to Default
@@ -693,27 +554,20 @@ const Dashboard = () => {
 
               {/* Overview Tab - Main Dashboard Grid */}
               <TabsContent value="overview" className="space-y-6">
-                {/* Dashboard Grid */}
-                <div ref={gridContainerRef} className="w-full max-w-none">
-                  <GridLayout
-                    className="dashboard-grid"
-                    layout={layout}
-                    cols={responsiveLayout.columns}
-                    rowHeight={80}
-                    width={containerWidth}
-                    margin={[12, 12]}
-                    containerPadding={[0, 0]}
-                    isDraggable={isCustomizing}
-                    isResizable={isCustomizing}
-                    onLayoutChange={updateLayout}
-                    draggableHandle=".drag-handle"
-                    compactType={null}
-                    preventCollision={false}
-                    useCSSTransforms={true}
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={widgetOrder}
+                    strategy={rectSortingStrategy}
                   >
-                    {layout.map(renderWidget)}
-                  </GridLayout>
-                </div>
+                    <div className="dashboard-grid">
+                      {widgetOrder.map(renderWidget)}
+                    </div>
+                  </SortableContext>
+                </DndContext>
               </TabsContent>
 
             {/* Insights Tab */}
