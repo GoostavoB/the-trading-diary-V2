@@ -54,19 +54,11 @@ const TradingHeatmapComponent = ({ trades }: TradingHeatmapProps) => {
 
     const winRate = cell.wins / cell.total;
 
-    if (isClassic) {
-      // Classic mode: Green for wins, Red for losses
-      if (winRate >= 0.7) return colors.positive;
-      if (winRate >= 0.5) return 'hsl(142 71% 45%)';
-      if (winRate >= 0.4) return 'hsl(45 93% 47%)';
-      return colors.negative;
-    } else {
-      // Default mode: Primary (blue) for high, Secondary (gray) for low
-      if (winRate >= 0.7) return colors.positive;
-      if (winRate >= 0.5) return 'hsl(var(--primary) / 0.7)';
-      if (winRate >= 0.4) return 'hsl(var(--secondary) / 0.6)';
-      return colors.negative;
-    }
+    // Use theme colors from useThemeMode
+    if (winRate >= 0.7) return colors.positive;
+    if (winRate >= 0.5) return 'hsl(var(--primary) / 0.7)';
+    if (winRate >= 0.4) return 'hsl(var(--secondary) / 0.6)';
+    return colors.negative;
   };
 
   const getBestSlot = () => {
@@ -213,7 +205,7 @@ const TradingHeatmapComponent = ({ trades }: TradingHeatmapProps) => {
               <span className="text-[10px] text-muted-foreground font-medium">High (≥70%)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: 'hsl(45 93% 47%)' }}></div>
+              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: 'hsl(var(--primary) / 0.7)' }}></div>
               <span className="text-[10px] text-muted-foreground font-medium">Medium (40-70%)</span>
             </div>
             <div className="flex items-center gap-1.5">

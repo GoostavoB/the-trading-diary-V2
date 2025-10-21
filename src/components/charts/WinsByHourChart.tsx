@@ -149,14 +149,17 @@ const WinsByHourChartComponent = ({ trades }: WinsByHourChartProps) => {
     );
   };
 
-  // Heatmap color calculation
+  // Heatmap color calculation - uses theme colors
   const getHeatmapColor = (pnl: number, maxPnL: number) => {
     if (pnl === 0) return 'hsl(var(--muted))';
     const intensity = Math.abs(pnl) / maxPnL;
+    
     if (pnl > 0) {
-      return `hsl(142, ${70 + intensity * 30}%, ${50 - intensity * 20}%)`;
+      // Use positive color from theme with intensity variation
+      return colors.positive.replace(')', ` / ${0.5 + intensity * 0.5})`);
     } else {
-      return `hsl(0, ${70 + intensity * 30}%, ${50 - intensity * 20}%)`;
+      // Use negative color from theme with intensity variation
+      return colors.negative.replace(')', ` / ${0.5 + intensity * 0.5})`);
     }
   };
 
@@ -179,16 +182,24 @@ const WinsByHourChartComponent = ({ trades }: WinsByHourChartProps) => {
           {/* Summary Stats */}
           <div className="flex flex-wrap items-center gap-3 text-sm">
             <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-green-500" />
+              <TrendingUp className="h-4 w-4" style={{ color: colors.positive }} />
               <span className="text-muted-foreground">Best:</span>
-              <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
+              <Badge variant="outline" style={{ 
+                backgroundColor: `${colors.positive.replace(')', ' / 0.1)')}`,
+                color: colors.positive,
+                borderColor: `${colors.positive.replace(')', ' / 0.2)')}`
+              }}>
                 {bestHour.hour} ({formatNumber(bestHour.totalPnL)})
               </Badge>
             </div>
             <div className="flex items-center gap-2">
-              <TrendingDown className="h-4 w-4 text-red-500" />
+              <TrendingDown className="h-4 w-4" style={{ color: colors.negative }} />
               <span className="text-muted-foreground">Worst:</span>
-              <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20">
+              <Badge variant="outline" style={{ 
+                backgroundColor: `${colors.negative.replace(')', ' / 0.1)')}`,
+                color: colors.negative,
+                borderColor: `${colors.negative.replace(')', ' / 0.2)')}`
+              }}>
                 {worstHour.hour} ({formatNumber(worstHour.totalPnL)})
               </Badge>
             </div>

@@ -1312,6 +1312,7 @@ export type Database = {
       }
       user_setups: {
         Row: {
+          color: string | null
           created_at: string
           id: string
           name: string
@@ -1319,6 +1320,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          color?: string | null
           created_at?: string
           id?: string
           name: string
@@ -1326,6 +1328,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          color?: string | null
           created_at?: string
           id?: string
           name?: string

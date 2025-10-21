@@ -512,8 +512,8 @@ const Dashboard = () => {
           />
         )}
 
-        {/* Customize Dashboard Controls */}
-        {!loading && stats && stats.total_trades > 0 && (
+        {/* Customize Dashboard Controls - Only show on Overview tab */}
+        {!loading && stats && stats.total_trades > 0 && activeTab === 'overview' && (
           <div className="flex items-center gap-2 flex-wrap">
             {!isCustomizing ? (
               <Button

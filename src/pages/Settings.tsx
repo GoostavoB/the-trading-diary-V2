@@ -21,10 +21,12 @@ const Settings = () => {
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState({ full_name: '', email: '' });
   const [settings, setSettings] = useState({ blur_enabled: false, sidebar_style: 'matte' });
-  const [setups, setSetups] = useState<{ id: string; name: string }[]>([]);
+  const [setups, setSetups] = useState<{ id: string; name: string; color?: string }[]>([]);
   const [newSetupName, setNewSetupName] = useState('');
+  const [newSetupColor, setNewSetupColor] = useState('#A18CFF');
   const [editingSetupId, setEditingSetupId] = useState<string | null>(null);
   const [editingSetupName, setEditingSetupName] = useState('');
+  const [editingSetupColor, setEditingSetupColor] = useState('#A18CFF');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [notifications, setNotifications] = useState({
@@ -211,7 +213,7 @@ const Settings = () => {
 
     const { error } = await supabase
       .from('user_setups')
-      .insert({ user_id: user.id, name: newSetupName.trim() });
+      .insert({ user_id: user.id, name: newSetupName.trim(), color: newSetupColor });
 
     if (error) {
       if (error.code === '23505') {
@@ -222,6 +224,7 @@ const Settings = () => {
     } else {
       toast.success('Setup added!');
       setNewSetupName('');
+      setNewSetupColor('#A18CFF');
       fetchSetups();
     }
   };
@@ -231,7 +234,7 @@ const Settings = () => {
 
     const { error } = await supabase
       .from('user_setups')
-      .update({ name: editingSetupName.trim() })
+      .update({ name: editingSetupName.trim(), color: editingSetupColor })
       .eq('id', id);
 
     if (error) {
@@ -244,6 +247,7 @@ const Settings = () => {
       toast.success('Setup updated!');
       setEditingSetupId(null);
       setEditingSetupName('');
+      setEditingSetupColor('#A18CFF');
       fetchSetups();
     }
   };
@@ -262,9 +266,10 @@ const Settings = () => {
     }
   };
 
-  const startEditingSetup = (id: string, name: string) => {
+  const startEditingSetup = (id: string, name: string, color: string) => {
     setEditingSetupId(id);
     setEditingSetupName(name);
+    setEditingSetupColor(color || '#A18CFF');
   };
 
   return (
@@ -402,6 +407,13 @@ const Settings = () => {
                     placeholder="Enter new setup name (e.g., Breakout, Reversal)"
                     className="flex-1"
                   />
+                  <input
+                    type="color"
+                    value={newSetupColor}
+                    onChange={(e) => setNewSetupColor(e.target.value)}
+                    className="w-12 h-10 rounded-md border border-border cursor-pointer"
+                    title="Choose setup color"
+                  />
                   <Button type="submit" disabled={!newSetupName.trim()}>
                     <Plus className="w-4 h-4 mr-1" />
                     Add
@@ -425,6 +437,13 @@ const Settings = () => {
                             className="flex-1 h-8"
                             autoFocus
                           />
+                          <input
+                            type="color"
+                            value={editingSetupColor}
+                            onChange={(e) => setEditingSetupColor(e.target.value)}
+                            className="w-8 h-8 rounded-md border border-border cursor-pointer"
+                            title="Choose setup color"
+                          />
                           <Button
                             size="sm"
                             onClick={() => handleUpdateSetup(setup.id)}
@@ -438,6 +457,7 @@ const Settings = () => {
                             onClick={() => {
                               setEditingSetupId(null);
                               setEditingSetupName('');
+                              setEditingSetupColor('#A18CFF');
                             }}
                             className="h-8 w-8 p-0"
                           >
@@ -446,13 +466,21 @@ const Settings = () => {
                         </>
                       ) : (
                         <>
-                          <Badge variant="secondary" className="flex-1 justify-start">
+                          <Badge 
+                            variant="secondary" 
+                            className="flex-1 justify-start"
+                            style={{ 
+                              backgroundColor: setup.color || '#A18CFF',
+                              color: 'white',
+                              borderColor: setup.color || '#A18CFF'
+                            }}
+                          >
                             {setup.name}
                           </Badge>
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => startEditingSetup(setup.id, setup.name)}
+                            onClick={() => startEditingSetup(setup.id, setup.name, setup.color || '#A18CFF')}
                             className="h-8 w-8 p-0"
                           >
                             <Edit2 className="w-4 h-4" />
