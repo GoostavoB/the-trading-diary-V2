@@ -552,23 +552,25 @@ textarea:focus-visible {
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  grid-auto-rows: auto;
+  grid-auto-rows: minmax(auto, max-content);
   gap: 16px;
   width: 100%;
   margin: 0;
   padding: 0;
+  align-items: start;
 }
 
 /* Widget items with auto height */
 .widget-item {
   height: auto !important;
-  min-height: 200px;
+  min-height: fit-content;
   transition: opacity 0.2s ease;
 }
 
-/* Ensure widget content fills the container */
+/* Ensure widget content maintains natural size */
 .widget-item > * {
-  height: 100%;
+  height: auto;
+  min-height: fit-content;
   display: flex;
   flex-direction: column;
 }
@@ -657,6 +659,8 @@ textarea:focus-visible {
 .widget-item.dragging {
   will-change: transform, opacity;
   cursor: grabbing !important;
+  height: auto !important;
+  min-height: fit-content !important;
 }
 
 /* Prevent text selection and touch callouts during drag */
