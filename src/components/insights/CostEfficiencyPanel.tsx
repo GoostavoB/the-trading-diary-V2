@@ -59,24 +59,30 @@ export const CostEfficiencyPanel = memo(({ trades }: CostEfficiencyPanelProps) =
             key={exchange.broker}
             className="p-4 bg-muted/20 border-border transition-all duration-300 hover:scale-[1.02]"
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Badge variant={idx === 0 ? 'default' : 'secondary'} className="font-mono">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <Badge variant={idx === 0 ? 'default' : 'secondary'} className="font-mono text-lg w-10 h-10 flex items-center justify-center flex-shrink-0">
                   {idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉'}
                 </Badge>
-                <ExchangeBadge source={exchange.broker} />
-                <div>
-                  <p className="font-medium text-sm">{exchange.broker}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {exchange.tradeCount} {t('insights.trades')}
-                  </p>
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex-shrink-0">
+                    <ExchangeBadge source={exchange.broker} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm truncate">{exchange.broker}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {exchange.tradeCount} {t('insights.trades')}
+                    </p>
+                  </div>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-right flex-shrink-0">
                 <p className="text-sm font-mono font-bold">
                   {exchange.avgFeePercent.toFixed(3)}%
                 </p>
-                <EfficiencyBadge score={exchange.avgEfficiencyScore} />
+                <div className="flex justify-end">
+                  <EfficiencyBadge score={exchange.avgEfficiencyScore} />
+                </div>
               </div>
             </div>
           </Card>
