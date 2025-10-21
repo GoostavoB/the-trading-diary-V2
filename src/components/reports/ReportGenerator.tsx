@@ -81,7 +81,7 @@ export function ReportGenerator() {
     try {
       // Filter trades by date range
       const filteredTrades = (trades || []).filter((trade) => {
-        const tradeDate = new Date(trade.entry_time);
+        const tradeDate = new Date(trade.created_at);
         const start = startDate ? new Date(startDate) : null;
         const end = endDate ? new Date(endDate) : null;
         

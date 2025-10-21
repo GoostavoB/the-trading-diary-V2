@@ -17,9 +17,9 @@ export function ScheduledReports() {
   const [showAddForm, setShowAddForm] = React.useState(false);
   const [newSchedule, setNewSchedule] = React.useState({
     name: "",
-    frequency: "weekly" as const,
-    reportType: "monthly" as const,
-    format: "pdf" as const,
+    frequency: "weekly",
+    reportType: "monthly",
+    format: "pdf",
     emailEnabled: false,
     emailAddress: "",
   });
@@ -48,11 +48,14 @@ export function ScheduledReports() {
     mutationFn: async () => {
       if (!user) throw new Error('Not authenticated');
       
-      const nextRun = newSchedule.frequency === 'daily' 
-        ? addDays(new Date(), 1)
-        : newSchedule.frequency === 'weekly'
-        ? addWeeks(new Date(), 1)
-        : addMonths(new Date(), 1);
+      let nextRun: Date;
+      if (newSchedule.frequency === 'daily') {
+        nextRun = addDays(new Date(), 1);
+      } else if (newSchedule.frequency === 'weekly') {
+        nextRun = addWeeks(new Date(), 1);
+      } else {
+        nextRun = addMonths(new Date(), 1);
+      }
 
       const { error } = await supabase
         .from('scheduled_reports')

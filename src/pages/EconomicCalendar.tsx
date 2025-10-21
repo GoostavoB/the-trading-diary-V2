@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNotifications } from "@/hooks/useNotifications";
 import { Calendar, TrendingUp, TrendingDown, Clock, Bell, BellOff } from "lucide-react";
 import { formatInTimeZone } from "date-fns-tz";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EconomicEvent {
   CalendarId: string;
@@ -76,26 +77,6 @@ const EconomicCalendar = () => {
         variant: "destructive",
       });
       setEvents([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-      // Filter only future events (after now)
-      const now = new Date();
-      const futureEvents = data.filter((event: EconomicEvent) => {
-        const eventDate = new Date(event.Date);
-        return eventDate > now;
-      });
-      
-      console.log('Future events:', futureEvents.length);
-      setEvents(futureEvents.slice(0, 50)); // Limit to 50 events
-    } catch (error) {
-      console.error("Error fetching economic calendar:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load economic calendar. Please check your API key.",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }
