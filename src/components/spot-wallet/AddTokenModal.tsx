@@ -12,6 +12,7 @@ import { CalendarIcon, ChevronsUpDown, Check, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTokenSearch } from '@/hooks/useTokenSearch';
+import { isValidDecimal, parseDecimalInput } from '@/utils/numberFormatting';
 
 interface AddTokenModalProps {
   open: boolean;
@@ -81,8 +82,8 @@ export const AddTokenModal = ({ open, onClose, onAdd }: AddTokenModalProps) => {
     onAdd({
       token_symbol: tokenSymbol.toUpperCase(),
       token_name: tokenName,
-      quantity: parseFloat(quantity),
-      purchase_price: purchasePrice ? parseFloat(purchasePrice) : undefined,
+      quantity: parseDecimalInput(quantity) || 0,
+      purchase_price: purchasePrice ? parseDecimalInput(purchasePrice) || undefined : undefined,
       purchase_date: purchaseDate?.toISOString(),
       exchange: exchange || undefined,
       notes: notes || undefined,
@@ -201,11 +202,16 @@ export const AddTokenModal = ({ open, onClose, onAdd }: AddTokenModalProps) => {
               <Label htmlFor="quantity">Quantity *</Label>
               <Input
                 id="quantity"
-                type="number"
-                step="any"
+                type="text"
+                inputMode="decimal"
                 placeholder="0.5"
                 value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (isValidDecimal(value)) {
+                    setQuantity(value);
+                  }
+                }}
                 required
               />
             </div>
@@ -214,11 +220,16 @@ export const AddTokenModal = ({ open, onClose, onAdd }: AddTokenModalProps) => {
               <Label htmlFor="price">Purchase Price</Label>
               <Input
                 id="price"
-                type="number"
-                step="any"
+                type="text"
+                inputMode="decimal"
                 placeholder="40000"
                 value={purchasePrice}
-                onChange={(e) => setPurchasePrice(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (isValidDecimal(value)) {
+                    setPurchasePrice(value);
+                  }
+                }}
               />
             </div>
           </div>

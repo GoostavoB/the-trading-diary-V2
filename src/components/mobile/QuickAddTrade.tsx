@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { isValidDecimal, parseDecimalInput } from "@/utils/numberFormatting";
 
 export const QuickAddTrade = () => {
   const [open, setOpen] = useState(false);
@@ -35,10 +36,10 @@ export const QuickAddTrade = () => {
         user_id: user.id,
         symbol_temp: formData.symbol,
         side: formData.side,
-        entry_price: parseFloat(formData.entry_price),
-        exit_price: parseFloat(formData.exit_price),
-        position_size: parseFloat(formData.position_size),
-        profit_loss: parseFloat(formData.profit_loss),
+        entry_price: parseDecimalInput(formData.entry_price),
+        exit_price: parseDecimalInput(formData.exit_price),
+        position_size: parseDecimalInput(formData.position_size),
+        profit_loss: parseDecimalInput(formData.profit_loss),
         trade_date: new Date().toISOString(),
       });
 
@@ -111,10 +112,15 @@ export const QuickAddTrade = () => {
                 <Label htmlFor="entry">Entry Price</Label>
                 <Input
                   id="entry"
-                  type="number"
-                  step="0.01"
+                  type="text"
+                  inputMode="decimal"
                   value={formData.entry_price}
-                  onChange={(e) => setFormData({ ...formData, entry_price: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (isValidDecimal(value)) {
+                      setFormData({ ...formData, entry_price: value });
+                    }
+                  }}
                   required
                 />
               </div>
@@ -122,10 +128,15 @@ export const QuickAddTrade = () => {
                 <Label htmlFor="exit">Exit Price</Label>
                 <Input
                   id="exit"
-                  type="number"
-                  step="0.01"
+                  type="text"
+                  inputMode="decimal"
                   value={formData.exit_price}
-                  onChange={(e) => setFormData({ ...formData, exit_price: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (isValidDecimal(value)) {
+                      setFormData({ ...formData, exit_price: value });
+                    }
+                  }}
                   required
                 />
               </div>
@@ -135,10 +146,15 @@ export const QuickAddTrade = () => {
               <Label htmlFor="size">Position Size</Label>
               <Input
                 id="size"
-                type="number"
-                step="0.001"
+                type="text"
+                inputMode="decimal"
                 value={formData.position_size}
-                onChange={(e) => setFormData({ ...formData, position_size: e.target.value })}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (isValidDecimal(value)) {
+                    setFormData({ ...formData, position_size: value });
+                  }
+                }}
                 required
               />
             </div>
@@ -147,10 +163,15 @@ export const QuickAddTrade = () => {
               <Label htmlFor="pnl">Profit/Loss</Label>
               <Input
                 id="pnl"
-                type="number"
-                step="0.01"
+                type="text"
+                inputMode="decimal"
                 value={formData.profit_loss}
-                onChange={(e) => setFormData({ ...formData, profit_loss: e.target.value })}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (isValidDecimal(value)) {
+                    setFormData({ ...formData, profit_loss: value });
+                  }
+                }}
                 required
               />
             </div>

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Upload as UploadIcon } from 'lucide-react';
+import { isValidDecimal } from '@/utils/numberFormatting';
 
 interface ManualTradeFormProps {
   formData: any;
@@ -64,11 +65,16 @@ export const ManualTradeForm = memo(({
             <Label htmlFor="entry_price">Entry Price *</Label>
             <Input
               id="entry_price"
-              type="number"
-              step="0.00000001"
+              type="text"
+              inputMode="decimal"
               placeholder="Entry price"
               value={formData.entry_price || ''}
-              onChange={(e) => onFormChange('entry_price', parseFloat(e.target.value))}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (isValidDecimal(value)) {
+                  onFormChange('entry_price', value);
+                }
+              }}
             />
           </div>
 
@@ -76,11 +82,16 @@ export const ManualTradeForm = memo(({
             <Label htmlFor="exit_price">Exit Price *</Label>
             <Input
               id="exit_price"
-              type="number"
-              step="0.00000001"
+              type="text"
+              inputMode="decimal"
               placeholder="Exit price"
               value={formData.exit_price || ''}
-              onChange={(e) => onFormChange('exit_price', parseFloat(e.target.value))}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (isValidDecimal(value)) {
+                  onFormChange('exit_price', value);
+                }
+              }}
             />
           </div>
 
@@ -88,11 +99,16 @@ export const ManualTradeForm = memo(({
             <Label htmlFor="position_size">Position Size *</Label>
             <Input
               id="position_size"
-              type="number"
-              step="0.00000001"
+              type="text"
+              inputMode="decimal"
               placeholder="Position size"
               value={formData.position_size || ''}
-              onChange={(e) => onFormChange('position_size', parseFloat(e.target.value))}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (isValidDecimal(value)) {
+                  onFormChange('position_size', value);
+                }
+              }}
             />
           </div>
 
@@ -100,11 +116,16 @@ export const ManualTradeForm = memo(({
             <Label htmlFor="leverage">Leverage</Label>
             <Input
               id="leverage"
-              type="number"
-              step="0.1"
+              type="text"
+              inputMode="decimal"
               placeholder="Leverage (default: 1)"
               value={formData.leverage || 1}
-              onChange={(e) => onFormChange('leverage', parseFloat(e.target.value))}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (isValidDecimal(value)) {
+                  onFormChange('leverage', value);
+                }
+              }}
             />
           </div>
 
@@ -132,11 +153,16 @@ export const ManualTradeForm = memo(({
             <Label htmlFor="funding_fee">Funding Fee</Label>
             <Input
               id="funding_fee"
-              type="number"
-              step="0.01"
+              type="text"
+              inputMode="decimal"
               placeholder="0.00"
               value={formData.funding_fee || ''}
-              onChange={(e) => onFormChange('funding_fee', parseFloat(e.target.value))}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (isValidDecimal(value)) {
+                  onFormChange('funding_fee', value);
+                }
+              }}
             />
           </div>
 
@@ -144,11 +170,16 @@ export const ManualTradeForm = memo(({
             <Label htmlFor="trading_fee">Trading Fee</Label>
             <Input
               id="trading_fee"
-              type="number"
-              step="0.01"
+              type="text"
+              inputMode="decimal"
               placeholder="0.00"
               value={formData.trading_fee || ''}
-              onChange={(e) => onFormChange('trading_fee', parseFloat(e.target.value))}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (isValidDecimal(value)) {
+                  onFormChange('trading_fee', value);
+                }
+              }}
             />
           </div>
         </div>
