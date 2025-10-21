@@ -79,7 +79,11 @@ export const BrokerSelect = ({ value, onChange, required = false }: BrokerSelect
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0 bg-popover" align="start">
+        <PopoverContent 
+          className="p-0 bg-popover" 
+          align="start" 
+          style={{ width: 'var(--radix-popover-trigger-width)', minWidth: '300px' }}
+        >
           <Command className="bg-popover">
             <CommandInput placeholder="Search broker..." className="h-9" />
             <CommandList>

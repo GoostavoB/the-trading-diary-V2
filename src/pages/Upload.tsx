@@ -325,11 +325,20 @@ const Upload = () => {
 
   const handleConfirmExtraction = async () => {
     if (!extractionPreview || extracting) return;
+    
+    // Validate broker is selected
+    if (!preSelectedBroker || preSelectedBroker.trim() === '') {
+      toast.error('Broker is required', {
+        description: 'Please select a broker before extracting trade data'
+      });
+      return;
+    }
+    
     setExtracting(true);
     setUploadStep(1);
     setProcessingMessage(getRandomThinkingPhrase());
     
-    toast.info('🔍 Starting AI extraction...', {
+    toast.info('Starting AI extraction...', {
       description: 'Analyzing your trade screenshot',
       duration: 2000
     });
@@ -767,10 +776,10 @@ const Upload = () => {
                     Upload a screenshot containing your trade information. The AI will automatically extract all trades.
                   </p>
                   
-                  {/* Pre-select broker */}
-                  {!extractionPreview && (
+                  {/* Pre-select broker - Always visible until trades are extracted */}
+                  {extractedTrades.length === 0 && (
                     <div className="mb-4 p-4 border border-border rounded-lg bg-muted/30">
-                      <Label className="text-sm font-medium mb-2 block">Broker (Required)</Label>
+                      <Label className="text-sm font-medium mb-2 block">Broker (Required) *</Label>
                       <p className="text-xs text-muted-foreground mb-3">
                         Select your broker to pre-fill this field in extracted trades
                       </p>
