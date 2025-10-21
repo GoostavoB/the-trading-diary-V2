@@ -25,13 +25,13 @@ export interface BestWorstDay {
 }
 
 export const calculateAvgHoldingTime = (trades: Trade[]): number => {
-  if (trades.length === 0) return 0;
+  if (!trades || trades.length === 0) return 0;
   const totalHours = trades.reduce((sum, t) => sum + (t.duration_hours || 0), 0);
   return totalHours / trades.length;
 };
 
 export const calculateAvgPositionSize = (trades: Trade[]): number => {
-  if (trades.length === 0) return 0;
+  if (!trades || trades.length === 0) return 0;
   const totalSize = trades.reduce((sum, t) => {
     const size = t.position_size || ((t.margin || 0) * (t.leverage || 1));
     return sum + size;
@@ -40,12 +40,14 @@ export const calculateAvgPositionSize = (trades: Trade[]): number => {
 };
 
 export const calculateAvgLeverage = (trades: Trade[]): number => {
-  if (trades.length === 0) return 0;
+  if (!trades || trades.length === 0) return 0;
   const totalLeverage = trades.reduce((sum, t) => sum + (t.leverage || 1), 0);
   return totalLeverage / trades.length;
 };
 
 export const analyzeHourlyPerformance = (trades: Trade[]): TimeBasedPerformance[] => {
+  if (!trades || trades.length === 0) return [];
+  
   const hourlyData: Record<number, { wins: number; losses: number; pnl: number }> = {};
   
   trades.forEach(t => {
@@ -71,6 +73,8 @@ export const analyzeHourlyPerformance = (trades: Trade[]): TimeBasedPerformance[
 };
 
 export const analyzeDayPerformance = (trades: Trade[]): DayPerformance[] => {
+  if (!trades || trades.length === 0) return [];
+  
   const dayData: Record<string, { wins: number; losses: number; pnl: number }> = {};
   
   trades.forEach(t => {
@@ -97,6 +101,8 @@ export const analyzeDayPerformance = (trades: Trade[]): DayPerformance[] => {
 };
 
 export const findBestWorstDays = (trades: Trade[]): { best: BestWorstDay | null; worst: BestWorstDay | null } => {
+  if (!trades || trades.length === 0) return { best: null, worst: null };
+  
   const dailyData: Record<string, { pnl: number; trades: number; wins: number }> = {};
   
   trades.forEach(t => {
@@ -128,6 +134,8 @@ export const findBestWorstDays = (trades: Trade[]): { best: BestWorstDay | null;
 };
 
 export const getTopAssets = (trades: Trade[], limit: number = 3): Array<{ symbol: string; winRate: number; avgPnL: number; trades: number }> => {
+  if (!trades || trades.length === 0) return [];
+  
   const assetData: Record<string, { wins: number; losses: number; totalPnL: number }> = {};
   
   trades.forEach(t => {
@@ -158,6 +166,14 @@ export const getRiskRewardRatio = (avgWin: number, avgLoss: number): number => {
 };
 
 export const calculateFeeImpactMetrics = (trades: Trade[]) => {
+  if (!trades || trades.length === 0) {
+    return {
+      totalFees: 0,
+      feeImpactOnPnL: 0,
+      effectiveFeeRate: 0,
+    };
+  }
+  
   const totalFees = trades.reduce((sum, t) => {
     return sum + (t.trading_fee || 0) + (t.funding_fee || 0);
   }, 0);
