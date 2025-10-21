@@ -218,6 +218,45 @@ export type Database = {
           },
         ]
       }
+      daily_challenges: {
+        Row: {
+          challenge_date: string
+          challenge_type: string
+          completed_at: string | null
+          created_at: string
+          current_progress: number
+          id: string
+          is_completed: boolean
+          target_value: number
+          user_id: string
+          xp_reward: number
+        }
+        Insert: {
+          challenge_date?: string
+          challenge_type: string
+          completed_at?: string | null
+          created_at?: string
+          current_progress?: number
+          id?: string
+          is_completed?: boolean
+          target_value: number
+          user_id: string
+          xp_reward: number
+        }
+        Update: {
+          challenge_date?: string
+          challenge_type?: string
+          completed_at?: string | null
+          created_at?: string
+          current_progress?: number
+          id?: string
+          is_completed?: boolean
+          target_value?: number
+          user_id?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       event_reminders: {
         Row: {
           created_at: string | null
@@ -1232,6 +1271,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_rewards: {
+        Row: {
+          id: string
+          is_seen: boolean
+          reward_id: string
+          reward_type: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_seen?: boolean
+          reward_id: string
+          reward_type: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_seen?: boolean
+          reward_id?: string
+          reward_type?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -1337,6 +1403,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_xp_levels: {
+        Row: {
+          created_at: string
+          current_level: number
+          current_xp: number
+          id: string
+          last_xp_earned_at: string | null
+          level_up_count: number
+          total_xp_earned: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_level?: number
+          current_xp?: number
+          id?: string
+          last_xp_earned_at?: string | null
+          level_up_count?: number
+          total_xp_earned?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_level?: number
+          current_xp?: number
+          id?: string
+          last_xp_earned_at?: string | null
+          level_up_count?: number
+          total_xp_earned?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       wallet_snapshots: {
         Row: {
           created_at: string
@@ -1361,6 +1463,33 @@ export type Database = {
           snapshot_data?: Json
           total_value?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      xp_activity_log: {
+        Row: {
+          activity_type: string
+          created_at: string
+          description: string | null
+          id: string
+          user_id: string
+          xp_earned: number
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          user_id: string
+          xp_earned: number
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          user_id?: string
+          xp_earned?: number
         }
         Relationships: []
       }

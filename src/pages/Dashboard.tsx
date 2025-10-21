@@ -16,6 +16,9 @@ import { CostEfficiencyPanel } from '@/components/insights/CostEfficiencyPanel';
 import { BehaviorAnalytics } from '@/components/insights/BehaviorAnalytics';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { ExportTradesDialog } from '@/components/ExportTradesDialog';
+import { LevelUpModal } from '@/components/gamification/LevelUpModal';
+import { useXPSystem } from '@/hooks/useXPSystem';
+import { useDailyChallenges } from '@/hooks/useDailyChallenges';
 import { TradingStreaks } from '@/components/TradingStreaks';
 import { DateRangeFilter, DateRange } from '@/components/DateRangeFilter';
 import { AccentColorPicker } from '@/components/AccentColorPicker';
@@ -83,6 +86,8 @@ const Dashboard = () => {
   useKeyboardShortcuts();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { xpData, showLevelUp, setShowLevelUp } = useXPSystem();
+  const { updateChallengeProgress } = useDailyChallenges();
   const [stats, setStats] = useState<TradeStats | null>(null);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
