@@ -5,6 +5,7 @@ import { Bot, Send } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAIAssistant } from '@/contexts/AIAssistantContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -16,7 +17,7 @@ export const AIAssistant = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Hi! I\'m your trading analytics assistant. Ask me anything about your performance, metrics, or request custom widgets.',
+      content: 'Hi! I\'m your AI trading coach. Ask me anything about your trading performance, patterns, or strategies!',
     },
   ]);
   const [input, setInput] = useState('');
@@ -43,11 +44,17 @@ export const AIAssistant = () => {
     setIsLoading(true);
 
     try {
+      // Get the user's JWT token from the session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('No active session');
+      }
+
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-dashboard-assistant`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ messages: [...messages, userMessage] }),
       });

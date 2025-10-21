@@ -11,6 +11,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Trash2, Edit } from 'lucide-react';
 import { formatCurrency, formatPercent } from '@/utils/formatNumber';
+import { useThemeMode } from '@/hooks/useThemeMode';
+import { TokenIcon } from '@/components/TokenIcon';
 
 interface TokenListProps {
   tokens: Array<{
@@ -34,6 +36,7 @@ type SortDirection = 'asc' | 'desc';
 export const TokenList = ({ tokens, onDelete, onEdit }: TokenListProps) => {
   const [sortField, setSortField] = useState<SortField>('value');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const { colors } = useThemeMode();
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -56,7 +59,7 @@ export const TokenList = ({ tokens, onDelete, onEdit }: TokenListProps) => {
 
   if (!tokens.length) {
     return (
-      <Card>
+      <Card className="glass-card border-border/50">
         <CardHeader>
           <CardTitle>Token Holdings</CardTitle>
         </CardHeader>
@@ -71,31 +74,31 @@ export const TokenList = ({ tokens, onDelete, onEdit }: TokenListProps) => {
   }
 
   return (
-    <Card>
+    <Card className="glass-card border-border/50">
       <CardHeader>
         <CardTitle>Token Holdings</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
+        <div className="rounded-md border border-border/50 glass-subtle overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="hover:bg-transparent border-border/50">
                 <TableHead>Token</TableHead>
                 <TableHead 
-                  className="cursor-pointer hover:text-foreground"
+                  className="cursor-pointer hover:text-foreground transition-colors"
                   onClick={() => handleSort('value')}
                 >
                   Value {sortField === 'value' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </TableHead>
                 <TableHead 
-                  className="cursor-pointer hover:text-foreground"
+                  className="cursor-pointer hover:text-foreground transition-colors"
                   onClick={() => handleSort('percentage')}
                 >
                   % of Total {sortField === 'percentage' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </TableHead>
                 <TableHead>Quantity</TableHead>
                 <TableHead 
-                  className="cursor-pointer hover:text-foreground"
+                  className="cursor-pointer hover:text-foreground transition-colors"
                   onClick={() => handleSort('priceChange24h')}
                 >
                   24h {sortField === 'priceChange24h' && (sortDirection === 'asc' ? '↑' : '↓')}
@@ -107,16 +110,10 @@ export const TokenList = ({ tokens, onDelete, onEdit }: TokenListProps) => {
             </TableHeader>
             <TableBody>
               {sortedTokens.map((token) => (
-                <TableRow key={token.symbol} className="hover:bg-accent/5">
+                <TableRow key={token.symbol} className="hover:bg-accent/5 border-border/30 transition-colors">
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      {token.icon && (
-                        <img 
-                          src={token.icon} 
-                          alt={token.symbol}
-                          className="w-8 h-8 rounded-full"
-                        />
-                      )}
+                      <TokenIcon symbol={token.symbol} className="w-8 h-8" />
                       <div>
                         <div className="font-semibold">{token.symbol}</div>
                         <div className="text-xs text-muted-foreground">{token.name}</div>
@@ -134,21 +131,21 @@ export const TokenList = ({ tokens, onDelete, onEdit }: TokenListProps) => {
                   </TableCell>
                   <TableCell>
                     {token.priceChange24h !== undefined && (
-                      <span className={token.priceChange24h >= 0 ? 'text-neon-green' : 'text-neon-red'}>
+                      <span style={{ color: token.priceChange24h >= 0 ? colors.positive : colors.negative }}>
                         {formatPercent(token.priceChange24h)}
                       </span>
                     )}
                   </TableCell>
                   <TableCell>
                     {token.priceChange7d !== undefined && (
-                      <span className={token.priceChange7d >= 0 ? 'text-neon-green' : 'text-neon-red'}>
+                      <span style={{ color: token.priceChange7d >= 0 ? colors.positive : colors.negative }}>
                         {formatPercent(token.priceChange7d)}
                       </span>
                     )}
                   </TableCell>
                   <TableCell>
                     {token.priceChange30d !== undefined && (
-                      <span className={token.priceChange30d >= 0 ? 'text-neon-green' : 'text-neon-red'}>
+                      <span style={{ color: token.priceChange30d >= 0 ? colors.positive : colors.negative }}>
                         {formatPercent(token.priceChange30d)}
                       </span>
                     )}
@@ -160,6 +157,7 @@ export const TokenList = ({ tokens, onDelete, onEdit }: TokenListProps) => {
                           variant="ghost"
                           size="icon"
                           onClick={() => onEdit(token.symbol)}
+                          className="hover:bg-accent/20"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -169,6 +167,7 @@ export const TokenList = ({ tokens, onDelete, onEdit }: TokenListProps) => {
                           variant="ghost"
                           size="icon"
                           onClick={() => onDelete(token.symbol)}
+                          className="hover:bg-destructive/20 hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
