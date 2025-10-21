@@ -80,7 +80,10 @@ export const AccentColorPicker = () => {
 
   const applyAccentColor = (color: string, hsl?: string) => {
     const hslValue = hsl || hexToHsl(color);
+    // Apply to accent AND primary tokens so the whole UI respects the choice
     document.documentElement.style.setProperty('--accent', hslValue);
+    document.documentElement.style.setProperty('--primary', hslValue);
+    document.documentElement.style.setProperty('--ring', hslValue);
     document.documentElement.style.setProperty('--chart-1', hslValue);
     localStorage.setItem('theme:accent', color);
   };
