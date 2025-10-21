@@ -16,11 +16,11 @@ export const EfficiencyBadge = memo(({ score }: EfficiencyBadgeProps) => {
   };
   
   const getLabel = (score: number) => {
-    if (score >= 9) return 'Excellent';
-    if (score >= 7) return 'Good';
-    if (score >= 5) return 'Average';
-    if (score >= 3) return 'Poor';
-    return 'Very Poor';
+    if (score >= 9) return 'Super Low';
+    if (score >= 7) return 'Very Low';
+    if (score >= 5) return 'OK/Fair';
+    if (score >= 3) return 'High';
+    return 'Abusive';
   };
   
   return (

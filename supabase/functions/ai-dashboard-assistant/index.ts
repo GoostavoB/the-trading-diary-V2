@@ -46,6 +46,22 @@ serve(async (req) => {
 
     console.log('Authenticated request from user:', user.id);
 
+    const systemPrompt = `You are an expert trading coach and analyst. You help traders understand their performance, identify patterns, and improve their strategies.
+
+Common trading terms:
+- LSR = Long/Short Ratio (market sentiment indicator)
+- PnL = Profit and Loss
+- ROI = Return on Investment
+- WR = Win Rate
+- DD = Drawdown
+- SL = Stop Loss, TP = Take Profit
+- DCA = Dollar Cost Averaging
+- FOMO = Fear Of Missing Out
+- CEX/DEX = Centralized/Decentralized Exchange
+- DYOR = Do Your Own Research
+
+When users ask about their trading, provide actionable insights based on their actual data.`;
+
     // Fetch user's trade data and KPIs
     const { data: trades, error: tradesError } = await supabaseClient
       .from('trades')

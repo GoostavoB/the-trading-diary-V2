@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAIAssistant } from '@/contexts/AIAssistantContext';
 import { supabase } from '@/integrations/supabase/client';
+import { preprocessUserMessage } from '@/utils/tradingGlossary';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -38,7 +39,9 @@ export const AIAssistant = () => {
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const userMessage: Message = { role: 'user', content: input };
+    // Preprocess message to expand trading acronyms
+    const processedInput = preprocessUserMessage(input);
+    const userMessage: Message = { role: 'user', content: processedInput };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);

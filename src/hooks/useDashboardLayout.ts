@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -54,6 +54,8 @@ export function useDashboardLayout() {
   const [loading, setLoading] = useState(true);
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -145,7 +147,7 @@ export function useDashboardLayout() {
   const saveLayout = async () => {
     if (!user) return;
 
-    setLoading(true);
+    setIsSaving(true);
     try {
       const layoutData: DashboardLayout = {
         widgets,
@@ -159,16 +161,28 @@ export function useDashboardLayout() {
 
       if (error) throw error;
 
-      toast.success('Dashboard layout saved!');
+      toast.success('Layout saved ✓', { duration: 2000 });
       setHasChanges(false);
       setIsCustomizing(false);
     } catch (error) {
       console.error('Error saving layout:', error);
       toast.error('Failed to save layout');
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
+
+  // Debounced auto-save function
+  const debouncedSave = useCallback(() => {
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+    
+    setIsSaving(true);
+    autoSaveTimerRef.current = setTimeout(async () => {
+      await saveLayout();
+    }, 2000);
+  }, [widgets, layout, user]);
 
   const resetLayout = async () => {
     if (!user) return;
@@ -209,6 +223,7 @@ export function useDashboardLayout() {
   const updateLayout = (newLayout: LayoutItem[]) => {
     setLayout(newLayout);
     setHasChanges(true);
+    debouncedSave();
   };
 
   const cancelCustomization = () => {
@@ -228,6 +243,7 @@ export function useDashboardLayout() {
     loading,
     isCustomizing,
     hasChanges,
+    isSaving,
     setIsCustomizing,
     toggleWidgetVisibility,
     updateLayout,

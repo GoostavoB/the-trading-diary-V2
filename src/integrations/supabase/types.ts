@@ -1389,10 +1389,13 @@ export type Database = {
           setup: string | null
           side: string | null
           side_temp: string | null
+          slippage_cost: number | null
+          spread_cost: number | null
           symbol: string | null
           symbol_temp: string
           trade_date: string | null
           trade_hash: string | null
+          trade_type: string | null
           trading_fee: number | null
           updated_at: string | null
           user_id: string
@@ -1427,10 +1430,13 @@ export type Database = {
           setup?: string | null
           side?: string | null
           side_temp?: string | null
+          slippage_cost?: number | null
+          spread_cost?: number | null
           symbol?: string | null
           symbol_temp: string
           trade_date?: string | null
           trade_hash?: string | null
+          trade_type?: string | null
           trading_fee?: number | null
           updated_at?: string | null
           user_id: string
@@ -1465,10 +1471,13 @@ export type Database = {
           setup?: string | null
           side?: string | null
           side_temp?: string | null
+          slippage_cost?: number | null
+          spread_cost?: number | null
           symbol?: string | null
           symbol_temp?: string
           trade_date?: string | null
           trade_hash?: string | null
+          trade_type?: string | null
           trading_fee?: number | null
           updated_at?: string | null
           user_id?: string

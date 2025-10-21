@@ -1,22 +1,27 @@
 import { Trade } from '@/types/trade';
 
+// Enhanced trade metrics with detailed fee analysis
 export interface EnhancedTradeMetrics {
   tradeId: string;
   symbol: string;
   broker: string;
-  margin: number;
   leverage: number;
+  margin: number;
   positionSize: number;
   tradingFee: number;
   fundingFee: number;
-  grossPnL: number;
+  slippageCost: number;
+  spreadCost: number;
   totalFees: number;
-  feePercentOfPosition: number;
+  comprehensiveFees: number;
+  grossPnL: number;
   netPnL: number;
-  effectiveReturnOnMargin: number;
   grossReturnPercent: number;
-  feeImpact: number;
-  tradeDate: string | null;
+  feePercentOfPosition: number;
+  feePercentOfMargin: number;
+  effectiveReturnOnMargin: number;
+  tradeType: string;
+  setup?: string | null;
 }
 
 export interface ExchangeFeeStats {
@@ -38,49 +43,83 @@ export interface ExchangeFeeStats {
 export const calculateEnhancedMetrics = (trade: Trade): EnhancedTradeMetrics => {
   const margin = trade.margin || 0;
   const leverage = trade.leverage || 1;
-  const positionSize = trade.position_size || (margin * leverage);
-  const tradingFee = trade.trading_fee || 0;
+  const positionSize = margin * leverage;
+  
+  const tradingFee = Math.abs(trade.trading_fee || 0);
   const fundingFee = trade.funding_fee || 0;
-  const grossPnL = trade.pnl || 0;
+  const slippageCost = Math.abs((trade as any).slippage_cost || 0);
+  const spreadCost = Math.abs((trade as any).spread_cost || 0);
   
-  // Core calculations using user's formulas
-  const totalFees = tradingFee + fundingFee;
-  const feePercentOfPosition = positionSize > 0 ? (totalFees / positionSize) * 100 : 0;
-  const netPnL = grossPnL - totalFees;
+  // Basic fees (exchange + funding)
+  const totalFees = tradingFee + Math.abs(fundingFee);
+  
+  // Comprehensive fees (includes slippage and spread)
+  const comprehensiveFees = totalFees + slippageCost + spreadCost;
+  
+  // Calculate gross PnL (before fees)
+  const grossPnL = (trade.profit_loss || 0) + totalFees;
+  
+  // Net PnL (after fees) - this is what user actually received
+  const netPnL = trade.profit_loss || 0;
+  
+  // Gross return % (based on position size, before fees)
+  const grossReturnPercent = positionSize > 0 ? (grossPnL / positionSize) * 100 : 0;
+  
+  // CRITICAL FIX: Fee as % of MARGIN (not position size)
+  // This is the actual capital at risk, not the leveraged position
+  const feePercentOfMargin = margin > 0 ? (totalFees / margin) * 100 : 0;
+  
+  // Keep legacy metric for volume-based analysis
+  const feePercentOfPosition = positionSize > 0 ? (comprehensiveFees / positionSize) * 100 : 0;
+  
+  // Effective return on margin (net return after fees)
   const effectiveReturnOnMargin = margin > 0 ? (netPnL / margin) * 100 : 0;
-  const grossReturnPercent = margin > 0 ? (grossPnL / margin) * 100 : 0;
-  const feeImpact = grossReturnPercent - effectiveReturnOnMargin;
-  
+
   return {
     tradeId: trade.id,
-    symbol: trade.symbol || trade.symbol_temp || '',
+    symbol: trade.symbol || 'Unknown',
     broker: trade.broker || 'Unknown',
-    margin,
     leverage,
+    margin,
     positionSize,
     tradingFee,
     fundingFee,
-    grossPnL,
+    slippageCost,
+    spreadCost,
     totalFees,
-    feePercentOfPosition,
+    comprehensiveFees,
+    grossPnL,
     netPnL,
-    effectiveReturnOnMargin,
     grossReturnPercent,
-    feeImpact,
-    tradeDate: trade.trade_date,
+    feePercentOfPosition,
+    feePercentOfMargin,
+    effectiveReturnOnMargin,
+    tradeType: (trade as any).trade_type || 'futures',
+    setup: trade.setup,
   };
 };
 
-export const calculateEfficiencyScore = (feePercent: number): number => {
+// UPDATED: Fixed BingX rating issue - more granular scoring
+export const calculateEfficiencyScore = (feePercent: number, tradeType: string = 'futures'): number => {
+  // Super Low: < 0.02% (10/10) - VIP rates
   if (feePercent < 0.02) return 10;
-  if (feePercent < 0.03) return 9;
-  if (feePercent < 0.05) return 8;
-  if (feePercent < 0.07) return 7;
-  if (feePercent < 0.10) return 6;
-  if (feePercent < 0.15) return 5;
-  if (feePercent < 0.20) return 4;
-  if (feePercent < 0.30) return 3;
-  if (feePercent < 0.50) return 2;
+  // Very Low: 0.02-0.05% (9/10) - Maker rates
+  if (feePercent < 0.05) return 9;
+  // Low: 0.05-0.10% (8/10) - Standard maker
+  if (feePercent < 0.10) return 8;
+  // Below Average: 0.10-0.20% (7/10) - Standard taker
+  if (feePercent < 0.20) return 7;
+  // Average: 0.20-0.30% (6/10) - Normal taker
+  if (feePercent < 0.30) return 6;
+  // Above Average: 0.30-0.50% (5/10) - Budget exchanges (BingX should land here)
+  if (feePercent < 0.50) return 5;
+  // High: 0.50-0.75% (4/10) - High-fee venues
+  if (feePercent < 0.75) return 4;
+  // Very High: 0.75-1.0% (3/10) - DEX territory
+  if (feePercent < 1.0) return 3;
+  // Extreme: 1.0-2.0% (2/10) - Very expensive
+  if (feePercent < 2.0) return 2;
+  // Abusive: > 2.0% (1/10) - Avoid at all costs
   return 1;
 };
 
