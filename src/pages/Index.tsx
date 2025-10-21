@@ -12,6 +12,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { Logo } from "@/components/Logo";
 import { useTranslation } from "@/hooks/useTranslation";
+import { HomeMarketBanner } from "@/components/HomeMarketBanner";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-background">
+      <HomeMarketBanner />
       <div className="absolute top-6 left-6 z-50">
         <Logo size="lg" variant="horizontal" showText={true} className="hover:opacity-80 transition-opacity cursor-pointer" />
       </div>

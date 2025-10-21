@@ -7,7 +7,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string, rememberMe?: boolean) => Promise<{ error: any }>;
   signUp: (email: string, password: string, fullName: string, country: string, marketingConsent: boolean) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -49,11 +49,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, rememberMe: boolean = true) => {
+    // Store rememberMe preference
+    if (rememberMe) {
+      localStorage.setItem('rememberMe', 'true');
+    } else {
+      localStorage.setItem('rememberMe', 'false');
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    
     if (!error) {
       navigate('/dashboard');
     }

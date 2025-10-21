@@ -16,6 +16,8 @@ const AVAILABLE_TICKERS = [
   { symbol: 'BNBUSDT', display: 'BNB' },
   { symbol: 'SOLUSDT', display: 'SOL' },
   { symbol: 'XRPUSDT', display: 'XRP' },
+  { symbol: 'SPX', display: 'S&P 500', isIndex: true },
+  { symbol: 'BTC.D', display: 'BTC.D', isIndex: true },
 ];
 
 export function SidebarCryptoWidget() {

@@ -86,7 +86,7 @@ const Auth = () => {
           return;
         }
 
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(email, password, rememberMe);
         if (error) {
           toast.error(error.message || 'Failed to sign in');
         } else {
