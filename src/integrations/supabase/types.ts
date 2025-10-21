@@ -106,6 +106,51 @@ export type Database = {
         }
         Relationships: []
       }
+      alert_history: {
+        Row: {
+          alert_id: string
+          alert_type: string
+          clicked: boolean
+          clicked_at: string | null
+          created_at: string
+          id: string
+          message: string
+          notification_sent_at: string | null
+          notified: boolean
+          threshold_value: number
+          triggered_value: number
+          user_id: string
+        }
+        Insert: {
+          alert_id: string
+          alert_type: string
+          clicked?: boolean
+          clicked_at?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          notification_sent_at?: string | null
+          notified?: boolean
+          threshold_value: number
+          triggered_value: number
+          user_id: string
+        }
+        Update: {
+          alert_id?: string
+          alert_type?: string
+          clicked?: boolean
+          clicked_at?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          notification_sent_at?: string | null
+          notified?: boolean
+          threshold_value?: number
+          triggered_value?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       badge_tiers: {
         Row: {
           badge_id: string
@@ -828,6 +873,48 @@ export type Database = {
         }
         Relationships: []
       }
+      performance_alerts: {
+        Row: {
+          alert_name: string
+          alert_type: string
+          comparison_operator: string
+          cooldown_minutes: number
+          created_at: string
+          id: string
+          is_enabled: boolean
+          last_triggered_at: string | null
+          threshold_value: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_name: string
+          alert_type: string
+          comparison_operator: string
+          cooldown_minutes?: number
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          last_triggered_at?: string | null
+          threshold_value: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_name?: string
+          alert_type?: string
+          comparison_operator?: string
+          cooldown_minutes?: number
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          last_triggered_at?: string | null
+          threshold_value?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       post_comments: {
         Row: {
           content: string
@@ -1439,6 +1526,7 @@ export type Database = {
       }
       trades: {
         Row: {
+          account_id: string | null
           broker: string | null
           closed_at: string | null
           created_at: string | null
@@ -1480,6 +1568,7 @@ export type Database = {
           xp_awarded: boolean
         }
         Insert: {
+          account_id?: string | null
           broker?: string | null
           closed_at?: string | null
           created_at?: string | null
@@ -1521,6 +1610,7 @@ export type Database = {
           xp_awarded?: boolean
         }
         Update: {
+          account_id?: string | null
           broker?: string | null
           closed_at?: string | null
           created_at?: string | null
@@ -1560,6 +1650,62 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           xp_awarded?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trades_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "trading_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trading_accounts: {
+        Row: {
+          account_name: string
+          account_number: string | null
+          account_type: string
+          broker: string
+          created_at: string
+          currency: string
+          current_balance: number
+          id: string
+          initial_balance: number
+          is_active: boolean
+          notes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_name: string
+          account_number?: string | null
+          account_type?: string
+          broker: string
+          created_at?: string
+          currency?: string
+          current_balance?: number
+          id?: string
+          initial_balance?: number
+          is_active?: boolean
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string | null
+          account_type?: string
+          broker?: string
+          created_at?: string
+          currency?: string
+          current_balance?: number
+          id?: string
+          initial_balance?: number
+          is_active?: boolean
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
