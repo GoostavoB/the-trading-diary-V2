@@ -39,16 +39,6 @@ export const PRESET_THEMES: ColorMode[] = [
   },
 ];
 
-export const getThemeEmoji = (themeId: string): string => {
-  const emojiMap: Record<string, string> = {
-    ocean: '🌊',
-    purple: '💜',
-    classic: '📈',
-    midnight: '🌃',
-  };
-  return emojiMap[themeId] || '🎨';
-};
-
 export const getThemeColors = (theme: ColorMode) => {
   return [
     `hsl(${theme.primary})`,

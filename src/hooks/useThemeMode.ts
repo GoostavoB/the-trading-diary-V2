@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useSeasonalThemes } from './useSeasonalThemes';
+import { ALL_ADVANCED_THEMES } from '@/utils/advancedThemePresets';
 
 export type ThemeMode = 'default' | 'classic' | string;
 
@@ -36,6 +38,7 @@ const PRESET_MODES: ColorMode[] = [
 export function useThemeMode() {
   const [currentMode, setCurrentMode] = useState<string>('default');
   const [customModes, setCustomModes] = useState<ColorMode[]>([]);
+  const { activeSeasonalTheme } = useSeasonalThemes();
 
   useEffect(() => {
     loadColorModes();
@@ -69,23 +72,39 @@ export function useThemeMode() {
 
   const applyMode = (modeId: string, customModesList?: ColorMode[]) => {
     const customList = customModesList || customModes;
-    const allModes = [...PRESET_MODES, ...customList];
+    let allModes = [...PRESET_MODES, ...ALL_ADVANCED_THEMES, ...customList];
+    
+    // Add seasonal theme if active
+    if (activeSeasonalTheme) {
+      allModes = [...allModes, activeSeasonalTheme];
+    }
+    
     const mode = allModes.find(m => m.id === modeId);
 
     if (mode) {
       setCurrentMode(modeId);
-      document.documentElement.style.setProperty('--primary', mode.primary);
-      document.documentElement.style.setProperty('--secondary', mode.secondary);
-      document.documentElement.style.setProperty('--accent', mode.accent);
-      document.documentElement.style.setProperty('--profit', mode.profit);
-      document.documentElement.style.setProperty('--loss', mode.loss);
-      document.documentElement.style.setProperty('--chart-1', mode.accent);
-      document.documentElement.style.setProperty('--chart-2', mode.primary);
-      document.documentElement.style.setProperty('--chart-3', mode.secondary);
+      
+      // Apply with smooth transition
+      const root = document.documentElement;
+      root.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+      
+      root.style.setProperty('--primary', mode.primary);
+      root.style.setProperty('--secondary', mode.secondary);
+      root.style.setProperty('--accent', mode.accent);
+      root.style.setProperty('--profit', mode.profit);
+      root.style.setProperty('--loss', mode.loss);
+      root.style.setProperty('--chart-1', mode.accent);
+      root.style.setProperty('--chart-2', mode.primary);
+      root.style.setProperty('--chart-3', mode.secondary);
       
       // Update neon colors to match profit/loss
-      document.documentElement.style.setProperty('--neon-green', mode.profit);
-      document.documentElement.style.setProperty('--neon-red', mode.loss);
+      root.style.setProperty('--neon-green', mode.profit);
+      root.style.setProperty('--neon-red', mode.loss);
+      
+      // Remove transition after animation
+      setTimeout(() => {
+        root.style.transition = '';
+      }, 500);
     }
   };
 

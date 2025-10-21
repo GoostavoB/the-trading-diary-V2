@@ -1,7 +1,6 @@
 import { ColorMode } from '@/hooks/useThemeMode';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getThemeEmoji } from '@/utils/themePresets';
 
 interface ThemePreviewCardProps {
   theme: ColorMode;
@@ -40,8 +39,7 @@ export const ThemePreviewCard = ({ theme, isActive, onHover, onClick }: ThemePre
       </div>
 
       {/* Theme Name */}
-      <div className="text-center space-y-0.5">
-        <div className="text-lg">{getThemeEmoji(theme.id)}</div>
+      <div className="text-center">
         <p className="text-xs font-medium">{theme.name}</p>
       </div>
 

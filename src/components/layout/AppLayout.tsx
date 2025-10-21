@@ -7,6 +7,7 @@ import { useSidebarState } from '@/hooks/useSidebarState';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { KeyboardShortcutsHelp } from '@/components/KeyboardShortcutsHelp';
 import { ThemeStudio } from '@/components/theme-studio/ThemeStudio';
+import { ThemeUnlockNotification } from '@/components/theme-studio/ThemeUnlockNotification';
 import { MobileNav } from '@/components/mobile/MobileNav';
 import { QuickAddTrade } from '@/components/mobile/QuickAddTrade';
 import { InstallPrompt } from '@/components/mobile/InstallPrompt';
@@ -41,6 +42,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <SidebarProvider defaultOpen={!isCollapsed} onOpenChange={setIsCollapsed}>
+      <ThemeUnlockNotification />
       <div className="min-h-screen flex w-full mobile-safe overflow-hidden">
         <AppSidebar />
         <div className="flex-1 flex flex-col mobile-safe overflow-hidden h-screen">
