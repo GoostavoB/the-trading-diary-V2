@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Settings2, Save, X, RotateCcw, Eye, EyeOff, LayoutDashboard } from 'lucide-react';
+import { Settings2, Save, X, RotateCcw, Eye, EyeOff, LayoutDashboard, Columns } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WidgetConfig } from '@/hooks/useDashboardLayout';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface CustomizeDashboardControlsProps {
   isCustomizing: boolean;
@@ -14,6 +15,9 @@ interface CustomizeDashboardControlsProps {
   onReset: () => void;
   widgets?: WidgetConfig[];
   onToggleWidget?: (widgetId: string) => void;
+  columnCount?: number;
+  onColumnCountChange?: (count: number) => void;
+  widgetCount?: number;
 }
 
 const widgetLabels: Record<string, string> = {
@@ -39,8 +43,11 @@ export function CustomizeDashboardControls({
   onReset,
   widgets = [],
   onToggleWidget,
+  columnCount = 3,
+  onColumnCountChange,
+  widgetCount = 0,
 }: CustomizeDashboardControlsProps) {
-  const visibleCount = widgets.filter(w => w.visible).length;
+  const visibleCount = widgetCount || widgets.filter(w => w.visible).length;
   const hiddenCount = widgets.filter(w => !w.visible).length;
 
   return (
@@ -51,6 +58,7 @@ export function CustomizeDashboardControls({
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
+          className="flex items-center gap-2 flex-wrap"
         >
           <Button
             onClick={onStartCustomize}
@@ -60,6 +68,28 @@ export function CustomizeDashboardControls({
             <LayoutDashboard className="w-4 h-4" />
             Customize Dashboard
           </Button>
+          
+          {/* Column Count Selector */}
+          {onColumnCountChange && (
+            <div className="flex items-center gap-2">
+              <Columns className="w-4 h-4 text-muted-foreground" />
+              <Select
+                value={columnCount.toString()}
+                onValueChange={(value) => onColumnCountChange(parseInt(value, 10))}
+              >
+                <SelectTrigger className="w-[120px] glass">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2">2 Columns</SelectItem>
+                  <SelectItem value="3">3 Columns</SelectItem>
+                  <SelectItem value="4">4 Columns</SelectItem>
+                  <SelectItem value="5">5 Columns</SelectItem>
+                  <SelectItem value="6">6 Columns</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </motion.div>
       ) : (
         <motion.div

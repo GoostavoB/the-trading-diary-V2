@@ -1,7 +1,5 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { memo, useEffect, useRef, useState } from 'react';
 
 interface SortableWidgetProps {
@@ -58,29 +56,9 @@ export const SortableWidget = memo(({ id, children, isEditMode, onRemove }: Sort
       ref={(el) => { setNodeRef(el); nodeRef.current = el; }}
       style={style}
       data-sortable-id={id}
-      className={`widget-item relative ${isEditMode ? '' : ''} ${isDragging ? 'dragging ring-2 ring-primary/60 shadow-2xl shadow-primary/40 rounded-lg' : ''}`}
+      className={`widget-item relative ${isEditMode ? 'cursor-grab active:cursor-grabbing' : ''} ${isDragging ? 'dragging ring-2 ring-primary/60 shadow-2xl shadow-primary/40 rounded-lg' : ''}`}
+      {...(isEditMode ? { ...attributes, ...listeners } : {})}
     >
-      {isEditMode && (
-        <div className="absolute top-2 right-2 z-10 flex items-center gap-1 select-none pointer-events-auto">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="drag-handle h-8 w-8 cursor-grab active:cursor-grabbing bg-background/95 backdrop-blur-sm hover:bg-primary/10 hover:scale-105 transition-all duration-150"
-            {...attributes}
-            {...listeners}
-          >
-            <GripVertical className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onRemove}
-            className="h-8 w-8 bg-background/95 backdrop-blur-sm hover:bg-destructive hover:text-destructive-foreground hover:scale-105 transition-all duration-150"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
       {/* Wrap children in measurable content div for masonry */}
       <div className="widget-content">
         <div className={isDragging ? 'pointer-events-none' : ''}>

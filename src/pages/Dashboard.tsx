@@ -725,6 +725,9 @@ const Dashboard = () => {
             onSave={handleSaveLayout}
             onCancel={handleCancelCustomize}
             onReset={resetLayout}
+            columnCount={selectedColumnCount}
+            onColumnCountChange={setSelectedColumnCount}
+            widgetCount={positions.length}
           />
         )}
 
