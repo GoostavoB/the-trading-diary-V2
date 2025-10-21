@@ -1694,6 +1694,60 @@ export type Database = {
           },
         ]
       }
+      trading_plans: {
+        Row: {
+          created_at: string
+          description: string | null
+          entry_rules: string | null
+          exit_rules: string | null
+          id: string
+          is_active: boolean | null
+          markets: string[] | null
+          name: string
+          position_sizing: string | null
+          review_process: string | null
+          risk_management: string | null
+          timeframes: string[] | null
+          trading_schedule: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          entry_rules?: string | null
+          exit_rules?: string | null
+          id?: string
+          is_active?: boolean | null
+          markets?: string[] | null
+          name: string
+          position_sizing?: string | null
+          review_process?: string | null
+          risk_management?: string | null
+          timeframes?: string[] | null
+          trading_schedule?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          entry_rules?: string | null
+          exit_rules?: string | null
+          id?: string
+          is_active?: boolean | null
+          markets?: string[] | null
+          name?: string
+          position_sizing?: string | null
+          review_process?: string | null
+          risk_management?: string | null
+          timeframes?: string[] | null
+          trading_schedule?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       unlocked_badges: {
         Row: {
           badge_id: string

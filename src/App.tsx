@@ -39,6 +39,7 @@ const Goals = lazy(() => import("./pages/Goals"));
 const RiskManagement = lazy(() => import("./pages/RiskManagement"));
 const Reports = lazy(() => import("./pages/Reports"));
 const Psychology = lazy(() => import("./pages/Psychology"));
+const TradingPlan = lazy(() => import("./pages/TradingPlan"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const CustomPage = lazy(() => import("./pages/CustomPage"));
 const ExchangeConnections = lazy(() => import("./pages/ExchangeConnections"));
@@ -107,6 +108,7 @@ const App = () => (
                       <Route path="/risk-management" element={<ProtectedRoute><RiskManagement /></ProtectedRoute>} />
                       <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
                       <Route path="/psychology" element={<ProtectedRoute><Psychology /></ProtectedRoute>} />
+                      <Route path="/trading-plan" element={<ProtectedRoute><TradingPlan /></ProtectedRoute>} />
                       <Route path="/exchanges" element={<ProtectedRoute><ExchangeConnections /></ProtectedRoute>} />
                       <Route path="/spot-wallet" element={<ProtectedRoute><SpotWallet /></ProtectedRoute>} />
                       <Route path="/fee-analysis" element={<ProtectedRoute><FeeAnalysis /></ProtectedRoute>} />
