@@ -159,7 +159,7 @@ const LongShortRatio = () => {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="combined" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 glass max-w-full">
+        <TabsList className="grid w-full grid-cols-3 glass bg-primary/5 max-w-full">
           <TabsTrigger value="combined">Combined LSR</TabsTrigger>
           <TabsTrigger value="binance">Binance LSR</TabsTrigger>
           <TabsTrigger value="bybit">Bybit LSR</TabsTrigger>
