@@ -38,6 +38,7 @@ export function AppSidebar() {
     { title: t('navigation.marketData'), url: '/market-data', icon: LineChart },
     { title: t('navigation.forecast'), url: '/forecast', icon: Target },
     { title: t('navigation.aiTools'), url: '/ai-tools', icon: Brain },
+    { title: 'My Metrics', url: '/custom/my-metrics', icon: Sparkles },
     { title: t('navigation.achievements'), url: '/achievements', icon: Trophy },
     { title: t('common.settings'), url: '/settings', icon: Settings2 },
   ];

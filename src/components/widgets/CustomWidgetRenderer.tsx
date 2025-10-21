@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { Trash2, TrendingUp, TrendingDown } from 'lucide-react';
+import { Trash2, TrendingUp, TrendingDown, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { formatNumber, formatPercent } from '@/utils/formatNumber';
@@ -20,11 +20,13 @@ interface CustomWidget {
 interface CustomWidgetRendererProps {
   widget: CustomWidget;
   onDelete?: () => void;
+  showAddToDashboard?: boolean;
 }
 
-export const CustomWidgetRenderer = ({ widget, onDelete }: CustomWidgetRendererProps) => {
+export const CustomWidgetRenderer = ({ widget, onDelete, showAddToDashboard = false }: CustomWidgetRendererProps) => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [addingToDashboard, setAddingToDashboard] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -121,6 +123,48 @@ export const CustomWidgetRenderer = ({ widget, onDelete }: CustomWidgetRendererP
         description: 'Failed to delete widget',
         variant: 'destructive',
       });
+    }
+  };
+
+  const handleAddToDashboard = async () => {
+    try {
+      setAddingToDashboard(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: settings } = await supabase
+        .from('user_settings')
+        .select('layout_json')
+        .eq('user_id', user.id)
+        .single();
+
+      const currentPositions = (settings?.layout_json as any[]) || [];
+      const newPosition = {
+        id: `custom-${widget.id}`,
+        column: 0,
+        row: currentPositions.length > 0 ? Math.max(...currentPositions.map((p: any) => p.row)) + 1 : 0,
+      };
+
+      await supabase
+        .from('user_settings')
+        .update({
+          layout_json: [...currentPositions, newPosition] as any,
+        })
+        .eq('user_id', user.id);
+
+      toast({
+        title: 'Added to Dashboard',
+        description: `"${widget.title}" has been added to your dashboard`,
+      });
+    } catch (error) {
+      console.error('Error adding to dashboard:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to add widget to dashboard',
+        variant: 'destructive',
+      });
+    } finally {
+      setAddingToDashboard(false);
     }
   };
 
@@ -233,14 +277,27 @@ export const CustomWidgetRenderer = ({ widget, onDelete }: CustomWidgetRendererP
         <div>
           <h3 className="text-lg font-semibold">{widget.title}</h3>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleDelete}
-          className="opacity-0 group-hover:opacity-100 transition-opacity"
-        >
-          <Trash2 className="h-4 w-4 text-destructive" />
-        </Button>
+        <div className="flex gap-2">
+          {showAddToDashboard && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleAddToDashboard}
+              disabled={addingToDashboard}
+              className="opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <Plus className="h-4 w-4 text-primary" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleDelete}
+            className="opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
+        </div>
       </div>
 
       {widget.widget_type === 'metric' && renderMetricWidget()}

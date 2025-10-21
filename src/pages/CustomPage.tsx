@@ -61,6 +61,7 @@ const CustomPage = () => {
                 key={widget.id}
                 widget={widget}
                 onDelete={refreshWidgets}
+                showAddToDashboard={true}
               />
             ))}
           </div>

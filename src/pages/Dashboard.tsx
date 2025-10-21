@@ -32,6 +32,7 @@ import type { Trade } from '@/types/trade';
 import { WIDGET_CATALOG } from '@/config/widgetCatalog';
 import { WidgetLibrary } from '@/components/widgets/WidgetLibrary';
 import { SortableWidget } from '@/components/widgets/SortableWidget';
+import { CustomWidgetRenderer } from '@/components/widgets/CustomWidgetRenderer';
 import { toast } from 'sonner';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useGridLayout, WidgetPosition } from '@/hooks/useGridLayout';
@@ -92,6 +93,7 @@ const Dashboard = () => {
   const [filteredTrades, setFilteredTrades] = useState<Trade[]>([]);
   const [activeTab, setActiveTab] = useState<string>('overview');
   const tabsContainerRef = useRef<HTMLDivElement>(null);
+  const [customWidgets, setCustomWidgets] = useState<any[]>([]);
   
   // Memoize processed trades to prevent unnecessary recalculations
   const processedTrades = useMemo(() => 
@@ -208,12 +210,28 @@ const Dashboard = () => {
     }
   };
 
+  const fetchCustomWidgets = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('custom_dashboard_widgets')
+      .select('*')
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Error fetching custom widgets:', error);
+    } else {
+      setCustomWidgets(data || []);
+    }
+  };
+
 
   useEffect(() => {
     if (user) {
       fetchStats();
       fetchInitialInvestment();
       fetchCapitalLog();
+      fetchCustomWidgets();
     }
     
     // Set up realtime subscription for trades and capital changes
@@ -494,6 +512,32 @@ const Dashboard = () => {
 
   // Dynamic widget renderer
   const renderWidget = useCallback((widgetId: string) => {
+    // Check if it's a custom widget
+    if (widgetId.startsWith('custom-')) {
+      const customWidgetId = widgetId.replace('custom-', '');
+      const customWidget = customWidgets.find(w => w.id === customWidgetId);
+      
+      if (!customWidget) return null;
+
+      return (
+        <SortableWidget
+          key={widgetId}
+          id={widgetId}
+          isEditMode={isCustomizing}
+          onRemove={() => removeWidget(widgetId)}
+        >
+          <CustomWidgetRenderer 
+            widget={customWidget}
+            onDelete={() => {
+              removeWidget(widgetId);
+              fetchCustomWidgets();
+            }}
+          />
+        </SortableWidget>
+      );
+    }
+
+    // Built-in widgets
     const widgetConfig = WIDGET_CATALOG[widgetId];
     if (!widgetConfig) return null;
 
@@ -608,7 +652,7 @@ const Dashboard = () => {
         <WidgetComponent {...widgetProps} />
       </SortableWidget>
     );
-  }, [isCustomizing, removeWidget, stats, processedTrades, initialInvestment, spotWalletTotal, holdings, portfolioChartData]);
+  }, [isCustomizing, removeWidget, stats, processedTrades, initialInvestment, spotWalletTotal, holdings, portfolioChartData, customWidgets, fetchCustomWidgets]);
 
   return (
     <AppLayout>
