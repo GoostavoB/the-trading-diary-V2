@@ -14,6 +14,7 @@ import { Card } from "@/components/ui/card";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { InstallPrompt } from "@/components/mobile/InstallPrompt";
+import { ThemeInitializer } from "@/components/ThemeInitializer";
 
 // Eagerly load critical pages (landing and auth)
 import Index from "./pages/Index";
@@ -85,6 +86,7 @@ const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true} storageKey="app-theme">
+        <ThemeInitializer />
         <TooltipProvider>
           <Toaster />
           <Sonner />

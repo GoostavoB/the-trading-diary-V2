@@ -21,34 +21,25 @@ export function useThemeMode() {
   const { activeSeasonalTheme } = useSeasonalThemes();
 
   useEffect(() => {
-    loadColorModes();
-  }, []);
-
-  const loadColorModes = () => {
+    // Load theme synchronously on mount
     const savedMode = localStorage.getItem('theme:mode');
     const savedCustomModes = localStorage.getItem('theme:custom-modes');
 
+    let parsedModes: ColorMode[] = [];
     if (savedCustomModes) {
       try {
-        const parsedModes = JSON.parse(savedCustomModes);
+        parsedModes = JSON.parse(savedCustomModes);
         setCustomModes(parsedModes);
-        
-        if (savedMode) {
-          applyMode(savedMode, parsedModes);
-        } else {
-          applyMode('ocean', parsedModes);
-        }
       } catch (e) {
         console.error('Failed to parse custom modes', e);
-        applyMode('ocean', []);
       }
-    } else if (savedMode) {
-      setCurrentMode(savedMode);
-      applyMode(savedMode, []);
-    } else {
-      applyMode('ocean', []);
     }
-  };
+    
+    // Apply the saved theme immediately
+    const modeToApply = savedMode || 'ocean';
+    setCurrentMode(modeToApply);
+    applyMode(modeToApply, parsedModes);
+  }, []); // Empty deps - runs once on mount
 
   const applyMode = (modeId: string, customModesList?: ColorMode[]) => {
     const customList = customModesList || customModes;
@@ -64,27 +55,38 @@ export function useThemeMode() {
     if (mode) {
       setCurrentMode(modeId);
       
-      // Apply with smooth transition
-      const root = document.documentElement;
-      root.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-      
-      root.style.setProperty('--primary', mode.primary);
-      root.style.setProperty('--secondary', mode.secondary);
-      root.style.setProperty('--accent', mode.accent);
-      root.style.setProperty('--profit', mode.profit);
-      root.style.setProperty('--loss', mode.loss);
-      root.style.setProperty('--chart-1', mode.accent);
-      root.style.setProperty('--chart-2', mode.primary);
-      root.style.setProperty('--chart-3', mode.secondary);
-      
-      // Update neon colors to match profit/loss
-      root.style.setProperty('--neon-green', mode.profit);
-      root.style.setProperty('--neon-red', mode.loss);
-      
-      // Remove transition after animation
-      setTimeout(() => {
-        root.style.transition = '';
-      }, 500);
+      // Use requestAnimationFrame for reliable DOM updates
+      requestAnimationFrame(() => {
+        const root = document.documentElement;
+        
+        // Only add transition if we're doing a manual theme switch (not initial load)
+        const isManualSwitch = root.style.getPropertyValue('--primary') !== '';
+        if (isManualSwitch) {
+          root.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        }
+        
+        root.style.setProperty('--primary', mode.primary);
+        root.style.setProperty('--secondary', mode.secondary);
+        root.style.setProperty('--accent', mode.accent);
+        root.style.setProperty('--profit', mode.profit);
+        root.style.setProperty('--loss', mode.loss);
+        root.style.setProperty('--chart-1', mode.accent);
+        root.style.setProperty('--chart-2', mode.primary);
+        root.style.setProperty('--chart-3', mode.secondary);
+        
+        // Update neon colors to match profit/loss
+        root.style.setProperty('--neon-green', mode.profit);
+        root.style.setProperty('--neon-red', mode.loss);
+        
+        // Remove transition after animation
+        if (isManualSwitch) {
+          setTimeout(() => {
+            root.style.transition = '';
+          }, 500);
+        }
+      });
+    } else {
+      console.warn('⚠️ Theme mode not found:', modeId);
     }
   };
 
