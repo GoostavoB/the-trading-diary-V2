@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSeasonalThemes } from './useSeasonalThemes';
 import { ALL_ADVANCED_THEMES } from '@/utils/advancedThemePresets';
+import { PRESET_THEMES } from '@/utils/themePresets';
 
 export type ThemeMode = 'default' | 'classic' | string;
 
@@ -14,29 +15,8 @@ export interface ColorMode {
   loss: string;
 }
 
-const PRESET_MODES: ColorMode[] = [
-  {
-    id: 'default',
-    name: 'Blue vs Gray (Default)',
-    primary: '210 90% 58%',
-    secondary: '215 16% 47%',
-    accent: '251 100% 77%',
-    profit: '210 90% 58%',
-    loss: '215 16% 47%',
-  },
-  {
-    id: 'classic',
-    name: 'Classic P&L (Green vs Red)',
-    primary: '142 76% 58%',
-    secondary: '0 91% 61%',
-    accent: '251 100% 77%',
-    profit: '142 76% 58%',
-    loss: '0 91% 61%',
-  },
-];
-
 export function useThemeMode() {
-  const [currentMode, setCurrentMode] = useState<string>('default');
+  const [currentMode, setCurrentMode] = useState<string>('ocean');
   const [customModes, setCustomModes] = useState<ColorMode[]>([]);
   const { activeSeasonalTheme } = useSeasonalThemes();
 
@@ -56,23 +36,23 @@ export function useThemeMode() {
         if (savedMode) {
           applyMode(savedMode, parsedModes);
         } else {
-          applyMode('default', parsedModes);
+          applyMode('ocean', parsedModes);
         }
       } catch (e) {
         console.error('Failed to parse custom modes', e);
-        applyMode('default', []);
+        applyMode('ocean', []);
       }
     } else if (savedMode) {
       setCurrentMode(savedMode);
       applyMode(savedMode, []);
     } else {
-      applyMode('default', []);
+      applyMode('ocean', []);
     }
   };
 
   const applyMode = (modeId: string, customModesList?: ColorMode[]) => {
     const customList = customModesList || customModes;
-    let allModes = [...PRESET_MODES, ...ALL_ADVANCED_THEMES, ...customList];
+    let allModes = [...PRESET_THEMES, ...ALL_ADVANCED_THEMES, ...customList];
     
     // Add seasonal theme if active
     if (activeSeasonalTheme) {
@@ -136,7 +116,7 @@ export function useThemeMode() {
     localStorage.setItem('theme:custom-modes', JSON.stringify(updatedModes));
 
     if (currentMode === modeId) {
-      setThemeMode('default');
+      setThemeMode('ocean');
     }
   };
 
@@ -155,12 +135,12 @@ export function useThemeMode() {
   return {
     themeMode: currentMode,
     setThemeMode,
-    presetModes: PRESET_MODES,
+    presetModes: PRESET_THEMES,
     customModes,
     addCustomMode,
     deleteCustomMode,
     updateCustomMode,
-    allModes: [...PRESET_MODES, ...customModes],
+    allModes: [...PRESET_THEMES, ...customModes],
     isClassic: currentMode === 'classic',
     colors: {
       positive: 'hsl(var(--profit))',
