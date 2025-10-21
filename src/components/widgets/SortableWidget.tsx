@@ -39,6 +39,7 @@ export const SortableWidget = memo(({ id, children, isEditMode, onRemove }: Sort
     <div
       ref={setNodeRef}
       style={style}
+      data-sortable-id={id}
       className={`widget-item relative ${isDragging ? 'dragging' : ''}`}
     >
       {isEditMode && (

@@ -135,6 +135,7 @@ const Dashboard = () => {
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [showWidgetLibrary, setShowWidgetLibrary] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [overlaySize, setOverlaySize] = useState<{ width: number; height: number } | null>(null);
 
   // Drag and drop sensors with optimized settings for smooth dragging
   const sensors = useSensors(
@@ -347,9 +348,19 @@ const Dashboard = () => {
     }, 100);
   }, [widgetOrder, saveLayout]);
 
-  // Handle drag end
+  // Handle drag start/end
   const handleDragStart = useCallback((event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
+    const id = event.active.id as string;
+    setActiveId(id);
+
+    // Measure original element to size the overlay identically
+    const el = document.querySelector(`[data-sortable-id="${id}"]`) as HTMLElement | null;
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      setOverlaySize({ width: rect.width, height: rect.height });
+    } else {
+      setOverlaySize(null);
+    }
   }, []);
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
@@ -363,10 +374,12 @@ const Dashboard = () => {
     }
     
     setActiveId(null);
+    setOverlaySize(null);
   }, [widgetOrder, updateLayout]);
 
   const handleDragCancel = useCallback(() => {
     setActiveId(null);
+    setOverlaySize(null);
   }, []);
   const handleCancelCustomize = useCallback(() => {
     setIsCustomizing(false);
@@ -662,12 +675,12 @@ const Dashboard = () => {
                     {activeId ? (
                       (() => {
                         const config = WIDGET_CATALOG[activeId];
+                        const style = overlaySize ? { width: overlaySize.width, height: overlaySize.height } : undefined;
                         return (
-                          <div className="pointer-events-none select-none rounded-lg bg-card/90 border border-border p-4 w-[360px] h-[160px] flex items-center justify-center shadow-2xl shadow-primary/40 ring-2 ring-primary/60">
-                            <div className="text-sm font-semibold truncate max-w-[300px]">
-                              {config?.title || activeId}
-                            </div>
-                          </div>
+                          <div
+                            className="pointer-events-none select-none rounded-lg bg-card/90 border border-border shadow-2xl shadow-primary/40 ring-2 ring-primary/60"
+                            style={style}
+                          />
                         );
                       })()
                     ) : null}
