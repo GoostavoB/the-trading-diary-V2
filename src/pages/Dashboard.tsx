@@ -33,7 +33,7 @@ import { WidgetLibrary } from '@/components/widgets/WidgetLibrary';
 import { SortableWidget } from '@/components/widgets/SortableWidget';
 import { toast } from 'sonner';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useMasonryGrid } from '@/hooks/useMasonryGrid';
+import { DropZone } from '@/components/widgets/DropZone';
 
 // Lazy load heavy components
 const TradeHistory = lazy(() => import('@/components/TradeHistory').then(m => ({ default: m.TradeHistory })));
@@ -138,11 +138,40 @@ const Dashboard = () => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overlaySize, setOverlaySize] = useState<{ width: number; height: number } | null>(null);
 
-  // Masonry grid for compact layout with fine-grained vertical control
+  // Columns-based layout for free vertical stacking
   const gridRef = useRef<HTMLDivElement>(null);
-  const { reflow } = useMasonryGrid(gridRef, { rowHeight: 4, gap: 16 });
+  const [columnCount, setColumnCount] = useState(1);
+  const [columns, setColumns] = useState<string[][]>([]);
 
-  // Drag and drop sensors with optimized settings for smooth dragging
+  const minColWidth = 350;
+
+  const distribute = useCallback((order: string[], cols: number) => {
+    const res: string[][] = Array.from({ length: Math.max(cols, 1) }, () => []);
+    order.forEach((id, idx) => {
+      res[idx % Math.max(cols, 1)].push(id);
+    });
+    return res;
+  }, []);
+
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      const width = el.clientWidth;
+      const cols = Math.max(1, Math.floor(width / minColWidth));
+      setColumnCount(cols);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
+    setColumns(prev => {
+      if (!prev.length) return distribute(widgetOrder, columnCount);
+      const flat = prev.flat();
+      return distribute(flat, columnCount);
+    });
+  }, [widgetOrder, columnCount, distribute]);
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -358,7 +387,6 @@ const Dashboard = () => {
     const id = event.active.id as string;
     setActiveId(id);
 
-    // Measure original element to size the overlay identically
     const el = document.querySelector(`[data-sortable-id="${id}"]`) as HTMLElement | null;
     if (el) {
       const rect = el.getBoundingClientRect();
@@ -366,35 +394,53 @@ const Dashboard = () => {
     } else {
       setOverlaySize(null);
     }
-
-    // Reflow masonry after DOM settles
-    requestAnimationFrame(() => reflow());
-  }, [reflow]);
+  }, []);
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
+    if (!over) return;
 
-    if (over && active.id !== over.id) {
-      const oldIndex = widgetOrder.indexOf(active.id as string);
-      const newIndex = widgetOrder.indexOf(over.id as string);
-      const newOrder = arrayMove(widgetOrder, oldIndex, newIndex);
-      updateLayout(newOrder);
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    const findCol = (id: string) => columns.findIndex(col => col.includes(id));
+
+    const fromCol = findCol(activeId);
+    let toCol = -1;
+    let toIndex = -1;
+
+    if (overId.startsWith('col-drop-')) {
+      toCol = parseInt(overId.replace('col-drop-', ''), 10);
+      toIndex = columns[toCol]?.length ?? 0;
+    } else {
+      toCol = findCol(overId);
+      toIndex = columns[toCol]?.indexOf(overId) ?? 0;
     }
-    
+
+    if (fromCol === -1 || toCol === -1) return;
+
+    setColumns(prev => {
+      const next = prev.map(col => [...col]);
+      const fromIndex = next[fromCol].indexOf(activeId);
+      if (fromIndex === -1) return prev;
+      next[fromCol].splice(fromIndex, 1);
+      if (fromCol === toCol && fromIndex < toIndex) {
+        toIndex = Math.max(0, toIndex - 1);
+      }
+      next[toCol].splice(toIndex, 0, activeId);
+      const newOrder = next.flat();
+      updateLayout(newOrder);
+      return next;
+    });
+
     setActiveId(null);
     setOverlaySize(null);
-
-    // Reflow masonry after drag completes
-    requestAnimationFrame(() => reflow());
-  }, [widgetOrder, updateLayout, reflow]);
+  }, [columns, updateLayout]);
 
   const handleDragCancel = useCallback(() => {
     setActiveId(null);
     setOverlaySize(null);
-
-    // Reflow masonry after drag cancel
-    requestAnimationFrame(() => reflow());
-  }, [reflow]);
+  }, []);
   const handleCancelCustomize = useCallback(() => {
     setIsCustomizing(false);
   }, []);
@@ -662,7 +708,6 @@ const Dashboard = () => {
                 <TabsTrigger value="history" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('trades.tradeHistory')}</TabsTrigger>
               </TabsList>
 
-              {/* Overview Tab - Main Dashboard Grid */}
               <TabsContent value="overview" className="space-y-6">
                 <DndContext
                   sensors={sensors}
@@ -671,21 +716,20 @@ const Dashboard = () => {
                   onDragEnd={handleDragEnd}
                   onDragCancel={handleDragCancel}
                   measuring={{
-                    droppable: {
-                      strategy: MeasuringStrategy.Always,
-                    },
+                    droppable: { strategy: MeasuringStrategy.Always },
                   }}
                 >
-                  <SortableContext
-                    items={widgetOrder}
-                    strategy={rectSortingStrategy}
-                  >
-                    <div ref={gridRef} className="dashboard-grid">
-                      {widgetOrder.map(renderWidget)}
-                    </div>
-                  </SortableContext>
-                  
-                  {/* DragOverlay removed to keep dragging anchored to the original item */}
+                  <div ref={gridRef} className="dashboard-grid">
+                    {columns.map((col, i) => (
+                      <div key={`col-${i}`} className="dashboard-column">
+                        <SortableContext items={col} strategy={rectSortingStrategy}>
+                          {col.map(renderWidget)}
+                        </SortableContext>
+                        {/* Column end dropzone to allow dropping into empty areas */}
+                        <DropZone id={`col-drop-${i}`} />
+                      </div>
+                    ))}
+                  </div>
                 </DndContext>
               </TabsContent>
 
