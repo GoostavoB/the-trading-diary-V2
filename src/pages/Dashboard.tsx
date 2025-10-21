@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
 import { Plus } from 'lucide-react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragStartEvent, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy } from '@dnd-kit/sortable';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { InsightsQuickSummary } from '@/components/insights/InsightsQuickSummary';
@@ -134,10 +134,15 @@ const Dashboard = () => {
 
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [showWidgetLibrary, setShowWidgetLibrary] = useState(false);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
-  // Drag and drop sensors
+  // Drag and drop sensors with optimized settings for smooth dragging
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px movement before dragging starts
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -343,6 +348,10 @@ const Dashboard = () => {
   }, [widgetOrder, saveLayout]);
 
   // Handle drag end
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  }, []);
+
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
 
@@ -352,7 +361,13 @@ const Dashboard = () => {
       const newOrder = arrayMove(widgetOrder, oldIndex, newIndex);
       updateLayout(newOrder);
     }
+    
+    setActiveId(null);
   }, [widgetOrder, updateLayout]);
+
+  const handleDragCancel = useCallback(() => {
+    setActiveId(null);
+  }, []);
   const handleCancelCustomize = useCallback(() => {
     setIsCustomizing(false);
   }, []);
@@ -625,7 +640,9 @@ const Dashboard = () => {
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
                   onDragEnd={handleDragEnd}
+                  onDragCancel={handleDragCancel}
                 >
                   <SortableContext
                     items={widgetOrder}
@@ -635,6 +652,19 @@ const Dashboard = () => {
                       {widgetOrder.map(renderWidget)}
                     </div>
                   </SortableContext>
+                  
+                  <DragOverlay
+                    dropAnimation={{
+                      duration: 200,
+                      easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                    }}
+                  >
+                    {activeId ? (
+                      <div className="opacity-80 scale-105 shadow-2xl shadow-primary/40 ring-2 ring-primary/60 rounded-lg">
+                        {renderWidget(activeId)}
+                      </div>
+                    ) : null}
+                  </DragOverlay>
                 </DndContext>
               </TabsContent>
 
