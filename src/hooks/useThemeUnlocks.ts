@@ -23,7 +23,7 @@ const THEME_CATALOG: Omit<UnlockableTheme, 'isUnlocked'>[] = [
     id: 'default',
     name: 'Default Theme',
     description: 'Clean and professional',
-    previewColors: { primary: '#8B5CF6', secondary: '#06B6D4', accent: '#F59E0B' },
+    previewColors: { primary: '#3B82F6', secondary: '#6B7280', accent: '#3B82F6' },
     unlockRequirement: { type: 'level', value: 1 }
   },
   {

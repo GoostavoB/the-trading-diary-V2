@@ -2,13 +2,13 @@ import { ColorMode } from '@/hooks/useThemeMode';
 
 export const PRESET_THEMES: ColorMode[] = [
   {
-    id: 'ocean',
-    name: 'Ocean Breeze',
-    primary: '189 94% 43%', // Cyan
-    secondary: '217 91% 60%', // Blue
-    accent: '189 94% 43%',
-    profit: '189 94% 43%',
-    loss: '217 91% 60%',
+    id: 'default',
+    name: 'Default Theme',
+    primary: '210 90% 58%', // Blue
+    secondary: '215 16% 47%', // Gray
+    accent: '210 90% 58%',
+    profit: '210 90% 58%',
+    loss: '215 16% 47%',
   },
   {
     id: 'purple',
