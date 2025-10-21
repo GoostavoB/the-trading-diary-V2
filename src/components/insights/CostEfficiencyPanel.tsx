@@ -17,6 +17,8 @@ interface CostEfficiencyPanelProps {
 }
 
 export const CostEfficiencyPanel = memo(({ trades }: CostEfficiencyPanelProps) => {
+  if (!trades || trades.length === 0) return null;
+  
   const { t } = useTranslation();
   const exchangeStats = aggregateExchangeStats(trades);
   const topExchanges = exchangeStats.slice(0, 3);

@@ -455,6 +455,32 @@ const Dashboard = () => {
       case 'recentTransactions':
         widgetProps.trades = processedTrades;
         break;
+      case 'behaviorAnalytics':
+        widgetProps.trades = processedTrades;
+        break;
+      case 'costEfficiency':
+        widgetProps.trades = processedTrades;
+        break;
+      case 'performanceHighlights':
+        widgetProps.trades = processedTrades;
+        widgetProps.bestTrade = dashboardStats.bestTrade;
+        widgetProps.worstTrade = dashboardStats.worstTrade;
+        widgetProps.currentStreak = currentStreak;
+        break;
+      case 'tradingQuality':
+        const minPnl = processedTrades.length > 0 
+          ? Math.min(...processedTrades.map(t => t.pnl || 0)) 
+          : 0;
+        widgetProps.avgWin = dashboardStats.avgWin;
+        widgetProps.avgLoss = dashboardStats.avgLoss;
+        widgetProps.winCount = dashboardStats.winningTrades.length;
+        widgetProps.lossCount = dashboardStats.losingTrades.length;
+        widgetProps.maxDrawdownAmount = Math.min(0, minPnl);
+        widgetProps.maxDrawdownPercent = initialInvestment > 0 
+          ? Math.abs((minPnl / initialInvestment) * 100) 
+          : 0;
+        widgetProps.profitFactor = dashboardStats.profitFactor;
+        break;
       case 'quickActions':
         // No additional props needed
         break;

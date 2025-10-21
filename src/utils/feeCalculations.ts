@@ -85,6 +85,8 @@ export const calculateEfficiencyScore = (feePercent: number): number => {
 };
 
 export const aggregateExchangeStats = (trades: Trade[]): ExchangeFeeStats[] => {
+  if (!trades || trades.length === 0) return [];
+  
   const grouped = trades.reduce((acc, trade) => {
     const broker = trade.broker || 'Unknown';
     const metrics = calculateEnhancedMetrics(trade);
@@ -127,12 +129,14 @@ export const aggregateExchangeStats = (trades: Trade[]): ExchangeFeeStats[] => {
       totalTradingFees: data.totalTradingFees,
       totalFundingFees: data.totalFundingFees,
       totalFees,
-      avgFeePerTrade: totalFees / data.trades.length,
+      avgFeePerTrade: data.trades.length > 0 ? totalFees / data.trades.length : 0,
       avgFeePercent,
       totalGrossPnL: data.totalGrossPnL,
       totalNetPnL,
       feeImpactOnPnL,
-      avgEfficiencyScore: data.efficiencyScores.reduce((a: number, b: number) => a + b, 0) / data.efficiencyScores.length,
+      avgEfficiencyScore: data.efficiencyScores.length > 0 
+        ? data.efficiencyScores.reduce((a: number, b: number) => a + b, 0) / data.efficiencyScores.length 
+        : 0,
       rank: 0,
     };
   });
