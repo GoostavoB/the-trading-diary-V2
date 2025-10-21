@@ -61,12 +61,18 @@ const Forecast = () => {
 
     const { data: trades } = await supabase
       .from('trades')
-      .select('pnl, trade_date')
+      .select('pnl, trade_date, trading_fee, funding_fee')
       .eq('user_id', user.id)
       .is('deleted_at', null);
 
     if (trades && trades.length > 0) {
-      const totalPnl = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+      // Calculate P&L after fees
+      const totalPnl = trades.reduce((sum, t) => {
+        const pnl = t.pnl || 0;
+        const tradingFee = t.trading_fee || 0;
+        const fundingFee = t.funding_fee || 0;
+        return sum + (pnl - tradingFee - fundingFee);
+      }, 0);
       const uniqueDays = new Set(trades.map(t => new Date(t.trade_date).toDateString())).size;
       setAvgDailyPnl(totalPnl / (uniqueDays || 1));
     } else {

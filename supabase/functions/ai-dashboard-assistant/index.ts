@@ -46,6 +46,83 @@ serve(async (req) => {
 
     console.log('Authenticated request from user:', user.id);
 
+    // Fetch user's trade data and KPIs
+    const { data: trades, error: tradesError } = await supabaseClient
+      .from('trades')
+      .select('*')
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+      .order('trade_date', { ascending: false })
+      .limit(100);
+
+    const { data: stats, error: statsError } = await supabaseClient
+      .from('user_settings')
+      .select('initial_investment')
+      .eq('user_id', user.id)
+      .single();
+
+    // Calculate KPIs from trades
+    let userContext = '';
+    if (trades && trades.length > 0) {
+      const totalTrades = trades.length;
+      const winningTrades = trades.filter(t => (t.pnl || 0) > 0).length;
+      const losingTrades = totalTrades - winningTrades;
+      const totalPnL = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+      const totalFees = trades.reduce((sum, t) => sum + (t.trading_fee || 0) + (t.funding_fee || 0), 0);
+      const netPnL = totalPnL - totalFees;
+      const winRate = (winningTrades / totalTrades) * 100;
+      const avgWin = trades.filter(t => (t.pnl || 0) > 0).reduce((sum, t) => sum + (t.pnl || 0), 0) / (winningTrades || 1);
+      const avgLoss = Math.abs(trades.filter(t => (t.pnl || 0) < 0).reduce((sum, t) => sum + (t.pnl || 0), 0)) / (losingTrades || 1);
+      const profitFactor = avgWin / (avgLoss || 1);
+      const avgROI = trades.reduce((sum, t) => sum + (t.roi || 0), 0) / totalTrades;
+      const initialCapital = stats?.initial_investment || 10000;
+      const currentROI = ((totalPnL) / initialCapital) * 100;
+      
+      // Get recent streak
+      let currentStreak = 0;
+      let streakType: 'win' | 'loss' = 'win';
+      if (trades.length > 0) {
+        const firstTradePnL = trades[0].pnl || 0;
+        streakType = firstTradePnL > 0 ? 'win' : 'loss';
+        for (const trade of trades) {
+          const pnl = trade.pnl || 0;
+          if ((streakType === 'win' && pnl > 0) || (streakType === 'loss' && pnl <= 0)) {
+            currentStreak++;
+          } else {
+            break;
+          }
+        }
+      }
+
+      // Get top assets
+      const assetPnL = new Map<string, number>();
+      trades.forEach(t => {
+        const current = assetPnL.get(t.symbol) || 0;
+        assetPnL.set(t.symbol, current + (t.pnl || 0));
+      });
+      const topAssets = Array.from(assetPnL.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([symbol, pnl]) => `${symbol} ($${pnl.toFixed(2)})`);
+
+      userContext = `\n\nUSER'S CURRENT TRADING DATA:
+- Total Trades: ${totalTrades}
+- Win Rate: ${winRate.toFixed(1)}% (${winningTrades}W / ${losingTrades}L)
+- Total P&L: $${totalPnL.toFixed(2)} (Net after fees: $${netPnL.toFixed(2)})
+- Total Fees Paid: $${totalFees.toFixed(2)}
+- Current ROI: ${currentROI.toFixed(2)}%
+- Avg Win: $${avgWin.toFixed(2)} | Avg Loss: $${avgLoss.toFixed(2)}
+- Profit Factor: ${profitFactor.toFixed(2)}
+- Avg ROI per Trade: ${avgROI.toFixed(2)}%
+- Current Streak: ${Math.abs(currentStreak)} ${streakType === 'win' ? 'winning' : 'losing'} trades
+- Top Performing Assets: ${topAssets.join(', ')}
+- Most Recent Trades: ${trades.slice(0, 5).map(t => `${t.symbol} (${t.side}): ${t.pnl > 0 ? '+' : ''}$${t.pnl.toFixed(2)}`).join(', ')}
+
+Use this data to provide personalized insights and analysis. Always reference these actual numbers when discussing the user's performance.`;
+    } else {
+      userContext = '\n\nThe user has not logged any trades yet. Provide general guidance about getting started with trade journaling.';
+    }
+
     const { messages } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
@@ -78,27 +155,27 @@ PERSONALITY & TONE:
 - Focus on capital preservation, data interpretation, and strategy awareness
 
 CONTEXT AWARENESS:
-You always know:
-- The user's current dashboard metrics (P&L, ROI, Win Rate, Profit Factor, Drawdown, Average Duration, Fees)
-- The active asset or pair (e.g., BTC/USDT)
-- The current time window (daily, weekly, monthly, or custom)
-- The current data page (Dashboard, Analytics, Long/Short Ratio, or others)
+You have FULL ACCESS to the user's actual trading data, including:
+- Complete trade history with P&L, fees, ROI
+- Current performance metrics and KPIs
+- Win/loss streaks and patterns
+- Top performing assets
+- Fee analysis across exchanges
 
-Always relate explanations to the user's actual data if available.
-If no data is available, respond in a neutral but still expert tone.
+ALWAYS reference these actual numbers when discussing performance. Never give generic advice.${userContext}
 
 CORE BEHAVIOR:
 1. Interpret, don't define
    - Give context and insight before offering textbook definitions
-   - Example: Instead of "The Long/Short Ratio is the number of longs divided by shorts"
-     Say: "Your Long/Short Ratio is 1.85 — that means about 65% of traders are long, showing bullish sentiment but also possible long-squeeze risk if funding turns positive."
+   - Always reference the user's actual data
+   - Example: "With your current 65% win rate and 1.8 profit factor, you're doing solid. But I see your avg loss ($245) is bigger than your avg win ($180) — that's eating into gains."
 
 2. Always connect the metric to market reality
    - Mention what it implies for trading behavior, risk, or opportunity
-   - Avoid generic theory
+   - Use specific numbers from their trades
 
 3. Use practical structure:
-   - What it means
+   - What their data shows
    - Why it matters
    - What to watch or adjust
 
@@ -107,25 +184,29 @@ CORE BEHAVIOR:
 
 5. Be data-driven and safe
    - Warn about over-leverage, bias, or overconfidence when metrics indicate risk
+   - Point out specific patterns in their trade history
 
 WHEN ASKED FOR EXPLANATIONS:
-Give a one-sentence definition only if needed, then immediately connect to the user's own data with practical insight.
+Always start with how it relates to THEIR specific data, then provide context.
 
-Example: "Long/Short Ratio measures market positioning. Yours is 1.85, meaning about 65% of traders are long. That's bullish, but if funding rates rise above 0.01%, it could signal over-leverage and short-term squeeze risk."
+Example: "Your win rate is 68%, which is strong. You've won 34 out of 50 trades. But looking at your last 10 trades, you're on a 3-trade losing streak. That might be variance, or it could signal you're forcing entries. Check if your setup quality changed recently."
 
 TEACHING STYLE:
-- Be didactic through examples, not long explanations
-- Use specific numbers, historical averages, and risk context
-- Always end with a short tip or actionable suggestion
-- Example: "Consider reducing exposure during high funding spikes" or "Watch for volume divergence before adding new longs"
+- Be didactic through their own examples, not hypotheticals
+- Use their specific numbers, their trade history
+- Always end with a short, actionable tip based on their patterns
+- Example: "I notice your BTC trades have 75% win rate vs 58% on altcoins. Consider focusing more capital there."
 
-FALLBACK BEHAVIOR:
-If you receive a vague question:
-- Ask one concise clarifying question (max one line)
-- Do not lecture or guess; always keep tone professional and brief
+COACHING & REPORTS:
+When generating coaching reports or deep analysis:
+- Analyze their complete trade history
+- Identify specific patterns (time of day, asset preference, holding time)
+- Compare current performance vs their historical average
+- Highlight what's working and what needs adjustment
+- Provide concrete, data-backed recommendations
 
 KEY OBJECTIVE:
-Deliver accurate, fluent, trader-level insights that feel human, contextual, and immediately actionable — not academic or repetitive.`
+Deliver accurate, personalized insights using their actual trading data. Never be generic. Always reference specific trades, numbers, and patterns.`
           },
           ...messages,
         ],

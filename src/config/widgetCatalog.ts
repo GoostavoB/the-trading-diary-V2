@@ -29,6 +29,10 @@ import { AvgPnLPerDayWidget } from '@/components/widgets/AvgPnLPerDayWidget';
 import { CurrentROIWidget } from '@/components/widgets/CurrentROIWidget';
 import { AvgROIPerTradeWidget } from '@/components/widgets/AvgROIPerTradeWidget';
 import { CapitalGrowthWidget } from '@/components/widgets/CapitalGrowthWidget';
+import { BehaviorAnalytics } from '@/components/insights/BehaviorAnalytics';
+import { CostEfficiencyPanel } from '@/components/insights/CostEfficiencyPanel';
+import { PerformanceHighlights } from '@/components/insights/PerformanceHighlights';
+import { TradingQualityMetrics } from '@/components/insights/TradingQualityMetrics';
 
 /**
  * Widget Catalog - Registry of all available dashboard widgets
@@ -187,6 +191,50 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     component: CapitalGrowthWidget,
     requiresData: ['stats', 'trades'],
   },
+
+  behaviorAnalytics: {
+    id: 'behaviorAnalytics',
+    title: 'Behavior Analytics',
+    description: 'Analyze your trading patterns and behaviors',
+    category: 'insights',
+    icon: Activity,
+    defaultSize: 'large',
+    component: BehaviorAnalytics as any,
+    requiresData: ['trades'],
+  },
+
+  costEfficiency: {
+    id: 'costEfficiency',
+    title: 'Cost Efficiency',
+    description: 'Track fees and exchange cost analysis',
+    category: 'insights',
+    icon: DollarSign,
+    defaultSize: 'medium',
+    component: CostEfficiencyPanel as any,
+    requiresData: ['trades'],
+  },
+
+  performanceHighlights: {
+    id: 'performanceHighlights',
+    title: 'Performance Highlights',
+    description: 'Best/worst trades and current streaks',
+    category: 'insights',
+    icon: Trophy,
+    defaultSize: 'medium',
+    component: PerformanceHighlights as any,
+    requiresData: ['trades'],
+  },
+
+  tradingQuality: {
+    id: 'tradingQuality',
+    title: 'Trading Quality Metrics',
+    description: 'Win/loss analysis and profit factor',
+    category: 'insights',
+    icon: BarChart3,
+    defaultSize: 'medium',
+    component: TradingQualityMetrics as any,
+    requiresData: ['stats'],
+  },
 };
 
 /**
@@ -225,5 +273,6 @@ export const WIDGET_CATEGORIES = [
   { id: 'portfolio', label: 'Portfolio', description: 'Holdings and allocation' },
   { id: 'market', label: 'Market Data', description: 'Price movements and market info' },
   { id: 'performance', label: 'Performance', description: 'ROI, P&L, and analytics' },
+  { id: 'insights', label: 'Insights', description: 'Advanced trading analytics' },
   { id: 'ai', label: 'AI & Insights', description: 'AI-powered recommendations' },
 ];

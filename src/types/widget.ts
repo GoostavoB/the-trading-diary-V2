@@ -41,6 +41,7 @@ export type WidgetCategory =
   | 'market'
   | 'portfolio'
   | 'performance'
+  | 'insights'
   | 'ai'
   | 'overview';
 
