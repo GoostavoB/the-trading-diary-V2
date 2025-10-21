@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { TopMoversCard } from '@/components/TopMoversCard';
+import { WidgetWrapper } from './WidgetWrapper';
 import { WidgetProps } from '@/types/widget';
 import { Trade } from '@/types/trade';
 
@@ -14,9 +15,14 @@ export const TopMoversWidget = memo(({
   trades,
 }: TopMoversWidgetProps) => {
   return (
-    <div className="h-full">
-      <TopMoversCard trades={trades} />
-    </div>
+    <WidgetWrapper
+      id={id}
+      isEditMode={isEditMode}
+      onRemove={onRemove}
+      className="h-full p-0"
+    >
+      <TopMoversCard trades={trades} className="border-0 bg-transparent" />
+    </WidgetWrapper>
   );
 });
 
