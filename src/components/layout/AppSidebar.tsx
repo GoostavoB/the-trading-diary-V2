@@ -34,6 +34,7 @@ export function AppSidebar() {
     { title: 'Trade Analysis', url: '/trade-analysis', icon: GitCompare },
     { title: 'Risk Management', url: '/risk-management', icon: Shield },
     { title: 'Reports', url: '/reports', icon: FileBarChart },
+    { title: 'Psychology', url: '/psychology', icon: Brain },
     { title: t('navigation.marketData'), url: '/market-data', icon: LineChart },
     { title: t('navigation.forecast'), url: '/forecast', icon: Target },
     { title: t('navigation.aiTools'), url: '/ai-tools', icon: Brain },

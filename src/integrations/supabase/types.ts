@@ -985,6 +985,39 @@ export type Database = {
         }
         Relationships: []
       }
+      psychology_logs: {
+        Row: {
+          conditions: string[] | null
+          created_at: string
+          emotional_state: string
+          id: string
+          intensity: number
+          logged_at: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          conditions?: string[] | null
+          created_at?: string
+          emotional_state: string
+          id?: string
+          intensity: number
+          logged_at?: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          conditions?: string[] | null
+          created_at?: string
+          emotional_state?: string
+          id?: string
+          intensity?: number
+          logged_at?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       reactions_log: {
         Row: {
           created_at: string
