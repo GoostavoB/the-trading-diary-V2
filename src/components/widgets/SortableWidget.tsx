@@ -2,7 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { memo } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 
 interface SortableWidgetProps {
   id: string;
@@ -27,23 +27,41 @@ export const SortableWidget = memo(({ id, children, isEditMode, onRemove }: Sort
     },
   });
 
+  const nodeRef = useRef<HTMLDivElement | null>(null);
+  const [lockedSize, setLockedSize] = useState<{ width: number; height: number } | null>(null);
+
+  useEffect(() => {
+    if (isDragging && nodeRef.current) {
+      const rect = nodeRef.current.getBoundingClientRect();
+      setLockedSize({ width: rect.width, height: rect.height });
+    } else if (!isDragging) {
+      setLockedSize(null);
+    }
+  }, [isDragging]);
+
+  const transformStr = transform
+    ? `translate3d(${Math.round(transform.x)}px, ${Math.round(transform.y)}px, 0)`
+    : undefined;
+
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: transformStr,
     transition: isDragging ? 'transform 0s linear' : (transition || undefined),
     opacity: 1,
     touchAction: 'none',
     zIndex: isDragging ? 1000 : 'auto',
-  };
+    width: isDragging && lockedSize ? `${lockedSize.width}px` : undefined,
+    height: isDragging && lockedSize ? `${lockedSize.height}px` : undefined,
+  } as React.CSSProperties;
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(el) => { setNodeRef(el); nodeRef.current = el; }}
       style={style}
       data-sortable-id={id}
-      className={`widget-item relative ${isDragging ? 'dragging ring-2 ring-primary/60 shadow-2xl shadow-primary/40 rounded-lg' : ''}`}
+      className={`widget-item relative ${isEditMode ? '' : ''} ${isDragging ? 'dragging ring-2 ring-primary/60 shadow-2xl shadow-primary/40 rounded-lg' : ''}`}
     >
       {isEditMode && (
-        <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
+        <div className="absolute top-2 right-2 z-10 flex items-center gap-1 select-none pointer-events-auto">
           <Button
             variant="ghost"
             size="icon"
@@ -63,7 +81,9 @@ export const SortableWidget = memo(({ id, children, isEditMode, onRemove }: Sort
           </Button>
         </div>
       )}
-      {children}
+      <div className={isDragging ? 'pointer-events-none' : ''}>
+        {children}
+      </div>
     </div>
   );
 });
