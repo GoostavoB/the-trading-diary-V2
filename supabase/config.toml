@@ -2,3 +2,16 @@ project_id = "qziawervfvptoretkjrn"
 
 [functions.ai-dashboard-assistant]
 verify_jwt = true
+
+# Gamification CRON Jobs
+[functions.calculate-leaderboard]
+verify_jwt = false
+schedule = "0 0 * * *"  # Daily at midnight UTC
+
+[functions.update-challenges]
+verify_jwt = false
+schedule = "0 0 * * *"  # Daily at midnight UTC
+
+[functions.check-user-activity]
+verify_jwt = false
+schedule = "0 */6 * * *"  # Every 6 hours

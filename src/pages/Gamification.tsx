@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { XPProgressBar } from '@/components/gamification/XPProgressBar';
 import { DailyChallengesPanel } from '@/components/gamification/DailyChallengesPanel';
 import { LevelUpModal } from '@/components/gamification/LevelUpModal';
+import { BadgeProgressionPanel } from '@/components/gamification/BadgeProgressionPanel';
 import { useXPSystem } from '@/hooks/useXPSystem';
 import { useDailyChallenges } from '@/hooks/useDailyChallenges';
 import { Trophy, Zap, Target, TrendingUp, Award, Star } from 'lucide-react';
@@ -140,11 +141,11 @@ const Gamification = () => {
           </div>
         </Card>
 
-        {/* Tabs for Challenges, Leaderboard, Rewards */}
+        {/* Tabs for Challenges, Badges, XP History */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Daily Challenges</TabsTrigger>
-            <TabsTrigger value="rewards">Rewards</TabsTrigger>
+            <TabsTrigger value="badges">Badge Progress</TabsTrigger>
             <TabsTrigger value="history">XP History</TabsTrigger>
           </TabsList>
 
@@ -152,16 +153,8 @@ const Gamification = () => {
             <DailyChallengesPanel challenges={challenges} />
           </TabsContent>
 
-          <TabsContent value="rewards" className="space-y-4">
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Unlockable Rewards</h3>
-              <p className="text-muted-foreground text-sm">
-                Complete challenges and level up to unlock exclusive features and rewards.
-              </p>
-              <div className="mt-6 text-center">
-                <p className="text-sm text-muted-foreground">Coming Soon...</p>
-              </div>
-            </Card>
+          <TabsContent value="badges" className="space-y-4">
+            <BadgeProgressionPanel />
           </TabsContent>
 
           <TabsContent value="history" className="space-y-4">
