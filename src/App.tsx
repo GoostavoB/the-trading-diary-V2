@@ -11,6 +11,8 @@ import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { lazy, Suspense } from "react";
 import { Card } from "@/components/ui/card";
+import { GlobalSearch } from "@/components/GlobalSearch";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
 
 // Eagerly load critical pages (landing and auth)
 import Index from "./pages/Index";
@@ -104,6 +106,8 @@ const App = () => (
                     </Routes>
                   </Suspense>
                   <PerformanceMonitor />
+                  <GlobalSearch />
+                  <OfflineIndicator />
                 </AIAssistantProvider>
               </CalmModeProvider>
             </AuthProvider>

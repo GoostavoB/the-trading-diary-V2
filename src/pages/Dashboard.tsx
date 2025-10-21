@@ -43,6 +43,8 @@ import { toast } from 'sonner';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useGridLayout, WidgetPosition } from '@/hooks/useGridLayout';
 import { DropZone } from '@/components/widgets/DropZone';
+import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
+import { useOnboarding } from '@/hooks/useOnboarding';
 
 // Lazy load heavy components
 const TradeHistory = lazy(() => import('@/components/TradeHistory').then(m => ({ default: m.TradeHistory })));
@@ -100,6 +102,9 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<string>('overview');
   const tabsContainerRef = useRef<HTMLDivElement>(null);
   const [customWidgets, setCustomWidgets] = useState<any[]>([]);
+  
+  // Onboarding flow
+  const { showOnboarding, loading: onboardingLoading, completeOnboarding } = useOnboarding();
   
   // Memoize processed trades to prevent unnecessary recalculations
   const processedTrades = useMemo(() => 
@@ -731,6 +736,11 @@ const Dashboard = () => {
 
   return (
     <AppLayout>
+      {/* Onboarding Flow - shows for new users */}
+      {showOnboarding && !onboardingLoading && (
+        <OnboardingFlow onComplete={completeOnboarding} />
+      )}
+      
       <FloatingXP />
       <MicroFeedbackOverlay />
       <WeeklySummaryRecap />

@@ -1880,6 +1880,7 @@ export type Database = {
           initial_investment: number | null
           layout_json: Json | null
           monthly_report: boolean | null
+          onboarding_completed: boolean | null
           performance_alerts: boolean | null
           sidebar_style: string | null
           theme: string | null
@@ -1898,6 +1899,7 @@ export type Database = {
           initial_investment?: number | null
           layout_json?: Json | null
           monthly_report?: boolean | null
+          onboarding_completed?: boolean | null
           performance_alerts?: boolean | null
           sidebar_style?: string | null
           theme?: string | null
@@ -1916,6 +1918,7 @@ export type Database = {
           initial_investment?: number | null
           layout_json?: Json | null
           monthly_report?: boolean | null
+          onboarding_completed?: boolean | null
           performance_alerts?: boolean | null
           sidebar_style?: string | null
           theme?: string | null
