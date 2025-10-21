@@ -1,7 +1,5 @@
-import { BarChart3, Upload, TrendingUp, TrendingDown, Target, Users, Brain, Trophy, Settings2, BookOpen, HelpCircle, LineChart, LogOut, Circle, Star, PieChart, Activity, Zap, Sparkles, DollarSign, RefreshCw, Wallet, Receipt } from 'lucide-react';
+import { BarChart3, Upload, TrendingUp, Target, Brain, Trophy, Settings2, BookOpen, HelpCircle, LineChart, LogOut, Zap, Sparkles, RefreshCw, Wallet, Receipt } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import * as LucideIcons from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import {
   Sidebar,
@@ -17,10 +15,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/contexts/AuthContext';
 import { SidebarCryptoWidget } from '@/components/SidebarCryptoWidget';
-import { SidebarQuickLinks } from '@/components/SidebarQuickLinks';
 import { GamificationSidebar } from '@/components/gamification/GamificationSidebar';
-import { MenuCustomizationDialog } from '@/components/menu/MenuCustomizationDialog';
-import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export function AppSidebar() {
@@ -28,7 +23,6 @@ export function AppSidebar() {
   const location = useLocation();
   const { signOut } = useAuth();
   const { t } = useTranslation();
-  const [customMenuItems, setCustomMenuItems] = useState<any[]>([]);
 
   const mainItems = [
     { title: t('navigation.dashboard'), url: '/dashboard', icon: BarChart3 },
@@ -50,24 +44,6 @@ export function AppSidebar() {
     { title: t('navigation.blog'), url: '/blog', icon: BookOpen },
     { title: t('navigation.faq'), url: '/faq', icon: HelpCircle },
   ];
-
-  useEffect(() => {
-    loadCustomMenuItems();
-  }, []);
-
-  const loadCustomMenuItems = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('custom_menu_items')
-        .select('*')
-        .order('order_index');
-
-      if (error) throw error;
-      setCustomMenuItems(data || []);
-    } catch (error) {
-      console.error('Error loading custom menu items:', error);
-    }
-  };
 
   const isActive = (path: string) => location.pathname === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
@@ -118,55 +94,17 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Custom Menu Items */}
-        {customMenuItems.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Custom</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {customMenuItems.map((item) => {
-                  const iconMap: Record<string, any> = {
-                    Circle, Star, TrendingUp, TrendingDown, BarChart3, 
-                    PieChart, Activity, Target, Zap, Sparkles, LineChart, DollarSign,
-                    ...LucideIcons
-                  };
-                  const IconComponent = iconMap[item.icon] || Circle;
-                  return (
-                    <SidebarMenuItem key={item.id}>
-                      <SidebarMenuButton asChild tooltip={item.label}>
-                        <NavLink to={item.route} end className={getNavCls}>
-                          <IconComponent className="mr-2 h-4 w-4" />
-                          <span>{item.label}</span>
-                        </NavLink>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
+        {/* Gamification & Crypto Widgets */}
+        <div className="mt-auto space-y-0">
+          {/* Gamification Widget */}
+          <div className="border-t border-border/50 px-4 py-3">
+            <GamificationSidebar />
+          </div>
 
-        {/* Menu Customization */}
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <MenuCustomizationDialog />
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Quick Links - Above Crypto Widget */}
-        <div className="mt-auto">
-          <SidebarQuickLinks />
-        </div>
-
-        {/* Gamification Widget */}
-        <div className="border-t border-border/50 px-4 py-3">
-          <GamificationSidebar />
-        </div>
-
-        {/* Crypto Prices Widget */}
-        <div className="border-t border-border/50">
-          <SidebarCryptoWidget />
+          {/* Crypto Prices Widget */}
+          <div className="border-t border-border/50">
+            <SidebarCryptoWidget />
+          </div>
         </div>
 
         <SidebarGroup>
