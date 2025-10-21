@@ -30,13 +30,19 @@ export const WidgetWrapper = memo(({
   return (
     <GlassCard 
       className={cn(
-        "relative flex flex-col",
+        "relative flex flex-col overflow-hidden",
         "transition-all duration-200",
         isEditMode && "ring-2 ring-primary/20 hover:ring-primary/40",
         isCompact && "widget-compact",
         className
       )}
     >
+      {/* Shimmer Effect for Edit Mode */}
+      {isEditMode && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
+          <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+        </div>
+      )}
       {/* Edit Mode Controls */}
       {isEditMode && (
         <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 flex gap-1">
