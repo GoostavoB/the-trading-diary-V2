@@ -3,6 +3,12 @@ project_id = "qziawervfvptoretkjrn"
 [functions.ai-dashboard-assistant]
 verify_jwt = true
 
+[functions.ai-psychology-analysis]
+verify_jwt = true
+
+[functions.ai-performance-prediction]
+verify_jwt = true
+
 # Gamification CRON Jobs
 [functions.calculate-leaderboard]
 verify_jwt = false
