@@ -80,13 +80,13 @@ export const BrokerSelect = ({ value, onChange, required = false }: BrokerSelect
           </Button>
         </PopoverTrigger>
         <PopoverContent 
-          className="p-0 bg-popover" 
+          className="p-0 bg-popover border-border" 
           align="start" 
           style={{ width: 'var(--radix-popover-trigger-width)', minWidth: '300px' }}
         >
-          <Command className="bg-popover">
-            <CommandInput placeholder="Search broker..." className="h-9" />
-            <CommandList>
+          <Command className="bg-popover rounded-lg border-0">
+            <CommandInput placeholder="Search broker..." className="h-9 border-0" />
+            <CommandList className="max-h-[300px]">
               <CommandEmpty>No broker found.</CommandEmpty>
               <CommandGroup>
                 {sortedBrokers.map((broker) => (
