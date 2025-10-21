@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
-import { Plus } from 'lucide-react';
+import { Plus, Columns } from 'lucide-react';
 import { DndContext, rectIntersection, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragStartEvent, MeasuringStrategy } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy } from '@dnd-kit/sortable';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { InsightsQuickSummary } from '@/components/insights/InsightsQuickSummary';
 import { PerformanceHighlights } from '@/components/insights/PerformanceHighlights';
@@ -136,27 +137,32 @@ const Dashboard = () => {
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [showWidgetLibrary, setShowWidgetLibrary] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [selectedColumnCount, setSelectedColumnCount] = useState(3);
 
   const gridRef = useRef<HTMLDivElement>(null);
   const [columnCount, setColumnCount] = useState(3);
 
-  // Track column count based on viewport
+  // Track column count based on user selection and viewport
   useEffect(() => {
     const el = gridRef.current;
     if (!el) return;
     
     const updateCols = () => {
       const width = el.clientWidth;
-      if (width < 768) setColumnCount(1);
-      else if (width < 1024) setColumnCount(2);
-      else setColumnCount(3);
+      // On mobile, always use 1 column
+      if (width < 768) {
+        setColumnCount(1);
+      } else {
+        // Use user's selected column count
+        setColumnCount(selectedColumnCount);
+      }
     };
     
     updateCols();
     const ro = new ResizeObserver(updateCols);
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [selectedColumnCount]);
 
   // Organize widgets by column and row
   const grid = useMemo(() => {
@@ -647,13 +653,34 @@ const Dashboard = () => {
         {!loading && stats && stats.total_trades > 0 && activeTab === 'overview' && (
           <div className="flex items-center gap-2 flex-wrap">
             {!isCustomizing ? (
-              <Button
-                onClick={handleStartCustomize}
-                variant="outline"
-                className="glass"
-              >
-                {t('dashboard.customizeLayout')}
-              </Button>
+              <>
+                <Button
+                  onClick={handleStartCustomize}
+                  variant="outline"
+                  className="glass"
+                >
+                  {t('dashboard.customizeLayout')}
+                </Button>
+                
+                {/* Column Count Selector */}
+                <div className="flex items-center gap-2">
+                  <Columns className="w-4 h-4 text-muted-foreground" />
+                  <Select
+                    value={selectedColumnCount.toString()}
+                    onValueChange={(value) => setSelectedColumnCount(parseInt(value, 10))}
+                  >
+                    <SelectTrigger className="w-[120px] glass">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="2">2 Columns</SelectItem>
+                      <SelectItem value="3">3 Columns</SelectItem>
+                      <SelectItem value="4">4 Columns</SelectItem>
+                      <SelectItem value="5">5 Columns</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
             ) : (
               <>
                 <Button
@@ -712,7 +739,11 @@ const Dashboard = () => {
                     items={positions.map(p => p.id)}
                     strategy={rectSortingStrategy}
                   >
-                    <div ref={gridRef} className="dashboard-grid-free">
+                    <div 
+                      ref={gridRef} 
+                      className="dashboard-grid-free"
+                      style={{ '--column-count': columnCount } as React.CSSProperties}
+                    >
                       {Array.from({ length: columnCount }, (_, colIdx) => (
                         <div key={`col-${colIdx}`} className="dashboard-column-free">
                           {Object.entries(grid[colIdx] || {})
