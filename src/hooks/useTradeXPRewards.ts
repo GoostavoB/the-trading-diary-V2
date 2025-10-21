@@ -3,6 +3,7 @@ import { useXPSystem } from './useXPSystem';
 import { supabase } from '@/integrations/supabase/client';
 import type { Trade } from '@/types/trade';
 import { addXPNotification } from '@/components/gamification/FloatingXP';
+import { triggerMicroFeedback } from '@/components/gamification/MicroFeedbackOverlay';
 
 export const useTradeXPRewards = (trades: Trade[]) => {
   const { addXP } = useXPSystem();
@@ -34,6 +35,7 @@ export const useTradeXPRewards = (trades: Trade[]) => {
           // Base XP for completing a trade (10 XP)
           await addXP(10, 'trade_completed', `Traded ${trade.symbol}`);
           addXPNotification(10, `Traded ${trade.symbol}`);
+          triggerMicroFeedback('xp', '+10 XP');
           totalXPForTrade += 10;
 
           // Bonus XP for winning trades
@@ -44,8 +46,14 @@ export const useTradeXPRewards = (trades: Trade[]) => {
             if (winXP > 0) {
               await addXP(winXP, 'winning_trade', `Profit: $${pnl.toFixed(2)}`);
               addXPNotification(winXP, `Winning trade: $${pnl.toFixed(2)}`);
+              triggerMicroFeedback('profit', `+$${pnl.toFixed(2)}`);
               totalXPForTrade += winXP;
             }
+          } else if (pnl < 0) {
+            // Small XP for losses (participation reward)
+            await addXP(3, 'trade_participation', 'Learning experience');
+            triggerMicroFeedback('loss', `$${pnl.toFixed(2)}`);
+            totalXPForTrade += 3;
           }
 
           // Bonus XP for excellent ROI (>5%)

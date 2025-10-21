@@ -18,6 +18,7 @@ import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { ExportTradesDialog } from '@/components/ExportTradesDialog';
 import { LevelUpModal } from '@/components/gamification/LevelUpModal';
 import { FloatingXP } from '@/components/gamification/FloatingXP';
+import { MicroFeedbackOverlay } from '@/components/gamification/MicroFeedbackOverlay';
 import { useXPSystem } from '@/hooks/useXPSystem';
 import { useDailyChallenges } from '@/hooks/useDailyChallenges';
 import { useTradeXPRewards } from '@/hooks/useTradeXPRewards';
@@ -730,6 +731,7 @@ const Dashboard = () => {
   return (
     <AppLayout>
       <FloatingXP />
+      <MicroFeedbackOverlay />
       <LevelUpModal 
         show={showLevelUp} 
         level={xpData.currentLevel} 

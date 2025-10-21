@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievement_showcase: {
+        Row: {
+          badge_id: string
+          created_at: string
+          display_order: number
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          created_at?: string
+          display_order: number
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_analysis_cache: {
         Row: {
           analysis_type: string
@@ -79,6 +103,33 @@ export type Database = {
           message?: string
           response?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      badge_tiers: {
+        Row: {
+          badge_id: string
+          created_at: string
+          id: string
+          requirement_multiplier: number
+          tier: string
+          xp_reward: number
+        }
+        Insert: {
+          badge_id: string
+          created_at?: string
+          id?: string
+          requirement_multiplier?: number
+          tier: string
+          xp_reward?: number
+        }
+        Update: {
+          badge_id?: string
+          created_at?: string
+          id?: string
+          requirement_multiplier?: number
+          tier?: string
+          xp_reward?: number
         }
         Relationships: []
       }
@@ -254,6 +305,36 @@ export type Database = {
           target_value?: number
           user_id?: string
           xp_reward?: number
+        }
+        Relationships: []
+      }
+      dopamine_events: {
+        Row: {
+          animation_type: string | null
+          event_type: string
+          id: string
+          sound_type: string | null
+          triggered_at: string
+          user_id: string
+          xp_awarded: number
+        }
+        Insert: {
+          animation_type?: string | null
+          event_type: string
+          id?: string
+          sound_type?: string | null
+          triggered_at?: string
+          user_id: string
+          xp_awarded?: number
+        }
+        Update: {
+          animation_type?: string | null
+          event_type?: string
+          id?: string
+          sound_type?: string | null
+          triggered_at?: string
+          user_id?: string
+          xp_awarded?: number
         }
         Relationships: []
       }
@@ -479,6 +560,53 @@ export type Database = {
           },
         ]
       }
+      leaderboard_entries: {
+        Row: {
+          consistency_index: number
+          created_at: string
+          id: string
+          performance_score: number
+          rank: number
+          roi: number
+          season_id: string
+          updated_at: string
+          user_id: string
+          win_rate: number
+        }
+        Insert: {
+          consistency_index?: number
+          created_at?: string
+          id?: string
+          performance_score?: number
+          rank?: number
+          roi?: number
+          season_id: string
+          updated_at?: string
+          user_id: string
+          win_rate?: number
+        }
+        Update: {
+          consistency_index?: number
+          created_at?: string
+          id?: string
+          performance_score?: number
+          rank?: number
+          roi?: number
+          season_id?: string
+          updated_at?: string
+          user_id?: string
+          win_rate?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leaderboard_entries_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasonal_competitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lsr_alert_daily_stats: {
         Row: {
           alerts_clicked: number
@@ -643,6 +771,36 @@ export type Database = {
         }
         Relationships: []
       }
+      mystery_rewards: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          rarity: string
+          reward_type: string
+          reward_value: number
+          trigger_condition: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          rarity?: string
+          reward_type: string
+          reward_value: number
+          trigger_condition?: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          rarity?: string
+          reward_type?: string
+          reward_value?: number
+          trigger_condition?: Json
+        }
+        Relationships: []
+      }
       post_comments: {
         Row: {
           content: string
@@ -764,6 +922,33 @@ export type Database = {
           terms_accepted_at?: string | null
           updated_at?: string | null
           username?: string | null
+        }
+        Relationships: []
+      }
+      seasonal_competitions: {
+        Row: {
+          created_at: string
+          end_date: string
+          id: string
+          is_active: boolean
+          season_name: string
+          start_date: string
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          id?: string
+          is_active?: boolean
+          season_name: string
+          start_date: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          id?: string
+          is_active?: boolean
+          season_name?: string
+          start_date?: string
         }
         Relationships: []
       }
@@ -956,6 +1141,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      streak_freeze_inventory: {
+        Row: {
+          created_at: string
+          freeze_tokens: number
+          id: string
+          last_used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          freeze_tokens?: number
+          id?: string
+          last_used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          freeze_tokens?: number
+          id?: string
+          last_used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       trade_annotations: {
         Row: {
@@ -1198,6 +1407,9 @@ export type Database = {
           badge_id: string
           id: string
           notified: boolean
+          progress_to_next_tier: number
+          tier: string
+          unlock_animation_seen: boolean
           unlocked_at: string
           user_id: string
         }
@@ -1205,6 +1417,9 @@ export type Database = {
           badge_id: string
           id?: string
           notified?: boolean
+          progress_to_next_tier?: number
+          tier?: string
+          unlock_animation_seen?: boolean
           unlocked_at?: string
           user_id: string
         }
@@ -1212,6 +1427,9 @@ export type Database = {
           badge_id?: string
           id?: string
           notified?: boolean
+          progress_to_next_tier?: number
+          tier?: string
+          unlock_animation_seen?: boolean
           unlocked_at?: string
           user_id?: string
         }
@@ -1283,6 +1501,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_customization_preferences: {
+        Row: {
+          active_theme: string
+          animation_speed: string
+          calm_mode_enabled: boolean
+          created_at: string
+          haptic_feedback_enabled: boolean
+          id: string
+          profile_frame: string | null
+          sound_enabled: boolean
+          unlocked_themes: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active_theme?: string
+          animation_speed?: string
+          calm_mode_enabled?: boolean
+          created_at?: string
+          haptic_feedback_enabled?: boolean
+          id?: string
+          profile_frame?: string | null
+          sound_enabled?: boolean
+          unlocked_themes?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active_theme?: string
+          animation_speed?: string
+          calm_mode_enabled?: boolean
+          created_at?: string
+          haptic_feedback_enabled?: boolean
+          id?: string
+          profile_frame?: string | null
+          sound_enabled?: boolean
+          unlocked_themes?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_follows: {
         Row: {
           created_at: string | null
@@ -1301,6 +1561,51 @@ export type Database = {
           follower_id?: string
           following_id?: string
           id?: string
+        }
+        Relationships: []
+      }
+      user_progression: {
+        Row: {
+          created_at: string
+          customization_count: number
+          daily_streak: number
+          id: string
+          last_active_date: string
+          level: number
+          rank: string
+          total_badges_unlocked: number
+          updated_at: string
+          user_id: string
+          weekly_streak: number
+          xp: number
+        }
+        Insert: {
+          created_at?: string
+          customization_count?: number
+          daily_streak?: number
+          id?: string
+          last_active_date?: string
+          level?: number
+          rank?: string
+          total_badges_unlocked?: number
+          updated_at?: string
+          user_id: string
+          weekly_streak?: number
+          xp?: number
+        }
+        Update: {
+          created_at?: string
+          customization_count?: number
+          daily_streak?: number
+          id?: string
+          last_active_date?: string
+          level?: number
+          rank?: string
+          total_badges_unlocked?: number
+          updated_at?: string
+          user_id?: string
+          weekly_streak?: number
+          xp?: number
         }
         Relationships: []
       }
