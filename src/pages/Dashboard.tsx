@@ -83,6 +83,15 @@ const Dashboard = () => {
   // Memoize dashboard stats calculations with capital log
   const dashboardStats = useDashboardStats(processedTrades, capitalLog);
 
+  // Memoize current streak calculation
+  const currentStreak = useMemo(() => {
+    const streak = calculateCurrentStreak(processedTrades);
+    return { 
+      type: (streak > 0 ? 'win' : 'loss') as 'win' | 'loss',
+      count: Math.abs(streak)
+    };
+  }, [processedTrades]);
+
   // Enable badge notifications
   useBadgeNotifications(processedTrades);
   
@@ -594,13 +603,7 @@ const Dashboard = () => {
                       trades={processedTrades}
                       bestTrade={dashboardStats.bestTrade}
                       worstTrade={dashboardStats.worstTrade}
-                      currentStreak={useMemo(() => {
-                        const streak = calculateCurrentStreak(processedTrades);
-                        return { 
-                          type: streak > 0 ? 'win' : 'loss' as 'win' | 'loss',
-                          count: Math.abs(streak)
-                        };
-                      }, [processedTrades])}
+                      currentStreak={currentStreak}
                     />
                     
                     <TradingQualityMetrics
