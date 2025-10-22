@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { ConnectExchangeModal } from '@/components/exchanges/ConnectExchangeModal';
 import { SyncHistoryWidget } from '@/components/exchanges/SyncHistoryWidget';
 import { TradePreviewModal } from '@/components/exchanges/TradePreviewModal';
+import { SyncTradesDialog } from '@/components/exchanges/SyncTradesDialog';
 import { formatDistanceToNow } from 'date-fns';
 import AppLayout from '@/components/layout/AppLayout';
 
@@ -27,6 +28,9 @@ export default function ExchangeConnections() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [previewConnectionId, setPreviewConnectionId] = useState<string | null>(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [isSyncDialogOpen, setIsSyncDialogOpen] = useState(false);
+  const [syncConnectionId, setSyncConnectionId] = useState<string | null>(null);
+  const [syncExchangeName, setSyncExchangeName] = useState<string>('');
   const queryClient = useQueryClient();
 
   const { data: connections = [], isLoading } = useQuery({
@@ -233,8 +237,16 @@ export default function ExchangeConnections() {
     setIsModalOpen(true);
   };
 
-  const handleSync = (connectionId: string) => {
-    syncMutation.mutate(connectionId);
+  const handleSync = (connectionId: string, exchangeName: string) => {
+    setSyncConnectionId(connectionId);
+    setSyncExchangeName(exchangeName);
+    setIsSyncDialogOpen(true);
+  };
+
+  const handleSyncComplete = () => {
+    // After fetching trades, open preview modal
+    setPreviewConnectionId(syncConnectionId);
+    setIsPreviewModalOpen(true);
   };
 
   const handleDisconnect = (connectionId: string) => {
@@ -315,12 +327,12 @@ export default function ExchangeConnections() {
                     </div>
                     <div className="flex gap-2">
                       <Button
-                        onClick={() => handleSync(connection.id)}
-                        disabled={isSyncing || syncMutation.isPending}
+                        onClick={() => handleSync(connection.id, connection.exchange_name)}
+                        disabled={isSyncing}
                         size="sm"
                         className="flex-1"
                       >
-                        {isSyncing || syncMutation.isPending ? (
+                        {isSyncing ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             Syncing...
@@ -328,7 +340,7 @@ export default function ExchangeConnections() {
                         ) : (
                           <>
                             <RefreshCw className="mr-2 h-4 w-4" />
-                            Sync Now
+                            Sync Trades
                           </>
                         )}
                       </Button>
@@ -371,6 +383,17 @@ export default function ExchangeConnections() {
         }}
       />
 
+      <SyncTradesDialog
+        connectionId={syncConnectionId}
+        exchangeName={syncExchangeName}
+        isOpen={isSyncDialogOpen}
+        onClose={() => {
+          setIsSyncDialogOpen(false);
+          setSyncConnectionId(null);
+        }}
+        onFetchComplete={handleSyncComplete}
+      />
+
       <TradePreviewModal
         connectionId={previewConnectionId}
         isOpen={isPreviewModalOpen}
@@ -381,6 +404,7 @@ export default function ExchangeConnections() {
         onImportComplete={() => {
           setIsPreviewModalOpen(false);
           setPreviewConnectionId(null);
+          queryClient.invalidateQueries({ queryKey: ['trades'] });
         }}
       />
       </div>
