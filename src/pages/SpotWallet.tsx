@@ -1,183 +1,220 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, TrendingUp, TrendingDown, Wallet, Coins } from 'lucide-react';
-import { useSpotWallet } from '@/hooks/useSpotWallet';
-import { useTokenPrices } from '@/hooks/useTokenPrices';
-import { useWalletAnalytics } from '@/hooks/useWalletAnalytics';
-import { AddTokenModal } from '@/components/spot-wallet/AddTokenModal';
-import { TokenAllocationChart } from '@/components/spot-wallet/TokenAllocationChart';
-import { TokenList } from '@/components/spot-wallet/TokenList';
-import { TokenIcon } from '@/components/TokenIcon';
-import { formatCurrency, formatPercent } from '@/utils/formatNumber';
 import AppLayout from '@/components/layout/AppLayout';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Plus, TrendingUp, TrendingDown, Wallet, Package } from 'lucide-react';
+import { usePortfolio } from '@/hooks/usePortfolio';
+import { useSpotWallet } from '@/hooks/useSpotWallet';
+import { formatCurrency, formatPercent } from '@/utils/formatNumber';
+import { AnimatedCounter } from '@/components/AnimatedCounter';
+import { RangeSelector } from '@/components/portfolio/RangeSelector';
+import { PortfolioChart } from '@/components/portfolio/PortfolioChart';
+import { TokenList } from '@/components/spot-wallet/TokenList';
+import { TokenAllocationChart } from '@/components/spot-wallet/TokenAllocationChart';
+import { AddTokenModal } from '@/components/spot-wallet/AddTokenModal';
+import type { TimeRange } from '@/utils/timeframeReturns';
 
 export default function SpotWallet() {
+  const [selectedRange, setSelectedRange] = useState<TimeRange>('1M');
   const [showAddModal, setShowAddModal] = useState(false);
-  const { holdings, isLoading, addHolding, deleteHolding } = useSpotWallet();
+  const [viewType, setViewType] = useState<'value' | 'percent'>('value');
+
+  const {
+    holdings,
+    metrics,
+    bestPerformers,
+    worstPerformers,
+    isLoading,
+    baseCurrency,
+    costMethod,
+  } = usePortfolio(selectedRange);
   
-  const symbols = holdings.map(h => h.token_symbol);
-  const { prices } = useTokenPrices(symbols);
-  const analytics = useWalletAnalytics(holdings, prices);
+  const { addHolding, deleteHolding } = useSpotWallet();
 
-  const handleAddToken = (token: any) => {
-    addHolding.mutate(token);
-  };
+  if (isLoading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center h-96">
+          <div className="animate-pulse text-muted-foreground">Loading portfolio...</div>
+        </div>
+      </AppLayout>
+    );
+  }
 
-  const handleDeleteToken = (symbol: string) => {
-    const holding = holdings.find(h => h.token_symbol === symbol);
-    if (holding) {
-      deleteHolding.mutate(holding.id);
-    }
-  };
-
-  const tokenListData = analytics.allocation.map(item => ({
-    ...item,
-    icon: prices[item.symbol]?.icon,
-    priceChange24h: prices[item.symbol]?.priceChangePercentage24h,
-    priceChange7d: prices[item.symbol]?.priceChangePercentage7d,
-    priceChange30d: prices[item.symbol]?.priceChangePercentage30d,
-  }));
+  const totalValue = holdings?.reduce((sum, h) => sum + (h.quantity * (h.purchase_price || 0)), 0) || 1;
+  const chartData = holdings?.map((h) => ({
+    symbol: h.token_symbol,
+    name: h.token_name || h.token_symbol,
+    value: h.quantity * (h.purchase_price || 0),
+    percentage: ((h.quantity * (h.purchase_price || 0)) / totalValue) * 100,
+  })) || [];
 
   return (
     <AppLayout>
-      <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Spot Wallet</h1>
-          <p className="text-muted-foreground mt-1">
-            Monitor your holdings and token performance in real time
+      <div className="space-y-6 p-6">
+        {/* Page Header */}
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold tracking-tight">Spot Wallet</h1>
+          <p className="text-muted-foreground">
+            Track your portfolio with real-time P&L, cost basis, and performance analytics · {holdings?.length || 0} assets · {costMethod} · {baseCurrency}
           </p>
         </div>
-        <div className="flex gap-3">
-          <Button onClick={() => setShowAddModal(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Token
-          </Button>
+        {/* Header Controls */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <RangeSelector selected={selectedRange} onChange={setSelectedRange} />
+          
+          <div className="flex items-center gap-2">
+            <Button
+              variant={viewType === 'value' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewType('value')}
+            >
+              Value
+            </Button>
+            <Button
+              variant={viewType === 'percent' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewType('percent')}
+            >
+              Percent
+            </Button>
+            <Button onClick={() => setShowAddModal(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Asset
+            </Button>
+          </div>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Total Value */}
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-muted-foreground">Total Value</span>
+              <Wallet className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <AnimatedCounter
+              value={metrics.total_value}
+              className="text-3xl font-bold"
+              prefix="$"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Cost Basis: {formatCurrency(metrics.total_cost_basis)}
+            </p>
+          </Card>
+
+          {/* Unrealized P&L */}
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-muted-foreground">Unrealized P&L</span>
+              {metrics.unrealized_pnl >= 0 ? (
+                <TrendingUp className="h-4 w-4 text-profit" />
+              ) : (
+                <TrendingDown className="h-4 w-4 text-loss" />
+              )}
+            </div>
+            <AnimatedCounter
+              value={Math.abs(metrics.unrealized_pnl)}
+              className={`text-3xl font-bold ${metrics.unrealized_pnl >= 0 ? 'text-profit' : 'text-loss'}`}
+              prefix={metrics.unrealized_pnl >= 0 ? '$' : '-$'}
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              ROI: {formatPercent(metrics.unrealized_roi)}
+            </p>
+          </Card>
+
+          {/* Realized P&L */}
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-muted-foreground">Realized P&L</span>
+              {metrics.realized_pnl >= 0 ? (
+                <TrendingUp className="h-4 w-4 text-profit" />
+              ) : (
+                <TrendingDown className="h-4 w-4 text-loss" />
+              )}
+            </div>
+            <AnimatedCounter
+              value={Math.abs(metrics.realized_pnl)}
+              className={`text-3xl font-bold ${metrics.realized_pnl >= 0 ? 'text-profit' : 'text-loss'}`}
+              prefix={metrics.realized_pnl >= 0 ? '$' : '-$'}
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              From closed positions
+            </p>
+          </Card>
+
+          {/* Total Assets */}
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-muted-foreground">Total Assets</span>
+              <Package className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div className="text-3xl font-bold">{holdings?.length || 0}</div>
+            {bestPerformers.length > 0 && (
+              <p className="text-xs text-profit mt-1">
+                Best: {bestPerformers[0].symbol} +{((bestPerformers[0].quantity * bestPerformers[0].current_price - bestPerformers[0].cost_basis) / bestPerformers[0].cost_basis * 100).toFixed(2)}%
+              </p>
+            )}
+          </Card>
+        </div>
+
+        {/* Portfolio Chart */}
+        <PortfolioChart 
+          data={[]} // TODO: Implement timeseries data
+          showPercent={viewType === 'percent'}
+          deposits={[]}
+          withdrawals={[]}
+        />
+
+        {/* Holdings Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Token Allocation */}
+          <Card className="p-6 lg:col-span-1">
+            <h3 className="text-lg font-semibold mb-4">Allocation</h3>
+            <TokenAllocationChart data={chartData} />
+          </Card>
+
+          {/* Token List */}
+          <div className="lg:col-span-2">
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Holdings</h3>
+              <div className="space-y-3">
+                {holdings && holdings.length > 0 ? (
+                  holdings.map((holding) => (
+                    <div key={holding.id} className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+                      <div className="flex-1">
+                        <div className="font-semibold">{holding.token_symbol}</div>
+                        <div className="text-sm text-muted-foreground">{holding.token_name}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-semibold">{holding.quantity.toFixed(8)}</div>
+                        <div className="text-sm text-muted-foreground">
+                          ${((holding.purchase_price || 0) * holding.quantity).toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-muted-foreground py-8">
+                    No holdings yet. Add your first token to get started.
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="glass">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Wallet Value</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(analytics.totalValue)}</div>
-            <div className="flex items-center gap-1 mt-1">
-              {analytics.totalChange24h >= 0 ? (
-                <TrendingUp className="h-3 w-3 text-neon-green" />
-              ) : (
-                <TrendingDown className="h-3 w-3 text-neon-red" />
-              )}
-              <p className={`text-xs ${analytics.totalChange24h >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
-                {analytics.totalChange24h >= 0 ? '+' : ''}{formatCurrency(analytics.totalChange24h)} ({formatPercent(analytics.totalChangePercent24h)}) 24h
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Portfolio P/L</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${analytics.unrealizedPnL >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
-              {analytics.unrealizedPnL >= 0 ? '+' : ''}{formatCurrency(analytics.unrealizedPnL)}
-            </div>
-            <p className={`text-xs mt-1 ${analytics.unrealizedPnL >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
-              {analytics.unrealizedPnL >= 0 ? '+' : ''}{formatPercent(analytics.unrealizedPnLPercent)} unrealized
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="glass">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Best Performer</CardTitle>
-            <TrendingUp className="h-4 w-4 text-neon-green" />
-          </CardHeader>
-          <CardContent>
-            {analytics.bestPerformer ? (
-              <>
-                <div className="flex items-center gap-2">
-                  <TokenIcon symbol={analytics.bestPerformer.symbol} size="sm" />
-                  <div className="text-2xl font-bold">{analytics.bestPerformer.symbol}</div>
-                </div>
-                <p className="text-xs text-neon-green mt-1">
-                  +{formatPercent(analytics.bestPerformer.changePercent)} (24h)
-                </p>
-              </>
-            ) : (
-              <div className="text-sm text-muted-foreground">No data</div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="glass">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tokens</CardTitle>
-            <Coins className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analytics.tokenCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {analytics.tokenCount === 1 ? 'Token' : 'Tokens'} tracked
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Charts and List */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <TokenAllocationChart data={analytics.allocation} />
-        <Card className="glass">
-          <CardHeader>
-            <CardTitle>Performance Overview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center p-3 border border-border rounded-lg">
-                <span className="text-sm text-muted-foreground">Total Invested</span>
-                <span className="font-mono font-semibold">{formatCurrency(analytics.totalInvested)}</span>
-              </div>
-              <div className="flex justify-between items-center p-3 border border-border rounded-lg">
-                <span className="text-sm text-muted-foreground">Current Value</span>
-                <span className="font-mono font-semibold">{formatCurrency(analytics.totalValue)}</span>
-              </div>
-              <div className="flex justify-between items-center p-3 border border-border rounded-lg">
-                <span className="text-sm text-muted-foreground">Unrealized P/L</span>
-                <span className={`font-mono font-semibold ${analytics.unrealizedPnL >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
-                  {analytics.unrealizedPnL >= 0 ? '+' : ''}{formatCurrency(analytics.unrealizedPnL)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center p-3 border border-border rounded-lg">
-                <span className="text-sm text-muted-foreground">ROI</span>
-                <span className={`font-mono font-semibold ${analytics.unrealizedPnLPercent >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
-                  {analytics.unrealizedPnLPercent >= 0 ? '+' : ''}{formatPercent(analytics.unrealizedPnLPercent)}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Token List */}
-      <TokenList 
-        tokens={tokenListData}
-        onDelete={handleDeleteToken}
-      />
-
-      {/* Add Token Modal */}
-      <AddTokenModal
-        open={showAddModal}
+      <AddTokenModal 
+        open={showAddModal} 
         onClose={() => setShowAddModal(false)}
-        onAdd={handleAddToken}
+        onAdd={(token) => {
+          addHolding.mutate(token);
+          setShowAddModal(false);
+        }}
       />
-      </div>
     </AppLayout>
   );
-}
+};
+
+
