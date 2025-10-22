@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -32,6 +32,12 @@ export const WidgetLibrary = memo(({
 }: WidgetLibraryProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('overview');
+  const [localActive, setLocalActive] = useState<Set<string>>(new Set(activeWidgets));
+
+  useEffect(() => {
+    // Sync local active state when external active widgets change or dialog opens
+    setLocalActive(new Set(activeWidgets));
+  }, [activeWidgets, open]);
 
   const filteredWidgets = Object.values(WIDGET_CATALOG).filter(widget => {
     const matchesSearch = widget.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -43,12 +49,18 @@ export const WidgetLibrary = memo(({
   const handleToggleWidget = (widgetId: string, isActive: boolean) => {
     if (isActive) {
       onRemoveWidget(widgetId);
+      setLocalActive(prev => {
+        const next = new Set(prev);
+        next.delete(widgetId);
+        return next;
+      });
     } else {
       onAddWidget(widgetId);
+      setLocalActive(prev => new Set(prev).add(widgetId));
     }
   };
 
-  const isWidgetActive = (widgetId: string) => activeWidgets.includes(widgetId);
+  const isWidgetActive = (widgetId: string) => localActive.has(widgetId);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
