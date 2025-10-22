@@ -195,10 +195,10 @@ export function AppSidebar() {
         <Logo size={open ? "md" : "sm"} variant={open ? "horizontal" : "icon"} showText={open} />
       </div>
 
-      <SidebarContent className="gap-1">
+      <SidebarContent className="gap-0.5">
         {/* Search and Controls */}
         {open && (
-          <div className="px-3 py-2 space-y-2">
+          <div className="px-3 py-1.5 space-y-1.5">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
