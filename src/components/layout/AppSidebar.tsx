@@ -50,6 +50,7 @@ export function AppSidebar() {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [archivedGroups, setArchivedGroups] = useState<string[]>([]);
+  const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
   const { favorites, isFavorite, toggleFavorite } = useFavorites();
 
   const menuStructure: MenuGroup[] = [
@@ -163,6 +164,28 @@ export function AppSidebar() {
     );
   };
 
+  const expandAll = () => {
+    const allLabels = menuStructure.map(g => g.label);
+    setExpandedGroups(allLabels);
+  };
+
+  const collapseAll = () => {
+    setExpandedGroups([]);
+  };
+
+  const isGroupExpanded = (label: string) => {
+    if (searchQuery !== '') return true; // Keep all expanded during search
+    return expandedGroups.includes(label);
+  };
+
+  const toggleGroup = (label: string) => {
+    setExpandedGroups(prev =>
+      prev.includes(label)
+        ? prev.filter(l => l !== label)
+        : [...prev, label]
+    );
+  };
+
   return (
     <Sidebar collapsible="icon" className="sticky top-0 h-screen border-r border-border/50 backdrop-blur-xl bg-background/95 shadow-lg z-40">
       <div className="p-4 border-b border-border/50 flex items-center justify-center">
@@ -170,9 +193,9 @@ export function AppSidebar() {
       </div>
 
       <SidebarContent>
-        {/* Search */}
+        {/* Search and Controls */}
         {open && (
-          <div className="px-3 py-2">
+          <div className="px-3 py-2 space-y-2">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -182,43 +205,71 @@ export function AppSidebar() {
                 className="pl-9 h-9"
               />
             </div>
+            {/* Expand/Collapse Controls */}
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={expandAll}
+                className="flex-1 h-7 text-xs"
+              >
+                Expand All
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={collapseAll}
+                className="flex-1 h-7 text-xs"
+              >
+                Collapse All
+              </Button>
+            </div>
           </div>
         )}
 
         {/* Favorites Section */}
         {favorites.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-primary flex items-center gap-2">
-              <Star className="h-4 w-4 fill-primary" />
-              Favorites
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {favorites.map((fav) => (
-                  <SidebarMenuItem key={fav.page_url}>
-                    <SidebarMenuButton asChild tooltip={fav.page_title}>
-                      <NavLink 
-                        to={fav.page_url} 
-                        end 
-                        className={getNavCls}
-                      >
-                        <Star className="h-4 w-4 fill-primary text-primary" />
-                        {open && <span>{fav.page_title}</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          <Collapsible defaultOpen={true}>
+            <SidebarGroup>
+              <CollapsibleTrigger className="w-full">
+                <SidebarGroupLabel className="text-primary flex items-center justify-between group-data-[state=open]/collapsible:text-primary">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-4 w-4 fill-primary" />
+                    Favorites ({favorites.length}/12)
+                  </div>
+                  <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                </SidebarGroupLabel>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {favorites.map((fav) => (
+                      <SidebarMenuItem key={fav.page_url}>
+                        <SidebarMenuButton asChild tooltip={fav.page_title}>
+                          <NavLink 
+                            to={fav.page_url} 
+                            end 
+                            className={getNavCls}
+                          >
+                            <Star className="h-4 w-4 fill-primary text-primary" />
+                            {open && <span>{fav.page_title}</span>}
+                          </NavLink>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </CollapsibleContent>
+            </SidebarGroup>
+          </Collapsible>
         )}
 
         {/* Main Menu Groups */}
         {filteredMenuStructure.map((group) => (
           <Collapsible 
             key={group.label} 
-            defaultOpen={group.defaultOpen || searchQuery !== ''} 
-            open={searchQuery !== '' ? true : undefined}
+            open={isGroupExpanded(group.label)}
+            onOpenChange={() => toggleGroup(group.label)}
             className="group/collapsible"
           >
             <SidebarGroup>
