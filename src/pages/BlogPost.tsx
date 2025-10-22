@@ -8,8 +8,9 @@ import { ArrowLeft, Calendar, Clock, User, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import { usePageMeta } from '@/hooks/usePageMeta';
-import { addStructuredData, generateBreadcrumbSchema } from '@/utils/seoHelpers';
+import { addStructuredData, generateBreadcrumbSchema, generateHowToSchema } from '@/utils/seoHelpers';
 import { useEffect } from 'react';
+import { TableOfContents } from '@/components/TableOfContents';
 
 const BlogPost = () => {
   const { slug } = useParams();
@@ -58,6 +59,29 @@ const BlogPost = () => {
       ]);
       
       addStructuredData(breadcrumbSchema, 'breadcrumb-schema');
+      
+      // Add HowTo Schema for tutorial articles
+      if (article.category === 'Tools & AI' || article.category === 'Trading Strategies') {
+        const headings = article.content.match(/^#{2,3}\s+(.+)$/gm) || [];
+        if (headings.length >= 3) {
+          const steps = headings.slice(0, 8).map(heading => {
+            const text = heading.replace(/^#{2,3}\s+/, '');
+            return {
+              name: text,
+              text: `Learn about ${text.toLowerCase()} in crypto trading.`
+            };
+          });
+          
+          const howToSchema = generateHowToSchema({
+            title: article.title,
+            description: article.description,
+            image: article.heroImage ? `https://www.thetradingdiary.com${article.heroImage}` : undefined,
+            steps
+          });
+          
+          addStructuredData(howToSchema, 'howto-schema');
+        }
+      }
       
       // Add hreflang tags for language versions
       const languages = ['en', 'pt', 'es', 'ar', 'vi'];
@@ -139,7 +163,9 @@ const BlogPost = () => {
 
   return (
     <AppLayout>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
+          <div className="space-y-6">
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
           <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -221,9 +247,21 @@ const BlogPost = () => {
           <div className="prose prose-invert prose-lg max-w-none">
             <ReactMarkdown
               components={{
-                h1: ({node, ...props}) => <h1 className="text-3xl font-bold mt-8 mb-4" {...props} />,
-                h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-6 mb-3" {...props} />,
-                h3: ({node, ...props}) => <h3 className="text-xl font-semibold mt-5 mb-2" {...props} />,
+                h1: ({node, children, ...props}) => {
+                  const text = String(children);
+                  const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                  return <h1 id={id} className="text-3xl font-bold mt-8 mb-4 scroll-mt-24" {...props}>{children}</h1>;
+                },
+                h2: ({node, children, ...props}) => {
+                  const text = String(children);
+                  const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                  return <h2 id={id} className="text-2xl font-bold mt-6 mb-3 scroll-mt-24" {...props}>{children}</h2>;
+                },
+                h3: ({node, children, ...props}) => {
+                  const text = String(children);
+                  const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                  return <h3 id={id} className="text-xl font-semibold mt-5 mb-2 scroll-mt-24" {...props}>{children}</h3>;
+                },
                 p: ({node, ...props}) => <p className="text-muted-foreground leading-relaxed mb-4" {...props} />,
                 ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,
                 ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
@@ -267,6 +305,13 @@ const BlogPost = () => {
               ))}
           </div>
         </Card>
+          </div>
+          
+          {/* Table of Contents Sidebar */}
+          <aside className="hidden lg:block">
+            <TableOfContents content={article.content} />
+          </aside>
+        </div>
       </div>
     </AppLayout>
   );

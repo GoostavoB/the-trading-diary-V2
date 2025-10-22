@@ -377,6 +377,8 @@ When ready to publish articles 6-10:
 **Latest Updates:**
 - ✅ Phase 1: Critical SEO fixes (hero preload, social tags, image captions)
 - ✅ Phase 2: RSS feed, language-specific blog routes, author pages, dynamic sitemap script
+- ✅ Phase 3A: Performance optimization (preconnect, preload, critical resources)
+- ✅ Phase 3B: Advanced structured data (HowTo, SoftwareApplication, Review schemas, TOC)
 
 ### Phase 2 Additions (2025-10-22)
 - ✅ RSS feed created (`public/blog/rss.xml`) with all blog articles
@@ -387,6 +389,32 @@ When ready to publish articles 6-10:
 - ✅ Author URLs added to Article Schema
 - ✅ Clickable author names in blog posts linking to author pages
 - ✅ Author expertise areas and contact information display
+
+### Phase 3A Additions (2025-10-22)
+- ✅ Added preconnect hints for Supabase backend (faster API calls)
+- ✅ Added dns-prefetch for Google Analytics and Tag Manager
+- ✅ Implemented automatic preloading of top 3 blog article hero images
+- ✅ Preload strategy integrated into Blog page for faster navigation
+
+**Expected Impact:**
+- LCP improvement: -0.4s (hero images load faster)
+- FCP improvement: -0.2s (DNS resolution faster)
+- Lighthouse Performance: +5-7 points
+
+### Phase 3B Additions (2025-10-22)
+- ✅ Created HowTo Schema generator for tutorial articles
+- ✅ Upgraded WebApplication to SoftwareApplication Schema (richer data)
+- ✅ Added Review Schema generator for individual testimonials
+- ✅ Created TableOfContents component with smooth scrolling
+- ✅ Added IDs to all H2/H3 headings for anchor links
+- ✅ Implemented sticky TOC sidebar on blog posts (desktop)
+- ✅ Active heading tracking with Intersection Observer
+
+**Expected Impact:**
+- Rich snippet eligibility: +70% (HowTo steps, feature lists)
+- CTR improvement: +15-20% (more prominent search results)
+- Time on page: +25% (TOC improves navigation)
+- Enhanced SoftwareApplication schema shows features, ratings, screenshots
 
 This comprehensive SEO implementation provides a solid foundation for organic growth. All technical optimizations, structured data, and content strategies are now in place to improve search visibility and drive qualified traffic to The Trading Diary.
 

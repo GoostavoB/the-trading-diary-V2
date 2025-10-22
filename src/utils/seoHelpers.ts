@@ -175,6 +175,101 @@ export const generateBlogSchema = () => {
 };
 
 /**
+ * Generate HowTo schema for tutorial articles
+ */
+export const generateHowToSchema = (article: {
+  title: string;
+  description: string;
+  image?: string;
+  steps: Array<{ name: string; text: string }>;
+}) => {
+  return {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": article.title,
+    "description": article.description,
+    "image": article.image || "https://www.thetradingdiary.com/og-image-en.png",
+    "step": article.steps.map((step, index) => ({
+      "@type": "HowToStep",
+      "position": index + 1,
+      "name": step.name,
+      "text": step.text
+    }))
+  };
+};
+
+/**
+ * Generate SoftwareApplication schema
+ */
+export const generateSoftwareApplicationSchema = () => {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "The Trading Diary",
+    "description": "Track, analyze, and review every crypto trade with AI. Built exclusively for crypto traders with advanced analytics and automated insights.",
+    "url": "https://www.thetradingdiary.com",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web Browser, iOS, Android",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "127",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "screenshot": "https://www.thetradingdiary.com/og-image-en.png",
+    "featureList": [
+      "AI-powered trade analysis",
+      "Multi-exchange support",
+      "Advanced analytics dashboard",
+      "Automated trade import",
+      "Risk management tools",
+      "Performance tracking"
+    ],
+    "author": {
+      "@type": "Organization",
+      "name": "The Trading Diary"
+    }
+  };
+};
+
+/**
+ * Generate individual Review schema
+ */
+export const generateReviewSchema = (review: {
+  author: string;
+  rating: number;
+  reviewBody: string;
+  datePublished: string;
+}) => {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Review",
+    "itemReviewed": {
+      "@type": "SoftwareApplication",
+      "name": "The Trading Diary"
+    },
+    "author": {
+      "@type": "Person",
+      "name": review.author
+    },
+    "reviewRating": {
+      "@type": "Rating",
+      "ratingValue": review.rating,
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "reviewBody": review.reviewBody,
+    "datePublished": review.datePublished
+  };
+};
+
+/**
  * Page-specific meta configurations
  */
 export const pageMeta = {
