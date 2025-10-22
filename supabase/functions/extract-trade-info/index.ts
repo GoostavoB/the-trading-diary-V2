@@ -36,6 +36,24 @@ const TRADE_SCHEMA = {
   required: ["symbol", "side", "entry_price", "opened_at"]
 };
 
+function extractJSON(text: string): any {
+  // Remove markdown code blocks if present
+  let cleaned = text.trim();
+  
+  // Strip ```json or ``` wrappers
+  cleaned = cleaned.replace(/^```(?:json)?\s*/i, '');
+  cleaned = cleaned.replace(/\s*```\s*$/i, '');
+  
+  // Extract JSON array or object
+  const jsonMatch = cleaned.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
+  if (jsonMatch) {
+    return JSON.parse(jsonMatch[0]);
+  }
+  
+  // Fallback: try parsing directly
+  return JSON.parse(cleaned);
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -188,12 +206,12 @@ serve(async (req) => {
       tokensIn = result.usage?.prompt_tokens || 0;
       tokensOut = result.usage?.completion_tokens || 0;
 
-      // Parse JSON
-      const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        trades = JSON.parse(jsonMatch[0]);
-      } else {
-        trades = JSON.parse(aiResponse);
+      // Parse JSON with robust extraction
+      try {
+        trades = extractJSON(aiResponse);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError, 'Raw response:', aiResponse);
+        throw new Error('Failed to parse AI response. The model returned invalid JSON.');
       }
 
     } else {
@@ -251,12 +269,12 @@ serve(async (req) => {
       tokensIn = result.usage?.prompt_tokens || 0;
       tokensOut = result.usage?.completion_tokens || 0;
 
-      // Parse JSON
-      const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        trades = JSON.parse(jsonMatch[0]);
-      } else {
-        trades = JSON.parse(aiResponse);
+      // Parse JSON with robust extraction
+      try {
+        trades = extractJSON(aiResponse);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError, 'Raw response:', aiResponse);
+        throw new Error('Failed to parse AI response. The model returned invalid JSON.');
       }
     }
 
@@ -328,10 +346,29 @@ serve(async (req) => {
     console.error("❌ Error in extract-trade-info:", error);
     const latency = Date.now() - startTime;
     
+    // Determine error type and provide specific message
+    let errorMessage = "Trade extraction failed";
+    let errorDetails = "Please try again or enter manually";
+    
+    if (error instanceof Error) {
+      if (error.message.includes('parse')) {
+        errorMessage = "AI response parsing failed";
+        errorDetails = "The AI returned invalid data. Please try again with a clearer screenshot.";
+      } else if (error.message.includes('Unauthorized')) {
+        errorMessage = "Authentication failed";
+        errorDetails = "Please sign in again.";
+      } else if (error.message.includes('model failed')) {
+        errorMessage = "AI service temporarily unavailable";
+        errorDetails = "Please try again in a moment.";
+      } else {
+        errorMessage = error.message;
+      }
+    }
+    
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : "Trade extraction failed",
-        details: "Please check image quality and try again"
+        error: errorMessage,
+        details: errorDetails
       }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

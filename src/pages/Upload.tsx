@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -97,6 +97,8 @@ const Upload = () => {
   const [showAnnotator, setShowAnnotator] = useState(false);
   const [ocrResult, setOcrResult] = useState<OCRResult | null>(null);
   const [ocrRunning, setOcrRunning] = useState(false);
+  const [brokerError, setBrokerError] = useState(false);
+  const brokerFieldRef = useRef<HTMLDivElement>(null);
   
   const [formData, setFormData] = useState({
     symbol: '',
@@ -373,11 +375,22 @@ const Upload = () => {
     
     // Validate broker is selected
     if (!preSelectedBroker || preSelectedBroker.trim() === '') {
+      setBrokerError(true);
+      
+      // Scroll to broker field
+      brokerFieldRef.current?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+      
       toast.error('Broker is required', {
         description: 'Please select a broker before extracting trade data'
       });
       return;
     }
+    
+    // Clear error if validation passes
+    setBrokerError(false);
     
     setExtracting(true);
     setUploadStep(1);
@@ -426,15 +439,36 @@ const Upload = () => {
         console.error('Extraction error:', error);
         const status = (error as any)?.status || (error as any)?.cause?.status;
         const errMsg = (data as any)?.error || (error as any)?.message || 'Failed to extract trade information';
+        const errDetails = (data as any)?.details || '';
+        
+        // Categorize errors
         const isCredits = status === 402 || /credit/i.test(errMsg);
         const isRateLimited = status === 429 || /rate limit/i.test(errMsg);
-        toast.error(isCredits ? 'AI credits exhausted' : isRateLimited ? 'Too many requests' : errMsg, {
-          description: isCredits
-            ? 'Please try again later.'
-            : isRateLimited
-              ? 'Please slow down and retry in a minute.'
-              : 'Please try again or enter manually',
-        });
+        const isParseError = /parse/i.test(errMsg);
+        const isAuthError = status === 401 || /unauthorized/i.test(errMsg);
+        
+        // Provide context-specific error messages
+        let title = 'Extraction Failed';
+        let description = 'Please try again or enter manually';
+        
+        if (isCredits) {
+          title = 'AI Credits Exhausted';
+          description = 'Please contact support or try again later.';
+        } else if (isRateLimited) {
+          title = 'Too Many Requests';
+          description = 'Please wait a minute and try again.';
+        } else if (isParseError) {
+          title = 'Data Processing Error';
+          description = 'The AI returned invalid data. Try a clearer screenshot or enter manually.';
+        } else if (isAuthError) {
+          title = 'Authentication Required';
+          description = 'Please sign in again to continue.';
+        } else if (errMsg && errMsg !== 'Failed to extract trade information') {
+          title = errMsg;
+          description = errDetails || 'Please try again or enter manually';
+        }
+        
+        toast.error(title, { description });
         return;
       }
 
@@ -832,16 +866,40 @@ const Upload = () => {
                   
                   {/* Pre-select broker - Always visible until trades are extracted */}
                   {extractedTrades.length === 0 && (
-                    <div className="mb-4 p-4 border border-border rounded-lg bg-muted/30">
-                      <Label className="text-sm font-medium mb-2 block">Broker (Required) *</Label>
+                    <div 
+                      ref={brokerFieldRef}
+                      className={cn(
+                        "mb-4 p-4 border rounded-lg bg-muted/30 transition-colors",
+                        brokerError 
+                          ? "border-destructive bg-destructive/5" 
+                          : "border-border"
+                      )}
+                    >
+                      <Label className={cn(
+                        "text-sm font-medium mb-2 block",
+                        brokerError && "text-destructive"
+                      )}>
+                        Broker (Required) *
+                      </Label>
                       <p className="text-xs text-muted-foreground mb-3">
                         Select your broker to pre-fill this field in extracted trades
                       </p>
                       <BrokerSelect 
                         value={preSelectedBroker}
-                        onChange={setPreSelectedBroker}
+                        onChange={(value) => {
+                          setPreSelectedBroker(value);
+                          setBrokerError(false);
+                        }}
                         required
                       />
+                      {brokerError && (
+                        <p className="text-xs text-destructive mt-2 flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          Please select a broker to continue
+                        </p>
+                      )}
                     </div>
                   )}
                   <div className="mt-2">
