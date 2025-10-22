@@ -61,36 +61,48 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             </div>
           </header>
 
-          <div className="flex-1 flex overflow-hidden">
+          <div className="flex-1 flex overflow-hidden relative">
             <main className="flex-1 p-3 md:p-6 overflow-auto pb-20 md:pb-6 custom-scrollbar mobile-safe">
               {children}
             </main>
             
-            {/* Collapsible Right Sidebar - Gamification */}
+            {/* Glassmorphic Overlay Sidebar - Gamification */}
             <AnimatePresence>
               {isGamificationOpen && (
-                <motion.aside
-                  initial={{ width: 0, opacity: 0 }}
-                  animate={{ width: 320, opacity: 1 }}
-                  exit={{ width: 0, opacity: 0 }}
-                  transition={{ type: "spring", duration: 0.4 }}
-                  className="hidden xl:block border-l border-border/50 overflow-hidden bg-background/50 backdrop-blur-sm"
-                >
-                  <div className="w-80 p-4 overflow-auto custom-scrollbar h-full">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-semibold text-sm text-muted-foreground">Progress</h3>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setIsGamificationOpen(false)}
-                        className="h-7 w-7"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </Button>
+                <>
+                  {/* Backdrop */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setIsGamificationOpen(false)}
+                    className="hidden xl:block fixed inset-0 bg-black/20 backdrop-blur-[2px] z-40"
+                  />
+                  
+                  {/* Glass Sidebar */}
+                  <motion.aside
+                    initial={{ x: "100%", opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: "100%", opacity: 0 }}
+                    transition={{ type: "spring", duration: 0.5, bounce: 0.2 }}
+                    className="hidden xl:block fixed right-0 top-0 bottom-0 w-96 z-50 bg-background/40 backdrop-blur-3xl border-l border-white/20 shadow-2xl"
+                  >
+                    <div className="h-full p-6 overflow-auto custom-scrollbar">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="font-semibold text-lg">Your Progress</h3>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setIsGamificationOpen(false)}
+                          className="h-8 w-8 rounded-full hover:bg-white/10"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <GamificationSidebar />
                     </div>
-                    <GamificationSidebar />
-                  </div>
-                </motion.aside>
+                  </motion.aside>
+                </>
               )}
             </AnimatePresence>
           </div>
