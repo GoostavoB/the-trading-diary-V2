@@ -1,23 +1,25 @@
 import { SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
 import { BarChart3, TrendingUp, Target, Sparkles } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function SidebarQuickLinks() {
+  const { t } = useTranslation();
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive
       ? "bg-accent text-accent-foreground font-medium"
       : "hover:bg-accent/50 hover:text-accent-foreground";
 
   const quickLinks = [
-    { to: '/analytics', icon: BarChart3, label: 'Analytics' },
-    { to: '/forecast', icon: TrendingUp, label: 'Forecast' },
-    { to: '/achievements', icon: Target, label: 'Goals' },
-    { to: '/ai-tools', icon: Sparkles, label: 'AI Tools' },
+    { to: '/analytics', icon: BarChart3, label: t('navigation.analytics') },
+    { to: '/forecast', icon: TrendingUp, label: t('navigation.forecast') },
+    { to: '/achievements', icon: Target, label: t('navigation.achievements') },
+    { to: '/ai-tools', icon: Sparkles, label: t('navigation.aiTools') },
   ];
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Quick Access</SidebarGroupLabel>
+      <SidebarGroupLabel>{t('navigation.quickAccess')}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {quickLinks.map((link) => (

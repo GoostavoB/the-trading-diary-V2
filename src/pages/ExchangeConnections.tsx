@@ -13,6 +13,7 @@ import { SyncTradesDialog } from '@/components/exchanges/SyncTradesDialog';
 import { ExchangeLogo } from '@/components/ExchangeLogo';
 import { formatDistanceToNow } from 'date-fns';
 import AppLayout from '@/components/layout/AppLayout';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface ExchangeConnection {
   id: string;
@@ -25,6 +26,7 @@ interface ExchangeConnection {
 }
 
 export default function ExchangeConnections() {
+  const { t } = useTranslation();
   const [selectedExchange, setSelectedExchange] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [previewConnectionId, setPreviewConnectionId] = useState<string | null>(null);
@@ -154,7 +156,7 @@ export default function ExchangeConnections() {
     {
       id: 'binance',
       name: 'Binance',
-      description: 'World\'s largest crypto exchange - sync spot & futures trades',
+      description: t('exchanges.descriptions.binance'),
       comingSoon: false,
       sizeScale: 1.0, // No change
     },
@@ -268,9 +270,9 @@ export default function ExchangeConnections() {
     <AppLayout>
       <div className="container max-w-7xl mx-auto p-6 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Exchange Connections</h1>
+        <h1 className="text-3xl font-bold">{t('exchanges.title')}</h1>
         <p className="text-muted-foreground mt-2">
-          Connect your exchange accounts to automatically sync your trading history
+          {t('exchanges.subtitle')}
         </p>
       </div>
 
