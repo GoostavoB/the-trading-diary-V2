@@ -31,6 +31,7 @@ interface MenuItem {
   title: string;
   url: string;
   icon: any;
+  keywords?: string[]; // Semantic search keywords
 }
 
 interface MenuGroup {
@@ -52,65 +53,65 @@ export function AppSidebar() {
       label: 'Dashboard',
       defaultOpen: true,
       items: [
-        { title: t('navigation.dashboard'), url: '/dashboard', icon: BarChart3 },
+        { title: t('navigation.dashboard'), url: '/dashboard', icon: BarChart3, keywords: ['overview', 'home', 'main', 'summary'] },
       ],
     },
     {
       label: 'Portfolio',
       defaultOpen: true,
       items: [
-        { title: t('navigation.spotWallet'), url: '/spot-wallet', icon: Wallet },
-        { title: t('navigation.exchanges'), url: '/exchanges', icon: RefreshCw },
-        { title: 'Trading Accounts', url: '/accounts', icon: PieChart },
+        { title: t('navigation.spotWallet'), url: '/spot-wallet', icon: Wallet, keywords: ['balance', 'holdings', 'assets', 'tokens', 'coins', 'crypto'] },
+        { title: t('navigation.exchanges'), url: '/exchanges', icon: RefreshCw, keywords: ['binance', 'bybit', 'api', 'connect', 'sync', 'integration'] },
+        { title: 'Trading Accounts', url: '/accounts', icon: PieChart, keywords: ['accounts', 'wallets', 'manage', 'profiles'] },
       ],
     },
     {
       label: 'Trades',
       defaultOpen: true,
       items: [
-        { title: t('trades.addTrade'), url: '/upload', icon: Plus },
-        { title: 'Trade Analysis', url: '/trade-analysis', icon: GitCompare },
-        { title: t('navigation.feeAnalysis'), url: '/fee-analysis', icon: Receipt },
-        { title: 'Risk Management', url: '/risk-management', icon: Shield },
-        { title: 'Trading Journal', url: '/journal', icon: BookMarked },
+        { title: t('trades.addTrade'), url: '/upload', icon: Plus, keywords: ['new', 'create', 'add', 'import', 'log', 'record', 'entry'] },
+        { title: 'Trade Analysis', url: '/trade-analysis', icon: GitCompare, keywords: ['performance', 'results', 'stats', 'pairs', 'setups', 'review'] },
+        { title: t('navigation.feeAnalysis'), url: '/fee-analysis', icon: Receipt, keywords: ['costs', 'expenses', 'commissions', 'charges', 'fees'] },
+        { title: 'Risk Management', url: '/risk-management', icon: Shield, keywords: ['position sizing', 'drawdown', 'exposure', 'risk', 'safety', 'protection'] },
+        { title: 'Trading Journal', url: '/journal', icon: BookMarked, keywords: ['notes', 'diary', 'log', 'thoughts', 'lessons', 'reflection'] },
       ],
     },
     {
       label: 'Analytics',
       defaultOpen: false,
       items: [
-        { title: t('navigation.marketData'), url: '/market-data', icon: LineChart },
-        { title: t('navigation.forecast'), url: '/forecast', icon: Target },
-        { title: 'Economic Calendar', url: '/economic-calendar', icon: Calendar },
-        { title: 'Performance Alerts', url: '/performance-alerts', icon: Bell },
+        { title: t('navigation.marketData'), url: '/market-data', icon: LineChart, keywords: ['prices', 'charts', 'market', 'data', 'volatility', 'volume'] },
+        { title: t('navigation.forecast'), url: '/forecast', icon: Target, keywords: ['prediction', 'projections', 'models', 'signals', 'forecast'] },
+        { title: 'Economic Calendar', url: '/economic-calendar', icon: Calendar, keywords: ['events', 'news', 'macro', 'economy', 'calendar', 'schedule'] },
+        { title: 'Performance Alerts', url: '/performance-alerts', icon: Bell, keywords: ['notifications', 'alerts', 'warnings', 'triggers', 'monitoring'] },
       ],
     },
     {
       label: 'Planning',
       defaultOpen: false,
       items: [
-        { title: 'Trading Plan', url: '/trading-plan', icon: ClipboardList },
-        { title: 'Goals & Milestones', url: '/goals', icon: Target },
-        { title: 'Psychology', url: '/psychology', icon: Brain },
+        { title: 'Trading Plan', url: '/trading-plan', icon: ClipboardList, keywords: ['strategy', 'rules', 'checklist', 'plan', 'system', 'framework'] },
+        { title: 'Goals & Milestones', url: '/goals', icon: Target, keywords: ['targets', 'objectives', 'goals', 'milestones', 'achievements', 'progress'] },
+        { title: 'Psychology', url: '/psychology', icon: Brain, keywords: ['emotions', 'feelings', 'mental', 'mindset', 'bias', 'mood', 'discipline', 'behavior', 'emotional'] },
       ],
     },
     {
       label: 'Reports',
       defaultOpen: false,
       items: [
-        { title: 'Reports', url: '/reports', icon: FileBarChart },
-        { title: 'Tax Reports', url: '/tax-reports', icon: FileText },
-        { title: 'My Metrics', url: '/my-metrics', icon: Star },
+        { title: 'Reports', url: '/reports', icon: FileBarChart, keywords: ['export', 'download', 'report', 'summary', 'kpi', 'metrics'] },
+        { title: 'Tax Reports', url: '/tax-reports', icon: FileText, keywords: ['tax', 'gains', 'losses', 'fifo', 'lifo', 'irs', 'accounting'] },
+        { title: 'My Metrics', url: '/my-metrics', icon: Star, keywords: ['custom', 'kpi', 'benchmarks', 'personal', 'metrics', 'indicators'] },
       ],
     },
     {
       label: 'Community',
       defaultOpen: false,
       items: [
-        { title: 'Social', url: '/social', icon: Users },
-        { title: 'Leaderboard', url: '/leaderboard', icon: Trophy },
-        { title: t('navigation.achievements'), url: '/achievements', icon: Award },
-        { title: 'Progress & XP', url: '/progress-analytics', icon: Zap },
+        { title: 'Social', url: '/social', icon: Users, keywords: ['feed', 'community', 'share', 'posts', 'follow', 'social'] },
+        { title: 'Leaderboard', url: '/leaderboard', icon: Trophy, keywords: ['rankings', 'top', 'competition', 'leaderboard', 'leaders'] },
+        { title: t('navigation.achievements'), url: '/achievements', icon: Award, keywords: ['badges', 'awards', 'achievements', 'trophies', 'rewards', 'unlocks'] },
+        { title: 'Progress & XP', url: '/progress-analytics', icon: Zap, keywords: ['level', 'xp', 'experience', 'progress', 'growth', 'streaks'] },
       ],
     },
   ];
@@ -124,9 +125,14 @@ export function AppSidebar() {
   const filteredMenuStructure = menuStructure
     .map(group => ({
       ...group,
-      items: group.items.filter(item =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase())
-      ),
+      items: group.items.filter(item => {
+        const query = searchQuery.toLowerCase();
+        const titleMatch = item.title.toLowerCase().includes(query);
+        const keywordsMatch = item.keywords?.some(keyword => 
+          keyword.toLowerCase().includes(query)
+        );
+        return titleMatch || keywordsMatch;
+      }),
     }))
     .filter(group => 
       !archivedGroups.includes(group.label) && 
