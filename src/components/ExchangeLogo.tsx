@@ -9,17 +9,17 @@ interface ExchangeLogoProps {
 }
 
 const exchangeLogos: Record<string, { svg: string; png?: string }> = {
-  binance: { svg: "/exchange-logos/binance.png" },
-  bybit: { svg: "/exchange-logos/bybit.png" },
+  binance: { svg: "/exchange-logos/binance.png?v=20251022-1" },
+  bybit: { svg: "/exchange-logos/bybit.png?v=20251022-1" },
   coinbase: { svg: "/exchange-logos/coinbase.png" },
   okx: { svg: "/exchange-logos/okx.svg" },
   kraken: { svg: "/exchange-logos/kraken.svg" },
-  kucoin: { svg: "/exchange-logos/kucoin.png" },
+  kucoin: { svg: "/exchange-logos/kucoin.png?v=20251022-1" },
   gateio: { svg: "/exchange-logos/gateio.svg" },
-  mexc: { svg: "/exchange-logos/mexc.png" },
+  mexc: { svg: "/exchange-logos/mexc.png?v=20251022-1" },
   bitfinex: { svg: "/exchange-logos/bitfinex.png" },
   bitstamp: { svg: "/exchange-logos/bitstamp.png" },
-  bingx: { svg: "/exchange-logos/bingx.png" },
+  bingx: { svg: "/exchange-logos/bingx.png?v=20251022-1" },
 };
 
 const sizeClasses = {
@@ -73,6 +73,7 @@ export const ExchangeLogo = ({
       className={`${sizeClasses[size]} w-auto object-contain ${className}`}
       onError={handleError}
       loading="lazy"
+      decoding="async"
       style={{
         imageRendering: "-webkit-optimize-contrast",
         WebkitBackfaceVisibility: "hidden",

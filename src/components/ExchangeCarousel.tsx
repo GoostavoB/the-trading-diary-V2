@@ -5,17 +5,17 @@ interface Exchange {
 }
 
 const exchanges: Exchange[] = [
-  { name: "Binance", logo: "/exchange-logos/binance.png", alt: "Binance logo" },
-  { name: "Bybit", logo: "/exchange-logos/bybit.png", alt: "Bybit logo" },
+  { name: "Binance", logo: "/exchange-logos/binance.png?v=20251022-1", alt: "Binance logo" },
+  { name: "Bybit", logo: "/exchange-logos/bybit.png?v=20251022-1", alt: "Bybit logo" },
   { name: "Coinbase", logo: "/exchange-logos/coinbase.png", alt: "Coinbase logo" },
   { name: "OKX", logo: "/exchange-logos/okx.svg", alt: "OKX logo" },
   { name: "Kraken", logo: "/exchange-logos/kraken.svg", alt: "Kraken logo" },
-  { name: "KuCoin", logo: "/exchange-logos/kucoin.png", alt: "KuCoin logo" },
+  { name: "KuCoin", logo: "/exchange-logos/kucoin.png?v=20251022-1", alt: "KuCoin logo" },
   { name: "Gate.io", logo: "/exchange-logos/gateio.svg", alt: "Gate.io logo" },
-  { name: "MEXC", logo: "/exchange-logos/mexc.png", alt: "MEXC logo" },
+  { name: "MEXC", logo: "/exchange-logos/mexc.png?v=20251022-1", alt: "MEXC logo" },
   { name: "Bitfinex", logo: "/exchange-logos/bitfinex.png", alt: "Bitfinex logo" },
   { name: "Bitstamp", logo: "/exchange-logos/bitstamp.png", alt: "Bitstamp logo" },
-  { name: "BingX", logo: "/exchange-logos/bingx.png", alt: "BingX logo" },
+  { name: "BingX", logo: "/exchange-logos/bingx.png?v=20251022-1", alt: "BingX logo" },
 ];
 
 export const ExchangeCarousel = () => {
@@ -25,21 +25,18 @@ export const ExchangeCarousel = () => {
       aria-label="Partner exchanges"
       role="region"
     >
-      <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8 max-w-4xl mx-auto">
+      <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 max-w-4xl mx-auto">
         {exchanges.map((exchange) => (
-          <div
+          <img
             key={exchange.name}
-            className="flex items-center justify-center p-4 md:p-5 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50"
+            src={exchange.logo}
+            alt={exchange.alt}
+            className="h-8 md:h-10 w-auto object-contain shrink-0"
+            loading="lazy"
+            decoding="async"
             role="img"
             aria-label={exchange.alt}
-          >
-            <img
-              src={exchange.logo}
-              alt={exchange.alt}
-              className="h-7 md:h-9 w-auto object-contain"
-              loading="lazy"
-            />
-          </div>
+          />
         ))}
       </div>
     </div>
