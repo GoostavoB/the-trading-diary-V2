@@ -1,7 +1,22 @@
 /**
  * Analytics utilities for tracking user interactions
- * Placeholder for future analytics integration
+ * Google Analytics 4 Integration
  */
+
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+    dataLayer?: any[];
+  }
+}
+
+export type EventCategory = 
+  | 'engagement'
+  | 'conversion'
+  | 'navigation'
+  | 'trading'
+  | 'content'
+  | 'social';
 
 interface AnalyticsEvent {
   event: string;
@@ -82,13 +97,84 @@ class Analytics {
   }
 
   /**
+   * Track article view
+   */
+  trackArticleView(articleSlug: string, articleTitle: string, category: string) {
+    this.track('view_item', {
+      content_type: 'article',
+      item_id: articleSlug,
+      item_name: articleTitle,
+      item_category: category,
+    });
+
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'view_item', {
+        content_type: 'article',
+        item_id: articleSlug,
+        item_name: articleTitle,
+        item_category: category,
+      });
+    }
+  }
+
+  /**
+   * Track article reading progress
+   */
+  trackArticleProgress(articleSlug: string, progressPercent: number) {
+    if (progressPercent === 25 || progressPercent === 50 || progressPercent === 75 || progressPercent === 100) {
+      this.track('article_progress', {
+        article_slug: articleSlug,
+        progress_percent: progressPercent,
+      });
+    }
+  }
+
+  /**
+   * Track custom event with category
+   */
+  trackEvent({ action, category, label, value, ...params }: {
+    action: string;
+    category: EventCategory;
+    label?: string;
+    value?: number;
+    [key: string]: any;
+  }) {
+    this.track(action, {
+      event_category: category,
+      event_label: label,
+      value: value,
+      ...params,
+    });
+
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', action, {
+        event_category: category,
+        event_label: label,
+        value: value,
+        ...params,
+      });
+    }
+  }
+
+  /**
+   * Set user properties for segmentation
+   */
+  setUserProperties(properties: Record<string, any>) {
+    if (typeof window.gtag === 'function') {
+      window.gtag('set', 'user_properties', properties);
+    }
+    
+    this.track('user_properties_set', properties);
+  }
+
+  /**
    * Send event to analytics service
    */
   private sendEvent(event: AnalyticsEvent) {
-    // Implement your analytics provider here
-    // Example: segment.track(event.event, event.properties);
-    // Example: mixpanel.track(event.event, event.properties);
-    // Example: amplitude.logEvent(event.event, event.properties);
+    // Google Analytics 4 via gtag
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', event.event, event.properties);
+    }
   }
 
   /**
@@ -101,3 +187,8 @@ class Analytics {
 }
 
 export const analytics = new Analytics();
+
+// Export convenience functions
+export const trackPageView = (path: string, title?: string) => analytics.page(path, { page_title: title });
+export const trackArticleView = (slug: string, title: string, category: string) => 
+  analytics.trackArticleView(slug, title, category);

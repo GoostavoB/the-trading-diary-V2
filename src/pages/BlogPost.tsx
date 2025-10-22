@@ -11,10 +11,18 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 import { addStructuredData, generateBreadcrumbSchema, generateHowToSchema } from '@/utils/seoHelpers';
 import { useEffect } from 'react';
 import { TableOfContents } from '@/components/TableOfContents';
+import { useArticleTracking } from '@/hooks/useArticleTracking';
 
 const BlogPost = () => {
   const { slug } = useParams();
   const article = blogArticles.find(a => a.slug === slug);
+  
+  // Track article reading behavior
+  useArticleTracking({
+    articleSlug: slug || '',
+    articleTitle: article?.title || '',
+    category: article?.category || '',
+  });
   
   // SEO Meta Tags and Structured Data
   useEffect(() => {

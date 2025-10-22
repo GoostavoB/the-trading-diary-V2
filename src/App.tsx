@@ -15,6 +15,8 @@ import { GlobalSearch } from "@/components/GlobalSearch";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { InstallPrompt } from "@/components/mobile/InstallPrompt";
 import { ThemeInitializer } from "@/components/ThemeInitializer";
+import { usePageTracking } from "@/hooks/usePageTracking";
+import { ConversionTracking } from "@/components/ConversionTracking";
 
 // Eagerly load critical pages (landing and auth)
 import Index from "./pages/Index";
@@ -94,6 +96,74 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const AppRoutes = () => {
+  usePageTracking(); // Automatically track page views
+  
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        {/* Landing pages by language */}
+        <Route path="/" element={<Index />} />
+        <Route path="/pt" element={<IndexPt />} />
+        <Route path="/es" element={<IndexEs />} />
+        <Route path="/ar" element={<IndexAr />} />
+        <Route path="/vi" element={<IndexVi />} />
+        
+        {/* Auth with language detection */}
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/logo-download" element={<LogoDownload />} />
+        <Route path="/crypto-trading-faq" element={<CryptoTradingFAQ />} />
+        <Route path="/sitemap" element={<Sitemap />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/seo-dashboard" element={<SEODashboard />} />
+        
+        {/* Blog routes with language support */}
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
+        <Route path="/author/:authorSlug" element={<Author />} />
+        
+        {/* Language-specific blog routes */}
+        <Route path="/:lang/blog" element={<Blog />} />
+        <Route path="/:lang/blog/:slug" element={<BlogPost />} />
+        
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/upload" element={<ProtectedRoute><Upload /></ProtectedRoute>} />
+        <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+        <Route path="/forecast" element={<ProtectedRoute><Forecast /></ProtectedRoute>} />
+        <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
+        <Route path="/gamification" element={<ProtectedRoute><Gamification /></ProtectedRoute>} />
+        <Route path="/market-data" element={<ProtectedRoute><MarketData /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+        <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} />
+        <Route path="/ai-tools" element={<ProtectedRoute><AITools /></ProtectedRoute>} />
+        <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
+        <Route path="/trade-analysis" element={<ProtectedRoute><TradeAnalysis /></ProtectedRoute>} />
+        <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
+        <Route path="/risk-management" element={<ProtectedRoute><RiskManagement /></ProtectedRoute>} />
+        <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+        <Route path="/psychology" element={<ProtectedRoute><Psychology /></ProtectedRoute>} />
+        <Route path="/trading-plan" element={<ProtectedRoute><TradingPlan /></ProtectedRoute>} />
+        <Route path="/exchanges" element={<ProtectedRoute><ExchangeConnections /></ProtectedRoute>} />
+        <Route path="/spot-wallet" element={<ProtectedRoute><SpotWallet /></ProtectedRoute>} />
+        <Route path="/fee-analysis" element={<ProtectedRoute><FeeAnalysis /></ProtectedRoute>} />
+        <Route path="/faq" element={<ProtectedRoute><FAQ /></ProtectedRoute>} />
+        <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+        <Route path="/long-short-ratio" element={<ProtectedRoute><LongShortRatio /></ProtectedRoute>} />
+        <Route path="/economic-calendar" element={<ProtectedRoute><EconomicCalendar /></ProtectedRoute>} />
+        <Route path="/tax-reports" element={<ProtectedRoute><TaxReports /></ProtectedRoute>} />
+        <Route path="/accounts" element={<ProtectedRoute><Accounts /></ProtectedRoute>} />
+        <Route path="/performance-alerts" element={<ProtectedRoute><PerformanceAlerts /></ProtectedRoute>} />
+        <Route path="/exchange-connections" element={<ProtectedRoute><ExchangeConnections /></ProtectedRoute>} />
+        <Route path="/progress-analytics" element={<ProtectedRoute><ProgressAnalytics /></ProtectedRoute>} />
+        <Route path="/my-metrics" element={<ProtectedRoute><MyMetrics /></ProtectedRoute>} />
+        <Route path="/user-guide" element={<ProtectedRoute><UserGuide /></ProtectedRoute>} />
+        <Route path="/custom/:pageId" element={<ProtectedRoute><CustomPage /></ProtectedRoute>} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
+  );
+};
+
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
@@ -106,67 +176,8 @@ const App = () => (
             <AuthProvider>
               <CalmModeProvider>
                 <AIAssistantProvider>
-                  <Suspense fallback={<PageLoader />}>
-                    <Routes>
-                      {/* Landing pages by language */}
-                      <Route path="/" element={<Index />} />
-                      <Route path="/pt" element={<IndexPt />} />
-                      <Route path="/es" element={<IndexEs />} />
-                      <Route path="/ar" element={<IndexAr />} />
-                      <Route path="/vi" element={<IndexVi />} />
-                      
-                      {/* Auth with language detection */}
-                      <Route path="/auth" element={<Auth />} />
-                      <Route path="/logo-download" element={<LogoDownload />} />
-                      <Route path="/crypto-trading-faq" element={<CryptoTradingFAQ />} />
-                      <Route path="/sitemap" element={<Sitemap />} />
-                      <Route path="/about" element={<About />} />
-                      <Route path="/seo-dashboard" element={<SEODashboard />} />
-                      
-                      {/* Blog routes with language support */}
-                      <Route path="/blog" element={<Blog />} />
-                      <Route path="/blog/:slug" element={<BlogPost />} />
-                      <Route path="/author/:authorSlug" element={<Author />} />
-                      
-                      {/* Language-specific blog routes */}
-                      <Route path="/:lang/blog" element={<Blog />} />
-                      <Route path="/:lang/blog/:slug" element={<BlogPost />} />
-                      
-                      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                      <Route path="/upload" element={<ProtectedRoute><Upload /></ProtectedRoute>} />
-                      <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-                      <Route path="/forecast" element={<ProtectedRoute><Forecast /></ProtectedRoute>} />
-                      <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
-                      <Route path="/gamification" element={<ProtectedRoute><Gamification /></ProtectedRoute>} />
-                      <Route path="/market-data" element={<ProtectedRoute><MarketData /></ProtectedRoute>} />
-                      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                      <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} />
-                      <Route path="/ai-tools" element={<ProtectedRoute><AITools /></ProtectedRoute>} />
-                      <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
-                      <Route path="/trade-analysis" element={<ProtectedRoute><TradeAnalysis /></ProtectedRoute>} />
-                      <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
-                      <Route path="/risk-management" element={<ProtectedRoute><RiskManagement /></ProtectedRoute>} />
-                      <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
-                      <Route path="/psychology" element={<ProtectedRoute><Psychology /></ProtectedRoute>} />
-                      <Route path="/trading-plan" element={<ProtectedRoute><TradingPlan /></ProtectedRoute>} />
-                      <Route path="/exchanges" element={<ProtectedRoute><ExchangeConnections /></ProtectedRoute>} />
-                      <Route path="/spot-wallet" element={<ProtectedRoute><SpotWallet /></ProtectedRoute>} />
-                      <Route path="/fee-analysis" element={<ProtectedRoute><FeeAnalysis /></ProtectedRoute>} />
-                      <Route path="/faq" element={<ProtectedRoute><FAQ /></ProtectedRoute>} />
-                      <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
-                      <Route path="/long-short-ratio" element={<ProtectedRoute><LongShortRatio /></ProtectedRoute>} />
-                      <Route path="/economic-calendar" element={<ProtectedRoute><EconomicCalendar /></ProtectedRoute>} />
-                      <Route path="/tax-reports" element={<ProtectedRoute><TaxReports /></ProtectedRoute>} />
-                      <Route path="/accounts" element={<ProtectedRoute><Accounts /></ProtectedRoute>} />
-                      <Route path="/performance-alerts" element={<ProtectedRoute><PerformanceAlerts /></ProtectedRoute>} />
-                      <Route path="/exchange-connections" element={<ProtectedRoute><ExchangeConnections /></ProtectedRoute>} />
-                      <Route path="/progress-analytics" element={<ProtectedRoute><ProgressAnalytics /></ProtectedRoute>} />
-                      <Route path="/my-metrics" element={<ProtectedRoute><MyMetrics /></ProtectedRoute>} />
-                      <Route path="/user-guide" element={<ProtectedRoute><UserGuide /></ProtectedRoute>} />
-                      <Route path="/custom/:pageId" element={<ProtectedRoute><CustomPage /></ProtectedRoute>} />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </Suspense>
+                  <AppRoutes />
+                  <ConversionTracking />
                   <PerformanceMonitor />
                   <GlobalSearch />
                   <OfflineIndicator />
