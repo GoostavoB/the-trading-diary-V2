@@ -54,10 +54,10 @@ export const ExchangeLogo = ({
   if (imgError || !logoData) {
     return showFallback ? (
       <div
-        className={`${sizeClasses[size]} w-auto px-3 py-1 rounded bg-muted flex items-center justify-center ${className}`}
+        className={`${sizeClasses[size]} w-auto px-4 py-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 flex items-center justify-center ${className}`}
         aria-label={`${exchangeName} logo`}
       >
-        <span className="text-xs font-semibold text-muted-foreground uppercase">
+        <span className="text-sm font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent uppercase tracking-wider">
           {exchangeName.slice(0, 4)}
         </span>
       </div>
