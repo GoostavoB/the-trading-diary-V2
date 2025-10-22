@@ -148,6 +148,9 @@ serve(async (req) => {
       );
     }
 
+    // Pre-estimate trade count from OCR for cache validation
+    const estimatedTradeCount = estimateTradeCount(ocrText || '');
+
     // Check cache first using image hash
     if (imageHash) {
       const { data: cached } = await supabaseClient
@@ -157,16 +160,21 @@ serve(async (req) => {
         .single();
 
       if (cached) {
-        console.log('✅ Cache hit for image:', imageHash);
-        const latency = Date.now() - startTime;
-        
-        await logCost(supabaseClient, user.id, 'extract-trade-info', 'cached', 
-          'cached', 0, 0, 0, latency, { cacheHit: true });
-        
-        return new Response(
-          JSON.stringify({ trades: cached.parsed_json, cached: true }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        const cachedCount = Array.isArray(cached.parsed_json) ? cached.parsed_json.length : 0;
+        const shouldBypassCache = estimatedTradeCount > 1 && estimatedTradeCount <= 10 && cachedCount < estimatedTradeCount;
+
+        if (!shouldBypassCache) {
+          console.log('✅ Cache hit for image:', imageHash, `(trades: ${cachedCount})`);
+          const latency = Date.now() - startTime;
+          await logCost(supabaseClient, user.id, 'extract-trade-info', 'cached', 
+            'cached', 0, 0, 0, latency, { cacheHit: true });
+          return new Response(
+            JSON.stringify({ trades: cached.parsed_json, cached: true }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        } else {
+          console.log(`♻️ Bypassing cache: estimated ${estimatedTradeCount} trades, cached had ${cachedCount}`);
+        }
       }
     }
 
@@ -184,8 +192,7 @@ serve(async (req) => {
     // Calculate OCR quality score
     const ocrQualityScore = ocrText && ocrConfidence ? ocrConfidence : 0;
 
-    // Estimate trade count from OCR text
-    const estimatedTradeCount = estimateTradeCount(ocrText || '');
+    // Log estimate from OCR analysis
     console.log(`📊 Estimated ${estimatedTradeCount} trade(s) from OCR analysis`);
 
     // Build context
@@ -423,6 +430,17 @@ serve(async (req) => {
       duration_minutes: Number(t.duration_minutes) || 0,
       notes: t.notes ?? ''
     }));
+
+    // Enforce max 10 trades per image
+    if (normalizedTrades.length > 10) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Too many trades detected in one image',
+          details: `Found ${normalizedTrades.length} trades. Maximum allowed is 10.`
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Cache result
     if (imageHash) {
