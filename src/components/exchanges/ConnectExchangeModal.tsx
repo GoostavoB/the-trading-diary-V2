@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   Dialog,
   DialogContent,
@@ -28,6 +29,7 @@ export function ConnectExchangeModal({
   onClose,
   onSuccess,
 }: ConnectExchangeModalProps) {
+  const { t } = useTranslation();
   const [apiKey, setApiKey] = useState('');
   const [apiSecret, setApiSecret] = useState('');
   const [apiPassphrase, setApiPassphrase] = useState('');
@@ -79,7 +81,7 @@ export function ConnectExchangeModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!apiKey || !apiSecret) {
-      toast.error('Please fill in all fields');
+      toast.error(t('exchanges.connect.fillAllFields'));
       return;
     }
     connectMutation.mutate();
@@ -105,34 +107,34 @@ export function ConnectExchangeModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Connect to {info.name}</DialogTitle>
+          <DialogTitle>{t('exchanges.connect.title')} {info.name}</DialogTitle>
           <DialogDescription>
-            Enter your {info.name} API credentials to sync your trades automatically
+            {t('exchanges.connect.description', { exchange: info.name })}
           </DialogDescription>
         </DialogHeader>
 
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription className="text-sm space-y-2">
-            <p className="font-semibold">Important Security Notice:</p>
+            <p className="font-semibold">{t('exchanges.connect.securityNotice')}</p>
             <ul className="list-disc list-inside space-y-1 text-xs">
-              <li>Only use read-only API keys</li>
-              <li>Never grant trading, withdrawal, or transfer permissions</li>
-              <li>Your credentials are encrypted and stored securely</li>
+              <li>{t('exchanges.connect.readOnlyKeys')}</li>
+              <li>{t('exchanges.connect.neverGrant')}</li>
+              <li>{t('exchanges.connect.encrypted')}</li>
             </ul>
           </AlertDescription>
         </Alert>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="apiKey">API Key *</Label>
+            <Label htmlFor="apiKey">{t('exchanges.connect.apiKey')} *</Label>
             <div className="relative">
               <Input
                 id="apiKey"
                 type={showKey ? 'text' : 'password'}
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Enter your API key"
+                placeholder={t('exchanges.connect.enterApiKey')}
                 required
               />
               <Button
@@ -148,14 +150,14 @@ export function ConnectExchangeModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="apiSecret">API Secret *</Label>
+            <Label htmlFor="apiSecret">{t('exchanges.connect.apiSecret')} *</Label>
             <div className="relative">
               <Input
                 id="apiSecret"
                 type={showSecret ? 'text' : 'password'}
                 value={apiSecret}
                 onChange={(e) => setApiSecret(e.target.value)}
-                placeholder="Enter your API secret"
+                placeholder={t('exchanges.connect.enterApiSecret')}
                 required
               />
               <Button
@@ -179,7 +181,7 @@ export function ConnectExchangeModal({
                   type={showPassphrase ? 'text' : 'password'}
                   value={apiPassphrase}
                   onChange={(e) => setApiPassphrase(e.target.value)}
-                  placeholder={`Enter your ${info.passphraseLabel?.toLowerCase()}`}
+                  placeholder={t('exchanges.connect.enterPassphrase')}
                   required
                 />
                 <Button
@@ -201,13 +203,13 @@ export function ConnectExchangeModal({
             className="p-0 h-auto text-sm"
             onClick={() => window.open(info.docsUrl, '_blank')}
           >
-            How to get {info.name} API keys
+            {t('exchanges.connect.howToGet', { exchange: info.name })}
             <ExternalLink className="ml-1 h-3 w-3" />
           </Button>
 
           <div className="flex gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               type="submit"
@@ -217,10 +219,10 @@ export function ConnectExchangeModal({
               {connectMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Testing...
+                  {t('exchanges.connect.testing')}
                 </>
               ) : (
-                'Connect'
+                t('exchanges.connect.connect')
               )}
             </Button>
           </div>

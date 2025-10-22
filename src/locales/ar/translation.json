@@ -23,6 +23,9 @@
     "success": "تم بنجاح",
     "noData": "لا توجد بيانات"
   },
+  "common": {
+    "cancel": "إلغاء"
+  },
   "navigation": {
     "home": "الرئيسية",
     "dashboard": "لوحة التحكم",
@@ -95,7 +98,8 @@
       "enterPassphrase": "أدخل {{label}} الخاص بك",
       "howToGet": "كيفية الحصول على مفاتيح API لـ {{exchange}}",
       "testing": "جارٍ الاختبار...",
-      "connect": "اتصال"
+      "connect": "اتصال",
+      "fillAllFields": "يرجى ملء جميع الحقول"
     },
     "sync": {
       "title": "جلب الصفقات من {{exchange}}",

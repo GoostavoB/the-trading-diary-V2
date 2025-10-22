@@ -29,6 +29,9 @@
     "customize": "Customize",
     "settings": "Settings"
   },
+  "common": {
+    "cancel": "Cancel"
+  },
   "navigation": {
     "home": "Home",
     "dashboard": "Dashboard",
@@ -96,7 +99,8 @@
       "enterPassphrase": "Enter your {{label}}",
       "howToGet": "How to get {{exchange}} API keys",
       "testing": "Testing...",
-      "connect": "Connect"
+      "connect": "Connect",
+      "fillAllFields": "Please fill in all fields"
     },
     "sync": {
       "title": "Fetch Trades from {{exchange}}",

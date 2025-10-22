@@ -23,6 +23,9 @@
     "success": "Erfolg",
     "noData": "Keine Daten verfügbar"
   },
+  "common": {
+    "cancel": "Abbrechen"
+  },
   "navigation": {
     "home": "Start",
     "dashboard": "Dashboard",
@@ -95,7 +98,8 @@
       "enterPassphrase": "Geben Sie Ihre {{label}} ein",
       "howToGet": "So erhalten Sie {{exchange}} API-Schlüssel",
       "testing": "Teste...",
-      "connect": "Verbinden"
+      "connect": "Verbinden",
+      "fillAllFields": "Bitte füllen Sie alle Felder aus"
     },
     "sync": {
       "title": "Trades von {{exchange}} abrufen",

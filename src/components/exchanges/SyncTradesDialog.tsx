@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   Dialog,
   DialogContent,
@@ -36,6 +37,7 @@ export function SyncTradesDialog({
   onClose,
   onFetchComplete,
 }: SyncTradesDialogProps) {
+  const { t } = useTranslation();
   const [preset, setPreset] = useState<DateRangePreset>('last30days');
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
@@ -103,12 +105,12 @@ export function SyncTradesDialog({
 
   const handleFetch = () => {
     if (preset === 'custom' && (!startDate || !endDate)) {
-      toast.error('Please select both start and end dates for custom range');
+      toast.error(t('exchanges.sync.selectBothDates'));
       return;
     }
     
     if (preset === 'custom' && startDate && endDate && startDate > endDate) {
-      toast.error('Start date must be before end date');
+      toast.error(t('exchanges.sync.startBeforeEnd'));
       return;
     }
 
@@ -131,39 +133,39 @@ export function SyncTradesDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Fetch Trades from {exchangeName}</DialogTitle>
+          <DialogTitle>{t('exchanges.sync.title', { exchange: exchangeName })}</DialogTitle>
           <DialogDescription>
-            Select the time period for trades you want to fetch and review
+            {t('exchanges.sync.description')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           {/* Date Range Preset */}
           <div className="space-y-3">
-            <Label>Time Period</Label>
+            <Label>{t('exchanges.sync.timePeriod')}</Label>
             <RadioGroup value={preset} onValueChange={(v) => setPreset(v as DateRangePreset)}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="last7days" id="last7days" />
                 <Label htmlFor="last7days" className="font-normal cursor-pointer">
-                  Last 7 days
+                  {t('exchanges.sync.last7days')}
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="last30days" id="last30days" />
                 <Label htmlFor="last30days" className="font-normal cursor-pointer">
-                  Last 30 days (recommended)
+                  {t('exchanges.sync.last30days')}
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="last90days" id="last90days" />
                 <Label htmlFor="last90days" className="font-normal cursor-pointer">
-                  Last 90 days
+                  {t('exchanges.sync.last90days')}
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="custom" id="custom" />
                 <Label htmlFor="custom" className="font-normal cursor-pointer">
-                  Custom date range
+                  {t('exchanges.sync.custom')}
                 </Label>
               </div>
             </RadioGroup>
@@ -174,7 +176,7 @@ export function SyncTradesDialog({
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label>Start Date</Label>
+                  <Label>{t('exchanges.sync.startDate')}</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -185,7 +187,7 @@ export function SyncTradesDialog({
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {startDate ? format(startDate, 'MMM dd, yyyy') : 'Pick date'}
+                        {startDate ? format(startDate, 'MMM dd, yyyy') : t('exchanges.sync.pickDate')}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -201,7 +203,7 @@ export function SyncTradesDialog({
                 </div>
 
                 <div className="space-y-2">
-                  <Label>End Date</Label>
+                  <Label>{t('exchanges.sync.endDate')}</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -212,7 +214,7 @@ export function SyncTradesDialog({
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {endDate ? format(endDate, 'MMM dd, yyyy') : 'Pick date'}
+                        {endDate ? format(endDate, 'MMM dd, yyyy') : t('exchanges.sync.pickDate')}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -233,27 +235,27 @@ export function SyncTradesDialog({
           {/* Summary */}
           <div className="rounded-lg bg-muted p-4 space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Selected Range:</span>
+              <span className="text-muted-foreground">{t('exchanges.sync.selectedRange')}:</span>
               <span className="font-medium">{getDateRangeLabel()}</span>
             </div>
             <p className="text-xs text-muted-foreground">
-              You'll be able to review and select specific trades before importing
+              {t('exchanges.sync.reviewNote')}
             </p>
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={fetchMutation.isPending}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button onClick={handleFetch} disabled={fetchMutation.isPending}>
             {fetchMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Fetching Trades...
+                {t('exchanges.sync.fetching')}
               </>
             ) : (
-              'Fetch Trades'
+              t('exchanges.sync.fetchTrades')
             )}
           </Button>
         </DialogFooter>

@@ -23,6 +23,9 @@
     "success": "सफल",
     "noData": "डेटा उपलब्ध नहीं"
   },
+  "common": {
+    "cancel": "रद्द करें"
+  },
   "navigation": {
     "home": "होम",
     "dashboard": "डैशबोर्ड",
@@ -95,7 +98,8 @@
       "enterPassphrase": "अपना {{label}} दर्ज करें",
       "howToGet": "{{exchange}} API कुंजियाँ कैसे प्राप्त करें",
       "testing": "टेस्ट हो रहा है...",
-      "connect": "कनेक्ट"
+      "connect": "कनेक्ट",
+      "fillAllFields": "कृपया सभी फ़ील्ड भरें"
     },
     "sync": {
       "title": "{{exchange}} से ट्रेड्स फेच करें",

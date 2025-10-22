@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   Dialog,
   DialogContent,
@@ -40,6 +41,7 @@ export function TradePreviewModal({
   onClose,
   onImportComplete,
 }: TradePreviewModalProps) {
+  const { t } = useTranslation();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState({
     symbol: 'all',
@@ -179,17 +181,16 @@ export function TradePreviewModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Review Trades from BingX</DialogTitle>
+          <DialogTitle>{t('exchanges.preview.title')}</DialogTitle>
           <DialogDescription>
-            Select the trades you want to import to your dashboard
+            {t('exchanges.preview.description')}
           </DialogDescription>
           <div className="flex items-center justify-between pt-4">
             <div className="text-sm text-muted-foreground">
-              {selectedIds.size} of {filteredTrades.length} trades selected
+              {t('exchanges.preview.selected', { count: selectedIds.size, total: filteredTrades.length })}
               {totalPnL !== 0 && (
                 <span className={totalPnL > 0 ? 'text-success' : 'text-destructive'}>
-                  {' • Total P&L: $'}
-                  {formatNumber(totalPnL)}
+                  {' • '}{t('exchanges.preview.totalPnL')}: ${formatNumber(totalPnL)}
                 </span>
               )}
             </div>
@@ -200,7 +201,7 @@ export function TradePreviewModal({
                 selectedIds.size === filteredTrades.length ? handleDeselectAll : handleSelectAll
               }
             >
-              {selectedIds.size === filteredTrades.length ? 'Deselect All' : 'Select All'}
+              {selectedIds.size === filteredTrades.length ? t('exchanges.preview.deselectAll') : t('exchanges.preview.selectAll')}
             </Button>
           </div>
         </DialogHeader>
@@ -209,10 +210,10 @@ export function TradePreviewModal({
         <div className="flex gap-2 py-4 border-y">
           <Select value={filters.symbol} onValueChange={(value) => setFilters({ ...filters, symbol: value })}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Symbol" />
+              <SelectValue placeholder={t('exchanges.preview.symbol')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Symbols</SelectItem>
+              <SelectItem value="all">{t('exchanges.preview.allSymbols')}</SelectItem>
               {uniqueSymbols.map((s) => (
                 <SelectItem key={s} value={s}>
                   {s}
@@ -223,12 +224,12 @@ export function TradePreviewModal({
 
           <Select value={filters.side} onValueChange={(value) => setFilters({ ...filters, side: value })}>
             <SelectTrigger className="w-32">
-              <SelectValue placeholder="Side" />
+              <SelectValue placeholder={t('exchanges.preview.side')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Sides</SelectItem>
-              <SelectItem value="long">Long</SelectItem>
-              <SelectItem value="short">Short</SelectItem>
+              <SelectItem value="all">{t('exchanges.preview.allSides')}</SelectItem>
+              <SelectItem value="long">{t('exchanges.preview.long')}</SelectItem>
+              <SelectItem value="short">{t('exchanges.preview.short')}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -241,7 +242,7 @@ export function TradePreviewModal({
               id="profitable"
             />
             <label htmlFor="profitable" className="text-sm cursor-pointer">
-              Profitable only
+              {t('exchanges.preview.profitableOnly')}
             </label>
           </div>
         </div>
@@ -253,7 +254,7 @@ export function TradePreviewModal({
           </div>
         ) : filteredTrades.length === 0 ? (
           <div className="flex items-center justify-center h-96 text-muted-foreground">
-            No trades found matching your filters
+            {t('exchanges.preview.noTrades')}
           </div>
         ) : (
           <ScrollArea className="h-96">
@@ -268,13 +269,13 @@ export function TradePreviewModal({
                       }
                     />
                   </TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Symbol</TableHead>
-                  <TableHead>Side</TableHead>
-                  <TableHead>Size</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>P&L</TableHead>
-                  <TableHead>Fee</TableHead>
+                  <TableHead>{t('exchanges.preview.date')}</TableHead>
+                  <TableHead>{t('exchanges.preview.symbol')}</TableHead>
+                  <TableHead>{t('exchanges.preview.side')}</TableHead>
+                  <TableHead>{t('exchanges.preview.size')}</TableHead>
+                  <TableHead>{t('exchanges.preview.price')}</TableHead>
+                  <TableHead>{t('exchanges.preview.pnl')}</TableHead>
+                  <TableHead>{t('exchanges.preview.fee')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -326,7 +327,7 @@ export function TradePreviewModal({
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleImport}
@@ -335,10 +336,10 @@ export function TradePreviewModal({
             {importMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Importing...
+                {t('exchanges.preview.importing')}
               </>
             ) : (
-              `Import Selected (${selectedIds.size} trades)`
+              t('exchanges.preview.importSelected', { count: selectedIds.size })
             )}
           </Button>
         </DialogFooter>

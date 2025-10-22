@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   Table,
   TableBody,
@@ -27,6 +28,7 @@ interface SyncHistory {
 }
 
 export function SyncHistoryWidget() {
+  const { t } = useTranslation();
   const { data: history = [], isLoading } = useQuery({
     queryKey: ['sync-history'],
     queryFn: async () => {
@@ -44,8 +46,8 @@ export function SyncHistoryWidget() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Sync History</CardTitle>
-        <CardDescription>Last 10 synchronization operations</CardDescription>
+        <CardTitle>{t('exchanges.history.title')}</CardTitle>
+        <CardDescription>{t('exchanges.history.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -54,18 +56,18 @@ export function SyncHistoryWidget() {
           </div>
         ) : history.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
-            No sync history yet. Connect an exchange to get started.
+            {t('exchanges.history.noHistory')}
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Exchange</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className="text-right">Fetched</TableHead>
-                <TableHead className="text-right">Imported</TableHead>
-                <TableHead className="text-right">Skipped</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('exchanges.history.exchange')}</TableHead>
+                <TableHead>{t('exchanges.history.date')}</TableHead>
+                <TableHead className="text-right">{t('exchanges.history.fetched')}</TableHead>
+                <TableHead className="text-right">{t('exchanges.history.imported')}</TableHead>
+                <TableHead className="text-right">{t('exchanges.history.skipped')}</TableHead>
+                <TableHead>{t('exchanges.history.status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

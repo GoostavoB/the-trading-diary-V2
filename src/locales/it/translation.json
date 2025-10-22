@@ -23,6 +23,9 @@
     "success": "Successo",
     "noData": "Nessun dato disponibile"
   },
+  "common": {
+    "cancel": "Annulla"
+  },
   "navigation": {
     "home": "Home",
     "dashboard": "Dashboard",
@@ -95,7 +98,8 @@
       "enterPassphrase": "Inserisci il tuo {{label}}",
       "howToGet": "Come ottenere le chiavi API di {{exchange}}",
       "testing": "Test in corso...",
-      "connect": "Connetti"
+      "connect": "Connetti",
+      "fillAllFields": "Si prega di compilare tutti i campi"
     },
     "sync": {
       "title": "Recupera Trade da {{exchange}}",

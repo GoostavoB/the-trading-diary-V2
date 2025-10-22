@@ -29,6 +29,9 @@
     "customize": "Personalizar",
     "settings": "Configuración"
   },
+  "common": {
+    "cancel": "Cancelar"
+  },
   "navigation": {
     "home": "Inicio",
     "dashboard": "Panel",
@@ -96,7 +99,8 @@
       "enterPassphrase": "Ingresa tu {{label}}",
       "howToGet": "Cómo obtener claves API de {{exchange}}",
       "testing": "Probando...",
-      "connect": "Conectar"
+      "connect": "Conectar",
+      "fillAllFields": "Por favor complete todos los campos"
     },
     "sync": {
       "title": "Obtener Operaciones de {{exchange}}",
