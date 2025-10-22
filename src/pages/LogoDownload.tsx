@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
-import { Download, Copy, ArrowLeft, ExternalLink, Check } from "lucide-react";
+import { Download, ArrowLeft, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Logo } from "@/components/Logo";
 import { useState } from "react";
@@ -9,36 +9,30 @@ import heroBg from '@/assets/bull-bear-realistic.png';
 import wallpaperLogo from '@/assets/wallpaper-logo-center.png';
 import wallpaperTrading from '@/assets/wallpaper-trading-theme.png';
 import wallpaperCreative from '@/assets/wallpaper-creative.png';
+import tdLogoBlue from '@/assets/td-logo-blue.png';
 
 const LogoDownload = () => {
   const navigate = useNavigate();
   const [selectedBg, setSelectedBg] = useState<'transparent' | 'white' | 'dark'>('transparent');
-  const [copied, setCopied] = useState(false);
 
   const downloadLogo = (size: number, bgColor: 'transparent' | 'white') => {
-    const svg = document.getElementById('logo-svg-source');
-    if (!svg) return;
-
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set background
-    if (bgColor === 'white') {
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, size, size);
-    }
-
-    const svgData = new XMLSerializer().serializeToString(svg);
     const img = new Image();
-    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(svgBlob);
-
+    img.crossOrigin = 'anonymous';
     img.onload = () => {
+      // Set background
+      if (bgColor === 'white') {
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, size, size);
+      }
+
+      // Draw logo
       ctx.drawImage(img, 0, 0, size, size);
-      URL.revokeObjectURL(url);
 
       canvas.toBlob((blob) => {
         if (!blob) return;
@@ -51,17 +45,7 @@ const LogoDownload = () => {
       }, 'image/png');
     };
 
-    img.src = url;
-  };
-
-  const copySVG = () => {
-    const svg = document.getElementById('logo-svg-source');
-    if (!svg) return;
-    const svgData = new XMLSerializer().serializeToString(svg);
-    navigator.clipboard.writeText(svgData);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-    toast.success('SVG code copied to clipboard!');
+    img.src = tdLogoBlue;
   };
 
   const downloadThumbnail = (width: number, height: number) => {
@@ -81,36 +65,14 @@ const LogoDownload = () => {
 
       // Apply gradient overlay
       const gradient = ctx.createLinearGradient(0, 0, width, height);
-      gradient.addColorStop(0, 'rgba(155, 135, 245, 0.15)');
-      gradient.addColorStop(1, 'rgba(126, 105, 171, 0.15)');
+      gradient.addColorStop(0, 'rgba(60, 131, 246, 0.15)');
+      gradient.addColorStop(1, 'rgba(60, 131, 246, 0.08)');
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
-      // Draw logo SVG
-      const svgData = `
-        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="200" height="200">
-          <defs>
-            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color: hsl(250, 80%, 75%); stop-opacity: 1" />
-              <stop offset="100%" style="stop-color: hsl(250, 80%, 75%); stop-opacity: 0.85" />
-            </linearGradient>
-          </defs>
-          <rect x="8" y="10" width="24" height="5" fill="url(#logoGradient)" />
-          <rect x="17" y="10" width="6" height="28" fill="url(#logoGradient)" />
-          <rect x="25" y="15" width="6" height="23" fill="url(#logoGradient)" />
-          <path d="M 31 15 L 38 15 Q 42 15 42 19 L 42 34 Q 42 38 38 38 L 31 38 Z
-                   M 31 20 L 35 20 Q 37 20 37 22 L 37 31 Q 37 33 35 33 L 31 33 Z"
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                fill="url(#logoGradient)" />
-          <rect x="7" y="9" width="36" height="30" rx="2" stroke="hsl(250, 80%, 75%)" stroke-width="0.5" fill="none" opacity="0.2" />
-        </svg>
-      `;
-
+      // Draw logo
       const logoImg = new Image();
-      const blob = new Blob([svgData], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(blob);
-
+      logoImg.crossOrigin = 'anonymous';
       logoImg.onload = () => {
         const logoSize = Math.min(width, height) * 0.25;
         const x = (width - logoSize) / 2;
@@ -129,13 +91,12 @@ const LogoDownload = () => {
             link.download = `trading-diary-thumbnail-${width}x${height}.png`;
             link.href = URL.createObjectURL(blob);
             link.click();
-            URL.revokeObjectURL(url);
             toast.success(`Downloaded ${width}x${height} thumbnail`);
           }
         });
       };
 
-      logoImg.src = url;
+      logoImg.src = tdLogoBlue;
     };
 
     bgImg.src = heroBg;
@@ -148,40 +109,17 @@ const LogoDownload = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set background
-    if (bgColor === 'white') {
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, size, size);
-    }
-
-    // Icon-only SVG (no text)
-    const svgData = `
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
-        <defs>
-          <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color: hsl(250, 80%, 75%); stop-opacity: 1" />
-            <stop offset="100%" style="stop-color: hsl(250, 80%, 75%); stop-opacity: 0.85" />
-          </linearGradient>
-        </defs>
-        <rect x="8" y="10" width="24" height="5" fill="url(#logoGradient)" />
-        <rect x="17" y="10" width="6" height="28" fill="url(#logoGradient)" />
-        <rect x="25" y="15" width="6" height="23" fill="url(#logoGradient)" />
-        <path d="M 31 15 L 38 15 Q 42 15 42 19 L 42 34 Q 42 38 38 38 L 31 38 Z
-                 M 31 20 L 35 20 Q 37 20 37 22 L 37 31 Q 37 33 35 33 L 31 33 Z"
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              fill="url(#logoGradient)" />
-        <rect x="7" y="9" width="36" height="30" rx="2" stroke="hsl(250, 80%, 75%)" stroke-width="0.5" fill="none" opacity="0.2" />
-      </svg>
-    `;
-
     const img = new Image();
-    const blob = new Blob([svgData], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
-
+    img.crossOrigin = 'anonymous';
     img.onload = () => {
+      // Set background
+      if (bgColor === 'white') {
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, size, size);
+      }
+
+      // Draw logo (icon only - it's the same as the main logo since your logo is already icon-only)
       ctx.drawImage(img, 0, 0, size, size);
-      URL.revokeObjectURL(url);
 
       canvas.toBlob((blob) => {
         if (!blob) return;
@@ -194,7 +132,7 @@ const LogoDownload = () => {
       }, 'image/png');
     };
 
-    img.src = url;
+    img.src = tdLogoBlue;
   };
 
   const downloadWallpaper = (wallpaperSrc: string, name: string) => {
@@ -277,14 +215,23 @@ const LogoDownload = () => {
               border: selectedBg === 'transparent' ? '1px dashed hsl(var(--border))' : 'none'
             }}
           >
-            <Logo size="xl" variant="horizontal" showText={true} />
+            <div className="flex flex-col items-center gap-3">
+              <img src={tdLogoBlue} alt="The Trading Diary Logo" className="w-32 h-32" />
+              <span className="text-lg font-semibold">The Trading Diary</span>
+            </div>
           </div>
 
-          {/* Copy SVG Button */}
+          {/* Copy SVG Button - Hidden since we're using PNG */}
           <div className="mt-6 flex justify-center">
-            <Button onClick={copySVG} variant={copied ? "default" : "outline"}>
-              {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
-              {copied ? "Copied!" : "Copy SVG Code"}
+            <Button onClick={() => {
+              const link = document.createElement('a');
+              link.download = 'trading-diary-logo-1024x1024.png';
+              link.href = tdLogoBlue;
+              link.click();
+              toast.success('Downloaded original logo PNG');
+            }} variant="outline">
+              <Download className="mr-2 h-4 w-4" />
+              Download Original (1024×1024)
             </Button>
           </div>
         </GlassCard>
@@ -310,7 +257,7 @@ const LogoDownload = () => {
                 <div className="absolute inset-0 bg-background/70" />
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/15 to-primary/5" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <Logo size="lg" variant="icon" />
+                  <img src={tdLogoBlue} alt="TD Logo" className="w-16 h-16" />
                   <span className="mt-4 text-sm font-semibold">The Trading Diary</span>
                 </div>
               </div>
@@ -333,7 +280,7 @@ const LogoDownload = () => {
                 <div className="absolute inset-0 bg-background/70" />
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/15 to-primary/5" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <Logo size="lg" variant="icon" />
+                  <img src={tdLogoBlue} alt="TD Logo" className="w-16 h-16" />
                   <span className="mt-4 text-sm font-semibold">The Trading Diary</span>
                 </div>
               </div>
@@ -562,35 +509,6 @@ const LogoDownload = () => {
           </ul>
         </GlassCard>
       </div>
-
-      {/* Hidden SVG Source */}
-      <svg
-        id="logo-svg-source"
-        viewBox="0 0 48 48"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="hidden"
-        style={{ width: '48px', height: '48px' }}
-      >
-        <defs>
-          <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{ stopColor: 'hsl(217, 91%, 60%)', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: 'hsl(217, 91%, 60%)', stopOpacity: 0.85 }} />
-          </linearGradient>
-        </defs>
-        
-        <rect x="8" y="10" width="24" height="5" fill="url(#logoGradient)" />
-        <rect x="17" y="10" width="6" height="28" fill="url(#logoGradient)" />
-        <rect x="25" y="15" width="6" height="23" fill="url(#logoGradient)" />
-        <path
-          d="M 31 15 L 38 15 Q 42 15 42 19 L 42 34 Q 42 38 38 38 L 31 38 Z
-             M 31 20 L 35 20 Q 37 20 37 22 L 37 31 Q 37 33 35 33 L 31 33 Z"
-          fillRule="evenodd"
-          clipRule="evenodd"
-          fill="url(#logoGradient)"
-        />
-        <rect x="7" y="9" width="36" height="30" rx="2" stroke="hsl(217, 91%, 60%)" strokeWidth="0.5" fill="none" opacity="0.2" />
-      </svg>
     </div>
   );
 };
