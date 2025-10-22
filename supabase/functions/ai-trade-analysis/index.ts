@@ -43,6 +43,26 @@ serve(async (req) => {
     const tradeIds = batch ? batch.slice(0, 10) : (trade_ids || [trade_data?.id] || []);
     const cacheKey = `analysis_${user.id}_${tradeIds.join('_')}`;
 
+    // Fetch actual trade data from database
+    let tradesData = [];
+    if (trade_data) {
+      tradesData = [trade_data];
+    } else if (tradeIds.length > 0) {
+      const { data: fetchedTrades } = await supabaseClient
+        .from('trades')
+        .select('*')
+        .in('id', tradeIds)
+        .eq('user_id', user.id);
+      tradesData = fetchedTrades || [];
+    }
+
+    if (tradesData.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "No trade data found for the provided IDs" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Check cache
     const { data: cached } = await supabaseClient
       .from('ai_trade_cache')
@@ -70,19 +90,73 @@ serve(async (req) => {
     // Always use lite model for trade analysis
     const modelUsed = 'google/gemini-2.5-flash-lite';
 
-    const systemPrompt = `Analyze trading performance. Output JSON: 
-{
-  "patterns": { "winning_patterns": [], "losing_patterns": [], "time_based_insights": [] },
-  "insights": { "behavioral": [], "emotional": [], "performance": [] },
-  "risks": { "current_risks": [], "risk_score": 0, "recommendations": [] },
-  "suggestions": { "immediate": [], "long_term": [], "optimization": [] },
-  "encouragement": ""
-}
-Keep concise. Max 300 tokens.`;
+    // Calculate key metrics from actual trade data
+    const totalPnL = tradesData.reduce((sum, t) => sum + (t.pnl || 0), 0);
+    const wins = tradesData.filter(t => (t.pnl || 0) > 0).length;
+    const losses = tradesData.filter(t => (t.pnl || 0) < 0).length;
+    const winRate = tradesData.length > 0 ? (wins / tradesData.length * 100).toFixed(1) : '0';
+    
+    const avgWin = wins > 0 ? tradesData.filter(t => (t.pnl || 0) > 0).reduce((sum, t) => sum + t.pnl, 0) / wins : 0;
+    const avgLoss = losses > 0 ? Math.abs(tradesData.filter(t => (t.pnl || 0) < 0).reduce((sum, t) => sum + t.pnl, 0) / losses) : 0;
 
-    const userPrompt = trade_data 
-      ? `Analyze: ${JSON.stringify(trade_data)}`
-      : `Analyze trades: ${tradeIds.join(', ')}`;
+    const systemPrompt = `You are a professional trading coach analyzing real trade data. 
+Provide actionable insights based on the metrics and patterns you observe.
+Output JSON format: 
+{
+  "patterns": { 
+    "winning_patterns": ["specific patterns from data"], 
+    "losing_patterns": ["specific patterns from data"], 
+    "time_based_insights": ["time-specific observations"] 
+  },
+  "insights": { 
+    "behavioral": ["behavioral observations"], 
+    "emotional": ["emotional patterns detected"], 
+    "performance": ["performance metrics analysis"] 
+  },
+  "risks": { 
+    "current_risks": ["identified risks"], 
+    "risk_score": 0-100, 
+    "recommendations": ["specific risk management advice"] 
+  },
+  "suggestions": { 
+    "immediate": ["actionable steps for next trade"], 
+    "long_term": ["strategic improvements"], 
+    "optimization": ["efficiency improvements"] 
+  },
+  "encouragement": "personalized motivational message"
+}
+Be specific and data-driven. Keep concise but insightful. Max 400 tokens.`;
+
+    // Format trade data for analysis with key metrics
+    const tradesSummary = tradesData.map(t => ({
+      symbol: t.symbol,
+      direction: t.direction,
+      pnl: t.pnl,
+      roi: t.roi,
+      entry_price: t.entry_price,
+      exit_price: t.exit_price,
+      quantity: t.quantity,
+      trade_date: t.trade_date,
+      entry_time: t.entry_time,
+      exit_time: t.exit_time,
+      setup: t.setup,
+      notes: t.notes,
+      fees: t.fees
+    }));
+
+    const userPrompt = `Analyze these ${tradesData.length} trades:
+
+PERFORMANCE METRICS:
+- Total P&L: $${totalPnL.toFixed(2)}
+- Win Rate: ${winRate}% (${wins} wins, ${losses} losses)
+- Avg Win: $${avgWin.toFixed(2)}
+- Avg Loss: $${Math.abs(avgLoss).toFixed(2)}
+- Risk/Reward Ratio: ${avgLoss > 0 ? (avgWin / avgLoss).toFixed(2) : 'N/A'}
+
+TRADE DATA:
+${JSON.stringify(tradesSummary, null, 2)}
+
+Provide specific, actionable insights based on this actual data.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -96,7 +170,7 @@ Keep concise. Max 300 tokens.`;
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        max_tokens: 300,
+        max_tokens: 500,
         response_format: { type: "json_object" }
       }),
     });
