@@ -298,6 +298,51 @@ export type Database = {
         }
         Relationships: []
       }
+      assets: {
+        Row: {
+          categories_json: Json | null
+          coingecko_id: string | null
+          color_hex: string | null
+          created_at: string
+          decimals: number
+          id: string
+          is_active: boolean | null
+          last_synced_at: string | null
+          name: string
+          primary_category: string | null
+          symbol: string
+          updated_at: string
+        }
+        Insert: {
+          categories_json?: Json | null
+          coingecko_id?: string | null
+          color_hex?: string | null
+          created_at?: string
+          decimals?: number
+          id?: string
+          is_active?: boolean | null
+          last_synced_at?: string | null
+          name: string
+          primary_category?: string | null
+          symbol: string
+          updated_at?: string
+        }
+        Update: {
+          categories_json?: Json | null
+          coingecko_id?: string | null
+          color_hex?: string | null
+          created_at?: string
+          decimals?: number
+          id?: string
+          is_active?: boolean | null
+          last_synced_at?: string | null
+          name?: string
+          primary_category?: string | null
+          symbol?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       badge_tiers: {
         Row: {
           badge_id: string
@@ -379,6 +424,33 @@ export type Database = {
           total_after?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          coingecko_category_id: string | null
+          color_hex: string
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          coingecko_category_id?: string | null
+          color_hex: string
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          coingecko_category_id?: string | null
+          color_hex?: string
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1062,6 +1134,78 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolio_settings: {
+        Row: {
+          base_currency: string
+          blur_sensitive: boolean
+          category_split_mode: boolean
+          cost_method: string
+          created_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          base_currency?: string
+          blur_sensitive?: boolean
+          category_split_mode?: boolean
+          cost_method?: string
+          created_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          base_currency?: string
+          blur_sensitive?: boolean
+          category_split_mode?: boolean
+          cost_method?: string
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      position_lots: {
+        Row: {
+          acquisition_date: string
+          acquisition_tx_id: string | null
+          asset_symbol: string
+          cost_basis_per_unit: number
+          created_at: string
+          id: string
+          is_closed: boolean
+          lot_method: string
+          quantity_remaining: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          acquisition_date: string
+          acquisition_tx_id?: string | null
+          asset_symbol: string
+          cost_basis_per_unit: number
+          created_at?: string
+          id?: string
+          is_closed?: boolean
+          lot_method: string
+          quantity_remaining: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          acquisition_date?: string
+          acquisition_tx_id?: string | null
+          asset_symbol?: string
+          cost_basis_per_unit?: number
+          created_at?: string
+          id?: string
+          is_closed?: boolean
+          lot_method?: string
+          quantity_remaining?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       post_comments: {
         Row: {
           content: string
@@ -1122,6 +1266,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      price_history: {
+        Row: {
+          created_at: string
+          price: number
+          source: string
+          symbol: string
+          timestamp: string
+        }
+        Insert: {
+          created_at?: string
+          price: number
+          source?: string
+          symbol: string
+          timestamp: string
+        }
+        Update: {
+          created_at?: string
+          price?: number
+          source?: string
+          symbol?: string
+          timestamp?: string
+        }
+        Relationships: []
       }
       profile_frames: {
         Row: {
@@ -1275,6 +1443,45 @@ export type Database = {
           reaction_emoji?: string
           target_id?: string
           target_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      realized_pnl: {
+        Row: {
+          asset_symbol: string
+          cost_disposed_base: number
+          created_at: string
+          fees_base: number
+          id: string
+          proceeds_base: number
+          realized_date: string
+          realized_pnl: number
+          transaction_id: string | null
+          user_id: string
+        }
+        Insert: {
+          asset_symbol: string
+          cost_disposed_base: number
+          created_at?: string
+          fees_base?: number
+          id?: string
+          proceeds_base: number
+          realized_date: string
+          realized_pnl: number
+          transaction_id?: string | null
+          user_id: string
+        }
+        Update: {
+          asset_symbol?: string
+          cost_disposed_base?: number
+          created_at?: string
+          fees_base?: number
+          id?: string
+          proceeds_base?: number
+          realized_date?: string
+          realized_pnl?: number
+          transaction_id?: string | null
           user_id?: string
         }
         Relationships: []
@@ -1648,10 +1855,15 @@ export type Database = {
       }
       spot_transactions: {
         Row: {
+          cost_basis_method: string | null
           created_at: string
           exchange: string | null
+          fee_amount: number | null
+          fee_currency: string | null
+          fx_rate: number | null
           holding_id: string | null
           id: string
+          is_realized_event: boolean | null
           notes: string | null
           price: number
           quantity: number
@@ -1662,10 +1874,15 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          cost_basis_method?: string | null
           created_at?: string
           exchange?: string | null
+          fee_amount?: number | null
+          fee_currency?: string | null
+          fx_rate?: number | null
           holding_id?: string | null
           id?: string
+          is_realized_event?: boolean | null
           notes?: string | null
           price: number
           quantity: number
@@ -1676,10 +1893,15 @@ export type Database = {
           user_id: string
         }
         Update: {
+          cost_basis_method?: string | null
           created_at?: string
           exchange?: string | null
+          fee_amount?: number | null
+          fee_currency?: string | null
+          fx_rate?: number | null
           holding_id?: string | null
           id?: string
+          is_realized_event?: boolean | null
           notes?: string | null
           price?: number
           quantity?: number
@@ -2915,18 +3137,9 @@ export type Database = {
       }
     }
     Functions: {
-      check_daily_alert_cap: {
-        Args: { p_user_id: string }
-        Returns: boolean
-      }
-      cleanup_deleted_trades: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_expired_pending_trades: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      check_daily_alert_cap: { Args: { p_user_id: string }; Returns: boolean }
+      cleanup_deleted_trades: { Args: never; Returns: undefined }
+      cleanup_expired_pending_trades: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
