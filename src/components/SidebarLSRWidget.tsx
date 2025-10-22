@@ -1,24 +1,45 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity, ChevronDown } from 'lucide-react';
 import { useSidebar } from '@/components/ui/sidebar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 
 interface LSRData {
   longShortRatio: number;
-  change15m: number;
+  change: number;
   openInterest: number;
-  openInterestChange15m: number;
+  openInterestChange: number;
 }
+
+type TimeFrame = '5m' | '15m' | '30m' | '1h' | '2h' | '4h' | '1d';
+
+const TIME_FRAMES: { value: TimeFrame; label: string }[] = [
+  { value: '5m', label: '5m' },
+  { value: '15m', label: '15m' },
+  { value: '30m', label: '30m' },
+  { value: '1h', label: '1h' },
+  { value: '2h', label: '2h' },
+  { value: '4h', label: '4h' },
+  { value: '1d', label: '1d' },
+];
 
 export function SidebarLSRWidget() {
   const { open } = useSidebar();
   const [lsrData, setLsrData] = useState<LSRData | null>(null);
+  const [timeFrame, setTimeFrame] = useState<TimeFrame>('15m');
 
   useEffect(() => {
     const fetchBinanceLSR = async () => {
       try {
         const [lsrResponse, oiResponse] = await Promise.all([
-          fetch('https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=BTCUSDT&period=15m&limit=2'),
-          fetch('https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=15m&limit=2')
+          fetch(`https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=BTCUSDT&period=${timeFrame}&limit=2`),
+          fetch(`https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=${timeFrame}&limit=2`)
         ]);
 
         const lsrJson = await lsrResponse.json();
@@ -35,9 +56,9 @@ export function SidebarLSRWidget() {
 
           setLsrData({
             longShortRatio: current,
-            change15m: change,
+            change: change,
             openInterest: currentOI,
-            openInterestChange15m: oiChange
+            openInterestChange: oiChange
           });
         }
       } catch (error) {
@@ -48,7 +69,7 @@ export function SidebarLSRWidget() {
     fetchBinanceLSR();
     const interval = setInterval(fetchBinanceLSR, 15000);
     return () => clearInterval(interval);
-  }, []);
+  }, [timeFrame]);
 
   if (!lsrData) return null;
 
@@ -60,14 +81,40 @@ export function SidebarLSRWidget() {
     );
   }
 
-  const isLsrPositive = lsrData.change15m >= 0;
-  const isOiPositive = lsrData.openInterestChange15m >= 0;
+  const isLsrPositive = lsrData.change >= 0;
+  const isOiPositive = lsrData.openInterestChange >= 0;
 
   return (
     <div className="p-3 space-y-2 bg-background/50">
+      {/* Header with Time Frame Selector */}
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-semibold text-muted-foreground">Market Data</span>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-6 px-2 text-xs hover:bg-muted/50"
+            >
+              {timeFrame}
+              <ChevronDown className="h-3 w-3 ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-24 bg-popover/95 backdrop-blur-sm z-50">
+            <DropdownMenuRadioGroup value={timeFrame} onValueChange={(value) => setTimeFrame(value as TimeFrame)}>
+              {TIME_FRAMES.map((tf) => (
+                <DropdownMenuRadioItem key={tf.value} value={tf.value} className="text-xs">
+                  {tf.label}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       {/* LSR */}
       <div className="flex items-center justify-between text-xs">
-        <span className="text-muted-foreground font-medium">LSR (BTC 15m):</span>
+        <span className="text-muted-foreground font-medium">LSR (BTC):</span>
         <div className="flex items-center gap-1.5">
           <span className="font-mono font-semibold text-foreground">
             {lsrData.longShortRatio.toFixed(4)}
@@ -76,7 +123,7 @@ export function SidebarLSRWidget() {
             isLsrPositive ? 'text-emerald-500' : 'text-red-500'
           }`}>
             {isLsrPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-            {isLsrPositive ? '+' : ''}{lsrData.change15m.toFixed(2)}%
+            {isLsrPositive ? '+' : ''}{lsrData.change.toFixed(2)}%
           </span>
         </div>
       </div>
@@ -92,7 +139,7 @@ export function SidebarLSRWidget() {
             isOiPositive ? 'text-emerald-500' : 'text-red-500'
           }`}>
             {isOiPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-            {isOiPositive ? '+' : ''}{lsrData.openInterestChange15m.toFixed(2)}%
+            {isOiPositive ? '+' : ''}{lsrData.openInterestChange.toFixed(2)}%
           </span>
         </div>
       </div>
