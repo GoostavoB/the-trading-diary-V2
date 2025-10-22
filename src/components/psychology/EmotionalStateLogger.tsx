@@ -6,9 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Brain, Heart, Zap, TrendingUp, AlertCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 const emotionalStates = [
   { id: "confident", label: "Confident", icon: TrendingUp, color: "bg-green-500" },
@@ -31,7 +32,7 @@ const tradingConditions = [
 
 export function EmotionalStateLogger() {
   const { user } = useAuth();
-  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [selectedEmotion, setSelectedEmotion] = useState<string>("");
   const [intensity, setIntensity] = useState([5]);
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
@@ -48,11 +49,7 @@ export function EmotionalStateLogger() {
 
   const handleSubmit = async () => {
     if (!selectedEmotion) {
-      toast({
-        title: "Missing Information",
-        description: "Please select your emotional state",
-        variant: "destructive",
-      });
+      toast.error("Please select your emotional state");
       return;
     }
 
@@ -72,10 +69,7 @@ export function EmotionalStateLogger() {
 
       if (error) throw error;
 
-      toast({
-        title: "State Logged",
-        description: "Your emotional state has been recorded",
-      });
+      toast.success("Your emotional state has been recorded");
 
       // Reset form
       setSelectedEmotion("");
@@ -83,13 +77,12 @@ export function EmotionalStateLogger() {
       setSelectedConditions([]);
       setNotes("");
 
+      // Invalidate and refetch the timeline
+      queryClient.invalidateQueries({ queryKey: ['psychology-logs'] });
+
     } catch (error) {
       console.error("Error logging state:", error);
-      toast({
-        title: "Error",
-        description: "Failed to log emotional state",
-        variant: "destructive",
-      });
+      toast.error("Failed to log emotional state");
     } finally {
       setIsSubmitting(false);
     }
