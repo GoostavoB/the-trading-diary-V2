@@ -59,9 +59,6 @@ const Hero = () => {
             >
               {t('landing.hero.cta')}
             </Button>
-            <p className="text-xs md:text-sm text-muted-foreground mt-4">
-              {t('landing.cta.note').split(' • ')[0]} • {t('landing.cta.note').split(' • ')[2]}
-            </p>
           </motion.div>
 
           {/* Stats Cards */}
