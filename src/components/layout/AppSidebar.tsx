@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/contexts/AuthContext';
 import { SidebarCryptoWidget } from '@/components/SidebarCryptoWidget';
+import { SidebarLSRWidget } from '@/components/SidebarLSRWidget';
 import { GamificationSidebar } from '@/components/gamification/GamificationSidebar';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -112,6 +113,11 @@ export function AppSidebar() {
           {/* Gamification Widget */}
           <div className="border-t border-border/50 px-4 py-3">
             <GamificationSidebar />
+          </div>
+
+          {/* LSR & Open Interest Widget */}
+          <div className="border-t border-border/50">
+            <SidebarLSRWidget />
           </div>
 
           {/* Crypto Prices Widget */}
