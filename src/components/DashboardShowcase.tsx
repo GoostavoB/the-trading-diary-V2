@@ -81,6 +81,9 @@ const DashboardShowcase = () => {
                       src={dashboardScreenshot}
                       alt="Trading Dashboard showing real-time analytics, win rate, ROI, and capital growth charts"
                       className="w-full h-full object-contain object-center"
+                      width={1920}
+                      height={1200}
+                      loading="eager"
                     />
                     
                     {/* Hover overlay with expand icon */}
@@ -98,8 +101,12 @@ const DashboardShowcase = () => {
                   <div className="relative w-full h-full flex items-center justify-center bg-background/95 backdrop-blur-xl p-4">
                     <img 
                       src={dashboardScreenshot}
-                      alt="Full Trading Dashboard"
+                      alt="Full Trading Dashboard with detailed analytics and performance metrics"
                       className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                      width={1920}
+                      height={1200}
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                 </DialogContent>

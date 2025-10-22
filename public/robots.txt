@@ -8,9 +8,22 @@ Disallow: /upload
 Disallow: /analytics
 Disallow: /tools
 Disallow: /settings
+Disallow: /auth
+Disallow: /api/
 
-# Sitemap location
+# Allow blog content (explicitly)
+Allow: /blog
+
+# Sitemap locations
 Sitemap: https://www.thetradingdiary.com/sitemap.xml
+Sitemap: https://www.thetradingdiary.com/image-sitemap.xml
 
 # Crawl-delay for polite crawling
 Crawl-delay: 1
+
+# Specific bot rules
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /

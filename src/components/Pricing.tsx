@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Check, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
+import { addStructuredData } from "@/utils/seoHelpers";
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -23,6 +25,9 @@ const Pricing = () => {
       ],
       ctaKey: "landing.pricing.starter.cta",
       popular: false,
+      price: "Free",
+      priceCurrency: "USD",
+      priceValue: 0,
     },
     {
       nameKey: "landing.pricing.pro.name",
@@ -40,6 +45,9 @@ const Pricing = () => {
       ],
       ctaKey: "landing.pricing.pro.cta",
       popular: true,
+      price: "$29",
+      priceCurrency: "USD",
+      priceValue: 29,
     },
     {
       nameKey: "landing.pricing.elite.name",
@@ -57,8 +65,39 @@ const Pricing = () => {
       ],
       ctaKey: "landing.pricing.elite.cta",
       popular: false,
+      price: "$99",
+      priceCurrency: "USD",
+      priceValue: 99,
     },
   ];
+  
+  // Add Offer Schema for SEO
+  useEffect(() => {
+    const offersSchema = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": plans.map((plan, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
+          "@type": "Offer",
+          "name": t(plan.nameKey),
+          "description": t(plan.descriptionKey),
+          "price": plan.priceValue,
+          "priceCurrency": plan.priceCurrency,
+          "availability": "https://schema.org/InStock",
+          "url": "https://www.thetradingdiary.com/auth",
+          "priceValidUntil": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+          "seller": {
+            "@type": "Organization",
+            "name": "The Trading Diary"
+          }
+        }
+      }))
+    };
+    
+    addStructuredData(offersSchema, 'pricing-offers-schema');
+  }, [t]);
 
   return (
     <section className="py-16 md:py-20 px-6">
