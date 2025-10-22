@@ -107,7 +107,7 @@ export class ExchangeService {
     try {
       const trades = await adapter.fetchTrades({
         startTime: options?.startDate,
-        endTime: options?.endTime,
+        endTime: options?.endDate,
       });
 
       return { success: true, trades };
