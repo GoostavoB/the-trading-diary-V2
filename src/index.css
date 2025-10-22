@@ -77,53 +77,58 @@
   }
 
   .dark {
-    /* Dark mode colors */
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 210 90% 58%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Cinematic dark base - near-black with blue-green undertone */
+    --background: 210 20% 2%;
+    --foreground: 0 0% 95%;
+    --card: 210 18% 3%;
+    --card-foreground: 0 0% 95%;
+    --popover: 210 18% 3%;
+    --popover-foreground: 0 0% 95%;
+    
+    /* Muted metallic accents */
+    --primary: 200 15% 65%;
+    --primary-foreground: 210 20% 10%;
+    --secondary: 210 10% 25%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 210 15% 15%;
+    --muted-foreground: 210 10% 55%;
+    --accent: 195 30% 45%;
+    --accent-foreground: 0 0% 95%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
     
-    /* Glass effects - dark mode */
+    /* Hairline dividers at 16% white */
+    --border: 0 0% 16%;
+    --input: 210 15% 15%;
+    --ring: 200 15% 65%;
+    
+    /* Glass effects - layered glass panels */
     --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.08);
     --glass-blur: 12px;
     
-    /* Profit/Loss colors - controlled by color modes */
+    /* Profit/Loss colors */
     --profit: 142 76% 58%;
     --loss: 0 91% 61%;
     
-    /* Shadows - dark mode */
-    --shadow-elegant: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
-    --shadow-glow: 0 0 40px rgba(59, 130, 246, 0.15);
+    /* Shadows with depth */
+    --shadow-elegant: 0 10px 40px -15px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 50px rgba(200, 220, 240, 0.08);
+    --shadow-rim: inset 0 1px 0 rgba(255, 255, 255, 0.08);
     
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 210 20% 5%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 200 15% 65%;
+    --sidebar-primary-foreground: 210 20% 10%;
+    --sidebar-accent: 210 15% 12%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 16%;
+    --sidebar-ring: 200 15% 65%;
   }
 }
 
@@ -153,19 +158,34 @@
 }
 
 @layer utilities {
-  /* Glass morphism utility */
+  /* Premium glass morphism utilities */
   .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+  }
+
+  .glass-card {
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-rim), 0 20px 60px -15px rgba(0, 0, 0, 0.4);
+  }
+
+  .glass-card.elevated {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: var(--shadow-rim), 0 24px 70px -15px rgba(0, 0, 0, 0.5), 0 0 50px rgba(200, 220, 240, 0.06);
   }
 
   .glass-strong {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.12);
   }
 
   .glass-subtle {
@@ -173,6 +193,16 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* Metallic accents */
+  .metallic-edge {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  /* Premium easing */
+  .ease-premium {
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   /* Standardized shadow levels */

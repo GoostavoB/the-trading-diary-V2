@@ -1,20 +1,24 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { motion } from "framer-motion";
 import { Sparkles, Target, Shield, TrendingUp, FileText, LayoutDashboard, Users } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import Pricing from "@/components/Pricing";
 import PricingComparison from "@/components/PricingComparison";
 import PricingRoadmap from "@/components/PricingRoadmap";
 import CTA from "@/components/CTA";
+import { ShaderBackground } from "@/components/ShaderBackground";
+import { SolutionCard } from "@/components/SolutionCard";
+import { PremiumPricingCard } from "@/components/PremiumPricingCard";
+import { MagneticButton } from "@/components/MagneticButton";
 
 const PricingPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const heroRef = useRef<HTMLDivElement>(null);
+  const pricingRef = useRef<HTMLDivElement>(null);
+  const [backgroundIntensity, setBackgroundIntensity] = useState(1.0);
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
 
   usePageMeta({
     title: 'Pricing Plans - AI-Powered Crypto Trading Journal',
@@ -22,11 +26,21 @@ const PricingPage = () => {
     canonical: 'https://www.thetradingdiary.com/pricing',
   });
 
+  // Scroll-linked background intensity
   useEffect(() => {
     const handleScroll = () => {
-      if (heroRef.current) {
-        const scrollY = window.scrollY;
-        heroRef.current.style.transform = `translateY(${scrollY * 0.5}px)`;
+      if (pricingRef.current) {
+        const rect = pricingRef.current.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        
+        // Increase intensity as pricing section approaches
+        if (rect.top < windowHeight && rect.top > 0) {
+          const progress = 1 - (rect.top / windowHeight);
+          setBackgroundIntensity(1 + progress * 0.08);
+        } else if (rect.top <= 0) {
+          // Return to baseline when section is in view
+          setBackgroundIntensity(1.0);
+        }
       }
     };
 
@@ -79,70 +93,139 @@ const PricingPage = () => {
     }
   ];
 
+  const plans = [
+    {
+      id: 'basic',
+      nameKey: "pricing.plans.basic.name",
+      descriptionKey: "pricing.plans.basic.description",
+      monthlyPrice: 15,
+      annualPrice: 12,
+      annualTotal: 144,
+      featuresKeys: [
+        "pricing.plans.basic.features.uploads",
+        "pricing.plans.basic.features.manualUploads",
+        "pricing.plans.basic.features.dashboard",
+        "pricing.plans.basic.features.charts",
+        "pricing.plans.basic.features.basicJournal",
+        "pricing.plans.basic.features.feeAnalytics",
+        "pricing.plans.basic.features.csv",
+        "pricing.plans.basic.features.social",
+      ],
+      ctaKey: "pricing.plans.cta",
+      popular: false,
+    },
+    {
+      id: 'pro',
+      nameKey: "pricing.plans.pro.name",
+      descriptionKey: "pricing.plans.pro.description",
+      monthlyPrice: 35,
+      annualPrice: 28,
+      annualTotal: 336,
+      featuresKeys: [
+        "pricing.plans.pro.features.uploads",
+        "pricing.plans.pro.features.aiAnalysis",
+        "pricing.plans.pro.features.tradingPlan",
+        "pricing.plans.pro.features.goals",
+        "pricing.plans.pro.features.richJournal",
+        "pricing.plans.pro.features.customWidgets",
+        "pricing.plans.pro.features.fullSocial",
+        "pricing.plans.pro.features.everythingBasic",
+      ],
+      ctaKey: "pricing.plans.cta",
+      popular: true,
+    },
+    {
+      id: 'elite',
+      nameKey: "pricing.plans.elite.name",
+      descriptionKey: "pricing.plans.elite.description",
+      monthlyPrice: 79,
+      annualPrice: 63,
+      annualTotal: 756,
+      featuresKeys: [
+        "pricing.plans.elite.features.uploads",
+        "pricing.plans.elite.features.aiAnalysis",
+        "pricing.plans.elite.features.tradeReplay",
+        "pricing.plans.elite.features.positionCalculator",
+        "pricing.plans.elite.features.riskDashboard",
+        "pricing.plans.elite.features.advancedAlerts",
+        "pricing.plans.elite.features.everythingPro",
+      ],
+      ctaKey: "pricing.plans.cta",
+      popular: false,
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
+    <div className="min-h-screen relative">
+      {/* WebGL Shader Background */}
+      <ShaderBackground intensity={backgroundIntensity} />
+
       {/* Hero Section */}
-      <section ref={heroRef} className="relative py-20 md:py-32 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple-500/5 to-transparent opacity-50" />
-        <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-        
+      <section ref={heroRef} className="relative py-32 md:py-40 px-6 overflow-hidden">
         <div className="container relative mx-auto max-w-4xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            <h1 
+              className="text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight" 
+              style={{ letterSpacing: '-0.02em', maxWidth: '64ch', margin: '0 auto' }}
+            >
               {t('pricing.hero.title')}
             </h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
               {t('pricing.hero.subtitle')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
+              <MagneticButton
                 onClick={() => navigate('/auth')}
-                className="px-8 py-4 bg-primary text-primary-foreground rounded-xl font-medium hover:opacity-90 transition-all"
+                size="lg"
+                className="px-10 py-7 text-base"
               >
                 {t('pricing.hero.primaryCta')}
-              </button>
-              <button
+              </MagneticButton>
+              <MagneticButton
                 onClick={() => {/* TODO: Add demo video */}}
-                className="px-8 py-4 bg-secondary text-secondary-foreground rounded-xl font-medium hover:opacity-90 transition-all"
+                variant="outline"
+                size="lg"
+                className="px-10 py-7 text-base"
               >
                 {t('pricing.hero.secondaryCta')}
-              </button>
+              </MagneticButton>
             </div>
           </motion.div>
         </div>
       </section>
 
       {/* Solutions Section with Scroll Animations */}
-      <section className="py-20 px-6">
+      <section className="py-32 px-6">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16">
+          <div className="text-center mb-20">
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               viewport={{ once: true }}
-              className="text-3xl md:text-4xl font-bold mb-4"
+              className="text-4xl md:text-5xl font-bold mb-6 tracking-tight"
+              style={{ letterSpacing: '-0.01em' }}
             >
               {t('pricing.solutions.title')}
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              transition={{ duration: 0.45, delay: 0.09, ease: [0.22, 1, 0.36, 1] }}
               viewport={{ once: true }}
-              className="text-lg text-muted-foreground max-w-2xl mx-auto"
+              className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed"
             >
               {t('pricing.solutions.subtitle')}
             </motion.p>
           </div>
           
-          <div className="space-y-6">
+          <div className="space-y-8">
             {solutions.map((solution, index) => (
               <SolutionCard key={index} solution={solution} index={index} />
             ))}
@@ -151,9 +234,87 @@ const PricingPage = () => {
       </section>
 
       {/* Pricing Cards */}
-      <section className="py-16 px-6">
-        <div className="container mx-auto max-w-6xl">
-          <Pricing />
+      <section ref={pricingRef} className="py-32 px-6">
+        <div className="container mx-auto max-w-7xl">
+          <div className="text-center mb-16">
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              viewport={{ once: true }}
+              className="text-4xl md:text-5xl font-bold mb-6 tracking-tight"
+              style={{ letterSpacing: '-0.01em' }}
+            >
+              {t('pricing.title')}
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.09, ease: [0.22, 1, 0.36, 1] }}
+              viewport={{ once: true }}
+              className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed"
+            >
+              {t('pricing.subtitle')}
+            </motion.p>
+
+            {/* Billing Toggle with Physical Switch Feel */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.28, delay: 0.18 }}
+              viewport={{ once: true }}
+              className="flex items-center justify-center gap-4 mb-4"
+            >
+              <button
+                onClick={() => setBillingCycle('monthly')}
+                className={`px-6 py-3 rounded-lg font-medium transition-all duration-280 ease-premium ${
+                  billingCycle === 'monthly'
+                    ? 'text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {t('pricing.billing.monthly')}
+              </button>
+              
+              <motion.button
+                onClick={() => setBillingCycle('annual')}
+                whileTap={{ scale: 0.98 }}
+                className={`relative px-6 py-3 rounded-lg font-medium transition-all duration-280 ease-premium ${
+                  billingCycle === 'annual'
+                    ? 'text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {t('pricing.billing.annual')}
+                <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+                  {t('pricing.billing.save20')}
+                </span>
+              </motion.button>
+            </motion.div>
+
+            {/* Guarantee Banner */}
+            <motion.p 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.28, delay: 0.27 }}
+              viewport={{ once: true }}
+              className="text-sm text-muted-foreground"
+            >
+              {t('pricing.guaranteeNote')}
+            </motion.p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-20">
+            {plans.map((plan, index) => (
+              <PremiumPricingCard 
+                key={plan.id} 
+                plan={plan} 
+                billingCycle={billingCycle}
+                index={index}
+                t={t}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -169,59 +330,6 @@ const PricingPage = () => {
   );
 };
 
-// Solution Card Component with Scroll Animation
-const SolutionCard = ({ solution, index }: { solution: any; index: number }) => {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.4 });
-  const Icon = solution.icon;
-  const isEven = index % 2 === 0;
-
-  return (
-    <div ref={ref}>
-      <motion.div
-        initial={{ 
-          opacity: 0, 
-          x: isEven ? -32 : 32 
-        }}
-        animate={{ 
-          opacity: isVisible ? 1 : 0, 
-          x: isVisible ? 0 : (isEven ? -32 : 32)
-        }}
-        transition={{ 
-          duration: 0.35,
-          delay: 0.12,
-          ease: [0.4, 0, 0.2, 1]
-        }}
-      >
-        <Card className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
-          <CardContent className="p-8">
-            <div className="flex items-start gap-6">
-              <div className="flex-shrink-0">
-                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Icon className="w-7 h-7 text-primary" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-2xl font-bold mb-3">{solution.title}</h3>
-                <p className="text-muted-foreground mb-4 text-base leading-relaxed">
-                  {solution.description}
-                </p>
-                <div className="flex items-start gap-2 pt-2 border-t border-border/50">
-                  <div className="flex-shrink-0 mt-1">
-                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
-                      <span className="text-xs">→</span>
-                    </div>
-                  </div>
-                  <p className="text-sm font-medium text-foreground">
-                    {solution.outcome}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </div>
-  );
-};
+// Remove the old SolutionCard component as it's now in its own file
 
 export default PricingPage;
