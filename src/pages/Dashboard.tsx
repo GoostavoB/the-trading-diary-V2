@@ -60,6 +60,7 @@ const TradingHeatmap = lazy(() => import('@/components/TradingHeatmap').then(m =
 const AIAssistant = lazy(() => import('@/components/AIAssistant').then(m => ({ default: m.AIAssistant })));
 const GamificationSidebar = lazy(() => import('@/components/gamification/GamificationSidebar').then(m => ({ default: m.GamificationSidebar })));
 import { TourCTAButton } from '@/components/tour/TourCTAButton';
+import { GuidedTour } from '@/components/tour/GuidedTour';
 import { Zap, ChevronLeft } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -815,6 +816,7 @@ const Dashboard = () => {
       <FloatingXP />
       <MicroFeedbackOverlay />
       <WeeklySummaryRecap />
+      <GuidedTour />
       <LevelUpModal
         show={showLevelUp} 
         level={xpData.currentLevel} 
