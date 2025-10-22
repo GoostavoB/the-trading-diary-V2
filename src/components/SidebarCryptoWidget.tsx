@@ -54,11 +54,11 @@ export function SidebarCryptoWidget() {
   }
 
   return (
-    <div className="p-3 space-y-2">
+    <div className="p-3 space-y-1.5">
       {/* Header with dropdown */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+          <TrendingUp className="h-3.5 w-3.5 text-profit" />
           <span className="text-xs font-semibold text-muted-foreground">LIVE</span>
         </div>
         
@@ -89,25 +89,23 @@ export function SidebarCryptoWidget() {
 
       {/* Prices */}
       {loading ? (
-        <div className="text-xs text-muted-foreground">Loading...</div>
+        <div className="text-[11px] text-muted-foreground">Loading...</div>
       ) : (
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           {prices.map((price) => {
             const isPositive = price.priceChangePercent >= 0;
-            const priceColor = isPositive ? 'text-emerald-500' : 'text-red-500';
-            const changeSign = isPositive ? '+' : '';
             
             return (
-              <div key={price.symbol} className="flex items-center justify-between text-xs">
+              <div key={price.symbol} className="flex items-center justify-between text-[11px] leading-tight">
                 <span className="font-semibold text-foreground">
                   {price.displaySymbol}
                 </span>
-                <div className="flex flex-col items-end">
-                  <span className={`font-mono font-medium ${priceColor}`}>
+                <div className="flex items-center gap-1">
+                  <span className="font-mono font-medium text-foreground">
                     ${price.price}
                   </span>
-                  <span className={`text-[10px] font-mono ${priceColor} opacity-70`}>
-                    {changeSign}{price.priceChangePercent.toFixed(2)}%
+                  <span className={`font-mono ${isPositive ? 'text-profit' : 'text-loss'}`}>
+                    {isPositive ? '↗' : '↘'}{isPositive ? '+' : ''}{price.priceChangePercent.toFixed(2)}%
                   </span>
                 </div>
               </div>

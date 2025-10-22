@@ -85,9 +85,9 @@ export function SidebarLSRWidget() {
   const isOiPositive = lsrData.openInterestChange >= 0;
 
   return (
-    <div className="p-3 space-y-2 bg-background/50">
+    <div className="p-3 space-y-1.5 bg-background/50">
       {/* Header with Time Frame Selector */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between">
         <span className="text-xs font-semibold text-muted-foreground">Market Data</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -112,33 +112,30 @@ export function SidebarLSRWidget() {
         </DropdownMenu>
       </div>
 
-      {/* LSR */}
-      <div className="flex items-center justify-between text-xs">
-        <span className="text-muted-foreground font-medium">LSR (BTC):</span>
-        <div className="flex items-center gap-1.5">
+      {/* Compact LSR Display */}
+      <div className="text-[11px] leading-tight space-y-0.5">
+        <div className="flex items-center gap-1 flex-wrap">
+          <span className="text-muted-foreground">LSR (BTC):</span>
           <span className="font-mono font-semibold text-foreground">
             {lsrData.longShortRatio.toFixed(4)}
           </span>
-          <span className={`font-mono text-[10px] flex items-center gap-0.5 ${
-            isLsrPositive ? 'text-emerald-500' : 'text-red-500'
+          <span className={`font-mono flex items-center gap-0.5 ${
+            isLsrPositive ? 'text-profit' : 'text-loss'
           }`}>
-            {isLsrPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+            {isLsrPositive ? '↗' : '↘'}
             {isLsrPositive ? '+' : ''}{lsrData.change.toFixed(2)}%
           </span>
         </div>
-      </div>
-
-      {/* Open Interest */}
-      <div className="flex items-center justify-between text-xs">
-        <span className="text-muted-foreground font-medium">Open Interest:</span>
-        <div className="flex items-center gap-1.5">
+        
+        <div className="flex items-center gap-1 flex-wrap">
+          <span className="text-muted-foreground">Open Interest:</span>
           <span className="font-mono font-semibold text-foreground">
             ${(lsrData.openInterest / 1e9).toFixed(2)}B
           </span>
-          <span className={`font-mono text-[10px] flex items-center gap-0.5 ${
-            isOiPositive ? 'text-emerald-500' : 'text-red-500'
+          <span className={`font-mono flex items-center gap-0.5 ${
+            isOiPositive ? 'text-profit' : 'text-loss'
           }`}>
-            {isOiPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+            {isOiPositive ? '↗' : '↘'}
             {isOiPositive ? '+' : ''}{lsrData.openInterestChange.toFixed(2)}%
           </span>
         </div>
