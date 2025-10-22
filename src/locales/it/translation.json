@@ -135,6 +135,18 @@
       "title": "Azioni Rapide",
       "description": "Accesso veloce alle azioni comuni"
     },
+    "stats": "Statistiche",
+    "portfolio": "Portfolio",
+    "premiumCTA": "Premium",
+    "insights": "Insights IA",
+    "streaks": "Serie",
+    "heatmap": "Mappa di Calore",
+    "charts": "Grafici",
+    "newTrade": "Nuovo Trade",
+    "importCSV": "Importa CSV",
+    "viewAnalytics": "Vedi Analytics",
+    "viewAll": "Vedi tutto",
+    "tokens": "token",
     "avgPnLPerTrade": {
       "title": "P&L Medio per Trade",
       "description": "Profitto/perdita medio per trade eseguito"

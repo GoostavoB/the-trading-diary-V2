@@ -125,7 +125,8 @@
     "columns": {
       "one": "1 Column",
       "two": "2 Columns",
-      "three": "3 Columns"
+      "three": "3 Columns",
+      "four": "4 Columns"
     },
     "pickDateRange": "Pick a date range",
     "hiddenWidgets": "Hidden Widgets",

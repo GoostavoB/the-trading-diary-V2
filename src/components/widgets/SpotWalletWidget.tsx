@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatCurrency, formatPercent } from '@/utils/formatNumber';
 import { WidgetProps } from '@/types/widget';
 import { WidgetWrapper } from './WidgetWrapper';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface SpotWalletWidgetProps extends WidgetProps {
   totalValue: number;
@@ -24,12 +25,13 @@ export const SpotWalletWidget = memo(({
   tokenCount,
 }: SpotWalletWidgetProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const isPositive = change24h >= 0;
 
   return (
     <WidgetWrapper
       id={id}
-      title="Spot Wallet"
+      title={t('widgets.spotWallet')}
       isEditMode={isEditMode}
       onRemove={onRemove}
       onExpand={onExpand}
@@ -41,7 +43,7 @@ export const SpotWalletWidget = memo(({
             onClick={() => navigate('/spot-wallet')}
             className="h-7"
           >
-            View All <ArrowRight className="ml-1 h-3 w-3" />
+            {t('widgets.viewAll')} <ArrowRight className="ml-1 h-3 w-3" />
           </Button>
         )
       }
@@ -50,7 +52,7 @@ export const SpotWalletWidget = memo(({
         <div className="flex items-center justify-between">
           <div>
             <p className="text-2xl font-bold">{formatCurrency(totalValue)}</p>
-            <p className="text-sm text-muted-foreground mt-1">{tokenCount} tokens</p>
+            <p className="text-sm text-muted-foreground mt-1">{tokenCount} {t('widgets.tokens')}</p>
           </div>
           <Wallet className="h-8 w-8 text-primary/60" />
         </div>

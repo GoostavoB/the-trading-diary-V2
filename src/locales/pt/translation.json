@@ -353,7 +353,14 @@
     "viewAnalytics": "Ver Análises",
     "noTransactions": "Nenhuma transação ainda",
     "noData": "Nenhum dado disponível",
-    "unknown": "Desconhecido"
+    "unknown": "Desconhecido",
+    "stats": "Estatísticas",
+    "portfolio": "Carteira",
+    "premiumCTA": "Premium",
+    "insights": "Insights de IA",
+    "streaks": "Sequências",
+    "heatmap": "Mapa de Calor",
+    "charts": "Gráficos"
   },
   "settings": {
     "title": "Configurações",

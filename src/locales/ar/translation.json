@@ -95,7 +95,21 @@
     "winRate": "Win Rate",
     "recentTransactions": "المعاملات الأخيرة",
     "topMovers": "الأكثر حركة",
-    "aiInsights": "رؤى الذكاء الاصطناعي"
+    "aiInsights": "رؤى الذكاء الاصطناعي",
+    "stats": "الإحصائيات",
+    "portfolio": "المحفظة",
+    "quickActions": "إجراءات سريعة",
+    "premiumCTA": "Premium",
+    "insights": "رؤى الذكاء الاصطناعي",
+    "streaks": "السلاسل",
+    "heatmap": "خريطة الحرارة",
+    "charts": "الرسوم البيانية",
+    "spotWallet": "محفظة Spot",
+    "viewAll": "عرض الكل",
+    "tokens": "عملات",
+    "newTrade": "صفقة جديدة",
+    "importCSV": "استيراد CSV",
+    "viewAnalytics": "عرض التحليلات"
   },
   "settings": {
     "profile": "الملف الشخصي",

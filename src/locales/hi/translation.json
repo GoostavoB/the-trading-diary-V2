@@ -95,7 +95,21 @@
     "winRate": "विन रेट",
     "recentTransactions": "हाल के लेनदेन",
     "topMovers": "टॉप मूवर्स",
-    "aiInsights": "AI इनसाइट्स"
+    "aiInsights": "AI इनसाइट्स",
+    "stats": "सांख्यिकी",
+    "portfolio": "पोर्टफोलियो",
+    "quickActions": "त्वरित कार्य",
+    "premiumCTA": "Premium",
+    "insights": "AI इनसाइट्स",
+    "streaks": "स्ट्रीक्स",
+    "heatmap": "हीटमैप",
+    "charts": "चार्ट्स",
+    "spotWallet": "स्पॉट वॉलेट",
+    "viewAll": "सभी देखें",
+    "tokens": "टोकन",
+    "newTrade": "नया ट्रेड",
+    "importCSV": "CSV इम्पोर्ट करें",
+    "viewAnalytics": "एनालिटिक्स देखें"
   },
   "settings": {
     "profile": "प्रोफाइल",

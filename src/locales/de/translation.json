@@ -135,6 +135,18 @@
       "title": "Schnellaktionen",
       "description": "Schnellzugriff auf häufige Aktionen"
     },
+    "stats": "Statistiken",
+    "portfolio": "Portfolio",
+    "premiumCTA": "Premium",
+    "insights": "KI-Insights",
+    "streaks": "Streaks",
+    "heatmap": "Heatmap",
+    "charts": "Diagramme",
+    "newTrade": "Neuer Trade",
+    "importCSV": "CSV importieren",
+    "viewAnalytics": "Analytics ansehen",
+    "viewAll": "Alle anzeigen",
+    "tokens": "Token",
     "avgPnLPerTrade": {
       "title": "Durchschn. P&L pro Trade",
       "description": "Durchschnittlicher Gewinn/Verlust pro Trade"

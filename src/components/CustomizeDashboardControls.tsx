@@ -23,20 +23,6 @@ interface CustomizeDashboardControlsProps {
   widgetCount?: number;
 }
 
-const widgetLabels: Record<string, string> = {
-  totalBalance: 'Total Balance',
-  stats: 'Statistics Overview',
-  portfolio: 'Portfolio Overview',
-  topMovers: 'Top Movers',
-  quickActions: 'Quick Actions',
-  recentTransactions: 'Recent Transactions',
-  premiumCTA: 'Premium Upgrade',
-  insights: 'Performance Insights',
-  streaks: 'Trading Streaks',
-  heatmap: 'Trading Heatmap',
-  charts: 'Performance Charts',
-};
-
 export function CustomizeDashboardControls({
   isCustomizing,
   hasChanges,
@@ -51,8 +37,23 @@ export function CustomizeDashboardControls({
   onColumnCountChange,
   widgetCount = 0,
 }: CustomizeDashboardControlsProps) {
+  const { t } = useTranslation();
   const visibleCount = widgetCount || widgets.filter(w => w.visible).length;
   const hiddenCount = widgets.filter(w => !w.visible).length;
+
+  const widgetLabels: Record<string, string> = {
+    totalBalance: t('widgets.totalBalance'),
+    stats: t('widgets.stats'),
+    portfolio: t('widgets.portfolio'),
+    topMovers: t('widgets.topMovers'),
+    quickActions: t('widgets.quickActions'),
+    recentTransactions: t('widgets.recentTransactions'),
+    premiumCTA: t('widgets.premiumCTA'),
+    insights: t('widgets.insights'),
+    streaks: t('widgets.streaks'),
+    heatmap: t('widgets.heatmap'),
+    charts: t('widgets.charts'),
+  };
 
   return (
     <AnimatePresence mode="wait">
@@ -70,7 +71,7 @@ export function CustomizeDashboardControls({
             className="gap-2 glass hover:glass-strong"
           >
             <LayoutDashboard className="w-4 h-4" />
-            Customize Dashboard
+            {t('dashboard.customizeLayout')}
           </Button>
           
           {/* Column Count Selector */}
@@ -85,10 +86,10 @@ export function CustomizeDashboardControls({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">1 Column</SelectItem>
-                  <SelectItem value="2">2 Columns</SelectItem>
-                  <SelectItem value="3">3 Columns</SelectItem>
-                  <SelectItem value="4">4 Columns</SelectItem>
+                  <SelectItem value="1">{t('dashboard.columns.one')}</SelectItem>
+                  <SelectItem value="2">{t('dashboard.columns.two')}</SelectItem>
+                  <SelectItem value="3">{t('dashboard.columns.three')}</SelectItem>
+                  <SelectItem value="4">{t('dashboard.columns.four')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -110,13 +111,13 @@ export function CustomizeDashboardControls({
                 </div>
                 <div>
                   <h3 className="font-semibold text-sm flex items-center gap-2">
-                    Customize Mode
+                    {t('dashboard.editMode')}
                     <Badge variant="secondary" className="text-xs">
-                      {visibleCount} visible
+                      {t('dashboard.visibleCount', { count: visibleCount })}
                     </Badge>
                   </h3>
                   <p className="text-xs text-muted-foreground">
-                    Drag widgets to rearrange, toggle visibility, or resize them
+                    {t('dashboard.dragInstructions')}
                   </p>
                 </div>
               </div>
@@ -129,7 +130,7 @@ export function CustomizeDashboardControls({
                     className="gap-2"
                   >
                     <Plus className="w-4 h-4" />
-                    Add Widget
+                    {t('dashboard.addWidget')}
                   </Button>
                 )}
                 <Button
@@ -139,7 +140,7 @@ export function CustomizeDashboardControls({
                   className="gap-2 hover:bg-destructive/10 hover:text-destructive"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  Reset
+                  {t('dashboard.resetLayout')}
                 </Button>
                 <Button
                   onClick={onCancel}
@@ -148,7 +149,7 @@ export function CustomizeDashboardControls({
                   className="gap-2"
                 >
                   <X className="w-4 h-4" />
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   onClick={onSave}
@@ -157,7 +158,7 @@ export function CustomizeDashboardControls({
                   className="gap-2"
                 >
                   <Save className="w-4 h-4" />
-                  Save Layout
+                  {t('dashboard.saveLayout')}
                 </Button>
               </div>
             </div>
@@ -177,13 +178,13 @@ export function CustomizeDashboardControls({
                   </div>
                   <div className="flex-1">
                     <h4 className="font-semibold text-sm mb-1 flex items-center gap-2">
-                      Hidden Widgets
+                      {t('dashboard.hiddenWidgets')}
                       <Badge variant="outline" className="text-xs">
                         {hiddenCount}
                       </Badge>
                     </h4>
                     <p className="text-xs text-muted-foreground mb-3">
-                      Click to show these widgets again
+                      {t('dashboard.clickToShow')}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {widgets
