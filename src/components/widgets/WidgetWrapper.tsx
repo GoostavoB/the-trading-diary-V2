@@ -41,9 +41,9 @@ export const WidgetWrapper = memo(({
       {isEditMode && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
           <div 
-            className="absolute inset-y-0 w-1/2 -left-1/2 animate-shimmer opacity-30"
+            className="absolute inset-y-0 w-1/2 -left-1/2 animate-shimmer opacity-50"
             style={{
-              background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.12), transparent)',
+              background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.2), transparent)',
             }}
           />
         </div>
@@ -52,14 +52,14 @@ export const WidgetWrapper = memo(({
       {/* Edit Mode Controls */}
       {isEditMode && (
         <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 flex gap-1">
-          <div className="drag-handle cursor-move p-1.5 rounded bg-background/90 hover:bg-background shadow-sm border border-primary/20">
-            <GripVertical className="h-4 w-4 text-primary/70" />
+          <div className="drag-handle cursor-move p-1.5 rounded bg-background/95 hover:bg-background shadow-md border border-primary/40">
+            <GripVertical className="h-4 w-4 text-primary" />
           </div>
           {onRemove && (
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 bg-background/90 hover:bg-destructive hover:text-destructive-foreground shadow-sm border border-primary/20"
+              className="h-7 w-7 bg-background/95 hover:bg-destructive hover:text-destructive-foreground shadow-md border border-primary/40"
               onClick={onRemove}
             >
               <Trash2 className="h-3.5 w-3.5" />
