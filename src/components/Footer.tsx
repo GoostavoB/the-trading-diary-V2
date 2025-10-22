@@ -92,6 +92,16 @@ const Footer = () => {
             <h4 className="font-semibold mb-3 text-sm">{t('landing.footer.legal')}</h4>
             <ul className="space-y-2.5">
               <li>
+                <a href="/about" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                  About Us
+                </a>
+              </li>
+              <li>
+                <a href="/sitemap" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                  Sitemap
+                </a>
+              </li>
+              <li>
                 <a href="#" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                   {t('landing.footer.privacy')}
                 </a>

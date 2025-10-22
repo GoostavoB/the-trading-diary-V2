@@ -1,7 +1,8 @@
-import { Upload, Repeat, TrendingUp, Filter, Smartphone } from "lucide-react";
+import { Upload, Repeat, TrendingUp, Filter, Smartphone, ArrowRight } from "lucide-react";
 import { GlassCard } from "@/components/ui/glass-card";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 const Features = () => {
   const { t } = useTranslation();
@@ -11,26 +12,36 @@ const Features = () => {
       icon: <Upload className="w-6 h-6" />,
       titleKey: "landing.features.smartLogging.title",
       descriptionKey: "landing.features.smartLogging.description",
+      blogLink: "/blog/trading-journal-for-crypto",
+      blogLinkText: "Learn about Trading Journals"
     },
     {
       icon: <Repeat className="w-6 h-6" />,
       titleKey: "landing.features.autoImports.title",
       descriptionKey: "landing.features.autoImports.description",
+      blogLink: "/blog/ai-tools-for-crypto-trading",
+      blogLinkText: "Discover AI Trading Tools"
     },
     {
       icon: <TrendingUp className="w-6 h-6" />,
       titleKey: "landing.features.advancedAnalytics.title",
       descriptionKey: "landing.features.advancedAnalytics.description",
+      blogLink: "/blog/data-driven-trading",
+      blogLinkText: "Read about Data-Driven Trading"
     },
     {
       icon: <Filter className="w-6 h-6" />,
       titleKey: "landing.features.tagFilter.title",
       descriptionKey: "landing.features.tagFilter.description",
+      blogLink: "/blog/ai-powered-trading-journal",
+      blogLinkText: "See AI-Powered Features"
     },
     {
       icon: <Smartphone className="w-6 h-6" />,
       titleKey: "landing.features.mobileFriendly.title",
       descriptionKey: "landing.features.mobileFriendly.description",
+      blogLink: "/blog/trading-psychology-control-emotions",
+      blogLinkText: "Master Trading Psychology"
     },
   ];
   return (
@@ -71,9 +82,16 @@ const Features = () => {
                   {feature.icon}
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{t(feature.titleKey)}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
                   {t(feature.descriptionKey)}
                 </p>
+                <Link 
+                  to={feature.blogLink}
+                  className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                >
+                  {feature.blogLinkText}
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
               </GlassCard>
             </motion.article>
           ))}
@@ -97,14 +115,38 @@ const Features = () => {
                   {feature.icon}
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{t(feature.titleKey)}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
                   {t(feature.descriptionKey)}
                 </p>
+                <Link 
+                  to={feature.blogLink}
+                  className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                >
+                  {feature.blogLinkText}
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
               </GlassCard>
             </motion.article>
           ))}
+          </div>
+          
+          {/* Related Blog Articles */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            viewport={{ once: true }}
+            className="mt-12 text-center"
+          >
+            <Link 
+              to="/blog"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg font-medium transition-colors"
+            >
+              Read More Trading Insights
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
         </div>
-      </div>
     </section>
   );
 };

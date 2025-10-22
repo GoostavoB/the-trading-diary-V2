@@ -62,6 +62,8 @@ const PerformanceAlerts = lazy(() => import("./pages/PerformanceAlerts"));
 const ProgressAnalytics = lazy(() => import("./pages/ProgressAnalytics"));
 const MyMetrics = lazy(() => import("./pages/MyMetrics"));
 const UserGuide = lazy(() => import("./pages/UserGuide"));
+const Sitemap = lazy(() => import("./pages/Sitemap"));
+const About = lazy(() => import("./pages/About"));
 
 // Loading fallback
 const PageLoader = () => (
@@ -116,6 +118,8 @@ const App = () => (
                       <Route path="/auth" element={<Auth />} />
                       <Route path="/logo-download" element={<LogoDownload />} />
                       <Route path="/crypto-trading-faq" element={<CryptoTradingFAQ />} />
+                      <Route path="/sitemap" element={<Sitemap />} />
+                      <Route path="/about" element={<About />} />
                       
                       {/* Blog routes with language support */}
                       <Route path="/blog" element={<Blog />} />
