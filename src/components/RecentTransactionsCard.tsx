@@ -44,11 +44,11 @@ export const RecentTransactionsCard = memo(({ trades, className }: RecentTransac
               return (
                 <li 
                   key={trade.id} 
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                  className="flex items-center justify-between gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
                   role="listitem"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className={`p-2 rounded-lg shrink-0 ${
                       isWin ? 'bg-primary/10' : 'bg-secondary/10'
                     }`}>
                       {isWin ? (
@@ -57,15 +57,15 @@ export const RecentTransactionsCard = memo(({ trades, className }: RecentTransac
                         <TrendingDown className="h-4 w-4 text-secondary" />
                       )}
                     </div>
-                    <div>
-                      <p className="font-medium text-sm">{trade.symbol || 'Unknown'}</p>
-                      <p className="text-xs text-muted-foreground">
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm truncate">{trade.symbol || 'Unknown'}</p>
+                      <p className="text-xs text-muted-foreground truncate">
                         {format(new Date(trade.trade_date), 'MMM dd, HH:mm')}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className={`font-semibold text-sm ${
+                  <div className="text-right shrink-0">
+                    <p className={`font-semibold text-sm whitespace-nowrap ${
                       isWin ? 'text-primary' : 'text-secondary'
                     }`}>
                       {formatCurrency(trade.pnl || 0)}

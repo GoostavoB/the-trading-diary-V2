@@ -8,6 +8,11 @@ export interface WidgetPosition {
   row: number;
 }
 
+export interface LayoutData {
+  positions: WidgetPosition[];
+  columnCount?: number;
+}
+
 const DEFAULT_POSITIONS: WidgetPosition[] = [
   { id: 'totalBalance', column: 0, row: 0 },
   { id: 'winRate', column: 1, row: 0 },
@@ -26,6 +31,7 @@ const DEFAULT_POSITIONS: WidgetPosition[] = [
 
 export const useGridLayout = (userId: string | undefined, availableWidgets: string[]) => {
   const [positions, setPositions] = useState<WidgetPosition[]>(DEFAULT_POSITIONS);
+  const [columnCount, setColumnCount] = useState<number>(3);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -51,8 +57,16 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
         if (data?.layout_json) {
           const layoutData = data.layout_json as any;
           
-          // Handle new position-based format
-          if (Array.isArray(layoutData) && layoutData.length > 0 && layoutData[0]?.column !== undefined) {
+          // Handle new format with positions and columnCount
+          if (layoutData?.positions && Array.isArray(layoutData.positions)) {
+            console.log('Loading layout with column count:', layoutData);
+            setPositions(layoutData.positions);
+            if (layoutData.columnCount && layoutData.columnCount >= 1 && layoutData.columnCount <= 4) {
+              setColumnCount(layoutData.columnCount);
+            }
+          }
+          // Handle position-based format (backwards compatibility)
+          else if (Array.isArray(layoutData) && layoutData.length > 0 && layoutData[0]?.column !== undefined) {
             console.log('Loading position-based layout:', layoutData);
             setPositions(layoutData);
           }
@@ -65,7 +79,6 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
               row: Math.floor(idx / 3),
             }));
             setPositions(newPositions);
-            // Save in new format (will happen on next interaction)
           }
         }
       } catch (error) {
@@ -78,10 +91,11 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
     loadLayout();
   }, [userId]);
 
-  const saveLayout = useCallback(async (newPositions: WidgetPosition[]) => {
+  const saveLayout = useCallback(async (newPositions: WidgetPosition[], newColumnCount?: number) => {
     if (!userId) return;
 
-    console.log('Saving layout with positions:', newPositions);
+    const countToSave = newColumnCount ?? columnCount;
+    console.log('Saving layout with positions and column count:', newPositions, countToSave);
     
     // Validate before saving
     const uniqueIds = new Set(newPositions.map(p => p.id));
@@ -95,12 +109,21 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
     try {
       // Update local state first
       setPositions(newPositions);
+      if (newColumnCount !== undefined) {
+        setColumnCount(newColumnCount);
+      }
+      
+      // Save in new format with both positions and columnCount
+      const layoutData: LayoutData = {
+        positions: newPositions,
+        columnCount: countToSave,
+      };
       
       // Then save to database
       const { error } = await supabase
         .from('user_settings')
         .update({
-          layout_json: newPositions as any,
+          layout_json: layoutData as any,
           updated_at: new Date().toISOString(),
         })
         .eq('user_id', userId);
@@ -113,7 +136,7 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
     } finally {
       setIsSaving(false);
     }
-  }, [userId]);
+  }, [userId, columnCount]);
 
   const updatePosition = useCallback((widgetId: string, column: number, row: number) => {
     setPositions(prev => {
@@ -148,12 +171,21 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
     toast.success('Layout reset');
   }, [saveLayout]);
 
+  const updateColumnCount = useCallback((newCount: number) => {
+    if (newCount >= 1 && newCount <= 4) {
+      setColumnCount(newCount);
+      saveLayout(positions, newCount);
+    }
+  }, [positions, saveLayout]);
+
   return {
     positions,
+    columnCount,
     isLoading,
     isSaving,
     updatePosition,
     saveLayout,
+    updateColumnCount,
     addWidget,
     removeWidget,
     resetLayout,

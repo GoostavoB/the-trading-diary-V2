@@ -65,13 +65,13 @@ const TopMoversCardComponent = ({ trades, className }: TopMoversCardProps) => {
               return (
                 <li 
                   key={asset.symbol} 
-                  className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                  className="flex items-center justify-between gap-3 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
                   role="listitem"
                   aria-label={`${asset.symbol}: ${formatCurrency(asset.pnl)}, ${isPositive ? 'up' : 'down'} ${formatPercent(Math.abs(asset.change))}`}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
                     <div 
-                      className={`p-1.5 rounded-lg ${
+                      className={`p-1.5 rounded-lg shrink-0 ${
                         isPositive ? 'bg-primary/10' : 'bg-secondary/10'
                       }`}
                       aria-hidden="true"
@@ -82,19 +82,19 @@ const TopMoversCardComponent = ({ trades, className }: TopMoversCardProps) => {
                         <TrendingDown className="h-3 w-3 text-secondary" />
                       )}
                     </div>
-                    <TokenIcon symbol={asset.symbol} size="sm" />
-                    <div>
-                      <p className="font-medium text-sm">{asset.symbol}</p>
-                      <p className="text-xs text-muted-foreground">{asset.trades} trades</p>
+                    <TokenIcon symbol={asset.symbol} size="sm" className="shrink-0" />
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm truncate">{asset.symbol}</p>
+                      <p className="text-xs text-muted-foreground truncate">{asset.trades} trades</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className={`font-semibold text-sm ${
+                  <div className="text-right shrink-0">
+                    <p className={`font-semibold text-sm whitespace-nowrap ${
                       isPositive ? 'text-primary' : 'text-secondary'
                     }`}>
                       {formatCurrency(asset.pnl)}
                     </p>
-                    <p className={`text-xs ${
+                    <p className={`text-xs whitespace-nowrap ${
                       isPositive ? 'text-primary/70' : 'text-secondary/70'
                     }`}>
                       {isPositive ? '+' : ''}{formatPercent(asset.change)}

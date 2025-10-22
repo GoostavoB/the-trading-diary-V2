@@ -143,26 +143,33 @@ const Dashboard = () => {
   // Grid layout with free positioning
   const {
     positions: loadedPositions,
+    columnCount: savedColumnCount,
     isLoading: isLayoutLoading,
     updatePosition,
     saveLayout: saveGridLayout,
+    updateColumnCount,
     addWidget,
     removeWidget,
     resetLayout,
   } = useGridLayout(user?.id, Object.keys(WIDGET_CATALOG));
-
-  // Sync loaded positions with local state
-  useEffect(() => {
-    if (!isCustomizing && loadedPositions.length > 0) {
-      setPositions(loadedPositions);
-    }
-  }, [loadedPositions]);
 
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [showWidgetLibrary, setShowWidgetLibrary] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedColumnCount, setSelectedColumnCount] = useState(3);
   const [originalPositions, setOriginalPositions] = useState<WidgetPosition[]>([]);
+
+  // Sync loaded positions and column count with local state
+  useEffect(() => {
+    if (!isCustomizing && loadedPositions.length > 0) {
+      setPositions(loadedPositions);
+    }
+  }, [loadedPositions, isCustomizing]);
+
+  // Sync column count from saved settings
+  useEffect(() => {
+    setSelectedColumnCount(savedColumnCount);
+  }, [savedColumnCount]);
 
   // Track if layout has changed
   const hasLayoutChanges = useMemo(() => {
@@ -845,7 +852,7 @@ const Dashboard = () => {
             onCancel={handleCancelCustomize}
             onReset={resetLayout}
             columnCount={selectedColumnCount}
-            onColumnCountChange={setSelectedColumnCount}
+            onColumnCountChange={updateColumnCount}
             widgetCount={positions.length}
           />
         )}
