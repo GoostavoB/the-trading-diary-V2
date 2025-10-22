@@ -1247,13 +1247,6 @@
     "thisYear": "This Year",
     "custom": "Custom Range"
   },
-  "sidebar": {
-    "expandAll": "Expand All",
-    "collapseAll": "Collapse All",
-    "searchPlaceholder": "Search menu...",
-    "favorites": "Favorites",
-    "removeFromFavorites": "Remove from favorites"
-  },
   "keyboardShortcuts": {
     "title": "Keyboard Shortcuts",
     "subtitle": "Speed up your workflow with these keyboard shortcuts",
