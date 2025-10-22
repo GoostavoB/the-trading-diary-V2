@@ -6,6 +6,9 @@ import { Logo } from "@/components/Logo";
 import { useState } from "react";
 import { toast } from "sonner";
 import heroBg from '@/assets/bull-bear-realistic.png';
+import wallpaperLogo from '@/assets/wallpaper-logo-center.png';
+import wallpaperTrading from '@/assets/wallpaper-trading-theme.png';
+import wallpaperCreative from '@/assets/wallpaper-creative.png';
 
 const LogoDownload = () => {
   const navigate = useNavigate();
@@ -136,6 +139,70 @@ const LogoDownload = () => {
     };
 
     bgImg.src = heroBg;
+  };
+
+  const downloadIconOnly = (size: number, bgColor: 'transparent' | 'white') => {
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set background
+    if (bgColor === 'white') {
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, size, size);
+    }
+
+    // Icon-only SVG (no text)
+    const svgData = `
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
+        <defs>
+          <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color: hsl(250, 80%, 75%); stop-opacity: 1" />
+            <stop offset="100%" style="stop-color: hsl(250, 80%, 75%); stop-opacity: 0.85" />
+          </linearGradient>
+        </defs>
+        <rect x="8" y="10" width="24" height="5" fill="url(#logoGradient)" />
+        <rect x="17" y="10" width="6" height="28" fill="url(#logoGradient)" />
+        <rect x="25" y="15" width="6" height="23" fill="url(#logoGradient)" />
+        <path d="M 31 15 L 38 15 Q 42 15 42 19 L 42 34 Q 42 38 38 38 L 31 38 Z
+                 M 31 20 L 35 20 Q 37 20 37 22 L 37 31 Q 37 33 35 33 L 31 33 Z"
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              fill="url(#logoGradient)" />
+        <rect x="7" y="9" width="36" height="30" rx="2" stroke="hsl(250, 80%, 75%)" stroke-width="0.5" fill="none" opacity="0.2" />
+      </svg>
+    `;
+
+    const img = new Image();
+    const blob = new Blob([svgData], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const link = document.createElement('a');
+        link.download = `trading-diary-icon-${size}x${size}-${bgColor}.png`;
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        toast.success(`Downloaded ${size}x${size} icon PNG`);
+      }, 'image/png');
+    };
+
+    img.src = url;
+  };
+
+  const downloadWallpaper = (wallpaperSrc: string, name: string) => {
+    const link = document.createElement('a');
+    link.download = `trading-diary-wallpaper-${name}.png`;
+    link.href = wallpaperSrc;
+    link.click();
+    toast.success(`Downloaded ${name} wallpaper`);
   };
 
   return (
@@ -285,7 +352,7 @@ const LogoDownload = () => {
         </GlassCard>
 
         {/* Download Options */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
           {/* Transparent Background */}
           <GlassCard className="p-6">
             <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -335,13 +402,162 @@ const LogoDownload = () => {
           </GlassCard>
         </div>
 
+        {/* Larger Sizes Section */}
+        <GlassCard className="p-6 mb-6">
+          <h3 className="text-xl font-semibold mb-4">High Resolution Logos</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Ultra high-resolution versions for professional use, billboards, and large format printing
+          </p>
+          <div className="grid md:grid-cols-2 gap-3">
+            {[2048, 4096].map((size) => (
+              <div key={size} className="space-y-2">
+                <Button
+                  onClick={() => downloadLogo(size, 'transparent')}
+                  variant="outline"
+                  className="w-full justify-between hover:bg-primary/10"
+                >
+                  <span>{size}x{size} PNG (Transparent)</span>
+                  <Download className="h-4 w-4" />
+                </Button>
+                <Button
+                  onClick={() => downloadLogo(size, 'white')}
+                  variant="outline"
+                  className="w-full justify-between hover:bg-primary/10"
+                >
+                  <span>{size}x{size} PNG (White BG)</span>
+                  <Download className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </GlassCard>
+
+        {/* Icon Only Section */}
+        <GlassCard className="p-6 mb-6">
+          <h3 className="text-xl font-semibold mb-4">Icon Only (No Text)</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Just the TD monogram without "The Trading Diary" text - perfect for app icons and compact spaces
+          </p>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="text-sm font-medium mb-3">Transparent</h4>
+              <div className="space-y-2">
+                {[512, 1024, 2048].map((size) => (
+                  <Button
+                    key={`icon-transparent-${size}`}
+                    onClick={() => downloadIconOnly(size, 'transparent')}
+                    variant="outline"
+                    className="w-full justify-between hover:bg-primary/10"
+                  >
+                    <span>{size}x{size} PNG</span>
+                    <Download className="h-4 w-4" />
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h4 className="text-sm font-medium mb-3">White Background</h4>
+              <div className="space-y-2">
+                {[512, 1024, 2048].map((size) => (
+                  <Button
+                    key={`icon-white-${size}`}
+                    onClick={() => downloadIconOnly(size, 'white')}
+                    variant="outline"
+                    className="w-full justify-between hover:bg-primary/10"
+                  >
+                    <span>{size}x{size} PNG</span>
+                    <Download className="h-4 w-4" />
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+
+        {/* Wallpapers Section */}
+        <GlassCard className="p-8 mb-6">
+          <h2 className="text-2xl font-semibold mb-4">Desktop Wallpapers</h2>
+          <p className="text-muted-foreground mb-6">
+            Professional 1920x1080 wallpapers featuring The Trading Diary branding
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Wallpaper 1: Logo Center */}
+            <div>
+              <div 
+                className="relative w-full aspect-video rounded-lg overflow-hidden mb-4 border border-border/50"
+                style={{
+                  backgroundImage: `url(${wallpaperLogo})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              />
+              <Button 
+                onClick={() => downloadWallpaper(wallpaperLogo, 'logo-center')} 
+                className="w-full justify-between hover:bg-primary/90"
+              >
+                <span>Logo Center</span>
+                <Download className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Wallpaper 2: Trading Theme */}
+            <div>
+              <div 
+                className="relative w-full aspect-video rounded-lg overflow-hidden mb-4 border border-border/50"
+                style={{
+                  backgroundImage: `url(${wallpaperTrading})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              />
+              <Button 
+                onClick={() => downloadWallpaper(wallpaperTrading, 'trading-theme')} 
+                className="w-full justify-between hover:bg-primary/90"
+              >
+                <span>Trading Theme</span>
+                <Download className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Wallpaper 3: Creative */}
+            <div>
+              <div 
+                className="relative w-full aspect-video rounded-lg overflow-hidden mb-4 border border-border/50"
+                style={{
+                  backgroundImage: `url(${wallpaperCreative})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              />
+              <Button 
+                onClick={() => downloadWallpaper(wallpaperCreative, 'creative')} 
+                className="w-full justify-between hover:bg-primary/90"
+              >
+                <span>Creative Abstract</span>
+                <Download className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="mt-6 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              <strong className="text-foreground">Resolution:</strong> 1920×1080 Full HD - Perfect for desktop backgrounds and dual monitors
+            </p>
+          </div>
+        </GlassCard>
+
         {/* Usage Guidelines */}
         <GlassCard className="p-6 mt-6">
           <h3 className="text-xl font-semibold mb-4">Usage Guidelines</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>• <strong>192x192:</strong> Perfect for favicons and small icons</li>
             <li>• <strong>512x512:</strong> Ideal for app icons and social media profiles</li>
-            <li>• <strong>1024x1024:</strong> High-resolution for marketing materials and print</li>
+            <li>• <strong>1024x1024:</strong> High-resolution for marketing materials and web use</li>
+            <li>• <strong>2048x2048:</strong> Professional print materials and large format displays</li>
+            <li>• <strong>4096x4096:</strong> Ultra high-resolution for billboards and premium applications</li>
+            <li>• <strong>Icon Only:</strong> Use when space is limited - perfect for mobile apps and compact layouts</li>
+            <li>• <strong>Wallpapers:</strong> 1920x1080 Full HD for desktop backgrounds and presentations</li>
             <li>• <strong>SVG:</strong> Scalable vector format for web use - always sharp at any size</li>
           </ul>
         </GlassCard>
