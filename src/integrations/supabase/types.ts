@@ -106,6 +106,153 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_cost_log: {
+        Row: {
+          cache_hit: boolean | null
+          canary: boolean | null
+          complexity: string | null
+          cost_cents: number
+          created_at: string | null
+          endpoint: string
+          error_message: string | null
+          id: number
+          latency_ms: number
+          model_id: string
+          ocr_quality_score: number | null
+          route: string
+          tokens_in: number
+          tokens_out: number
+          user_id: string
+        }
+        Insert: {
+          cache_hit?: boolean | null
+          canary?: boolean | null
+          complexity?: string | null
+          cost_cents?: number
+          created_at?: string | null
+          endpoint: string
+          error_message?: string | null
+          id?: number
+          latency_ms?: number
+          model_id: string
+          ocr_quality_score?: number | null
+          route: string
+          tokens_in?: number
+          tokens_out?: number
+          user_id: string
+        }
+        Update: {
+          cache_hit?: boolean | null
+          canary?: boolean | null
+          complexity?: string | null
+          cost_cents?: number
+          created_at?: string | null
+          endpoint?: string
+          error_message?: string | null
+          id?: number
+          latency_ms?: number
+          model_id?: string
+          ocr_quality_score?: number | null
+          route?: string
+          tokens_in?: number
+          tokens_out?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_image_cache: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          image_hash: string
+          model_id: string
+          model_version: string
+          ocr_confidence: number | null
+          ocr_quality_score: number | null
+          ocr_text: string | null
+          parsed_json: Json
+          perceptual_hash: string | null
+          preprocessing_version: string
+          prompt_version: string
+          route_used: string
+          tokens_saved: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          image_hash: string
+          model_id: string
+          model_version: string
+          ocr_confidence?: number | null
+          ocr_quality_score?: number | null
+          ocr_text?: string | null
+          parsed_json: Json
+          perceptual_hash?: string | null
+          preprocessing_version?: string
+          prompt_version?: string
+          route_used: string
+          tokens_saved?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          image_hash?: string
+          model_id?: string
+          model_version?: string
+          ocr_confidence?: number | null
+          ocr_quality_score?: number | null
+          ocr_text?: string | null
+          parsed_json?: Json
+          perceptual_hash?: string | null
+          preprocessing_version?: string
+          prompt_version?: string
+          route_used?: string
+          tokens_saved?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ai_trade_cache: {
+        Row: {
+          analysis_type: string
+          cache_key: string
+          created_at: string | null
+          model_id: string
+          parsed_json: Json
+          prompt_version: string
+          trade_hash: string
+          trade_id: string | null
+          ttl_expires_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_type: string
+          cache_key: string
+          created_at?: string | null
+          model_id: string
+          parsed_json: Json
+          prompt_version: string
+          trade_hash: string
+          trade_id?: string | null
+          ttl_expires_at: string
+          user_id: string
+        }
+        Update: {
+          analysis_type?: string
+          cache_key?: string
+          created_at?: string | null
+          model_id?: string
+          parsed_json?: Json
+          prompt_version?: string
+          trade_hash?: string
+          trade_id?: string | null
+          ttl_expires_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       alert_history: {
         Row: {
           alert_id: string
@@ -2065,6 +2212,90 @@ export type Database = {
         }
         Relationships: []
       }
+      user_ai_budget: {
+        Row: {
+          blocked_at_100_percent: boolean | null
+          budget_cents: number
+          created_at: string | null
+          force_lite_at_80_percent: boolean | null
+          last_reset_at: string | null
+          month_start: string
+          plan: string
+          spend_cents: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          blocked_at_100_percent?: boolean | null
+          budget_cents: number
+          created_at?: string | null
+          force_lite_at_80_percent?: boolean | null
+          last_reset_at?: string | null
+          month_start: string
+          plan: string
+          spend_cents?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          blocked_at_100_percent?: boolean | null
+          budget_cents?: number
+          created_at?: string | null
+          force_lite_at_80_percent?: boolean | null
+          last_reset_at?: string | null
+          month_start?: string
+          plan?: string
+          spend_cents?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_ai_usage: {
+        Row: {
+          analyses_run: number | null
+          chat_messages: number | null
+          clarifications_run: number | null
+          images_used: number | null
+          month_start: string
+          predictions_run: number | null
+          psychology_run: number | null
+          reports_run: number | null
+          total_tokens_in: number | null
+          total_tokens_out: number | null
+          user_id: string
+          widgets_run: number | null
+        }
+        Insert: {
+          analyses_run?: number | null
+          chat_messages?: number | null
+          clarifications_run?: number | null
+          images_used?: number | null
+          month_start: string
+          predictions_run?: number | null
+          psychology_run?: number | null
+          reports_run?: number | null
+          total_tokens_in?: number | null
+          total_tokens_out?: number | null
+          user_id: string
+          widgets_run?: number | null
+        }
+        Update: {
+          analyses_run?: number | null
+          chat_messages?: number | null
+          clarifications_run?: number | null
+          images_used?: number | null
+          month_start?: string
+          predictions_run?: number | null
+          psychology_run?: number | null
+          reports_run?: number | null
+          total_tokens_in?: number | null
+          total_tokens_out?: number | null
+          user_id?: string
+          widgets_run?: number | null
+        }
+        Relationships: []
+      }
       user_broker_preferences: {
         Row: {
           broker_name: string
@@ -2669,6 +2900,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_ai_spend: {
+        Args: { p_cost_cents: number; p_month_start: string; p_user_id: string }
+        Returns: undefined
       }
       increment_broker_usage: {
         Args: { p_broker_name: string }
