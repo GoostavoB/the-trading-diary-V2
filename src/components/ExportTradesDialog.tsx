@@ -12,6 +12,7 @@ import { Download, FileSpreadsheet, FileJson, FileText } from 'lucide-react';
 import { exportToCSV, exportToJSON, exportWithSummary } from '@/utils/exportTrades';
 import type { Trade } from '@/types/trade';
 import { toast } from 'sonner';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface ExportTradesDialogProps {
   trades: Trade[];
@@ -19,6 +20,7 @@ interface ExportTradesDialogProps {
 }
 
 export const ExportTradesDialog = ({ trades, trigger }: ExportTradesDialogProps) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const handleExport = (format: 'csv' | 'json' | 'summary') => {
@@ -26,21 +28,21 @@ export const ExportTradesDialog = ({ trades, trigger }: ExportTradesDialogProps)
       switch (format) {
         case 'csv':
           exportToCSV(trades, 'trades');
-          toast.success('Trades exported as CSV');
+          toast.success(t('export.success.csv'));
           break;
         case 'json':
           exportToJSON(trades, 'trades');
-          toast.success('Trades exported as JSON');
+          toast.success(t('export.success.json'));
           break;
         case 'summary':
           exportWithSummary(trades, 'trades');
-          toast.success('Trades exported with summary');
+          toast.success(t('export.success.summary'));
           break;
       }
       setOpen(false);
     } catch (error) {
       console.error('Export error:', error);
-      toast.error('Failed to export trades');
+      toast.error(t('export.error'));
     }
   };
 
@@ -50,15 +52,15 @@ export const ExportTradesDialog = ({ trades, trigger }: ExportTradesDialogProps)
         {trigger || (
           <Button variant="outline" className="gap-2">
             <Download className="w-4 h-4" />
-            Export
+            {t('common.export')}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Export Trades</DialogTitle>
+          <DialogTitle>{t('export.title')}</DialogTitle>
           <DialogDescription>
-            Choose a format to export your {trades.length} trade{trades.length !== 1 ? 's' : ''}
+            {t('export.description')} {trades.length} {trades.length !== 1 ? t('export.trades') : t('export.trade')}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3 py-4 overflow-y-auto">
@@ -69,9 +71,9 @@ export const ExportTradesDialog = ({ trades, trigger }: ExportTradesDialogProps)
           >
             <FileSpreadsheet className="w-5 h-5 text-neon-green flex-shrink-0" />
             <div className="text-left flex-1 min-w-0">
-              <div className="font-semibold text-sm">CSV Format</div>
+              <div className="font-semibold text-sm">{t('export.formats.csv.title')}</div>
               <div className="text-xs text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere">
-                Compatible with Excel, Google Sheets, and other spreadsheets
+                {t('export.formats.csv.description')}
               </div>
             </div>
           </Button>
@@ -83,9 +85,9 @@ export const ExportTradesDialog = ({ trades, trigger }: ExportTradesDialogProps)
           >
             <FileText className="w-5 h-5 text-primary flex-shrink-0" />
             <div className="text-left flex-1 min-w-0">
-              <div className="font-semibold text-sm">CSV with Summary</div>
+              <div className="font-semibold text-sm">{t('export.formats.csvWithSummary.title')}</div>
               <div className="text-xs text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere">
-                Includes performance summary at the top
+                {t('export.formats.csvWithSummary.description')}
               </div>
             </div>
           </Button>
@@ -97,9 +99,9 @@ export const ExportTradesDialog = ({ trades, trigger }: ExportTradesDialogProps)
           >
             <FileJson className="w-5 h-5 text-yellow-500 flex-shrink-0" />
             <div className="text-left flex-1 min-w-0">
-              <div className="font-semibold text-sm">JSON Format</div>
+              <div className="font-semibold text-sm">{t('export.formats.json.title')}</div>
               <div className="text-xs text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere">
-                For developers and data analysis tools
+                {t('export.formats.json.description')}
               </div>
             </div>
           </Button>

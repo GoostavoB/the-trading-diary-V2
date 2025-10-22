@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { User, LogOut, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const passwordChangeSchema = z.object({
   newPassword: z.string().min(6, 'Password must be at least 6 characters').max(128, 'Password is too long'),
@@ -26,6 +27,7 @@ const passwordChangeSchema = z.object({
 });
 
 export const UserMenu = () => {
+  const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
@@ -36,7 +38,7 @@ export const UserMenu = () => {
   const handleLogout = async () => {
     await signOut();
     navigate('/auth');
-    toast.success('Logged out successfully');
+    toast.success(t('auth.toast.signOutSuccess'));
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -64,7 +66,7 @@ export const UserMenu = () => {
       if (error) {
         toast.error(error.message);
       } else {
-        toast.success('Password updated successfully! Please sign in again.');
+        toast.success(t('userMenu.dialog.success'));
         setChangePasswordOpen(false);
         setNewPassword('');
         setConfirmPassword('');
@@ -73,7 +75,7 @@ export const UserMenu = () => {
         navigate('/auth');
       }
     } catch (error) {
-      toast.error('Failed to update password');
+      toast.error(t('userMenu.dialog.error'));
     } finally {
       setLoading(false);
     }
@@ -91,11 +93,11 @@ export const UserMenu = () => {
       if (error) {
         toast.error(error.message);
       } else {
-        toast.success('Password reset email sent! Check your inbox.');
+        toast.success(t('userMenu.dialog.resetEmailSent'));
         setChangePasswordOpen(false);
       }
     } catch (error) {
-      toast.error('Failed to send reset email');
+      toast.error(t('userMenu.dialog.resetError'));
     } finally {
       setLoading(false);
     }
@@ -112,11 +114,11 @@ export const UserMenu = () => {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="flex items-center gap-2">
             <User className="w-4 h-4" />
-            <span className="hidden md:inline">Hello, {displayName}</span>
+            <span className="hidden md:inline">{t('userMenu.hello')}, {displayName}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel>{t('userMenu.myAccount')}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <div className="px-2 py-1.5 text-sm text-muted-foreground">
             {user.email}
@@ -124,11 +126,11 @@ export const UserMenu = () => {
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setChangePasswordOpen(true)}>
             <KeyRound className="w-4 h-4 mr-2" />
-            Change Password
+            {t('userMenu.changePassword')}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleLogout} className="text-destructive">
             <LogOut className="w-4 h-4 mr-2" />
-            Logout
+            {t('userMenu.logout')}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -136,45 +138,45 @@ export const UserMenu = () => {
       <Dialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Change Password</DialogTitle>
+            <DialogTitle>{t('userMenu.dialog.title')}</DialogTitle>
             <DialogDescription>
-              Choose how you'd like to change your password
+              {t('userMenu.dialog.description')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="p-4 border rounded-md space-y-3">
-              <h3 className="font-medium">Change Password Now</h3>
+              <h3 className="font-medium">{t('userMenu.dialog.changeNow')}</h3>
               <p className="text-sm text-muted-foreground">
-                Set a new password immediately
+                {t('userMenu.dialog.changeNowDescription')}
               </p>
               <form onSubmit={handleChangePassword} className="space-y-3">
                 <div>
-                  <label className="text-sm font-medium">New Password</label>
+                  <label className="text-sm font-medium">{t('userMenu.dialog.newPassword')}</label>
                   <Input
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter new password"
+                    placeholder={t('userMenu.dialog.newPasswordPlaceholder')}
                     minLength={6}
                     required
                     className="mt-1"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Confirm Password</label>
+                  <label className="text-sm font-medium">{t('userMenu.dialog.confirmPassword')}</label>
                   <Input
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm new password"
+                    placeholder={t('userMenu.dialog.confirmPasswordPlaceholder')}
                     minLength={6}
                     required
                     className="mt-1"
                   />
                 </div>
                 <Button type="submit" disabled={loading} className="w-full">
-                  {loading ? 'Updating...' : 'Update Password'}
+                  {loading ? t('userMenu.dialog.updating') : t('userMenu.dialog.updatePassword')}
                 </Button>
               </form>
             </div>
@@ -184,14 +186,14 @@ export const UserMenu = () => {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or</span>
+                <span className="bg-background px-2 text-muted-foreground">{t('userMenu.dialog.or')}</span>
               </div>
             </div>
 
             <div className="p-4 border rounded-md space-y-3">
-              <h3 className="font-medium">Send Reset Email</h3>
+              <h3 className="font-medium">{t('userMenu.dialog.sendResetEmail')}</h3>
               <p className="text-sm text-muted-foreground">
-                We'll send a password reset link to <strong>{user.email}</strong>
+                {t('userMenu.dialog.sendResetEmailDescription')} <strong>{user.email}</strong>
               </p>
               <Button
                 variant="outline"
@@ -199,7 +201,7 @@ export const UserMenu = () => {
                 disabled={loading}
                 className="w-full"
               >
-                {loading ? 'Sending...' : 'Send Reset Email'}
+                {loading ? t('userMenu.dialog.sending') : t('userMenu.dialog.sendEmail')}
               </Button>
             </div>
           </div>

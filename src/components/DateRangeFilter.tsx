@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export type DateRange = {
   from: Date | undefined;
@@ -18,33 +19,34 @@ interface DateRangeFilterProps {
 }
 
 export const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [tempRange, setTempRange] = useState<DateRange>(dateRange);
 
   const presetRanges = [
     {
-      label: 'Last 7 days',
+      label: t('dateRange.presets.last7Days'),
       getValue: () => ({
         from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
         to: new Date(),
       }),
     },
     {
-      label: 'Last 30 days',
+      label: t('dateRange.presets.last30Days'),
       getValue: () => ({
         from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
         to: new Date(),
       }),
     },
     {
-      label: 'Last 90 days',
+      label: t('dateRange.presets.last90Days'),
       getValue: () => ({
         from: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
         to: new Date(),
       }),
     },
     {
-      label: 'This Month',
+      label: t('dateRange.presets.thisMonth'),
       getValue: () => {
         const now = new Date();
         return {
@@ -65,7 +67,7 @@ export const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilte
     onDateRangeChange(tempRange);
     setIsOpen(false);
     if (tempRange?.from && tempRange?.to) {
-      toast.success(`Showing data for ${format(tempRange.from, 'MMM dd')} - ${format(tempRange.to, 'MMM dd, yyyy')}`);
+      toast.success(`${t('dateRange.showingData')} ${format(tempRange.from, 'MMM dd')} - ${format(tempRange.to, 'MMM dd, yyyy')}`);
     }
   };
 
@@ -100,14 +102,14 @@ export const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilte
                 format(dateRange.from, 'LLL dd, y')
               )
             ) : (
-              <span>Pick a date range</span>
+              <span>{t('dateRange.pickDateRange')}</span>
             )}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0 glass rounded-3xl shadow-xl" align="start">
           <div className="flex flex-col lg:flex-row">
             <div className="border-r border-border/50 p-4 space-y-2 min-w-[140px]">
-              <div className="text-sm font-semibold mb-3 text-foreground">Quick Select</div>
+              <div className="text-sm font-semibold mb-3 text-foreground">{t('dateRange.quickSelect')}</div>
               {presetRanges.map((preset) => (
                 <Button
                   key={preset.label}
@@ -135,7 +137,7 @@ export const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilte
                   onClick={handleCancel}
                   className="flex-1"
                 >
-                  Cancel
+                  {t('dateRange.cancel')}
                 </Button>
                 <Button
                   size="sm"
@@ -143,7 +145,7 @@ export const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilte
                   className="flex-1 bg-primary hover:bg-primary/90"
                   disabled={!tempRange?.from || !tempRange?.to}
                 >
-                  Apply
+                  {t('dateRange.apply')}
                 </Button>
               </div>
             </div>
