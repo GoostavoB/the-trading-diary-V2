@@ -5,6 +5,7 @@ export interface LandingMeta {
   canonical: string;
   ogTitle: string;
   ogDescription: string;
+  ogImage: string;
   lang: string;
   alternates: { lang: string; url: string }[];
 }
@@ -17,6 +18,7 @@ export const landingMeta: Record<string, LandingMeta> = {
     canonical: 'https://www.thetradingdiary.com/',
     ogTitle: 'The #1 Crypto Trading Journal',
     ogDescription: 'Track, analyze, and review every crypto trade with AI. Built for serious traders.',
+    ogImage: 'https://www.thetradingdiary.com/og-image-en.png',
     lang: 'en',
     alternates: [
       { lang: 'en', url: 'https://www.thetradingdiary.com/' },
@@ -34,6 +36,7 @@ export const landingMeta: Record<string, LandingMeta> = {
     canonical: 'https://www.thetradingdiary.com/pt',
     ogTitle: 'Diário de Trading #1 para Cripto',
     ogDescription: 'Rastreie, analise e revise cada trade de cripto com IA. Feito para traders sérios.',
+    ogImage: 'https://www.thetradingdiary.com/og-image-pt.png',
     lang: 'pt-BR',
     alternates: [
       { lang: 'en', url: 'https://www.thetradingdiary.com/' },
@@ -51,6 +54,7 @@ export const landingMeta: Record<string, LandingMeta> = {
     canonical: 'https://www.thetradingdiary.com/es',
     ogTitle: 'Diario de Trading #1 para Cripto',
     ogDescription: 'Rastrea, analiza y revisa cada trade de cripto con IA. Hecho para traders serios.',
+    ogImage: 'https://www.thetradingdiary.com/og-image-es.png',
     lang: 'es',
     alternates: [
       { lang: 'en', url: 'https://www.thetradingdiary.com/' },
@@ -68,6 +72,7 @@ export const landingMeta: Record<string, LandingMeta> = {
     canonical: 'https://www.thetradingdiary.com/ar',
     ogTitle: 'أفضل مجلة تداول للعملات الرقمية',
     ogDescription: 'تتبع وتحليل ومراجعة كل صفقة عملات رقمية بالذكاء الاصطناعي. مصمم للمتداولين الجادين.',
+    ogImage: 'https://www.thetradingdiary.com/og-image-ar.png',
     lang: 'ar',
     alternates: [
       { lang: 'en', url: 'https://www.thetradingdiary.com/' },
@@ -85,6 +90,7 @@ export const landingMeta: Record<string, LandingMeta> = {
     canonical: 'https://www.thetradingdiary.com/vi',
     ogTitle: 'Nhật Ký Trading Crypto #1',
     ogDescription: 'Theo dõi, phân tích và xem xét mọi giao dịch crypto với AI. Được tạo cho trader chuyên nghiệp.',
+    ogImage: 'https://www.thetradingdiary.com/og-image-vi.png',
     lang: 'vi',
     alternates: [
       { lang: 'en', url: 'https://www.thetradingdiary.com/' },
@@ -126,11 +132,13 @@ export const updateLandingMeta = (langCode: string) => {
   updateMetaTag('og:description', meta.ogDescription, true);
   updateMetaTag('og:url', meta.canonical, true);
   updateMetaTag('og:type', 'website', true);
+  updateMetaTag('og:image', meta.ogImage, true);
 
   // Update Twitter Card tags
   updateMetaTag('twitter:card', 'summary_large_image');
   updateMetaTag('twitter:title', meta.ogTitle);
   updateMetaTag('twitter:description', meta.ogDescription);
+  updateMetaTag('twitter:image', meta.ogImage);
 
   // Update canonical link
   let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
