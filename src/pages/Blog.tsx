@@ -6,9 +6,10 @@ import { Calendar, Clock, User, Search } from 'lucide-react';
 import { blogArticles, getArticlesByLanguage } from '@/data/blogArticles';
 import { useTranslation } from '@/hooks/useTranslation';
 import { usePageMeta } from '@/hooks/usePageMeta';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { preloadImages } from '@/utils/preloadStrategies';
 
 const Blog = () => {
   const { t, language } = useTranslation();
@@ -48,6 +49,18 @@ const Blog = () => {
       return matchesSearch && matchesCategory;
     });
   }, [languageArticles, searchQuery, selectedCategory]);
+  
+  // Preload first 3 article hero images for faster navigation
+  useEffect(() => {
+    const topArticles = filteredArticles.slice(0, 3);
+    const heroImages = topArticles
+      .map(article => article.heroImage)
+      .filter(Boolean) as string[];
+    
+    if (heroImages.length > 0) {
+      preloadImages(heroImages);
+    }
+  }, [filteredArticles]);
   
   return (
     <AppLayout>
