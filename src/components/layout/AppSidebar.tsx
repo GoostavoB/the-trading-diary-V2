@@ -53,65 +53,65 @@ export function AppSidebar() {
       label: 'Dashboard',
       defaultOpen: true,
       items: [
-        { title: t('navigation.dashboard'), url: '/dashboard', icon: BarChart3, keywords: ['overview', 'home', 'main', 'summary'] },
+        { title: t('navigation.dashboard'), url: '/dashboard', icon: BarChart3, keywords: ['overview', 'home', 'main', 'summary', 'performance', 'stats', 'view', 'monitor'] },
       ],
     },
     {
       label: 'Portfolio',
       defaultOpen: true,
       items: [
-        { title: t('navigation.spotWallet'), url: '/spot-wallet', icon: Wallet, keywords: ['balance', 'holdings', 'assets', 'tokens', 'coins', 'crypto'] },
-        { title: t('navigation.exchanges'), url: '/exchanges', icon: RefreshCw, keywords: ['binance', 'bybit', 'api', 'connect', 'sync', 'integration'] },
-        { title: 'Trading Accounts', url: '/accounts', icon: PieChart, keywords: ['accounts', 'wallets', 'manage', 'profiles'] },
+        { title: t('navigation.spotWallet'), url: '/spot-wallet', icon: Wallet, keywords: ['balance', 'holdings', 'assets', 'tokens', 'coins', 'crypto', 'portfolio', 'funds', 'money', 'cash'] },
+        { title: t('navigation.exchanges'), url: '/exchanges', icon: RefreshCw, keywords: ['binance', 'bybit', 'api', 'connect', 'sync', 'integration', 'platform', 'broker', 'exchange'] },
+        { title: 'Trading Accounts', url: '/accounts', icon: PieChart, keywords: ['accounts', 'wallets', 'manage', 'profiles', 'multiple', 'organize'] },
       ],
     },
     {
       label: 'Trades',
       defaultOpen: true,
       items: [
-        { title: t('trades.addTrade'), url: '/upload', icon: Plus, keywords: ['new', 'create', 'add', 'import', 'log', 'record', 'entry'] },
-        { title: 'Trade Analysis', url: '/trade-analysis', icon: GitCompare, keywords: ['performance', 'results', 'stats', 'pairs', 'setups', 'review'] },
-        { title: t('navigation.feeAnalysis'), url: '/fee-analysis', icon: Receipt, keywords: ['costs', 'expenses', 'commissions', 'charges', 'fees'] },
-        { title: 'Risk Management', url: '/risk-management', icon: Shield, keywords: ['position sizing', 'drawdown', 'exposure', 'risk', 'safety', 'protection'] },
-        { title: 'Trading Journal', url: '/journal', icon: BookMarked, keywords: ['notes', 'diary', 'log', 'thoughts', 'lessons', 'reflection'] },
+        { title: t('trades.addTrade'), url: '/upload', icon: Plus, keywords: ['new', 'create', 'add', 'import', 'log', 'record', 'entry', 'manual', 'input', 'enter'] },
+        { title: 'Trade Analysis', url: '/trade-analysis', icon: GitCompare, keywords: ['performance', 'results', 'stats', 'pairs', 'setups', 'review', 'analyze', 'study', 'examine', 'history'] },
+        { title: t('navigation.feeAnalysis'), url: '/fee-analysis', icon: Receipt, keywords: ['costs', 'expenses', 'commissions', 'charges', 'fees', 'trading fees', 'funding', 'breakdown'] },
+        { title: 'Risk Management', url: '/risk-management', icon: Shield, keywords: ['position sizing', 'drawdown', 'exposure', 'risk', 'safety', 'protection', 'loss', 'stop loss', 'leverage'] },
+        { title: 'Trading Journal', url: '/journal', icon: BookMarked, keywords: ['notes', 'diary', 'log', 'thoughts', 'lessons', 'reflection', 'review', 'write', 'document'] },
       ],
     },
     {
       label: 'Analytics',
       defaultOpen: false,
       items: [
-        { title: t('navigation.marketData'), url: '/market-data', icon: LineChart, keywords: ['prices', 'charts', 'market', 'data', 'volatility', 'volume'] },
-        { title: t('navigation.forecast'), url: '/forecast', icon: Target, keywords: ['prediction', 'projections', 'models', 'signals', 'forecast'] },
-        { title: 'Economic Calendar', url: '/economic-calendar', icon: Calendar, keywords: ['events', 'news', 'macro', 'economy', 'calendar', 'schedule'] },
-        { title: 'Performance Alerts', url: '/performance-alerts', icon: Bell, keywords: ['notifications', 'alerts', 'warnings', 'triggers', 'monitoring'] },
+        { title: t('navigation.marketData'), url: '/market-data', icon: LineChart, keywords: ['prices', 'charts', 'market', 'data', 'volatility', 'volume', 'crypto prices', 'btc', 'eth', 'trends'] },
+        { title: t('navigation.forecast'), url: '/forecast', icon: Target, keywords: ['prediction', 'projections', 'models', 'signals', 'forecast', 'future', 'estimate', 'predict'] },
+        { title: 'Economic Calendar', url: '/economic-calendar', icon: Calendar, keywords: ['events', 'news', 'macro', 'economy', 'calendar', 'schedule', 'announcements', 'fed', 'inflation'] },
+        { title: 'Performance Alerts', url: '/performance-alerts', icon: Bell, keywords: ['notifications', 'alerts', 'warnings', 'triggers', 'monitoring', 'notify', 'remind', 'alarm'] },
       ],
     },
     {
       label: 'Planning',
       defaultOpen: false,
       items: [
-        { title: 'Trading Plan', url: '/trading-plan', icon: ClipboardList, keywords: ['strategy', 'rules', 'checklist', 'plan', 'system', 'framework'] },
-        { title: 'Goals & Milestones', url: '/goals', icon: Target, keywords: ['targets', 'objectives', 'goals', 'milestones', 'achievements', 'progress'] },
-        { title: 'Psychology', url: '/psychology', icon: Brain, keywords: ['emotions', 'feelings', 'mental', 'mindset', 'bias', 'mood', 'discipline', 'behavior', 'emotional'] },
+        { title: 'Trading Plan', url: '/trading-plan', icon: ClipboardList, keywords: ['strategy', 'rules', 'checklist', 'plan', 'system', 'framework', 'setup', 'prepare', 'routine'] },
+        { title: 'Goals & Milestones', url: '/goals', icon: Target, keywords: ['targets', 'objectives', 'goals', 'milestones', 'achievements', 'progress', 'aim', 'ambition', 'success'] },
+        { title: 'Psychology', url: '/psychology', icon: Brain, keywords: ['emotions', 'feelings', 'mental', 'mindset', 'bias', 'mood', 'discipline', 'behavior', 'emotional', 'psychology', 'thinking', 'cognition', 'stress', 'anxiety', 'confidence', 'fear', 'greed', 'calm', 'state', 'mind', 'mental health', 'wellbeing'] },
       ],
     },
     {
       label: 'Reports',
       defaultOpen: false,
       items: [
-        { title: 'Reports', url: '/reports', icon: FileBarChart, keywords: ['export', 'download', 'report', 'summary', 'kpi', 'metrics'] },
-        { title: 'Tax Reports', url: '/tax-reports', icon: FileText, keywords: ['tax', 'gains', 'losses', 'fifo', 'lifo', 'irs', 'accounting'] },
-        { title: 'My Metrics', url: '/my-metrics', icon: Star, keywords: ['custom', 'kpi', 'benchmarks', 'personal', 'metrics', 'indicators'] },
+        { title: 'Reports', url: '/reports', icon: FileBarChart, keywords: ['export', 'download', 'report', 'summary', 'kpi', 'metrics', 'analysis', 'monthly', 'weekly', 'period'] },
+        { title: 'Tax Reports', url: '/tax-reports', icon: FileText, keywords: ['tax', 'gains', 'losses', 'fifo', 'lifo', 'irs', 'accounting', 'fiscal', 'revenue', 'income'] },
+        { title: 'My Metrics', url: '/my-metrics', icon: Star, keywords: ['custom', 'kpi', 'benchmarks', 'personal', 'metrics', 'indicators', 'measure', 'track', 'performance'] },
       ],
     },
     {
       label: 'Community',
       defaultOpen: false,
       items: [
-        { title: 'Social', url: '/social', icon: Users, keywords: ['feed', 'community', 'share', 'posts', 'follow', 'social'] },
-        { title: 'Leaderboard', url: '/leaderboard', icon: Trophy, keywords: ['rankings', 'top', 'competition', 'leaderboard', 'leaders'] },
-        { title: t('navigation.achievements'), url: '/achievements', icon: Award, keywords: ['badges', 'awards', 'achievements', 'trophies', 'rewards', 'unlocks'] },
-        { title: 'Progress & XP', url: '/progress-analytics', icon: Zap, keywords: ['level', 'xp', 'experience', 'progress', 'growth', 'streaks'] },
+        { title: 'Social', url: '/social', icon: Users, keywords: ['feed', 'community', 'share', 'posts', 'follow', 'social', 'network', 'friends', 'traders'] },
+        { title: 'Leaderboard', url: '/leaderboard', icon: Trophy, keywords: ['rankings', 'top', 'competition', 'leaderboard', 'leaders', 'best', 'winners', 'rank', 'compete'] },
+        { title: t('navigation.achievements'), url: '/achievements', icon: Award, keywords: ['badges', 'awards', 'achievements', 'trophies', 'rewards', 'unlocks', 'earn', 'win', 'accomplish'] },
+        { title: 'Progress & XP', url: '/progress-analytics', icon: Zap, keywords: ['level', 'xp', 'experience', 'progress', 'growth', 'streaks', 'challenges', 'gamification', 'points'] },
       ],
     },
   ];
@@ -138,6 +138,16 @@ export function AppSidebar() {
       !archivedGroups.includes(group.label) && 
       (searchQuery === '' || group.items.length > 0)
     );
+
+  // Helper to check if an item matches the search
+  const itemMatchesSearch = (item: MenuItem) => {
+    const query = searchQuery.toLowerCase();
+    const titleMatch = item.title.toLowerCase().includes(query);
+    const keywordsMatch = item.keywords?.some(keyword => 
+      keyword.toLowerCase().includes(query)
+    );
+    return titleMatch || keywordsMatch;
+  };
 
   const archivedMenu = menuStructure.filter(group => archivedGroups.includes(group.label));
 
@@ -173,7 +183,12 @@ export function AppSidebar() {
 
         {/* Main Menu Groups */}
         {filteredMenuStructure.map((group) => (
-          <Collapsible key={group.label} defaultOpen={group.defaultOpen} className="group/collapsible">
+          <Collapsible 
+            key={group.label} 
+            defaultOpen={group.defaultOpen || searchQuery !== ''} 
+            open={searchQuery !== '' ? true : undefined}
+            className="group/collapsible"
+          >
             <SidebarGroup>
               <CollapsibleTrigger className="w-full">
                 <SidebarGroupLabel className="flex items-center justify-between group-data-[state=open]/collapsible:text-primary">
@@ -199,16 +214,26 @@ export function AppSidebar() {
               <CollapsibleContent>
                 <SidebarGroupContent>
                   <SidebarMenu>
-                    {group.items.map((item) => (
-                      <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild tooltip={item.title}>
-                          <NavLink to={item.url} end className={getNavCls}>
-                            <item.icon className="h-4 w-4" />
-                            {open && <span>{item.title}</span>}
-                          </NavLink>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
+                    {group.items.map((item) => {
+                      const isHighlighted = searchQuery !== '' && itemMatchesSearch(item);
+                      return (
+                        <SidebarMenuItem key={item.title}>
+                          <SidebarMenuButton asChild tooltip={item.title}>
+                            <NavLink 
+                              to={item.url} 
+                              end 
+                              className={cn(
+                                getNavCls,
+                                isHighlighted && "ring-2 ring-primary/50 bg-primary/10"
+                              )}
+                            >
+                              <item.icon className="h-4 w-4" />
+                              {open && <span>{item.title}</span>}
+                            </NavLink>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
                   </SidebarMenu>
                 </SidebarGroupContent>
               </CollapsibleContent>
