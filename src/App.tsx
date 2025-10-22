@@ -67,6 +67,7 @@ const UserGuide = lazy(() => import("./pages/UserGuide"));
 const Sitemap = lazy(() => import("./pages/Sitemap"));
 const About = lazy(() => import("./pages/About"));
 const SEODashboard = lazy(() => import("./pages/SEODashboard"));
+const PricingPage = lazy(() => import("./pages/PricingPage"));
 
 // Loading fallback
 const PageLoader = () => (
@@ -116,6 +117,7 @@ const AppRoutes = () => {
         <Route path="/sitemap" element={<Sitemap />} />
         <Route path="/about" element={<About />} />
         <Route path="/seo-dashboard" element={<SEODashboard />} />
+        <Route path="/pricing" element={<PricingPage />} />
         
         {/* Blog routes with language support */}
         <Route path="/blog" element={<Blog />} />

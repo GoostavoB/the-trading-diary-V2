@@ -1341,7 +1341,10 @@ export type Database = {
           profile_visibility: string | null
           provider: string | null
           public_stats: Json | null
+          subscription_status: string | null
+          subscription_tier: string | null
           terms_accepted_at: string | null
+          trial_end_date: string | null
           updated_at: string | null
           username: string | null
         }
@@ -1361,7 +1364,10 @@ export type Database = {
           profile_visibility?: string | null
           provider?: string | null
           public_stats?: Json | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
           terms_accepted_at?: string | null
+          trial_end_date?: string | null
           updated_at?: string | null
           username?: string | null
         }
@@ -1381,7 +1387,10 @@ export type Database = {
           profile_visibility?: string | null
           provider?: string | null
           public_stats?: Json | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
           terms_accepted_at?: string | null
+          trial_end_date?: string | null
           updated_at?: string | null
           username?: string | null
         }
@@ -3242,6 +3251,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      user_has_access: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
