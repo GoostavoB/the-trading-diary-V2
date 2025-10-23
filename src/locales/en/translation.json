@@ -125,7 +125,7 @@
           "tradingPlan": "Trading Plan Builder with checklist",
           "goals": "Goals tracking & progress",
           "richJournal": "Rich journal with mood & pattern analysis",
-          "customWidgets": "Unlimited custom KPI widgets",
+          "customWidgets": "5 custom KPI widgets",
           "fullSocial": "Full social features (posts, XP, badges)",
           "everythingBasic": "Everything in Basic"
         }
@@ -140,6 +140,7 @@
           "positionCalculator": "Advanced Position Size Calculator",
           "riskDashboard": "Risk Dashboard with drawdown analysis",
           "advancedAlerts": "Advanced performance & fee alerts",
+          "customWidgets": "Unlimited custom KPI widgets",
           "everythingPro": "Everything in Pro"
         }
       }

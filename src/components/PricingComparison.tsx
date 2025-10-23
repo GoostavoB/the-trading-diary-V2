@@ -19,7 +19,7 @@ const PricingComparison = () => {
         { name: t('pricing.comparison.features.aiUploads'), basic: "50/mo", pro: "100/mo", elite: "300/mo" },
         { name: t('pricing.comparison.features.manualUploads'), basic: true, pro: true, elite: true },
         { name: t('pricing.comparison.features.aiAnalysis'), basic: false, pro: "1/week", elite: "5/week" },
-        { name: t('pricing.comparison.features.customWidgets'), basic: "15+", pro: t('pricing.comparison.unlimited'), elite: t('pricing.comparison.unlimited') },
+        { name: t('pricing.comparison.features.customWidgets'), basic: "15+", pro: "5", elite: t('pricing.comparison.unlimited') },
         { name: t('pricing.comparison.features.advancedCharts'), basic: true, pro: true, elite: true },
       ]
     },

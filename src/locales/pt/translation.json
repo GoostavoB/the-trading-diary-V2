@@ -941,7 +941,7 @@
             "tradingPlan": "Construtor de Plano de Trading com checklist",
             "goals": "Rastreamento de objetivos e progresso",
             "richJournal": "Diário completo com análise de humor e padrões",
-            "customWidgets": "Widgets KPI personalizados ilimitados",
+            "customWidgets": "5 widgets KPI personalizados",
             "fullSocial": "Recursos sociais completos (posts, XP, badges)",
             "everythingBasic": "Tudo no Basic"
           }
@@ -956,6 +956,7 @@
             "positionCalculator": "Calculadora Avançada de Tamanho de Posição",
             "riskDashboard": "Painel de Risco com análise de drawdown",
             "advancedAlerts": "Alertas avançados de desempenho e taxas",
+            "customWidgets": "Widgets KPI personalizados ilimitados",
             "everythingPro": "Tudo no Pro"
           }
         }

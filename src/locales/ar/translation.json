@@ -985,7 +985,7 @@
             "tradingPlan": "منشئ خطة التداول مع قائمة مراجعة",
             "goals": "تتبع الأهداف والتقدم",
             "richJournal": "دفتر غني بتحليل المزاج والنمط",
-            "customWidgets": "أدوات KPI مخصصة غير محدودة",
+            "customWidgets": "5 أدوات KPI مخصصة",
             "fullSocial": "ميزات اجتماعية كاملة (منشورات، XP، شارات)",
             "everythingBasic": "كل شيء في Basic"
           }
@@ -1000,6 +1000,7 @@
             "positionCalculator": "حاسبة متقدمة لحجم المركز",
             "riskDashboard": "لوحة المخاطر مع تحليل الخسائر",
             "advancedAlerts": "تنبيهات متقدمة للأداء والرسوم",
+            "customWidgets": "أدوات KPI مخصصة غير محدودة",
             "everythingPro": "كل شيء في Pro"
           }
         }
