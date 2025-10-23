@@ -38,6 +38,15 @@ export const LEVEL_3_THEMES: ColorMode[] = [
     profit: '142 71% 45%',
     loss: '25 46% 38%',
   },
+  {
+    id: 'vietnam',
+    name: '🇻🇳 Vietnam',
+    primary: '358 77% 48%', // Vietnam Red (#DA251D)
+    secondary: '60 100% 50%', // Vietnam Yellow (#FFFF00)
+    accent: '358 77% 48%',
+    profit: '358 77% 48%',
+    loss: '60 100% 50%',
+  },
 ];
 
 // Level 4+ themes

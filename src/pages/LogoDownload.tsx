@@ -245,7 +245,7 @@ const LogoDownload = () => {
                 padding: '24px 32px',
               }}
             >
-              <Logo size="xl" variant="horizontal" colorVariant={colorVariant} className={selectedBg === 'white' ? 'text-foreground' : 'text-white'} />
+              <Logo size="xl" variant="horizontal" colorVariant={colorVariant === "default" ? "default" : "vietnam"} className={selectedBg === 'white' ? 'text-foreground' : 'text-white'} />
             </div>
           </div>
 

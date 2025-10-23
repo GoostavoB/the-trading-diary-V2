@@ -1,11 +1,12 @@
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg" | "xl";
   variant?: "full" | "icon" | "horizontal";
   showText?: boolean;
   className?: string;
-  colorVariant?: "default" | "vietnam";
+  colorVariant?: "default" | "vietnam" | "auto";
 }
 
 const sizeMap = {
@@ -20,15 +21,33 @@ export const Logo = ({
   variant = "full", 
   showText = true,
   className,
-  colorVariant = "default"
+  colorVariant = "auto"
 }: LogoProps) => {
   const { icon, text } = sizeMap[size];
   const iconOnly = variant === "icon" || !showText;
   
-  const isVietnam = colorVariant === "vietnam";
-  const primaryColor = isVietnam ? "#C8102E" : "hsl(var(--primary))";
-  const gradientColor1 = isVietnam ? "#C8102E" : "hsl(var(--primary))";
-  const gradientColor2 = isVietnam ? "#A00D24" : "hsl(var(--primary))";
+  // Auto-detect Vietnam theme
+  const [currentTheme, setCurrentTheme] = useState<string>('default');
+  
+  useEffect(() => {
+    const savedMode = localStorage.getItem('theme:mode') || 'ocean';
+    setCurrentTheme(savedMode);
+    
+    // Listen for theme changes
+    const handleStorageChange = () => {
+      const mode = localStorage.getItem('theme:mode') || 'ocean';
+      setCurrentTheme(mode);
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+  
+  // Determine if Vietnam variant should be used
+  const isVietnam = colorVariant === "vietnam" || (colorVariant === "auto" && currentTheme === "vietnam");
+  const primaryColor = isVietnam ? "#DA251D" : "hsl(var(--primary))";
+  const gradientColor1 = isVietnam ? "#DA251D" : "hsl(var(--primary))";
+  const gradientColor2 = isVietnam ? "#B01F18" : "hsl(var(--primary))";
 
   return (
     <div className={cn(
