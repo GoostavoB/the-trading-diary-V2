@@ -46,17 +46,23 @@ export const WidgetLibrary = memo(({
     return matchesSearch && matchesCategory;
   });
 
-  const handleToggleWidget = (widgetId: string, isActive: boolean) => {
+  const handleToggleWidget = async (widgetId: string, isActive: boolean) => {
     if (isActive) {
-      onRemoveWidget(widgetId);
+      // Update local state first for immediate feedback
       setLocalActive(prev => {
         const next = new Set(prev);
         next.delete(widgetId);
         return next;
       });
+      
+      // Then remove from backend
+      await onRemoveWidget(widgetId);
     } else {
-      onAddWidget(widgetId);
+      // Add to local state first
       setLocalActive(prev => new Set(prev).add(widgetId));
+      
+      // Then add to backend
+      await onAddWidget(widgetId);
     }
   };
 
