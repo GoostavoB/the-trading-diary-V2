@@ -151,7 +151,7 @@ export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPric
               <div className="flex-shrink-0 mt-0.5 w-5 h-5 rounded-full bg-accent/20 flex items-center justify-center group-hover:bg-accent/30 transition-all duration-280 ease-premium">
                 <Check size={14} className="text-accent" />
               </div>
-              <span className="text-sm text-muted-foreground leading-relaxed group-hover:text-foreground transition-colors duration-280 ease-premium">
+              <span className="text-sm text-muted-foreground dark:text-muted-foreground/70 leading-relaxed group-hover:text-foreground transition-colors duration-280 ease-premium">
                 {plan.comingSoon ? featureKey : t(featureKey)}
               </span>
             </motion.li>

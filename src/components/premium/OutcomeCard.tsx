@@ -70,7 +70,7 @@ export const OutcomeCard = ({
               initial={{ opacity: 0, x: -20 }}
               animate={inView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.3, delay: index * 0.12 + 0.15 }}
-              className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 font-medium"
+              className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 dark:text-muted-foreground/60 font-medium"
             >
               Solution {index + 1}
             </motion.div>
@@ -107,7 +107,7 @@ export const OutcomeCard = ({
                 decimals={metricValue && metricValue % 1 !== 0 ? 1 : 0}
                 inView={inView}
               />
-              <p className="text-[10px] text-muted-foreground/40 uppercase tracking-wider">
+              <p className="text-[10px] text-muted-foreground/40 dark:text-muted-foreground/50 uppercase tracking-wider">
                 {metric}
               </p>
             </motion.div>
@@ -116,7 +116,7 @@ export const OutcomeCard = ({
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ duration: 0.3, delay: index * 0.12 + 0.5 }}
-              className="text-[10px] text-muted-foreground/30 leading-relaxed tracking-wide"
+              className="text-[10px] text-muted-foreground/30 dark:text-muted-foreground/40 leading-relaxed tracking-wide"
             >
               {proofPoint}
             </motion.p>
