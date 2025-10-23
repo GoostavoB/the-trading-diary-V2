@@ -47,6 +47,7 @@ const PricingPage = () => {
       headline: t('pricing.solutions.seePatterns.headline'),
       subhead: t('pricing.solutions.seePatterns.subhead'),
       metric: t('pricing.solutions.seePatterns.metric'),
+      metricValue: 3,
       proofPoint: t('pricing.solutions.seePatterns.proofPoint'),
       visual: (
         <div className="relative w-full h-48 bg-gradient-to-br from-primary/10 to-accent/5 rounded-2xl overflow-hidden">
