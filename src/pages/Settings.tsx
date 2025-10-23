@@ -9,12 +9,14 @@ import AppLayout from '@/components/layout/AppLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { X, Plus, Edit2, Check, Upload, Download, User, Bell, TrendingUp } from 'lucide-react';
+import { X, Plus, Edit2, Check, Upload, Download, User, Bell, TrendingUp, Gift } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NotificationPreferences } from '@/components/NotificationPreferences';
 import { DataManagement } from '@/components/DataManagement';
 import { CapitalManagement } from '@/components/CapitalManagement';
 import { ThemeSelector } from '@/components/ThemeSelector';
+import { SocialShareRewards } from '@/components/SocialShareRewards';
+import { ReferralProgram } from '@/components/ReferralProgram';
 import { useCalmMode } from '@/contexts/CalmModeContext';
 
 const Settings = () => {
@@ -304,6 +306,10 @@ const Settings = () => {
               <Bell className="w-4 h-4 mr-2" />
               Notifications
             </TabsTrigger>
+            <TabsTrigger value="rewards">
+              <Gift className="w-4 h-4 mr-2" />
+              Rewards
+            </TabsTrigger>
             <TabsTrigger value="data">
               <Download className="w-4 h-4 mr-2" />
               Data
@@ -581,10 +587,17 @@ const Settings = () => {
               />
             </div>
           </div>
-        </Card>
-      </TabsContent>
+          </Card>
+        </TabsContent>
 
-      <TabsContent value="data" className="space-y-6">
+        <TabsContent value="rewards" className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <SocialShareRewards />
+            <ReferralProgram />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="data" className="space-y-6">
         <Card className="p-6 glass">
           <h2 className="text-xl font-semibold mb-4">Data Management</h2>
           <div className="space-y-6">

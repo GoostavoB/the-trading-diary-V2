@@ -48,6 +48,39 @@
     "success": "Message sent successfully!",
     "error": "Failed to send message. Please try again."
   },
+  "premium": {
+    "proFeature": "Pro Feature",
+    "eliteFeature": "Elite Feature",
+    "upgradeMessage": "Upgrade to {{plan}} to unlock this feature",
+    "upgradeCTA": "Upgrade Now"
+  },
+  "social": {
+    "shareRewards": "Share & Earn Rewards",
+    "shareDescription": "Share The Trading Diary on social media and earn bonus AI uploads",
+    "shareText": "I'm using The Trading Diary to track my crypto trades with AI! 🚀",
+    "shareOn": "Share on {{platform}}",
+    "shareSuccess": "Shared on {{platform}}! You earned +{{uploads}} uploads",
+    "shareRewardDescription": "Bonus uploads added to your account",
+    "earnedRewards": "Total Earned",
+    "uploadsEarned": "AI uploads earned",
+    "shareLimit": "Rewards are limited to once per platform"
+  },
+  "referral": {
+    "title": "Refer Friends",
+    "description": "Invite friends and earn bonus uploads when they sign up",
+    "rewardAmount": "+20 Uploads per Referral",
+    "rewardDetails": "You and your friend both get 20 bonus AI uploads when they create an account",
+    "yourLink": "Your Referral Link",
+    "shareButton": "Share Link",
+    "copied": "Link copied!",
+    "copiedDescription": "Referral link copied to clipboard",
+    "copyError": "Failed to copy link",
+    "shareTitle": "Join The Trading Diary",
+    "shareText": "Track your crypto trades with AI-powered insights",
+    "totalReferrals": "Total Referrals",
+    "uploadsEarned": "Uploads Earned",
+    "terms": "Both parties receive rewards once the referred user completes signup"
+  },
   "pricing": {
     "title": "Simple, Transparent Pricing",
     "subtitle": "Choose the plan that fits your trading journey",
