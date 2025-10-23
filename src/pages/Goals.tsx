@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GoalCard } from "@/components/goals/GoalCard";
 import { CreateGoalDialog } from "@/components/goals/CreateGoalDialog";
+import { GoalProjection } from "@/components/goals/GoalProjection";
 import { GamificationSidebar } from "@/components/gamification/GamificationSidebar";
 import { AchievementBadges } from "@/components/AchievementBadges";
 import { Target, TrendingUp, Award, CheckCircle, Zap, X, Trophy, Star } from "lucide-react";
@@ -149,6 +150,14 @@ export default function Goals() {
             </Card>
           ))}
         </div>
+
+        {/* Goal Projections */}
+        {activeGoals.length > 0 && trades && trades.length > 0 && (
+          <GoalProjection 
+            goals={(goals || []) as any} 
+            trades={trades as any} 
+          />
+        )}
 
         {/* Goals Tabs */}
         <Tabs defaultValue="active" className="space-y-6">
