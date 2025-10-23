@@ -1,6 +1,7 @@
 import { Twitter, Github, Linkedin, Mail } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { useTranslation } from "@/hooks/useTranslation";
+import NewsletterSignup from "@/components/NewsletterSignup";
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -8,6 +9,11 @@ const Footer = () => {
   return (
     <footer className="border-t border-border/50 py-12 px-6 bg-background/60 backdrop-blur-sm">
       <div className="container mx-auto max-w-6xl">
+        {/* Newsletter Section */}
+        <div className="mb-10">
+          <NewsletterSignup />
+        </div>
+        
         <div className="grid md:grid-cols-4 gap-8 mb-10">
           {/* Brand */}
           <div className="md:col-span-1">
@@ -84,6 +90,11 @@ const Footer = () => {
                   {t('landing.footer.contact')}
                 </a>
               </li>
+              <li>
+                <a href="/testimonials" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                  Testimonials
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -114,6 +125,11 @@ const Footer = () => {
               <li>
                 <a href="/cookie-policy" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                   Cookie Policy
+                </a>
+              </li>
+              <li>
+                <a href="/changelog" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                  Changelog
                 </a>
               </li>
             </ul>

@@ -48,16 +48,20 @@ const Contact = () => {
       
       setIsSubmitting(true);
       
-      // Encode data for mailto
-      const subject = encodeURIComponent(`Contact from ${validatedData.name}${validatedData.company ? ` - ${validatedData.company}` : ''}`);
-      const body = encodeURIComponent(
-        `Name: ${validatedData.name}\nEmail: ${validatedData.email}\n${validatedData.company ? `Company: ${validatedData.company}\n` : ''}\n\nMessage:\n${validatedData.message}`
-      );
+      // Call the edge function
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data, error } = await supabase.functions.invoke('send-contact-email', {
+        body: {
+          name: validatedData.name,
+          email: validatedData.email,
+          subject: `Contact from ${validatedData.name}${validatedData.company ? ` - ${validatedData.company}` : ''}`,
+          message: `${validatedData.company ? `Company: ${validatedData.company}\n\n` : ''}${validatedData.message}`,
+        },
+      });
       
-      // Open mailto link
-      window.location.href = `mailto:contact@thetradingdiary.com?subject=${subject}&body=${body}`;
+      if (error) throw error;
       
-      toast.success(t('contact.messageSent'));
+      toast.success('Message sent successfully! We\'ll get back to you soon.');
       
       // Reset form
       setFormData({
@@ -67,11 +71,12 @@ const Contact = () => {
         message: '',
       });
     } catch (error) {
+      console.error('Error sending message:', error);
       if (error instanceof z.ZodError) {
         const firstError = error.errors[0];
         toast.error(firstError.message);
       } else {
-        toast.error(t('common.error'));
+        toast.error('Failed to send message. Please try again or email us directly.');
       }
     } finally {
       setIsSubmitting(false);
