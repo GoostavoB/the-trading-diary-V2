@@ -791,7 +791,7 @@ const Upload = () => {
       profit_loss: pnl,
       emotional_tag: formData.emotional_tag,
       notes: formData.notes,
-      duration_minutes: parseInt(formData.duration_minutes) || 0,
+      duration_minutes: parseFloat(formData.duration_minutes) || 0,
       trade_date: formData.opened_at || new Date().toISOString()
     };
 
