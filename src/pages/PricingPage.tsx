@@ -352,7 +352,8 @@ const PricingPage = () => {
               viewport={{ once: true }}
               className="text-3xl md:text-4xl font-bold mb-4"
             >
-              {t('pricing.solutions.title')}
+              Your rules.{' '}
+              <span className="font-serif italic text-primary">Your results.</span>
             </motion.h2>
             <motion.p
               initial={{ opacity: 0 }}
@@ -361,7 +362,7 @@ const PricingPage = () => {
               viewport={{ once: true }}
               className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto"
             >
-              {t('pricing.solutions.subtitle')}
+              If you cannot measure it, you cannot improve it.
             </motion.p>
           </div>
 
@@ -373,32 +374,6 @@ const PricingPage = () => {
         </div>
       </section>
 
-      <motion.section 
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="py-16 px-6"
-      >
-        <div className="container mx-auto max-w-4xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="space-y-8"
-          >
-            <p className="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed">
-              If you cannot measure it, you cannot improve it.
-            </p>
-            <div className="h-px w-24 mx-auto bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-            <h3 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight">
-              Your rules.{' '}
-              <span className="font-serif italic text-primary">Your results.</span>
-            </h3>
-          </motion.div>
-        </div>
-      </motion.section>
 
       {/* Pricing Cards */}
       <section ref={pricingRef} className="py-16 px-6">
