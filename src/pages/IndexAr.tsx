@@ -14,10 +14,18 @@ import { ThemeStudio } from "@/components/theme-studio/ThemeStudio";
 import { Logo } from "@/components/Logo";
 import { useTranslation } from "@/hooks/useTranslation";
 import { updateLandingMeta, addStructuredData, trackLandingView, trackCTAClick } from "@/utils/i18nLandingMeta";
+import { useHreflang } from "@/hooks/useHreflang";
+import { SUPPORTED_LANGUAGES } from "@/utils/languageRouting";
 
 const IndexAr = () => {
   const navigate = useNavigate();
   const { t, changeLanguage } = useTranslation();
+
+  // Add hreflang tags for SEO
+  useHreflang({
+    languages: [...SUPPORTED_LANGUAGES],
+    defaultLanguage: 'en'
+  });
 
   useEffect(() => {
     // Set language to Arabic
@@ -51,6 +59,20 @@ const IndexAr = () => {
       <div className="absolute top-6 right-6 z-50 flex items-center gap-3">
         <LanguageToggle />
         <ThemeStudio />
+        <Button
+          onClick={() => navigate('/ar/blog')}
+          variant="ghost"
+          className="glass backdrop-blur-[10px] border border-primary/20 text-foreground hover:bg-primary/10 transition-all rounded-xl px-5 py-2 font-medium shadow-sm hover:shadow-md"
+        >
+          {t('navigation.blog')}
+        </Button>
+        <Button
+          onClick={() => navigate('/contact')}
+          variant="ghost"
+          className="glass backdrop-blur-[10px] border border-primary/20 text-foreground hover:bg-primary/10 transition-all rounded-xl px-5 py-2 font-medium shadow-sm hover:shadow-md"
+        >
+          {t('contact.title')}
+        </Button>
         <Button
           onClick={() => navigate('/ar/pricing')}
           variant="ghost"

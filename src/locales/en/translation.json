@@ -1158,24 +1158,31 @@
       "subtitle": "Powerful features designed to help you make better decisions.",
       "smartLogging": {
         "title": "Smart Trade Logging",
-        "description": "Add trades in seconds with details, screenshots, and notes."
+        "description": "Add trades in seconds with details, screenshots, and notes.",
+        "blogLinkText": "Learn about Trading Journals"
       },
       "autoImports": {
         "title": "Auto Imports",
-        "description": "Connect your exchange or broker for instant sync."
+        "description": "Connect your exchange or broker for instant sync.",
+        "blogLinkText": "Discover AI Trading Tools"
       },
       "advancedAnalytics": {
         "title": "Advanced Analytics",
-        "description": "Visualize win rates, risk ratios, and strategy performance."
+        "description": "Visualize win rates, risk ratios, and strategy performance.",
+        "blogLinkText": "Read about Data-Driven Trading"
       },
       "tagFilter": {
         "title": "Tag and Filter Everything",
-        "description": "Track setups, emotions, and mistakes with custom metrics."
+        "description": "Track setups, emotions, and mistakes with custom metrics.",
+        "blogLinkText": "See AI-Powered Features"
       },
       "mobileFriendly": {
         "title": "Mobile Friendly",
-        "description": "Access your journal anywhere — phone, tablet, or desktop."
-      }
+        "description": "Access your journal anywhere — phone, tablet, or desktop.",
+        "blogLinkText": "Master Trading Psychology"
+      },
+      "learnMore": "Learn More",
+      "readMoreInsights": "Read More Trading Insights"
     },
     "testimonials": {
       "title": "Trusted by Thousands of Traders",

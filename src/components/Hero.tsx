@@ -68,7 +68,7 @@ const Hero = () => {
           </motion.div>
         </header>
 
-          {/* Stats Cards */}
+          {/* Stats Cards - Centered KPIs */}
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -77,17 +77,17 @@ const Hero = () => {
             role="group"
             aria-label="Platform statistics"
           >
-            <article className="glass-strong backdrop-blur-[20px] p-5 rounded-xl shadow-lg border border-primary/10 text-center">
-              <div className="text-2xl md:text-3xl font-bold text-primary mb-1 mx-auto" aria-label="10,000 plus active traders">10,000+</div>
-              <div className="text-xs text-muted-foreground">{t('landing.stats.activeTraders')}</div>
+            <article className="glass-strong backdrop-blur-[20px] p-5 rounded-xl shadow-lg border border-primary/10 text-center flex flex-col items-center justify-center">
+              <div className="text-2xl md:text-3xl font-bold text-primary mb-1" aria-label="10,000 plus active traders">10,000+</div>
+              <div className="text-xs text-muted-foreground text-center">{t('landing.stats.activeTraders')}</div>
             </article>
-            <article className="glass-strong backdrop-blur-[20px] p-5 rounded-xl shadow-lg border border-primary/10 text-center">
-              <div className="text-2xl md:text-3xl font-bold text-primary mb-1 mx-auto" aria-label="1 million plus trades logged">1M+</div>
-              <div className="text-xs text-muted-foreground">{t('landing.stats.tradesLogged')}</div>
+            <article className="glass-strong backdrop-blur-[20px] p-5 rounded-xl shadow-lg border border-primary/10 text-center flex flex-col items-center justify-center">
+              <div className="text-2xl md:text-3xl font-bold text-primary mb-1" aria-label="1 million plus trades logged">1M+</div>
+              <div className="text-xs text-muted-foreground text-center">{t('landing.stats.tradesLogged')}</div>
             </article>
-            <article className="glass-strong backdrop-blur-[20px] p-5 rounded-xl shadow-lg border border-primary/10 text-center">
-              <div className="text-2xl md:text-3xl font-bold text-primary mb-1 mx-auto" aria-label="98 percent satisfaction rate">98%</div>
-              <div className="text-xs text-muted-foreground">{t('landing.stats.satisfaction')}</div>
+            <article className="glass-strong backdrop-blur-[20px] p-5 rounded-xl shadow-lg border border-primary/10 text-center flex flex-col items-center justify-center">
+              <div className="text-2xl md:text-3xl font-bold text-primary mb-1" aria-label="98 percent satisfaction rate">98%</div>
+              <div className="text-xs text-muted-foreground text-center">{t('landing.stats.satisfaction')}</div>
             </article>
           </motion.div>
       </div>

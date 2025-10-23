@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card';
 import AppLayout from '@/components/layout/AppLayout';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, User, Search } from 'lucide-react';
 import { blogArticles, getArticlesByLanguage } from '@/data/blogArticles';
@@ -10,25 +10,48 @@ import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { preloadImages } from '@/utils/preloadStrategies';
+import { useHreflang } from '@/hooks/useHreflang';
+import { SUPPORTED_LANGUAGES, getLocalizedPath, getLanguageFromPath, type SupportedLanguage } from '@/utils/languageRouting';
+import { useLocation } from 'react-router-dom';
 
 const Blog = () => {
-  const { t, language } = useTranslation();
+  const { lang } = useParams();
+  const location = useLocation();
+  const { t, language, changeLanguage } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  
+  // Get current language from URL or i18n
+  const currentLang: SupportedLanguage = (lang && SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage)) 
+    ? (lang as SupportedLanguage)
+    : getLanguageFromPath(location.pathname);
+  
+  // Add hreflang tags for SEO
+  useHreflang({
+    languages: [...SUPPORTED_LANGUAGES],
+    defaultLanguage: 'en'
+  });
+  
+  // Update language if needed
+  useEffect(() => {
+    if (lang && lang !== language) {
+      changeLanguage(lang);
+    }
+  }, [lang, language, changeLanguage]);
   
   // SEO Meta
   usePageMeta({
     title: 'Crypto Trading Blog | AI Tools, Strategies & Tips',
     description: 'Expert insights on crypto trading, AI-powered tools, trading psychology, risk management, and data-driven strategies. Learn from proven trading techniques.',
-    canonical: 'https://www.thetradingdiary.com/blog',
+    canonical: `https://www.thetradingdiary.com${getLocalizedPath('/blog', currentLang)}`,
     keywords: 'crypto trading blog, AI trading tools, trading journal, trading psychology, risk management'
   });
   
   // Get articles for current language, fallback to English
   const languageArticles = useMemo(() => {
-    const articles = getArticlesByLanguage(language);
+    const articles = getArticlesByLanguage(currentLang);
     return articles.length > 0 ? articles : getArticlesByLanguage('en');
-  }, [language]);
+  }, [currentLang]);
   
   // Get unique categories
   const categories = useMemo(() => {
@@ -108,7 +131,7 @@ const Blog = () => {
 
         <div className="grid gap-6">
           {filteredArticles.map((article) => (
-            <Link to={`/blog/${article.slug}`} key={article.slug}>
+            <Link to={getLocalizedPath(`/blog/${article.slug}`, currentLang)} key={article.slug}>
               <Card className="p-6 bg-card border-border hover:border-primary/50 transition-all duration-300 cursor-pointer group hover:shadow-lg">
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div className="flex-1">

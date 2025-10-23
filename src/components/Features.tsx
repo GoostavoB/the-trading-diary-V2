@@ -3,9 +3,13 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { getLocalizedPath, getLanguageFromPath } from "@/utils/languageRouting";
+import { useLocation } from "react-router-dom";
 
 const Features = () => {
   const { t } = useTranslation();
+  const location = useLocation();
+  const currentLang = getLanguageFromPath(location.pathname);
 
   const features = [
     {
@@ -13,35 +17,35 @@ const Features = () => {
       titleKey: "landing.features.smartLogging.title",
       descriptionKey: "landing.features.smartLogging.description",
       blogLink: "/blog/trading-journal-for-crypto",
-      blogLinkText: "Learn about Trading Journals"
+      blogLinkTextKey: "landing.features.smartLogging.blogLinkText"
     },
     {
       icon: <Repeat className="w-6 h-6" />,
       titleKey: "landing.features.autoImports.title",
       descriptionKey: "landing.features.autoImports.description",
       blogLink: "/blog/ai-tools-for-crypto-trading",
-      blogLinkText: "Discover AI Trading Tools"
+      blogLinkTextKey: "landing.features.autoImports.blogLinkText"
     },
     {
       icon: <TrendingUp className="w-6 h-6" />,
       titleKey: "landing.features.advancedAnalytics.title",
       descriptionKey: "landing.features.advancedAnalytics.description",
       blogLink: "/blog/data-driven-trading",
-      blogLinkText: "Read about Data-Driven Trading"
+      blogLinkTextKey: "landing.features.advancedAnalytics.blogLinkText"
     },
     {
       icon: <Filter className="w-6 h-6" />,
       titleKey: "landing.features.tagFilter.title",
       descriptionKey: "landing.features.tagFilter.description",
       blogLink: "/blog/ai-powered-trading-journal",
-      blogLinkText: "See AI-Powered Features"
+      blogLinkTextKey: "landing.features.tagFilter.blogLinkText"
     },
     {
       icon: <Smartphone className="w-6 h-6" />,
       titleKey: "landing.features.mobileFriendly.title",
       descriptionKey: "landing.features.mobileFriendly.description",
       blogLink: "/blog/trading-psychology-control-emotions",
-      blogLinkText: "Master Trading Psychology"
+      blogLinkTextKey: "landing.features.mobileFriendly.blogLinkText"
     },
   ];
   return (
@@ -86,10 +90,10 @@ const Features = () => {
                   {t(feature.descriptionKey)}
                 </p>
                 <Link 
-                  to={feature.blogLink}
+                  to={getLocalizedPath(feature.blogLink, currentLang)}
                   className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
                 >
-                  {feature.blogLinkText}
+                  {t(feature.blogLinkTextKey || 'landing.features.learnMore')}
                   <ArrowRight className="w-3 h-3" />
                 </Link>
               </GlassCard>
@@ -119,10 +123,10 @@ const Features = () => {
                   {t(feature.descriptionKey)}
                 </p>
                 <Link 
-                  to={feature.blogLink}
+                  to={getLocalizedPath(feature.blogLink, currentLang)}
                   className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
                 >
-                  {feature.blogLinkText}
+                  {t(feature.blogLinkTextKey || 'landing.features.learnMore')}
                   <ArrowRight className="w-3 h-3" />
                 </Link>
               </GlassCard>
@@ -139,10 +143,10 @@ const Features = () => {
             className="mt-12 text-center"
           >
             <Link 
-              to="/blog"
+              to={getLocalizedPath("/blog", currentLang)}
               className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg font-medium transition-colors"
             >
-              Read More Trading Insights
+              {t('landing.features.readMoreInsights')}
               <ArrowRight className="w-4 h-4" />
             </Link>
           </motion.div>

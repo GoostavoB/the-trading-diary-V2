@@ -14,10 +14,18 @@ import { ThemeStudio } from "@/components/theme-studio/ThemeStudio";
 import { Logo } from "@/components/Logo";
 import { useTranslation } from "@/hooks/useTranslation";
 import { updateLandingMeta, addStructuredData, trackLandingView, trackCTAClick } from "@/utils/i18nLandingMeta";
+import { useHreflang } from "@/hooks/useHreflang";
+import { SUPPORTED_LANGUAGES } from "@/utils/languageRouting";
 
 const Index = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  // Add hreflang tags for SEO
+  useHreflang({
+    languages: [...SUPPORTED_LANGUAGES],
+    defaultLanguage: 'en'
+  });
 
   useEffect(() => {
     // Update meta tags and SEO for English (USA)
