@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertTriangle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { BlurredPercent } from '@/components/ui/BlurredValue';
 
 interface RedFlagAlertProps {
   totalFees: number;
@@ -31,13 +32,13 @@ export const RedFlagAlert = memo(({ totalFees, grossPnL, className }: RedFlagAle
             className={cn("gap-1 cursor-help", className)}
           >
             <AlertTriangle className="h-3 w-3" />
-            {feeToExpectedProfitRatio.toFixed(0)}% of profit
+            <BlurredPercent value={feeToExpectedProfitRatio} className="inline" /> of profit
           </Badge>
         </TooltipTrigger>
         <TooltipContent className="max-w-xs">
           <p className="font-semibold text-destructive">⚠️ Excessive Fees Detected!</p>
           <p className="text-sm mt-1">
-            Fees consumed <strong>{feeToExpectedProfitRatio.toFixed(1)}%</strong> of your expected profit on this trade.
+            Fees consumed <strong><BlurredPercent value={feeToExpectedProfitRatio} className="inline" /></strong> of your expected profit on this trade.
           </p>
           <p className="text-xs text-muted-foreground mt-2">
             Industry best practice: Keep fees under 20% of profit target.

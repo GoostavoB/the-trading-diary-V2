@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info } from 'lucide-react';
+import { BlurredCurrency } from '@/components/ui/BlurredValue';
 
 interface FeeBreakdownTooltipProps {
   tradingFee: number;
@@ -17,10 +18,6 @@ export const FeeBreakdownTooltip = memo(({
   spreadCost = 0,
   totalFees 
 }: FeeBreakdownTooltipProps) => {
-  const formatCurrency = (value: number) => {
-    return `$${Math.abs(value).toFixed(2)}`;
-  };
-
   const hasAdditionalCosts = slippageCost !== 0 || spreadCost !== 0;
 
   return (
@@ -35,12 +32,15 @@ export const FeeBreakdownTooltip = memo(({
             <div className="space-y-1 text-sm">
               <div className="flex justify-between gap-4">
                 <span>Exchange Fee:</span>
-                <span className="font-mono text-red-500">{formatCurrency(tradingFee)}</span>
+                <span className="font-mono text-red-500">
+                  <BlurredCurrency amount={Math.abs(tradingFee)} className="inline" />
+                </span>
               </div>
               <div className="flex justify-between gap-4">
                 <span>Funding Fee:</span>
                 <span className={`font-mono ${fundingFee >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {fundingFee >= 0 ? '+' : ''}{formatCurrency(fundingFee)}
+                  {fundingFee >= 0 ? '+' : ''}
+                  <BlurredCurrency amount={Math.abs(fundingFee)} className="inline" />
                 </span>
               </div>
               {hasAdditionalCosts && (
@@ -48,20 +48,26 @@ export const FeeBreakdownTooltip = memo(({
                   {slippageCost !== 0 && (
                     <div className="flex justify-between gap-4">
                       <span>Slippage:</span>
-                      <span className="font-mono text-orange-500">{formatCurrency(slippageCost)}</span>
+                      <span className="font-mono text-orange-500">
+                        <BlurredCurrency amount={Math.abs(slippageCost)} className="inline" />
+                      </span>
                     </div>
                   )}
                   {spreadCost !== 0 && (
                     <div className="flex justify-between gap-4">
                       <span>Spread:</span>
-                      <span className="font-mono text-orange-500">{formatCurrency(spreadCost)}</span>
+                      <span className="font-mono text-orange-500">
+                        <BlurredCurrency amount={Math.abs(spreadCost)} className="inline" />
+                      </span>
                     </div>
                   )}
                 </>
               )}
               <div className="pt-1 border-t border-border flex justify-between gap-4 font-semibold">
                 <span>Total Cost:</span>
-                <span className="font-mono text-red-500">{formatCurrency(totalFees)}</span>
+                <span className="font-mono text-red-500">
+                  <BlurredCurrency amount={Math.abs(totalFees)} className="inline" />
+                </span>
               </div>
             </div>
             <p className="text-xs text-muted-foreground pt-1">
