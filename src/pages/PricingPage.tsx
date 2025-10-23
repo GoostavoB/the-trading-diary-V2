@@ -404,7 +404,7 @@ const PricingPage = () => {
             If you cannot measure it, you cannot improve it.
             <br />
             Your rules.{' '}
-            <span className="text-primary">Your results</span>
+            <span className="font-serif italic text-primary">Your results</span>
           </h3>
         </div>
       </motion.section>
