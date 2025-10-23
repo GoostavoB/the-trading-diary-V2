@@ -10,6 +10,7 @@ import { PremiumPricingCard } from "@/components/PremiumPricingCard";
 import { MagneticButton } from "@/components/MagneticButton";
 import { PremiumBillingToggle } from "@/components/premium/PremiumBillingToggle";
 import { Logo } from "@/components/Logo";
+import { GlassCard } from "@/components/GlassCard";
 import appStoreSoon from "@/assets/app-store-coming-soon.png";
 import googlePlaySoon from "@/assets/google-play-coming-soon.png";
 
@@ -292,26 +293,6 @@ const PricingPage = () => {
       ctaKey: "pricing.plans.cta",
       popular: false,
     },
-    {
-      id: 'enterprise',
-      nameKey: "Enterprise",
-      descriptionKey: "Team collaboration, powerful reports & white label",
-      monthlyPrice: null,
-      annualPrice: null,
-      annualTotal: null,
-      featuresKeys: [
-        "Team Collaboration Tools",
-        "Advanced Reporting & Analytics",
-        "White Label Solution",
-        "Priority Support",
-        "Custom Integrations",
-        "Dedicated Account Manager",
-        "Everything in Elite",
-      ],
-      ctaKey: "Coming Soon",
-      popular: false,
-      comingSoon: true,
-    },
   ];
 
   return (
@@ -397,15 +378,25 @@ const PricingPage = () => {
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
-        className="py-12 px-6"
+        className="py-16 px-6"
       >
-        <div className="container mx-auto max-w-3xl text-center">
-          <h3 className="text-3xl md:text-4xl leading-tight font-sans">
-            If you cannot measure it, you cannot improve it.
-            <br />
-            Your rules.{' '}
-            <span className="font-serif italic text-primary">Your results</span>
-          </h3>
+        <div className="container mx-auto max-w-4xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="space-y-8"
+          >
+            <p className="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed">
+              If you cannot measure it, you cannot improve it.
+            </p>
+            <div className="h-px w-24 mx-auto bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+            <h3 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight">
+              Your rules.{' '}
+              <span className="font-serif italic text-primary">Your results.</span>
+            </h3>
+          </motion.div>
         </div>
       </motion.section>
 
@@ -453,7 +444,7 @@ const PricingPage = () => {
             </motion.p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             {plans.map((plan, index) => (
               <PremiumPricingCard 
                 key={plan.id} 
@@ -464,6 +455,32 @@ const PricingPage = () => {
               />
             ))}
           </div>
+
+          {/* Enterprise Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            viewport={{ once: true }}
+            className="relative"
+          >
+            <GlassCard className="p-8 md:p-12 text-center">
+              <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-gradient-to-r from-accent via-primary to-accent bg-size-200 animate-gradient mb-6 shadow-lg shadow-accent/20">
+                <span className="text-sm font-bold text-white uppercase tracking-wider">Coming Soon</span>
+              </div>
+              <h3 className="text-3xl md:text-4xl font-bold mb-4">Enterprise</h3>
+              <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
+                Team collaboration, powerful reports & white label solutions for professional trading teams
+              </p>
+              <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
+                <span>• Team Collaboration Tools</span>
+                <span>• Advanced Reporting</span>
+                <span>• White Label Solution</span>
+                <span>• Priority Support</span>
+                <span>• Custom Integrations</span>
+              </div>
+            </GlassCard>
+          </motion.div>
 
           {/* Mobile Apps Section */}
           <motion.div

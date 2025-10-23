@@ -57,10 +57,10 @@ export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPric
       >
         {plan.popular && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-accent/80 to-primary/80 rounded-full text-xs font-semibold tracking-wide"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+            className="absolute -top-5 left-1/2 -translate-x-1/2 px-6 py-2 bg-gradient-to-r from-primary via-accent to-primary bg-size-200 animate-gradient rounded-full text-xs font-bold tracking-wider text-white shadow-lg shadow-primary/25"
           >
             {t('pricing.mostPopular')}
           </motion.div>
@@ -68,10 +68,10 @@ export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPric
 
         {plan.comingSoon && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-primary/80 to-accent/80 rounded-full text-xs font-semibold tracking-wide"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+            className="absolute -top-5 left-1/2 -translate-x-1/2 px-6 py-2 bg-gradient-to-r from-accent via-primary to-accent bg-size-200 animate-gradient rounded-full text-xs font-bold tracking-wider text-white shadow-lg shadow-accent/25"
           >
             Coming Soon
           </motion.div>
