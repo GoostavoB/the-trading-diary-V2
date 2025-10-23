@@ -54,6 +54,7 @@
     "settings": "الإعدادات",
     "help": "المساعدة",
     "blog": "المدونة",
+    "pricing": "التسعير",
     "faq": "الأسئلة الشائعة",
     "advancedAnalytics": "تحليلات متقدمة",
     "tradeAnalysis": "تحليل الصفقات",
@@ -889,55 +890,182 @@
       "subtitle": "سواء كنت تتداول بشكل سريع، أو يومي، أو متأرجح - تتبع ما يعمل وما يكلفك."
     },
     "pricing": {
-      "title": "تسعير بسيط وشفاف",
-      "subtitle": "اختر الخطة التي تناسب أسلوب التداول الخاص بك. ترقية أو تخفيض في أي وقت.",
+      "title": "أسعار بسيطة وشفافة",
+      "subtitle": "اختر الخطة التي تناسب رحلة تداولك",
       "mostPopular": "الأكثر شعبية",
-      "starter": {
-        "name": "Starter",
-        "price": "مجاني",
-        "period": "للأبد",
-        "description": "مثالي للمبتدئين",
-        "cta": "ابدأ مجانًا",
-        "features": {
-          "trades": "حتى 50 صفقة شهريًا",
-          "analytics": "تحليلات ورسوم بيانية أساسية",
-          "manualEntry": "إدخال يدوي للصفقات",
-          "retention": "الاحتفاظ بالبيانات لمدة 7 أيام",
-          "support": "دعم البريد الإلكتروني"
+      "perMonth": "شهر",
+      "perMonthBilledAnnually": "شهر، يتم الفوترة سنوياً",
+      "savingsAmount": "وفر ${{amount}}/سنة",
+      "guaranteeNote": "ضمان استرداد الأموال لمدة 7 أيام • إلغاء في أي وقت • بدون رسوم مخفية",
+      "hero": {
+        "title": "تداول بوضوح.",
+        "subtitle": "دفتر تداول مدعوم بالذكاء الاصطناعي لمستثمري العملات المشفرة. احفظ كل صفقة، واكتشف الأنماط، وتتبع ميزتك.",
+        "primaryCta": "ابدأ الفترة التجريبية المجانية",
+        "secondaryCta": "شاهد عرض توضيحي لمدة دقيقتين"
+      },
+      "solutions": {
+        "title": "النتائج التي تهم",
+        "subtitle": "قدرات متميزة مصممة للمتداولين النخبة",
+        "seePatterns": {
+          "headline": "انظر الأنماط فوراً",
+          "subhead": "الذكاء الاصطناعي يقرأ تاريخك بالكامل. يسلط الضوء على ما يحقق الأرباح فعلياً.",
+          "metric": "4.2x مراجعات أسرع",
+          "proofPoint": "المتداول العادي يكتشف 3 أنماط مربحة في الأسبوع الأول"
+        },
+        "knowEdge": {
+          "headline": "اعرف ميزتك",
+          "subhead": "كل إعداد، كل ساعة، كل حالة سوق. مقاس.",
+          "metric": "67%",
+          "metricValue": 67,
+          "proofPoint": "تحسين معدل الفوز (المستخدم العادي)"
+        },
+        "tradeConfidence": {
+          "headline": "تداول بثقة",
+          "subhead": "حجم المركز محسوب. المخاطر مضبوطة. الخسائر المتوقعة.",
+          "metric": "89%",
+          "metricValue": 89,
+          "proofPoint": "خسائر ضخمة أقل"
+        },
+        "trackEffortlessly": {
+          "headline": "تتبع كل شيء بسهولة",
+          "subhead": "لقطات الشاشة، الملاحظات، الحالة العاطفية. كل شيء منظم. دائماً قابل للبحث.",
+          "metric": "12 دقيقة موفرة",
+          "metricValue": 12,
+          "proofPoint": "لكل جلسة مراجعة"
+        },
+        "performanceSpeaks": {
+          "headline": "أداء يتحدث",
+          "subhead": "معدل الفوز، التوقع، مضاعفات R. رسوم بيانية تروي قصتك.",
+          "metric": "2.3 شارب",
+          "metricValue": 2.3,
+          "proofPoint": "أداء المستخدم النخبة المتوسط"
+        },
+        "yourRules": {
+          "headline": "لوحتك، قواعدك",
+          "subhead": "الأدوات التي تحتاجها. المقاييس التي تهم. لا شيء آخر.",
+          "metric": "8 تخطيطات",
+          "metricValue": 8,
+          "proofPoint": "تكوينات مخصصة لكل مستخدم (متوسط)"
+        },
+        "builtByTraders": {
+          "headline": "مبني من قبل متداولين يفهمون",
+          "subhead": "كل سير عمل من دفاتر حقيقية. كل ميزة مختبرة في المعركة.",
+          "metric": "10,000+ ساعة",
+          "metricValue": 10000,
+          "proofPoint": "من ملاحظات المتداولين المتكاملة"
         }
       },
-      "pro": {
-        "name": "Pro",
-        "price": "$19",
-        "period": "شهريًا",
-        "description": "للمتداولين الجادين الذين يحتاجون المزيد",
-        "cta": "ابدأ النسخة التجريبية المجانية",
-        "features": {
-          "unlimited": "صفقات غير محدودة",
-          "advancedAnalytics": "تحليلات متقدمة وتوقعات",
-          "aiExtraction": "استخراج الصفقات بالذكاء الاصطناعي",
-          "unlimitedRetention": "الاحتفاظ بالبيانات غير محدود",
-          "prioritySupport": "دعم ذو أولوية",
-          "customSetups": "إعدادات وعلامات مخصصة",
-          "exportReports": "تصدير التقارير"
+      "billing": {
+        "monthly": "شهري",
+        "annual": "سنوي",
+        "save20": "وفر 20%"
+      },
+      "plans": {
+        "cta": "ابدأ الفترة التجريبية المجانية",
+        "basic": {
+          "name": "Basic",
+          "description": "مثالي للمتداولين النشطين الذين يبنون الهيكل",
+          "features": {
+            "uploads": "50 تحميل صفقات IA/شهر",
+            "manualUploads": "تحميلات يدوية غير محدودة",
+            "dashboard": "لوحة مخصصة مع أكثر من 15 أداة",
+            "charts": "رسوم بيانية متقدمة وتحليلات",
+            "basicJournal": "دفتر أساسي مع تتبع عاطفي",
+            "feeAnalytics": "تحليلات الرسوم مع التنبيهات",
+            "csv": "استيراد وتصدير CSV",
+            "social": "الوصول إلى الفيد الاجتماعي ولوحة المتصدرين"
+          }
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "للمتداولين الجادين الذين يحسنون الانضباط",
+          "features": {
+            "uploads": "100 تحميل صفقات IA/شهر",
+            "aiAnalysis": "1 تحليل أداء IA في الأسبوع",
+            "tradingPlan": "منشئ خطة التداول مع قائمة مراجعة",
+            "goals": "تتبع الأهداف والتقدم",
+            "richJournal": "دفتر غني بتحليل المزاج والنمط",
+            "customWidgets": "أدوات KPI مخصصة غير محدودة",
+            "fullSocial": "ميزات اجتماعية كاملة (منشورات، XP، شارات)",
+            "everythingBasic": "كل شيء في Basic"
+          }
+        },
+        "elite": {
+          "name": "Elite",
+          "description": "المتداولون المحترفون والمحللون",
+          "features": {
+            "uploads": "300 تحميل صفقات IA/شهر",
+            "aiAnalysis": "5 تحليلات أداء IA في الأسبوع",
+            "tradeReplay": "إعادة تشغيل الصفقة (مراجعة خطوة بخطوة)",
+            "positionCalculator": "حاسبة متقدمة لحجم المركز",
+            "riskDashboard": "لوحة المخاطر مع تحليل الخسائر",
+            "advancedAlerts": "تنبيهات متقدمة للأداء والرسوم",
+            "everythingPro": "كل شيء في Pro"
+          }
         }
       },
-      "elite": {
-        "name": "Elite",
-        "price": "$49",
-        "period": "شهريًا",
-        "description": "للمتداولين المحترفين والفرق",
-        "cta": "اتصل بالمبيعات",
+      "comparison": {
+        "title": "قارن الخطط بالتفصيل",
+        "subtitle": "انظر بالضبط ما هو مدرج في كل خطة",
+        "feature": "الميزة",
+        "unlimited": "غير محدود",
+        "categories": {
+          "aiAnalytics": "IA والتحليلات",
+          "tradingTools": "أدوات التداول",
+          "journaling": "اليوميات وعلم النفس",
+          "riskManagement": "إدارة المخاطر",
+          "integrations": "التكاملات",
+          "social": "الاجتماعية والمجتمع"
+        },
         "features": {
-          "everythingPro": "كل شيء في Pro",
-          "multiAccount": "تتبع حسابات متعددة",
-          "apiAccess": "الوصول إلى API",
-          "whiteLabel": "تقارير العلامة البيضاء",
-          "accountManager": "مدير حساب مخصص",
-          "earlyAccess": "الوصول المبكر إلى الميزات",
-          "teamCollaboration": "أدوات تعاون الفريق"
+          "aiUploads": "تحميلات الصفقات IA",
+          "manualUploads": "تحميلات الصفقات اليدوية",
+          "aiAnalysis": "تحليل الأداء IA",
+          "customWidgets": "أدوات KPI المخصصة",
+          "advancedCharts": "الرسوم البيانية المتقدمة والتحليلات",
+          "tradingPlan": "منشئ خطة التداول",
+          "preTradeChecklist": "قائمة مراجعة ما قبل التداول",
+          "goalsTracking": "تتبع الأهداف",
+          "tradeReplay": "إعادة تشغيل الصفقة",
+          "positionCalculator": "حاسبة حجم المركز",
+          "basicJournal": "دفتر أساسي",
+          "emotionalTimeline": "جدول زمني عاطفي",
+          "richJournal": "دفتر غني مع تتبع المزاج",
+          "patternAnalysis": "تحليل النمط",
+          "feeAnalytics": "تحليلات الرسوم",
+          "riskDashboard": "لوحة المخاطر",
+          "drawdownAnalysis": "تحليل الخسائر",
+          "performanceAlerts": "تنبيهات الأداء",
+          "csvImport": "استيراد/تصدير CSV",
+          "exchangeConnections": "اتصالات البورصة",
+          "autoRefresh": "التحديث التلقائي",
+          "viewFeed": "عرض الفيد الاجتماعي",
+          "createPosts": "إنشاء منشورات وتعليقات",
+          "leaderboard": "لوحة المتصدرين",
+          "xpBadges": "XP والشارات",
+          "challenges": "التحديات اليومية/الأسبوعية"
         }
       },
+      "roadmap": {
+        "title": "قريباً",
+        "subtitle": "ميزات جديدة مثيرة نبنيها لك",
+        "targetQuarter": "الهدف",
+        "highPriority": "أولوية عالية",
+        "mediumPriority": "أولوية متوسطة",
+        "features": {
+          "bestAssetFinder": "محدد أفضل الأصول - حدد أزواجك الأكثر ربحية",
+          "batchEdit": "تحرير دفعي - تحرير عدة صفقات دفعة واحدة",
+          "valueAtRisk": "حاسبة القيمة المعرضة للخطر (VaR)",
+          "apiAccess": "الوصول إلى مفتاح API للقراءة فقط",
+          "portfolioTracking": "تحليلات ولقطات المحفظة",
+          "inAppAlerts": "نظام تنبيهات داخل التطبيق",
+          "autosyncDelta": "استيراد دلتا للمزامنة التلقائية",
+          "savedViews": "مرشحات سريعة وطرق عرض محفوظة",
+          "teamCollaboration": "أدوات التعاون الجماعي"
+        },
+        "disclaimer": "الميزات والجدول الزمني قابلان للتغيير بناءً على ملاحظات المستخدمين وأولويات التطوير"
+      }
+    },
       "trialNote": "تتضمن جميع الخطط تجربة مجانية لمدة 14 يومًا • لا حاجة لبطاقة ائتمان • إلغاء في أي وقت"
     },
     "cta": {

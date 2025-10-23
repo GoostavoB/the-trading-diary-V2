@@ -66,6 +66,7 @@
     "longShortRatio": "Proporção Long/Short",
     "feeAnalysis": "Análise de Taxas",
     "blog": "Blog",
+    "pricing": "Preços",
     "faq": "Perguntas Frequentes",
     "quickAccess": "Acesso Rápido",
     "tradingAccounts": "Contas de Trading",
@@ -846,78 +847,179 @@
     },
     "pricing": {
       "title": "Preços Simples e Transparentes",
-      "subtitle": "Escolha o plano que se adapta ao seu estilo de trading. Atualize ou faça downgrade a qualquer momento.",
+      "subtitle": "Escolha o plano que se adapta à sua jornada de trading",
       "mostPopular": "Mais Popular",
-      "starter": {
-        "name": "Starter",
-        "price": "Grátis",
-        "period": "para sempre",
-        "description": "Perfeito para iniciantes",
-        "cta": "Começar Grátis",
-        "features": {
-          "trades": "Até 50 operações por mês",
-          "analytics": "Análises e gráficos básicos",
-          "manualEntry": "Entrada manual de operações",
-          "retention": "Retenção de dados de 7 dias",
-          "support": "Suporte por e-mail"
+      "perMonth": "mês",
+      "perMonthBilledAnnually": "mês, cobrado anualmente",
+      "savingsAmount": "Economize ${{amount}}/ano",
+      "guaranteeNote": "Garantia de reembolso de 7 dias • Cancele a qualquer momento • Sem taxas ocultas",
+      "hero": {
+        "title": "Opere com clareza.",
+        "subtitle": "Um diário de trading alimentado por IA para investidores em cripto. Capture cada operação, encontre padrões e acompanhe sua vantagem.",
+        "primaryCta": "Começar Teste Grátis",
+        "secondaryCta": "Assista demo de 2 minutos"
+      },
+      "solutions": {
+        "title": "Resultados que Importam",
+        "subtitle": "Capacidades premium construídas para traders de elite",
+        "seePatterns": {
+          "headline": "Veja padrões instantaneamente",
+          "subhead": "A IA lê todo seu histórico. Destaca o que realmente gera lucro.",
+          "metric": "4.2x revisões mais rápidas",
+          "proofPoint": "Trader médio descobre 3 padrões lucrativos na primeira semana"
+        },
+        "knowEdge": {
+          "headline": "Conheça sua vantagem",
+          "subhead": "Cada setup, cada hora, cada condição de mercado. Medido.",
+          "metric": "67%",
+          "metricValue": 67,
+          "proofPoint": "Melhoria na taxa de vitórias (usuário médio)"
+        },
+        "tradeConfidence": {
+          "headline": "Opere com confiança",
+          "subhead": "Tamanho de posição calculado. Risco controlado. Drawdowns previstos.",
+          "metric": "89%",
+          "metricValue": 89,
+          "proofPoint": "Menos perdas excessivas"
+        },
+        "trackEffortlessly": {
+          "headline": "Acompanhe tudo sem esforço",
+          "subhead": "Screenshots, notas, estado emocional. Tudo organizado. Sempre pesquisável.",
+          "metric": "12 minutos economizados",
+          "metricValue": 12,
+          "proofPoint": "Por sessão de revisão"
+        },
+        "performanceSpeaks": {
+          "headline": "Desempenho que fala",
+          "subhead": "Taxa de vitórias, expectativa, múltiplos R. Gráficos que contam sua história.",
+          "metric": "2.3 Sharpe",
+          "metricValue": 2.3,
+          "proofPoint": "Desempenho médio de usuários elite"
+        },
+        "yourRules": {
+          "headline": "Seu painel, suas regras",
+          "subhead": "Widgets que você precisa. Métricas que importam. Nada mais.",
+          "metric": "8 layouts",
+          "metricValue": 8,
+          "proofPoint": "Configurações personalizadas por usuário (média)"
+        },
+        "builtByTraders": {
+          "headline": "Construído por traders que entendem",
+          "subhead": "Cada fluxo de trabalho de diários reais. Cada recurso testado em batalha.",
+          "metric": "10.000+ horas",
+          "metricValue": 10000,
+          "proofPoint": "De feedback de traders integrado"
         }
       },
-      "pro": {
-        "name": "Pro",
-        "price": "$19",
-        "period": "por mês",
-        "description": "Para traders sérios que precisam de mais",
-        "cta": "Iniciar Teste Gratuito",
-        "features": {
-          "unlimited": "Operações ilimitadas",
-          "advancedAnalytics": "Análises avançadas e previsões",
-          "aiExtraction": "Extração de operações com IA",
-          "unlimitedRetention": "Retenção ilimitada de dados",
-          "prioritySupport": "Suporte prioritário",
-          "customSetups": "Setups e tags personalizadas",
-          "exportReports": "Exportar relatórios"
+      "billing": {
+        "monthly": "Mensal",
+        "annual": "Anual",
+        "save20": "Economize 20%"
+      },
+      "plans": {
+        "cta": "Começar Teste Grátis",
+        "basic": {
+          "name": "Basic",
+          "description": "Perfeito para traders ativos construindo estrutura",
+          "features": {
+            "uploads": "50 uploads de operações IA/mês",
+            "manualUploads": "Uploads manuais ilimitados",
+            "dashboard": "Painel personalizado com mais de 15 widgets",
+            "charts": "Gráficos avançados e análises",
+            "basicJournal": "Diário básico com rastreamento emocional",
+            "feeAnalytics": "Análise de taxas com alertas",
+            "csv": "Importação e exportação CSV",
+            "social": "Acesso ao feed social e tabela de classificação"
+          }
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "Para traders sérios melhorando a disciplina",
+          "features": {
+            "uploads": "100 uploads de operações IA/mês",
+            "aiAnalysis": "1 Análise de Desempenho IA por semana",
+            "tradingPlan": "Construtor de Plano de Trading com checklist",
+            "goals": "Rastreamento de objetivos e progresso",
+            "richJournal": "Diário completo com análise de humor e padrões",
+            "customWidgets": "Widgets KPI personalizados ilimitados",
+            "fullSocial": "Recursos sociais completos (posts, XP, badges)",
+            "everythingBasic": "Tudo no Basic"
+          }
+        },
+        "elite": {
+          "name": "Elite",
+          "description": "Traders profissionais e analistas",
+          "features": {
+            "uploads": "300 uploads de operações IA/mês",
+            "aiAnalysis": "5 Análises de Desempenho IA por semana",
+            "tradeReplay": "Trade Replay (revisão passo a passo)",
+            "positionCalculator": "Calculadora Avançada de Tamanho de Posição",
+            "riskDashboard": "Painel de Risco com análise de drawdown",
+            "advancedAlerts": "Alertas avançados de desempenho e taxas",
+            "everythingPro": "Tudo no Pro"
+          }
         }
       },
-      "elite": {
-        "name": "Elite",
-        "price": "$49",
-        "period": "por mês",
-        "description": "Para traders profissionais e equipes",
-        "cta": "Contatar Vendas",
+      "comparison": {
+        "title": "Compare os Planos em Detalhes",
+        "subtitle": "Veja exatamente o que está incluído em cada plano",
+        "feature": "Recurso",
+        "unlimited": "Ilimitado",
+        "categories": {
+          "aiAnalytics": "IA e Análises",
+          "tradingTools": "Ferramentas de Trading",
+          "journaling": "Diário e Psicologia",
+          "riskManagement": "Gestão de Risco",
+          "integrations": "Integrações",
+          "social": "Social e Comunidade"
+        },
         "features": {
-          "everythingPro": "Tudo no Pro",
-          "multiAccount": "Rastreamento de várias contas",
-          "apiAccess": "Acesso à API",
-          "whiteLabel": "Relatórios de marca branca",
-          "accountManager": "Gerente de conta dedicado",
-          "earlyAccess": "Acesso antecipado a recursos",
-          "teamCollaboration": "Ferramentas de colaboração em equipe"
+          "aiUploads": "Uploads de Operações IA",
+          "manualUploads": "Uploads de Operações Manuais",
+          "aiAnalysis": "Análise de Desempenho IA",
+          "customWidgets": "Widgets KPI Personalizados",
+          "advancedCharts": "Gráficos Avançados e Análises",
+          "tradingPlan": "Construtor de Plano de Trading",
+          "preTradeChecklist": "Checklist Pré-Operação",
+          "goalsTracking": "Rastreamento de Objetivos",
+          "tradeReplay": "Trade Replay",
+          "positionCalculator": "Calculadora de Tamanho de Posição",
+          "basicJournal": "Diário Básico",
+          "emotionalTimeline": "Linha do Tempo Emocional",
+          "richJournal": "Diário Completo com Rastreamento de Humor",
+          "patternAnalysis": "Análise de Padrões",
+          "feeAnalytics": "Análise de Taxas",
+          "riskDashboard": "Painel de Risco",
+          "drawdownAnalysis": "Análise de Drawdown",
+          "performanceAlerts": "Alertas de Desempenho",
+          "csvImport": "Importação/Exportação CSV",
+          "exchangeConnections": "Conexões de Exchange",
+          "autoRefresh": "Atualização Automática",
+          "viewFeed": "Ver Feed Social",
+          "createPosts": "Criar Posts e Comentários",
+          "leaderboard": "Tabela de Classificação",
+          "xpBadges": "XP e Badges",
+          "challenges": "Desafios Diários/Semanais"
         }
       },
-      "trialNote": "Todos os planos incluem teste gratuito de 14 dias • Sem cartão de crédito • Cancele a qualquer momento",
-      "free": "Grátis",
-      "pro": "Pro",
-      "monthly": "Mensal",
-      "yearly": "Anual",
-      "freePlan": {
-        "price": "$0",
-        "period": "para sempre",
+      "roadmap": {
+        "title": "Em Breve",
+        "subtitle": "Novos recursos emocionantes que estamos construindo para você",
+        "targetQuarter": "Meta",
+        "highPriority": "Alta Prioridade",
+        "mediumPriority": "Média Prioridade",
         "features": {
-          "trades": "Até 100 operações",
-          "analytics": "Análises básicas",
-          "support": "Suporte da comunidade"
-        }
-      },
-      "proPlan": {
-        "price": "$19",
-        "period": "por mês",
-        "features": {
-          "trades": "Operações ilimitadas",
-          "analytics": "Análises avançadas",
-          "ai": "Insights IA",
-          "support": "Suporte prioritário",
-          "exchanges": "Integração com exchanges"
-        }
+          "bestAssetFinder": "Localizador de Melhor Ativo - Identifique seus pares mais lucrativos",
+          "batchEdit": "Edição em Lote - Edite várias operações de uma vez",
+          "valueAtRisk": "Calculadora de Valor em Risco (VaR)",
+          "apiAccess": "Acesso à Chave API Somente Leitura",
+          "portfolioTracking": "Análises e Snapshots de Portfólio",
+          "inAppAlerts": "Sistema de Alertas no Aplicativo",
+          "autosyncDelta": "Importações Delta de Sincronização Automática",
+          "savedViews": "Filtros Rápidos e Visualizações Salvas",
+          "teamCollaboration": "Ferramentas de Colaboração em Equipe"
+        },
+        "disclaimer": "Recursos e cronograma sujeitos a alterações com base no feedback dos usuários e prioridades de desenvolvimento"
       }
     },
     "cta": {

@@ -119,6 +119,12 @@ const AppRoutes = () => {
         <Route path="/seo-dashboard" element={<SEODashboard />} />
         <Route path="/pricing" element={<PricingPage />} />
         
+        {/* Language-specific pricing pages */}
+        <Route path="/pt/pricing" element={<PricingPage />} />
+        <Route path="/es/pricing" element={<PricingPage />} />
+        <Route path="/ar/pricing" element={<PricingPage />} />
+        <Route path="/vi/pricing" element={<PricingPage />} />
+        
         {/* Blog routes with language support */}
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />

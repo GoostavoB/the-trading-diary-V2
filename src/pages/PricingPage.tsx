@@ -16,10 +16,24 @@ import googlePlaySoon from "@/assets/google-play-coming-soon.png";
 
 const PricingPage = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, changeLanguage } = useTranslation();
   const heroRef = useRef<HTMLDivElement>(null);
   const pricingRef = useRef<HTMLDivElement>(null);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+
+  // Detect language from URL and set it
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path.startsWith('/pt/')) {
+      changeLanguage('pt');
+    } else if (path.startsWith('/es/')) {
+      changeLanguage('es');
+    } else if (path.startsWith('/ar/')) {
+      changeLanguage('ar');
+    } else if (path.startsWith('/vi/')) {
+      changeLanguage('vi');
+    }
+  }, [changeLanguage]);
 
   usePageMeta({
     title: 'Pricing Plans - AI-Powered Crypto Trading Journal',
