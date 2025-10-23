@@ -14,6 +14,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Wallet, Plus, Edit, Trash2, TrendingUp, DollarSign } from "lucide-react";
 import { formatCurrency, formatNumber } from "@/utils/formatNumber";
+import { BlurredCurrency, BlurredPercent } from "@/components/ui/BlurredValue";
+import { BlurToggleButton } from "@/components/ui/BlurToggleButton";
 
 interface TradingAccount {
   id: string;
@@ -173,19 +175,21 @@ const Accounts = () => {
     <AppLayout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
+          <div className="flex-1">
             <h1 className="text-3xl font-bold text-foreground">Trading Accounts</h1>
             <p className="text-muted-foreground mt-2">
               Manage your trading accounts across different brokers
             </p>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2" onClick={() => { setEditingAccount(null); resetForm(); }}>
-                <Plus className="h-4 w-4" />
-                Add Account
-              </Button>
-            </DialogTrigger>
+          <div className="flex items-center gap-2">
+            <BlurToggleButton />
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="gap-2" onClick={() => { setEditingAccount(null); resetForm(); }}>
+                  <Plus className="h-4 w-4" />
+                  Add Account
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <form onSubmit={handleSubmit}>
                 <DialogHeader>
@@ -309,6 +313,7 @@ const Accounts = () => {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
@@ -318,7 +323,9 @@ const Accounts = () => {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${formatNumber(totalBalance)}</div>
+              <div className="text-2xl font-bold">
+                <BlurredCurrency amount={totalBalance} />
+              </div>
               <p className="text-xs text-muted-foreground mt-1">
                 Across all accounts
               </p>
@@ -332,7 +339,7 @@ const Accounts = () => {
             </CardHeader>
             <CardContent>
               <div className={`text-2xl font-bold ${totalPnL >= 0 ? "text-neon-green" : "text-neon-red"}`}>
-                ${formatNumber(totalPnL)}
+                <BlurredCurrency amount={totalPnL} />
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 Combined profit/loss
@@ -401,16 +408,20 @@ const Accounts = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Current Balance</span>
-                      <span className="font-medium">${formatNumber(account.current_balance)}</span>
+                      <span className="font-medium">
+                        <BlurredCurrency amount={account.current_balance} />
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Initial Balance</span>
-                      <span>${formatNumber(account.initial_balance)}</span>
+                      <span>
+                        <BlurredCurrency amount={account.initial_balance} />
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm font-medium">
                       <span className="text-muted-foreground">P&L</span>
                       <span className={pnl >= 0 ? "text-neon-green" : "text-neon-red"}>
-                        ${formatNumber(pnl)} ({pnlPercent}%)
+                        <BlurredCurrency amount={pnl} /> (<BlurredPercent value={parseFloat(pnlPercent)} />)
                       </span>
                     </div>
                   </div>
