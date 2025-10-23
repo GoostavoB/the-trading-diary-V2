@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Download, Loader2 } from 'lucide-react';
+import { Download, Loader2, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import AppLayout from '@/components/layout/AppLayout';
+import tdLogoOfficial from '@/assets/td-logo-official.png';
 
 interface LogoVariation {
   id: string;
@@ -46,6 +48,7 @@ const getBase64FromImage = async (imagePath: string): Promise<string> => {
 };
 
 export default function LogoGenerator() {
+  const navigate = useNavigate();
   const [generating, setGenerating] = useState<string | null>(null);
   const [generatedLogos, setGeneratedLogos] = useState<Record<string, string>>({});
 
@@ -106,11 +109,37 @@ export default function LogoGenerator() {
   return (
     <AppLayout>
       <div className="container mx-auto p-6 max-w-7xl space-y-6">
+        <div className="mb-6 flex items-center justify-between">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/')}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+        </div>
+
+        <Card className="mb-8 border-primary/20 bg-primary/5 p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex-1">
+              <h2 className="mb-2 text-xl font-semibold">Looking for the Official Logo?</h2>
+              <p className="mb-4 text-muted-foreground">
+                Download the standard Trading Diary logo in various sizes and formats from the Logo Download page.
+              </p>
+              <Button onClick={() => navigate('/logo-download')} className="gap-2">
+                <Download className="h-4 w-4" />
+                Go to Logo Download
+              </Button>
+            </div>
+          </div>
+        </Card>
+
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Logo Generator</h1>
+            <h1 className="text-3xl font-bold">Experimental: Logo Color Variations</h1>
             <p className="text-muted-foreground mt-1">
-              Generate high-resolution logo variations for The Trading Diary
+              AI-generated color variations (experimental feature)
             </p>
           </div>
           <Button onClick={generateAll} disabled={generating !== null} size="lg">

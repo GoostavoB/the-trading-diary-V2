@@ -3,7 +3,7 @@ import {
   BarChart3, Upload, TrendingUp, Target, Brain, Trophy, Settings2, BookOpen, HelpCircle, 
   LineChart, LogOut, Zap, RefreshCw, Wallet, Receipt, BookMarked, Users, GitCompare, 
   Shield, FileBarChart, ClipboardList, Calendar, Bell, FileText, ChevronDown, Search,
-  Plus, Archive, Star, Flame, Award, PieChart, Heart, Image
+  Plus, Archive, Star, Flame, Award, PieChart, Heart, Image, Download, Info
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Logo } from '@/components/Logo';
@@ -135,7 +135,8 @@ export function AppSidebar() {
         { title: 'Trading Lessons', url: '/learn', icon: BookOpen, iconName: 'BookOpen', keywords: ['learn', 'education', 'lessons', 'courses', 'training', 'tutorials', 'knowledge', 'improve', 'study'] },
         { title: 'API Documentation', url: '/api-docs', icon: FileText, iconName: 'FileText', keywords: ['api', 'docs', 'documentation', 'developer', 'integration', 'endpoints', 'technical'] },
         { title: 'Advanced Analytics', url: '/advanced-analytics', icon: TrendingUp, iconName: 'TrendingUp', keywords: ['advanced', 'analytics', 'metrics', 'deep', 'analysis', 'statistics', 'insights'] },
-        { title: 'Logo Generator', url: '/logo-generator', icon: Image, iconName: 'Image', keywords: ['logo', 'branding', 'design', 'icon', 'graphics', 'variations', 'download', 'png', 'assets', 'visual', 'identity'] },
+        { title: 'Logo Download', url: '/logo-download', icon: Download, iconName: 'Download', keywords: ['logo', 'brand', 'assets', 'download', 'branding', 'official', 'icon', 'graphics'] },
+        { title: 'Logo Generator', url: '/logo-generator', icon: Image, iconName: 'Image', keywords: ['logo', 'branding', 'design', 'icon', 'graphics', 'variations', 'download', 'png', 'assets', 'visual', 'identity', 'experimental', 'colors'] },
       ],
     },
   ];
