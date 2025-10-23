@@ -23,6 +23,7 @@ import { SuccessFeedback } from '@/components/SuccessFeedback';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ImageAnnotator, Annotation } from '@/components/upload/ImageAnnotator';
 import { BrokerSelect } from '@/components/upload/BrokerSelect';
+import { EnhancedFileUpload } from '@/components/upload/EnhancedFileUpload';
 import { runOCR, type OCRResult } from '@/utils/ocrPipeline';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { pageMeta } from '@/utils/seoHelpers';
@@ -906,24 +907,25 @@ const Upload = () => {
                     </div>
                   )}
                   <div className="mt-2">
-                    {extractionPreview ? (
-                      <div className="space-y-3">
-                        <div className="relative">
-                          <img
-                            src={extractionPreview}
-                            alt="Extraction preview"
-                            className="w-full h-64 object-contain rounded-md border border-border bg-muted"
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            className="absolute top-2 right-2"
-                            onClick={removeExtractionImage}
-                          >
-                            <X size={16} />
-                          </Button>
-                        </div>
+                    <EnhancedFileUpload
+                      onFileSelected={(file) => {
+                        setExtractionImage(file);
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setExtractionPreview(reader.result as string);
+                        };
+                        reader.readAsDataURL(file);
+                      }}
+                      existingPreview={extractionPreview}
+                      onRemove={removeExtractionImage}
+                      uploading={extracting}
+                      uploadProgress={uploadStep * 25}
+                      maxSize={10}
+                      acceptedTypes={['image/jpeg', 'image/png', 'image/webp']}
+                    />
+                    
+                    {extractionPreview && (
+                      <div className="space-y-3 mt-4">
                         {extractedTrades.length === 0 && (
                           <>
                             {/* Image annotation system */}
@@ -989,37 +991,6 @@ const Upload = () => {
                             )}
                           </>
                         )}
-                      </div>
-                    ) : (
-                      <div
-                        onDragOver={handleDragOver}
-                        onDragLeave={handleDragLeave}
-                        onDrop={handleDrop}
-                        className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-md cursor-pointer transition-colors ${
-                          isDragging 
-                            ? 'border-primary bg-primary/5' 
-                            : 'border-border hover:border-foreground/50'
-                        }`}
-                      >
-                        <label
-                          htmlFor="extraction-image"
-                          className="flex flex-col items-center justify-center w-full h-full cursor-pointer"
-                        >
-                          <UploadIcon className="w-12 h-12 text-muted-foreground mb-2" />
-                          <p className="text-sm text-muted-foreground mb-1">
-                            Click to upload or drag and drop
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Supports PNG, JPG, WEBP (max 10MB)
-                          </p>
-                          <Input
-                            id="extraction-image"
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp"
-                            onChange={handleExtractionImageChange}
-                            className="hidden"
-                          />
-                        </label>
                       </div>
                     )}
                   </div>
