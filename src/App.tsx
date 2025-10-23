@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { AIAssistantProvider } from "@/contexts/AIAssistantContext";
+import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { CalmModeProvider } from "@/contexts/CalmModeContext";
 import { ThemeProvider } from "next-themes";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
@@ -226,7 +227,8 @@ const App = () => (
           <BrowserRouter>
             <AuthProvider>
               <SubscriptionProvider>
-                <CalmModeProvider>
+              <CalmModeProvider>
+                <CurrencyProvider>
                   <AIAssistantProvider>
                     <AppRoutes />
                     <ConversionTracking />
@@ -235,7 +237,8 @@ const App = () => (
                     <OfflineIndicator />
                     <InstallPrompt />
                   </AIAssistantProvider>
-                </CalmModeProvider>
+                </CurrencyProvider>
+              </CalmModeProvider>
               </SubscriptionProvider>
             </AuthProvider>
           </BrowserRouter>

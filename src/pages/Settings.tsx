@@ -15,6 +15,7 @@ import { NotificationPreferences } from '@/components/NotificationPreferences';
 import { DataManagement } from '@/components/DataManagement';
 import { CapitalManagement } from '@/components/CapitalManagement';
 import { ThemeSelector } from '@/components/ThemeSelector';
+import { CurrencySelector } from '@/components/settings/CurrencySelector';
 import { SocialShareRewards } from '@/components/SocialShareRewards';
 import { ReferralProgram } from '@/components/ReferralProgram';
 import { useCalmMode } from '@/contexts/CalmModeContext';
@@ -517,6 +518,8 @@ const Settings = () => {
               <h2 className="text-xl font-semibold mb-4">Theme Preferences</h2>
               <ThemeSelector />
             </Card>
+
+            <CurrencySelector />
 
             <Card className="p-6 glass">
               <h2 className="text-xl font-semibold mb-4">Animation & Sound</h2>

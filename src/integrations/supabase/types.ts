@@ -3123,6 +3123,7 @@ export type Database = {
           accent_color: string | null
           blur_enabled: boolean | null
           created_at: string | null
+          currency: string | null
           email_notifications: boolean | null
           event_reminders: boolean | null
           guided_tour_completed: boolean | null
@@ -3145,6 +3146,7 @@ export type Database = {
           accent_color?: string | null
           blur_enabled?: boolean | null
           created_at?: string | null
+          currency?: string | null
           email_notifications?: boolean | null
           event_reminders?: boolean | null
           guided_tour_completed?: boolean | null
@@ -3167,6 +3169,7 @@ export type Database = {
           accent_color?: string | null
           blur_enabled?: boolean | null
           created_at?: string | null
+          currency?: string | null
           email_notifications?: boolean | null
           event_reminders?: boolean | null
           guided_tour_completed?: boolean | null
