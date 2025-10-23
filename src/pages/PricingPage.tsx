@@ -4,7 +4,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { motion } from "framer-motion";
 import PricingComparison from "@/components/PricingComparison";
-import { OutcomeCard } from "@/components/premium/OutcomeCard";
+import { WideOutcomeCard } from "@/components/premium/WideOutcomeCard";
 import { ParallaxTradingElements } from "@/components/premium/ParallaxTradingElements";
 import { PremiumPricingCard } from "@/components/PremiumPricingCard";
 import { MagneticButton } from "@/components/MagneticButton";
@@ -42,148 +42,6 @@ const PricingPage = () => {
     canonical: 'https://www.thetradingdiary.com/pricing',
   });
 
-  const solutions = [
-    {
-      headline: t('pricing.solutions.knowEdge.headline'),
-      subhead: t('pricing.solutions.knowEdge.subhead'),
-      metric: t('pricing.solutions.knowEdge.metric'),
-      metricValue: 67,
-      proofPoint: t('pricing.solutions.knowEdge.proofPoint'),
-      visual: (
-        <div className="relative w-full h-48">
-          <svg viewBox="0 0 200 100" className="w-full h-full">
-            {[30, 45, 60, 75, 90].map((height, i) => (
-              <motion.rect
-                key={i}
-                x={i * 35 + 10}
-                y={100 - height}
-                width="25"
-                height={height}
-                fill="currentColor"
-                className="text-primary/60"
-                initial={{ height: 0 }}
-                animate={{ height }}
-                transition={{ duration: 1, delay: i * 0.1 }}
-              />
-            ))}
-          </svg>
-        </div>
-      ),
-    },
-    {
-      headline: t('pricing.solutions.tradeConfidence.headline'),
-      subhead: t('pricing.solutions.tradeConfidence.subhead'),
-      metric: t('pricing.solutions.tradeConfidence.metric'),
-      metricValue: 89,
-      proofPoint: t('pricing.solutions.tradeConfidence.proofPoint'),
-      visual: (
-        <div className="relative w-full h-48 flex items-center justify-center">
-          <div className="relative w-32 h-32">
-            <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
-              <circle
-                cx="50"
-                cy="50"
-                r="40"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="8"
-                className="text-muted/20"
-              />
-              <motion.circle
-                cx="50"
-                cy="50"
-                r="40"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="8"
-                strokeLinecap="round"
-                className="text-primary"
-                initial={{ strokeDasharray: '0 251.2' }}
-                animate={{ strokeDasharray: '224 251.2' }}
-                transition={{ duration: 2, ease: 'easeOut' }}
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center text-2xl font-bold">
-              89%
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      headline: "Upload 40x Faster",
-      subhead: "Batch upload trades from screenshots instead of manual entry",
-      metric: "40x",
-      metricValue: 40,
-      proofPoint: "Batch uploads from screenshots beat manual entry every time",
-      visual: (
-        <div className="relative w-full h-48 flex items-center justify-center">
-          <div className="relative">
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                className="absolute w-32 h-40 bg-gradient-to-br from-primary/20 to-accent/10 rounded-lg border border-white/10"
-                style={{
-                  left: `${i * 12}px`,
-                  top: `${i * 8}px`,
-                  zIndex: 3 - i,
-                }}
-                initial={{ rotateZ: 0, y: 0 }}
-                animate={{
-                  rotateZ: i * 4,
-                  y: i * -2,
-                }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-              />
-            ))}
-          </div>
-        </div>
-      ),
-    },
-    {
-      headline: "Save 75-97% of Your Time",
-      subhead: "Spend less time logging, more time analyzing and trading",
-      metric: "97%",
-      metricValue: 97,
-      proofPoint: "Spend less time logging, more time winning",
-      visual: (
-        <div className="relative w-full h-48">
-          <svg viewBox="0 0 200 100" className="w-full h-full">
-            <motion.path
-              d="M 10 90 Q 50 70, 100 40 T 190 10"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              className="text-primary"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 2, ease: 'easeInOut' }}
-            />
-          </svg>
-        </div>
-      ),
-    },
-    {
-      headline: t('pricing.solutions.yourRules.headline'),
-      subhead: t('pricing.solutions.yourRules.subhead'),
-      metric: t('pricing.solutions.yourRules.metric'),
-      metricValue: 8,
-      proofPoint: t('pricing.solutions.yourRules.proofPoint'),
-      visual: (
-        <div className="relative w-full h-48 grid grid-cols-3 grid-rows-3 gap-2 p-4">
-          {Array.from({ length: 9 }).map((_, i) => (
-            <motion.div
-              key={i}
-              className="bg-gradient-to-br from-primary/20 to-accent/10 rounded-lg border border-white/10"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.3, delay: i * 0.05 }}
-            />
-          ))}
-        </div>
-      ),
-    },
-  ];
 
   const plans = [
     {
@@ -323,10 +181,21 @@ const PricingPage = () => {
             </motion.p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {solutions.map((solution, index) => (
-              <OutcomeCard key={index} {...solution} index={index} />
-            ))}
+          <div className="max-w-5xl mx-auto space-y-6 md:space-y-8">
+            <WideOutcomeCard
+              headline="Upload 40x Faster"
+              subhead="Batch upload trades from screenshots instead of manual entry"
+              metric="40x"
+              metricValue={40}
+              proofPoint="Batch uploads from screenshots beat manual entry every time"
+            />
+            <WideOutcomeCard
+              headline="Save 75-97% of Your Time"
+              subhead="Spend less time logging, more time analyzing and trading"
+              metric="97%"
+              metricValue={97}
+              proofPoint="Spend less time logging, more time winning"
+            />
           </div>
         </div>
       </section>
