@@ -458,11 +458,14 @@ const PricingPage = () => {
             viewport={{ once: true }}
             className="text-center mt-20"
           >
+            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
+              <span className="text-sm font-bold text-primary uppercase tracking-wider">Coming Soon</span>
+            </div>
             <h3 className="text-2xl md:text-3xl font-bold mb-4">
-              Available on iOS & Android
+              iOS & Android Apps
             </h3>
             <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-              Take your trading diary with you. Track trades, analyze performance, and stay on top of your game from anywhere.
+              Native mobile apps are in development. Soon you'll be able to take your trading diary with you, track trades, analyze performance, and stay on top of your game from anywhere.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <img 
