@@ -6,13 +6,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Download, FileText, Mail } from "lucide-react";
-import { format } from "date-fns";
+import { CalendarIcon, Download, FileText, Mail, Eye } from "lucide-react";
+import { format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { PDFReportPreview } from "./PDFReportPreview";
 
 type ReportType = "monthly" | "quarterly" | "yearly" | "custom";
 type ReportFormat = "excel" | "json";
@@ -31,6 +32,8 @@ export function ReportGenerator() {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [reportData, setReportData] = useState<any>(null);
 
   const [sections, setSections] = useState<ReportSection[]>([
     { id: "summary", label: "Executive Summary", enabled: true },
@@ -79,19 +82,49 @@ export function ReportGenerator() {
     setIsGenerating(true);
     
     try {
+      // Determine date range based on report type
+      let dateStart = startDate;
+      let dateEnd = endDate;
+
+      if (reportType === 'monthly') {
+        const now = new Date();
+        dateStart = startOfMonth(now);
+        dateEnd = endOfMonth(now);
+      } else if (reportType === 'quarterly') {
+        const now = new Date();
+        dateStart = startOfQuarter(now);
+        dateEnd = endOfQuarter(now);
+      } else if (reportType === 'yearly') {
+        const now = new Date();
+        dateStart = startOfYear(now);
+        dateEnd = endOfYear(now);
+      }
+
       // Filter trades by date range
       const filteredTrades = (trades || []).filter((trade) => {
-        const tradeDate = new Date(trade.created_at);
-        const start = startDate ? new Date(startDate) : null;
-        const end = endDate ? new Date(endDate) : null;
+        const tradeDate = new Date(trade.trade_date);
+        const start = dateStart ? new Date(dateStart) : null;
+        const end = dateEnd ? new Date(dateEnd) : null;
         
         if (start && tradeDate < start) return false;
         if (end && tradeDate > end) return false;
         return true;
       });
 
-      // Calculate metrics
+      if (filteredTrades.length === 0) {
+        toast({
+          title: "No Data",
+          description: "No trades found in the selected period",
+          variant: "destructive",
+        });
+        setIsGenerating(false);
+        return;
+      }
+
+      // Calculate comprehensive metrics
       const totalPnL = filteredTrades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+      const totalFees = filteredTrades.reduce((sum, t) => sum + (t.trading_fee || 0) + (t.funding_fee || 0), 0);
+      const netPnL = totalPnL - totalFees;
       const winningTrades = filteredTrades.filter(t => (t.pnl || 0) > 0);
       const losingTrades = filteredTrades.filter(t => (t.pnl || 0) < 0);
       const winRate = filteredTrades.length > 0 
@@ -103,6 +136,61 @@ export function ReportGenerator() {
       const avgLoss = losingTrades.length > 0
         ? losingTrades.reduce((sum, t) => sum + (t.pnl || 0), 0) / losingTrades.length
         : 0;
+      const profitFactor = Math.abs(avgLoss) > 0 ? avgWin / Math.abs(avgLoss) : 0;
+
+      // Best and worst trades
+      const sortedByPnL = [...filteredTrades].sort((a, b) => (b.pnl || 0) - (a.pnl || 0));
+      const bestTrade = sortedByPnL[0];
+      const worstTrade = sortedByPnL[sortedByPnL.length - 1];
+
+      // Top assets
+      const assetPnL = new Map<string, { pnl: number; trades: number }>();
+      filteredTrades.forEach(t => {
+        const current = assetPnL.get(t.symbol) || { pnl: 0, trades: 0 };
+        assetPnL.set(t.symbol, {
+          pnl: current.pnl + (t.pnl || 0),
+          trades: current.trades + 1
+        });
+      });
+      const topAssets = Array.from(assetPnL.entries())
+        .sort((a, b) => b[1].pnl - a[1].pnl)
+        .slice(0, 5)
+        .map(([symbol, data]) => ({ symbol, ...data }));
+
+      // Monthly breakdown
+      const monthlyData = new Map<string, { pnl: number; trades: number }>();
+      filteredTrades.forEach(t => {
+        const month = format(new Date(t.trade_date), 'MMM yyyy');
+        const current = monthlyData.get(month) || { pnl: 0, trades: 0 };
+        monthlyData.set(month, {
+          pnl: current.pnl + (t.pnl || 0),
+          trades: current.trades + 1
+        });
+      });
+      const monthlyBreakdown = Array.from(monthlyData.entries())
+        .map(([month, data]) => ({ month, ...data }));
+
+      const reportDataObj = {
+        period: dateStart && dateEnd 
+          ? `${format(dateStart, 'MMM dd, yyyy')} - ${format(dateEnd, 'MMM dd, yyyy')}`
+          : 'All Time',
+        totalTrades: filteredTrades.length,
+        winRate,
+        totalPnL,
+        avgWin,
+        avgLoss,
+        profitFactor,
+        winningTrades: winningTrades.length,
+        losingTrades: losingTrades.length,
+        totalFees,
+        netPnL,
+        bestTrade: { symbol: bestTrade?.symbol || 'N/A', pnl: bestTrade?.pnl || 0 },
+        worstTrade: { symbol: worstTrade?.symbol || 'N/A', pnl: worstTrade?.pnl || 0 },
+        topAssets,
+        monthlyBreakdown,
+      };
+
+      setReportData(reportDataObj);
 
       // Save report to database
       const { data: report, error: reportError } = await supabase
@@ -112,7 +200,7 @@ export function ReportGenerator() {
           report_name: `${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report`,
           report_type: reportType,
           report_format: reportFormat,
-          date_range: { start: startDate?.toISOString(), end: endDate?.toISOString() },
+          date_range: { start: dateStart?.toISOString(), end: dateEnd?.toISOString() },
           sections: sections.filter(s => s.enabled).map(s => s.id),
           metrics: {
             totalPnL,
@@ -130,14 +218,12 @@ export function ReportGenerator() {
 
       if (reportError) throw reportError;
 
+      setShowPreview(true);
       toast({
         title: "Report Generated",
-        description: `Your ${reportType} report has been saved successfully.`,
+        description: `Your ${reportType} report is ready for download.`,
       });
 
-      // In production, you could call an edge function here to generate the actual file
-      // await supabase.functions.invoke('generate-report', { body: { reportId: report.id } });
-      
     } catch (error) {
       console.error("Error generating report:", error);
       toast({
@@ -151,7 +237,8 @@ export function ReportGenerator() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <Card>
         <CardHeader>
           <CardTitle>Report Settings</CardTitle>
@@ -274,16 +361,30 @@ export function ReportGenerator() {
               onClick={generateReport}
               disabled={isGenerating}
             >
-              <Download className="mr-2 h-4 w-4" />
-              {isGenerating ? "Generating..." : "Generate Report"}
-            </Button>
-            <Button variant="outline" disabled={isGenerating}>
-              <Mail className="mr-2 h-4 w-4" />
-              Email
+              {isGenerating ? (
+                <>
+                  <Download className="mr-2 h-4 w-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Eye className="mr-2 h-4 w-4" />
+                  Generate Report
+                </>
+              )}
             </Button>
           </div>
         </CardContent>
       </Card>
+      </div>
+
+      {/* Report Preview */}
+      {showPreview && reportData && (
+        <PDFReportPreview 
+          data={reportData} 
+          isGenerating={isGenerating}
+        />
+      )}
     </div>
   );
 }
