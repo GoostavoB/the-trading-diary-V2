@@ -46,7 +46,85 @@
     "companyPlaceholder": "Tu empresa (opcional)",
     "messagePlaceholder": "Cuéntanos cómo podemos ayudarte...",
     "success": "¡Mensaje enviado correctamente!",
-    "error": "Error al enviar mensaje. Por favor, inténtalo de nuevo."
+    "error": "Error al enviar mensaje. Por favor, inténtalo de nuevo.",
+    "messageSent": "Cliente de correo abierto. Por favor, envía el mensaje.",
+    "orEmail": "O envíanos un correo directamente:"
+  },
+  "premium": {
+    "proFeature": "Función Pro",
+    "eliteFeature": "Función Elite",
+    "upgradeMessage": "Actualiza a {{plan}} para desbloquear esta función",
+    "upgradeCTA": "Actualizar Ahora"
+  },
+  "social": {
+    "shareRewards": "Comparte y Gana Recompensas",
+    "shareDescription": "Comparte The Trading Diary en redes sociales y gana subidas de IA adicionales",
+    "shareText": "¡Estoy usando The Trading Diary para rastrear mis operaciones de cripto con IA! 🚀",
+    "shareOn": "Compartir en {{platform}}",
+    "shareSuccess": "¡Compartido en {{platform}}! Ganaste +{{uploads}} subidas",
+    "shareRewardDescription": "Subidas adicionales añadidas a tu cuenta",
+    "earnedRewards": "Total Ganado",
+    "uploadsEarned": "Subidas de IA ganadas",
+    "shareLimit": "Las recompensas están limitadas a una vez por plataforma"
+  },
+  "referral": {
+    "title": "Refiere Amigos",
+    "description": "Invita amigos y gana subidas adicionales cuando se registren",
+    "rewardAmount": "+20 Subidas por Referido",
+    "rewardDetails": "Tú y tu amigo reciben 20 subidas de IA adicionales cuando cree una cuenta",
+    "yourLink": "Tu Enlace de Referido",
+    "shareButton": "Compartir Enlace",
+    "copied": "¡Enlace copiado!",
+    "copiedDescription": "Enlace de referido copiado al portapapeles",
+    "copyError": "Error al copiar enlace",
+    "shareTitle": "Únete a The Trading Diary",
+    "shareText": "Rastrea tus operaciones de cripto con información de IA",
+    "totalReferrals": "Total de Referidos",
+    "uploadsEarned": "Subidas Ganadas",
+    "terms": "Ambas partes reciben recompensas cuando el usuario referido completa el registro"
+  },
+  "errors": {
+    "title": "Errores de Trading",
+    "description": "Rastrea errores para aprender y mejorar tu disciplina de trading",
+    "addError": "Añadir Error",
+    "errorType": "Tipo de Error",
+    "notes": "Notas",
+    "notesPlaceholder": "¿Qué pasó y qué puedes aprender de esto?",
+    "save": "Guardar Error",
+    "added": "Error registrado correctamente",
+    "removed": "Error eliminado",
+    "selectType": "Por favor selecciona un tipo de error",
+    "noErrors": "No hay errores rastreados para esta operación",
+    "totalErrors": "Total de Errores: {{count}}",
+    "optional": "(opcional)"
+  },
+  "fearGreed": {
+    "title": "Índice de Miedo y Codicia",
+    "description": "Indicador de sentimiento del mercado para cripto",
+    "crypto": "Cripto",
+    "extremeFear": "Miedo Extremo",
+    "neutral": "Neutral",
+    "extremeGreed": "Codicia Extrema",
+    "lastUpdate": "Última actualización",
+    "error": "No se puede cargar el Índice de Miedo y Codicia"
+  },
+  "portfolio": {
+    "snapshots": "Capturas del Portafolio",
+    "snapshotsDescription": "Captura y comparte el rendimiento de tu portafolio",
+    "myPortfolio": "Mi Portafolio",
+    "totalValue": "Valor Total",
+    "totalROI": "ROI Total",
+    "topHoldings": "Principales Holdings",
+    "noData": "No hay datos de portafolio disponibles",
+    "download": "Descargar Captura",
+    "share": "Compartir",
+    "capturing": "Capturando...",
+    "snapshotSuccess": "Captura guardada correctamente",
+    "snapshotError": "Error al capturar instantánea",
+    "shareTitle": "Rendimiento de Mi Portafolio",
+    "shareText": "Echa un vistazo al rendimiento de mi portafolio de trading",
+    "shareNotSupported": "Compartir no es compatible con este navegador",
+    "snapshotNote": "Las capturas ayudan a rastrear el crecimiento de tu portafolio con el tiempo"
   },
   "sidebar": {
     "groups": {
@@ -296,7 +374,11 @@
     "trades": "operaciones",
     "assets": "Activos:",
     "totalPnL": "P&L Total:",
-    "uploaded": "Subido"
+    "uploaded": "Subido",
+    "dragAndDrop": "Arrastra y suelta tu captura aquí",
+    "dropHere": "Suelta aquí para cargar",
+    "orClickToSelect": "o haz clic para seleccionar archivo",
+    "maxSize": "Máx {{size}}MB"
   },
   "tradeForm": {
     "asset": "Activo",

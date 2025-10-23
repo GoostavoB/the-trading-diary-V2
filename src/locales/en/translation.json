@@ -108,6 +108,24 @@
     "lastUpdate": "Last updated",
     "error": "Unable to load Fear & Greed Index"
   },
+  "portfolio": {
+    "snapshots": "Portfolio Snapshots",
+    "snapshotsDescription": "Capture and share your portfolio performance",
+    "myPortfolio": "My Portfolio",
+    "totalValue": "Total Value",
+    "totalROI": "Total ROI",
+    "topHoldings": "Top Holdings",
+    "noData": "No portfolio data available",
+    "download": "Download Snapshot",
+    "share": "Share",
+    "capturing": "Capturing...",
+    "snapshotSuccess": "Snapshot saved successfully",
+    "snapshotError": "Failed to capture snapshot",
+    "shareTitle": "My Portfolio Performance",
+    "shareText": "Check out my trading portfolio performance",
+    "shareNotSupported": "Sharing not supported on this browser",
+    "snapshotNote": "Snapshots help track your portfolio growth over time"
+  },
   "pricing": {
     "title": "Simple, Transparent Pricing",
     "subtitle": "Choose the plan that fits your trading journey",
@@ -565,7 +583,11 @@
     "trades": "trades",
     "assets": "Assets:",
     "totalPnL": "Total P&L:",
-    "uploaded": "Uploaded"
+    "uploaded": "Uploaded",
+    "dragAndDrop": "Drag and drop your screenshot here",
+    "dropHere": "Drop here to upload",
+    "orClickToSelect": "or click to select file",
+    "maxSize": "Max {{size}}MB"
   },
   "tradeForm": {
     "asset": "Asset",

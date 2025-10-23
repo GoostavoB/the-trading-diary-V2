@@ -46,7 +46,85 @@
     "companyPlaceholder": "Sua empresa (opcional)",
     "messagePlaceholder": "Conte-nos como podemos ajudar...",
     "success": "Mensagem enviada com sucesso!",
-    "error": "Falha ao enviar mensagem. Por favor, tente novamente."
+    "error": "Falha ao enviar mensagem. Por favor, tente novamente.",
+    "messageSent": "Cliente de e-mail aberto. Por favor, envie a mensagem.",
+    "orEmail": "Ou envie-nos um e-mail diretamente:"
+  },
+  "premium": {
+    "proFeature": "Recurso Pro",
+    "eliteFeature": "Recurso Elite",
+    "upgradeMessage": "Atualize para {{plan}} para desbloquear este recurso",
+    "upgradeCTA": "Atualizar Agora"
+  },
+  "social": {
+    "shareRewards": "Compartilhe e Ganhe Recompensas",
+    "shareDescription": "Compartilhe The Trading Diary nas redes sociais e ganhe uploads de IA bônus",
+    "shareText": "Estou usando The Trading Diary para rastrear minhas operações de cripto com IA! 🚀",
+    "shareOn": "Compartilhar no {{platform}}",
+    "shareSuccess": "Compartilhado no {{platform}}! Você ganhou +{{uploads}} uploads",
+    "shareRewardDescription": "Uploads bônus adicionados à sua conta",
+    "earnedRewards": "Total Ganho",
+    "uploadsEarned": "Uploads de IA ganhos",
+    "shareLimit": "Recompensas são limitadas a uma vez por plataforma"
+  },
+  "referral": {
+    "title": "Indique Amigos",
+    "description": "Convide amigos e ganhe uploads bônus quando eles se inscreverem",
+    "rewardAmount": "+20 Uploads por Indicação",
+    "rewardDetails": "Você e seu amigo recebem 20 uploads de IA bônus quando ele criar uma conta",
+    "yourLink": "Seu Link de Indicação",
+    "shareButton": "Compartilhar Link",
+    "copied": "Link copiado!",
+    "copiedDescription": "Link de indicação copiado para a área de transferência",
+    "copyError": "Falha ao copiar link",
+    "shareTitle": "Junte-se ao The Trading Diary",
+    "shareText": "Rastreie suas operações de cripto com insights de IA",
+    "totalReferrals": "Total de Indicações",
+    "uploadsEarned": "Uploads Ganhos",
+    "terms": "Ambas as partes recebem recompensas quando o usuário indicado completa o cadastro"
+  },
+  "errors": {
+    "title": "Erros de Trading",
+    "description": "Rastreie erros para aprender e melhorar sua disciplina de trading",
+    "addError": "Adicionar Erro",
+    "errorType": "Tipo de Erro",
+    "notes": "Notas",
+    "notesPlaceholder": "O que aconteceu e o que você pode aprender com isso?",
+    "save": "Salvar Erro",
+    "added": "Erro registrado com sucesso",
+    "removed": "Erro removido",
+    "selectType": "Por favor, selecione um tipo de erro",
+    "noErrors": "Nenhum erro rastreado para esta operação",
+    "totalErrors": "Total de Erros: {{count}}",
+    "optional": "(opcional)"
+  },
+  "fearGreed": {
+    "title": "Índice de Medo e Ganância",
+    "description": "Indicador de sentimento do mercado para cripto",
+    "crypto": "Cripto",
+    "extremeFear": "Medo Extremo",
+    "neutral": "Neutro",
+    "extremeGreed": "Ganância Extrema",
+    "lastUpdate": "Última atualização",
+    "error": "Não foi possível carregar o Índice de Medo e Ganância"
+  },
+  "portfolio": {
+    "snapshots": "Snapshots do Portfólio",
+    "snapshotsDescription": "Capture e compartilhe o desempenho do seu portfólio",
+    "myPortfolio": "Meu Portfólio",
+    "totalValue": "Valor Total",
+    "totalROI": "ROI Total",
+    "topHoldings": "Principais Holdings",
+    "noData": "Nenhum dado de portfólio disponível",
+    "download": "Baixar Snapshot",
+    "share": "Compartilhar",
+    "capturing": "Capturando...",
+    "snapshotSuccess": "Snapshot salvo com sucesso",
+    "snapshotError": "Falha ao capturar snapshot",
+    "shareTitle": "Desempenho do Meu Portfólio",
+    "shareText": "Confira o desempenho do meu portfólio de trading",
+    "shareNotSupported": "Compartilhamento não suportado neste navegador",
+    "snapshotNote": "Snapshots ajudam a rastrear o crescimento do seu portfólio ao longo do tempo"
   },
   "sidebar": {
     "groups": {
