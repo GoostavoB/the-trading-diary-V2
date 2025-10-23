@@ -5,6 +5,7 @@ import { formatCurrency, formatPercent } from '@/utils/formatNumber';
 import { WidgetProps } from '@/types/widget';
 import { WidgetWrapper } from './WidgetWrapper';
 import { useTranslation } from '@/hooks/useTranslation';
+import { BlurredCurrency } from '@/components/ui/BlurredValue';
 
 interface TotalBalanceWidgetProps extends WidgetProps {
   totalBalance: number;
@@ -40,9 +41,9 @@ export const TotalBalanceWidget = memo(({
         </div>
         
         <div className="space-y-2">
-          <p className="text-3xl font-bold tracking-tight">
-            <AnimatedCounter value={totalBalance} prefix="$" />
-          </p>
+          <div className="text-3xl font-bold tracking-tight">
+            <BlurredCurrency amount={totalBalance} />
+          </div>
           
           {(change24h !== 0 || changePercent24h !== 0) && (
             <div className="flex items-center gap-1.5">
@@ -54,7 +55,7 @@ export const TotalBalanceWidget = memo(({
               <span className={`text-sm font-semibold ${
                 isPositive ? 'text-neon-green' : 'text-neon-red'
               }`}>
-                {isPositive ? '+' : ''}{formatCurrency(change24h)} ({formatPercent(changePercent24h)})
+                {isPositive ? '+' : ''}<BlurredCurrency amount={change24h} className="inline" /> ({formatPercent(changePercent24h)})
               </span>
               <span className="text-xs text-muted-foreground">24h</span>
             </div>

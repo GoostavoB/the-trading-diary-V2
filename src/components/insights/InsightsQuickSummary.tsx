@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { ExplainMetricButton } from '@/components/ExplainMetricButton';
 import { useAIAssistant } from '@/contexts/AIAssistantContext';
 import { useTranslation } from '@/hooks/useTranslation';
+import { BlurredCurrency } from '@/components/ui/BlurredValue';
 
 interface InsightsQuickSummaryProps {
   totalPnL: number;
@@ -27,7 +28,8 @@ export const InsightsQuickSummary = memo(({
   const metrics = [
     {
       label: t('dashboard.totalPnL'),
-      value: formatCurrency(totalPnL),
+      value: totalPnL,
+      displayValue: <BlurredCurrency amount={totalPnL} className="inline" />,
       icon: DollarSign,
       color: totalPnL >= 0 ? 'text-profit' : 'text-loss',
       bgColor: totalPnL >= 0 ? 'bg-profit/10' : 'bg-loss/10',
@@ -35,7 +37,8 @@ export const InsightsQuickSummary = memo(({
     },
     {
       label: t('dashboard.winRate'),
-      value: formatPercent(winRate),
+      value: winRate,
+      displayValue: formatPercent(winRate),
       icon: Target,
       color: winRate >= 55 ? 'text-profit' : winRate >= 45 ? 'text-yellow-500' : 'text-loss',
       bgColor: winRate >= 55 ? 'bg-profit/10' : 'bg-yellow-500/10',
@@ -43,7 +46,8 @@ export const InsightsQuickSummary = memo(({
     },
     {
       label: t('dashboard.profitFactor'),
-      value: profitFactor.toFixed(2),
+      value: profitFactor,
+      displayValue: profitFactor.toFixed(2),
       icon: Activity,
       color: profitFactor >= 1.5 ? 'text-profit' : profitFactor >= 1 ? 'text-yellow-500' : 'text-loss',
       bgColor: 'bg-primary/10',
@@ -51,7 +55,8 @@ export const InsightsQuickSummary = memo(({
     },
     {
       label: t('dashboard.avgROI'),
-      value: `${avgROI >= 0 ? '+' : ''}${avgROI.toFixed(2)}%`,
+      value: avgROI,
+      displayValue: `${avgROI >= 0 ? '+' : ''}${avgROI.toFixed(2)}%`,
       icon: TrendingUp,
       color: avgROI >= 0 ? 'text-profit' : 'text-loss',
       bgColor: avgROI >= 0 ? 'bg-profit/10' : 'bg-loss/10',
@@ -59,7 +64,8 @@ export const InsightsQuickSummary = memo(({
     },
     {
       label: t('dashboard.totalTrades'),
-      value: totalTrades.toString(),
+      value: totalTrades,
+      displayValue: totalTrades.toString(),
       icon: Activity,
       color: 'text-muted-foreground',
       bgColor: 'bg-muted/20',
@@ -88,7 +94,7 @@ export const InsightsQuickSummary = memo(({
             </div>
             <div className="flex items-baseline justify-between">
               <span className={cn("text-2xl lg:text-3xl font-bold", metric.color)}>
-                {metric.value}
+                {metric.displayValue}
               </span>
               {metric.trend && (
                 metric.trend === 'up' ? 
@@ -99,7 +105,7 @@ export const InsightsQuickSummary = memo(({
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <ExplainMetricButton
                 metricName={metric.label}
-                metricValue={metric.value}
+                metricValue={typeof metric.value === 'number' && metric.label === t('dashboard.totalPnL') ? formatCurrency(metric.value) : metric.displayValue?.toString() || metric.value.toString()}
                 onExplain={openWithPrompt}
                 className="h-6 w-6"
               />

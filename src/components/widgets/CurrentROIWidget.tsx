@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
+import { BlurredCurrency } from '@/components/ui/BlurredValue';
 
 interface CurrentROIWidgetProps {
   id: string;
@@ -99,7 +100,9 @@ export const CurrentROIWidget = memo(({
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">{t('widgets.initialCapital')}</span>
             <div className="flex items-center gap-2">
-              <span className="font-medium">{formatCurrency(initialInvestment)}</span>
+              <span className="font-medium">
+                <BlurredCurrency amount={initialInvestment} className="inline" />
+              </span>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
@@ -136,7 +139,7 @@ export const CurrentROIWidget = memo(({
                         }}
                       />
                       <p className="text-xs text-muted-foreground">
-                        {t('widgets.currentBalance')}: {formatCurrency(currentBalance)}
+                        {t('widgets.currentBalance')}: <BlurredCurrency amount={currentBalance} className="inline" />
                       </p>
                       <p className="text-xs text-muted-foreground mt-2">
                         💡 Tip: Use Capital Management in Settings → Trading to track capital additions over time for accurate ROI calculation.
@@ -161,7 +164,9 @@ export const CurrentROIWidget = memo(({
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">{t('widgets.currentCapital')}</span>
-            <span className="font-medium">{formatCurrency(currentBalance)}</span>
+            <span className="font-medium">
+              <BlurredCurrency amount={currentBalance} className="inline" />
+            </span>
           </div>
           <p className="text-[10px] text-muted-foreground/70 mt-2">
             ROI calculation includes all capital additions tracked in Capital Management

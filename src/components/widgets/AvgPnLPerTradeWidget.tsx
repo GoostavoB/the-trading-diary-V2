@@ -4,6 +4,7 @@ import { AnimatedCounter } from '@/components/AnimatedCounter';
 import { formatCurrency } from '@/utils/formatNumber';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { BlurredCurrency } from '@/components/ui/BlurredValue';
 
 interface AvgPnLPerTradeWidgetProps {
   id: string;
@@ -30,11 +31,10 @@ export const AvgPnLPerTradeWidget = memo(({
     >
       <div className="space-y-3">
         <div className="flex items-baseline gap-2">
-          <AnimatedCounter
-            value={Math.abs(avgPnLPerTrade)}
-            className={`text-3xl font-bold ${isPositive ? 'text-profit' : 'text-loss'}`}
-            prefix={isPositive ? '$' : '-$'}
-          />
+          <div className={`text-3xl font-bold ${isPositive ? 'text-profit' : 'text-loss'}`}>
+            {isPositive ? '' : '-'}
+            <BlurredCurrency amount={Math.abs(avgPnLPerTrade)} className="inline" />
+          </div>
           {isPositive ? (
             <TrendingUp className="h-5 w-5 text-profit" />
           ) : (

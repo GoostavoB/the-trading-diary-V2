@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { formatCurrency } from '@/utils/formatNumber';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { BlurredCurrency } from '@/components/ui/BlurredValue';
 
 interface CapitalGrowthWidgetProps {
   id: string;
@@ -42,11 +43,15 @@ export const CapitalGrowthWidget = memo(({
         <div className="grid grid-cols-3 gap-4">
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground">{t('widgets.initial')}</p>
-            <p className="text-sm font-semibold">{formatCurrency(totalCapitalInvested)}</p>
+            <p className="text-sm font-semibold">
+              <BlurredCurrency amount={totalCapitalInvested} className="inline" />
+            </p>
           </div>
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground">{t('widgets.current')}</p>
-            <p className="text-sm font-semibold">{formatCurrency(currentBalance)}</p>
+            <p className="text-sm font-semibold">
+              <BlurredCurrency amount={currentBalance} className="inline" />
+            </p>
           </div>
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground">{t('widgets.growth')}</p>

@@ -9,6 +9,7 @@ import { useAIAssistant } from '@/contexts/AIAssistantContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { findBestWorstDays, getTopAssets } from '@/utils/insightCalculations';
 import { cn } from '@/lib/utils';
+import { BlurredCurrency } from '@/components/ui/BlurredValue';
 
 interface PerformanceHighlightsProps {
   trades: Trade[];
@@ -69,7 +70,7 @@ export const PerformanceHighlights = memo(({
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">{t('insights.pnl')}</span>
                 <span className="text-sm font-bold text-profit">
-                  {formatCurrency(bestTrade.pnl || 0)}
+                  <BlurredCurrency amount={bestTrade.pnl || 0} className="inline" />
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -91,7 +92,7 @@ export const PerformanceHighlights = memo(({
                 </div>
               </div>
               <p className="text-2xl font-bold text-profit">
-                {formatCurrency(bestDay.totalPnL)}
+                <BlurredCurrency amount={bestDay.totalPnL} className="inline" />
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 {new Date(bestDay.date).toLocaleDateString()} • {bestDay.tradeCount} {t('insights.trades')}
@@ -113,7 +114,7 @@ export const PerformanceHighlights = memo(({
                       <span className="text-sm font-medium">{asset.symbol}</span>
                     </div>
                     <span className="text-sm text-profit font-bold">
-                      {formatCurrency(asset.avgPnL)}
+                      <BlurredCurrency amount={asset.avgPnL} className="inline" />
                     </span>
                   </div>
                 ))}
@@ -176,7 +177,7 @@ export const PerformanceHighlights = memo(({
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">{t('insights.pnl')}</span>
                 <span className="text-sm font-bold text-loss">
-                  {formatCurrency(worstTrade.pnl || 0)}
+                  <BlurredCurrency amount={worstTrade.pnl || 0} className="inline" />
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -198,7 +199,7 @@ export const PerformanceHighlights = memo(({
                 </div>
               </div>
               <p className="text-2xl font-bold text-loss">
-                {formatCurrency(worstDay.totalPnL)}
+                <BlurredCurrency amount={worstDay.totalPnL} className="inline" />
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 {new Date(worstDay.date).toLocaleDateString()} • {worstDay.tradeCount} {t('insights.trades')}
@@ -220,7 +221,7 @@ export const PerformanceHighlights = memo(({
                       <span className="text-sm font-medium">{asset.symbol}</span>
                     </div>
                     <span className="text-sm text-loss font-bold">
-                      {formatCurrency(asset.avgPnL)}
+                      <BlurredCurrency amount={asset.avgPnL} className="inline" />
                     </span>
                   </div>
                 ))}

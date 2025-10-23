@@ -4,6 +4,7 @@ import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'rec
 import { formatCurrency } from '@/utils/formatNumber';
 import { WidgetProps } from '@/types/widget';
 import { WidgetWrapper } from './WidgetWrapper';
+import { BlurredCurrency } from '@/components/ui/BlurredValue';
 
 interface PortfolioOverviewWidgetProps extends WidgetProps {
   data: Array<{ date: string; value: number }>;
@@ -28,7 +29,9 @@ export const PortfolioOverviewWidget = memo(({
     >
       <div className="space-y-4">
         <div>
-          <p className="text-3xl font-bold">{formatCurrency(totalValue)}</p>
+          <p className="text-3xl font-bold">
+            <BlurredCurrency amount={totalValue} className="inline" />
+          </p>
           <p className="text-sm text-muted-foreground mt-1">Total Portfolio Value</p>
         </div>
 

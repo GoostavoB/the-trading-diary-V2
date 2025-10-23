@@ -6,6 +6,7 @@ import { formatCurrency, formatPercent } from '@/utils/formatNumber';
 import { WidgetProps } from '@/types/widget';
 import { WidgetWrapper } from './WidgetWrapper';
 import { useTranslation } from '@/hooks/useTranslation';
+import { BlurredCurrency } from '@/components/ui/BlurredValue';
 
 interface SpotWalletWidgetProps extends WidgetProps {
   totalValue: number;
@@ -51,7 +52,9 @@ export const SpotWalletWidget = memo(({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-2xl font-bold">{formatCurrency(totalValue)}</p>
+            <p className="text-2xl font-bold">
+              <BlurredCurrency amount={totalValue} className="inline" />
+            </p>
             <p className="text-sm text-muted-foreground mt-1">{tokenCount} {t('widgets.tokens')}</p>
           </div>
           <Wallet className="h-8 w-8 text-primary/60" />
@@ -66,7 +69,7 @@ export const SpotWalletWidget = memo(({
           <span className={`text-sm font-semibold ${
             isPositive ? 'text-neon-green' : 'text-neon-red'
           }`}>
-            {isPositive ? '+' : ''}{formatCurrency(change24h)} ({formatPercent(changePercent24h)})
+            {isPositive ? '+' : ''}<BlurredCurrency amount={change24h} className="inline" /> ({formatPercent(changePercent24h)})
           </span>
           <span className="text-xs text-muted-foreground">24h</span>
         </div>
