@@ -437,61 +437,59 @@ const PricingPage = () => {
             ))}
           </div>
 
-          {/* Enterprise Section */}
+          {/* Coming Soon Section - Enterprise & Mobile Apps */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
             viewport={{ once: true }}
-            className="relative"
+            className="relative mt-12"
           >
             <GlassCard className="p-8 md:p-12 text-center">
-              <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-gradient-to-r from-accent via-primary to-accent bg-size-200 animate-gradient mb-6 shadow-lg shadow-accent/20">
+              <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-gradient-to-r from-accent via-primary to-accent bg-size-200 animate-gradient mb-8 shadow-lg shadow-accent/20">
                 <span className="text-sm font-bold text-white uppercase tracking-wider">Coming Soon</span>
               </div>
-              <h3 className="text-3xl md:text-4xl font-bold mb-4">Enterprise</h3>
-              <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-                Team collaboration, powerful reports & white label solutions for professional trading teams
-              </p>
-              <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
-                <span>• Team Collaboration Tools</span>
-                <span>• Advanced Reporting</span>
-                <span>• White Label Solution</span>
-                <span>• Priority Support</span>
-                <span>• Custom Integrations</span>
+              
+              {/* Enterprise */}
+              <div className="mb-12">
+                <h3 className="text-3xl md:text-4xl font-bold mb-4">Enterprise</h3>
+                <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
+                  Team collaboration, powerful reports & white label solutions for professional trading teams
+                </p>
+                <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
+                  <span>• Team Collaboration Tools</span>
+                  <span>• Advanced Reporting</span>
+                  <span>• White Label Solution</span>
+                  <span>• Priority Support</span>
+                  <span>• Custom Integrations</span>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="h-px w-full max-w-2xl mx-auto bg-gradient-to-r from-transparent via-primary/30 to-transparent mb-12" />
+
+              {/* Mobile Apps */}
+              <div>
+                <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                  iOS & Android Apps
+                </h3>
+                <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+                  Native mobile apps are in development. Soon you'll be able to take your trading diary with you, track trades, analyze performance, and stay on top of your game from anywhere.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <img 
+                    src={appStoreSoon} 
+                    alt="Coming soon to the App Store" 
+                    className="h-14 hover:opacity-80 transition-opacity"
+                  />
+                  <img 
+                    src={googlePlaySoon} 
+                    alt="Coming soon to Google Play" 
+                    className="h-14 hover:opacity-80 transition-opacity"
+                  />
+                </div>
               </div>
             </GlassCard>
-          </motion.div>
-
-          {/* Mobile Apps Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="text-center mt-12"
-          >
-            <div className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-primary/10 border border-primary/20 mb-4">
-              <span className="text-lg font-bold text-primary uppercase tracking-wider">Coming Soon</span>
-            </div>
-            <h3 className="text-2xl md:text-3xl font-bold mb-4">
-              iOS & Android Apps
-            </h3>
-            <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-              Native mobile apps are in development. Soon you'll be able to take your trading diary with you, track trades, analyze performance, and stay on top of your game from anywhere.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <img 
-                src={appStoreSoon} 
-                alt="Coming soon to the App Store" 
-                className="h-14 hover:opacity-80 transition-opacity"
-              />
-              <img 
-                src={googlePlaySoon} 
-                alt="Coming soon to Google Play" 
-                className="h-14 hover:opacity-80 transition-opacity"
-              />
-            </div>
           </motion.div>
         </div>
       </section>
