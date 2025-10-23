@@ -21,7 +21,9 @@
     "updated": "تم التحديث",
     "error": "خطأ",
     "success": "تم بنجاح",
-    "noData": "لا توجد بيانات"
+    "noData": "لا توجد بيانات",
+    "inDevelopment": "قيد التطوير",
+    "comingSoon": "قريباً"
   },
   "sidebar": {
     "groups": {

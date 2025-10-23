@@ -9,6 +9,8 @@
     "loading": "Cargando",
     "error": "Error",
     "success": "Éxito",
+    "inDevelopment": "En Desarrollo",
+    "comingSoon": "Próximamente",
     "confirm": "Confirmar",
     "close": "Cerrar",
     "back": "Atrás",

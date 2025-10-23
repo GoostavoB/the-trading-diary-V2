@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useNotifications } from "@/hooks/useNotifications";
+import { DevelopmentBadge } from "@/components/DevelopmentBadge";
 import { Calendar, TrendingUp, TrendingDown, Clock, Bell, BellOff } from "lucide-react";
 import { formatInTimeZone } from "date-fns-tz";
 import { supabase } from "@/integrations/supabase/client";
@@ -179,6 +180,7 @@ const EconomicCalendar = () => {
             <div className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
               <CardTitle>United States Economic Events</CardTitle>
+              <DevelopmentBadge />
             </div>
             <CardDescription>
               High-impact economic events from the United States

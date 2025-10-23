@@ -9,6 +9,8 @@
     "loading": "Loading",
     "error": "Error",
     "success": "Success",
+    "inDevelopment": "In Development",
+    "comingSoon": "Coming Soon",
     "confirm": "Confirm",
     "close": "Close",
     "back": "Back",
