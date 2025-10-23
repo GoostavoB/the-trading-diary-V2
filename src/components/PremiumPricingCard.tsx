@@ -81,7 +81,7 @@ export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPric
           <h3 className="text-2xl font-bold mb-2 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
             {plan.comingSoon ? plan.nameKey : t(plan.nameKey)}
           </h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground/70 leading-relaxed">
             {plan.comingSoon ? plan.descriptionKey : t(plan.descriptionKey)}
           </p>
         </div>
@@ -103,7 +103,7 @@ export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPric
                 >
                   ${getDisplayPrice()}
                 </motion.span>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-muted-foreground dark:text-muted-foreground/70">
                   /{billingCycle === 'monthly' ? t('pricing.perMonth') : t('pricing.perMonthBilledAnnually')}
                 </span>
               </div>

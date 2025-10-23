@@ -419,7 +419,7 @@ const PricingPage = () => {
               whileInView={{ opacity: 1 }}
               transition={{ duration: 0.28, delay: 0.27 }}
               viewport={{ once: true }}
-              className="text-sm text-muted-foreground"
+              className="text-sm text-muted-foreground dark:text-muted-foreground/70"
             >
               {t('pricing.guaranteeNote')}
             </motion.p>

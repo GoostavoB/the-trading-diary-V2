@@ -88,7 +88,7 @@ export const OutcomeCard = ({
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ duration: 0.3, delay: index * 0.12 + 0.3 }}
-              className="text-sm text-foreground/60 leading-relaxed"
+              className="text-sm text-foreground/60 dark:text-foreground/70 leading-relaxed"
             >
               {subhead}
             </motion.p>
