@@ -458,8 +458,8 @@ const PricingPage = () => {
             viewport={{ once: true }}
             className="text-center mt-20"
           >
-            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
-              <span className="text-sm font-bold text-primary uppercase tracking-wider">Coming Soon</span>
+            <div className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-primary/10 border border-primary/20 mb-4">
+              <span className="text-lg font-bold text-primary uppercase tracking-wider">Coming Soon</span>
             </div>
             <h3 className="text-2xl md:text-3xl font-bold mb-4">
               iOS & Android Apps
