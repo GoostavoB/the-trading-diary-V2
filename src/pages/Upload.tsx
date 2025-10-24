@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
 import { toast } from 'sonner';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Upload as UploadIcon, X, Sparkles, Check, ChevronsUpDown, Plus, Trash2, MapPin } from 'lucide-react';
+import { Upload as UploadIcon, X, Sparkles, Check, ChevronsUpDown, Plus, Trash2, MapPin, ThumbsUp, ThumbsDown, Images } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from "@/lib/utils";
@@ -24,6 +24,8 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ImageAnnotator, Annotation } from '@/components/upload/ImageAnnotator';
 import { BrokerSelect } from '@/components/upload/BrokerSelect';
 import { EnhancedFileUpload } from '@/components/upload/EnhancedFileUpload';
+import { MultiImageUpload } from '@/components/upload/MultiImageUpload';
+import { AIFeedback } from '@/components/upload/AIFeedback';
 import { runOCR, type OCRResult } from '@/utils/ocrPipeline';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { pageMeta } from '@/utils/seoHelpers';
@@ -851,13 +853,37 @@ const Upload = () => {
         </div>
 
         <Tabs defaultValue="ai-extract" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="ai-extract">
               <Sparkles className="w-4 h-4 mr-2" />
-              AI Extract from Image
+              AI Extract
+            </TabsTrigger>
+            <TabsTrigger value="batch-upload">
+              <Images className="w-4 h-4 mr-2" />
+              Batch Upload
             </TabsTrigger>
             <TabsTrigger value="manual">Manual Entry</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="batch-upload" className="space-y-6">
+            <Card className="p-6 glass">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold">Multi-Image Batch Upload</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Upload up to 3 trade screenshots at once. AI will detect and extract all trades from each image.
+                  </p>
+                </div>
+                
+                <MultiImageUpload 
+                  onTradesExtracted={(trades) => {
+                    setExtractedTrades(trades);
+                    toast.success(`Extracted ${trades.length} trades from batch upload`);
+                  }} 
+                />
+              </div>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="ai-extract" className="space-y-6">
             <Card className="p-6 glass">
@@ -1305,6 +1331,14 @@ const Upload = () => {
                         );
                       })}
                     </div>
+
+                    {/* AI Feedback for extraction quality */}
+                    {extractedTrades.length > 0 && extractionPreview && (
+                      <AIFeedback 
+                        extractedData={extractedTrades}
+                        imagePath={extractionPreview}
+                      />
+                    )}
                   </div>
                 )}
 

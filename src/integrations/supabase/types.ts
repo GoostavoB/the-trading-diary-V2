@@ -160,6 +160,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_extraction_feedback: {
+        Row: {
+          created_at: string
+          extracted_data: Json
+          feedback_text: string | null
+          feedback_type: string
+          id: string
+          image_path: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          extracted_data: Json
+          feedback_text?: string | null
+          feedback_type: string
+          id?: string
+          image_path: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          extracted_data?: Json
+          feedback_text?: string | null
+          feedback_type?: string
+          id?: string
+          image_path?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_image_cache: {
         Row: {
           created_at: string | null
