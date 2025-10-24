@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { useHreflang } from "@/hooks/useHreflang";
-import { SUPPORTED_LANGUAGES } from "@/utils/languageRouting";
+import { SUPPORTED_LANGUAGES, SupportedLanguage } from "@/utils/languageRouting";
 import { motion } from "framer-motion";
 import PricingComparison from "@/components/PricingComparison";
 import { WideOutcomeCard } from "@/components/premium/WideOutcomeCard";
@@ -35,7 +35,7 @@ const PricingPage = () => {
   useEffect(() => {
     const pathLang = window.location.pathname.split('/')[1];
     if (['pt', 'es', 'ar', 'vi'].includes(pathLang)) {
-      changeLanguage(pathLang);
+      changeLanguage(pathLang as SupportedLanguage);
     }
   }, [changeLanguage]);
 

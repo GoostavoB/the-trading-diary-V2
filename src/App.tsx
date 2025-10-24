@@ -10,6 +10,7 @@ import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { BlurProvider } from "@/contexts/BlurContext";
 import { CalmModeProvider } from "@/contexts/CalmModeContext";
 import { DateRangeProvider } from "@/contexts/DateRangeContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "next-themes";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -228,27 +229,29 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <ThemeInitializer />
-            <AuthProvider>
-              <SubscriptionProvider>
-              <CalmModeProvider>
-                <CurrencyProvider>
-                  <BlurProvider>
-                    <AIAssistantProvider>
-                      <DateRangeProvider>
-                        <AppRoutes />
-                        <ConversionTracking />
-                        <PerformanceMonitor />
-                        <GlobalSearch />
-                        <OfflineIndicator />
-                        <InstallPrompt />
-                      </DateRangeProvider>
-                    </AIAssistantProvider>
-                  </BlurProvider>
-                </CurrencyProvider>
-              </CalmModeProvider>
-              </SubscriptionProvider>
-            </AuthProvider>
+            <LanguageProvider>
+              <ThemeInitializer />
+              <AuthProvider>
+                <SubscriptionProvider>
+                <CalmModeProvider>
+                  <CurrencyProvider>
+                    <BlurProvider>
+                      <AIAssistantProvider>
+                        <DateRangeProvider>
+                          <AppRoutes />
+                          <ConversionTracking />
+                          <PerformanceMonitor />
+                          <GlobalSearch />
+                          <OfflineIndicator />
+                          <InstallPrompt />
+                        </DateRangeProvider>
+                      </AIAssistantProvider>
+                    </BlurProvider>
+                  </CurrencyProvider>
+                </CalmModeProvider>
+                </SubscriptionProvider>
+              </AuthProvider>
+            </LanguageProvider>
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>

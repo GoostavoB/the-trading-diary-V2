@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Globe } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { SupportedLanguage } from "@/utils/languageRouting";
 
 const languages = [
   { code: "en", name: "English", flag: "🇬🇧" },
@@ -23,7 +24,7 @@ export const LanguageSelector = () => {
   const location = useLocation();
 
   const handleLanguageChange = (langCode: string) => {
-    changeLanguage(langCode);
+    changeLanguage(langCode as SupportedLanguage);
     
     // Get current path without existing language prefix
     const currentPath = location.pathname;

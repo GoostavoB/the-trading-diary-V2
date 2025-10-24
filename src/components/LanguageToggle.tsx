@@ -9,6 +9,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate, useLocation } from "react-router-dom";
+import { SupportedLanguage } from "@/utils/languageRouting";
 
 const languages = [
   { code: 'pt', name: 'Português', flag: '🇧🇷' },
@@ -26,7 +27,7 @@ export const LanguageToggle = () => {
   const currentLanguage = languages.find(lang => lang.code === language) || languages[0];
 
   const changeLanguage = (langCode: string) => {
-    i18nChangeLanguage(langCode);
+    i18nChangeLanguage(langCode as SupportedLanguage);
     localStorage.setItem('app-language', langCode);
     
     // Get current path without existing language prefix

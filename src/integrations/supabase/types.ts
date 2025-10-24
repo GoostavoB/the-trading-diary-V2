@@ -3227,6 +3227,7 @@ export type Database = {
           guided_tour_completed: boolean | null
           id: string
           initial_investment: number | null
+          language: string | null
           last_seen_updates_version: number | null
           layout_json: Json | null
           monthly_report: boolean | null
@@ -3252,6 +3253,7 @@ export type Database = {
           guided_tour_completed?: boolean | null
           id?: string
           initial_investment?: number | null
+          language?: string | null
           last_seen_updates_version?: number | null
           layout_json?: Json | null
           monthly_report?: boolean | null
@@ -3277,6 +3279,7 @@ export type Database = {
           guided_tour_completed?: boolean | null
           id?: string
           initial_investment?: number | null
+          language?: string | null
           last_seen_updates_version?: number | null
           layout_json?: Json | null
           monthly_report?: boolean | null

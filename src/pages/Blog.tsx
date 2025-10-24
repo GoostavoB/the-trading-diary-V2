@@ -35,7 +35,7 @@ const Blog = () => {
   // Update language if needed
   useEffect(() => {
     if (lang && lang !== language) {
-      changeLanguage(lang);
+      changeLanguage(lang as SupportedLanguage);
     }
   }, [lang, language, changeLanguage]);
   

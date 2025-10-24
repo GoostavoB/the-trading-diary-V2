@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useHreflang } from '@/hooks/useHreflang';
-import { SUPPORTED_LANGUAGES } from '@/utils/languageRouting';
+import { SUPPORTED_LANGUAGES, SupportedLanguage } from '@/utils/languageRouting';
 import { Target, Users, TrendingUp, Shield } from 'lucide-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +22,7 @@ const About = () => {
   useEffect(() => {
     const pathLang = window.location.pathname.split('/')[1];
     if (['pt', 'es', 'ar', 'vi'].includes(pathLang)) {
-      changeLanguage(pathLang);
+      changeLanguage(pathLang as SupportedLanguage);
     }
   }, [changeLanguage]);
   

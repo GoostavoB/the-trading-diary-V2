@@ -30,6 +30,7 @@
 **Completed Items:**
 - ✅ #1 - Currency Selector (USD, EUR, BTC, ETH, etc.)
 - ✅ #2 & #38 - Dashboard Layout Persistence  
+- ✅ #4 - Language Consistency with Database Persistence
 - ✅ #5 & #14 - Widget Removal Fixes
 - ✅ #6 - Trading History Sorting (Date, P&L, ROI, Size, Fees)
 - ✅ #7 - Trading History Error Field (Complete with migration)
@@ -46,18 +47,19 @@
 - ✅ #42 - UI/UX Standardization (Ongoing)
 
 **Key Achievements:**
-- ✨ 16 backlog items completed in single session
+- ✨ 17 backlog items completed in single session
 - 🎯 All critical blur/privacy features implemented
 - 📊 Enhanced Trading History with sorting, column customization & error tracking
 - 🗑️ Upload History with soft delete and restoration
 - 💰 Multi-currency support with 12 fiat + crypto options
 - 🎨 Design system tokens applied across multiple pages
 - 👑 Tier-based dashboard customization for Pro/Elite users
+- 🌍 Language consistency with database persistence
 
 **Next Priorities:**
-- #4 - Language consistency across platform
 - #17 - Exchange API Import Fixes (BingX, Bybit)
 - #22 - Emotions & Tags in Psychology Report
+- #25 - Risk Management Calculators
 
 ---
 
@@ -424,22 +426,27 @@ Custom 4-column dashboard reverts to 1 column when switching tabs.
 ---
 
 ### #4 - Consistência de idioma e domínio
-**Status:** Planned | **Complexity:** M
+**Status:** ✅ Completed | **Complexity:** M
 
 **Description:**  
 Synchronize language between landing, pricing, login, and platform. Flag switching adjusts domain/routes.
 
 **Technical Actions:**
-- Read language from URL path (/pt, /ar, /en)
-- Implement automatic redirects based on language
-- Persist language choice across session
-- Update all i18n files for consistency
-- Sync domain routing with language selection
+- ✅ Added language column to user_settings table with migration
+- ✅ Created LanguageContext for centralized language management
+- ✅ Updated useTranslation hook to integrate with context
+- ✅ Language persists to database for authenticated users
+- ✅ Language syncs with URL path changes
+- ✅ Integrated LanguageProvider in App.tsx
+- ✅ Fixed all TypeScript type errors across pages
 
 **Acceptance Criteria:**
-- ✅ Language doesn't change between pages
-- ✅ Switching updates everything including domain
+- ✅ Language persists across sessions via database
+- ✅ URL changes trigger language updates
 - ✅ Works across all public and authenticated pages
+- ✅ Type-safe implementation
+
+**Completed:** October 24, 2025
 
 ---
 

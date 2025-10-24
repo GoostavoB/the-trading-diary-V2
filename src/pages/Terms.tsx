@@ -3,7 +3,7 @@ import AppLayout from '@/components/layout/AppLayout';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useEffect } from 'react';
 import { useHreflang } from '@/hooks/useHreflang';
-import { SUPPORTED_LANGUAGES } from '@/utils/languageRouting';
+import { SUPPORTED_LANGUAGES, SupportedLanguage } from '@/utils/languageRouting';
 
 export default function Terms() {
   const { t, changeLanguage } = useTranslation();
@@ -18,7 +18,7 @@ export default function Terms() {
   useEffect(() => {
     const pathLang = window.location.pathname.split('/')[1];
     if (['pt', 'es', 'ar', 'vi'].includes(pathLang)) {
-      changeLanguage(pathLang);
+      changeLanguage(pathLang as SupportedLanguage);
     }
   }, [changeLanguage]);
   return (
