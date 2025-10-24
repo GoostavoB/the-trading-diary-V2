@@ -34,11 +34,6 @@
     "settings": "Cài đặt"
   },
   "landing": {
-    "hero": {
-      "title": "Giao dịch với sự rõ ràng.",
-      "subtitle": "Nhật ký giao dịch được hỗ trợ bởi AI cho nhà đầu tư tiền điện tử. Ghi lại mọi giao dịch, tìm kiếm mẫu và theo dõi lợi thế của bạn.",
-      "cta": "Bắt Đầu Dùng Thử Miễn Phí"
-    },
     "stats": {
       "fasterUploads": {
         "title": "Nhanh Hơn 40 Lần",

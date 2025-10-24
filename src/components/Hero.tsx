@@ -9,8 +9,12 @@ const Hero = () => {
   const { t, i18n, ready } = useTranslation();
 
   // Ensure i18n is initialized and translations are loaded
-  if (!i18n.isInitialized || !ready) {
-    return null;
+  if (!i18n.isInitialized || !ready || !i18n.exists('landing.hero.titleShort')) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      </div>
+    );
   }
 
   return (
@@ -54,12 +58,16 @@ const Hero = () => {
             className="flex flex-col items-center gap-2 text-base md:text-lg text-muted-foreground"
             role="list"
           >
-            {(t('landing.hero.benefits', { returnObjects: true }) as string[]).map((benefit: string, index: number) => (
-              <li key={index} className="flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-primary" aria-hidden="true" />
-                {benefit}
-              </li>
-            ))}
+            {(() => {
+              const benefits = t('landing.hero.benefits', { returnObjects: true });
+              const benefitArray = Array.isArray(benefits) ? benefits : [];
+              return benefitArray.map((benefit: string, index: number) => (
+                <li key={index} className="flex items-center gap-2">
+                  <span className="w-1 h-1 rounded-full bg-primary" aria-hidden="true" />
+                  {benefit}
+                </li>
+              ));
+            })()}
           </motion.ul>
 
           {/* Primary CTA */}
