@@ -32,7 +32,7 @@ const MaxDrawdownCardComponent = ({ value, percentage, className }: MaxDrawdownC
           <div className="flex items-center gap-2">
             <ExplainMetricButton 
               metricName="Max Drawdown"
-              metricValue={formatAmount(convertAmount(value))}
+              metricValue={formatAmount(value)}
               context={`Percentage of peak: ${formatPercent(percentage)}`}
               onExplain={openWithPrompt}
             />
@@ -45,7 +45,7 @@ const MaxDrawdownCardComponent = ({ value, percentage, className }: MaxDrawdownC
         <div className="space-y-2">
           <p 
             className="text-3xl font-bold tracking-tight text-secondary"
-            aria-label={`Max drawdown value: ${formatAmount(convertAmount(value))}`}
+            aria-label={`Max drawdown value: ${formatAmount(value)}`}
           >
             <BlurredCurrency amount={value} />
           </p>

@@ -56,7 +56,7 @@ const TopMoversCardComponent = ({ trades, className }: TopMoversCardProps) => {
           <ExplainMetricButton 
             metricName="Top Movers"
             metricValue={`${topMovers.length} assets`}
-            context={topMovers.length > 0 ? `Biggest mover: ${topMovers[0].symbol} at ${formatAmount(convertAmount(topMovers[0].pnl))}` : ''}
+            context={topMovers.length > 0 ? `Biggest mover: ${topMovers[0].symbol} at ${formatAmount(topMovers[0].pnl)}` : ''}
             onExplain={openWithPrompt}
           />
         </div>
@@ -70,7 +70,7 @@ const TopMoversCardComponent = ({ trades, className }: TopMoversCardProps) => {
                   key={asset.symbol} 
                   className="flex items-center justify-between gap-3 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
                   role="listitem"
-                  aria-label={`${asset.symbol}: ${formatAmount(convertAmount(asset.pnl))}, ${isPositive ? 'up' : 'down'} ${formatPercent(Math.abs(asset.change))}`}
+                  aria-label={`${asset.symbol}: ${formatAmount(asset.pnl)}, ${isPositive ? 'up' : 'down'} ${formatPercent(Math.abs(asset.change))}`}
                 >
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <div 

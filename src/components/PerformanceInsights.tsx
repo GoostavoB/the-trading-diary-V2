@@ -105,14 +105,14 @@ export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) =
       type: 'success',
       icon: TrendingUp,
       title: 'Profitable Overall',
-      message: `Total P&L of ${formatAmount(convertAmount(totalPnl))}. Stay consistent with your winning strategy.`
+      message: `Total P&L of ${formatAmount(totalPnl)}. Stay consistent with your winning strategy.`
     });
   } else if (totalPnl < 0) {
     insights.push({
       type: 'danger',
       icon: TrendingDown,
       title: 'Drawdown Alert',
-      message: `Down ${formatAmount(convertAmount(Math.abs(totalPnl)))}. Take a break, review your trades, and refocus.`
+      message: `Down ${formatAmount(Math.abs(totalPnl))}. Take a break, review your trades, and refocus.`
     });
   }
 
@@ -192,7 +192,7 @@ export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) =
             </div>
             <ExplainMetricButton
               metricName="Best Trade"
-              metricValue={formatAmount(convertAmount(bestTrade.pnl || 0))}
+              metricValue={formatAmount(bestTrade.pnl || 0)}
               context={`${bestTrade.symbol} with ${formatPercent(bestTrade.roi || 0)} ROI`}
               onExplain={openWithPrompt}
             />
@@ -225,7 +225,7 @@ export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) =
             </div>
             <ExplainMetricButton
               metricName="Worst Trade"
-              metricValue={formatAmount(convertAmount(worstTrade.pnl || 0))}
+              metricValue={formatAmount(worstTrade.pnl || 0)}
               context={`${worstTrade.symbol} with ${formatPercent(worstTrade.roi || 0)} ROI`}
               onExplain={openWithPrompt}
             />

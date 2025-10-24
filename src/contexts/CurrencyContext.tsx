@@ -134,6 +134,16 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  /**
+   * Convert an amount from one currency to another
+   * @param amount - The amount to convert (in the source currency)
+   * @param fromCurrency - The source currency code (defaults to 'USD')
+   * @returns The converted amount in the currently selected currency
+   * 
+   * @example
+   * // If current currency is BRL and rate is 5.38
+   * convertAmount(100) // Returns 538 (100 USD → 538 BRL)
+   */
   const convertAmount = (amount: number, fromCurrency: string = 'USD'): number => {
     // If amount is already in target currency, return as is
     if (fromCurrency === currency.code) {
@@ -148,6 +158,22 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
     return amountInUSD * currency.rate;
   };
 
+  /**
+   * Format an amount with currency symbol
+   * ⚠️ IMPORTANT: This function internally calls convertAmount()
+   * Do NOT call convertAmount() before this function, or the value will be converted twice!
+   * 
+   * @param amount - The amount in USD (will be converted automatically)
+   * @param options - Optional Intl.NumberFormat options
+   * @returns Formatted string with currency symbol
+   * 
+   * @example
+   * // ✅ CORRECT - formatAmount handles conversion
+   * formatAmount(2047) // "$2,047.00" (USD) or "R$11,013.00" (BRL)
+   * 
+   * // ❌ WRONG - double conversion!
+   * formatAmount(convertAmount(2047)) // Will convert twice!
+   */
   const formatAmount = (amount: number, options?: Intl.NumberFormatOptions): string => {
     const convertedAmount = convertAmount(amount);
     const sign = convertedAmount < 0 ? '-' : '';

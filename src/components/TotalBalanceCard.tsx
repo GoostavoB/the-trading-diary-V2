@@ -61,8 +61,8 @@ export const TotalBalanceCard = memo(({
           <div className="flex items-center gap-2">
             <ExplainMetricButton 
               metricName="Total Balance"
-              metricValue={formatAmount(convertAmount(balance))}
-              context={`Current change: ${formatAmount(convertAmount(change))} (${changePercent.toFixed(1)}%)`}
+              metricValue={formatAmount(balance)}
+              context={`Current change: ${formatAmount(change)} (${changePercent.toFixed(1)}%)`}
               onExplain={openWithPrompt}
             />
             <div 
@@ -87,7 +87,7 @@ export const TotalBalanceCard = memo(({
         <div className="space-y-1">
           <div 
             className="text-4xl font-bold tracking-tight"
-            aria-label={`Current balance: ${formatAmount(convertAmount(balance))}`}
+            aria-label={`Current balance: ${formatAmount(balance)}`}
           >
             <AnimatedCounter value={convertAmount(balance)} prefix={currency.symbol} decimals={2} />
           </div>
