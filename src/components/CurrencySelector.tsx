@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCurrency, SUPPORTED_CURRENCIES } from '@/contexts/CurrencyContext';
+import { CurrencyUpdateIndicator } from './CurrencyUpdateIndicator';
 
 export function CurrencySelector() {
   const { currency, setCurrency } = useCurrency();
@@ -23,7 +24,12 @@ export function CurrencySelector() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
-        <DropdownMenuLabel>Display Currency</DropdownMenuLabel>
+        <DropdownMenuLabel className="flex items-center justify-between">
+          <span>Display Currency</span>
+        </DropdownMenuLabel>
+        <div className="px-2 pb-2">
+          <CurrencyUpdateIndicator />
+        </div>
         <DropdownMenuSeparator />
         
         <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">

@@ -953,6 +953,24 @@ export type Database = {
           },
         ]
       }
+      exchange_rates_cache: {
+        Row: {
+          id: string
+          rates: Json
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          rates: Json
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          rates?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       exchange_sync_history: {
         Row: {
           completed_at: string | null

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
+import { useExchangeRates } from '@/hooks/useExchangeRates';
 
 interface Currency {
   code: string;
@@ -9,26 +10,50 @@ interface Currency {
   rate: number;
 }
 
-export const SUPPORTED_CURRENCIES: Currency[] = [
-  { code: 'USD', symbol: '$', name: 'US Dollar', rate: 1.00 },
-  { code: 'EUR', symbol: '€', name: 'Euro', rate: 0.92 },
-  { code: 'GBP', symbol: '£', name: 'British Pound', rate: 0.79 },
-  { code: 'JPY', symbol: '¥', name: 'Japanese Yen', rate: 149.50 },
-  { code: 'AUD', symbol: 'A$', name: 'Australian Dollar', rate: 1.53 },
-  { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar', rate: 1.36 },
-  { code: 'CHF', symbol: 'CHF', name: 'Swiss Franc', rate: 0.88 },
-  { code: 'CNY', symbol: '¥', name: 'Chinese Yuan', rate: 7.24 },
-  { code: 'BRL', symbol: 'R$', name: 'Brazilian Real', rate: 4.98 },
-  { code: 'INR', symbol: '₹', name: 'Indian Rupee', rate: 83.25 },
-  { code: 'BTC', symbol: '₿', name: 'Bitcoin', rate: 0.000023 },
-  { code: 'ETH', symbol: 'Ξ', name: 'Ethereum', rate: 0.00031 },
+// Base currency definitions (rates will be updated from API)
+const BASE_CURRENCIES: Omit<Currency, 'rate'>[] = [
+  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'EUR', symbol: '€', name: 'Euro' },
+  { code: 'GBP', symbol: '£', name: 'British Pound' },
+  { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+  { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
+  { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' },
+  { code: 'CHF', symbol: 'CHF', name: 'Swiss Franc' },
+  { code: 'CNY', symbol: '¥', name: 'Chinese Yuan' },
+  { code: 'BRL', symbol: 'R$', name: 'Brazilian Real' },
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+  { code: 'BTC', symbol: '₿', name: 'Bitcoin' },
+  { code: 'ETH', symbol: 'Ξ', name: 'Ethereum' },
 ];
+
+// Default fallback rates (used only if API fails)
+const FALLBACK_RATES: Record<string, number> = {
+  USD: 1.00,
+  EUR: 0.92,
+  GBP: 0.79,
+  JPY: 149.50,
+  AUD: 1.53,
+  CAD: 1.36,
+  CHF: 0.88,
+  CNY: 7.24,
+  BRL: 4.98,
+  INR: 83.25,
+  BTC: 0.000023,
+  ETH: 0.00031,
+};
+
+export let SUPPORTED_CURRENCIES: Currency[] = BASE_CURRENCIES.map(c => ({
+  ...c,
+  rate: FALLBACK_RATES[c.code],
+}));
 
 interface CurrencyContextType {
   currency: Currency;
   setCurrency: (currency: Currency) => void;
   convertAmount: (amount: number, fromCurrency?: string) => number;
   formatAmount: (amount: number, options?: Intl.NumberFormatOptions) => string;
+  lastUpdate: string | null;
+  isLoading: boolean;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
@@ -36,6 +61,38 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const [currency, setCurrencyState] = useState<Currency>(SUPPORTED_CURRENCIES[0]); // Default to USD
+  const { data: exchangeRates, isLoading } = useExchangeRates();
+
+  // Update SUPPORTED_CURRENCIES with real rates when available
+  useEffect(() => {
+    if (exchangeRates) {
+      console.log('Updating currency rates with real data');
+      
+      const updatedCurrencies = BASE_CURRENCIES.map(c => {
+        let rate = FALLBACK_RATES[c.code];
+
+        if (c.code === 'BTC' && exchangeRates.crypto.bitcoin) {
+          rate = 1 / exchangeRates.crypto.bitcoin.usd;
+        } else if (c.code === 'ETH' && exchangeRates.crypto.ethereum) {
+          rate = 1 / exchangeRates.crypto.ethereum.usd;
+        } else if (c.code === 'USD') {
+          rate = 1.00;
+        } else if (exchangeRates.fiat[c.code]) {
+          rate = exchangeRates.fiat[c.code];
+        }
+
+        return { ...c, rate };
+      });
+
+      SUPPORTED_CURRENCIES = updatedCurrencies;
+
+      // Update current currency with new rate
+      const updatedCurrency = updatedCurrencies.find(c => c.code === currency.code);
+      if (updatedCurrency) {
+        setCurrencyState(updatedCurrency);
+      }
+    }
+  }, [exchangeRates]);
 
   useEffect(() => {
     if (user) {
@@ -116,7 +173,14 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <CurrencyContext.Provider value={{ currency, setCurrency, convertAmount, formatAmount }}>
+    <CurrencyContext.Provider value={{ 
+      currency, 
+      setCurrency, 
+      convertAmount, 
+      formatAmount,
+      lastUpdate: exchangeRates?.timestamp || null,
+      isLoading,
+    }}>
       {children}
     </CurrencyContext.Provider>
   );
