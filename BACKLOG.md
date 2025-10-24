@@ -47,21 +47,23 @@
 - ✅ #24 - Trade Analysis Module Hidden
 - ✅ #25 - Risk Management Calculators (Stop Loss, Leverage, Drawdown redesign)
 - ✅ #27 - Daily Lesson Learned Popup (Press-and-hold)
+- ✅ #29 - Forecast Visual Refinement
 - ✅ #30 - Economic Calendar & Performance Alerts Hidden
 - ✅ #31 - Goals System (Schema + UI fixes)
 - ✅ #33 - Reports System (Backend + UI)
+- ✅ #36 - Progress IXP Hidden
 - ✅ #37 - AI Parsing Enhancement (Infrastructure)
 - ✅ #39 - Risk Metrics Validation & Documentation
 - ✅ #40 - Learn More Contextual Links (User Guide Performance Metrics)
 - ✅ #42 - UI/UX Standardization (Ongoing)
 
 **Key Achievements:**
-- ✨ 30 backlog items completed (71% done)
+- ✨ 32 backlog items completed (76% done)
 - 🎯 All critical blur/privacy features implemented
 - 📊 Enhanced Trading History with sorting, column customization & error tracking
 - 🗑️ Upload History with soft delete and restoration
 - 💰 Multi-currency support with 12 fiat + crypto options + real-time exchange rates
-- 🎨 Design system tokens applied across multiple pages
+- 🎨 Design system tokens applied across multiple pages (Forecast, Risk, Goals, Reports)
 - 👑 Tier-based dashboard customization for Pro/Elite users
 - 🌍 Language consistency with database persistence
 - 🧮 Complete Risk Management suite with calculators and documentation
@@ -73,6 +75,8 @@
 - 📅 Economic Calendar & Performance Alerts hidden for phase 2
 - 🌙 Dark mode fixes for Exchange Connections
 - 🏦 Trading Accounts module hidden for redesign
+- 📈 Forecast page visual refinement with design tokens
+- ⚡ Progress IXP hidden pending visual redesign
 
 **Next Priorities:**
 - #28 - Long/Short Ratio Alerts (Pro/Elite)
@@ -1084,21 +1088,32 @@ In "New Trading Journal", Tags include Setups, Emotions, Errors, and custom tags
 ---
 
 ### #29 - Forecast (Analytics): refino visual
-**Status:** Planned | **Complexity:** S
+**Status:** ✅ Completed | **Complexity:** S
 
 **Description:**  
 Keep calculations. Improve typography, colors, spacing, and responsiveness.
 
 **Technical Actions:**
-- Improve visual hierarchy
-- Ensure 4.5:1 contrast
-- Add tooltips
-- Modernize sliders
-- Test Dark/Light modes
+- ✅ Replaced hardcoded colors (text-neon-green/red) with semantic tokens (text-success/destructive)
+- ✅ Improved typography hierarchy (larger headings, better line heights)
+- ✅ Enhanced spacing and padding throughout
+- ✅ Improved card styling with glass-card and better borders
+- ✅ Added icon containers with backgrounds
+- ✅ Better responsive breakpoints (sm:, md:)
+- ✅ Enhanced contrast for readability
+- ✅ Modernized disclaimer card with warning styling
+- ✅ Improved loading state with spinner
+- ✅ Better visual hierarchy with section spacing
 
 **Acceptance Criteria:**
 - ✅ Premium visual and responsive
 - ✅ Same metrics maintained
+- ✅ All colors use design system tokens
+- ✅ Improved contrast (4.5:1 minimum)
+- ✅ Modern sliders and switches
+- ✅ Dark/Light modes tested
+
+**Completed:** October 25, 2025
 
 ---
 
@@ -1163,20 +1178,24 @@ Leave Social and Leaderboard as disabled "Zoom". Keep Achievements and X sharing
 ---
 
 ### #36 - Progress IXP: colocar como 'Zoom' e ocultar
-**Status:** Planned | **Complexity:** S
+**Status:** ✅ Completed | **Complexity:** S
 
 **Description:**  
 Make IXP progress as non-clickable zoom. Move visual development to backlog.
 
 **Technical Actions:**
-- Hide interactions
-- Add "Zoom" disabled tag
-- Register redesign task
+- ✅ Commented out route in App.tsx
+- ✅ Sidebar navigation already hidden
+- ✅ Added clear "Phase 2" comments
+- ✅ Preserved all component code for future redesign
 
 **Acceptance Criteria:**
 - ✅ Nothing clickable
 - ✅ No errors
 - ✅ Item listed in future backlog
+- ✅ Code preserved for visual redesign
+
+**Completed:** October 25, 2025
 
 ---
 

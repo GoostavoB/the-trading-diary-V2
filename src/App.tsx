@@ -71,7 +71,8 @@ const TaxReports = lazy(() => import("./pages/TaxReports"));
 // Phase 2: Trading Accounts module - temporarily disabled for backlog #18 (incomplete form)
 // const Accounts = lazy(() => import("./pages/Accounts"));
 const PerformanceAlerts = lazy(() => import("./pages/PerformanceAlerts"));
-const ProgressAnalytics = lazy(() => import("./pages/ProgressAnalytics"));
+// Phase 2: Progress Analytics (IXP/XP) - temporarily disabled for backlog #36 (visual redesign pending)
+// const ProgressAnalytics = lazy(() => import("./pages/ProgressAnalytics"));
 const MyMetrics = lazy(() => import("./pages/MyMetrics"));
 const UserGuide = lazy(() => import("./pages/UserGuide"));
 const Contact = lazy(() => import("./pages/Contact"));
@@ -205,7 +206,8 @@ const AppRoutes = () => {
         {/* <Route path="/accounts" element={<ProtectedRoute><Accounts /></ProtectedRoute>} /> */}
         {/* <Route path="/performance-alerts" element={<ProtectedRoute><PerformanceAlerts /></ProtectedRoute>} /> */}
         <Route path="/exchange-connections" element={<ProtectedRoute><ExchangeConnections /></ProtectedRoute>} />
-        <Route path="/progress-analytics" element={<ProtectedRoute><ProgressAnalytics /></ProtectedRoute>} />
+        {/* Phase 2: Progress Analytics (IXP/XP) - temporarily disabled for backlog #36 */}
+        {/* <Route path="/progress-analytics" element={<ProtectedRoute><ProgressAnalytics /></ProtectedRoute>} /> */}
         <Route path="/my-metrics" element={<ProtectedRoute><MyMetrics /></ProtectedRoute>} />
         <Route path="/user-guide" element={<ProtectedRoute><UserGuide /></ProtectedRoute>} />
         <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
