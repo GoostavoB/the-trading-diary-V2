@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { useNavigate, useLocation } from 'react-router-dom';
 import i18n from '@/i18n';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { AuthContext } from '@/contexts/AuthContext';
 import { 
   SUPPORTED_LANGUAGES, 
   SupportedLanguage, 
@@ -20,7 +20,8 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const authContext = useContext(AuthContext);
+  const user = authContext?.user ?? null;
   const navigate = useNavigate();
   const location = useLocation();
   const [language, setLanguage] = useState<SupportedLanguage>(() => {
