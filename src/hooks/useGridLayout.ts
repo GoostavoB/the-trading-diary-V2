@@ -159,17 +159,16 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
   }, [positions, saveLayout]);
 
   const removeWidget = useCallback(async (widgetId: string) => {
+    console.log('Removing widget:', widgetId);
+    
     // Optimistically update UI immediately
     const newPositions = positions.filter(p => p.id !== widgetId);
+    
+    // Update state first for immediate UI feedback
     setPositions(newPositions);
     
     // Save to backend
     await saveLayout(newPositions);
-    
-    // Force re-render by triggering a small delay
-    setTimeout(() => {
-      setPositions([...newPositions]);
-    }, 50);
     
     toast.success('Widget removed');
   }, [positions, saveLayout]);

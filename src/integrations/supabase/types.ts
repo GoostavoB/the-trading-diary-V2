@@ -484,6 +484,30 @@ export type Database = {
         }
         Relationships: []
       }
+      currency_rates: {
+        Row: {
+          base_currency: string
+          id: string
+          rate: number
+          target_currency: string
+          updated_at: string
+        }
+        Insert: {
+          base_currency: string
+          id?: string
+          rate: number
+          target_currency: string
+          updated_at?: string
+        }
+        Update: {
+          base_currency?: string
+          id?: string
+          rate?: number
+          target_currency?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       custom_dashboard_widgets: {
         Row: {
           created_at: string
@@ -3189,7 +3213,9 @@ export type Database = {
           accent_color: string | null
           blur_enabled: boolean | null
           created_at: string | null
+          crypto_display_mode: boolean | null
           currency: string | null
+          display_currency: string | null
           email_notifications: boolean | null
           event_reminders: boolean | null
           guided_tour_completed: boolean | null
@@ -3212,7 +3238,9 @@ export type Database = {
           accent_color?: string | null
           blur_enabled?: boolean | null
           created_at?: string | null
+          crypto_display_mode?: boolean | null
           currency?: string | null
+          display_currency?: string | null
           email_notifications?: boolean | null
           event_reminders?: boolean | null
           guided_tour_completed?: boolean | null
@@ -3235,7 +3263,9 @@ export type Database = {
           accent_color?: string | null
           blur_enabled?: boolean | null
           created_at?: string | null
+          crypto_display_mode?: boolean | null
           currency?: string | null
+          display_currency?: string | null
           email_notifications?: boolean | null
           event_reminders?: boolean | null
           guided_tour_completed?: boolean | null

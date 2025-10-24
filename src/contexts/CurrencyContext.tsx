@@ -1,16 +1,16 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuth } from './AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './AuthContext';
 
-export interface Currency {
+interface Currency {
   code: string;
   symbol: string;
   name: string;
-  rate: number; // Conversion rate from USD
+  rate: number;
 }
 
 export const SUPPORTED_CURRENCIES: Currency[] = [
-  { code: 'USD', symbol: '$', name: 'US Dollar', rate: 1 },
+  { code: 'USD', symbol: '$', name: 'US Dollar', rate: 1.00 },
   { code: 'EUR', symbol: '€', name: 'Euro', rate: 0.92 },
   { code: 'GBP', symbol: '£', name: 'British Pound', rate: 0.79 },
   { code: 'JPY', symbol: '¥', name: 'Japanese Yen', rate: 149.50 },
@@ -20,6 +20,8 @@ export const SUPPORTED_CURRENCIES: Currency[] = [
   { code: 'CNY', symbol: '¥', name: 'Chinese Yuan', rate: 7.24 },
   { code: 'BRL', symbol: 'R$', name: 'Brazilian Real', rate: 4.98 },
   { code: 'INR', symbol: '₹', name: 'Indian Rupee', rate: 83.25 },
+  { code: 'BTC', symbol: '₿', name: 'Bitcoin', rate: 0.000023 },
+  { code: 'ETH', symbol: 'Ξ', name: 'Ethereum', rate: 0.00031 },
 ];
 
 interface CurrencyContextType {
@@ -43,73 +45,68 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
 
   const loadUserCurrency = async () => {
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('user_settings')
-        .select('currency')
-        .eq('user_id', user?.id)
-        .maybeSingle();
+        .select('display_currency')
+        .eq('user_id', user!.id)
+        .single();
 
-      if (error) {
-        console.error('Error loading currency:', error);
-        return;
-      }
-
-      if (data?.currency) {
-        const userCurrency = SUPPORTED_CURRENCIES.find(c => c.code === data.currency);
-        if (userCurrency) {
-          setCurrencyState(userCurrency);
+      if (data?.display_currency) {
+        const savedCurrency = SUPPORTED_CURRENCIES.find(c => c.code === data.display_currency);
+        if (savedCurrency) {
+          setCurrencyState(savedCurrency);
         }
       }
     } catch (error) {
-      console.error('Error loading currency:', error);
+      console.error('Error loading currency preference:', error);
     }
   };
 
   const setCurrency = async (newCurrency: Currency) => {
     setCurrencyState(newCurrency);
-
+    
     if (user) {
       try {
-        const { error } = await supabase
+        await supabase
           .from('user_settings')
-          .update({ currency: newCurrency.code })
+          .update({ display_currency: newCurrency.code })
           .eq('user_id', user.id);
-
-        if (error) {
-          console.error('Error saving currency:', error);
-        }
       } catch (error) {
-        console.error('Error saving currency:', error);
+        console.error('Error saving currency preference:', error);
       }
     }
   };
 
   const convertAmount = (amount: number, fromCurrency: string = 'USD'): number => {
-    if (!amount || isNaN(amount)) return 0;
-    
-    // Convert to USD first if needed
-    const fromRate = SUPPORTED_CURRENCIES.find(c => c.code === fromCurrency)?.rate || 1;
-    const amountInUSD = amount / fromRate;
-    
-    // Then convert to target currency
+    // If amount is already in target currency, return as is
+    if (fromCurrency === currency.code) {
+      return amount;
+    }
+
+    // Convert from source currency to USD first (if needed)
+    const sourceCurrency = SUPPORTED_CURRENCIES.find(c => c.code === fromCurrency);
+    const amountInUSD = sourceCurrency ? amount / sourceCurrency.rate : amount;
+
+    // Then convert from USD to target currency
     return amountInUSD * currency.rate;
   };
 
   const formatAmount = (amount: number, options?: Intl.NumberFormatOptions): string => {
-    if (amount === null || amount === undefined || isNaN(amount)) return `${currency.symbol}0`;
-    
-    const absValue = Math.abs(amount);
-    const sign = amount < 0 ? '-' : '';
-    
-    // Format large numbers with K, M, B suffixes
-    if (absValue >= 1_000_000_000) {
-      return `${sign}${currency.symbol}${(absValue / 1_000_000_000).toFixed(absValue >= 10_000_000_000 ? 0 : 1)}B`;
+    const convertedAmount = convertAmount(amount);
+    const sign = convertedAmount < 0 ? '-' : '';
+    const absValue = Math.abs(convertedAmount);
+
+    // Crypto currencies need more decimal places
+    if (currency.code === 'BTC' || currency.code === 'ETH') {
+      return `${sign}${currency.symbol}${absValue.toFixed(8)}`;
     }
-    if (absValue >= 1_000_000) {
-      return `${sign}${currency.symbol}${(absValue / 1_000_000).toFixed(absValue >= 10_000_000 ? 0 : 1)}M`;
+
+    // Large amounts - no decimals
+    if (absValue >= 1000000) {
+      return `${sign}${currency.symbol}${(absValue / 1000000).toFixed(2)}M`;
     }
-    if (absValue >= 1_000) {
-      return `${sign}${currency.symbol}${(absValue / 1_000).toFixed(absValue >= 10_000 ? 0 : 1)}K`;
+    if (absValue >= 10000) {
+      return `${sign}${currency.symbol}${(absValue / 1000).toFixed(1)}K`;
     }
     if (absValue >= 100) {
       return `${sign}${currency.symbol}${absValue.toFixed(0)}`;

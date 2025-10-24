@@ -341,7 +341,7 @@ Increase consistency and perceived quality across entire platform.
 ## 🟠 HIGH PRIORITY (20 items)
 
 ### #1 - Selector de moeda + BTC/ETH
-**Status:** Planned | **Complexity:** L
+**Status:** ✅ Completed | **Complexity:** L
 
 **Description:**  
 Allow user to choose display currency (BRL, USD, EUR, etc.) and also view values in BTC/ETH across entire platform.
@@ -359,6 +359,9 @@ Allow user to choose display currency (BRL, USD, EUR, etc.) and also view values
 - ✅ Preference persists after logout/login
 - ✅ Accurate conversion rates
 - ✅ BTC/ETH display toggle works
+- ✅ Integrated in app header (desktop & mobile)
+
+**Completed:** October 24, 2025
 
 ---
 
@@ -403,7 +406,7 @@ Synchronize language between landing, pricing, login, and platform. Flag switchi
 ---
 
 ### #5 - Remoção de widget no Dashboard (botão interno)
-**Status:** Planned | **Complexity:** S
+**Status:** ✅ Completed | **Complexity:** S
 
 **Problem:**  
 "Widget Removed" message appears but widget remains visible.
@@ -503,7 +506,7 @@ Global blur toggle in top menu (next to "Hello, ...") that applies platform-wide
 ---
 
 ### #14 - Fix remover widgets via 'Customizar Página'
-**Status:** Planned | **Complexity:** S
+**Status:** ✅ Completed | **Complexity:** S
 
 **Problem:**  
 Widget removal via customization modal doesn't update grid.

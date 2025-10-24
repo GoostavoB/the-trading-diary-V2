@@ -13,6 +13,7 @@ import { QuickAddTrade } from '@/components/mobile/QuickAddTrade';
 import { InstallPrompt } from '@/components/mobile/InstallPrompt';
 import { GuidedTour } from '@/components/tour/GuidedTour';
 import { UpdatesModal } from '@/components/tour/UpdatesModal';
+import { CurrencySelector } from '@/components/CurrencySelector';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -47,6 +48,7 @@ const AppLayout = ({ children, isGamificationOpen, onGamificationToggle }: AppLa
 
             {/* Right: Icon Buttons */}
             <div className="flex items-center gap-2">
+              <CurrencySelector />
               <KeyboardShortcutsHelp />
               <LanguageToggle />
               <div data-tour="theme-toggle">
@@ -63,7 +65,8 @@ const AppLayout = ({ children, isGamificationOpen, onGamificationToggle }: AppLa
             <div className="flex items-center gap-2">
               <SidebarTrigger className="hover:bg-muted/50 rounded-lg p-2 transition-colors" />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <CurrencySelector />
               <KeyboardShortcutsHelp />
               <LanguageToggle />
               <ThemeStudio />
