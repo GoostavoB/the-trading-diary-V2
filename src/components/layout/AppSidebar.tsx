@@ -70,7 +70,8 @@ export function AppSidebar() {
       items: [
         { title: t('navigation.spotWallet'), url: '/spot-wallet', icon: Wallet, iconName: 'Wallet', keywords: ['wallet', 'balance', 'tokens', 'holdings', 'assets', 'portfolio', 'allocation', 'distribution', 'coins', 'cryptocurrencies', 'btc', 'eth', 'total', 'value', 'net worth', 'funds', 'money', 'cash', 'crypto'] },
         { title: t('navigation.exchanges'), url: '/exchanges', icon: RefreshCw, iconName: 'RefreshCw', keywords: ['binance', 'bybit', 'okx', 'api', 'connect', 'sync', 'integration', 'platform', 'broker', 'exchange', 'connection', 'link', 'import', 'automated', 'real-time', 'live'] },
-        { title: t('navigation.tradingAccounts'), url: '/accounts', icon: PieChart, iconName: 'PieChart', keywords: ['accounts', 'bank', 'capital', 'balance', 'funds', 'money', 'deposits', 'withdrawals', 'transactions', 'history', 'management', 'initial', 'current', 'wallets', 'manage', 'profiles', 'multiple', 'organize'] },
+        // Phase 2: Trading Accounts - temporarily disabled for backlog #18
+        // { title: t('navigation.tradingAccounts'), url: '/accounts', icon: PieChart, iconName: 'PieChart', keywords: ['accounts', 'bank', 'capital', 'balance', 'funds', 'money', 'deposits', 'withdrawals', 'transactions', 'history', 'management', 'initial', 'current', 'wallets', 'manage', 'profiles', 'multiple', 'organize'] },
       ],
     },
     {
@@ -93,8 +94,9 @@ export function AppSidebar() {
       items: [
         { title: t('navigation.marketData'), url: '/market-data', icon: LineChart, iconName: 'LineChart', keywords: ['market', 'prices', 'crypto', 'live', 'real-time', 'ticker', 'movers', 'gainers', 'losers', 'volume', '24h', 'change', 'top', 'coins', 'charts', 'data', 'volatility', 'btc', 'eth', 'trends'] },
         { title: t('navigation.forecast'), url: '/forecast', icon: Target, iconName: 'Target', keywords: ['forecast', 'prediction', 'future', 'projection', 'goals', 'targets', 'scenarios', 'simulation', 'planning', 'estimates', 'ai', 'predictions', 'what-if', 'models', 'signals', 'estimate', 'predict'] },
-        { title: t('navigation.economicCalendar'), url: '/economic-calendar', icon: Calendar, iconName: 'Calendar', keywords: ['calendar', 'events', 'news', 'macro', 'economy', 'schedule', 'announcements', 'fed', 'inflation', 'cpi', 'fomc', 'rate', 'decisions', 'economic', 'data', 'releases'] },
-        { title: t('navigation.performanceAlerts'), url: '/performance-alerts', icon: Bell, iconName: 'Bell', keywords: ['alerts', 'notifications', 'warnings', 'triggers', 'monitoring', 'notify', 'remind', 'alarm', 'watchlist', 'threshold', 'conditions', 'automated', 'email', 'push'] },
+        // Phase 2: Economic Calendar and Performance Alerts - temporarily disabled for backlog #30
+        // { title: t('navigation.economicCalendar'), url: '/economic-calendar', icon: Calendar, iconName: 'Calendar', keywords: ['calendar', 'events', 'news', 'macro', 'economy', 'schedule', 'announcements', 'fed', 'inflation', 'cpi', 'fomc', 'rate', 'decisions', 'economic', 'data', 'releases'] },
+        // { title: t('navigation.performanceAlerts'), url: '/performance-alerts', icon: Bell, iconName: 'Bell', keywords: ['alerts', 'notifications', 'warnings', 'triggers', 'monitoring', 'notify', 'remind', 'alarm', 'watchlist', 'threshold', 'conditions', 'automated', 'email', 'push'] },
       ],
     },
     {

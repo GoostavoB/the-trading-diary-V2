@@ -285,11 +285,11 @@ export default function ExchangeConnections() {
           const isSyncing = connection?.sync_status === 'syncing';
 
           return (
-            <Card key={exchange.id} className="glass relative">
+            <Card key={exchange.id} className="glass-card border-border/50">
               <CardHeader>
                   <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-background/50 dark:bg-gray-200 border border-primary/10">
+                    <div className="p-2 rounded-lg bg-muted/30 border border-border/30">
                       <div style={{ transform: `scale(${exchange.sizeScale})` }}>
                         <ExchangeLogo
                           exchangeId={exchange.id}

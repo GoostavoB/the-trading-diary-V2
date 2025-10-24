@@ -1,6 +1,6 @@
 # The Trading Diary - Product Backlog
 
-**Last Updated:** October 23, 2025  
+**Last Updated:** October 25, 2025  
 **Total Items:** 42  
 **Status:** Active Development
 
@@ -25,7 +25,7 @@
 
 ---
 
-## 🎉 RECENT PROGRESS (October 24, 2025)
+## 🎉 RECENT PROGRESS (October 25, 2025)
 
 **Completed Items:**
 - ✅ #1 - Currency Selector (USD, EUR, BTC, ETH, etc.)
@@ -40,11 +40,14 @@
 - ✅ #11 - SpotWallet Auto-price + Remove Quick Select
 - ✅ #12 & #13 - Global Blur Toggle System
 - ✅ #15 - Single Day Timeframe Selection
+- ✅ #16 - Dark mode em Portfolio > Exchanges
+- ✅ #18 - Trading Account Module Hidden
 - ✅ #19 - Upload UX Premium (Batch upload)
 - ✅ #20 - Deleted History with 48h Restoration
 - ✅ #24 - Trade Analysis Module Hidden
 - ✅ #25 - Risk Management Calculators (Stop Loss, Leverage, Drawdown redesign)
 - ✅ #27 - Daily Lesson Learned Popup (Press-and-hold)
+- ✅ #30 - Economic Calendar & Performance Alerts Hidden
 - ✅ #31 - Goals System (Schema + UI fixes)
 - ✅ #33 - Reports System (Backend + UI)
 - ✅ #37 - AI Parsing Enhancement (Infrastructure)
@@ -53,7 +56,7 @@
 - ✅ #42 - UI/UX Standardization (Ongoing)
 
 **Key Achievements:**
-- ✨ 23 backlog items completed
+- ✨ 30 backlog items completed (71% done)
 - 🎯 All critical blur/privacy features implemented
 - 📊 Enhanced Trading History with sorting, column customization & error tracking
 - 🗑️ Upload History with soft delete and restoration
@@ -67,6 +70,9 @@
 - 🔗 Learn More links integrated across risk metrics
 - 💎 SpotWallet auto-fills token data with live CoinGecko prices
 - 🎮 Gamification UI hidden (badges preserved) - cleaner UX
+- 📅 Economic Calendar & Performance Alerts hidden for phase 2
+- 🌙 Dark mode fixes for Exchange Connections
+- 🏦 Trading Accounts module hidden for redesign
 
 **Next Priorities:**
 - #28 - Long/Short Ratio Alerts (Pro/Elite)
@@ -977,40 +983,47 @@ When typing symbol (e.g., ADA), auto-fill Token Name, current Purchase Price via
 ---
 
 ### #16 - Dark mode em Portfolio > Exchanges
-**Status:** Planned | **Complexity:** S
+**Status:** ✅ Completed | **Complexity:** S
 
 **Problem:**  
 Exchange cards are white in Dark mode. Logos lose readability.
 
 **Technical Actions:**
-- Change background to gray (#2A-#3A range)
-- Add subtle border
-- Test dark logos for legibility
-- Ensure responsive
-- Keep Light mode white
+- ✅ Changed card background to use glass-card with proper border
+- ✅ Fixed logo container background (bg-muted/30 instead of bg-gray-200)
+- ✅ Added proper border styling (border-border/30)
+- ✅ Maintained light mode appearance
+- ✅ Tested responsiveness
 
 **Acceptance Criteria:**
 - ✅ Consistent visual in Dark mode
 - ✅ Logos are legible
 - ✅ Light mode unchanged
+- ✅ Proper contrast maintained
+
+**Completed:** October 25, 2025
 
 ---
 
 ### #18 - Remover módulo 'Trading Account' (fase 1)
-**Status:** Planned | **Complexity:** S
+**Status:** ✅ Completed | **Complexity:** S
 
 **Problem:**  
 Incomplete form. "Create Account" button does nothing.
 
 **Technical Actions:**
-- Remove from frontend
-- Keep backend/schemas inactive
-- Create task for future redesign
+- ✅ Commented out route in App.tsx
+- ✅ Commented out sidebar navigation item
+- ✅ Preserved backend/schemas for future redesign
+- ✅ Added clear comments for re-enablement
 
 **Acceptance Criteria:**
 - ✅ No menu/form visible
 - ✅ No errors
 - ✅ Roadmap updated
+- ✅ Code preserved for phase 2
+
+**Completed:** October 25, 2025
 
 ---
 
@@ -1090,20 +1103,24 @@ Keep calculations. Improve typography, colors, spacing, and responsiveness.
 ---
 
 ### #30 - Remover 'Economic Calendar' e 'Performance Alert' (Analytics)
-**Status:** Planned | **Complexity:** S
+**Status:** ✅ Completed | **Complexity:** S
 
 **Description:**  
 Hide modules and keep in backlog for phase 2.
 
 **Technical Actions:**
-- Remove components
-- Preserve code
-- Update routes/history
+- ✅ Commented out routes in App.tsx
+- ✅ Commented out sidebar navigation items
+- ✅ Preserved all component code for phase 2
+- ✅ Added clear comments for re-enablement
 
 **Acceptance Criteria:**
-- ✅ Not visible in UI
+- ✅ Not visible in UI (sidebar and routes disabled)
 - ✅ No errors
 - ✅ Backlog updated
+- ✅ Code preserved for future activation
+
+**Completed:** October 25, 2025
 
 ---
 
