@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BookOpen, Calendar, Tag, TrendingUp } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { SkipToContent } from "@/components/SkipToContent";
 
 export default function Journal() {
   const { user } = useAuth();
@@ -45,11 +46,12 @@ export default function Journal() {
 
   return (
     <AppLayout>
-      <div className="container mx-auto p-6 max-w-7xl">
-        <div className="flex items-center justify-between mb-6">
+      <SkipToContent />
+      <main id="main-content" className="container mx-auto p-6 max-w-7xl">
+        <header className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <BookOpen className="h-8 w-8" />
+            <h1 className="text-3xl font-bold flex items-center gap-2" id="journal-heading">
+              <BookOpen className="h-8 w-8" aria-hidden="true" />
               Trading Journal
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -61,17 +63,18 @@ export default function Journal() {
               setShowNewEntry(true);
               setSelectedEntry(null);
             }}
+            aria-label="Create new journal entry"
           >
             New Entry
           </Button>
-        </div>
+        </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Journal Entries List */}
-          <div className="lg:col-span-1">
+          <section className="lg:col-span-1" aria-labelledby="recent-entries-heading">
             <Card className="p-4">
-              <h3 className="font-semibold mb-4">Recent Entries</h3>
-              <div className="space-y-2 max-h-[600px] overflow-y-auto">
+              <h2 id="recent-entries-heading" className="font-semibold mb-4">Recent Entries</h2>
+              <div className="space-y-2 max-h-[600px] overflow-y-auto" role="list">
                 {journalEntries?.map((entry) => (
                   <Card
                     key={entry.id}
@@ -124,17 +127,17 @@ export default function Journal() {
                 ))}
                 {!journalEntries || journalEntries.length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">
-                    <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-20" />
+                    <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-20" aria-hidden="true" />
                     <p className="text-sm">No journal entries yet</p>
                     <p className="text-xs mt-1">Start documenting your trading journey</p>
                   </div>
                 )}
               </div>
             </Card>
-          </div>
+          </section>
 
           {/* Journal Entry Editor/Viewer */}
-          <div className="lg:col-span-2">
+          <section className="lg:col-span-2" aria-labelledby="journal-entry-heading">
             {showNewEntry || !selectedEntry ? (
               <RichTradingJournal
                 existingEntry={selectedEntry}
@@ -148,19 +151,21 @@ export default function Journal() {
                 <div className="flex items-start justify-between mb-6">
                   <div>
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-3xl">{getMoodEmoji(selectedEntry.mood)}</span>
+                      <span className="text-3xl" role="img" aria-label={`Mood: ${selectedEntry.mood}`}>{getMoodEmoji(selectedEntry.mood)}</span>
                       <div>
-                        <h2 className="text-2xl font-bold">{selectedEntry.title}</h2>
+                        <h2 id="journal-entry-heading" className="text-2xl font-bold">{selectedEntry.title}</h2>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="h-4 w-4" />
-                          {format(new Date(selectedEntry.created_at), 'MMMM dd, yyyy')}
+                          <Calendar className="h-4 w-4" aria-hidden="true" />
+                          <time dateTime={selectedEntry.created_at}>
+                            {format(new Date(selectedEntry.created_at), 'MMMM dd, yyyy')}
+                          </time>
                         </div>
                       </div>
                     </div>
                     {selectedEntry.rating && (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1" role="img" aria-label={`Rating: ${selectedEntry.rating} out of 5 stars`}>
                         {Array.from({ length: 5 }).map((_, i) => (
-                          <span key={i} className={i < selectedEntry.rating ? "text-yellow-500 text-xl" : "text-gray-300 text-xl"}>
+                          <span key={i} className={i < selectedEntry.rating ? "text-yellow-500 text-xl" : "text-gray-300 text-xl"} aria-hidden="true">
                             ★
                           </span>
                         ))}
@@ -172,6 +177,7 @@ export default function Journal() {
                     onClick={() => {
                       setShowNewEntry(true);
                     }}
+                    aria-label="Edit journal entry"
                   >
                     Edit
                   </Button>
@@ -185,40 +191,40 @@ export default function Journal() {
 
                   {selectedEntry.what_went_well && (
                     <div>
-                      <h3 className="font-semibold mb-2 flex items-center gap-2 text-green-600">
-                        <TrendingUp className="h-4 w-4" />
-                        What Went Well
-                      </h3>
+                    <h3 className="font-semibold mb-2 flex items-center gap-2 text-green-600">
+                      <TrendingUp className="h-4 w-4" aria-hidden="true" />
+                      What Went Well
+                    </h3>
                       <p className="text-muted-foreground whitespace-pre-wrap">{selectedEntry.what_went_well}</p>
                     </div>
                   )}
 
                   {selectedEntry.what_to_improve && (
                     <div>
-                      <h3 className="font-semibold mb-2 flex items-center gap-2 text-orange-600">
-                        <TrendingUp className="h-4 w-4 rotate-180" />
-                        What To Improve
-                      </h3>
+                    <h3 className="font-semibold mb-2 flex items-center gap-2 text-orange-600">
+                      <TrendingUp className="h-4 w-4 rotate-180" aria-hidden="true" />
+                      What To Improve
+                    </h3>
                       <p className="text-muted-foreground whitespace-pre-wrap">{selectedEntry.what_to_improve}</p>
                     </div>
                   )}
 
                   {selectedEntry.lessons_learned && (
                     <div>
-                      <h3 className="font-semibold mb-2 flex items-center gap-2 text-blue-600">
-                        <BookOpen className="h-4 w-4" />
-                        Lessons Learned
-                      </h3>
+                    <h3 className="font-semibold mb-2 flex items-center gap-2 text-blue-600">
+                      <BookOpen className="h-4 w-4" aria-hidden="true" />
+                      Lessons Learned
+                    </h3>
                       <p className="text-muted-foreground whitespace-pre-wrap">{selectedEntry.lessons_learned}</p>
                     </div>
                   )}
 
                   {selectedEntry.tags && selectedEntry.tags.length > 0 && (
                     <div>
-                      <h3 className="font-semibold mb-2 flex items-center gap-2">
-                        <Tag className="h-4 w-4" />
-                        Tags
-                      </h3>
+                    <h3 className="font-semibold mb-2 flex items-center gap-2">
+                      <Tag className="h-4 w-4" aria-hidden="true" />
+                      Tags
+                    </h3>
                       <div className="flex flex-wrap gap-2">
                         {selectedEntry.tags.map((tag: string) => (
                           <Badge key={tag} variant="secondary">
@@ -231,9 +237,9 @@ export default function Journal() {
                 </div>
               </Card>
             )}
-          </div>
+          </section>
         </div>
-      </div>
+      </main>
     </AppLayout>
   );
 }
