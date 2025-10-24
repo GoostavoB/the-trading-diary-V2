@@ -27,6 +27,7 @@ export interface Trade {
   setup: string | null;
   emotional_tag: string | null;
   notes: string | null;
+  error_description?: string | null;
   screenshot_url: string | null;
   image_url: string | null;
   trade_hash: string | null;

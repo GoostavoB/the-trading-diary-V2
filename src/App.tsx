@@ -180,7 +180,8 @@ const AppRoutes = () => {
         <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} />
         <Route path="/ai-tools" element={<ProtectedRoute><AITools /></ProtectedRoute>} />
         <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
-        <Route path="/trade-analysis" element={<ProtectedRoute><TradeAnalysis /></ProtectedRoute>} />
+        {/* Trade Analysis temporarily disabled - incomplete module */}
+        {/* <Route path="/trade-analysis" element={<ProtectedRoute><TradeAnalysis /></ProtectedRoute>} /> */}
         <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
         <Route path="/risk-management" element={<ProtectedRoute><RiskManagement /></ProtectedRoute>} />
         <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />

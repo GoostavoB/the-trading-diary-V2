@@ -16,7 +16,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 
-type ColumnKey = 'date' | 'symbol' | 'setup' | 'broker' | 'type' | 'entry' | 'exit' | 'size' | 'pnl' | 'roi' | 'fundingFee' | 'tradingFee';
+type ColumnKey = 'date' | 'symbol' | 'setup' | 'broker' | 'type' | 'entry' | 'exit' | 'size' | 'pnl' | 'roi' | 'fundingFee' | 'tradingFee' | 'error';
 
 interface ColumnConfig {
   key: ColumnKey;

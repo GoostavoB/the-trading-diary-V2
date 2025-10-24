@@ -61,7 +61,7 @@ import { ExportTradesDialog } from '@/components/ExportTradesDialog';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { useDateRange } from '@/contexts/DateRangeContext';
 
-type ColumnKey = 'date' | 'symbol' | 'setup' | 'broker' | 'type' | 'entry' | 'exit' | 'size' | 'pnl' | 'roi' | 'fundingFee' | 'tradingFee';
+type ColumnKey = 'date' | 'symbol' | 'setup' | 'broker' | 'type' | 'entry' | 'exit' | 'size' | 'pnl' | 'roi' | 'fundingFee' | 'tradingFee' | 'error';
 
 interface ColumnConfig {
   key: ColumnKey;
@@ -80,8 +80,9 @@ const DEFAULT_COLUMNS: ColumnConfig[] = [
   { key: 'size', label: 'Size', visible: true },
   { key: 'pnl', label: 'P&L', visible: true },
   { key: 'roi', label: 'ROI', visible: true },
-  { key: 'fundingFee', label: 'Funding Fee', visible: true },
-  { key: 'tradingFee', label: 'Trading Fee', visible: true },
+  { key: 'fundingFee', label: 'Funding Fee', visible: false },
+  { key: 'tradingFee', label: 'Trading Fee', visible: false },
+  { key: 'error', label: 'Error/Mistake', visible: true },
 ];
 
 interface TradeHistoryProps {
@@ -115,6 +116,9 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
   const [editingBroker, setEditingBroker] = useState<string | null>(null);
   const [brokerSearch, setBrokerSearch] = useState('');
   const [brokerPopoverOpen, setBrokerPopoverOpen] = useState(false);
+  const [editingError, setEditingError] = useState<string | null>(null);
+  const [errorText, setErrorText] = useState('');
+  const [errorPopoverOpen, setErrorPopoverOpen] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [tradeToShare, setTradeToShare] = useState<Trade | null>(null);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
@@ -502,6 +506,34 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
     }
   };
 
+  const handleErrorUpdate = async (tradeId: string, error_description: string) => {
+    // Note: error_description field needs to be added to trades table schema
+    // Temporarily disabled until migration is run
+    toast.info('Error field feature coming soon - database migration pending');
+    setEditingError(null);
+    setErrorText('');
+    setErrorPopoverOpen(false);
+    return;
+    
+    /* Uncomment after adding error_description column to trades table
+    const { error } = await supabase
+      .from('trades')
+      .update({ error_description })
+      .eq('id', tradeId);
+
+    if (error) {
+      toast.error('Failed to update error field');
+    } else {
+      setTrades(trades.map(t => t.id === tradeId ? { ...t, error_description } : t));
+      toast.success('Error field updated');
+      setEditingError(null);
+      setErrorText('');
+      setErrorPopoverOpen(false);
+      onTradesChange?.();
+    }
+    */
+  };
+
   if (loading) {
     return <div className="text-center py-8">Loading trades...</div>;
   }
@@ -630,6 +662,7 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
                 {isColumnVisible('roi') && <TableHead>ROI</TableHead>}
                 {isColumnVisible('fundingFee') && <TableHead>Funding Fee</TableHead>}
                 {isColumnVisible('tradingFee') && <TableHead>Trading Fee</TableHead>}
+                {isColumnVisible('error') && <TableHead>Error/Mistake</TableHead>}
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -849,6 +882,71 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
                       }>
                         ${(trade.trading_fee || 0).toFixed(2)}
                       </span>
+                    </TableCell>
+                  )}
+                  {isColumnVisible('error') && (
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm truncate max-w-[200px]" title={trade.error_description || ''}>
+                          {trade.error_description || '-'}
+                        </span>
+                        <Popover 
+                          open={errorPopoverOpen && editingError === trade.id} 
+                          onOpenChange={(open) => {
+                            setErrorPopoverOpen(open);
+                            if (!open) {
+                              setEditingError(null);
+                              setErrorText('');
+                            }
+                          }}
+                        >
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => {
+                                setEditingError(trade.id);
+                                setErrorText(trade.error_description || '');
+                                setErrorPopoverOpen(true);
+                              }}
+                            >
+                              <Pencil size={12} />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[300px] p-4 bg-card border-border z-50" align="start">
+                            <div className="space-y-3">
+                              <Label htmlFor="error-input">Error/Mistake</Label>
+                              <Textarea 
+                                id="error-input"
+                                placeholder="Describe what went wrong..." 
+                                value={errorText}
+                                onChange={(e) => setErrorText(e.target.value)}
+                                className="min-h-[100px]"
+                              />
+                              <div className="flex justify-end gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setEditingError(null);
+                                    setErrorText('');
+                                    setErrorPopoverOpen(false);
+                                  }}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleErrorUpdate(trade.id, errorText)}
+                                >
+                                  Save
+                                </Button>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
                     </TableCell>
                   )}
                   <TableCell className="text-right">

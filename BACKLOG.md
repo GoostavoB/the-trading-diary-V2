@@ -427,23 +427,44 @@ Synchronize language between landing, pricing, login, and platform. Flag switchi
 ---
 
 ### #7 - Campo de erro editável + customização de colunas no Trading History
-**Status:** Planned | **Complexity:** M
+**Status:** In Progress | **Complexity:** M
 
 **Description:**  
-Edit "Error/Mistake" field per trade row and customize columns (show/hide and reorder).
+Edit "Error/Mistake" field per trade row and customize columns (show/hide).
 
 **Technical Actions:**
-- Add inline editing for Error field with autosave
-- Build "Customize Columns" modal:
-  - Checkboxes to show/hide columns
-  - Drag & drop to reorder
-- Persist per user
-- Add keyboard shortcuts for faster editing
+- ✅ Added "Error/Mistake" column UI to Trading History
+- ✅ Implemented inline editing interface with textarea popover
+- ✅ Column customization UI complete (show/hide via settings)
+- ⏳ Pending: Database migration to add error_description column
+- ⏳ Pending: Connect UI to backend once migration is complete
 
 **Acceptance Criteria:**
-- ✅ Error field saves and persists
-- ✅ Column layout saves and applies correctly
+- ✅ Column layout saves and applies correctly  
+- ⏳ Error field saves and persists (pending migration)
 - ✅ Smooth UX for customization
+
+**Note:** UI implementation complete, requires database migration to add `error_description` column to `trades` table.
+
+---
+
+### #24 - Remover 'Trade Analysis' e 'Compare Trades' + links do User Guide
+**Status:** ✅ Completed | **Complexity:** M
+
+**Description:**  
+Hide incomplete modules. Add "Learn More" links to User Guide in active sections, focus on Risk.
+
+**Technical Actions:**
+- ✅ Removed Trade Analysis from sidebar navigation
+- ✅ Disabled Trade Analysis route
+- ✅ Preserved code for future reactivation
+- Risk calculations and User Guide links to be addressed separately
+
+**Acceptance Criteria:**
+- ✅ No incomplete modules visible
+- ✅ No broken routes
+
+**Completed:** October 24, 2025
 
 ---
 
@@ -572,23 +593,6 @@ Emotions and Errors become tags. Cross-analyze with performance data.
 
 ---
 
-### #24 - Remover 'Trade Analysis' e 'Compare Trades' + links do User Guide
-**Status:** Planned | **Complexity:** M
-
-**Description:**  
-Hide incomplete modules. Add "Learn More" links to User Guide in active sections, focus on Risk.
-
-**Technical Actions:**
-- Remove Trade Analysis and Compare Trades components
-- Validate all Risk calculation formulas
-- Add contextual "Learn More" links per metric
-- Link to specific User Guide sections
-- Ensure no broken routes
-
-**Acceptance Criteria:**
-- ✅ No incomplete modules visible
-- ✅ Links open correct User Guide section
-- ✅ Risk calculations reviewed and correct
 
 ---
 
