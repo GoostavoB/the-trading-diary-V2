@@ -14,6 +14,8 @@ const LongShortRatioContent = lazy(() => import('@/pages/LongShortRatio').then(m
   return <Component />;
 }})));
 
+const OpenInterestChartsContent = lazy(() => import('@/components/OpenInterestCharts').then(m => ({ default: m.OpenInterestCharts })));
+
 const MarketData = () => {
   const { permission, requestPermission, isEnabled } = useLSRNotifications();
 
@@ -90,6 +92,19 @@ const MarketData = () => {
         <Suspense fallback={<DashboardSkeleton />}>
           <LongShortRatioContent />
         </Suspense>
+
+        {/* Open Interest Charts Section */}
+        <div className="mt-8">
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold">Open Interest Analysis</h2>
+            <p className="text-muted-foreground text-sm mt-1">
+              Monitor open interest trends to gauge market leverage and sentiment
+            </p>
+          </div>
+          <Suspense fallback={<DashboardSkeleton />}>
+            <OpenInterestChartsContent />
+          </Suspense>
+        </div>
       </div>
     </AppLayout>
   );

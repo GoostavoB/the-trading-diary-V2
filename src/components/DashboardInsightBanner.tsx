@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Sparkles, TrendingUp, TrendingDown } from 'lucide-react';
 import { formatPercent } from '@/utils/formatNumber';
@@ -18,8 +19,13 @@ interface LSRData {
 }
 
 export const DashboardInsightBanner = ({ totalPnL, winRate, totalTrades }: DashboardInsightBannerProps) => {
+  const navigate = useNavigate();
   const [lsrData, setLsrData] = useState<LSRData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const handleMarketDataClick = () => {
+    navigate('/market-data');
+  };
 
   useEffect(() => {
     fetchBinanceLSR();
@@ -123,9 +129,13 @@ export const DashboardInsightBanner = ({ totalPnL, winRate, totalTrades }: Dashb
 
           {/* Binance Market Data Section */}
           {!loading && lsrData && (
-            <div className="flex items-center gap-3">
+            <div 
+              onClick={handleMarketDataClick}
+              className="flex items-center gap-3 cursor-pointer group"
+              title="Click to view detailed market data"
+            >
               {/* LSR */}
-              <div className="px-3 py-2 rounded-lg bg-card/50 border border-border/50">
+              <div className="px-3 py-2 rounded-lg bg-card/50 border border-border/50 group-hover:border-primary/50 transition-colors">
                 <p className="text-xs text-muted-foreground mb-1">LSR (BTC)</p>
                 <div className="flex items-center gap-2">
                   <span className="text-base font-bold">
@@ -147,7 +157,7 @@ export const DashboardInsightBanner = ({ totalPnL, winRate, totalTrades }: Dashb
               </div>
 
               {/* Open Interest */}
-              <div className="px-3 py-2 rounded-lg bg-card/50 border border-border/50">
+              <div className="px-3 py-2 rounded-lg bg-card/50 border border-border/50 group-hover:border-primary/50 transition-colors">
                 <p className="text-xs text-muted-foreground mb-1">Open Interest</p>
                 <div className="flex items-center gap-2">
                   <span className="text-base font-bold">

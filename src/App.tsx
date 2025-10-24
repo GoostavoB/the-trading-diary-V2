@@ -132,9 +132,9 @@ const AppRoutes = () => {
         <Route path="/ar" element={<PublicPageThemeWrapper><IndexAr /></PublicPageThemeWrapper>} />
         <Route path="/vi" element={<PublicPageThemeWrapper><IndexVi /></PublicPageThemeWrapper>} />
         
-        {/* Auth routes */}
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/:lang/auth" element={<Auth />} />
+        {/* Auth routes - wrapped with default theme */}
+        <Route path="/auth" element={<PublicPageThemeWrapper><Auth /></PublicPageThemeWrapper>} />
+        <Route path="/:lang/auth" element={<PublicPageThemeWrapper><Auth /></PublicPageThemeWrapper>} />
         
         {/* Public pages with language support - wrapped with default theme */}
         <Route path="/pricing" element={<PublicPageThemeWrapper><PricingPage /></PublicPageThemeWrapper>} />
