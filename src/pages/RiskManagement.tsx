@@ -6,6 +6,7 @@ import { PositionSizeCalculator } from "@/components/risk/PositionSizeCalculator
 import { StopLossCalculator } from "@/components/risk/StopLossCalculator";
 import { LeverageCalculator } from "@/components/risk/LeverageCalculator";
 import { DrawdownChart } from "@/components/risk/DrawdownChart";
+import { LeverageStopWidget } from "@/components/leverage-stop/LeverageStopWidget";
 import { BlurToggleButton } from "@/components/ui/BlurToggleButton";
 import { Shield, Calculator, TrendingDown, BarChart3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -210,8 +211,11 @@ export default function RiskManagement() {
           </TabsContent>
 
           <TabsContent value="calculator" className="space-y-6">
-            <PositionSizeCalculator />
-            <StopLossCalculator />
+            <LeverageStopWidget />
+            <div className="grid lg:grid-cols-2 gap-6 mt-8">
+              <PositionSizeCalculator />
+              <StopLossCalculator />
+            </div>
             <LeverageCalculator />
           </TabsContent>
 
