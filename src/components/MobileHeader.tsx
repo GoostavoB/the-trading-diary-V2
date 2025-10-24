@@ -9,11 +9,28 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export const MobileHeader = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Define public routes where Theme Studio should be hidden
+  const publicRoutes = [
+    '/', '/pt', '/es', '/ar', '/vi',
+    '/pricing', '/contact', '/legal', '/terms', '/privacy',
+    '/blog', '/about', '/testimonials', '/how-it-works', '/features',
+    '/changelog', '/cookie-policy', '/sitemap', '/logo-download', 
+    '/logo-generator', '/crypto-trading-faq', '/seo-dashboard', '/author'
+  ];
+  
+  const isPublicRoute = publicRoutes.some(route => 
+    location.pathname === route || 
+    location.pathname.startsWith('/blog/') ||
+    location.pathname.startsWith('/author/') ||
+    location.pathname.match(/^\/(pt|es|ar|vi)\/(pricing|contact|legal|terms|privacy|blog|about|cookie-policy)/)
+  );
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-14 border-b border-border/40 bg-background/80 backdrop-blur-xl">
@@ -54,7 +71,7 @@ export const MobileHeader = () => {
             {t('navigation.signIn')}
           </Button>
           <LanguageToggle />
-          <ThemeStudio />
+          {!isPublicRoute && <ThemeStudio />}
         </nav>
 
         {/* Mobile Menu - Hamburger */}
@@ -112,10 +129,12 @@ export const MobileHeader = () => {
                     <span className="text-sm text-muted-foreground">Language</span>
                     <LanguageToggle />
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Theme</span>
-                    <ThemeStudio />
-                  </div>
+                  {!isPublicRoute && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Theme</span>
+                      <ThemeStudio />
+                    </div>
+                  )}
                 </div>
               </nav>
             </SheetContent>

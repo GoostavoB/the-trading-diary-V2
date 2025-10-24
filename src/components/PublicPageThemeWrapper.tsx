@@ -1,13 +1,18 @@
 import { useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import { PRESET_THEMES } from '@/utils/themePresets';
 
 /**
- * PublicPageThemeWrapper - Forces default theme colors on public pages
- * Always uses the default blue/gray theme regardless of user's saved custom theme
- * Still respects system light/dark mode preference via next-themes
+ * PublicPageThemeWrapper - Forces dark mode and default theme colors on public pages
+ * Always uses dark mode with default blue/gray theme regardless of user's saved preferences
  */
 export const PublicPageThemeWrapper = ({ children }: { children: React.ReactNode }) => {
+  const { setTheme } = useTheme();
+  
   useEffect(() => {
+    // Force dark mode on all public pages
+    setTheme('dark');
+    
     // Force default theme colors on public pages
     const defaultTheme = PRESET_THEMES.find(t => t.id === 'default');
     
@@ -24,7 +29,7 @@ export const PublicPageThemeWrapper = ({ children }: { children: React.ReactNode
       root.style.setProperty('--neon-green', defaultTheme.profit);
       root.style.setProperty('--neon-red', defaultTheme.loss);
     }
-  }, []);
+  }, [setTheme]);
   
   return <>{children}</>;
 };
