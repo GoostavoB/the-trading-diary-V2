@@ -34,19 +34,23 @@ export const ProofBar = () => {
     >
       <div className="container mx-auto max-w-6xl">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {metrics.map((metric, index) => (
-            <div
-              key={index}
-              className="glass-card border border-border/40 rounded-2xl p-8 flex flex-col items-center text-center gap-3 hover:border-primary/40 transition-all duration-300"
-            >
-              <div className="text-4xl md:text-5xl font-bold text-primary">
-                {metric.value}
+          {metrics.map((metric, index) => {
+            const Icon = metric.icon;
+            return (
+              <div
+                key={index}
+                className="bg-card/50 border border-border/20 rounded-2xl p-8 flex flex-col items-center text-center gap-3 hover:border-primary/40 transition-all duration-300"
+              >
+                <Icon className="w-8 h-8 text-primary mb-2" />
+                <div className="text-4xl md:text-5xl font-bold text-primary">
+                  {metric.value}
+                </div>
+                <div className="text-sm md:text-base text-muted-foreground">
+                  {metric.label}
+                </div>
               </div>
-              <div className="text-sm md:text-base text-muted-foreground">
-                {metric.label}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </motion.section>
