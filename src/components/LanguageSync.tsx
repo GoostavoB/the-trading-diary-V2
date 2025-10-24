@@ -19,7 +19,8 @@ export const LanguageSync = () => {
     // Only change if different from current language
     if (pathLanguage !== language) {
       console.log(`Syncing language from ${language} to ${pathLanguage}`);
-      changeLanguage(pathLanguage);
+      // Avoid URL update here to prevent redirect loops; URL handled below
+      changeLanguage(pathLanguage, false);
     }
   }, [location.pathname, language, changeLanguage]);
 
