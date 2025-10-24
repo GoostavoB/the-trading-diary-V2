@@ -32,11 +32,10 @@
     --neon-purple: 270 67% 62%;
     --neon-yellow: 45 93% 57%;
 
-    /* Hero premium accent colors */
-    --hero-lime: 84 81% 44%;
-    --hero-yellow: 48 96% 53%;
-    --hero-gradient-start: 84 81% 44%;
-    --hero-gradient-end: 48 96% 53%;
+    /* Hero premium accent colors - Blue brand */
+    --hero-blue-start: 210 90% 58%;
+    --hero-blue-end: 200 80% 65%;
+    --hero-gray-accent: 215 16% 47%;
 
     /* Semantic colors */
     --positive: var(--neon-green);
@@ -181,11 +180,11 @@
     background-clip: text;
   }
 
-  /* Hero-specific gradient text (lime to yellow) */
+  /* Hero-specific gradient text (blue brand) */
   .gradient-text-hero {
     background: linear-gradient(135deg, 
-      hsl(var(--hero-lime)) 0%, 
-      hsl(var(--hero-yellow)) 100%
+      hsl(var(--hero-blue-start)) 0%, 
+      hsl(var(--hero-blue-end)) 100%
     );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -199,8 +198,8 @@
     width: 1200px;
     height: 1200px;
     background: linear-gradient(135deg, 
-      hsl(var(--hero-lime) / 0.25) 0%, 
-      hsl(var(--hero-yellow) / 0.15) 100%
+      hsl(var(--hero-blue-start) / 0.2) 0%, 
+      hsl(var(--hero-blue-end) / 0.12) 100%
     );
     filter: blur(150px);
     transform: rotate(-45deg);

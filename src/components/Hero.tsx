@@ -37,14 +37,14 @@ const Hero = () => {
         <div 
           className="glow-orb w-[600px] h-[600px] top-[20%] left-[10%]"
           style={{ 
-            background: 'radial-gradient(circle, hsl(var(--hero-lime) / 0.15) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, hsl(var(--hero-blue-start) / 0.12) 0%, transparent 70%)',
             animation: 'pulse-subtle 4s ease-in-out infinite'
           }}
         />
         <div 
           className="glow-orb w-[500px] h-[500px] bottom-[15%] right-[15%]"
           style={{ 
-            background: 'radial-gradient(circle, hsl(var(--hero-yellow) / 0.1) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, hsl(var(--hero-blue-end) / 0.08) 0%, transparent 70%)',
             animation: 'pulse-subtle 5s ease-in-out infinite',
             animationDelay: '1.5s'
           }}
@@ -82,7 +82,7 @@ const Hero = () => {
                 <li key={index} className="flex items-center gap-3">
                   <span 
                     className="w-1.5 h-1.5 rounded-full" 
-                    style={{ background: 'linear-gradient(135deg, hsl(var(--hero-lime)), hsl(var(--hero-yellow)))' }}
+                    style={{ background: 'linear-gradient(135deg, hsl(var(--hero-blue-start)), hsl(var(--hero-blue-end)))' }}
                     aria-hidden="true" 
                   />
                   {benefit}
@@ -108,17 +108,13 @@ const Hero = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-14 px-6 text-base bg-background/50 border-border/50 backdrop-blur-sm focus:border-[hsl(var(--hero-lime))] focus:ring-[hsl(var(--hero-lime))] rounded-xl w-full sm:flex-1"
+                className="h-14 px-6 text-base bg-background/50 border-border/50 backdrop-blur-sm focus:border-primary focus:ring-primary rounded-xl w-full sm:flex-1"
                 aria-label="Email address"
               />
               <Button 
                 type="submit"
                 size="lg"
-                className="h-14 px-8 text-base font-semibold rounded-xl w-full sm:w-auto group transition-all duration-300"
-                style={{
-                  background: 'linear-gradient(135deg, hsl(var(--hero-lime)), hsl(var(--hero-yellow)))',
-                  color: 'hsl(210 20% 2%)',
-                }}
+                className="h-14 px-8 text-base font-semibold rounded-xl w-full sm:w-auto group transition-all duration-300 bg-primary hover:bg-primary/90"
                 aria-label="Start using The Trading Diary for free"
               >
                 {t('landing.hero.ctaPrimary', 'Get started free')}
