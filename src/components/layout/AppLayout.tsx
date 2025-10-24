@@ -14,6 +14,7 @@ import { InstallPrompt } from '@/components/mobile/InstallPrompt';
 import { GuidedTour } from '@/components/tour/GuidedTour';
 import { UpdatesModal } from '@/components/tour/UpdatesModal';
 import { CurrencySelector } from '@/components/CurrencySelector';
+import { BlurToggle } from '@/components/BlurToggle';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -49,6 +50,7 @@ const AppLayout = ({ children, isGamificationOpen, onGamificationToggle }: AppLa
             {/* Right: Icon Buttons */}
             <div className="flex items-center gap-2">
               <CurrencySelector />
+              <BlurToggle variant="icon" />
               <KeyboardShortcutsHelp />
               <LanguageToggle />
               <div data-tour="theme-toggle">
@@ -67,6 +69,7 @@ const AppLayout = ({ children, isGamificationOpen, onGamificationToggle }: AppLa
             </div>
             <div className="flex items-center gap-1">
               <CurrencySelector />
+              <BlurToggle variant="icon" />
               <KeyboardShortcutsHelp />
               <LanguageToggle />
               <ThemeStudio />

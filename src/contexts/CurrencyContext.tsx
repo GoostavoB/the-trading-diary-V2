@@ -112,7 +112,7 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
       return `${sign}${currency.symbol}${absValue.toFixed(0)}`;
     }
     
-    return `${sign}${currency.symbol}${amount.toFixed(2)}`;
+    return `${sign}${currency.symbol}${absValue.toFixed(2)}`;
   };
 
   return (

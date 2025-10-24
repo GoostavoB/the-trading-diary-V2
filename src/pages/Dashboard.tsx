@@ -203,7 +203,7 @@ const Dashboard = () => {
   const gridRef = useRef<HTMLDivElement>(null);
   const [columnCount, setColumnCount] = useState(3);
 
-  // Track column count based on user selection and viewport
+  // Track column count based on user selection and viewport - only restore once on mount
   useEffect(() => {
     const el = gridRef.current;
     if (!el) return;
@@ -214,7 +214,7 @@ const Dashboard = () => {
       if (width < 768) {
         setColumnCount(1);
       } else {
-        // Use user's selected column count
+        // Use user's selected column count (from saved settings)
         setColumnCount(selectedColumnCount);
       }
     };
@@ -224,6 +224,12 @@ const Dashboard = () => {
     ro.observe(el);
     return () => ro.disconnect();
   }, [selectedColumnCount]);
+
+  // Save column count to backend when user changes it
+  const handleColumnCountChange = useCallback((newCount: number) => {
+    setSelectedColumnCount(newCount);
+    updateColumnCount(newCount);
+  }, [updateColumnCount]);
 
   // Organize widgets by column and row
   const grid = useMemo(() => {
@@ -873,7 +879,7 @@ const Dashboard = () => {
               onReset={resetLayout}
               onAddWidget={() => setShowWidgetLibrary(true)}
               columnCount={selectedColumnCount}
-              onColumnCountChange={updateColumnCount}
+              onColumnCountChange={handleColumnCountChange}
               widgetCount={positions.length}
             />
           </div>
