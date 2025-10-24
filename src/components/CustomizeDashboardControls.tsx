@@ -1,13 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Settings2, Save, X, RotateCcw, Eye, EyeOff, LayoutDashboard, Columns, Plus } from 'lucide-react';
+import { Settings2, Save, X, RotateCcw, Eye, EyeOff, LayoutDashboard, Columns, Plus, Crown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WidgetConfig } from '@/hooks/useDashboardLayout';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TourButton } from '@/components/tour/TourButton';
+import { useUserTier } from '@/hooks/useUserTier';
 
 interface CustomizeDashboardControlsProps {
   isCustomizing: boolean;
@@ -39,6 +40,7 @@ export function CustomizeDashboardControls({
   widgetCount = 0,
 }: CustomizeDashboardControlsProps) {
   const { t } = useTranslation();
+  const { canCustomizeDashboard } = useUserTier();
   const visibleCount = widgetCount || widgets.filter(w => w.visible).length;
   const hiddenCount = widgets.filter(w => !w.visible).length;
 
@@ -73,6 +75,9 @@ export function CustomizeDashboardControls({
           >
             <LayoutDashboard className="w-4 h-4" />
             {t('dashboard.customizeLayout')}
+            {!canCustomizeDashboard && (
+              <Crown className="w-3 h-3 text-amber-500 ml-1" />
+            )}
           </Button>
           
           {/* Column Count Selector */}

@@ -33,6 +33,7 @@
 - ✅ #5 & #14 - Widget Removal Fixes
 - ✅ #6 - Trading History Sorting (Date, P&L, ROI, Size, Fees)
 - ✅ #7 - Trading History Error Field (Complete with migration)
+- ✅ #8 - Customizable Dashboard for Pro/Elite
 - ✅ #9 - Trading Assistant LLM (Backend deployed)
 - ✅ #12 & #13 - Global Blur Toggle System
 - ✅ #15 - Single Day Timeframe Selection
@@ -45,17 +46,18 @@
 - ✅ #42 - UI/UX Standardization (Ongoing)
 
 **Key Achievements:**
-- ✨ 15 backlog items completed in single session
+- ✨ 16 backlog items completed in single session
 - 🎯 All critical blur/privacy features implemented
 - 📊 Enhanced Trading History with sorting, column customization & error tracking
 - 🗑️ Upload History with soft delete and restoration
 - 💰 Multi-currency support with 12 fiat + crypto options
 - 🎨 Design system tokens applied across multiple pages
+- 👑 Tier-based dashboard customization for Pro/Elite users
 
 **Next Priorities:**
-- #8 - Customizable Dashboard for Pro/Elite users
 - #4 - Language consistency across platform
 - #17 - Exchange API Import Fixes (BingX, Bybit)
+- #22 - Emotions & Tags in Psychology Report
 
 ---
 
@@ -503,22 +505,28 @@ Hide incomplete modules. Add "Learn More" links to User Guide in active sections
 ---
 
 ### #8 - Overview Dashboard totalmente customizável (Pro/Elite)
-**Status:** Planned | **Complexity:** L
+**Status:** ✅ Completed | **Complexity:** L
 
 **Description:**  
 Add widgets from Insights to Overview via "+" button. Allow full reordering and removal. Basic tier keeps fixed layout.
 
 **Technical Actions:**
-- Add "+" button to each Insights metric
-- Implement drag & drop for widgets
-- Save custom layouts per user
-- Restrict Basic tier to fixed layout
-- Add widget gallery/library
+- ✅ Created useUserTier hook for subscription checking
+- ✅ Implemented tier-based access control
+- ✅ Added UpgradePrompt component for free users
+- ✅ Restricted customization features to Pro/Elite tiers
+- ✅ Widget library includes all Insights widgets
+- ✅ Drag & drop and widget management functional
+- ✅ Free users see upgrade prompt with feature list
 
 **Acceptance Criteria:**
-- ✅ Pro/Elite can fully customize
-- ✅ Basic tier remains fixed
+- ✅ Pro/Elite can fully customize dashboard
+- ✅ Basic/free tier cannot access customization
+- ✅ Upgrade prompt shown to free users
+- ✅ All Insights widgets available in widget library
 - ✅ Changes persist across sessions
+
+**Completed:** October 24, 2025
 
 ---
 

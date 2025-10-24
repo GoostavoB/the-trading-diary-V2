@@ -46,6 +46,8 @@ import { useGridLayout, WidgetPosition } from '@/hooks/useGridLayout';
 import { DropZone } from '@/components/widgets/DropZone';
 import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import { useUserTier } from '@/hooks/useUserTier';
+import { UpgradePrompt } from '@/components/UpgradePrompt';
 
 // Lazy load heavy components
 const TradeHistory = lazy(() => import('@/components/TradeHistory').then(m => ({ default: m.TradeHistory })));
@@ -167,6 +169,10 @@ const Dashboard = () => {
   const [selectedColumnCount, setSelectedColumnCount] = useState(3);
   const [originalPositions, setOriginalPositions] = useState<WidgetPosition[]>([]);
   const [isGamificationOpen, setIsGamificationOpen] = useState(false);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  
+  // User tier for feature restrictions
+  const { tier, canCustomizeDashboard, isLoading: tierLoading } = useUserTier();
 
   // Sync loaded positions and column count with local state
   useEffect(() => {
@@ -509,9 +515,15 @@ const Dashboard = () => {
   }, [setDateRange]);
 
   const handleStartCustomize = useCallback(() => {
+    // Check if user has permission to customize
+    if (!canCustomizeDashboard) {
+      setShowUpgradePrompt(true);
+      return;
+    }
+    
     setOriginalPositions([...positions]);
     setIsCustomizing(true);
-  }, [positions]);
+  }, [positions, canCustomizeDashboard]);
 
   const handleSaveLayout = useCallback(() => {
     saveGridLayout(positions);
@@ -877,7 +889,13 @@ const Dashboard = () => {
               onSave={handleSaveLayout}
               onCancel={handleCancelCustomize}
               onReset={resetLayout}
-              onAddWidget={() => setShowWidgetLibrary(true)}
+              onAddWidget={() => {
+                if (!canCustomizeDashboard) {
+                  setShowUpgradePrompt(true);
+                  return;
+                }
+                setShowWidgetLibrary(true);
+              }}
               columnCount={selectedColumnCount}
               onColumnCountChange={handleColumnCountChange}
               widgetCount={positions.length}
@@ -1018,6 +1036,13 @@ const Dashboard = () => {
         
         {/* Tour CTA Button */}
         <TourCTAButton />
+        
+        {/* Upgrade Prompt for Free Users */}
+        <UpgradePrompt
+          open={showUpgradePrompt}
+          onClose={() => setShowUpgradePrompt(false)}
+          feature="dashboard customization"
+        />
       </div>
     </AppLayout>
     
