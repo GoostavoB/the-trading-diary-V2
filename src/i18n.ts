@@ -1,6 +1,5 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
 
 import enTranslations from './locales/en/translation.json';
 import esTranslations from './locales/es/translation.json';
@@ -8,8 +7,10 @@ import ptTranslations from './locales/pt/translation.json';
 import arTranslations from './locales/ar/translation.json';
 import viTranslations from './locales/vi/translation.json';
 
+// Get language from localStorage or default to 'en'
+const savedLanguage = localStorage.getItem('app-language') || 'en';
+
 i18n
-  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
@@ -29,15 +30,14 @@ i18n
         translation: viTranslations
       }
     },
+    lng: savedLanguage,
     fallbackLng: 'en',
     debug: false,
     interpolation: {
       escapeValue: false, // React already escapes values
     },
-    detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
-      lookupLocalStorage: 'app-language',
+    react: {
+      useSuspense: false, // Prevent suspense-related loading issues
     }
   });
 
