@@ -29,7 +29,7 @@ export const ProofBar = () => {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
       viewport={{ once: true }}
-      className="py-12 px-6"
+      className="relative -mt-20 z-20 py-12 px-6"
       aria-label="Social proof metrics"
     >
       <div className="container mx-auto max-w-6xl">
