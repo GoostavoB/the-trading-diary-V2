@@ -53,6 +53,20 @@
         "description": "Fully customizable metrics, colors, and layout."
       }
     },
+    "benefits": {
+      "fasterUploads": {
+        "title": "40× Faster Uploads",
+        "description": "Batch upload from screenshots. No more manual entry."
+      },
+      "knowEveryFee": {
+        "title": "Know Every Fee",
+        "description": "Compare exchanges and uncover hidden costs."
+      },
+      "yourRules": {
+        "title": "Your Dashboard, Your Rules",
+        "description": "Fully customizable metrics, colors, and layout."
+      }
+    },
     "dashboardShowcase": {
       "title": "Your trades, organized. This one shows progress.",
       "subtitle": "Track everything in one place—P&L, emotions, errors. Find what works.",

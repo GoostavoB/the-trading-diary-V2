@@ -83,16 +83,16 @@ const Hero = () => {
             aria-label="Platform benefits"
           >
             <article className="glass-strong backdrop-blur-[20px] p-6 rounded-xl shadow-lg border border-primary/10 text-center flex flex-col items-center justify-center">
-              <h3 className="text-lg md:text-xl font-bold text-primary mb-2">{t('landing.stats.fasterUploads.title')}</h3>
-              <p className="text-sm text-muted-foreground">{t('landing.stats.fasterUploads.description')}</p>
+              <h3 className="text-lg md:text-xl font-bold text-primary mb-2">{t('landing.benefits.fasterUploads.title')}</h3>
+              <p className="text-sm text-muted-foreground">{t('landing.benefits.fasterUploads.description')}</p>
             </article>
             <article className="glass-strong backdrop-blur-[20px] p-6 rounded-xl shadow-lg border border-primary/10 text-center flex flex-col items-center justify-center">
-              <h3 className="text-lg md:text-xl font-bold text-primary mb-2">{t('landing.stats.knowEveryFee.title')}</h3>
-              <p className="text-sm text-muted-foreground">{t('landing.stats.knowEveryFee.description')}</p>
+              <h3 className="text-lg md:text-xl font-bold text-primary mb-2">{t('landing.benefits.knowEveryFee.title')}</h3>
+              <p className="text-sm text-muted-foreground">{t('landing.benefits.knowEveryFee.description')}</p>
             </article>
             <article className="glass-strong backdrop-blur-[20px] p-6 rounded-xl shadow-lg border border-primary/10 text-center flex flex-col items-center justify-center">
-              <h3 className="text-lg md:text-xl font-bold text-primary mb-2">{t('landing.stats.yourRules.title')}</h3>
-              <p className="text-sm text-muted-foreground">{t('landing.stats.yourRules.description')}</p>
+              <h3 className="text-lg md:text-xl font-bold text-primary mb-2">{t('landing.benefits.yourRules.title')}</h3>
+              <p className="text-sm text-muted-foreground">{t('landing.benefits.yourRules.description')}</p>
             </article>
           </motion.div>
       </div>

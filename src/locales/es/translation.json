@@ -53,6 +53,20 @@
         "description": "Métricas, colores y diseño completamente personalizables."
       }
     },
+    "benefits": {
+      "fasterUploads": {
+        "title": "40× Más Rápido",
+        "description": "Carga por lotes desde capturas. Sin entrada manual."
+      },
+      "knowEveryFee": {
+        "title": "Conoce Cada Comisión",
+        "description": "Compara exchanges y descubre costos ocultos."
+      },
+      "yourRules": {
+        "title": "Tu Panel, Tus Reglas",
+        "description": "Métricas, colores y diseño completamente personalizables."
+      }
+    },
     "dashboardShowcase": {
       "title": "Tus operaciones, organizadas. Este muestra el progreso.",
       "subtitle": "Rastrea todo en un solo lugar: P&L, emociones, errores. Encuentra lo que funciona.",
