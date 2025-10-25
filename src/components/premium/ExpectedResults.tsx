@@ -69,7 +69,7 @@ export const ExpectedResults = () => {
                   
                   {/* Right side - Large Metric */}
                   <div className="shrink-0 text-right md:text-left">
-                    <div className="text-5xl md:text-7xl font-bold text-primary tracking-tight">
+                    <div className="text-4xl md:text-5xl font-bold text-primary tracking-tight">
                       {metric.metric}
                     </div>
                   </div>
