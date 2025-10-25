@@ -65,6 +65,7 @@ const SpotWallet = lazy(() => import("./pages/SpotWallet"));
 const FeeAnalysis = lazy(() => import("./pages/FeeAnalysis"));
 const LogoDownload = lazy(() => import("./pages/LogoDownload"));
 const LogoGenerator = lazy(() => import("./pages/LogoGenerator"));
+const Calculators = lazy(() => import("./pages/Calculators"));
 // Phase 2: Leaderboard feature - temporarily disabled for backlog #34
 // const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 const LongShortRatio = lazy(() => import("./pages/LongShortRatio"));
@@ -172,6 +173,7 @@ const AppRoutes = () => {
         {/* Other public pages - wrapped with default theme */}
         <Route path="/logo-download" element={<PublicPageThemeWrapper><LogoDownload /></PublicPageThemeWrapper>} />
         <Route path="/logo-generator" element={<PublicPageThemeWrapper><LogoGenerator /></PublicPageThemeWrapper>} />
+        <Route path="/calculators" element={<ProtectedRoute><Calculators /></ProtectedRoute>} />
         <Route path="/crypto-trading-faq" element={<PublicPageThemeWrapper><CryptoTradingFAQ /></PublicPageThemeWrapper>} />
         <Route path="/sitemap" element={<PublicPageThemeWrapper><Sitemap /></PublicPageThemeWrapper>} />
         <Route path="/about" element={<PublicPageThemeWrapper><About /></PublicPageThemeWrapper>} />

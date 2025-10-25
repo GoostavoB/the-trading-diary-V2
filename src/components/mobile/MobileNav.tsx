@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, TrendingUp, Users, Settings, BarChart3, Image } from "lucide-react";
+import { Home, TrendingUp, Settings, BarChart3, Calculator } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -9,9 +9,9 @@ export const MobileNav = () => {
 
   const navItems = [
     { path: "/dashboard", icon: Home, label: t('navigation.home') },
-    { path: "/tools", icon: BarChart3, label: t('navigation.tools') },
+    { path: "/calculators", icon: Calculator, label: "Calculators" },
     { path: "/upload", icon: TrendingUp, label: t('trades.trade') },
-    { path: "/logo-generator", icon: Image, label: "Logos" },
+    { path: "/tools", icon: BarChart3, label: "Journal" },
     { path: "/settings", icon: Settings, label: t('common.settings') },
   ];
 

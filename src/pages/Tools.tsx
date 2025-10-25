@@ -23,22 +23,26 @@ const Tools = () => {
         </header>
 
         <Tabs defaultValue="journal" className="space-y-6">
-          <TabsList className="grid w-full max-w-4xl grid-cols-4 glass">
-            <TabsTrigger value="journal" className="gap-2">
+          <TabsList className="w-full max-w-4xl glass overflow-x-auto flex md:grid md:grid-cols-4">
+            <TabsTrigger value="journal" className="gap-2 flex-1 md:flex-none min-w-[120px]">
               <BookOpen className="w-4 h-4" aria-hidden="true" />
-              Journal
+              <span className="hidden sm:inline">Journal</span>
+              <span className="sm:hidden">Journal</span>
             </TabsTrigger>
-            <TabsTrigger value="calculator" className="gap-2">
+            <TabsTrigger value="calculator" className="gap-2 flex-1 md:flex-none min-w-[120px]">
               <Calculator className="w-4 h-4" aria-hidden="true" />
-              Risk Calculator
+              <span className="hidden sm:inline">Risk Calculator</span>
+              <span className="sm:hidden">Risk</span>
             </TabsTrigger>
-            <TabsTrigger value="stoploss" className="gap-2">
+            <TabsTrigger value="stoploss" className="gap-2 flex-1 md:flex-none min-w-[120px]">
               <Target className="w-4 h-4" aria-hidden="true" />
-              Stop Loss
+              <span className="hidden sm:inline">Stop Loss</span>
+              <span className="sm:hidden">Stop</span>
             </TabsTrigger>
-            <TabsTrigger value="expenses" className="gap-2">
+            <TabsTrigger value="expenses" className="gap-2 flex-1 md:flex-none min-w-[120px]">
               <Receipt className="w-4 h-4" aria-hidden="true" />
-              Expenses
+              <span className="hidden sm:inline">Expenses</span>
+              <span className="sm:hidden">Expenses</span>
             </TabsTrigger>
           </TabsList>
 

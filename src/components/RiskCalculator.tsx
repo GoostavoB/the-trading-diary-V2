@@ -101,22 +101,33 @@ export const RiskCalculator = () => {
       </div>
 
       <Tabs defaultValue="position" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="position">Position Size</TabsTrigger>
-          <TabsTrigger value="rr">Risk/Reward</TabsTrigger>
-          <TabsTrigger value="kelly">Kelly Criterion</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 h-auto">
+          <TabsTrigger value="position" className="min-h-[44px] text-xs sm:text-sm">
+            <span className="hidden sm:inline">Position Size</span>
+            <span className="sm:hidden">Position</span>
+          </TabsTrigger>
+          <TabsTrigger value="rr" className="min-h-[44px] text-xs sm:text-sm">
+            <span className="hidden sm:inline">Risk/Reward</span>
+            <span className="sm:hidden">R/R</span>
+          </TabsTrigger>
+          <TabsTrigger value="kelly" className="min-h-[44px] text-xs sm:text-sm">
+            <span className="hidden sm:inline">Kelly Criterion</span>
+            <span className="sm:hidden">Kelly</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="position" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <Label htmlFor="account-balance">Account Balance ($)</Label>
               <Input
                 id="account-balance"
                 type="number"
+                inputMode="decimal"
                 value={accountBalance}
                 onChange={(e) => setAccountBalance(e.target.value)}
                 placeholder="10000"
+                className="min-h-[48px]"
               />
             </div>
             <div>
@@ -124,10 +135,12 @@ export const RiskCalculator = () => {
               <Input
                 id="risk-percentage"
                 type="number"
+                inputMode="decimal"
                 step="0.1"
                 value={riskPercentage}
                 onChange={(e) => setRiskPercentage(e.target.value)}
                 placeholder="2"
+                className="min-h-[48px]"
               />
             </div>
             <div>
@@ -135,10 +148,12 @@ export const RiskCalculator = () => {
               <Input
                 id="entry-price"
                 type="number"
+                inputMode="decimal"
                 step="0.01"
                 value={entryPrice}
                 onChange={(e) => setEntryPrice(e.target.value)}
                 placeholder="50000"
+                className="min-h-[48px]"
               />
             </div>
             <div>
@@ -146,10 +161,12 @@ export const RiskCalculator = () => {
               <Input
                 id="stop-loss"
                 type="number"
+                inputMode="decimal"
                 step="0.01"
                 value={stopLoss}
                 onChange={(e) => setStopLoss(e.target.value)}
                 placeholder="49000"
+                className="min-h-[48px]"
               />
             </div>
           </div>
@@ -197,16 +214,18 @@ export const RiskCalculator = () => {
         </TabsContent>
 
         <TabsContent value="rr" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <Label htmlFor="rr-entry">Entry Price ($)</Label>
               <Input
                 id="rr-entry"
                 type="number"
+                inputMode="decimal"
                 step="0.01"
                 value={rrEntryPrice}
                 onChange={(e) => setRrEntryPrice(e.target.value)}
                 placeholder="50000"
+                className="min-h-[48px]"
               />
             </div>
             <div>
@@ -214,10 +233,12 @@ export const RiskCalculator = () => {
               <Input
                 id="rr-stop"
                 type="number"
+                inputMode="decimal"
                 step="0.01"
                 value={rrStopLoss}
                 onChange={(e) => setRrStopLoss(e.target.value)}
                 placeholder="49000"
+                className="min-h-[48px]"
               />
             </div>
             <div>
@@ -225,10 +246,12 @@ export const RiskCalculator = () => {
               <Input
                 id="rr-target"
                 type="number"
+                inputMode="decimal"
                 step="0.01"
                 value={rrTakeProfit}
                 onChange={(e) => setRrTakeProfit(e.target.value)}
                 placeholder="52000"
+                className="min-h-[48px]"
               />
             </div>
           </div>
@@ -277,16 +300,18 @@ export const RiskCalculator = () => {
         </TabsContent>
 
         <TabsContent value="kelly" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <Label htmlFor="win-rate">Win Rate (%)</Label>
               <Input
                 id="win-rate"
                 type="number"
+                inputMode="decimal"
                 step="1"
                 value={winRate}
                 onChange={(e) => setWinRate(e.target.value)}
                 placeholder="55"
+                className="min-h-[48px]"
               />
             </div>
             <div>
@@ -294,10 +319,12 @@ export const RiskCalculator = () => {
               <Input
                 id="avg-win"
                 type="number"
+                inputMode="decimal"
                 step="1"
                 value={avgWin}
                 onChange={(e) => setAvgWin(e.target.value)}
                 placeholder="150"
+                className="min-h-[48px]"
               />
             </div>
             <div>
@@ -305,10 +332,12 @@ export const RiskCalculator = () => {
               <Input
                 id="avg-loss"
                 type="number"
+                inputMode="decimal"
                 step="1"
                 value={avgLoss}
                 onChange={(e) => setAvgLoss(e.target.value)}
                 placeholder="100"
+                className="min-h-[48px]"
               />
             </div>
           </div>

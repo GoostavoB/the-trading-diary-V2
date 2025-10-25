@@ -156,16 +156,16 @@ export function EnhancedStopLossCalculator() {
           {/* Risk Presets */}
           <div className="space-y-2">
             <Label>Quick Presets</Label>
-            <div className="flex gap-2 flex-wrap">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {RISK_PRESETS.map((preset) => (
                 <Button
                   key={preset.name}
                   variant="outline"
                   size="sm"
                   onClick={() => applyPreset(preset)}
-                  className="flex-1 min-w-[120px]"
+                  className="min-h-[48px] touch-manipulation"
                 >
-                  <div className="text-left">
+                  <div className="text-center w-full">
                     <div className="font-semibold">{preset.name}</div>
                     <div className="text-xs text-muted-foreground">{preset.description}</div>
                   </div>
@@ -175,15 +175,17 @@ export function EnhancedStopLossCalculator() {
           </div>
 
           {/* Input Fields */}
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="accountSize">Account Size ($)</Label>
               <Input
                 id="accountSize"
                 type="text"
+                inputMode="decimal"
                 placeholder="10000"
                 value={accountSize}
                 onChange={(e) => setAccountSize(e.target.value)}
+                className="min-h-[48px]"
               />
             </div>
 
@@ -192,9 +194,11 @@ export function EnhancedStopLossCalculator() {
               <Input
                 id="riskPercent"
                 type="text"
+                inputMode="decimal"
                 placeholder="2"
                 value={riskPercent}
                 onChange={(e) => setRiskPercent(e.target.value)}
+                className="min-h-[48px]"
               />
               {parseDecimalInput(riskPercent) && parseDecimalInput(riskPercent)! > 5 && (
                 <div className="flex items-center gap-1 text-xs text-destructive">
@@ -209,9 +213,11 @@ export function EnhancedStopLossCalculator() {
               <Input
                 id="entryPrice"
                 type="text"
+                inputMode="decimal"
                 placeholder="50000"
                 value={entryPrice}
                 onChange={(e) => setEntryPrice(e.target.value)}
+                className="min-h-[48px]"
               />
             </div>
 
@@ -220,14 +226,16 @@ export function EnhancedStopLossCalculator() {
               <Input
                 id="stopLoss"
                 type="text"
+                inputMode="decimal"
                 placeholder="49000"
                 value={stopLoss}
                 onChange={(e) => setStopLoss(e.target.value)}
+                className="min-h-[48px]"
               />
             </div>
           </div>
 
-          <Button onClick={calculateStopLoss} className="w-full">
+          <Button onClick={calculateStopLoss} className="w-full min-h-[48px] touch-manipulation">
             <Calculator className="mr-2 h-4 w-4" />
             Calculate Position
           </Button>
@@ -235,36 +243,42 @@ export function EnhancedStopLossCalculator() {
           {/* Results */}
           {calculated && results && (
             <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="long">Long Position</TabsTrigger>
-                <TabsTrigger value="short">Short Position</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 h-auto">
+                <TabsTrigger value="overview" className="min-h-[44px]">Overview</TabsTrigger>
+                <TabsTrigger value="long" className="min-h-[44px]">
+                  <span className="hidden sm:inline">Long Position</span>
+                  <span className="sm:hidden">Long</span>
+                </TabsTrigger>
+                <TabsTrigger value="short" className="min-h-[44px]">
+                  <span className="hidden sm:inline">Short Position</span>
+                  <span className="sm:hidden">Short</span>
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-3">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
                   <Card>
-                    <CardHeader className="pb-2">
-                      <CardDescription>Risk Amount</CardDescription>
-                      <CardTitle className="text-2xl text-destructive">
+                    <CardHeader className="pb-3">
+                      <CardDescription className="text-xs">Risk Amount</CardDescription>
+                      <CardTitle className="text-xl sm:text-2xl text-destructive">
                         {formatCurrency(results.riskAmount)}
                       </CardTitle>
                     </CardHeader>
                   </Card>
 
                   <Card>
-                    <CardHeader className="pb-2">
-                      <CardDescription>Position Size</CardDescription>
-                      <CardTitle className="text-2xl">
+                    <CardHeader className="pb-3">
+                      <CardDescription className="text-xs">Position Size</CardDescription>
+                      <CardTitle className="text-xl sm:text-2xl break-all">
                         {results.positionSize.toFixed(6)}
                       </CardTitle>
                     </CardHeader>
                   </Card>
 
                   <Card>
-                    <CardHeader className="pb-2">
-                      <CardDescription>Position Value</CardDescription>
-                      <CardTitle className="text-2xl">
+                    <CardHeader className="pb-3">
+                      <CardDescription className="text-xs">Position Value</CardDescription>
+                      <CardTitle className="text-xl sm:text-2xl">
                         {formatCurrency(results.positionValue)}
                       </CardTitle>
                     </CardHeader>
