@@ -57,12 +57,9 @@ const BenefitBadges = () => {
               }}
               className="w-[200px] h-[200px] md:w-[280px] md:h-[280px] lg:w-[320px] lg:h-[320px] rounded-full bg-gradient-to-br from-primary via-primary/90 to-primary/70 flex flex-col items-center justify-center text-center p-6 shadow-2xl shadow-primary/30 border-4 border-primary/20"
             >
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">
                 Built for<br />Every Trader
               </h2>
-              <p className="text-sm md:text-base text-white/90 font-medium">
-                Safe by Design
-              </p>
             </motion.div>
           </motion.div>
 
