@@ -68,9 +68,11 @@ export const getLanguageFromPath = (pathname: string): SupportedLanguage => {
  * Get the path without language prefix
  */
 export const getPathWithoutLanguage = (pathname: string): string => {
-  const lang = getLanguageFromPath(pathname);
-  if (lang === DEFAULT_LANGUAGE) return pathname;
-  return pathname.replace(`/${lang}`, '') || '/';
+  const firstSegment = pathname.split('/')[1];
+  const hasLangPrefix = SUPPORTED_LANGUAGES.includes(firstSegment as SupportedLanguage);
+  
+  if (!hasLangPrefix) return pathname;
+  return pathname.replace(`/${firstSegment}`, '') || '/';
 };
 
 /**
