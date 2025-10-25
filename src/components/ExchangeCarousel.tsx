@@ -6,17 +6,17 @@ interface Exchange {
 }
 
 const exchanges: Exchange[] = [
-  { name: "Binance", logo: "/exchange-logos/binance.png", alt: "Binance logo", size: "h-11 md:h-12" },
-  { name: "Bybit", logo: "/exchange-logos/bybit.png", alt: "Bybit logo", size: "h-8 md:h-10" },
-  { name: "Coinbase", logo: "/exchange-logos/coinbase.png", alt: "Coinbase logo", size: "h-8 md:h-10" },
-  { name: "OKX", logo: "/exchange-logos/okx.png", alt: "OKX logo", size: "h-8 md:h-10" },
-  { name: "Kraken", logo: "/exchange-logos/kraken.png", alt: "Kraken logo", size: "h-7 md:h-8" },
-  { name: "KuCoin", logo: "/exchange-logos/kucoin.png", alt: "KuCoin logo", size: "h-9 md:h-11" },
-  { name: "Gate.io", logo: "/exchange-logos/gateio.png", alt: "Gate.io logo", size: "h-8 md:h-10" },
-  { name: "MEXC", logo: "/exchange-logos/mexc.png", alt: "MEXC logo", size: "h-7 md:h-8" },
-  { name: "Bitfinex", logo: "/exchange-logos/bitfinex.png", alt: "Bitfinex logo", size: "h-6 md:h-7" },
-  { name: "Bitstamp", logo: "/exchange-logos/bitstamp.png", alt: "Bitstamp logo", size: "h-9 md:h-10" },
-  { name: "BingX", logo: "/exchange-logos/bingx.png", alt: "BingX logo", size: "h-10 md:h-12" },
+  { name: "Binance", logo: "/exchange-logos/binance.png?v=2", alt: "Binance logo", size: "h-11 md:h-12" },
+  { name: "Bybit", logo: "/exchange-logos/bybit.png?v=2", alt: "Bybit logo", size: "h-8 md:h-10" },
+  { name: "Coinbase", logo: "/exchange-logos/coinbase.png?v=2", alt: "Coinbase logo", size: "h-8 md:h-10" },
+  { name: "OKX", logo: "/exchange-logos/okx.png?v=2", alt: "OKX logo", size: "h-8 md:h-10" },
+  { name: "Kraken", logo: "/exchange-logos/kraken.png?v=2", alt: "Kraken logo", size: "h-7 md:h-8" },
+  { name: "KuCoin", logo: "/exchange-logos/kucoin.png?v=2", alt: "KuCoin logo", size: "h-9 md:h-11" },
+  { name: "Gate.io", logo: "/exchange-logos/gateio.png?v=2", alt: "Gate.io logo", size: "h-8 md:h-10" },
+  { name: "MEXC", logo: "/exchange-logos/mexc.png?v=2", alt: "MEXC logo", size: "h-7 md:h-8" },
+  { name: "Bitfinex", logo: "/exchange-logos/bitfinex.png?v=2", alt: "Bitfinex logo", size: "h-6 md:h-7" },
+  { name: "Bitstamp", logo: "/exchange-logos/bitstamp.png?v=2", alt: "Bitstamp logo", size: "h-9 md:h-10" },
+  { name: "BingX", logo: "/exchange-logos/bingx.png?v=2", alt: "BingX logo", size: "h-10 md:h-12" },
 ];
 
 export const ExchangeCarousel = () => {
