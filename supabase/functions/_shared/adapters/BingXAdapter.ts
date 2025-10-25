@@ -227,6 +227,24 @@ export class BingXAdapter extends BaseExchangeAdapter {
         }
       }
 
+      // Standard contract (non-perp) fallback as last attempt
+      if (!Array.isArray(items) || items.length === 0) {
+        console.log('BingX futures empty on swap/cswap; trying standard contract endpoints...');
+        const contractParams: Record<string, any> = { ...baseParams };
+        // symbol may be required by contract API; include if available
+        if (options?.symbol) contractParams.symbol = options.symbol.replace('/', '-');
+        try {
+          const resp5 = await this.makeRequest<any>(
+            '/openApi/contract/v1/allOrders',
+            contractParams
+          );
+          const list5 = resp5?.orders || resp5?.list || (Array.isArray(resp5) ? resp5 : []);
+          if (Array.isArray(list5)) items = list5;
+        } catch (e5) {
+          console.warn('BingX contract allOrders failed:', e5 instanceof Error ? e5.message : e5);
+        }
+      }
+
       if (!Array.isArray(items) || items.length === 0) {
         console.warn('BingX futures returned no trades or invalid format');
         return [];
@@ -272,7 +290,12 @@ export class BingXAdapter extends BaseExchangeAdapter {
       await this.makeRequest('/openApi/swap/v3/user/balance');
       return true;
     } catch {
-      return false;
+      try {
+        await this.makeRequest('/openApi/contract/v1/balance');
+        return true;
+      } catch {
+        return false;
+      }
     }
   }
 

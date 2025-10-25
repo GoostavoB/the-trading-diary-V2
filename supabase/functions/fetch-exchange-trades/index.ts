@@ -12,6 +12,7 @@ interface FetchRequest {
   selectedTradeIds?: string[];
   startDate?: string;
   endDate?: string;
+  symbol?: string;
 }
 
 function decrypt(encryptedText: string): string {
@@ -43,7 +44,7 @@ Deno.serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    const { connectionId, mode, selectedTradeIds, startDate, endDate }: FetchRequest = await req.json();
+    const { connectionId, mode, selectedTradeIds, startDate, endDate, symbol }: FetchRequest = await req.json();
 
     // Fetch connection
     const { data: connection, error: connectionError } = await supabaseClient
@@ -208,6 +209,7 @@ Deno.serve(async (req) => {
         startDate: startTime,
         endDate: endTime,
         tradingType: 'spot',
+        symbol,
       });
       if (spotResult.trades) {
         fetchedTrades.push(...spotResult.trades.map(t => ({ ...t, trading_type: 'spot' })));
@@ -219,25 +221,27 @@ Deno.serve(async (req) => {
         startDate: startTime,
         endDate: endTime,
         tradingType: 'futures',
+        symbol,
       });
       if (futuresResult.trades) {
         fetchedTrades.push(...futuresResult.trades.map(t => ({ ...t, trading_type: 'futures' })));
       }
     }
 
-    // Fallback: if user selected spot but nothing returned, try futures for exchanges that support it
-    const supportsFutures = ['bingx','binance','bybit','mexc','okx','gateio','kucoin'].includes(connection.exchange_name.toLowerCase());
-    if (tradingType === 'spot' && fetchedTrades.length === 0 && supportsFutures) {
-      console.log(`[${displayName}] Spot returned 0 trades, trying futures as fallback...`);
-      const futuresResult = await exchangeService.syncExchange(connection.exchange_name, {
-        startDate: startTime,
-        endDate: endTime,
-        tradingType: 'futures',
-      });
-      if (futuresResult.trades) {
-        fetchedTrades.push(...futuresResult.trades.map(t => ({ ...t, trading_type: 'futures' })));
-      }
+  // Fallback: if user selected spot but nothing returned, try futures for exchanges that support it
+  const supportsFutures = ['bingx','binance','bybit','mexc','okx','gateio','kucoin'].includes(connection.exchange_name.toLowerCase());
+  if (tradingType === 'spot' && fetchedTrades.length === 0 && supportsFutures) {
+    console.log(`[${displayName}] Spot returned 0 trades, trying futures as fallback...`);
+    const futuresResult = await exchangeService.syncExchange(connection.exchange_name, {
+      startDate: startTime,
+      endDate: endTime,
+      tradingType: 'futures',
+      symbol,
+    });
+    if (futuresResult.trades) {
+      fetchedTrades.push(...futuresResult.trades.map(t => ({ ...t, trading_type: 'futures' })));
     }
+  }
 
     console.log(`[${displayName}] Successfully fetched ${fetchedTrades.length} trades`);
 
@@ -317,6 +321,7 @@ Deno.serve(async (req) => {
         success: true,
         tradesFetched: stored,
         exchangeName: displayName,
+        symbolUsed: symbol || null,
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

@@ -95,6 +95,7 @@ export class ExchangeService {
       startDate?: Date;
       endDate?: Date;
       tradingType?: 'spot' | 'futures' | 'both';
+      symbol?: string;
     }
   ): Promise<{
     success: boolean;
@@ -117,11 +118,13 @@ export class ExchangeService {
         trades = await (adapter as any).fetchFuturesTrades({
           startTime: options?.startDate,
           endTime: options?.endDate,
+          symbol: options?.symbol,
         });
       } else {
         trades = await adapter.fetchTrades({
           startTime: options?.startDate,
           endTime: options?.endDate,
+          symbol: options?.symbol,
         });
       }
 

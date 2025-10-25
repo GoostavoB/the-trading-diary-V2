@@ -19,6 +19,7 @@ import { CalendarIcon, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
 
 interface SyncTradesDialogProps {
   connectionId: string | null;
@@ -41,6 +42,7 @@ export function SyncTradesDialog({
   const [preset, setPreset] = useState<DateRangePreset>('last30days');
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
+  const [symbol, setSymbol] = useState<string>('');
   const queryClient = useQueryClient();
 
   const fetchMutation = useMutation({
@@ -80,6 +82,7 @@ export function SyncTradesDialog({
             mode: 'preview',
             startDate: start,
             endDate: end,
+            symbol: symbol.trim() || undefined,
           }),
         }
       );
@@ -234,13 +237,23 @@ export function SyncTradesDialog({
 
           {/* Summary */}
           <div className="rounded-lg bg-muted p-4 space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">{t('exchanges.sync.selectedRange')}:</span>
-              <span className="font-medium">{getDateRangeLabel()}</span>
+            <div className="grid gap-3">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">{t('exchanges.sync.selectedRange')}:</span>
+                <span className="font-medium">{getDateRangeLabel()}</span>
+              </div>
+              <div className="grid gap-1">
+                <Label>{t('exchanges.sync.symbolOptional') || 'Symbol (optional)'}</Label>
+                <Input
+                  placeholder="e.g. BTC-USDT"
+                  value={symbol}
+                  onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {t('exchanges.sync.symbolHint') || 'For BingX spot and standard futures, a symbol may be required.'}
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {t('exchanges.sync.reviewNote')}
-            </p>
           </div>
         </div>
 
