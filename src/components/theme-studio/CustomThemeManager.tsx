@@ -3,7 +3,7 @@ import { useThemeMode, ColorMode, hexToHsl } from '@/hooks/useThemeMode';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Plus, Trash2, Edit2, Check, X } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, Shuffle } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -42,6 +42,16 @@ function hslToHex(hsl: string): string {
   return `#${rHex}${gHex}${bHex}`;
 }
 
+// Helper function to generate random hex color
+function generateRandomColor(): string {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
 export const CustomThemeManager = () => {
   const { themeMode, setThemeMode, customModes, addCustomMode, deleteCustomMode, updateCustomMode } = useThemeMode();
   const [isCreating, setIsCreating] = useState(false);
@@ -56,6 +66,20 @@ export const CustomThemeManager = () => {
   const [editPrimary, setEditPrimary] = useState('');
   const [editSecondary, setEditSecondary] = useState('');
   const [editAccent, setEditAccent] = useState('');
+
+  const handleRandomizeNewColors = () => {
+    setNewPrimary(generateRandomColor());
+    setNewSecondary(generateRandomColor());
+    setNewAccent(generateRandomColor());
+    toast.success('Random colors generated! 🎲');
+  };
+
+  const handleRandomizeEditColors = () => {
+    setEditPrimary(generateRandomColor());
+    setEditSecondary(generateRandomColor());
+    setEditAccent(generateRandomColor());
+    toast.success('Random colors generated! 🎲');
+  };
 
   const handleCreateMode = () => {
     if (!newModeName.trim()) {
@@ -174,7 +198,18 @@ export const CustomThemeManager = () => {
                 />
                 
                 <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">Edit colors:</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">Edit colors:</p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRandomizeEditColors}
+                      className="h-7 text-xs"
+                    >
+                      <Shuffle className="h-3 w-3 mr-1" />
+                      Random
+                    </Button>
+                  </div>
                   <div className="flex gap-2">
                     <div className="flex-1 space-y-1">
                       <label className="text-xs">Primary</label>
@@ -287,7 +322,18 @@ export const CustomThemeManager = () => {
           />
           
           <div className="space-y-2">
-            <p className="text-xs text-muted-foreground">Pick your colors:</p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">Pick your colors:</p>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRandomizeNewColors}
+                className="h-7 text-xs"
+              >
+                <Shuffle className="h-3 w-3 mr-1" />
+                Random
+              </Button>
+            </div>
             <div className="flex gap-2">
               <div className="flex-1 space-y-1">
                 <label className="text-xs">Primary</label>
