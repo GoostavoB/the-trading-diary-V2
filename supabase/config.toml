@@ -43,3 +43,6 @@ verify_jwt = true
 
 [functions.process-multi-upload]
 verify_jwt = true
+
+[functions.ai-insights-home]
+verify_jwt = true

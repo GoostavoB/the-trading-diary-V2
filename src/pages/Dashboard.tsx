@@ -16,6 +16,7 @@ import { CostEfficiencyPanel } from '@/components/insights/CostEfficiencyPanel';
 import { BehaviorAnalytics } from '@/components/insights/BehaviorAnalytics';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { ExportTradesDialog } from '@/components/ExportTradesDialog';
+import { AIInsightsBox } from '@/components/insights/AIInsightsBox';
 import { LevelUpModal } from '@/components/gamification/LevelUpModal';
 import { FloatingXP } from '@/components/gamification/FloatingXP';
 import { MicroFeedbackOverlay } from '@/components/gamification/MicroFeedbackOverlay';
@@ -921,6 +922,11 @@ const Dashboard = () => {
           </Card>
         ) : (
           <>
+            {/* AI Insights Box */}
+            <div className="mb-6 animate-fade-in" style={{animationDelay: '0.4s'}}>
+              <AIInsightsBox />
+            </div>
+
             {/* Main Content Tabs */}
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6 animate-fade-in" style={{animationDelay: '0.5s'}}>
               <TabsList className="glass rounded-2xl grid w-full grid-cols-3 h-auto p-1.5">
