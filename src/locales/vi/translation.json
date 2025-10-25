@@ -602,6 +602,185 @@
     "apply": "Áp dụng",
     "showingData": "Hiển thị dữ liệu cho"
   },
+  "pricing": {
+    "title": "Giá Cả Đơn Giản, Minh Bạch",
+    "subtitle": "Chọn gói phù hợp với hành trình giao dịch của bạn",
+    "mostPopular": "Phổ Biến Nhất",
+    "perMonth": "tháng",
+    "perMonthBilledAnnually": "tháng, thanh toán hàng năm",
+    "savingsAmount": "Tiết kiệm ${{amount}}/năm",
+    "guaranteeNote": "Đảm bảo hoàn tiền trong 7 ngày • Hủy bất cứ lúc nào • Không có phí ẩn",
+    "hero": {
+      "title": "Giao dịch với sự rõ ràng.",
+      "subtitle": "Nhật ký giao dịch được hỗ trợ bởi AI cho các nhà đầu tư tiền điện tử. Ghi lại mọi giao dịch, tìm ra mẫu hình và theo dõi lợi thế của bạn.",
+      "primaryCta": "Bắt Đầu Dùng Thử Miễn Phí",
+      "secondaryCta": "Xem demo 2 phút"
+    },
+    "solutions": {
+      "title": "Kết Quả Quan Trọng",
+      "subtitle": "Khả năng cao cấp được xây dựng cho các trader chuyên nghiệp",
+      "seePatterns": {
+        "headline": "Nhìn thấy mẫu hình ngay lập tức",
+        "subhead": "AI đọc toàn bộ lịch sử của bạn. Làm nổi bật những gì thực sự tạo ra tiền.",
+        "metric": "Đánh giá nhanh hơn 4.2 lần",
+        "proofPoint": "Trader trung bình phát hiện 3 mẫu hình có lợi nhuận trong tuần đầu tiên"
+      },
+      "knowEdge": {
+        "headline": "Biết lợi thế của bạn",
+        "subhead": "Mọi thiết lập, mọi giờ, mọi điều kiện thị trường. Được đo lường.",
+        "metric": "67%",
+        "metricValue": 67,
+        "proofPoint": "Cải thiện tỷ lệ thắng (người dùng trung bình)"
+      },
+      "tradeConfidence": {
+        "headline": "Giao dịch với sự tự tin",
+        "subhead": "Kích thước vị thế được tính toán. Rủi ro được kiểm soát. Sụt giảm được dự đoán.",
+        "metric": "89%",
+        "metricValue": 89,
+        "proofPoint": "Ít thua lỗ quá mức hơn"
+      },
+      "trackEffortlessly": {
+        "headline": "Theo dõi mọi thứ một cách dễ dàng",
+        "subhead": "Ảnh chụp màn hình, ghi chú, trạng thái cảm xúc. Tất cả được tổ chức. Luôn có thể tìm kiếm.",
+        "metric": "Tiết kiệm 12 phút",
+        "metricValue": 12,
+        "proofPoint": "Mỗi phiên đánh giá"
+      },
+      "performanceSpeaks": {
+        "headline": "Hiệu suất nói lên điều đó",
+        "subhead": "Tỷ lệ thắng, kỳ vọng, bội số R. Biểu đồ kể câu chuyện của bạn.",
+        "metric": "2.3 Sharpe",
+        "metricValue": 2.3,
+        "proofPoint": "Hiệu suất trung bình của người dùng chuyên nghiệp"
+      },
+      "yourRules": {
+        "headline": "Bảng điều khiển của bạn, quy tắc của bạn",
+        "subhead": "Widget bạn cần. Chỉ số quan trọng. Không gì khác.",
+        "metric": "8 bố cục",
+        "metricValue": 8,
+        "proofPoint": "Cấu hình tùy chỉnh mỗi người dùng (trung bình)"
+      },
+      "builtByTraders": {
+        "headline": "Được xây dựng bởi các trader hiểu biết",
+        "subhead": "Mọi quy trình từ nhật ký thực tế. Mọi tính năng được thử nghiệm trong thực chiến.",
+        "metric": "10.000+ giờ",
+        "metricValue": 10000,
+        "proofPoint": "Phản hồi từ trader được tích hợp"
+      }
+    },
+    "billing": {
+      "monthly": "Hàng Tháng",
+      "annual": "Hàng Năm",
+      "save20": "Tiết kiệm 20%"
+    },
+    "plans": {
+      "cta": "Bắt Đầu Dùng Thử Miễn Phí",
+      "terms": "Dùng thử miễn phí 7 ngày • Hủy bất cứ lúc nào • Thanh toán bằng USD",
+      "basic": {
+        "name": "Cơ Bản",
+        "description": "Hoàn hảo cho các trader tích cực xây dựng cấu trúc",
+        "features": {
+          "uploads": "50 lần tải lên giao dịch AI/tháng",
+          "manualUploads": "Tải lên thủ công không giới hạn",
+          "dashboard": "Bảng điều khiển tùy chỉnh với hơn 15 widget",
+          "charts": "Biểu đồ và phân tích nâng cao",
+          "basicJournal": "Nhật ký cơ bản với theo dõi cảm xúc",
+          "feeAnalytics": "Phân tích phí với cảnh báo",
+          "csv": "Nhập và xuất CSV",
+          "social": "Truy cập nguồn cấp dữ liệu xã hội và bảng xếp hạng"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Dành cho các trader nghiêm túc cải thiện kỷ luật",
+        "features": {
+          "uploads": "100 lần tải lên giao dịch AI/tháng",
+          "aiAnalysis": "1 Phân tích Hiệu suất AI mỗi tuần",
+          "tradingPlan": "Trình tạo Kế hoạch Giao dịch với danh sách kiểm tra",
+          "goals": "Theo dõi mục tiêu và tiến độ",
+          "richJournal": "Nhật ký phong phú với phân tích tâm trạng và mẫu hình",
+          "customWidgets": "3 widget KPI tùy chỉnh",
+          "fullSocial": "Tính năng xã hội đầy đủ (bài đăng, XP, huy hiệu)",
+          "everythingBasic": "Mọi thứ trong Cơ Bản"
+        }
+      },
+      "elite": {
+        "name": "Elite",
+        "description": "Trader chuyên nghiệp và nhà phân tích",
+        "features": {
+          "uploads": "300 lần tải lên giao dịch AI/tháng",
+          "aiAnalysis": "5 Phân tích Hiệu suất AI mỗi tuần",
+          "tradeReplay": "Phát lại Giao dịch (đánh giá từng bước)",
+          "positionCalculator": "Máy tính Kích thước Vị thế Nâng cao",
+          "riskDashboard": "Bảng điều khiển Rủi ro với phân tích sụt giảm",
+          "advancedAlerts": "Cảnh báo hiệu suất và phí nâng cao",
+          "customWidgets": "10 widget KPI tùy chỉnh",
+          "everythingPro": "Mọi thứ trong Pro"
+        }
+      }
+    },
+    "comparison": {
+      "title": "So Sánh Gói Chi Tiết",
+      "subtitle": "Xem chính xác những gì có trong mỗi gói",
+      "feature": "Tính năng",
+      "unlimited": "Không giới hạn",
+      "categories": {
+        "aiAnalytics": "AI & Phân tích",
+        "tradingTools": "Công cụ Giao dịch",
+        "journaling": "Nhật ký & Tâm lý",
+        "riskManagement": "Quản lý Rủi ro",
+        "integrations": "Tích hợp",
+        "social": "Xã hội & Cộng đồng"
+      },
+      "features": {
+        "aiUploads": "Tải lên Giao dịch AI",
+        "manualUploads": "Tải lên Giao dịch Thủ công",
+        "aiAnalysis": "Phân tích Hiệu suất AI",
+        "customWidgets": "Widget KPI Tùy chỉnh",
+        "advancedCharts": "Biểu đồ & Phân tích Nâng cao",
+        "tradingPlan": "Trình tạo Kế hoạch Giao dịch",
+        "preTradeChecklist": "Danh sách Kiểm tra Trước Giao dịch",
+        "goalsTracking": "Theo dõi Mục tiêu",
+        "tradeReplay": "Phát lại Giao dịch",
+        "positionCalculator": "Máy tính Kích thước Vị thế",
+        "basicJournal": "Nhật ký Cơ bản",
+        "emotionalTimeline": "Dòng thời gian Cảm xúc",
+        "richJournal": "Nhật ký Phong phú với Theo dõi Tâm trạng",
+        "patternAnalysis": "Phân tích Mẫu hình",
+        "feeAnalytics": "Phân tích Phí",
+        "riskDashboard": "Bảng điều khiển Rủi ro",
+        "drawdownAnalysis": "Phân tích Sụt giảm",
+        "performanceAlerts": "Cảnh báo Hiệu suất",
+        "csvImport": "Nhập/Xuất CSV",
+        "exchangeConnections": "Kết nối Sàn giao dịch",
+        "autoRefresh": "Tự động Làm mới",
+        "viewFeed": "Xem Nguồn cấp Xã hội",
+        "createPosts": "Tạo Bài đăng & Bình luận",
+        "leaderboard": "Bảng xếp hạng",
+        "xpBadges": "XP & Huy hiệu",
+        "challenges": "Thử thách Hàng ngày/Hàng tuần"
+      }
+    },
+    "roadmap": {
+      "title": "Sắp Ra Mắt",
+      "subtitle": "Các tính năng mới thú vị mà chúng tôi đang xây dựng cho bạn",
+      "targetQuarter": "Mục tiêu",
+      "highPriority": "Ưu tiên Cao",
+      "mediumPriority": "Ưu tiên Trung bình",
+      "features": {
+        "bestAssetFinder": "Trình tìm Tài sản Tốt nhất - Xác định các cặp có lợi nhuận nhất của bạn",
+        "batchEdit": "Chỉnh sửa Hàng loạt - Chỉnh sửa nhiều giao dịch cùng một lúc",
+        "valueAtRisk": "Máy tính Giá trị Rủi ro (VaR)",
+        "apiAccess": "Truy cập Khóa API Chỉ Đọc",
+        "portfolioTracking": "Phân tích Danh mục Đầu tư & Ảnh chụp nhanh",
+        "inAppAlerts": "Hệ thống Cảnh báo Trong Ứng dụng",
+        "autosyncDelta": "Nhập Delta Tự động Đồng bộ",
+        "savedViews": "Bộ lọc Nhanh & Chế độ xem Đã lưu",
+        "teamCollaboration": "Công cụ Cộng tác Nhóm"
+      },
+      "disclaimer": "Các tính năng và thời gian biểu có thể thay đổi dựa trên phản hồi của người dùng và ưu tiên phát triển"
+    }
+  },
   "about": {
     "pageTitle": "Về Chúng Tôi",
     "pageDescription": "Tìm hiểu về đội ngũ The Trading Diary và sứ mệnh của chúng tôi trong việc giúp các trader tiền điện tử cải thiện hiệu suất với phân tích và insights được hỗ trợ bởi AI.",

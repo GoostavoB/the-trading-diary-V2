@@ -1729,6 +1729,185 @@
       }
     }
   },
+  "pricing": {
+    "title": "Precios Simples y Transparentes",
+    "subtitle": "Elige el plan que se adapte a tu camino de trading",
+    "mostPopular": "Más Popular",
+    "perMonth": "mes",
+    "perMonthBilledAnnually": "mes, facturado anualmente",
+    "savingsAmount": "Ahorra ${{amount}}/año",
+    "guaranteeNote": "Garantía de devolución de 7 días • Cancela en cualquier momento • Sin tarifas ocultas",
+    "hero": {
+      "title": "Opera con claridad.",
+      "subtitle": "Un diario de trading impulsado por IA para inversores de cripto. Captura cada operación, encuentra patrones y rastrea tu ventaja.",
+      "primaryCta": "Comienza Prueba Gratuita",
+      "secondaryCta": "Ver demo de 2 minutos"
+    },
+    "solutions": {
+      "title": "Resultados que Importan",
+      "subtitle": "Capacidades premium diseñadas para traders de élite",
+      "seePatterns": {
+        "headline": "Ve patrones al instante",
+        "subhead": "La IA lee todo tu historial. Resalta lo que realmente genera dinero.",
+        "metric": "4.2x revisiones más rápidas",
+        "proofPoint": "El trader promedio descubre 3 patrones rentables en la primera semana"
+      },
+      "knowEdge": {
+        "headline": "Conoce tu ventaja",
+        "subhead": "Cada configuración, cada hora, cada condición de mercado. Medida.",
+        "metric": "67%",
+        "metricValue": 67,
+        "proofPoint": "Mejora en tasa de ganancia (usuario promedio)"
+      },
+      "tradeConfidence": {
+        "headline": "Opera con confianza",
+        "subhead": "Tamaño de posición calculado. Riesgo controlado. Caídas predichas.",
+        "metric": "89%",
+        "metricValue": 89,
+        "proofPoint": "Menos pérdidas sobredimensionadas"
+      },
+      "trackEffortlessly": {
+        "headline": "Rastrea todo sin esfuerzo",
+        "subhead": "Capturas de pantalla, notas, estado emocional. Todo organizado. Siempre buscable.",
+        "metric": "12 minutos ahorrados",
+        "metricValue": 12,
+        "proofPoint": "Por sesión de revisión"
+      },
+      "performanceSpeaks": {
+        "headline": "Rendimiento que habla",
+        "subhead": "Tasa de ganancia, expectativa, múltiplos R. Gráficos que cuentan tu historia.",
+        "metric": "2.3 Sharpe",
+        "metricValue": 2.3,
+        "proofPoint": "Rendimiento promedio de usuario élite"
+      },
+      "yourRules": {
+        "headline": "Tu tablero, tus reglas",
+        "subhead": "Widgets que necesitas. Métricas que importan. Nada más.",
+        "metric": "8 diseños",
+        "metricValue": 8,
+        "proofPoint": "Configuraciones personalizadas por usuario (promedio)"
+      },
+      "builtByTraders": {
+        "headline": "Construido por traders que lo entienden",
+        "subhead": "Cada flujo de trabajo de diarios reales. Cada función probada en batalla.",
+        "metric": "10,000+ horas",
+        "metricValue": 10000,
+        "proofPoint": "De retroalimentación de traders integrada"
+      }
+    },
+    "billing": {
+      "monthly": "Mensual",
+      "annual": "Anual",
+      "save20": "Ahorra 20%"
+    },
+    "plans": {
+      "cta": "Comienza Prueba Gratuita",
+      "terms": "Prueba gratuita de 7 días • Cancela en cualquier momento • Facturado en USD",
+      "basic": {
+        "name": "Básico",
+        "description": "Perfecto para traders activos construyendo estructura",
+        "features": {
+          "uploads": "50 cargas de operaciones con IA/mes",
+          "manualUploads": "Cargas manuales ilimitadas",
+          "dashboard": "Tablero personalizado con más de 15 widgets",
+          "charts": "Gráficos y análisis avanzados",
+          "basicJournal": "Diario básico con seguimiento emocional",
+          "feeAnalytics": "Análisis de tarifas con alertas",
+          "csv": "Importación y exportación CSV",
+          "social": "Acceso a feed social y tabla de clasificación"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Para traders serios mejorando su disciplina",
+        "features": {
+          "uploads": "100 cargas de operaciones con IA/mes",
+          "aiAnalysis": "1 Análisis de Rendimiento con IA por semana",
+          "tradingPlan": "Constructor de Plan de Trading con lista de verificación",
+          "goals": "Seguimiento de objetivos y progreso",
+          "richJournal": "Diario enriquecido con análisis de ánimo y patrones",
+          "customWidgets": "3 widgets KPI personalizados",
+          "fullSocial": "Funciones sociales completas (publicaciones, XP, insignias)",
+          "everythingBasic": "Todo en Básico"
+        }
+      },
+      "elite": {
+        "name": "Elite",
+        "description": "Traders profesionales y analistas",
+        "features": {
+          "uploads": "300 cargas de operaciones con IA/mes",
+          "aiAnalysis": "5 Análisis de Rendimiento con IA por semana",
+          "tradeReplay": "Repetición de Operaciones (revisión paso a paso)",
+          "positionCalculator": "Calculadora Avanzada de Tamaño de Posición",
+          "riskDashboard": "Tablero de Riesgo con análisis de caída",
+          "advancedAlerts": "Alertas avanzadas de rendimiento y tarifas",
+          "customWidgets": "10 widgets KPI personalizados",
+          "everythingPro": "Todo en Pro"
+        }
+      }
+    },
+    "comparison": {
+      "title": "Compara Planes en Detalle",
+      "subtitle": "Ve exactamente qué está incluido en cada plan",
+      "feature": "Función",
+      "unlimited": "Ilimitado",
+      "categories": {
+        "aiAnalytics": "IA y Análisis",
+        "tradingTools": "Herramientas de Trading",
+        "journaling": "Diario y Psicología",
+        "riskManagement": "Gestión de Riesgo",
+        "integrations": "Integraciones",
+        "social": "Social y Comunidad"
+      },
+      "features": {
+        "aiUploads": "Cargas de Operaciones con IA",
+        "manualUploads": "Cargas Manuales de Operaciones",
+        "aiAnalysis": "Análisis de Rendimiento con IA",
+        "customWidgets": "Widgets KPI Personalizados",
+        "advancedCharts": "Gráficos y Análisis Avanzados",
+        "tradingPlan": "Constructor de Plan de Trading",
+        "preTradeChecklist": "Lista de Verificación Pre-Trading",
+        "goalsTracking": "Seguimiento de Objetivos",
+        "tradeReplay": "Repetición de Operaciones",
+        "positionCalculator": "Calculadora de Tamaño de Posición",
+        "basicJournal": "Diario Básico",
+        "emotionalTimeline": "Línea de Tiempo Emocional",
+        "richJournal": "Diario Enriquecido con Seguimiento de Ánimo",
+        "patternAnalysis": "Análisis de Patrones",
+        "feeAnalytics": "Análisis de Tarifas",
+        "riskDashboard": "Tablero de Riesgo",
+        "drawdownAnalysis": "Análisis de Caída",
+        "performanceAlerts": "Alertas de Rendimiento",
+        "csvImport": "Importación/Exportación CSV",
+        "exchangeConnections": "Conexiones de Exchange",
+        "autoRefresh": "Actualización Automática",
+        "viewFeed": "Ver Feed Social",
+        "createPosts": "Crear Publicaciones y Comentarios",
+        "leaderboard": "Tabla de Clasificación",
+        "xpBadges": "XP e Insignias",
+        "challenges": "Desafíos Diarios/Semanales"
+      }
+    },
+    "roadmap": {
+      "title": "Próximamente",
+      "subtitle": "Nuevas funciones emocionantes que estamos construyendo para ti",
+      "targetQuarter": "Objetivo",
+      "highPriority": "Alta Prioridad",
+      "mediumPriority": "Prioridad Media",
+      "features": {
+        "bestAssetFinder": "Buscador de Mejor Activo - Identifica tus pares más rentables",
+        "batchEdit": "Edición por Lotes - Edita múltiples operaciones a la vez",
+        "valueAtRisk": "Calculadora de Valor en Riesgo (VaR)",
+        "apiAccess": "Acceso a Clave API de Solo Lectura",
+        "portfolioTracking": "Análisis de Cartera e Instantáneas",
+        "inAppAlerts": "Sistema de Alertas en la Aplicación",
+        "autosyncDelta": "Importaciones Delta de Autosincronización",
+        "savedViews": "Filtros Rápidos y Vistas Guardadas",
+        "teamCollaboration": "Herramientas de Colaboración en Equipo"
+      },
+      "disclaimer": "Las funciones y el cronograma están sujetos a cambios según los comentarios de los usuarios y las prioridades de desarrollo"
+    }
+  },
   "about": {
     "pageTitle": "Acerca de Nosotros",
     "pageDescription": "Conoce al equipo de The Trading Diary y nuestra misión de ayudar a los traders de cripto a mejorar su rendimiento con análisis e insights impulsados por IA.",
