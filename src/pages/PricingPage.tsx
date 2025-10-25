@@ -41,18 +41,21 @@ const PricingPage = () => {
 
   const plans = [
     {
-      id: 'basic',
-      name: 'Basic',
-      description: 'New traders validating a system',
-      monthlyPrice: 0,
-      yearlyPrice: 0,
+      id: 'starter',
+      name: 'Starter',
+      description: 'Beginner traders tracking performance',
+      monthlyPrice: 10,
+      yearlyPrice: 8,
+      yearlyTotal: 96,
       features: [
-        '1 account',
-        'AI uploads up to 50/mo',
-        'Weekly heatmap and win rate',
-        'Net PnL with fees',
-        'One exchange',
-        'Email support'
+        '20 uploads per month. Up to 10 trades per upload',
+        '1 connected account',
+        'AI Insights on the homepage',
+        'Trading history, manual trades, spot wallet',
+        'Trading journal, drawdown, leverage stop calculator',
+        'Market data and smart equity forecast',
+        'Email support',
+        'Fee analysis not included'
       ],
       cta: 'Start free',
       popular: false
@@ -61,15 +64,16 @@ const PricingPage = () => {
       id: 'pro',
       name: 'Pro',
       description: 'Active traders optimizing risk and costs',
-      monthlyPrice: 35,
-      yearlyPrice: 29,
+      monthlyPrice: 15,
+      yearlyPrice: 12,
+      yearlyTotal: 144,
       features: [
+        '50 uploads per month. Up to 10 trades per upload',
         'Unlimited accounts',
-        'AI uploads up to 1,000/mo',
-        'Fees dashboard and maker vs taker sim',
-        'Leverage and position size by risk',
-        'Risk alerts and weekly DD limit',
-        'Up to 3 exchanges'
+        'Fee analysis',
+        'Trading plan, goals, trading psychology',
+        'Reports and tax reports',
+        'Custom AI metrics: 3 per month'
       ],
       cta: 'Start 7-day trial',
       popular: true
@@ -78,15 +82,17 @@ const PricingPage = () => {
       id: 'elite',
       name: 'Elite',
       description: 'Professional traders needing advanced analysis and reports',
-      monthlyPrice: 79,
-      yearlyPrice: 65,
+      monthlyPrice: 25,
+      yearlyPrice: 20,
+      yearlyTotal: 240,
       features: [
+        '120 uploads per month. Up to 10 trades per upload',
         'Unlimited accounts',
-        'AI uploads up to 5,000/mo',
-        'MFE/MAE and expectancy by setup',
-        'Weekly reports and PDF/CSV export',
-        'Team seats and priorities',
-        'Up to 5 exchanges'
+        'Everything in Pro',
+        'Custom AI metrics: 10 per month',
+        'Early access to new features',
+        'Premium priority support',
+        '50% off extra credits'
       ],
       cta: 'Start 7-day trial',
       popular: false
@@ -217,12 +223,17 @@ const PricingPage = () => {
                         <div className="flex items-baseline gap-2 mb-2">
                           <span className="text-4xl font-bold">${getPrice(plan)}</span>
                           <span className="text-sm text-muted-foreground">
-                            /month{billingCycle === 'yearly' ? ' billed annually' : ''}
+                            /month
                           </span>
                         </div>
+                        {billingCycle === 'yearly' && plan.yearlyTotal && (
+                          <div className="text-sm text-muted-foreground mb-2">
+                            Billed ${plan.yearlyTotal} once
+                          </div>
+                        )}
                         {billingCycle === 'yearly' && (
                           <div className="inline-block px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-md">
-                            Save 2 months on yearly
+                            Save {((1 - plan.yearlyPrice / plan.monthlyPrice) * 12).toFixed(0)} months
                           </div>
                         )}
                       </>
@@ -249,12 +260,43 @@ const PricingPage = () => {
                   </p>
 
                   <ul className="space-y-3">
-                    {plan.features.map((feature, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
+                    {plan.features.map((feature, i) => {
+                      // Determine if this feature needs a tooltip
+                      let tooltipContent = null;
+                      
+                      if (feature.includes('uploads per month')) {
+                        tooltipContent = "One upload spends 1 credit and can include up to 10 trades. To save credits, upload every 10 trades.";
+                      } else if (feature.includes('connected account') || feature.includes('Unlimited accounts')) {
+                        tooltipContent = "Connect your exchange or broker. Starter supports 1 account. Pro and Elite are unlimited.";
+                      } else if (feature.includes('Custom AI metrics')) {
+                        tooltipContent = "Create your own metric and add it to your dashboard. Choose the rule, the inputs, and the alert. You can create 3 per month on Pro and 10 per month on Elite.";
+                      } else if (feature.includes('Fee analysis')) {
+                        tooltipContent = "Detailed fees and funding by trade and by day. Available on Pro and Elite.";
+                      } else if (feature.includes('extra credits')) {
+                        tooltipContent = "Add 10 uploads for $2. Elite pays $1.";
+                      }
+                      
+                      return (
+                        <li key={i} className="flex items-start gap-2">
+                          <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                          <span className="text-sm flex items-center gap-1">
+                            {feature}
+                            {tooltipContent && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                                  </TooltipTrigger>
+                                  <TooltipContent className="max-w-xs">
+                                    <p className="text-sm">{tooltipContent}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </motion.div>
               ))}
