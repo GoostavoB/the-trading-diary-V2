@@ -169,7 +169,7 @@ export const CurrentROIWidget = memo(({
             </span>
           </div>
           <p className="text-[10px] text-muted-foreground/70 mt-2">
-            ROI calculation includes all capital additions tracked in Capital Management
+            Total profit from trading, regardless of withdrawals
           </p>
         </div>
       </div>

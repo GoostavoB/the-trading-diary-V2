@@ -26,7 +26,6 @@ const DEFAULT_POSITIONS: WidgetPosition[] = [
   { id: 'avgPnLPerTrade', column: 1, row: 3 },
   { id: 'avgPnLPerDay', column: 2, row: 3 },
   { id: 'currentROI', column: 0, row: 4 },
-  { id: 'avgROIPerTrade', column: 1, row: 4 },
 ];
 
 export const useGridLayout = (userId: string | undefined, availableWidgets: string[]) => {

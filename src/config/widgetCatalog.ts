@@ -27,7 +27,6 @@ import { QuickActionsWidget } from '@/components/widgets/QuickActionsWidget';
 import { AvgPnLPerTradeWidget } from '@/components/widgets/AvgPnLPerTradeWidget';
 import { AvgPnLPerDayWidget } from '@/components/widgets/AvgPnLPerDayWidget';
 import { CurrentROIWidget } from '@/components/widgets/CurrentROIWidget';
-import { AvgROIPerTradeWidget } from '@/components/widgets/AvgROIPerTradeWidget';
 import { CapitalGrowthWidget } from '@/components/widgets/CapitalGrowthWidget';
 import { AbsoluteProfitWidget } from '@/components/widgets/AbsoluteProfitWidget';
 import { BehaviorAnalytics } from '@/components/insights/BehaviorAnalytics';
@@ -165,22 +164,11 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
   currentROI: {
     id: 'currentROI',
     title: 'Current ROI',
-    description: 'Return on investment from initial capital',
+    description: 'Total return on investment regardless of withdrawals',
     category: 'performance',
     icon: TrendingUp,
     defaultSize: 'small',
     component: CurrentROIWidget,
-    requiresData: ['stats'],
-  },
-
-  avgROIPerTrade: {
-    id: 'avgROIPerTrade',
-    title: 'Avg ROI Per Trade',
-    description: 'Average ROI across all trades',
-    category: 'performance',
-    icon: Percent,
-    defaultSize: 'small',
-    component: AvgROIPerTradeWidget,
     requiresData: ['stats'],
   },
 
@@ -274,7 +262,6 @@ export const DEFAULT_DASHBOARD_LAYOUT = [
   'avgPnLPerTrade',
   'avgPnLPerDay',
   'currentROI',
-  'avgROIPerTrade',
   'capitalGrowth',
   'absoluteProfit',
   'heatmap',

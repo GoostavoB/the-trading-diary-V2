@@ -83,7 +83,6 @@ interface TradeStats {
   avg_pnl_per_day: number;
   trading_days: number;
   current_roi: number;
-  avg_roi_per_trade: number;
 }
 
 function calculateCurrentStreak(trades: Trade[]): number {
@@ -500,16 +499,11 @@ const Dashboard = () => {
       // Calculate current balance (subtract withdrawals)
       const currentBalance = baseCapital + totalPnL - totalWithdrawals;
       
-      // Calculate current ROI based on total invested capital
+      // Calculate current ROI: Total profit regardless of withdrawals
       let currentROI = 0;
       if (baseCapital > 0) {
-        currentROI = ((currentBalance - baseCapital) / baseCapital) * 100;
+        currentROI = (totalPnL / baseCapital) * 100;
       }
-      
-      // Calculate weighted average ROI (accounts for different position sizes)
-      const totalProfit = deduplicatedTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
-      const totalMargin = deduplicatedTrades.reduce((sum, t) => sum + (t.margin || 0), 0);
-      const avgROIPerTrade = totalMargin > 0 ? (totalProfit / totalMargin) * 100 : 0;
 
       setStats({
         total_pnl: totalPnL,
@@ -520,7 +514,6 @@ const Dashboard = () => {
         avg_pnl_per_day: avgPnLPerDay,
         trading_days: uniqueDays,
         current_roi: currentROI,
-        avg_roi_per_trade: avgROIPerTrade,
       });
     }
     setLoading(false);
@@ -855,10 +848,6 @@ const Dashboard = () => {
           setInitialInvestment(newValue);
           // fetchStats will be automatically called via useEffect when initialInvestment changes
         };
-        break;
-      case 'avgROIPerTrade':
-        widgetProps.avgROIPerTrade = stats?.avg_roi_per_trade || 0;
-        widgetProps.totalTrades = stats?.total_trades || 0;
         break;
       case 'capitalGrowth':
         // Capital Growth widget now self-fetches data via useCapitalGrowthData hook
