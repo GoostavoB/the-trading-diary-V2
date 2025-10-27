@@ -131,8 +131,7 @@ export function AppSidebar() {
         // { title: 'Social Feed', url: '/social-feed', icon: Heart, iconName: 'Heart', keywords: ['feed', 'posts', 'community', 'share', 'social', 'network', 'connect', 'trading', 'ideas', 'discuss'] },
         // { title: t('navigation.leaderboard'), url: '/leaderboard', icon: Trophy, iconName: 'Trophy', keywords: ['leaderboard', 'ranking', 'top', 'competition', 'scores', 'traders', 'best', 'performers', 'elite', 'standings', 'positions', 'compare', 'leaders', 'winners', 'rank', 'compete'] },
         { title: t('navigation.achievements'), url: '/achievements', icon: Award, iconName: 'Award', keywords: ['achievements', 'badges', 'rewards', 'unlocks', 'milestones', 'trophies', 'accomplishments', 'goals', 'completed', 'earned', 'collection', 'showcase', 'awards', 'earn', 'win', 'accomplish'] },
-        // Gamification temporarily hidden - XP/Level/Challenges removed, badges kept in Achievements
-        // { title: t('navigation.progressXP'), url: '/progress-analytics', icon: Zap, iconName: 'Zap', keywords: ['progress', 'xp', 'experience', 'level', 'achievements', 'gamification', 'points', 'rewards', 'streaks', 'challenges', 'daily', 'weekly', 'missions', 'unlock', 'growth', 'rank', 'leveling'] },
+        { title: t('navigation.progressXP'), url: '/gamification', icon: Zap, iconName: 'Zap', keywords: ['progress', 'xp', 'experience', 'level', 'achievements', 'gamification', 'points', 'rewards', 'streaks', 'challenges', 'daily', 'weekly', 'missions', 'unlock', 'growth', 'rank', 'leveling'] },
       ],
     },
     {

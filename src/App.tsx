@@ -40,8 +40,7 @@ const Upload = lazy(() => import("./pages/Upload"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Forecast = lazy(() => import("./pages/Forecast"));
 const Achievements = lazy(() => import("./pages/Achievements"));
-// Gamification page temporarily disabled - XP/Level/Challenges hidden, badges kept in Achievements
-// const Gamification = lazy(() => import("./pages/Gamification"));
+const Gamification = lazy(() => import("./pages/Gamification"));
 const MarketData = lazy(() => import("./pages/MarketData"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Blog = lazy(() => import("./pages/Blog"));
@@ -187,8 +186,7 @@ const AppRoutes = () => {
         <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
         <Route path="/forecast" element={<ProtectedRoute><Forecast /></ProtectedRoute>} />
         <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
-        {/* Gamification route temporarily disabled - XP/Level/Challenges hidden */}
-        {/* <Route path="/gamification" element={<ProtectedRoute><Gamification /></ProtectedRoute>} /> */}
+        <Route path="/gamification" element={<ProtectedRoute><Gamification /></ProtectedRoute>} />
         <Route path="/market-data" element={<ProtectedRoute><MarketData /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         {/* Phase 2: Social features - temporarily disabled for backlog #34 */}
