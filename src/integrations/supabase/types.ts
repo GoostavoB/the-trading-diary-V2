@@ -451,6 +451,42 @@ export type Database = {
         }
         Relationships: []
       }
+      broker_csv_templates: {
+        Row: {
+          broker_name: string
+          column_mappings: Json
+          created_at: string
+          id: string
+          is_global: boolean
+          last_used_at: string
+          sample_headers: string[]
+          usage_count: number
+          user_id: string
+        }
+        Insert: {
+          broker_name: string
+          column_mappings: Json
+          created_at?: string
+          id?: string
+          is_global?: boolean
+          last_used_at?: string
+          sample_headers: string[]
+          usage_count?: number
+          user_id: string
+        }
+        Update: {
+          broker_name?: string
+          column_mappings?: Json
+          created_at?: string
+          id?: string
+          is_global?: boolean
+          last_used_at?: string
+          sample_headers?: string[]
+          usage_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       browser_notifications: {
         Row: {
           created_at: string
@@ -4178,6 +4214,10 @@ export type Database = {
       }
       increment_daily_alert_count: {
         Args: { p_user_id: string }
+        Returns: undefined
+      }
+      increment_template_usage: {
+        Args: { p_template_id: string }
         Returns: undefined
       }
       record_social_share: { Args: { p_platform: string }; Returns: Json }

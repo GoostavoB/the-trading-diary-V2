@@ -1,276 +1,330 @@
-import { useState } from 'react';
-import { FileSpreadsheet, Upload, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { parseCSVFile, detectBrokerFormat, mapBrokerCSVToTrades, validateTradeData, BrokerFormat } from '@/utils/csvParser';
-import { ExtractedTrade } from '@/types/trade';
-import { CSVPreviewTable } from './CSVPreviewTable';
+import { useState, useCallback } from "react";
+import Papa from "papaparse";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Upload, FileText, CheckCircle2, AlertCircle, ArrowLeft } from "lucide-react";
+import { ExtractedTrade } from "@/types/trade";
+import { CSVColumnMapper } from "./CSVColumnMapper";
+import { BrokerTemplateManager } from "./BrokerTemplateManager";
+import { CSVPreviewWithEdit } from "./CSVPreviewWithEdit";
+import { BrokerSelect } from "./BrokerSelect";
+import { toast } from "sonner";
+import { useBrokerTemplates } from "@/hooks/useBrokerTemplates";
+import { findBestTemplateMatch } from "@/utils/csvAutoMapper";
 
 interface CSVUploadProps {
   onTradesExtracted: (trades: ExtractedTrade[]) => void;
 }
 
-export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [parsedTrades, setParsedTrades] = useState<ExtractedTrade[]>([]);
-  const [detectedFormat, setDetectedFormat] = useState<BrokerFormat | null>(null);
-  const [fileName, setFileName] = useState<string>('');
-  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+type UploadStep = 'upload' | 'mapping' | 'broker' | 'preview';
 
-  const formatLabels: Record<BrokerFormat, string> = {
-    'binance-futures': 'Binance Futures',
-    'bybit': 'Bybit',
-    'okx': 'OKX',
-    'app-export': 'TradeJournal Export',
-    'generic': 'Unknown Format',
+export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
+  const [currentStep, setCurrentStep] = useState<UploadStep>('upload');
+  const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
+  const [csvData, setCsvData] = useState<Record<string, any>[]>([]);
+  const [fileName, setFileName] = useState<string>("");
+  const [columnMappings, setColumnMappings] = useState<Record<string, string>>({});
+  const [selectedBroker, setSelectedBroker] = useState<string>("");
+  const [mappedTrades, setMappedTrades] = useState<ExtractedTrade[]>([]);
+  const [detectedTemplate, setDetectedTemplate] = useState<{ id: string; name: string } | null>(null);
+  
+  const { templates, incrementUsage, saveTemplate } = useBrokerTemplates();
+
+  const handleFileSelect = useCallback(async (file: File) => {
+    setFileName(file.name);
+    toast.info("Parsing CSV file...");
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        if (results.errors.length > 0) {
+          toast.error("Failed to parse CSV file");
+          console.error(results.errors);
+          return;
+        }
+
+        const headers = results.meta.fields || [];
+        const data = results.data as Record<string, any>[];
+
+        setCsvHeaders(headers);
+        setCsvData(data);
+
+        // Try to find matching template
+        const match = findBestTemplateMatch(headers, templates);
+        
+        if (match && match.similarity >= 80) {
+          setDetectedTemplate({ id: match.templateId, name: match.brokerName });
+          const template = templates.find(t => t.id === match.templateId);
+          
+          if (template) {
+            toast.success(`Recognized as ${match.brokerName}! Auto-loading mapping...`);
+            setColumnMappings(template.column_mappings);
+            setSelectedBroker(match.brokerName);
+            incrementUsage(match.templateId);
+            
+            // Skip to preview
+            const trades = applyMappingToData(data, template.column_mappings);
+            setMappedTrades(trades);
+            setCurrentStep('preview');
+          }
+        } else {
+          toast.info("New CSV format detected - let's map the columns");
+          setCurrentStep('mapping');
+        }
+      },
+      error: () => {
+        toast.error("Failed to read CSV file");
+      }
+    });
+  }, [templates, incrementUsage]);
+
+  const applyMappingToData = (data: Record<string, any>[], mappings: Record<string, string>): ExtractedTrade[] => {
+    return data.map(row => {
+      const trade: Partial<ExtractedTrade> = {};
+      
+      Object.entries(mappings).forEach(([tradeField, csvColumn]) => {
+        const value = row[csvColumn];
+        
+        // Type conversions
+        if (['entry_price', 'exit_price', 'position_size', 'leverage', 'funding_fee', 'trading_fee', 'margin', 'profit_loss', 'roi'].includes(tradeField)) {
+          (trade as any)[tradeField] = parseFloat(value) || 0;
+        } else if (['duration_days', 'duration_hours', 'duration_minutes'].includes(tradeField)) {
+          (trade as any)[tradeField] = parseInt(value) || 0;
+        } else if (tradeField === 'side') {
+          const normalized = value?.toLowerCase();
+          trade.side = (normalized === 'buy' || normalized === 'long') ? 'long' : 'short';
+        } else {
+          (trade as any)[tradeField] = value;
+        }
+      });
+
+      // Calculate derived fields
+      if (trade.entry_price && trade.exit_price && trade.position_size) {
+        const pnl = trade.side === 'long'
+          ? (trade.exit_price - trade.entry_price) * trade.position_size
+          : (trade.entry_price - trade.exit_price) * trade.position_size;
+        
+        trade.profit_loss = pnl - (trade.funding_fee || 0) - (trade.trading_fee || 0);
+        trade.margin = trade.entry_price * trade.position_size / (trade.leverage || 1);
+        trade.roi = (trade.profit_loss / trade.margin) * 100;
+      }
+
+      // Calculate duration
+      if (trade.opened_at && trade.closed_at) {
+        const openTime = new Date(trade.opened_at).getTime();
+        const closeTime = new Date(trade.closed_at).getTime();
+        const diffMs = closeTime - openTime;
+        
+        trade.duration_days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        trade.duration_hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        trade.duration_minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      }
+
+      // Set period of day
+      if (trade.opened_at) {
+        const hour = new Date(trade.opened_at).getHours();
+        if (hour < 12) trade.period_of_day = 'morning';
+        else if (hour < 18) trade.period_of_day = 'afternoon';
+        else trade.period_of_day = 'night';
+      }
+
+      return trade as ExtractedTrade;
+    });
   };
 
-  const handleFileSelect = async (file: File) => {
-    if (!file.name.endsWith('.csv')) {
-      setValidationErrors(['Please upload a valid CSV file']);
+  const handleMappingComplete = (mappings: Record<string, string>) => {
+    setColumnMappings(mappings);
+    setCurrentStep('broker');
+  };
+
+  const handleBrokerSelected = async () => {
+    if (!selectedBroker) {
+      toast.error("Please select a broker");
       return;
     }
 
-    setIsProcessing(true);
-    setFileName(file.name);
-    setValidationErrors([]);
+    // Apply mappings and generate trades
+    const trades = applyMappingToData(csvData, columnMappings);
+    setMappedTrades(trades);
 
+    // Save template
     try {
-      // Parse CSV
-      const result = await parseCSVFile(file);
-      
-      if (result.errors.length > 0) {
-        setValidationErrors(result.errors.map(e => e.message));
-        setIsProcessing(false);
-        return;
-      }
-
-      // Detect broker format
-      const format = detectBrokerFormat(result.headers);
-      setDetectedFormat(format);
-
-      if (format === 'generic') {
-        setValidationErrors(['Unable to detect broker format. Please ensure your CSV matches a supported format (Binance, Bybit, OKX).']);
-        setIsProcessing(false);
-        return;
-      }
-
-      // Map to trades
-      const trades = mapBrokerCSVToTrades(result.data, format);
-      
-      if (trades.length === 0) {
-        setValidationErrors(['No valid trades found in CSV. Please check the file format.']);
-        setIsProcessing(false);
-        return;
-      }
-
-      // Validate trades
-      const validation = validateTradeData(trades);
-      if (!validation.valid) {
-        const errorMessages = validation.errors.map(
-          e => `Row ${e.row}: ${e.message}`
-        );
-        setValidationErrors(errorMessages.slice(0, 5)); // Show first 5 errors
-      }
-
-      setParsedTrades(trades);
+      await saveTemplate({
+        brokerName: selectedBroker,
+        columnMappings,
+        sampleHeaders: csvHeaders
+      });
     } catch (error) {
-      console.error('CSV parsing error:', error);
-      setValidationErrors(['Failed to parse CSV file. Please check the file format.']);
-    } finally {
-      setIsProcessing(false);
+      console.error("Failed to save template:", error);
     }
+
+    setCurrentStep('preview');
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
+  const handleImportTrades = () => {
+    const validTrades = mappedTrades.filter(t => 
+      t.symbol && t.entry_price && t.exit_price && t.position_size
+    );
     
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      handleFileSelect(file);
+    if (validTrades.length === 0) {
+      toast.error("No valid trades to import");
+      return;
     }
-  };
 
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFileSelect(file);
-    }
-  };
-
-  const handleImportAll = () => {
-    onTradesExtracted(parsedTrades);
-    // Reset state
-    setParsedTrades([]);
-    setDetectedFormat(null);
-    setFileName('');
-    setValidationErrors([]);
+    onTradesExtracted(validTrades);
+    toast.success(`Extracted ${validTrades.length} trades from ${fileName}`);
+    handleReset();
   };
 
   const handleReset = () => {
-    setParsedTrades([]);
-    setDetectedFormat(null);
-    setFileName('');
-    setValidationErrors([]);
+    setCurrentStep('upload');
+    setCsvHeaders([]);
+    setCsvData([]);
+    setFileName("");
+    setColumnMappings({});
+    setSelectedBroker("");
+    setMappedTrades([]);
+    setDetectedTemplate(null);
   };
 
-  return (
-    <div className="space-y-4">
-      {parsedTrades.length === 0 ? (
-        <div
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          className={`relative border-2 border-dashed rounded-lg p-12 transition-colors ${
-            isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
-          }`}
-        >
+  const handleLoadTemplate = (templateId: string, brokerName: string, mappings: Record<string, string>) => {
+    setColumnMappings(mappings);
+    setSelectedBroker(brokerName);
+    setDetectedTemplate({ id: templateId, name: brokerName });
+    incrementUsage(templateId);
+    
+    if (csvData.length > 0) {
+      const trades = applyMappingToData(csvData, mappings);
+      setMappedTrades(trades);
+      setCurrentStep('preview');
+    } else {
+      setCurrentStep('mapping');
+    }
+  };
+
+  // Render current step
+  if (currentStep === 'upload') {
+    return (
+      <Card className="p-8">
+        <div className="border-2 border-dashed rounded-lg p-12 text-center">
           <input
             type="file"
             accept=".csv"
-            onChange={handleFileInput}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            disabled={isProcessing}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFileSelect(file);
+            }}
+            className="hidden"
+            id="csv-upload"
           />
-          
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <div className="p-4 bg-primary/10 rounded-full">
-              {isProcessing ? (
-                <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
-              ) : (
-                <FileSpreadsheet className="h-8 w-8 text-primary" />
-              )}
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold mb-2">
-                {isProcessing ? 'Processing CSV...' : 'Upload CSV File'}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Drag and drop your CSV file here, or click to browse
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                Supported: Binance Futures, Bybit, OKX exports (Max 5MB)
-              </p>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {/* Header with file info */}
-          <Card className="p-4 glass">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-neon-green" />
-                <div>
-                  <p className="font-medium">{fileName}</p>
-                  <p className="text-sm text-muted-foreground">
-                    Found {parsedTrades.length} trade{parsedTrades.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                {detectedFormat && (
-                  <Badge variant="secondary" className="gap-1">
-                    <CheckCircle2 className="h-3 w-3" />
-                    {formatLabels[detectedFormat]}
-                  </Badge>
-                )}
-                <Button variant="ghost" size="sm" onClick={handleReset}>
-                  Clear
-                </Button>
-              </div>
-            </div>
-          </Card>
-
-          {/* Validation errors */}
-          {validationErrors.length > 0 && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                <p className="font-medium mb-1">Validation Issues:</p>
-                <ul className="list-disc list-inside text-sm space-y-1">
-                  {validationErrors.map((error, i) => (
-                    <li key={i}>{error}</li>
-                  ))}
-                </ul>
-                {validationErrors.length >= 5 && (
-                  <p className="text-xs mt-2">Showing first 5 errors...</p>
-                )}
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {/* Preview table */}
-          <CSVPreviewTable trades={parsedTrades.slice(0, 10)} />
-
-          {parsedTrades.length > 10 && (
-            <p className="text-sm text-muted-foreground text-center">
-              Showing first 10 trades. {parsedTrades.length - 10} more will be imported.
+          <label htmlFor="csv-upload" className="cursor-pointer">
+            <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="text-lg font-semibold mb-2">Upload CSV File</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Any CSV format accepted - we'll help you map the columns
             </p>
-          )}
-
-          {/* Import button */}
-          <div className="flex gap-2">
-            <Button onClick={handleImportAll} className="flex-1" size="lg">
-              <Upload className="h-4 w-4 mr-2" />
-              Import All {parsedTrades.length} Trades
+            <Button type="button" variant="outline" asChild>
+              <span>Select File</span>
             </Button>
+          </label>
+        </div>
+
+        <div className="mt-6">
+          <BrokerTemplateManager onLoadTemplate={handleLoadTemplate} />
+        </div>
+      </Card>
+    );
+  }
+
+  if (currentStep === 'mapping') {
+    return (
+      <Card className="p-6">
+        <div className="mb-4 flex items-center gap-3">
+          <Button variant="ghost" size="sm" onClick={handleReset}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            <span className="font-medium">{fileName}</span>
           </div>
         </div>
-      )}
 
-      {/* Help section */}
-      <Card className="p-4 glass">
-        <details className="space-y-2">
-          <summary className="cursor-pointer font-medium text-sm flex items-center gap-2">
-            📖 How to export from your broker
-          </summary>
-          <div className="text-sm text-muted-foreground space-y-3 mt-3 pl-6">
+        <CSVColumnMapper
+          csvHeaders={csvHeaders}
+          sampleData={csvData.slice(0, 5)}
+          onMappingComplete={handleMappingComplete}
+          initialMappings={detectedTemplate ? columnMappings : undefined}
+        />
+      </Card>
+    );
+  }
+
+  if (currentStep === 'broker') {
+    return (
+      <Card className="p-6">
+        <div className="mb-6 flex items-center gap-3">
+          <Button variant="ghost" size="sm" onClick={() => setCurrentStep('mapping')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h3 className="text-lg font-semibold">Select Broker</h3>
+        </div>
+
+        <div className="space-y-6 max-w-md">
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              What broker is this data from?
+            </label>
+            <BrokerSelect
+              value={selectedBroker}
+              onChange={setSelectedBroker}
+              required
+            />
+          </div>
+
+          <Alert>
+            <CheckCircle2 className="h-4 w-4" />
+            <AlertDescription>
+              Your column mapping will be saved and automatically applied for future "{selectedBroker}" uploads
+            </AlertDescription>
+          </Alert>
+
+          <Button onClick={handleBrokerSelected} className="w-full" size="lg">
+            Continue to Preview
+          </Button>
+        </div>
+      </Card>
+    );
+  }
+
+  if (currentStep === 'preview') {
+    return (
+      <Card className="p-6">
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" onClick={() => setCurrentStep('mapping')}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
             <div>
-              <p className="font-medium text-foreground">Binance:</p>
-              <ol className="list-decimal list-inside space-y-1 mt-1">
-                <li>Go to Orders → Order History</li>
-                <li>Select date range</li>
-                <li>Click "Export Complete Order History"</li>
-                <li>Download CSV</li>
-              </ol>
-            </div>
-            <div>
-              <p className="font-medium text-foreground">Bybit:</p>
-              <ol className="list-decimal list-inside space-y-1 mt-1">
-                <li>Go to Orders → Order History</li>
-                <li>Filter by "Closed"</li>
-                <li>Click "Export" button</li>
-                <li>Save CSV file</li>
-              </ol>
-            </div>
-            <div>
-              <p className="font-medium text-foreground">OKX:</p>
-              <ol className="list-decimal list-inside space-y-1 mt-1">
-                <li>Go to Trade → Trade History</li>
-                <li>Select "Futures" or "Spot"</li>
-                <li>Click "Export" icon</li>
-                <li>Download CSV</li>
-              </ol>
+              <h3 className="text-lg font-semibold">Review Trades</h3>
+              <p className="text-sm text-muted-foreground">
+                {fileName} • {selectedBroker}
+              </p>
             </div>
           </div>
-        </details>
+          <Button onClick={handleImportTrades} size="lg">
+            Import {mappedTrades.length} Trades
+          </Button>
+        </div>
+
+        <CSVPreviewWithEdit
+          trades={mappedTrades}
+          onTradesUpdate={setMappedTrades}
+        />
       </Card>
-    </div>
-  );
+    );
+  }
+
+  return null;
 };
