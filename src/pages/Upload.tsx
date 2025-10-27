@@ -1299,6 +1299,9 @@ const Upload = () => {
                   <p className="text-sm text-muted-foreground mb-3">
                     Upload a screenshot containing your trade information. The AI will automatically extract all trades.
                   </p>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Maximum of 10 trades per image. We recommend taking a screenshot after every 10 trades to save credits and use the tool efficiently. Most exchanges display around 10 trades per page, so capture that full view, including the header (column names), for faster and smoother uploads. You can also use our tag tool to label key data points on your uploaded image. This helps the system identify and process your trades more accurately.
+                  </p>
                   
                   {/* Pre-select broker - Always visible until trades are extracted */}
                   {extractedTrades.length === 0 && (
