@@ -367,6 +367,7 @@ export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
         <CSVPreviewWithEdit
           trades={mappedTrades}
           onTradesUpdate={setMappedTrades}
+          broker={selectedBroker}
         />
       </Card>
     );
