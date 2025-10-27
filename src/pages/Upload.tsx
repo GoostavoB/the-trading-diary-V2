@@ -750,7 +750,12 @@ const Upload = () => {
       }
 
       if (duplicateMatches.length > 0) {
-        // Found duplicates
+        // Found duplicates - show warning toast immediately
+        toast.warning(`Found ${duplicateMatches.length} duplicate trade${duplicateMatches.length > 1 ? 's' : ''}!`, {
+          description: 'Please review the duplicates and choose whether to keep or remove them.',
+          duration: 5000,
+        });
+        
         setBatchDuplicates({
           open: true,
           duplicates: duplicateMatches,
@@ -1686,7 +1691,13 @@ const Upload = () => {
           
           setBatchDuplicates({ open: false, duplicates: [] });
           
-          toast.success(`Removed ${indicesToRemove.length} duplicate trade${indicesToRemove.length > 1 ? 's' : ''}`);
+          const remainingCount = filteredTrades.length;
+          toast.success(`Removed ${indicesToRemove.length} duplicate trade${indicesToRemove.length > 1 ? 's' : ''}!`, {
+            description: remainingCount > 0 
+              ? `${remainingCount} unique trade${remainingCount > 1 ? 's' : ''} will be saved.` 
+              : 'All trades were duplicates.',
+            duration: 4000,
+          });
           
           // Trigger save for remaining trades
           if (filteredTrades.length > 0) {
@@ -1694,6 +1705,13 @@ const Upload = () => {
           }
         }}
         onSaveAll={async () => {
+          const duplicateCount = batchDuplicates.duplicates.length;
+          
+          toast.info(`Saving all ${extractedTrades.length} trades (including ${duplicateCount} duplicate${duplicateCount > 1 ? 's' : ''})`, {
+            description: 'This may create duplicate entries in your trade history.',
+            duration: 4000,
+          });
+          
           setBatchDuplicates({ open: false, duplicates: [] });
           // Continue with save, ignoring duplicate check
           if (!user || extractedTrades.length === 0) return;
