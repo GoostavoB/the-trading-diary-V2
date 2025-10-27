@@ -5,7 +5,11 @@ import { componentTagger } from "lovable-tagger";
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode }) => {
+  const ENABLE_PWA = process.env.VITE_ENABLE_PWA === 'true';
+  const BUILD_ID = new Date().toISOString();
+  
+  return {
   server: {
     host: "::",
     port: 8080,
@@ -13,64 +17,74 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     componentTagger(),
-    VitePWA({
-      registerType: 'autoUpdate',
-      includeAssets: ['favicon.png', 'logo-192.png', 'logo-512.png'],
-      manifest: {
-        name: 'The Trading Diary',
-        short_name: 'Trading Diary',
-        description: 'Track, analyze, and review every crypto trade with AI',
-        theme_color: '#4A90E2',
-        background_color: '#050a14',
-        display: 'standalone',
-        icons: [
-          {
-            src: 'logo-192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'logo-512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
-      },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
+    ...(ENABLE_PWA ? [
+      VitePWA({
+        registerType: 'autoUpdate',
+        includeAssets: ['favicon.png', 'logo-192.png', 'logo-512.png'],
+        manifest: {
+          name: 'The Trading Diary',
+          short_name: 'Trading Diary',
+          description: 'Track, analyze, and review every crypto trade with AI',
+          theme_color: '#4A90E2',
+          background_color: '#050a14',
+          display: 'standalone',
+          icons: [
+            {
+              src: 'logo-192.png',
+              sizes: '192x192',
+              type: 'image/png'
+            },
+            {
+              src: 'logo-512.png',
+              sizes: '512x512',
+              type: 'image/png'
+            }
+          ]
+        },
+        workbox: {
+          cleanupOutdatedCaches: true,
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+          navigateFallbackDenylist: [/^\/api\//],
+          runtimeCaching: [
+            {
+              urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'google-fonts-cache',
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+                },
+                cacheableResponse: {
+                  statuses: [0, 200]
+                }
+              }
+            },
+            {
+              urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'gstatic-fonts-cache',
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+                },
+                cacheableResponse: {
+                  statuses: [0, 200]
+                }
               }
             }
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'gstatic-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          }
-        ]
-      }
-    }),
+          ]
+        },
+        devOptions: {
+          enabled: false
+        }
+      })
+    ] : []),
   ],
+  define: {
+    __BUILD_ID__: JSON.stringify(BUILD_ID),
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -135,4 +149,4 @@ export default defineConfig(({ mode }) => ({
     // Optimize CSS
     cssCodeSplit: true,
   },
-}));
+}});
