@@ -113,6 +113,7 @@ const Dashboard = () => {
   const { hasProfile, loading: profileLoading, refetch: refetchProfile } = useAITrainingProfile();
   const [initialInvestment, setInitialInvestment] = useState(0);
   const [capitalLog, setCapitalLog] = useState<any[]>([]);
+  const [withdrawalLog, setWithdrawalLog] = useState<any[]>([]);
   const [includeFeesInPnL, setIncludeFeesInPnL] = useState(true);
   const { dateRange, setDateRange, clearDateRange, isToday } = useDateRange();
   const [filteredTrades, setFilteredTrades] = useState<Trade[]>([]);
@@ -303,6 +304,22 @@ const Dashboard = () => {
     }
   };
 
+  const fetchWithdrawalLog = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('withdrawal_log')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('withdrawal_date', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching withdrawal log:', error);
+    } else {
+      setWithdrawalLog(data || []);
+    }
+  };
+
   const fetchCustomWidgets = async () => {
     if (!user) return;
 
@@ -322,6 +339,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (user) {
       fetchCapitalLog(); // Fetch capital log first
+      fetchWithdrawalLog(); // Fetch withdrawal log
       fetchInitialInvestment();
       fetchCustomWidgets();
     }
@@ -347,9 +365,20 @@ const Dashboard = () => {
       )
       .subscribe();
     
+    const withdrawalChannel = supabase
+      .channel('withdrawal-changes-dashboard')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'withdrawal_log', filter: `user_id=eq.${user?.id}` },
+        () => {
+          fetchWithdrawalLog().then(() => fetchStats());
+        }
+      )
+      .subscribe();
+    
     return () => {
       supabase.removeChannel(tradesChannel);
       supabase.removeChannel(capitalChannel);
+      supabase.removeChannel(withdrawalChannel);
     };
   }, [user, includeFeesInPnL, initialInvestment]);
 
@@ -454,8 +483,11 @@ const Dashboard = () => {
       // If no capital log exists, fallback to initialInvestment from settings
       const baseCapital = totalAddedCapital > 0 ? totalAddedCapital : initialInvestment;
       
-      // Calculate current balance
-      const currentBalance = baseCapital + totalPnL;
+      // Calculate total withdrawals
+      const totalWithdrawals = withdrawalLog.reduce((sum, entry) => sum + (entry.amount_withdrawn || 0), 0);
+      
+      // Calculate current balance (subtract withdrawals)
+      const currentBalance = baseCapital + totalPnL - totalWithdrawals;
       
       // Calculate current ROI based on total invested capital
       let currentROI = 0;
@@ -646,6 +678,11 @@ const Dashboard = () => {
     return capitalLog.reduce((sum, log) => sum + (log.amount_added || 0), 0);
   }, [capitalLog]);
 
+  // Calculate total withdrawals from withdrawal log
+  const totalWithdrawals = useMemo(() => {
+    return withdrawalLog.reduce((sum, log) => sum + (log.amount_withdrawn || 0), 0);
+  }, [withdrawalLog]);
+
   const portfolioChartData = useMemo(() => {
     // Start with initial investment as the first data point
     const startDate = new Date();
@@ -728,7 +765,7 @@ const Dashboard = () => {
     switch (widgetId) {
       case 'totalBalance':
         const totalInvestedCapital = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
-        widgetProps.totalBalance = totalInvestedCapital + (stats?.total_pnl || 0);
+        widgetProps.totalBalance = totalInvestedCapital + (stats?.total_pnl || 0) - totalWithdrawals;
         widgetProps.change24h = stats?.total_pnl || 0;
         widgetProps.changePercent24h = totalInvestedCapital > 0 
           ? ((stats?.total_pnl || 0) / totalInvestedCapital) * 100 
@@ -753,7 +790,7 @@ const Dashboard = () => {
       case 'portfolioOverview':
         widgetProps.data = portfolioChartData;
         const totalInvestedForPortfolio = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
-        widgetProps.totalValue = totalInvestedForPortfolio + (stats?.total_pnl || 0);
+        widgetProps.totalValue = totalInvestedForPortfolio + (stats?.total_pnl || 0) - totalWithdrawals;
         break;
       case 'topMovers':
       case 'aiInsights':
@@ -801,8 +838,8 @@ const Dashboard = () => {
         // Show total invested capital from capital_log as "initial investment"
         widgetProps.initialInvestment = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
         widgetProps.currentBalance = totalCapitalAdditions > 0 
-          ? totalCapitalAdditions + (stats?.total_pnl || 0)
-          : initialInvestment + (stats?.total_pnl || 0);
+          ? totalCapitalAdditions + (stats?.total_pnl || 0) - totalWithdrawals
+          : initialInvestment + (stats?.total_pnl || 0) - totalWithdrawals;
         widgetProps.onInitialInvestmentUpdate = async (newValue: number) => {
           setInitialInvestment(newValue);
           // fetchStats will be automatically called via useEffect when initialInvestment changes
