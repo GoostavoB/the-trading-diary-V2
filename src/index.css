@@ -773,13 +773,10 @@ textarea:focus-visible {
   padding: 0;
   min-height: min-content;
   align-content: start;
+  /* Always respects user's column count preference - no mobile overrides */
 }
 
-@media (max-width: 768px) {
-  .dashboard-grid-free {
-    grid-template-columns: 1fr !important;
-  }
-}
+/* Removed mobile override - respects user column count preference */
 
 /* Column for free vertical stacking */
 .dashboard-column-free {

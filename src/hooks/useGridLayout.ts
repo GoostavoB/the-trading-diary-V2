@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { DEFAULT_DASHBOARD_LAYOUT } from '@/config/widgetCatalog';
 
 export interface WidgetPosition {
   id: string;
@@ -43,9 +44,26 @@ const DEFAULT_POSITIONS: WidgetPosition[] = [
 
 export const useGridLayout = (userId: string | undefined, availableWidgets: string[]) => {
   const [positions, setPositions] = useState<WidgetPosition[]>(DEFAULT_POSITIONS);
-  const [columnCount, setColumnCount] = useState<number>(4);
+  const [columnCount, setColumnCount] = useState<number>(3);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Helper: Pack widgets row-major with absoluteProfit at top-left
+  const packRowMajor = useCallback((ids: string[], columns: number): WidgetPosition[] => {
+    const allowed = ids.filter(id => availableWidgets.includes(id));
+    const unique = Array.from(new Set(allowed));
+    
+    // Ensure absoluteProfit is first
+    const first = 'absoluteProfit';
+    const rest = unique.filter(id => id !== first);
+    const all = unique.includes(first) ? [first, ...rest] : unique;
+    
+    return all.map((id, idx) => ({
+      id,
+      column: idx % columns,
+      row: Math.floor(idx / columns),
+    }));
+  }, [availableWidgets]);
 
   useEffect(() => {
     if (!userId) {
@@ -66,7 +84,25 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
           return;
         }
 
-        if (data?.layout_json) {
+        if (!data?.layout_json) {
+          // No saved layout - create first-time default with 3 columns
+          console.log('[useGridLayout] No saved layout, creating default with 3 columns');
+          const packed = packRowMajor(DEFAULT_DASHBOARD_LAYOUT, 3);
+          setPositions(packed);
+          setColumnCount(3);
+          
+          // Persist immediately so user's first view becomes their preference
+          try {
+            const layoutToSave: LayoutData = { positions: packed, columnCount: 3 };
+            await supabase
+              .from('user_settings')
+              .update({ layout_json: layoutToSave as any, updated_at: new Date().toISOString() })
+              .eq('user_id', userId!);
+            console.log('[useGridLayout] Default layout persisted');
+          } catch (e) {
+            console.error('[useGridLayout] Failed to persist default layout:', e);
+          }
+        } else {
           const layoutData = data.layout_json as any;
           
           // Check if layout_json is empty object
@@ -75,26 +111,49 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
                                Object.keys(layoutData).length === 0;
           
           if (isEmptyObject) {
-            console.log('Empty layout object, using DEFAULT_POSITIONS');
-            setPositions(DEFAULT_POSITIONS);
-            setColumnCount(4);
+            console.log('[useGridLayout] Empty layout object, creating default');
+            const packed = packRowMajor(DEFAULT_DASHBOARD_LAYOUT, 3);
+            setPositions(packed);
+            setColumnCount(3);
+            
+            try {
+              const layoutToSave: LayoutData = { positions: packed, columnCount: 3 };
+              await supabase
+                .from('user_settings')
+                .update({ layout_json: layoutToSave as any, updated_at: new Date().toISOString() })
+                .eq('user_id', userId!);
+            } catch (e) {
+              console.error('[useGridLayout] Failed to persist default:', e);
+            }
           }
           // Handle new format with positions and columnCount
           else if (layoutData?.positions && Array.isArray(layoutData.positions)) {
-            console.log('Loading layout with column count:', layoutData);
+            console.log('[useGridLayout] Loading saved layout:', layoutData);
             const desiredCols = (typeof layoutData.columnCount === 'number' && layoutData.columnCount >= 1 && layoutData.columnCount <= 4)
               ? layoutData.columnCount
-              : 4;
+              : 3;
 
-            // If positions array is empty, use defaults
+            // If positions array is empty, create default
             if (layoutData.positions.length === 0) {
-              console.log('Empty positions array, using DEFAULT_POSITIONS');
-              setPositions(DEFAULT_POSITIONS);
-              setColumnCount(4);
+              console.log('[useGridLayout] Empty positions array, creating default');
+              const packed = packRowMajor(DEFAULT_DASHBOARD_LAYOUT, 3);
+              setPositions(packed);
+              setColumnCount(3);
+              
+              try {
+                const layoutToSave: LayoutData = { positions: packed, columnCount: 3 };
+                await supabase
+                  .from('user_settings')
+                  .update({ layout_json: layoutToSave as any, updated_at: new Date().toISOString() })
+                  .eq('user_id', userId!);
+              } catch (e) {
+                console.error('[useGridLayout] Failed to persist default:', e);
+              }
             } else {
+              // Check for legacy single-column bug (all widgets in column 0 but desiredCols > 1)
               const allInCol0 = layoutData.positions.every((p: WidgetPosition) => p.column === 0);
               if (allInCol0 && desiredCols > 1) {
-                console.log('Detected legacy single-column layout. Rebalancing to', desiredCols, 'columns');
+                console.log('[useGridLayout] Detected legacy single-column layout. Rebalancing to', desiredCols, 'columns');
                 const sorted = [...layoutData.positions].sort((a: WidgetPosition, b: WidgetPosition) => a.row - b.row);
                 const rebalanced: WidgetPosition[] = sorted.map((p, idx) => ({
                   id: p.id,
@@ -104,6 +163,7 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
                 setPositions(rebalanced);
                 setColumnCount(desiredCols);
                 toast.success('Layout fixed to multiple columns');
+                
                 // Persist fix immediately to backend
                 try {
                   const layoutToSave: LayoutData = { positions: rebalanced, columnCount: desiredCols };
@@ -112,28 +172,31 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
                     .update({ layout_json: layoutToSave as any, updated_at: new Date().toISOString() })
                     .eq('user_id', userId!);
                 } catch (e) {
-                  console.error('Failed to persist layout auto-fix:', e);
+                  console.error('[useGridLayout] Failed to persist layout auto-fix:', e);
                 }
               } else {
+                // Valid user layout - respect it completely
                 setPositions(layoutData.positions);
                 setColumnCount(desiredCols);
+                console.log('[useGridLayout] User layout loaded:', desiredCols, 'columns');
               }
             }
           }
           // Handle position-based format (backwards compatibility)
           else if (Array.isArray(layoutData) && layoutData.length > 0 && layoutData[0]?.column !== undefined) {
-            console.log('Loading position-based layout:', layoutData);
+            console.log('[useGridLayout] Loading position-based layout:', layoutData);
             setPositions(layoutData);
           }
           // Handle old order-based format - convert to positions
           else if (Array.isArray(layoutData) && layoutData.length > 0 && typeof layoutData[0] === 'string') {
-            console.log('Converting old layout format:', layoutData);
+            console.log('[useGridLayout] Converting old layout format:', layoutData);
             const newPositions = layoutData.map((id: string, idx: number) => ({
               id,
-              column: idx % 4,
-              row: Math.floor(idx / 4),
+              column: idx % 3,
+              row: Math.floor(idx / 3),
             }));
             setPositions(newPositions);
+            setColumnCount(3);
           }
         }
       } catch (error) {
@@ -229,10 +292,12 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
   }, [positions, saveLayout]);
 
   const resetLayout = useCallback(() => {
-    setPositions(DEFAULT_POSITIONS);
-    saveLayout(DEFAULT_POSITIONS);
+    // Re-pack using current column count (respects user's column preference)
+    const packed = packRowMajor(DEFAULT_DASHBOARD_LAYOUT, columnCount);
+    setPositions(packed);
+    saveLayout(packed, columnCount);
     toast.success('Layout reset');
-  }, [saveLayout]);
+  }, [saveLayout, columnCount]);
 
   const updateColumnCount = useCallback((newCount: number) => {
     if (newCount >= 1 && newCount <= 4) {
