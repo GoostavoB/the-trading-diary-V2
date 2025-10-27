@@ -6,6 +6,8 @@ import { Upload, X, CheckCircle, AlertCircle, Image as ImageIcon } from 'lucide-
 import { toast } from 'sonner';
 import { useUploadCredits } from '@/hooks/useUploadCredits';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown } from 'lucide-react';
 import { PreAnalysisConfirmDialog } from './PreAnalysisConfirmDialog';
 import { CreditPurchaseDialog } from './CreditPurchaseDialog';
 import { runOCR } from '@/utils/ocrPipeline';
@@ -208,9 +210,25 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
             {images.length} image{images.length !== 1 ? 's' : ''} selected
           </span>
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground mb-3">
           Upload screenshots of your trades. Each image costs 1 credit and can detect up to 10 trades.
         </p>
+        
+        <Collapsible className="bg-muted/50 rounded-lg p-3">
+          <CollapsibleTrigger className="flex items-center justify-between w-full text-sm hover:opacity-80 transition-opacity">
+            <span className="text-primary font-medium">Click here for best results</span>
+            <ChevronDown className="h-4 w-4 text-primary" />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-3">
+            <ul className="text-xs text-muted-foreground space-y-2">
+              <li>• Upload clear, high-resolution screenshots</li>
+              <li>• Include all trade details (symbol, entry, exit, P&L)</li>
+              <li>• Ensure text is readable and not cut off</li>
+              <li>• Multiple trades per screenshot are supported</li>
+              <li>• Avoid blurry or compressed images</li>
+            </ul>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
 
       {/* Image Grid */}
