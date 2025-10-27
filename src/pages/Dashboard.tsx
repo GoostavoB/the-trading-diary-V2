@@ -224,27 +224,15 @@ const Dashboard = () => {
   const gridRef = useRef<HTMLDivElement>(null);
   const [columnCount, setColumnCount] = useState(3);
 
-  // Track column count based on user selection and viewport - only restore once on mount
+  // Track column count from saved settings only; mobile handled by CSS media query
   useEffect(() => {
-    const el = gridRef.current;
-    if (!el) return;
-    
-    const updateCols = () => {
-      const width = el.clientWidth;
-      // On mobile, always use 1 column
-      if (width < 768) {
-        setColumnCount(1);
-      } else {
-        // Use user's selected column count (from saved settings)
-        setColumnCount(selectedColumnCount);
-      }
-    };
-    
-    updateCols();
-    const ro = new ResizeObserver(updateCols);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [selectedColumnCount]);
+    const clamped = Math.min(4, Math.max(1, savedColumnCount || 4));
+    setColumnCount(clamped);
+    console.log('[Dashboard] Column count set from saved settings:', {
+      saved: savedColumnCount,
+      clamped,
+    });
+  }, [savedColumnCount]);
 
   // Save column count to backend when user changes it
   const handleColumnCountChange = useCallback((newCount: number) => {

@@ -82,16 +82,41 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
           // Handle new format with positions and columnCount
           else if (layoutData?.positions && Array.isArray(layoutData.positions)) {
             console.log('Loading layout with column count:', layoutData);
-            
+            const desiredCols = (typeof layoutData.columnCount === 'number' && layoutData.columnCount >= 1 && layoutData.columnCount <= 4)
+              ? layoutData.columnCount
+              : 4;
+
             // If positions array is empty, use defaults
             if (layoutData.positions.length === 0) {
               console.log('Empty positions array, using DEFAULT_POSITIONS');
               setPositions(DEFAULT_POSITIONS);
               setColumnCount(4);
             } else {
-              setPositions(layoutData.positions);
-              if (layoutData.columnCount && layoutData.columnCount >= 1 && layoutData.columnCount <= 4) {
-                setColumnCount(layoutData.columnCount);
+              const allInCol0 = layoutData.positions.every((p: WidgetPosition) => p.column === 0);
+              if (allInCol0 && desiredCols > 1) {
+                console.log('Detected legacy single-column layout. Rebalancing to', desiredCols, 'columns');
+                const sorted = [...layoutData.positions].sort((a: WidgetPosition, b: WidgetPosition) => a.row - b.row);
+                const rebalanced: WidgetPosition[] = sorted.map((p, idx) => ({
+                  id: p.id,
+                  column: idx % desiredCols,
+                  row: Math.floor(idx / desiredCols),
+                }));
+                setPositions(rebalanced);
+                setColumnCount(desiredCols);
+                toast.success('Layout fixed to multiple columns');
+                // Persist fix immediately to backend
+                try {
+                  const layoutToSave: LayoutData = { positions: rebalanced, columnCount: desiredCols };
+                  await supabase
+                    .from('user_settings')
+                    .update({ layout_json: layoutToSave as any, updated_at: new Date().toISOString() })
+                    .eq('user_id', userId!);
+                } catch (e) {
+                  console.error('Failed to persist layout auto-fix:', e);
+                }
+              } else {
+                setPositions(layoutData.positions);
+                setColumnCount(desiredCols);
               }
             }
           }

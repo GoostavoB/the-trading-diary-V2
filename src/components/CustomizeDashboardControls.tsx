@@ -35,7 +35,7 @@ export function CustomizeDashboardControls({
   onAddWidget,
   widgets = [],
   onToggleWidget,
-  columnCount = 3,
+  columnCount = 4,
   onColumnCountChange,
   widgetCount = 0,
 }: CustomizeDashboardControlsProps) {
