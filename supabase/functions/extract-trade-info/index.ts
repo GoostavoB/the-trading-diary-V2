@@ -136,8 +136,12 @@ serve(async (req) => {
     // Check budget
     const budget = await checkBudget(supabaseClient, user.id);
     if (budget.blocked) {
+      console.error(`❌ User ${user.id} blocked due to budget limits`);
       return new Response(
-        JSON.stringify({ error: budget.message }),
+        JSON.stringify({ 
+          error: 'AI credits exhausted',
+          details: budget.message 
+        }),
         { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -148,6 +152,7 @@ serve(async (req) => {
     });
 
     if (creditError || !creditDeducted) {
+      console.error(`❌ Credit deduction failed for user ${user.id}:`, creditError);
       return new Response(
         JSON.stringify({ 
           error: 'Insufficient upload credits',
@@ -157,7 +162,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('✅ Deducted 1 upload credit for user:', user.id);
+    console.log(`✅ Deducted 1 upload credit for user: ${user.id}`);
 
     const { 
       imageBase64, 
@@ -220,7 +225,14 @@ serve(async (req) => {
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      console.error(`❌ LOVABLE_API_KEY not configured`);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Service configuration error',
+          details: 'AI service is not properly configured. Please contact support.'
+        }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     let trades: any[];
@@ -580,7 +592,8 @@ serve(async (req) => {
     
     // Determine error type and provide specific message
     let errorMessage = "Trade extraction failed";
-    let errorDetails = "Please try again or enter manually";
+    let errorDetails = "Please try again or enter trades manually";
+    let statusCode = 500;
     
     if (error instanceof Error) {
       if (error.message.includes('parse')) {
@@ -589,9 +602,13 @@ serve(async (req) => {
       } else if (error.message.includes('Unauthorized')) {
         errorMessage = "Authentication failed";
         errorDetails = "Please sign in again.";
+        statusCode = 401;
       } else if (error.message.includes('model failed')) {
         errorMessage = "AI service temporarily unavailable";
         errorDetails = "Please try again in a moment.";
+      } else if (error.message.includes('LOVABLE_API_KEY')) {
+        errorMessage = "Service configuration error";
+        errorDetails = "AI service is not properly configured. Please contact support.";
       } else {
         errorMessage = error.message;
       }
@@ -602,7 +619,7 @@ serve(async (req) => {
         error: errorMessage,
         details: errorDetails
       }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: statusCode, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

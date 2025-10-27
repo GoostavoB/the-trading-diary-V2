@@ -114,7 +114,35 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
             },
           });
 
-          if (error) throw error;
+          // Handle specific error responses with status codes
+          if (error) {
+            let errorMessage = 'Failed to analyze image';
+            
+            // Parse error details from the response
+            if (typeof error === 'object' && 'message' in error) {
+              const errorMsg = (error as any).message;
+              if (errorMsg.includes('400')) {
+                errorMessage = 'Image validation failed (too large or invalid format)';
+              } else if (errorMsg.includes('402')) {
+                errorMessage = 'Insufficient upload credits';
+                toast.error('Insufficient Credits', {
+                  description: 'You need more upload credits. Please purchase additional credits.',
+                });
+              } else if (errorMsg.includes('422')) {
+                errorMessage = 'No trades detected in image';
+              } else if (errorMsg.includes('429')) {
+                errorMessage = 'Rate limit exceeded - please wait';
+              } else if (errorMsg.includes('500')) {
+                errorMessage = 'Server error - please try again';
+              }
+            }
+
+            console.error('Edge function error:', error);
+            const failed: UploadedImage = { ...image, status: 'error', trades: [] };
+            results.push(failed);
+            setImages(prev => prev.map((img, idx) => (idx === i ? failed : img)));
+            continue;
+          }
 
           const success: UploadedImage = {
             ...image,
@@ -140,21 +168,24 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
         .filter(img => img.status === 'success')
         .flatMap(img => img.trades || []);
 
+      const successCount = results.filter(img => img.status === 'success').length;
+
       if (allTrades.length > 0) {
         setDetectedTrades(allTrades);
         // Select all trades by default
         setSelectedTrades(new Set(allTrades.map((_, idx) => idx)));
         setShowConfirmDialog(true);
       } else {
-        const failedAll = results.every(img => img.status === 'error');
-        toast.error(
-          failedAll ? 'Analysis failed for all images' : 'No trades detected', 
-          {
-            description: failedAll 
-              ? 'Try re-analyzing with "Bypass Cache" enabled or upload clearer screenshots.'
-              : 'No trades could be extracted. Try enabling "Bypass Cache" or upload sharper screenshots.',
-          }
-        );
+        // Provide specific guidance based on the failure scenario
+        if (successCount === 0) {
+          toast.error('Analysis Failed', {
+            description: `Failed to analyze all ${images.length} image(s). Try re-analyzing with "Bypass Cache" enabled or upload clearer screenshots.`,
+          });
+        } else {
+          toast.error('No Trades Detected', {
+            description: 'No trades were detected in any of the images. Try re-analyzing with "Bypass Cache" enabled, ensure the screenshot is clear and contains visible trade information, or enter trades manually.',
+          });
+        }
       }
     } catch (error) {
       console.error('Error analyzing images:', error);
