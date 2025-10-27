@@ -408,7 +408,7 @@ const Dashboard = () => {
       }
       updateChallengeProgress('win_rate', winStreak);
 
-      const todayProfit = todayTrades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+      const todayProfit = todayTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
       updateChallengeProgress('profit_target', Math.floor(todayProfit));
     }
   }, [trades, updateChallengeProgress]);
@@ -428,18 +428,10 @@ const Dashboard = () => {
         side: trade.side as 'long' | 'short' | null
       })));
       
-      // Calculate P&L without fees
-      const totalPnlWithoutFees = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+      // Calculate total P&L using profit_loss
+      const totalPnL = trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
       
-      // Calculate P&L with fees (subtract fees from profit)
-      const totalPnlWithFees = trades.reduce((sum, t) => {
-        const pnl = t.pnl || 0;
-        const fundingFee = t.funding_fee || 0;
-        const tradingFee = t.trading_fee || 0;
-        return sum + (pnl - Math.abs(fundingFee) - Math.abs(tradingFee));
-      }, 0);
-      
-      const winningTrades = trades.filter(t => (t.pnl || 0) > 0).length;
+      const winningTrades = trades.filter(t => (t.profit_loss || 0) > 0).length;
       const avgDuration = trades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (trades.length || 1);
 
       // Calculate unique trading days
@@ -447,12 +439,12 @@ const Dashboard = () => {
       
       // Calculate average P&L per trade
       const avgPnLPerTrade = trades.length > 0 
-        ? (includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees) / trades.length 
+        ? totalPnL / trades.length
         : 0;
       
       // Calculate average P&L per day
       const avgPnLPerDay = uniqueDays > 0 
-        ? (includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees) / uniqueDays 
+        ? totalPnL / uniqueDays 
         : 0;
       
       // Calculate total added capital from capital_log (sum of all additions)
@@ -463,7 +455,7 @@ const Dashboard = () => {
       const baseCapital = totalAddedCapital > 0 ? totalAddedCapital : initialInvestment;
       
       // Calculate current balance
-      const currentBalance = baseCapital + (includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees);
+      const currentBalance = baseCapital + totalPnL;
       
       // Calculate current ROI based on total invested capital
       let currentROI = 0;
@@ -477,7 +469,7 @@ const Dashboard = () => {
         : 0;
 
       setStats({
-        total_pnl: includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees,
+        total_pnl: totalPnL,
         win_rate: trades.length > 0 ? (winningTrades / trades.length) * 100 : 0,
         total_trades: trades.length,
         avg_duration: avgDuration,
@@ -518,7 +510,7 @@ const Dashboard = () => {
     const assetPnL: Record<string, number> = {};
     trades.forEach(t => {
       const symbol = t.symbol || 'Unknown';
-      assetPnL[symbol] = (assetPnL[symbol] || 0) + (t.pnl || 0);
+      assetPnL[symbol] = (assetPnL[symbol] || 0) + (t.profit_loss || 0);
     });
     const best = Object.entries(assetPnL).sort((a, b) => b[1] - a[1])[0];
     return best ? best[0] : 'N/A';
@@ -743,8 +735,8 @@ const Dashboard = () => {
           : 0;
         break;
       case 'winRate':
-        const winningTrades = processedTrades.filter(t => t.pnl > 0).length;
-        const losingTrades = processedTrades.filter(t => t.pnl <= 0).length;
+        const winningTrades = processedTrades.filter(t => t.profit_loss > 0).length;
+        const losingTrades = processedTrades.filter(t => t.profit_loss <= 0).length;
         widgetProps.winRate = stats?.win_rate || 0;
         widgetProps.wins = winningTrades;
         widgetProps.losses = losingTrades;
@@ -782,7 +774,7 @@ const Dashboard = () => {
         break;
       case 'tradingQuality':
         const minPnl = processedTrades.length > 0 
-          ? Math.min(...processedTrades.map(t => t.pnl || 0)) 
+          ? Math.min(...processedTrades.map(t => t.profit_loss || 0)) 
           : 0;
         widgetProps.avgWin = dashboardStats.avgWin;
         widgetProps.avgLoss = dashboardStats.avgLoss;
@@ -1029,8 +1021,8 @@ const Dashboard = () => {
                       avgLoss={dashboardStats.avgLoss}
                       winCount={dashboardStats.winningTrades.length}
                       lossCount={dashboardStats.losingTrades.length}
-                      maxDrawdownPercent={Math.abs((Math.min(...processedTrades.map(t => t.pnl || 0)) / initialInvestment) * 100)}
-                      maxDrawdownAmount={Math.min(...processedTrades.map(t => t.pnl || 0))}
+                      maxDrawdownPercent={Math.abs((Math.min(...processedTrades.map(t => t.profit_loss || 0)) / initialInvestment) * 100)}
+                      maxDrawdownAmount={Math.min(...processedTrades.map(t => t.profit_loss || 0))}
                       profitFactor={dashboardStats.profitFactor}
                     />
                   </div>
