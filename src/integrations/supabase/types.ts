@@ -630,11 +630,16 @@ export type Database = {
       }
       custom_dashboard_widgets: {
         Row: {
+          ai_prompt: string | null
+          conversation_id: string | null
           created_at: string
+          created_via: string | null
+          data_snapshot: Json | null
           description: string | null
           display_config: Json
           height: number
           id: string
+          is_permanent: boolean | null
           menu_item_id: string | null
           position_x: number
           position_y: number
@@ -646,11 +651,16 @@ export type Database = {
           width: number
         }
         Insert: {
+          ai_prompt?: string | null
+          conversation_id?: string | null
           created_at?: string
+          created_via?: string | null
+          data_snapshot?: Json | null
           description?: string | null
           display_config?: Json
           height?: number
           id?: string
+          is_permanent?: boolean | null
           menu_item_id?: string | null
           position_x?: number
           position_y?: number
@@ -662,11 +672,16 @@ export type Database = {
           width?: number
         }
         Update: {
+          ai_prompt?: string | null
+          conversation_id?: string | null
           created_at?: string
+          created_via?: string | null
+          data_snapshot?: Json | null
           description?: string | null
           display_config?: Json
           height?: number
           id?: string
+          is_permanent?: boolean | null
           menu_item_id?: string | null
           position_x?: number
           position_y?: number
@@ -1694,6 +1709,41 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      metric_conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          messages: Json
+          resulting_widget_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          messages?: Json
+          resulting_widget_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          messages?: Json
+          resulting_widget_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metric_conversations_resulting_widget_id_fkey"
+            columns: ["resulting_widget_id"]
+            isOneToOne: false
+            referencedRelation: "custom_dashboard_widgets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mystery_rewards: {
         Row: {

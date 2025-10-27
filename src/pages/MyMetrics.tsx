@@ -1,154 +1,200 @@
 import AppLayout from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Plus, TrendingUp, Target, DollarSign, Percent } from 'lucide-react';
+import { Sparkles, Star, BarChart, TrendingUp, Target, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { AIMetricsChat } from '@/components/metrics/AIMetricsChat';
+import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 
 const MyMetrics = () => {
-  const [metrics, setMetrics] = useState([
-    { id: 1, name: 'Custom Win Rate', value: '68%', target: '70%', type: 'percentage' },
-    { id: 2, name: 'Weekly Profit Target', value: '$1,200', target: '$1,500', type: 'currency' },
-    { id: 3, name: 'Max Daily Trades', value: '8', target: '10', type: 'number' },
-  ]);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const [newMetric, setNewMetric] = useState({ name: '', target: '', type: 'percentage' });
+  // Fetch user's saved metrics
+  const { data: savedMetrics, isLoading } = useQuery({
+    queryKey: ['user-metrics', refreshKey],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
-  const handleAddMetric = () => {
-    if (newMetric.name && newMetric.target) {
-      setMetrics([...metrics, { 
-        id: Date.now(), 
-        name: newMetric.name, 
-        value: '-', 
-        target: newMetric.target, 
-        type: newMetric.type 
-      }]);
-      setNewMetric({ name: '', target: '', type: 'percentage' });
+      const { data, error } = await supabase
+        .from('custom_dashboard_widgets')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_permanent', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const handleWidgetCreated = () => {
+    setRefreshKey(prev => prev + 1);
+  };
+
+  const handleDeleteMetric = async (metricId: string) => {
+    try {
+      const { error } = await supabase
+        .from('custom_dashboard_widgets')
+        .delete()
+        .eq('id', metricId);
+
+      if (error) throw error;
+
+      toast.success('Metric deleted');
+      setRefreshKey(prev => prev + 1);
+    } catch (error: any) {
+      console.error('Error deleting metric:', error);
+      toast.error('Failed to delete metric');
     }
   };
 
-  const getIcon = (type: string) => {
+  const getVisualizationIcon = (type: string) => {
     switch (type) {
-      case 'percentage': return Percent;
-      case 'currency': return DollarSign;
-      default: return Target;
+      case 'bar_chart':
+      case 'line_chart':
+        return BarChart;
+      case 'metric_card':
+        return TrendingUp;
+      default:
+        return Target;
     }
   };
+
+  // Suggested metrics based on common use cases
+  const suggestedMetrics = [
+    {
+      id: 'suggested-1',
+      title: 'Top 5 Setups by Win Rate',
+      description: 'See which setups perform best',
+      prompt: 'Show me my top 5 setups ranked by win rate'
+    },
+    {
+      id: 'suggested-2',
+      title: 'Hourly Performance Heatmap',
+      description: 'Find your best trading hours',
+      prompt: 'Create a heatmap showing my win rate by hour of day'
+    },
+    {
+      id: 'suggested-3',
+      title: 'Profit by Day of Week',
+      description: 'Identify profitable patterns',
+      prompt: 'Show my total profit grouped by day of week'
+    },
+  ];
 
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">My Metrics</h1>
             <p className="text-muted-foreground">
-              Create and track custom metrics that matter to your trading strategy
+              AI-powered custom metrics that adapt to your trading data
             </p>
           </div>
-
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Metric
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create Custom Metric</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Metric Name</Label>
-                  <Input
-                    placeholder="e.g., Weekly Win Rate"
-                    value={newMetric.name}
-                    onChange={(e) => setNewMetric({ ...newMetric, name: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Type</Label>
-                  <Select value={newMetric.type} onValueChange={(value) => setNewMetric({ ...newMetric, type: value })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="percentage">Percentage</SelectItem>
-                      <SelectItem value="currency">Currency</SelectItem>
-                      <SelectItem value="number">Number</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Target Value</Label>
-                  <Input
-                    placeholder="e.g., 75% or $5000"
-                    value={newMetric.target}
-                    onChange={(e) => setNewMetric({ ...newMetric, target: e.target.value })}
-                  />
-                </div>
-
-                <Button onClick={handleAddMetric} className="w-full">
-                  Create Metric
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Badge variant="outline" className="gap-1">
+            <Sparkles className="h-3 w-3" />
+            AI-Powered
+          </Badge>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {metrics.map((metric) => {
-            const IconComponent = getIcon(metric.type);
-            return (
-              <Card key={metric.id} className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 rounded-lg bg-primary/10">
-                    <IconComponent className="h-5 w-5 text-primary" />
-                  </div>
-                  <Button variant="ghost" size="sm">Edit</Button>
-                </div>
-                <h3 className="font-semibold mb-2">{metric.name}</h3>
-                <div className="space-y-1">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-2xl font-bold">{metric.value}</span>
-                    <span className="text-sm text-muted-foreground">Target: {metric.target}</span>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Left: AI Chat Interface */}
+          <div className="lg:col-span-2">
+            <AIMetricsChat onWidgetCreated={handleWidgetCreated} />
+          </div>
 
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Benchmark Comparison</h2>
+          {/* Right: Saved Metrics */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
-              <div>
-                <p className="font-medium">Your Win Rate vs Market Average</p>
-                <p className="text-sm text-muted-foreground">Last 30 days</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold">68%</span>
-                <TrendingUp className="h-5 w-5 text-success" />
-                <span className="text-sm text-success">+5% vs avg</span>
-              </div>
+            <div>
+              <h2 className="text-xl font-semibold mb-1">Your Metrics</h2>
+              <p className="text-sm text-muted-foreground">
+                {savedMetrics?.length || 0} custom metrics
+              </p>
             </div>
 
-            <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
-              <div>
-                <p className="font-medium">Average Trade Duration</p>
-                <p className="text-sm text-muted-foreground">Compared to your target</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold">4.5h</span>
-                <span className="text-sm text-muted-foreground">Target: 4h</span>
-              </div>
+            <div className="space-y-3">
+              {isLoading ? (
+                <Card className="p-4">
+                  <p className="text-sm text-muted-foreground">Loading metrics...</p>
+                </Card>
+              ) : savedMetrics && savedMetrics.length > 0 ? (
+                savedMetrics.map((metric) => {
+                  const IconComponent = getVisualizationIcon(metric.widget_type);
+                  return (
+                    <Card key={metric.id} className="p-4 hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-start gap-3 flex-1">
+                          <div className="p-2 rounded-lg bg-primary/10 mt-1">
+                            <IconComponent className="h-4 w-4 text-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-sm leading-tight mb-1">
+                              {metric.title}
+                            </h3>
+                            <p className="text-xs text-muted-foreground line-clamp-2">
+                              {metric.description}
+                            </p>
+                            {metric.created_via === 'ai_assistant' && (
+                              <Badge variant="secondary" className="mt-2 text-xs">
+                                <Sparkles className="h-3 w-3 mr-1" />
+                                AI Created
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleDeleteMetric(metric.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      <Button variant="outline" size="sm" className="w-full mt-2">
+                        Add to Dashboard
+                      </Button>
+                    </Card>
+                  );
+                })
+              ) : (
+                <Card className="p-6 text-center">
+                  <Star className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">
+                    No metrics yet. Create your first one using the AI chat!
+                  </p>
+                </Card>
+              )}
             </div>
+          </div>
+        </div>
+
+        {/* Bottom: Suggested Metrics */}
+        <Card className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles className="h-5 w-5 text-primary" />
+            <h2 className="text-xl font-semibold">Suggested Metrics</h2>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Popular metrics other traders use to improve their performance
+          </p>
+          <div className="grid md:grid-cols-3 gap-4">
+            {suggestedMetrics.map((suggestion) => (
+              <Card key={suggestion.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer">
+                <h3 className="font-semibold mb-1">{suggestion.title}</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {suggestion.description}
+                </p>
+                <Button variant="outline" size="sm" className="w-full">
+                  Create with AI
+                </Button>
+              </Card>
+            ))}
           </div>
         </Card>
       </div>
