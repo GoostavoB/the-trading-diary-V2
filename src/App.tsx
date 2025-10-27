@@ -61,6 +61,7 @@ const TradingPlan = lazy(() => import("./pages/TradingPlan"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const CustomPage = lazy(() => import("./pages/CustomPage"));
 const SpotWallet = lazy(() => import("./pages/SpotWallet"));
+const TrackCapital = lazy(() => import("./pages/TrackCapital"));
 const FeeAnalysis = lazy(() => import("./pages/FeeAnalysis"));
 const LogoDownload = lazy(() => import("./pages/LogoDownload"));
 const LogoGenerator = lazy(() => import("./pages/LogoGenerator"));
@@ -203,6 +204,7 @@ const AppRoutes = () => {
         {/* Exchange connections temporarily hidden for future use */}
         {/* <Route path="/exchanges" element={<ProtectedRoute><ExchangeConnections /></ProtectedRoute>} /> */}
         <Route path="/spot-wallet" element={<ProtectedRoute><SpotWallet /></ProtectedRoute>} />
+        <Route path="/track-capital" element={<ProtectedRoute><TrackCapital /></ProtectedRoute>} />
         <Route path="/fee-analysis" element={<ProtectedRoute><FeeAnalysis /></ProtectedRoute>} />
         <Route path="/faq" element={<ProtectedRoute><FAQ /></ProtectedRoute>} />
         {/* Phase 2: Leaderboard - temporarily disabled for backlog #34 */}

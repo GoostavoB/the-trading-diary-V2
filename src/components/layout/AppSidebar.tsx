@@ -3,7 +3,7 @@ import {
   BarChart3, Upload, TrendingUp, Target, Brain, Trophy, Settings2, BookOpen, HelpCircle, 
   LineChart, LogOut, Zap, RefreshCw, Wallet, Receipt, BookMarked, Users, GitCompare, 
   Shield, FileBarChart, ClipboardList, Calendar, Bell, FileText, ChevronDown, Search,
-  Plus, Archive, Star, Flame, Award, PieChart, Heart, Image, Download, Info, Accessibility, TrendingDown
+  Plus, Archive, Star, Flame, Award, PieChart, Heart, Image, Download, Info, Accessibility, TrendingDown, DollarSign
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Logo } from '@/components/Logo';
@@ -69,6 +69,7 @@ export function AppSidebar() {
       dataTour: 'portfolio-group',
       items: [
         { title: t('navigation.spotWallet'), url: '/spot-wallet', icon: Wallet, iconName: 'Wallet', keywords: ['wallet', 'balance', 'tokens', 'holdings', 'assets', 'portfolio', 'allocation', 'distribution', 'coins', 'cryptocurrencies', 'btc', 'eth', 'total', 'value', 'net worth', 'funds', 'money', 'cash', 'crypto'] },
+        { title: 'Track Capital', url: '/track-capital', icon: DollarSign, iconName: 'DollarSign', keywords: ['capital', 'deposits', 'withdrawals', 'money', 'funds', 'track', 'manage', 'balance', 'add', 'withdraw', 'cash', 'flow', 'history', 'log', 'investment', 'invested'] },
         // Exchange connections temporarily hidden for future use
         // { title: t('navigation.exchanges'), url: '/exchanges', icon: RefreshCw, iconName: 'RefreshCw', keywords: ['binance', 'bybit', 'okx', 'api', 'connect', 'sync', 'integration', 'platform', 'broker', 'exchange', 'connection', 'link', 'import', 'automated', 'real-time', 'live'] },
         // Phase 2: Trading Accounts - temporarily disabled for backlog #18
