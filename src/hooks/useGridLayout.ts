@@ -67,12 +67,30 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
         if (data?.layout_json) {
           const layoutData = data.layout_json as any;
           
+          // Check if layout_json is empty object
+          const isEmptyObject = typeof layoutData === 'object' && 
+                               !Array.isArray(layoutData) && 
+                               Object.keys(layoutData).length === 0;
+          
+          if (isEmptyObject) {
+            console.log('Empty layout object, using DEFAULT_POSITIONS');
+            setPositions(DEFAULT_POSITIONS);
+            setColumnCount(4);
+          }
           // Handle new format with positions and columnCount
-          if (layoutData?.positions && Array.isArray(layoutData.positions)) {
+          else if (layoutData?.positions && Array.isArray(layoutData.positions)) {
             console.log('Loading layout with column count:', layoutData);
-            setPositions(layoutData.positions);
-            if (layoutData.columnCount && layoutData.columnCount >= 1 && layoutData.columnCount <= 4) {
-              setColumnCount(layoutData.columnCount);
+            
+            // If positions array is empty, use defaults
+            if (layoutData.positions.length === 0) {
+              console.log('Empty positions array, using DEFAULT_POSITIONS');
+              setPositions(DEFAULT_POSITIONS);
+              setColumnCount(4);
+            } else {
+              setPositions(layoutData.positions);
+              if (layoutData.columnCount && layoutData.columnCount >= 1 && layoutData.columnCount <= 4) {
+                setColumnCount(layoutData.columnCount);
+              }
             }
           }
           // Handle position-based format (backwards compatibility)
@@ -85,8 +103,8 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
             console.log('Converting old layout format:', layoutData);
             const newPositions = layoutData.map((id: string, idx: number) => ({
               id,
-              column: idx % 3,
-              row: Math.floor(idx / 3),
+              column: idx % 4,
+              row: Math.floor(idx / 4),
             }));
             setPositions(newPositions);
           }
