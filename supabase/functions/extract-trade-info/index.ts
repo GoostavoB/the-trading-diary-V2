@@ -133,17 +133,13 @@ serve(async (req) => {
       );
     }
 
-    // Check budget
+    // Check budget but do not hard-block this endpoint; enforce lite when needed
     const budget = await checkBudget(supabaseClient, user.id);
-    if (budget.blocked) {
-      console.error(`❌ User ${user.id} blocked due to budget limits`);
-      return new Response(
-        JSON.stringify({ 
-          error: 'AI credits exhausted',
-          details: budget.message 
-        }),
-        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    const ADMIN_ID = 'e019b392-2eb3-4b82-8e92-bbb8f502560b';
+    const isAdminUser = user.id === ADMIN_ID;
+    const forceLite = (budget.forceLite || budget.blocked) && !isAdminUser; // if blocked, we still proceed but force lite (except admin)
+    if (budget.blocked && !isAdminUser) {
+      console.warn(`⚠️ User ${user.id} over monthly AI budget. Proceeding with forced lite route.`);
     }
 
     // Deduct 1 upload credit before processing
@@ -260,7 +256,7 @@ serve(async (req) => {
     }
 
     // Route decision: OCR-first if quality >= 0.80 and not forced to lite
-    if (ocrText && ocrQualityScore >= 0.80 && !budget.forceLite) {
+    if (ocrText && ocrQualityScore >= 0.80 && !forceLite) {
       console.log('🔤 Using OCR + lite route (quality:', ocrQualityScore.toFixed(2), ')');
       route = 'lite';
       modelUsed = 'google/gemini-2.5-flash-lite';

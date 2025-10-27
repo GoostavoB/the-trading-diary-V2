@@ -117,27 +117,33 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
           // Handle specific error responses with status codes
           if (error) {
             let errorMessage = 'Failed to analyze image';
-            
-            // Parse error details from the response
-            if (typeof error === 'object' && 'message' in error) {
-              const errorMsg = (error as any).message;
-              if (errorMsg.includes('400')) {
-                errorMessage = 'Image validation failed (too large or invalid format)';
-              } else if (errorMsg.includes('402')) {
-                errorMessage = 'Insufficient upload credits';
-                toast.error('Insufficient Credits', {
-                  description: 'You need more upload credits. Please purchase additional credits.',
-                });
-              } else if (errorMsg.includes('422')) {
-                errorMessage = 'No trades detected in image';
-              } else if (errorMsg.includes('429')) {
-                errorMessage = 'Rate limit exceeded - please wait';
-              } else if (errorMsg.includes('500')) {
-                errorMessage = 'Server error - please try again';
+
+            // Try to read status and JSON body from supabase functions error context
+            const resp = (error as any)?.context?.response as Response | undefined;
+            let status: number | undefined;
+            let serverErr: any = null;
+            try {
+              status = resp?.status;
+              const text = await resp?.text?.();
+              if (text) {
+                try { serverErr = JSON.parse(text); } catch { serverErr = { error: text }; }
               }
+            } catch {}
+
+            if (status) {
+              if (status === 400) errorMessage = serverErr?.error || 'Image validation failed';
+              else if (status === 402) {
+                errorMessage = serverErr?.error || 'Insufficient upload credits or AI budget';
+                toast.error('Insufficient Credits', {
+                  description: serverErr?.details || 'You need more upload credits. Please purchase additional credits.',
+                });
+              }
+              else if (status === 422) errorMessage = serverErr?.error || 'No trades detected in image';
+              else if (status === 429) errorMessage = serverErr?.error || 'Rate limit exceeded - please wait';
+              else if (status === 500) errorMessage = serverErr?.error || 'Server error - please try again';
             }
 
-            console.error('Edge function error:', error);
+            console.error('Edge function error:', { status, serverErr, raw: error });
             const failed: UploadedImage = { ...image, status: 'error', trades: [] };
             results.push(failed);
             setImages(prev => prev.map((img, idx) => (idx === i ? failed : img)));
