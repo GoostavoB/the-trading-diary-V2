@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
 import { toast } from 'sonner';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Upload as UploadIcon, X, Sparkles, Check, ChevronsUpDown, Plus, Trash2, MapPin, ThumbsUp, ThumbsDown, Images } from 'lucide-react';
+import { Upload as UploadIcon, X, Sparkles, Check, ChevronsUpDown, Plus, Trash2, MapPin, ThumbsUp, ThumbsDown, Images, FileSpreadsheet } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from "@/lib/utils";
@@ -29,6 +29,7 @@ import { AIFeedback } from '@/components/upload/AIFeedback';
 import { runOCR, type OCRResult } from '@/utils/ocrPipeline';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { pageMeta } from '@/utils/seoHelpers';
+import { CSVUpload } from '@/components/upload/CSVUpload';
 
 interface ExtractedTrade {
   symbol: string;
@@ -848,10 +849,14 @@ const Upload = () => {
         </div>
 
         <Tabs defaultValue="ai-extract" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="ai-extract">
               <Sparkles className="w-4 h-4 mr-2" />
               AI Extract
+            </TabsTrigger>
+            <TabsTrigger value="csv-import">
+              <FileSpreadsheet className="w-4 h-4 mr-2" />
+              CSV Import
             </TabsTrigger>
             <TabsTrigger value="batch-upload">
               <Images className="w-4 h-4 mr-2" />
@@ -859,6 +864,26 @@ const Upload = () => {
             </TabsTrigger>
             <TabsTrigger value="manual">Manual Entry</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="csv-import" className="space-y-6">
+            <Card className="p-6 glass">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold">Import from CSV</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Upload a CSV export from your broker (Binance, Bybit, OKX) or from TradeJournal Pro.
+                  </p>
+                </div>
+                
+                <CSVUpload 
+                  onTradesExtracted={(trades) => {
+                    setExtractedTrades(trades);
+                    toast.success(`Parsed ${trades.length} trades from CSV`);
+                  }} 
+                />
+              </div>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="batch-upload" className="space-y-6">
             <Card className="p-6 glass">
