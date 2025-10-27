@@ -72,6 +72,7 @@ import { ChevronLeft } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { pageMeta } from '@/utils/seoHelpers';
+import { DailyStreakFlame } from '@/components/DailyStreakFlame';
 
 interface TradeStats {
   total_pnl: number;
@@ -963,9 +964,14 @@ const Dashboard = () => {
 
       <div id="main-dashboard-content" className="space-y-6 mobile-safe animate-fade-in">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-1 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">{t('dashboard.title')}</h1>
-            <p className="text-sm text-muted-foreground/80">{t('dashboard.overview')}</p>
+          <div className="flex items-center gap-3">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-1 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                {t('dashboard.title')}
+              </h1>
+              <p className="text-sm text-muted-foreground/80">{t('dashboard.overview')}</p>
+            </div>
+            <DailyStreakFlame />
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <DateRangeFilter dateRange={dateRange} onDateRangeChange={handleDateRangeChange} />

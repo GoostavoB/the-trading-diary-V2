@@ -3796,6 +3796,7 @@ export type Database = {
           created_at: string | null
           crypto_display_mode: boolean | null
           currency: string | null
+          current_visit_streak: number | null
           display_currency: string | null
           email_notifications: boolean | null
           event_reminders: boolean | null
@@ -3805,7 +3806,9 @@ export type Database = {
           language: string | null
           last_seen_updates_version: number | null
           last_streak_milestone: number | null
+          last_visit_date: string | null
           layout_json: Json | null
+          longest_visit_streak: number | null
           monthly_report: boolean | null
           onboarding_completed: boolean | null
           performance_alerts: boolean | null
@@ -3824,6 +3827,7 @@ export type Database = {
           created_at?: string | null
           crypto_display_mode?: boolean | null
           currency?: string | null
+          current_visit_streak?: number | null
           display_currency?: string | null
           email_notifications?: boolean | null
           event_reminders?: boolean | null
@@ -3833,7 +3837,9 @@ export type Database = {
           language?: string | null
           last_seen_updates_version?: number | null
           last_streak_milestone?: number | null
+          last_visit_date?: string | null
           layout_json?: Json | null
+          longest_visit_streak?: number | null
           monthly_report?: boolean | null
           onboarding_completed?: boolean | null
           performance_alerts?: boolean | null
@@ -3852,6 +3858,7 @@ export type Database = {
           created_at?: string | null
           crypto_display_mode?: boolean | null
           currency?: string | null
+          current_visit_streak?: number | null
           display_currency?: string | null
           email_notifications?: boolean | null
           event_reminders?: boolean | null
@@ -3861,7 +3868,9 @@ export type Database = {
           language?: string | null
           last_seen_updates_version?: number | null
           last_streak_milestone?: number | null
+          last_visit_date?: string | null
           layout_json?: Json | null
+          longest_visit_streak?: number | null
           monthly_report?: boolean | null
           onboarding_completed?: boolean | null
           performance_alerts?: boolean | null
