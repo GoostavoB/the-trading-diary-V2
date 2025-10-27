@@ -148,14 +148,14 @@ export const CSVColumnMapper = ({
               
               <div className="flex-1">
                 <Select
-                  value={mapping.csvColumn || ""}
-                  onValueChange={(value) => handleMappingChange(mapping.tradeField, value || null)}
+                  value={mapping.csvColumn || "__none__"}
+                  onValueChange={(value) => handleMappingChange(mapping.tradeField, value === "__none__" ? null : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select column..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">-- None --</SelectItem>
+                    <SelectItem value="__none__">-- None --</SelectItem>
                     {csvHeaders.map((header) => (
                       <SelectItem key={header} value={header}>
                         {header}
