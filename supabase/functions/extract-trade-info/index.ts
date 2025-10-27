@@ -71,18 +71,18 @@ function extractJSON(text: string): any {
 function estimateTradeCount(ocrText: string): number {
   if (!ocrText) return 10; // Default to expecting 10 trades when no OCR
   
-  // Count distinct symbols (BTCUSDT, ETHUSDT, etc.)
-  const symbolMatches = ocrText.match(/[A-Z]{3,6}USDT?/gi) || [];
+  // Enhanced symbol detection: BTCUSDT, BTCUSD, BTC-PERP, XAUUSD, EURUSD, etc.
+  const symbolMatches = ocrText.match(/\b[A-Z]{2,6}(?:USDT|USD|USDC|EUR|GBP|JPY|PERP)?\b/gi) || [];
   const uniqueSymbols = new Set(symbolMatches.map(s => s.toUpperCase()));
   
-  // Count Long/Short mentions
-  const sideMatches = ocrText.match(/\b(long|short)\b/gi) || [];
+  // Count Long/Short AND BUY/SELL mentions
+  const sideMatches = ocrText.match(/\b(long|short|buy|sell)\b/gi) || [];
   
-  // Count timestamp patterns (YYYY/MM/DD or similar)
-  const dateMatches = ocrText.match(/\d{4}[-\/]\d{2}[-\/]\d{2}/g) || [];
+  // Count timestamp patterns: YYYY/MM/DD, DD/MM/YYYY, MM/DD/YYYY
+  const dateMatches = ocrText.match(/\d{4}[-\/]\d{2}[-\/]\d{2}|\d{2}[-\/]\d{2}[-\/]\d{4}/g) || [];
   
-  // Count PnL/profit mentions (usually one per trade)
-  const pnlMatches = ocrText.match(/\b(pnl|profit|loss|p&l)\b/gi) || [];
+  // Enhanced PnL detection: currency symbols, +/-, percentages
+  const pnlMatches = ocrText.match(/[$€£¥]\s*-?\d+(\.\d+)?|-?\d+(\.\d+)?%|\b(pnl|profit|loss|p&l|roe|roi)\b/gi) || [];
   
   // Use the maximum of these indicators
   const estimate = Math.max(
@@ -166,7 +166,8 @@ serve(async (req) => {
       imageHash, 
       perceptualHash,
       broker, 
-      annotations 
+      annotations,
+      bypassCache 
     } = await req.json();
 
     if (!imageBase64) {
@@ -186,8 +187,8 @@ serve(async (req) => {
     // Pre-estimate trade count from OCR for cache validation
     const estimatedTradeCount = estimateTradeCount(ocrText || '');
 
-    // Check cache first using image hash
-    if (imageHash) {
+    // Check cache first using image hash (unless manual bypass requested)
+    if (imageHash && !bypassCache) {
       const { data: cached } = await supabaseClient
         .from('ai_image_cache')
         .select('parsed_json, route_used')
@@ -196,7 +197,9 @@ serve(async (req) => {
 
       if (cached) {
         const cachedCount = Array.isArray(cached.parsed_json) ? cached.parsed_json.length : 0;
-        const shouldBypassCache = estimatedTradeCount > 1 && estimatedTradeCount <= 10 && cachedCount < estimatedTradeCount;
+        
+        // Improved bypass logic: bypass if cached 0 trades, or cached < max(estimate, 2)
+        const shouldBypassCache = cachedCount === 0 || cachedCount < Math.max(estimatedTradeCount, 2);
 
         if (!shouldBypassCache) {
           console.log('✅ Cache hit for image:', imageHash, `(trades: ${cachedCount})`);
@@ -211,6 +214,8 @@ serve(async (req) => {
           console.log(`♻️ Bypassing cache: estimated ${estimatedTradeCount} trades, cached had ${cachedCount}`);
         }
       }
+    } else if (bypassCache) {
+      console.log('🔄 Manual cache bypass requested');
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -264,7 +269,7 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `Extract ALL trades from OCR text. Output ONLY valid JSON array. Each trade must match schema: ${JSON.stringify(TRADE_SCHEMA)}. Calculate position_type: if entry > exit AND profit > 0 = SHORT, if entry < exit AND profit > 0 = LONG. Extract leverage (e.g., "10x" = 10) and position_size. Calculate duration and period_of_day. IMPORTANT: If screenshot contains multiple trades, return array with ALL trades. Expected approximately ${estimatedTradeCount} trade(s). End with "\\n\\nEND".`
+              content: `Extract ALL trades from OCR text. Treat this like a table: one trade per row. BUY => long, SELL => short. Output ONLY valid JSON array. Each trade must match schema: ${JSON.stringify(TRADE_SCHEMA)}. Calculate position_type: if entry > exit AND profit > 0 = SHORT, if entry < exit AND profit > 0 = LONG. Extract leverage (e.g., "10x" = 10) and position_size. Calculate duration and period_of_day. CRITICAL: Never return an empty array. If uncertain, return best-effort trade rows. Return up to 10 trades max per image, but include ALL rows present in the screenshot. Expected approximately ${estimatedTradeCount} trade(s). End with "\\n\\nEND".`
             },
             {
               role: "user",
@@ -324,7 +329,7 @@ serve(async (req) => {
             messages: [
               {
                 role: "system",
-                content: `Extract ALL trades from trading screenshot. Return ONLY valid JSON array. Schema: ${JSON.stringify(TRADE_SCHEMA)}. For position_type: if entry > exit AND profit > 0 = SHORT, if entry < exit AND profit > 0 = LONG. Extract leverage and position_size. Calculate duration and period_of_day. IMPORTANT: If screenshot contains multiple trades, return array with ALL trades. Expected approximately ${estimatedTradeCount} trade(s). End with "\\n\\nEND".${brokerContext}${annotationContext}`
+                content: `Extract ALL trades from trading screenshot. Treat this like a table: one trade per row. BUY => long, SELL => short. Return ONLY valid JSON array. Schema: ${JSON.stringify(TRADE_SCHEMA)}. For position_type: if entry > exit AND profit > 0 = SHORT, if entry < exit AND profit > 0 = LONG. Extract leverage and position_size. Calculate duration and period_of_day. CRITICAL: Never return an empty array. If uncertain, return best-effort trade rows. Return up to 10 trades max per image, but include ALL rows present in the screenshot. Expected approximately ${estimatedTradeCount} trade(s). End with "\\n\\nEND".${brokerContext}${annotationContext}`
               },
               {
                 role: "user",
@@ -390,7 +395,7 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `Extract ALL trades from trading screenshot. Return ONLY valid JSON array. Schema: ${JSON.stringify(TRADE_SCHEMA)}. For position_type: if entry > exit AND profit > 0 = SHORT, if entry < exit AND profit > 0 = LONG. Extract leverage and position_size. Calculate duration and period_of_day. IMPORTANT: If screenshot contains multiple trades, return array with ALL trades. Expected approximately ${estimatedTradeCount} trade(s). End with "\\n\\nEND".${brokerContext}${annotationContext}`
+              content: `Extract ALL trades from trading screenshot. Treat this like a table: one trade per row. BUY => long, SELL => short. Return ONLY valid JSON array. Schema: ${JSON.stringify(TRADE_SCHEMA)}. For position_type: if entry > exit AND profit > 0 = SHORT, if entry < exit AND profit > 0 = LONG. Extract leverage and position_size. Calculate duration and period_of_day. CRITICAL: Never return an empty array. If uncertain, return best-effort trade rows. Return up to 10 trades max per image, but include ALL rows present in the screenshot. Expected approximately ${estimatedTradeCount} trade(s). End with "\\n\\nEND".${brokerContext}${annotationContext}`
             },
             {
               role: "user",
@@ -440,6 +445,20 @@ serve(async (req) => {
     // Ensure trades is an array
     if (!Array.isArray(trades)) {
       trades = [trades];
+    }
+
+    // If no trades extracted, return specific error
+    if (trades.length === 0) {
+      console.error('❌ No trades extracted after all processing routes');
+      return new Response(
+        JSON.stringify({ 
+          error: 'No trades detected',
+          details: 'Could not extract any trade data from this image. Please ensure the screenshot is clear and contains visible trade information, or try re-analyzing without cache.',
+          routeUsed: route,
+          cacheStatus: bypassCache ? 'bypassed' : 'not-bypassed'
+        }),
+        { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Normalize trades to match database schema

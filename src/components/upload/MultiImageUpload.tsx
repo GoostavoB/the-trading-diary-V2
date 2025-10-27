@@ -31,6 +31,7 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
   const [detectedTrades, setDetectedTrades] = useState<any[]>([]);
   const [selectedTrades, setSelectedTrades] = useState<Set<number>>(new Set());
+  const [bypassCache, setBypassCache] = useState(false);
   const credits = useUploadCredits();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,6 +110,7 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
               ocrConfidence: ocrResult?.confidence || null,
               imageHash: ocrResult?.imageHash || null,
               perceptualHash: ocrResult?.perceptualHash || null,
+              bypassCache: bypassCache,
             },
           });
 
@@ -144,7 +146,15 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
         setSelectedTrades(new Set(allTrades.map((_, idx) => idx)));
         setShowConfirmDialog(true);
       } else {
-        toast.error('No trades detected in the uploaded images');
+        const failedAll = results.every(img => img.status === 'error');
+        toast.error(
+          failedAll ? 'Analysis failed for all images' : 'No trades detected', 
+          {
+            description: failedAll 
+              ? 'Try re-analyzing with "Bypass Cache" enabled or upload clearer screenshots.'
+              : 'No trades could be extracted. Try enabling "Bypass Cache" or upload sharper screenshots.',
+          }
+        );
       }
     } catch (error) {
       console.error('Error analyzing images:', error);
@@ -214,7 +224,7 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
           Upload screenshots of your trades. Each image costs 1 credit and can detect up to 10 trades.
         </p>
         
-        <Collapsible className="bg-muted/50 rounded-lg p-3">
+        <Collapsible className="bg-muted/50 rounded-lg p-3 mb-3">
           <CollapsibleTrigger className="flex items-center justify-between w-full text-sm hover:opacity-80 transition-opacity">
             <span className="text-primary font-medium">Click here for best results</span>
             <ChevronDown className="h-4 w-4 text-primary" />
@@ -229,6 +239,19 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
             </ul>
           </CollapsibleContent>
         </Collapsible>
+
+        <div className="flex items-center space-x-2 bg-muted/30 rounded-lg p-3">
+          <input
+            type="checkbox"
+            id="bypassCache"
+            checked={bypassCache}
+            onChange={(e) => setBypassCache(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+          />
+          <label htmlFor="bypassCache" className="text-sm text-muted-foreground cursor-pointer">
+            Re-analyze without cache (use if previous analysis had issues)
+          </label>
+        </div>
       </div>
 
       {/* Image Grid */}
