@@ -95,7 +95,7 @@ export const AIInsightsBox = memo(({
             variant="ghost"
             size="sm"
             onClick={toggleCollapse}
-            className="h-8 w-8 p-0"
+            className="h-8 w-8 p-0 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all hover:scale-110"
             title={isCollapsed ? "Expand insights" : "Collapse insights"}
           >
             {isCollapsed ? (
