@@ -18,7 +18,7 @@ interface CSVUploadProps {
   onTradesExtracted: (trades: ExtractedTrade[]) => void;
 }
 
-type UploadStep = 'upload' | 'mapping' | 'broker' | 'preview';
+type UploadStep = 'upload' | 'mapping' | 'preview';
 
 export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
   const [currentStep, setCurrentStep] = useState<UploadStep>('upload');
@@ -232,47 +232,37 @@ export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
     });
   };
 
-  const handleMappingComplete = (mappings: Record<string, string>) => {
+  const handleMappingComplete = async (mappings: Record<string, string>) => {
     setColumnMappings(mappings);
-    setCurrentStep('broker');
-  };
-
-  const handleBrokerSelected = async () => {
-    if (!selectedBroker) {
-      toast.error("Please select a broker");
-      return;
-    }
-
+    
     // Apply mappings and generate trades
-    const trades = applyMappingToData(csvData, columnMappings);
+    const trades = applyMappingToData(csvData, mappings);
     setMappedTrades(trades);
 
-    // Save template
-    try {
-      await saveTemplate({
-        brokerName: selectedBroker,
-        columnMappings,
-        sampleHeaders: csvHeaders
-      });
-    } catch (error) {
-      console.error("Failed to save template:", error);
+    // Save template if broker is selected
+    if (selectedBroker) {
+      try {
+        await saveTemplate({
+          brokerName: selectedBroker,
+          columnMappings: mappings,
+          sampleHeaders: csvHeaders
+        });
+      } catch (error) {
+        console.error("Failed to save template:", error);
+      }
     }
 
     setCurrentStep('preview');
   };
 
   const handleImportTrades = () => {
-    const validTrades = mappedTrades.filter(t => 
-      t.symbol && t.entry_price && t.exit_price && t.position_size
-    );
-    
-    if (validTrades.length === 0) {
-      toast.error("No valid trades to import");
+    if (mappedTrades.length === 0) {
+      toast.error("No trades to import");
       return;
     }
 
-    onTradesExtracted(validTrades);
-    toast.success(`Extracted ${validTrades.length} trades from ${fileName}`);
+    onTradesExtracted(mappedTrades);
+    toast.success(`Extracted ${mappedTrades.length} trades from ${fileName}`);
     handleReset();
   };
 
@@ -321,7 +311,7 @@ export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
             <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <h3 className="text-lg font-semibold mb-2">Upload CSV or Excel File</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              CSV, XLSX, or XLS formats - we'll help you map the columns
+              We'll help you map the columns to your trades
             </p>
             <Button type="button" variant="outline" asChild>
               <span>Select File</span>
@@ -349,49 +339,23 @@ export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
           </div>
         </div>
 
+        <div className="mb-6">
+          <label className="block text-sm font-medium mb-2">
+            Broker (Optional)
+          </label>
+          <BrokerSelect
+            value={selectedBroker}
+            onChange={setSelectedBroker}
+            required={false}
+          />
+        </div>
+
         <CSVColumnMapper
           csvHeaders={csvHeaders}
           sampleData={csvData.slice(0, 5)}
           onMappingComplete={handleMappingComplete}
           initialMappings={detectedTemplate ? columnMappings : undefined}
         />
-      </Card>
-    );
-  }
-
-  if (currentStep === 'broker') {
-    return (
-      <Card className="p-6">
-        <div className="mb-6 flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => setCurrentStep('mapping')}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h3 className="text-lg font-semibold">Select Broker</h3>
-        </div>
-
-        <div className="space-y-6 max-w-md">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              What broker is this data from?
-            </label>
-            <BrokerSelect
-              value={selectedBroker}
-              onChange={setSelectedBroker}
-              required
-            />
-          </div>
-
-          <Alert>
-            <CheckCircle2 className="h-4 w-4" />
-            <AlertDescription>
-              Your column mapping will be saved and automatically applied for future "{selectedBroker}" uploads
-            </AlertDescription>
-          </Alert>
-
-          <Button onClick={handleBrokerSelected} className="w-full" size="lg">
-            Continue to Preview
-          </Button>
-        </div>
       </Card>
     );
   }

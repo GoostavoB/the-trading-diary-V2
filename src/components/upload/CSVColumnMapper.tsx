@@ -107,7 +107,7 @@ export const CSVColumnMapper = ({
         <div>
           <h3 className="text-lg font-semibold">Map Your CSV Columns</h3>
           <p className="text-sm text-muted-foreground">
-            Match your CSV columns to the required trade fields
+            Match your CSV columns to trade fields (all fields are optional)
           </p>
         </div>
         <div className="flex gap-2">
@@ -124,11 +124,11 @@ export const CSVColumnMapper = ({
         </div>
       </div>
 
-      {!validation.isValid && (
+      {validation.missingFields.length > 0 && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Missing required fields: {validation.missingFields.join(', ')}
+            Missing recommended fields: {validation.missingFields.join(', ')}
           </AlertDescription>
         </Alert>
       )}
@@ -204,7 +204,6 @@ export const CSVColumnMapper = ({
       <div className="flex justify-end gap-3">
         <Button
           onClick={handleContinue}
-          disabled={!validation.isValid}
           size="lg"
         >
           Continue to Preview

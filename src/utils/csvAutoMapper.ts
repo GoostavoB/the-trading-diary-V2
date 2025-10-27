@@ -13,14 +13,8 @@ export interface AutoMapResult {
   overallConfidence: number;
 }
 
-// Required fields for a valid trade (relaxed - dates are optional)
-const REQUIRED_FIELDS: (keyof ExtractedTrade)[] = [
-  'symbol',
-  'entry_price',
-  'exit_price',
-  'position_size',
-  'side'
-];
+// Required fields for a valid trade (all fields are now optional)
+const REQUIRED_FIELDS: (keyof ExtractedTrade)[] = [];
 
 // Keywords for each trade field (lowercase)
 const FIELD_KEYWORDS: Record<keyof ExtractedTrade, string[]> = {
