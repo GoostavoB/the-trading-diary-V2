@@ -1,19 +1,19 @@
-import { useState, useCallback } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Upload, X, Image as ImageIcon, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Upload, X, CheckCircle, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { toast } from 'sonner';
+import { useUploadCredits } from '@/hooks/useUploadCredits';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { PreAnalysisConfirmDialog } from './PreAnalysisConfirmDialog';
+import { CreditPurchaseDialog } from './CreditPurchaseDialog';
 
 interface UploadedImage {
   file: File;
   preview: string;
   status: 'pending' | 'analyzing' | 'success' | 'error';
-  tradesDetected?: number;
-  error?: string;
+  trades?: any[];
 }
 
 interface MultiImageUploadProps {
@@ -21,118 +21,103 @@ interface MultiImageUploadProps {
 }
 
 export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
-  const { user } = useAuth();
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [totalTradesDetected, setTotalTradesDetected] = useState(0);
-  const [creditsRequired, setCreditsRequired] = useState(0);
-  const [extractedTrades, setExtractedTrades] = useState<any[]>([]);
+  const [showPreAnalysisDialog, setShowPreAnalysisDialog] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
+  const [detectedTrades, setDetectedTrades] = useState<any[]>([]);
+  const credits = useUploadCredits();
 
-  const handleFileSelect = useCallback((files: FileList | null) => {
-    if (!files) return;
-
-    const newImages: UploadedImage[] = [];
-    const remainingSlots = 3 - images.length;
-
-    Array.from(files).slice(0, remainingSlots).forEach((file) => {
-      if (file.type.startsWith('image/')) {
-        newImages.push({
-          file,
-          preview: URL.createObjectURL(file),
-          status: 'pending',
-        });
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    const filesToProcess = files.filter(file => {
+      const isValid = file.type.startsWith('image/');
+      if (!isValid) {
+        toast.error(`${file.name} is not a valid image file`);
       }
+      return isValid;
     });
 
-    if (newImages.length > 0) {
-      setImages([...images, ...newImages]);
-    }
+    const newImages: UploadedImage[] = filesToProcess.map(file => ({
+      file,
+      preview: URL.createObjectURL(file),
+      status: 'pending' as const,
+    }));
 
-    if (files.length > remainingSlots) {
-      toast.warning(`Only ${remainingSlots} slots available. First ${remainingSlots} images added.`);
-    }
-  }, [images]);
+    setImages(prev => [...prev, ...newImages]);
+  };
 
   const handleRemoveImage = (index: number) => {
-    const newImages = [...images];
-    URL.revokeObjectURL(newImages[index].preview);
-    newImages.splice(index, 1);
-    setImages(newImages);
+    setImages(prev => {
+      const newImages = [...prev];
+      URL.revokeObjectURL(newImages[index].preview);
+      newImages.splice(index, 1);
+      return newImages;
+    });
+  };
+
+  const startAnalysis = () => {
+    setShowPreAnalysisDialog(true);
   };
 
   const analyzeImages = async () => {
+    setShowPreAnalysisDialog(false);
     setIsAnalyzing(true);
-    let totalTrades = 0;
-    const allTrades: any[] = [];
 
     try {
-      // Analyze each image
-      for (let i = 0; i < images.length; i++) {
-        const image = images[i];
-        setImages(prev => prev.map((img, idx) => 
-          idx === i ? { ...img, status: 'analyzing' } : img
-        ));
+      const results = await Promise.all(
+        images.map(async (image) => {
+          try {
+            // Convert image to base64
+            const reader = new FileReader();
+            const base64Promise = new Promise<string>((resolve, reject) => {
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.onerror = reject;
+              reader.readAsDataURL(image.file);
+            });
+            
+            const imageBase64 = await base64Promise;
 
-        try {
-          // Get session token
-          const { data: { session } } = await supabase.auth.getSession();
-          if (!session) throw new Error('Not authenticated');
-
-          // Upload image to storage
-          const fileExt = image.file.name.split('.').pop();
-          const fileName = `${Date.now()}-${i}.${fileExt}`;
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('trade-screenshots')
-            .upload(`${user!.id}/${fileName}`, image.file);
-
-          if (uploadError) throw uploadError;
-
-          // Extract trades from image
-          const response = await fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-trade-info`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${session.access_token}`,
+            const { data, error } = await supabase.functions.invoke('extract-trade-info', {
+              body: { 
+                imageBase64: imageBase64,
               },
-              body: JSON.stringify({ 
-                imagePath: uploadData.path,
-                dryRun: true  // Don't deduct credits yet
-              }),
-            }
-          );
+            });
 
-          if (!response.ok) throw new Error('Failed to analyze image');
+            if (error) throw error;
 
-          const result = await response.json();
-          const tradesFound = Array.isArray(result.trades) ? result.trades.length : 1;
-          
-          totalTrades += tradesFound;
-          allTrades.push(...(Array.isArray(result.trades) ? result.trades : [result.trade]));
+            return {
+              ...image,
+              status: 'success' as const,
+              trades: data.trades || [],
+            };
+          } catch (error) {
+            console.error('Error analyzing image:', error);
+            return {
+              ...image,
+              status: 'error' as const,
+              trades: [],
+            };
+          }
+        })
+      );
 
-          setImages(prev => prev.map((img, idx) => 
-            idx === i ? { ...img, status: 'success', tradesDetected: tradesFound } : img
-          ));
-        } catch (error) {
-          console.error(`Error analyzing image ${i}:`, error);
-          setImages(prev => prev.map((img, idx) => 
-            idx === i ? { 
-              ...img, 
-              status: 'error', 
-              error: error instanceof Error ? error.message : 'Analysis failed' 
-            } : img
-          ));
-        }
+      setImages(results);
+
+      const allTrades = results
+        .filter(img => img.status === 'success')
+        .flatMap(img => img.trades || []);
+
+      if (allTrades.length > 0) {
+        setDetectedTrades(allTrades);
+        setShowConfirmDialog(true);
+      } else {
+        toast.error('No trades detected in the uploaded images');
       }
-
-      setTotalTradesDetected(totalTrades);
-      setCreditsRequired(totalTrades * 2); // 2 credits per trade
-      setExtractedTrades(allTrades);
-      setShowConfirmation(true);
     } catch (error) {
-      toast.error('Failed to analyze images');
+      console.error('Error analyzing images:', error);
+      toast.error('Failed to analyze images. Please try again.');
     } finally {
       setIsAnalyzing(false);
     }
@@ -140,134 +125,151 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
 
   const handleConfirmImport = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const totalTrades = detectedTrades.length;
 
-      // Process all images and deduct credits
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/process-multi-upload`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({ 
-            trades: extractedTrades,
-            creditsToDeduct: creditsRequired
-          }),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('process-multi-upload', {
+        body: {
+          trades: detectedTrades,
+        },
+      });
 
-      if (!response.ok) throw new Error('Failed to process trades');
+      if (error) throw error;
 
-      const result = await response.json();
+      toast.success(`Successfully imported ${totalTrades} trades`);
+
+      onTradesExtracted(data.trades);
       
-      toast.success(`Successfully imported ${totalTradesDetected} trades!`);
-      onTradesExtracted(result.trades);
-      
-      // Reset state
-      images.forEach(img => URL.revokeObjectURL(img.preview));
+      setShowConfirmDialog(false);
       setImages([]);
-      setShowConfirmation(false);
-      setExtractedTrades([]);
+      setDetectedTrades([]);
+      
+      await credits.refetch();
     } catch (error) {
-      toast.error('Failed to import trades');
+      console.error('Error importing trades:', error);
+      toast.error('Failed to import trades. Please try again.');
     }
   };
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-4">
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-semibold">Upload Trade Screenshots</h3>
+          <span className="text-sm text-muted-foreground">
+            {images.length} image{images.length !== 1 ? 's' : ''} selected
+          </span>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Upload screenshots of your trades. Each image costs 1 credit and can detect up to 10 trades.
+        </p>
+      </div>
+
+      {/* Image Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {images.map((image, index) => (
-          <Card key={index} className="relative group overflow-hidden">
-            <div className="aspect-square relative">
-              <img
-                src={image.preview}
-                alt={`Upload ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => handleRemoveImage(index)}
-                  disabled={isAnalyzing}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+          <Card key={index} className="relative overflow-hidden aspect-square group">
+            <img
+              src={image.preview}
+              alt={`Trade screenshot ${index + 1}`}
+              className="w-full h-full object-cover"
+            />
+            
+            {/* Remove button */}
+            <button
+              onClick={() => handleRemoveImage(index)}
+              disabled={isAnalyzing}
+              className="absolute top-2 right-2 p-1.5 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            {/* Status indicators */}
+            {image.status === 'analyzing' && (
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
               </div>
-              {image.status === 'analyzing' && (
-                <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary-foreground" aria-label="Analyzing image" />
-                </div>
-              )}
-              {image.status === 'success' && (
-                <div className="absolute top-2 right-2 bg-green-500 rounded-full p-1">
-                  <CheckCircle2 className="h-4 w-4 text-primary-foreground" aria-label="Analysis successful" />
-                </div>
-              )}
-              {image.status === 'error' && (
-                <div className="absolute top-2 right-2 bg-destructive rounded-full p-1">
-                  <AlertCircle className="h-4 w-4 text-primary-foreground" aria-label="Analysis failed" />
-                </div>
-              )}
-            </div>
-            {image.tradesDetected !== undefined && (
-              <div className="absolute bottom-0 left-0 right-0 bg-black/80 text-foreground text-xs p-2 text-center">
-                {image.tradesDetected} {image.tradesDetected === 1 ? 'trade' : 'trades'} detected
+            )}
+            {image.status === 'success' && (
+              <div className="absolute bottom-2 right-2 p-1 bg-green-600 rounded-full">
+                <CheckCircle className="h-4 w-4 text-white" />
+              </div>
+            )}
+            {image.status === 'error' && (
+              <div className="absolute bottom-2 right-2 p-1 bg-destructive rounded-full">
+                <AlertCircle className="h-4 w-4 text-white" />
               </div>
             )}
           </Card>
         ))}
 
-        {images.length < 3 && (
-          <Card className={cn(
-            "aspect-square flex flex-col items-center justify-center cursor-pointer hover:bg-accent/50 transition-colors",
-            images.length === 0 && "col-span-3"
-          )}>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(e) => handleFileSelect(e.target.files)}
-              className="hidden"
-              id="image-upload"
-              disabled={isAnalyzing}
-            />
-            <label htmlFor="image-upload" className="cursor-pointer flex flex-col items-center gap-2 p-4">
-              <Upload className="h-8 w-8 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground text-center">
-                Click to upload<br />
-                ({images.length}/3 slots used)
-              </p>
-            </label>
+        {/* Upload button */}
+        <label className="cursor-pointer">
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFileSelect}
+            className="hidden"
+            disabled={isAnalyzing}
+          />
+          <Card className="aspect-square flex flex-col items-center justify-center hover:bg-accent/50 transition-colors">
+            <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+            <p className="text-sm text-muted-foreground text-center px-4">
+              Click to upload images
+            </p>
           </Card>
-        )}
+        </label>
       </div>
 
+      {/* Analyze Button */}
       {images.length > 0 && (
         <Button
-          onClick={analyzeImages}
-          disabled={isAnalyzing || images.some(img => img.status === 'analyzing')}
+          onClick={startAnalysis}
+          disabled={images.length === 0 || isAnalyzing || credits.isLoading}
           className="w-full"
+          size="lg"
         >
           {isAnalyzing ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
               Analyzing Images...
             </>
           ) : (
             <>
-              <ImageIcon className="mr-2 h-4 w-4" />
-              Analyze & Detect Trades
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Analyze & Detect Trades ({images.length} credit{images.length !== 1 ? 's' : ''})
             </>
           )}
         </Button>
       )}
 
-      {/* Confirmation Dialog */}
-      <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+      {/* Pre-Analysis Dialog */}
+      <PreAnalysisConfirmDialog
+        open={showPreAnalysisDialog}
+        onOpenChange={setShowPreAnalysisDialog}
+        imageCount={images.length}
+        creditsRequired={images.length}
+        currentBalance={credits.balance}
+        onConfirm={analyzeImages}
+        onPurchaseCredits={() => {
+          setShowPreAnalysisDialog(false);
+          setShowPurchaseDialog(true);
+        }}
+        isAnalyzing={isAnalyzing}
+      />
+
+      {/* Purchase Credits Dialog */}
+      <CreditPurchaseDialog
+        open={showPurchaseDialog}
+        onOpenChange={setShowPurchaseDialog}
+        onPurchaseComplete={() => {
+          setShowPurchaseDialog(false);
+          setShowPreAnalysisDialog(true);
+        }}
+      />
+
+      {/* Post-Analysis Confirmation Dialog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirm Trade Import</DialogTitle>
@@ -275,34 +277,42 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
               Review the detected trades before importing
             </DialogDescription>
           </DialogHeader>
-
-          <div className="space-y-4 py-4">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Trades detected:</span>
-              <span className="font-semibold">{totalTradesDetected}</span>
+          
+          <div className="py-4">
+            <div className="mb-4 p-3 bg-muted rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-medium">Trades Detected:</span>
+                <span className="text-lg font-bold">{detectedTrades.length}</span>
+              </div>
             </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Credits required:</span>
-              <span className="font-semibold">{creditsRequired} credits</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Cost per trade:</span>
-              <span className="text-muted-foreground">2 credits</span>
-            </div>
-
-            <div className="border-t pt-4">
-              <p className="text-sm text-muted-foreground">
-                Images analyzed: {images.filter(img => img.status === 'success').length} / {images.length}
-              </p>
+            
+            <div className="max-h-[300px] overflow-y-auto space-y-2">
+              {detectedTrades.map((trade, index) => (
+                <div key={index} className="p-3 bg-muted/50 rounded border">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="font-medium">{trade.symbol}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {trade.side} • ${trade.entry_price}
+                      </div>
+                    </div>
+                    <div className={`px-2 py-1 rounded text-xs font-medium ${
+                      trade.side === 'long' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
+                    }`}>
+                      {trade.side}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-
+          
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowConfirmation(false)}>
+            <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
               Cancel
             </Button>
             <Button onClick={handleConfirmImport}>
-              Confirm & Import
+              Import Trades
             </Button>
           </DialogFooter>
         </DialogContent>

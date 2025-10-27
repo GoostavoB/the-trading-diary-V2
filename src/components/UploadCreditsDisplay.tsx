@@ -52,8 +52,8 @@ export const UploadCreditsDisplay = () => {
         </TooltipTrigger>
         <TooltipContent>
           <div className="text-sm">
-            <p>Each upload uses 1 credit</p>
-            <p>Up to 10 trades per upload</p>
+            <p>Each image analysis uses 1 credit</p>
+            <p>Each image can detect up to 10 trades</p>
             <p className="text-xs text-muted-foreground mt-1">
               Extra credits: $2 for 10 uploads
             </p>
