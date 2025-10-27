@@ -32,6 +32,13 @@ export const TradeEditCard = ({
   const [setupOpen, setSetupOpen] = React.useState(false);
   const [setupSearch, setSetupSearch] = React.useState('');
 
+  // Ensure period_of_day has a valid default value
+  React.useEffect(() => {
+    if (!trade.period_of_day || !['morning', 'afternoon', 'night'].includes(trade.period_of_day)) {
+      onUpdate(index, 'period_of_day', 'morning');
+    }
+  }, []);
+
   const handleCreateSetup = async () => {
     if (!setupSearch.trim() || !onCreateSetup) return;
     const newSetup = await onCreateSetup(setupSearch.trim());
