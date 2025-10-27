@@ -1,10 +1,11 @@
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { AIInsightCard } from './AIInsightCard';
 import { LSRInsightCard } from './LSRInsightCard';
 import { useHomeInsights } from '@/hooks/useHomeInsights';
 import { useInsightsRotation } from '@/hooks/useInsightsRotation';
 import { Card } from '@/components/ui/card';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface AIInsightsBoxProps {
   maxInsights?: number;
@@ -17,7 +18,20 @@ export const AIInsightsBox = memo(({
   rotationInterval = 8000,
   refreshInterval = 60000,
 }: AIInsightsBoxProps) => {
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('ai-insights-collapsed');
+    return saved === 'true';
+  });
+
   const { data, isLoading, error } = useHomeInsights(refreshInterval);
+
+  useEffect(() => {
+    localStorage.setItem('ai-insights-collapsed', isCollapsed.toString());
+  }, [isCollapsed]);
+
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
 
   const allInsights = data ? [...data.user_insights, ...data.market_insights] : [];
 
@@ -71,34 +85,59 @@ export const AIInsightsBox = memo(({
           <Sparkles className="h-5 w-5 text-primary" />
           <h2 className="text-xl font-bold">AI Insights</h2>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Updated {new Date(data.asOf).toLocaleTimeString()}
-        </p>
+        <div className="flex items-center gap-3">
+          {!isCollapsed && data && (
+            <p className="text-xs text-muted-foreground">
+              Updated {new Date(data.asOf).toLocaleTimeString()}
+            </p>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleCollapse}
+            className="h-8 w-8 p-0"
+            title={isCollapsed ? "Expand insights" : "Collapse insights"}
+          >
+            {isCollapsed ? (
+              <ChevronDown className="h-4 w-4" />
+            ) : (
+              <ChevronUp className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
       </div>
 
-      <div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        <LSRInsightCard />
-        {visibleInsights.map((insight, index) => (
-          <AIInsightCard
-            key={`${insight.id}-${index}`}
-            insight={insight}
-            position={index}
-          />
-        ))}
-      </div>
-
-      <div className="text-center">
-        <p className="text-xs text-muted-foreground">
-          This is not financial advice. •{' '}
-          <a href="#" className="underline hover:text-foreground">
-            Methodology
-          </a>
+      {isCollapsed ? (
+        <p className="text-sm text-muted-foreground">
+          Click to expand and view market insights and analysis
         </p>
-      </div>
+      ) : (
+        <>
+          <div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <LSRInsightCard />
+            {visibleInsights.map((insight, index) => (
+              <AIInsightCard
+                key={`${insight.id}-${index}`}
+                insight={insight}
+                position={index}
+              />
+            ))}
+          </div>
+
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground">
+              This is not financial advice. •{' '}
+              <a href="#" className="underline hover:text-foreground">
+                Methodology
+              </a>
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 });
