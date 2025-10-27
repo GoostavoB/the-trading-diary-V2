@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Upload, X, CheckCircle, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, CheckCircle, AlertCircle, Image as ImageIcon, TrendingUp, TrendingDown } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useUploadCredits } from '@/hooks/useUploadCredits';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -251,7 +253,11 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
         description: 'Images analyzed but no trades found. Try clearer screenshots or use "Bypass Cache".',
       });
     } else {
-      const allTrades = results.flatMap(r => r.trades || []);
+      // Pre-fill broker on all detected trades
+      const allTrades = results.flatMap(r => r.trades || []).map(trade => ({
+        ...trade,
+        broker: trade.broker || broker,
+      }));
       setDetectedTrades(allTrades);
       setSelectedTrades(new Set(allTrades.map((_, idx) => idx)));
       setShowConfirmDialog(true);
@@ -517,57 +523,110 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
                     />
                     <div className="flex-1 space-y-2">
                       <div className="flex justify-between items-start">
-                        <div className="space-y-1">
-                          <div>
-                            <span className="font-medium text-base">{trade.symbol}</span>
-                            <span className={`ml-2 text-xs px-2 py-0.5 rounded ${
-                              trade.side === 'long' 
-                                ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
-                                : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
-                            }`}>
-                              {trade.side?.toUpperCase()}
-                            </span>
-                            {trade.leverage && trade.leverage > 1 && (
-                              <span className="ml-1 text-xs px-1.5 py-0.5 bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 rounded">
-                                {trade.leverage}x
-                              </span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-base">{trade.symbol}</span>
+                          <Badge
+                            variant={trade.side === 'long' ? 'default' : 'secondary'}
+                            className={cn(
+                              "text-xs",
+                              trade.side === 'long'
+                                ? "bg-green-500/10 text-green-700 dark:text-green-400"
+                                : "bg-red-500/10 text-red-700 dark:text-red-400"
                             )}
-                          </div>
+                          >
+                            {trade.side?.toUpperCase()}
+                          </Badge>
+                          {trade.leverage && trade.leverage > 1 && (
+                            <Badge variant="outline" className="text-xs">
+                              {trade.leverage}x
+                            </Badge>
+                          )}
                           {trade.broker && (
-                            <div className="text-xs text-muted-foreground">
+                            <Badge variant="outline" className="text-xs">
                               {trade.broker}
-                            </div>
-                          )}
-                          {trade.setup && (
-                            <div className="text-xs text-blue-600 dark:text-blue-400">
-                              {trade.setup}
-                            </div>
+                            </Badge>
                           )}
                         </div>
-                        <div className="text-right">
-                          <div className={`text-sm font-medium ${
-                            trade.profit_loss >= 0 ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {trade.profit_loss >= 0 ? '+' : ''}${trade.profit_loss?.toFixed(2)}
-                          </div>
-                          {trade.roi && (
-                            <div className={`text-xs ${
-                              trade.roi >= 0 ? 'text-green-600' : 'text-red-600'
-                            }`}>
-                              {trade.roi >= 0 ? '+' : ''}{trade.roi?.toFixed(2)}%
-                            </div>
+                        
+                        {/* P&L with gain/loss pill */}
+                        <Badge
+                          variant={(trade.profit_loss || 0) >= 0 ? "default" : "destructive"}
+                          className={cn(
+                            "gap-1.5 font-medium tabular-nums",
+                            (trade.profit_loss || 0) >= 0
+                              ? "bg-green-500/10 text-green-700 dark:text-green-400 hover:bg-green-500/20"
+                              : "bg-red-500/10 text-red-700 dark:text-red-400 hover:bg-red-500/20"
                           )}
-                        </div>
+                        >
+                          {(trade.profit_loss || 0) >= 0 ? (
+                            <TrendingUp className="h-3 w-3" />
+                          ) : (
+                            <TrendingDown className="h-3 w-3" />
+                          )}
+                          ${Math.abs(trade.profit_loss || 0).toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </Badge>
                       </div>
+
+                      {/* ROI */}
+                      {trade.roi !== undefined && trade.roi !== null && (
+                        <div className="mb-3 mt-2">
+                          <span
+                            className={cn(
+                              "text-sm font-semibold tabular-nums",
+                              trade.roi >= 0
+                                ? "text-green-600 dark:text-green-500"
+                                : "text-red-600 dark:text-red-500"
+                            )}
+                          >
+                            {trade.roi >= 0 ? '+' : ''}
+                            {trade.roi.toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}% ROI
+                          </span>
+                        </div>
+                      )}
                       
+                      {/* Trade details grid */}
                       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                        <div>Entry: ${trade.entry_price?.toFixed(2)}</div>
-                        <div>Exit: ${trade.exit_price?.toFixed(2)}</div>
-                        <div>Size: ${trade.position_size?.toFixed(2)}</div>
-                        {trade.margin && <div>Margin: ${trade.margin?.toFixed(2)}</div>}
-                        {trade.trading_fee !== 0 && <div>Trade Fee: ${trade.trading_fee?.toFixed(2)}</div>}
-                        {trade.funding_fee !== 0 && <div>Funding: ${trade.funding_fee?.toFixed(2)}</div>}
-                        {trade.period_of_day && <div className="capitalize">{trade.period_of_day}</div>}
+                        <div>
+                          Entry: <span className="tabular-nums">${trade.entry_price?.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}</span>
+                        </div>
+                        <div>
+                          Exit: <span className="tabular-nums">${trade.exit_price?.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}</span>
+                        </div>
+                        <div>
+                          Size: <span className="tabular-nums">${trade.position_size?.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}</span>
+                        </div>
+                        <div>
+                          Margin: <span className="tabular-nums">${trade.margin?.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}</span>
+                        </div>
+                        {(trade.trading_fee !== 0 || trade.funding_fee !== 0) && (
+                          <div>
+                            Fees: <span className="tabular-nums">${((trade.trading_fee || 0) + (trade.funding_fee || 0)).toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}</span>
+                          </div>
+                        )}
+                        {trade.period_of_day && (
+                          <div className="capitalize">{trade.period_of_day}</div>
+                        )}
                       </div>
                     </div>
                   </div>

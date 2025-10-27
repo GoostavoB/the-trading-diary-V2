@@ -8,6 +8,7 @@ import { ExtractedTrade } from "@/types/trade";
 import { CSVColumnMapper } from "./CSVColumnMapper";
 import { BrokerTemplateManager } from "./BrokerTemplateManager";
 import { CSVPreviewWithEdit } from "./CSVPreviewWithEdit";
+import { CSVPreviewSummary } from "./CSVPreviewSummary";
 import { BrokerSelect } from "./BrokerSelect";
 import { EnhancedFileUpload } from "./EnhancedFileUpload";
 import { toast } from "sonner";
@@ -30,6 +31,7 @@ export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
   const [selectedBroker, setSelectedBroker] = useState<string>("");
   const [mappedTrades, setMappedTrades] = useState<ExtractedTrade[]>([]);
   const [detectedTemplate, setDetectedTemplate] = useState<{ id: string; name: string } | null>(null);
+  const [selectedTrades, setSelectedTrades] = useState<Set<number>>(new Set());
   
   const { templates, incrementUsage, saveTemplate } = useBrokerTemplates();
 
@@ -70,6 +72,7 @@ export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
             // Skip to preview
             const trades = applyMappingToData(rows, template.column_mappings);
             setMappedTrades(trades);
+            setSelectedTrades(new Set(trades.map((_, idx) => idx)));
             setCurrentStep('preview');
           }
         } else {
@@ -114,6 +117,7 @@ export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
                       incrementUsage(match.templateId);
                       const trades = applyMappingToData(rows, template.column_mappings);
                       setMappedTrades(trades);
+                      setSelectedTrades(new Set(trades.map((_, idx) => idx)));
                       setCurrentStep('preview');
                     }
                   } else {
@@ -156,6 +160,7 @@ export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
               // Skip to preview
               const trades = applyMappingToData(data, template.column_mappings);
               setMappedTrades(trades);
+              setSelectedTrades(new Set(trades.map((_, idx) => idx)));
               setCurrentStep('preview');
             }
           } else {
@@ -239,6 +244,7 @@ export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
     // Apply mappings and generate trades
     const trades = applyMappingToData(csvData, mappings);
     setMappedTrades(trades);
+    setSelectedTrades(new Set(trades.map((_, idx) => idx)));
 
     // Save template if broker is selected
     if (selectedBroker) {
@@ -257,13 +263,21 @@ export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
   };
 
   const handleImportTrades = () => {
-    if (mappedTrades.length === 0) {
-      toast.error("No trades to import");
+    // Get only selected trades and ensure broker is set
+    const tradesToImport = mappedTrades
+      .filter((_, idx) => selectedTrades.has(idx))
+      .map(trade => ({
+        ...trade,
+        broker: trade.broker || selectedBroker,
+      }));
+
+    if (tradesToImport.length === 0) {
+      toast.error('Please select at least one trade to import');
       return;
     }
 
-    onTradesExtracted(mappedTrades);
-    toast.success(`Extracted ${mappedTrades.length} trades from ${fileName}`);
+    onTradesExtracted(tradesToImport);
+    toast.success(`${tradesToImport.length} trade${tradesToImport.length !== 1 ? 's' : ''} imported from ${fileName}`);
     handleReset();
   };
 
@@ -276,6 +290,7 @@ export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
     setSelectedBroker("");
     setMappedTrades([]);
     setDetectedTemplate(null);
+    setSelectedTrades(new Set());
   };
 
   const handleLoadTemplate = (templateId: string, brokerName: string, mappings: Record<string, string>) => {
@@ -285,9 +300,10 @@ export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
     incrementUsage(templateId);
     
     if (csvData.length > 0) {
-      const trades = applyMappingToData(csvData, mappings);
-      setMappedTrades(trades);
-      setCurrentStep('preview');
+    const trades = applyMappingToData(csvData, mappings);
+    setMappedTrades(trades);
+    setSelectedTrades(new Set(trades.map((_, idx) => idx))); // Select all by default
+    setCurrentStep('preview');
     } else {
       setCurrentStep('mapping');
     }
@@ -353,22 +369,33 @@ export const CSVUpload = ({ onTradesExtracted }: CSVUploadProps) => {
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
-              <h3 className="text-lg font-semibold">Review Trades</h3>
+              <h3 className="text-lg font-semibold">Review Detected Trades</h3>
               <p className="text-sm text-muted-foreground">
-                {fileName} • {selectedBroker}
+                {fileName} {selectedBroker && `• ${selectedBroker}`}
               </p>
             </div>
           </div>
-          <Button onClick={handleImportTrades} size="lg">
-            Import {mappedTrades.length} Trades
-          </Button>
         </div>
 
-        <CSVPreviewWithEdit
+        <CSVPreviewSummary
           trades={mappedTrades}
-          onTradesUpdate={setMappedTrades}
+          selectedTrades={selectedTrades}
+          onSelectionChange={setSelectedTrades}
           broker={selectedBroker}
         />
+        
+        <div className="flex justify-end gap-3 mt-6">
+          <Button onClick={handleReset} variant="outline">
+            Start Over
+          </Button>
+          <Button 
+            onClick={handleImportTrades}
+            disabled={selectedTrades.size === 0}
+            size="lg"
+          >
+            Import {selectedTrades.size} Selected Trade{selectedTrades.size !== 1 ? 's' : ''}
+          </Button>
+        </div>
       </Card>
     );
   }
