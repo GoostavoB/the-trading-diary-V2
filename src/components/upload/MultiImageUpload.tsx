@@ -10,6 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronDown } from 'lucide-react';
 import { PreAnalysisConfirmDialog } from './PreAnalysisConfirmDialog';
 import { CreditPurchaseDialog } from './CreditPurchaseDialog';
+import { TradeTagEditor } from './TradeTagEditor';
 import { runOCR } from '@/utils/ocrPipeline';
 
 interface UploadedImage {
@@ -35,6 +36,7 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
   const [batchProgress, setBatchProgress] = useState<string>('');
   const [queuedCount, setQueuedCount] = useState(0);
   const [broker, setBroker] = useState<string>('');
+  const [tradeTags, setTradeTags] = useState<Map<number, { emotionTags: string[], setup: string }>>(new Map());
   const credits = useUploadCredits();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -254,6 +256,17 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
       const allTrades = results.flatMap(r => r.trades || []);
       setDetectedTrades(allTrades);
       setSelectedTrades(new Set(allTrades.map((_, idx) => idx)));
+      
+      // Initialize trade tags with extracted data
+      const initialTags = new Map<number, { emotionTags: string[], setup: string }>();
+      allTrades.forEach((trade, idx) => {
+        initialTags.set(idx, {
+          emotionTags: trade.emotion_tags || [],
+          setup: trade.setup || "",
+        });
+      });
+      setTradeTags(initialTags);
+      
       setShowConfirmDialog(true);
       
       toast.success('Trades Detected', {
@@ -264,8 +277,18 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
 
   const handleConfirmImport = async () => {
     try {
-      // Get only selected trades
-      const tradesToImport = detectedTrades.filter((_, idx) => selectedTrades.has(idx));
+      // Get only selected trades and merge tag data
+      const tradesToImport = detectedTrades
+        .map((trade, idx) => {
+          if (!selectedTrades.has(idx)) return null;
+          const tags = tradeTags.get(idx);
+          return {
+            ...trade,
+            emotion_tags: tags?.emotionTags || [],
+            setup: tags?.setup || trade.setup || "",
+          };
+        })
+        .filter(Boolean);
       
       if (tradesToImport.length === 0) {
         toast.error('Please select at least one trade to import');
@@ -281,6 +304,7 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
       setImages([]);
       setDetectedTrades([]);
       setSelectedTrades(new Set());
+      setTradeTags(new Map());
       
       await credits.refetch();
     } catch (error) {
@@ -560,7 +584,7 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
                         <div>Entry: ${trade.entry_price?.toFixed(2)}</div>
                         <div>Exit: ${trade.exit_price?.toFixed(2)}</div>
                         <div>Size: ${trade.position_size?.toFixed(2)}</div>
@@ -569,6 +593,25 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
                         {trade.funding_fee !== 0 && <div>Funding: ${trade.funding_fee?.toFixed(2)}</div>}
                         {trade.period_of_day && <div className="capitalize">{trade.period_of_day}</div>}
                       </div>
+                      
+                      {/* Trade Tag Editor */}
+                      <TradeTagEditor
+                        tradeIndex={index}
+                        emotionTags={tradeTags.get(index)?.emotionTags || []}
+                        setup={tradeTags.get(index)?.setup || trade.setup || ""}
+                        onEmotionTagsChange={(tags) => {
+                          const newTradeTags = new Map(tradeTags);
+                          const current = newTradeTags.get(index) || { emotionTags: [], setup: "" };
+                          newTradeTags.set(index, { ...current, emotionTags: tags });
+                          setTradeTags(newTradeTags);
+                        }}
+                        onSetupChange={(setup) => {
+                          const newTradeTags = new Map(tradeTags);
+                          const current = newTradeTags.get(index) || { emotionTags: [], setup: "" };
+                          newTradeTags.set(index, { ...current, setup });
+                          setTradeTags(newTradeTags);
+                        }}
+                      />
                     </div>
                   </div>
                 </div>
