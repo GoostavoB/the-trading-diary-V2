@@ -11,7 +11,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
 import { toast } from 'sonner';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Upload as UploadIcon, X, Sparkles, Check, ChevronsUpDown, Plus, Trash2, MapPin, ThumbsUp, ThumbsDown, Images, FileSpreadsheet } from 'lucide-react';
+import { Upload as UploadIcon, X, Sparkles, Check, ChevronsUpDown, Plus, Trash2, MapPin, ThumbsUp, ThumbsDown, Images, FileSpreadsheet, ChevronDown } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from "@/lib/utils";
@@ -1299,15 +1300,20 @@ const Upload = () => {
                   <p className="text-sm text-muted-foreground mb-3">
                     Upload a screenshot containing your trade information. The AI will automatically extract all trades.
                   </p>
-                  <div className="text-sm text-muted-foreground mb-3">
-                    <p className="mb-2">For best results:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-2">
-                      <li>Maximum of 10 trades per image.</li>
-                      <li>We recommend taking a screenshot after every 10 trades to save credits and use the tool efficiently.</li>
-                      <li>Most exchanges display around 10 trades per page, so capture that full view, including the header (column names), for faster and smoother uploads.</li>
-                      <li>You can also use our tag tool to label key data points on your uploaded image. This helps the system identify and process your trades more accurately.</li>
-                    </ul>
-                  </div>
+                  <Collapsible className="mb-3">
+                    <CollapsibleTrigger className="text-sm text-primary hover:text-primary/80 underline underline-offset-4 transition-colors flex items-center gap-1 group">
+                      Click here for best results
+                      <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="text-sm text-muted-foreground mt-2">
+                      <ul className="list-disc list-inside space-y-1 ml-2">
+                        <li>Maximum of 10 trades per image.</li>
+                        <li>We recommend taking a screenshot after every 10 trades to save credits and use the tool efficiently.</li>
+                        <li>Most exchanges display around 10 trades per page, so capture that full view, including the header (column names), for faster and smoother uploads.</li>
+                        <li>You can also use our tag tool to label key data points on your uploaded image. This helps the system identify and process your trades more accurately.</li>
+                      </ul>
+                    </CollapsibleContent>
+                  </Collapsible>
                   
                   {/* Pre-select broker - Always visible until trades are extracted */}
                   {extractedTrades.length === 0 && (
