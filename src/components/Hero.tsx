@@ -31,27 +31,27 @@ const Hero = () => {
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
-            className="space-y-8"
+            className="space-y-8 text-center lg:text-left flex flex-col items-center lg:items-start"
           >
             {/* Hero Title - Left Aligned */}
             <h1 
               id="hero-title"
-              className="text-[clamp(40px,6vw,68px)] font-bold leading-[1.1] tracking-tight"
+              className="text-[clamp(40px,6vw,68px)] font-bold leading-[1.1] tracking-tight max-w-3xl mx-auto lg:mx-0"
             >
               Maximize your trading performance
             </h1>
 
             {/* Subtitle - Left Aligned */}
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-xl">
+            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-xl lg:max-w-xl mx-auto lg:mx-0">
               Upload your trades, AI fills the journal, you get 3 actions to lift your average R today
             </p>
 
             {/* CTA Buttons */}
-            <div className="pt-4 flex flex-col sm:flex-row gap-4">
+            <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center w-full lg:w-auto">
               <Button 
                 onClick={() => navigate('/auth')}
                 size="lg"
-                className="h-14 px-10 text-base font-semibold rounded-xl bg-primary hover:bg-primary/90 transition-all duration-300"
+                className="h-14 px-10 text-base font-semibold rounded-xl bg-primary hover:bg-primary/90 transition-all duration-300 w-full sm:w-auto"
                 aria-label="Start free trial"
               >
                 Start free trial
@@ -60,7 +60,7 @@ const Hero = () => {
                 onClick={() => navigate('/demo')}
                 size="lg"
                 variant="outline"
-                className="h-14 px-10 text-base font-semibold rounded-xl border-2 border-primary/30 hover:bg-primary/10"
+                className="h-14 px-10 text-base font-semibold rounded-xl border-2 border-primary/30 hover:bg-primary/10 w-full sm:w-auto"
                 aria-label="Watch 2-minute demo"
               >
                 Watch 2-minute demo
@@ -68,8 +68,8 @@ const Hero = () => {
             </div>
 
             {/* Proof Badges */}
-            <div className="pt-6 space-y-3">
-              <div className="flex flex-wrap gap-3">
+            <div className="pt-6 space-y-3 w-full">
+              <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
                 <div className="px-4 py-2 bg-primary/10 border border-primary/20 rounded-lg text-sm font-medium">
                   Up to 40x faster logging
                 </div>
@@ -80,7 +80,7 @@ const Hero = () => {
                   Max weekly drawdown −30%
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground text-center lg:text-left">
                 Results observed in pilot groups, vary by risk, market, and discipline
               </p>
             </div>
@@ -91,10 +91,10 @@ const Hero = () => {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative"
+            className="relative mx-auto"
           >
             {/* Browser-like mockup frame */}
-            <div className="relative glass-strong rounded-2xl overflow-hidden shadow-2xl border border-primary/20">
+            <div className="relative glass-strong rounded-2xl overflow-hidden shadow-2xl border border-primary/20 mx-auto max-w-[900px] md:max-w-none">
               {/* Browser chrome */}
               <div className="bg-gray-800/50 px-4 py-3 flex items-center gap-2 border-b border-primary/10">
                 <div className="flex gap-2">
