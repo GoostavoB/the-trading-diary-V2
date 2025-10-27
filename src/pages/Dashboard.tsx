@@ -620,28 +620,46 @@ const Dashboard = () => {
 
     let updatedPositions: WidgetPosition[];
 
-    // Handle drop on another widget - swap positions
+    // Rule 1: Direct Swap - swap positions with another widget
     const overPos = positions.find(p => p.id === overId);
-    if (overPos) {
-      // Simply swap positions - no shifting needed
+    if (overPos && overId !== activeId) {
       updatedPositions = positions.map(p => {
         if (p.id === activeId) {
-          return { ...p, column: overPos.column, row: overPos.row };
+          return { id: p.id, column: overPos.column, row: overPos.row };
         }
         if (p.id === overId) {
-          return { ...p, column: activePos.column, row: activePos.row };
+          return { id: p.id, column: activePos.column, row: activePos.row };
         }
         return p;
       });
+
+      // Validate: Ensure no position duplicates after swap
+      const positionKeys = updatedPositions.map(p => `${p.column}-${p.row}`);
+      const uniquePositions = new Set(positionKeys);
+      
+      if (uniquePositions.size !== positionKeys.length) {
+        console.error('Position conflict detected after swap');
+        toast.error('Cannot swap: position conflict detected');
+        setActiveId(null);
+        return;
+      }
     }
-    // Handle drop on dropzone
+    // Rule 3: Move to Dropzone - move to empty space
     else if (overId.startsWith('dropzone-')) {
       const [, colStr, rowStr] = overId.split('-');
       const targetCol = parseInt(colStr, 10);
       const targetRow = parseInt(rowStr, 10);
       
+      // Check if position is truly empty
+      const occupied = positions.find(p => p.column === targetCol && p.row === targetRow && p.id !== activeId);
+      if (occupied) {
+        toast.error('Position already occupied');
+        setActiveId(null);
+        return;
+      }
+      
       updatedPositions = positions.map(p =>
-        p.id === activeId ? { ...p, column: targetCol, row: targetRow } : p
+        p.id === activeId ? { id: p.id, column: targetCol, row: targetRow } : p
       );
     }
     else {

@@ -754,7 +754,7 @@ textarea:focus-visible {
 }
 
 .dashboard-grid > div {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* Clean spacing - no visible grid lines */

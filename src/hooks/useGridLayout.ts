@@ -305,8 +305,19 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
   const removeWidget = useCallback(async (widgetId: string) => {
     console.log('Removing widget:', widgetId);
     
-    // Optimistically update UI immediately
-    const newPositions = positions.filter(p => p.id !== widgetId);
+    const removedWidget = positions.find(p => p.id === widgetId);
+    if (!removedWidget) return;
+
+    // Filter out the removed widget
+    let newPositions = positions.filter(p => p.id !== widgetId);
+    
+    // Column Compaction: Move widgets below the removed one up
+    newPositions = newPositions.map(p => {
+      if (p.column === removedWidget.column && p.row > removedWidget.row) {
+        return { ...p, row: p.row - 1 };
+      }
+      return p;
+    });
     
     // Update state first for immediate UI feedback
     setPositions(newPositions);
