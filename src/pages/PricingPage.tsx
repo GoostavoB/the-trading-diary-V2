@@ -31,12 +31,12 @@ const PricingPage = () => {
   };
 
   const includedFeatures = [
-    "AI uploads from CSV and screenshots",
+    "AI uploads from image screenshots",
     "Weekly heatmap and best assets",
     "Fees dashboard with maker vs taker and funding",
     "Leverage and position size calculator",
     "Risk alerts and pre-trade checklist",
-    "Encrypted data and local imports"
+    "Encrypted data and CSV export"
   ];
 
   const plans = [

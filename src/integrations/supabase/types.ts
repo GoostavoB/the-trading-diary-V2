@@ -535,6 +535,39 @@ export type Database = {
         }
         Relationships: []
       }
+      connected_accounts: {
+        Row: {
+          account_name: string | null
+          api_key_encrypted: string | null
+          created_at: string | null
+          exchange_name: string
+          id: string
+          is_active: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          account_name?: string | null
+          api_key_encrypted?: string | null
+          created_at?: string | null
+          exchange_name: string
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          account_name?: string | null
+          api_key_encrypted?: string | null
+          created_at?: string | null
+          exchange_name?: string
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       currency_rates: {
         Row: {
           base_currency: string
@@ -661,6 +694,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      custom_metrics: {
+        Row: {
+          created_at: string | null
+          created_this_month: string | null
+          description: string | null
+          id: string
+          metric_formula: string
+          metric_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_this_month?: string | null
+          description?: string | null
+          id?: string
+          metric_formula: string
+          metric_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_this_month?: string | null
+          description?: string | null
+          id?: string
+          metric_formula?: string
+          metric_name?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       custom_tags: {
         Row: {
@@ -2420,43 +2483,70 @@ export type Database = {
         Row: {
           billing_cycle: string | null
           cancel_at_period_end: boolean | null
+          connected_accounts_limit: number | null
           created_at: string
           current_period_end: string | null
           current_period_start: string | null
+          custom_metrics_limit: number | null
+          custom_metrics_used_this_month: number | null
+          extra_credits_purchased: number | null
+          has_fee_analysis_access: boolean | null
           id: string
+          last_reset_date: string | null
+          monthly_upload_limit: number | null
           plan_type: string
           status: string
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           updated_at: string
+          upload_credits_balance: number | null
+          upload_credits_used_this_month: number | null
           user_id: string
         }
         Insert: {
           billing_cycle?: string | null
           cancel_at_period_end?: boolean | null
+          connected_accounts_limit?: number | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
+          custom_metrics_limit?: number | null
+          custom_metrics_used_this_month?: number | null
+          extra_credits_purchased?: number | null
+          has_fee_analysis_access?: boolean | null
           id?: string
+          last_reset_date?: string | null
+          monthly_upload_limit?: number | null
           plan_type: string
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           updated_at?: string
+          upload_credits_balance?: number | null
+          upload_credits_used_this_month?: number | null
           user_id: string
         }
         Update: {
           billing_cycle?: string | null
           cancel_at_period_end?: boolean | null
+          connected_accounts_limit?: number | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
+          custom_metrics_limit?: number | null
+          custom_metrics_used_this_month?: number | null
+          extra_credits_purchased?: number | null
+          has_fee_analysis_access?: boolean | null
           id?: string
+          last_reset_date?: string | null
+          monthly_upload_limit?: number | null
           plan_type?: string
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           updated_at?: string
+          upload_credits_balance?: number | null
+          upload_credits_used_this_month?: number | null
           user_id?: string
         }
         Relationships: []
@@ -3791,6 +3881,15 @@ export type Database = {
       }
     }
     Functions: {
+      add_extra_credits: {
+        Args: { p_amount: number; p_credits: number; p_user_id: string }
+        Returns: boolean
+      }
+      can_add_account: { Args: { p_user_id: string }; Returns: boolean }
+      can_create_custom_metric: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
       can_share_this_week: {
         Args: { p_platform: string; p_user_id: string }
         Returns: boolean
@@ -3799,6 +3898,7 @@ export type Database = {
       cleanup_deleted_trades: { Args: never; Returns: undefined }
       cleanup_expired_deleted_batches: { Args: never; Returns: undefined }
       cleanup_expired_pending_trades: { Args: never; Returns: undefined }
+      deduct_upload_credit: { Args: { p_user_id: string }; Returns: boolean }
       get_week_start: { Args: { date_input?: string }; Returns: string }
       has_role: {
         Args: {
@@ -3820,6 +3920,7 @@ export type Database = {
         Returns: undefined
       }
       record_social_share: { Args: { p_platform: string }; Returns: Json }
+      reset_monthly_credits: { Args: never; Returns: undefined }
       update_lsr_latest_value: {
         Args: {
           p_binance_ratio?: number

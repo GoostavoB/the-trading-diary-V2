@@ -95,15 +95,16 @@ export default function UserGuide() {
                       Navigate to <strong>Trades → Add Trade</strong> in the left menu. You can:
                     </p>
                     <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-4">
-                      <li>Upload a CSV from your broker (automatic parsing)</li>
+                      <li>Upload a screenshot (up to 10 trades per image)</li>
                       <li>Connect your exchange API for auto-sync</li>
                       <li>Enter trade details manually</li>
+                      <li>Export your data to CSV anytime</li>
                     </ul>
                     <div className="p-3 bg-muted rounded-lg text-sm">
-                      <strong>Example:</strong> Binance users can upload CSV directly from their trade history.
+                      <strong>Tip:</strong> Screenshot every 10 trades to save upload credits.
                     </div>
                     <div className="text-sm text-muted-foreground italic">
-                      [screenshot: Upload trade form with CSV option highlighted]
+                      [screenshot: Upload trade form with image upload option highlighted]
                     </div>
                   </div>
                 </div>
@@ -676,9 +677,9 @@ export default function UserGuide() {
                   },
                   {
                     number: 2,
-                    title: "Use CSV uploads for bulk imports",
-                    description: "Faster than manual entry. Most brokers support CSV exports.",
-                    example: "Binance: Account → Order History → Export Complete Order History."
+                    title: "Use image uploads for bulk imports",
+                    description: "Faster than manual entry. Upload screenshots every 10 trades.",
+                    example: "Screenshot your completed trades and upload to save time."
                   },
                   {
                     number: 3,
@@ -882,8 +883,8 @@ export default function UserGuide() {
                     { q: "Which exchanges are supported?", a: "Binance, Bybit, Coinbase, OKX, Kraken, KuCoin, Gate.io, MEXC, Bitfinex, Bitstamp, BingX. More coming soon." },
                     { q: "How do I delete a trade?", a: "Go to Trade Analysis, find the trade, click the three-dot menu, select Delete. Soft-deleted for 48 hours before permanent removal." },
                     { q: "Can I export my data?", a: "Yes. Reports → Export trades as CSV or Excel. Choose date range and export format." },
-                    { q: "What's the maximum number of trades?", a: "No limit. The app handles thousands of trades efficiently." },
-                    { q: "How are fees calculated?", a: "Automatically from CSV imports or manual entry. Fee Analysis page shows breakdown by exchange and trade type." },
+                    { q: "What's the maximum number of trades?", a: "You can upload up to 10 trades per screenshot. Monthly limits: Starter (20 uploads), Pro (50 uploads), Elite (120 uploads)." },
+                    { q: "How are fees calculated?", a: "Automatically from image uploads or manual entry. Fee Analysis page shows breakdown by exchange and trade type (Pro/Elite only)." },
                     { q: "Can I share my performance?", a: "Yes. Social tab lets you share trade cards and connect with other traders. Choose public or private settings." },
                     { q: "Is there a mobile app?", a: "Progressive Web App (PWA) works on all devices. Install via browser menu: Add to Home Screen." },
                     { q: "How do I change my password?", a: "Settings → Security → Change Password. Enter current password, then new password twice." },
@@ -895,7 +896,8 @@ export default function UserGuide() {
                     { q: "Why is my win rate different from my broker's?", a: "Our calculation includes all fees and may count partially-filled orders differently. Check Trade Analysis for methodology." },
                     { q: "How do I set price alerts?", a: "Performance Alerts page. Set conditions (e.g., BTC > $50k) and get notifications via email or in-app." },
                     { q: "What's a trading setup?", a: "A predefined strategy pattern (e.g., breakout, reversal). Tag trades with setups to analyze which work best for you." },
-                    { q: "Can I import from TradingView?", a: "Not directly. Export from TradingView, then import CSV to The Trading Diary. Match column formats." },
+                    { q: "Can I import from TradingView?", a: "Screenshot your TradingView trades and upload. Alternatively, export from TradingView to CSV, then import to Excel for manual entry." },
+                    { q: "How do upload credits work?", a: "Each image upload uses 1 credit and can contain up to 10 trades. Credits reset monthly. Buy extras: $2 for 10 uploads ($1 for Elite)." },
                     { q: "How do I contact support?", a: "Settings → Help & Support → Contact Us. Include screenshots for faster resolution." }
                   ].map((item, index) => (
                     <AccordionItem key={index} value={`faq-${index}`}>

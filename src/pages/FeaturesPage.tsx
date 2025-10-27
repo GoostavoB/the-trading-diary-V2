@@ -17,7 +17,7 @@ const features = [
       {
         icon: Upload,
         title: 'Trade Import & Sync',
-        description: 'Import trades via CSV or connect exchanges (Binance, Bybit, OKX) for automatic syncing',
+        description: 'Import trades via image screenshots or connect exchanges (Binance, Bybit, OKX) for automatic syncing. CSV export available.',
         badge: 'Essential',
       },
       {

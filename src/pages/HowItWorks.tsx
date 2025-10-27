@@ -8,7 +8,7 @@ const steps = [
     number: '01',
     icon: Upload,
     title: 'Import Your Trades',
-    description: 'Connect your exchange via API or manually upload your trading history. We support CSV imports from all major brokers and exchanges.',
+    description: 'Upload screenshots of your trades (up to 10 trades per image). Connect your exchange via API for automatic syncing. Export to CSV available.',
   },
   {
     number: '02',
