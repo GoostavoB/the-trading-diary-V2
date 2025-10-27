@@ -449,7 +449,8 @@ const Dashboard = () => {
       .from('trades')
       .select('*')
       .eq('user_id', user.id)
-      .is('deleted_at', null);
+      .is('deleted_at', null)
+      .not('closed_at', 'is', null); // Only count closed trades for accurate P&L
 
     if (trades) {
       setTrades(trades.map(trade => ({
