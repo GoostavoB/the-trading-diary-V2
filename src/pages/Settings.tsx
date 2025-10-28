@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { X, Plus, Edit2, Check, Upload, Download, User, Bell, TrendingUp, Gift } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { NotificationPreferences } from '@/components/NotificationPreferences';
 import { DataManagement } from '@/components/DataManagement';
 import { CapitalManagement } from '@/components/CapitalManagement';
@@ -293,6 +294,33 @@ const Settings = () => {
     setEditingSetupColor(color || '#A18CFF');
   };
 
+  const handleUpdateReminderIntensity = async (intensity: string) => {
+    if (!user?.id) return;
+
+    const { error } = await supabase
+      .from('user_xp_tiers')
+      .update({ reminder_intensity: intensity })
+      .eq('user_id', user.id);
+
+    if (error) {
+      toast.error('Failed to update reminder settings');
+      console.error('Error updating reminder intensity:', error);
+    } else {
+      setReminderIntensity(intensity);
+      
+      // Clear cache to force refetch in useEngagementReminders
+      sessionStorage.removeItem('daily_activity_cache');
+      
+      toast.success('Reminder settings updated!', {
+        description: intensity === 'minimal' 
+          ? 'You\'ll only see reminders if inactive for 2+ days' 
+          : intensity === 'normal'
+          ? 'You\'ll see welcome back toasts once per day'
+          : 'You\'ll receive more frequent reminders'
+      });
+    }
+  };
+
   return (
     <AppLayout>
       <SkipToContent />
@@ -547,6 +575,51 @@ const Settings = () => {
                   setNotifications({...notifications, email_weekly_summary: checked})
                 }
               />
+            </div>
+
+            <div className="pt-6 border-t border-border">
+              <h3 className="font-medium mb-2">Daily Engagement Reminders</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Control how often we remind you about incomplete daily goals
+              </p>
+              
+              <Select value={reminderIntensity} onValueChange={handleUpdateReminderIntensity}>
+                <SelectTrigger className="w-full max-w-md">
+                  <SelectValue placeholder="Select reminder frequency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="minimal">
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">Minimal</span>
+                      <span className="text-xs text-muted-foreground">
+                        Only if inactive for 2+ days
+                      </span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="normal">
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">Normal (Recommended)</span>
+                      <span className="text-xs text-muted-foreground">
+                        Welcome back toast once per day
+                      </span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="aggressive">
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">Aggressive</span>
+                      <span className="text-xs text-muted-foreground">
+                        Multiple reminders if goals incomplete
+                      </span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+                <p className="text-xs text-muted-foreground">
+                  💡 <strong>Current setting:</strong> {reminderIntensity === 'minimal' ? 'You\'ll only see reminders if inactive' : reminderIntensity === 'normal' ? 'You\'ll see one reminder per day' : 'You\'ll see multiple reminders throughout the day'}
+                </p>
+              </div>
             </div>
           </div>
           </Card>
