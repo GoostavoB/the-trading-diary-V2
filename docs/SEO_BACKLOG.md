@@ -11,7 +11,7 @@
 
 | Phase | Status | Progress | Priority | Est. Time |
 |-------|--------|----------|----------|-----------|
-| Phase 1: Content Expansion | 🟡 In Progress | 5/60 articles | 🔴 URGENT | Week 1 |
+| Phase 1: Content Expansion | 🟡 In Progress | 6/70 articles (9%) | 🔴 URGENT | Week 1 |
 | Phase 2: Internal Linking Network | ⚪ Not Started | 0/4 hubs | 🟠 HIGH | Week 2 |
 | Phase 3: Landing Page Integration | ⚪ Not Started | 0/5 tasks | 🟠 HIGH | Week 2 |
 | Phase 4: Technical SEO | ⚪ Not Started | 0/60 articles | 🟡 IMPORTANT | Week 3 |
@@ -33,7 +33,8 @@
 #### Priority 1: Core Platform Articles ✅ STARTED
 - [x] **trading-journal-crypto** - Main journal article (EXPANDED)
 - [x] **binance-excel** - Binance CSV vs Journal (EXPANDED)
-- [ ] **binance-notion** - Binance Notion vs Journal
+- [x] **binance-notion** - Binance Notion vs Journal (EXPANDED)
+- [x] **okx-excel** - OKX CSV vs Journal (EXPANDED)
 - [ ] **binance-google-sheets** - Binance Sheets vs Journal
 - [ ] **okx-excel** - OKX CSV vs Journal
 - [ ] **okx-notion** - OKX Notion vs Journal
@@ -81,7 +82,7 @@
 
 #### Priority 1: High-Volume Strategies ✅ STARTED
 - [x] **scalping-bitcoin-5min** - Bitcoin 5-Min Scalping (EXPANDED)
-- [ ] **scalping-bitcoin-15min** - Bitcoin 15-Min Scalping
+- [ ] **scalping-bitcoin-15min** - Bitcoin 15-Min Scalping (NEXT)
 - [ ] **day-trading-bitcoin** - Bitcoin Day Trading
 - [ ] **swing-trading-bitcoin-daily** - Bitcoin Swing Trading
 
