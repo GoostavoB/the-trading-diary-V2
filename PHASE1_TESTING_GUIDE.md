@@ -155,9 +155,40 @@ This guide will help you thoroughly test all Phase 1 features before moving to P
 
 4. **Midnight Reset**
    - Setup: Hit daily cap (750/750)
-   - Action: Wait for midnight UTC OR run `reset_daily_xp()` function
-   - Expected: `daily_xp_earned` → 0, can earn again
-   - Verify: `last_reset_at` timestamp updated
+   - Action: Wait for midnight UTC OR manually test with SQL:
+     ```sql
+     -- Simulate midnight reset
+     UPDATE user_xp_tiers 
+     SET last_reset_at = NOW() - INTERVAL '2 days'
+     WHERE user_id = '[your-id]';
+     
+     -- Then award XP to trigger auto-reset
+     -- The system will detect old last_reset_at and auto-reset
+     ```
+   - Expected: 
+     - Auto-reset logic detects old date
+     - `daily_xp_earned` → 0 
+     - Console log: "[XPSystem] Auto-resetting daily XP (missed cron)"
+     - Can earn XP again
+   - Verify: `last_reset_at` timestamp updated to today
+
+5. **Cron Job Verification**
+   - Query cron status:
+     ```sql
+     SELECT jobid, schedule, command, active 
+     FROM cron.job 
+     WHERE jobname = 'reset-daily-xp-caps';
+     ```
+   - Expected: 
+     - `schedule`: '0 0 * * *' (midnight UTC)
+     - `active`: true
+     - Function: `public.reset_daily_xp_caps()`
+
+6. **Edge Case: Missed Cron**
+   - Setup: Set `last_reset_at` to 2 days ago
+   - Action: Award any XP
+   - Expected: System auto-resets before awarding XP
+   - Verify: No data loss, user gets fresh daily cap
 
 5. **Elite/Unlimited Tier**
    - Setup: Reach Tier 4 (15000 total XP)

@@ -4382,6 +4382,7 @@ export type Database = {
       }
       record_social_share: { Args: { p_platform: string }; Returns: Json }
       reset_daily_xp: { Args: never; Returns: undefined }
+      reset_daily_xp_caps: { Args: never; Returns: undefined }
       reset_monthly_credits: { Args: never; Returns: undefined }
       update_lsr_latest_value: {
         Args: {

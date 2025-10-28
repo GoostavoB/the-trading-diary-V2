@@ -107,13 +107,34 @@ export const useXPSystem = () => {
       // Check daily XP cap before awarding XP
       const { data: tierData } = await supabase
         .from('user_xp_tiers')
-        .select('daily_xp_earned, daily_xp_cap, current_tier')
+        .select('daily_xp_earned, daily_xp_cap, current_tier, last_reset_at')
         .eq('user_id', user.id)
         .single();
 
-      const dailyXPEarned = tierData?.daily_xp_earned || 0;
+      let dailyXPEarned = tierData?.daily_xp_earned || 0;
       const dailyXPCap = tierData?.daily_xp_cap || 750;
       const currentTier = tierData?.current_tier || 0;
+      const lastResetAt = tierData?.last_reset_at;
+
+      // Edge case: Auto-reset if last reset was before today (missed cron)
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      const lastResetDate = lastResetAt ? new Date(lastResetAt).toISOString().split('T')[0] : null;
+      
+      if (lastResetDate && lastResetDate < today) {
+        console.debug('[XPSystem] Auto-resetting daily XP (missed cron)', { lastResetDate, today });
+        
+        // Reset daily counters
+        await supabase
+          .from('user_xp_tiers')
+          .update({
+            daily_xp_earned: 0,
+            daily_upload_count: 0,
+            last_reset_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id);
+        
+        dailyXPEarned = 0; // Start fresh for today
+      }
 
       // Enforce cap based on calculated tier level (not DB sentinel)
       const tierLevel = calculateTier(xpData.totalXPEarned);
@@ -190,7 +211,11 @@ export const useXPSystem = () => {
       await supabase
         .from('user_xp_tiers')
         .upsert(
-          { user_id: user.id, daily_xp_earned: dailyXPEarned + finalAmount },
+          { 
+            user_id: user.id, 
+            daily_xp_earned: dailyXPEarned + finalAmount,
+            last_reset_at: lastResetAt || new Date().toISOString() // Preserve or set reset date
+          },
           { onConflict: 'user_id' }
         );
 
