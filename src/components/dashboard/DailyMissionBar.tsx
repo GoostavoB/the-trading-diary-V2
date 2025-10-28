@@ -24,13 +24,19 @@ export function DailyMissionBar() {
   const isCapped = dailyXPEarned >= dailyXPCap;
   const isUnlimited = tierLevel === 4;
 
-  // Color gradient based on progress
+  // Color gradient based on progress (for the indicator bar)
   const getProgressColor = () => {
     if (isCapped) return 'bg-red-500';
     if (progress >= 75) return 'bg-yellow-500';
     if (progress >= 50) return 'bg-green-500';
     return 'bg-primary';
   };
+
+  console.debug('[DailyMissionBar] Progress calculation:', {
+    progress: `${progress.toFixed(1)}%`,
+    raw: `${dailyXPEarned}/${dailyXPCap}`,
+    color: getProgressColor()
+  });
 
   return (
     <>
@@ -67,7 +73,8 @@ export function DailyMissionBar() {
           <>
             <Progress 
               value={progress} 
-              className={cn("h-2 mb-2", getProgressColor())}
+              className="h-2 mb-2"
+              indicatorClassName={getProgressColor()}
             />
             
             <div className="flex items-center justify-between text-xs">
