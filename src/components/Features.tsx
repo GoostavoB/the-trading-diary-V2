@@ -94,7 +94,7 @@ const Features = () => {
                     to={getLocalizedPath(feature.blogLink, currentLang)}
                     className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
                   >
-                    Learn more
+                    {t('landing.features.learnMore', 'Learn More')}
                     <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
@@ -130,7 +130,7 @@ const Features = () => {
                     to={getLocalizedPath(feature.blogLink, currentLang)}
                     className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
                   >
-                    Learn more
+                    {t('landing.features.learnMore', 'Learn More')}
                     <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>

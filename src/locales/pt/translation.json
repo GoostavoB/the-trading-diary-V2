@@ -58,6 +58,33 @@
     "features": {
       "title": "Negocie Melhor com Dados",
       "subtitle": "Tudo o que você precisa para melhorar seu desempenho de trading",
+      "mainTitle": "Recursos que Geram Resultados",
+      "mainSubtitle": "Ferramentas projetadas para melhorar seu desempenho de trading",
+      "leverage": {
+        "title": "Alavancagem e tamanho de posição por risco e stop",
+        "description": "Calcule o tamanho de posição correto para cada operação com base em sua tolerância ao risco",
+        "action": "Configure seus parâmetros de risco agora"
+      },
+      "fees": {
+        "title": "Painel de taxas e simulação maker vs taker com funding",
+        "description": "Entenda seus custos reais de trading e otimize estruturas de taxas",
+        "action": "Reduza custos trocando pares com taxas altas em um clique"
+      },
+      "heatmap": {
+        "title": "Mapa de calor semanal, melhores ativos e horários",
+        "description": "Identifique seus padrões de trading mais rentáveis e períodos de tempo",
+        "action": "Encontre sua vantagem com análises visuais"
+      },
+      "mfeMae": {
+        "title": "MFE e MAE para ajustar alvo e stop",
+        "description": "Otimize suas estratégias de saída com análise de excursão favorável e adversa máxima",
+        "action": "Melhore suas saídas hoje"
+      },
+      "riskAlerts": {
+        "title": "Alertas de risco e checklist pré-operação",
+        "description": "Mantenha a disciplina com avisos automáticos e validação sistemática de operações",
+        "action": "Ative proteção inteligente"
+      },
       "smartLogging": {
         "title": "Registro Inteligente",
         "description": "Capture capturas de tela, adicione tags emocionais, rastreie erros—tudo em um lugar.",
@@ -167,6 +194,10 @@
     "cta": {
       "title": "Pronto para Melhorar Seu Trading?",
       "subtitle": "Junte-se a milhares de traders melhorando sua disciplina e lucratividade.",
+      "mainTitle": "Comece hoje",
+      "mainSubtitle": "Carregue seus últimos 30 dias e obtenha insights de IA para aumentar seu R médio",
+      "buttonText": "Começar teste grátis",
+      "disclaimer": "Não é necessário cartão de crédito • Teste grátis de 7 dias",
       "button": "Começar Teste Grátis",
       "note": "Não é necessário cartão de crédito"
     },

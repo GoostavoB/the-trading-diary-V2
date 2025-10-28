@@ -33,12 +33,7 @@ const IndexAr = () => {
     // Track landing view
     trackLandingView('ar');
     
-    // Add RTL direction for Arabic
-    document.documentElement.dir = 'rtl';
-    
-    return () => {
-      document.documentElement.dir = 'ltr';
-    };
+    // RTL is now handled globally in LanguageSync component
   }, []);
 
   const handleCTAClick = (location: string) => {
@@ -47,7 +42,7 @@ const IndexAr = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-background">
+    <div key="ar" className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-background">
       <MobileHeader />
       
       <main className="pt-14">

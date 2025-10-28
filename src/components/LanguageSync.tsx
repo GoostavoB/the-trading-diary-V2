@@ -22,6 +22,13 @@ export const LanguageSync = () => {
       // Avoid URL update here to prevent redirect loops; URL handled below
       changeLanguage(pathLanguage, false);
     }
+    
+    // Set RTL for Arabic
+    if (pathLanguage === 'ar') {
+      document.documentElement.dir = 'rtl';
+    } else {
+      document.documentElement.dir = 'ltr';
+    }
   }, [location.pathname, language, changeLanguage]);
 
   // Ensure the current path is valid for the selected language (only for public routes)

@@ -58,6 +58,33 @@
     "features": {
       "title": "Giao Dịch Tốt Hơn với Dữ Liệu",
       "subtitle": "Mọi thứ bạn cần để cải thiện hiệu suất giao dịch của bạn",
+      "mainTitle": "Tính Năng Tạo Kết Quả",
+      "mainSubtitle": "Công cụ được thiết kế để cải thiện hiệu suất giao dịch của bạn",
+      "leverage": {
+        "title": "Đòn bẩy và kích thước vị thế theo rủi ro và stop",
+        "description": "Tính toán kích thước vị thế phù hợp cho mọi giao dịch dựa trên mức độ chấp nhận rủi ro của bạn",
+        "action": "Đặt các thông số rủi ro của bạn ngay"
+      },
+      "fees": {
+        "title": "Bảng điều khiển phí và mô phỏng maker vs taker với funding",
+        "description": "Hiểu chi phí giao dịch thực sự và tối ưu hóa cấu trúc phí",
+        "action": "Cắt giảm chi phí bằng cách chuyển đổi cặp có phí cao chỉ với một cú nhấp chuột"
+      },
+      "heatmap": {
+        "title": "Bản đồ nhiệt hàng tuần, tài sản và giờ tốt nhất",
+        "description": "Xác định các mô hình giao dịch có lợi nhuận nhất và khung thời gian",
+        "action": "Tìm lợi thế của bạn với phân tích trực quan"
+      },
+      "mfeMae": {
+        "title": "MFE và MAE để điều chỉnh mục tiêu và stop",
+        "description": "Tối ưu hóa chiến lược thoát của bạn với phân tích độ lệch tối đa thuận lợi và bất lợi",
+        "action": "Cải thiện điểm thoát của bạn ngay hôm nay"
+      },
+      "riskAlerts": {
+        "title": "Cảnh báo rủi ro và danh sách kiểm tra trước giao dịch",
+        "description": "Duy trì kỷ luật với cảnh báo tự động và xác thực giao dịch có hệ thống",
+        "action": "Kích hoạt bảo vệ thông minh"
+      },
       "smartLogging": {
         "title": "Ghi Nhật Ký Thông Minh",
         "description": "Chụp ảnh màn hình, thêm thẻ cảm xúc, theo dõi lỗi—tất cả ở một nơi.",
@@ -167,6 +194,10 @@
     "cta": {
       "title": "Sẵn Sàng Nâng Cấp Giao Dịch của Bạn?",
       "subtitle": "Tham gia hàng nghìn trader đang cải thiện kỷ luật và lợi nhuận của họ.",
+      "mainTitle": "Bắt đầu hôm nay",
+      "mainSubtitle": "Tải lên 30 ngày gần nhất và nhận thông tin chi tiết từ AI để nâng cao R trung bình của bạn",
+      "buttonText": "Bắt đầu dùng thử miễn phí",
+      "disclaimer": "Không yêu cầu thẻ tín dụng • Dùng thử miễn phí 7 ngày",
       "button": "Bắt Đầu Dùng Thử Miễn Phí",
       "note": "Không yêu cầu thẻ tín dụng"
     },

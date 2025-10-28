@@ -58,6 +58,33 @@
     "features": {
       "title": "Opera Mejor con Datos",
       "subtitle": "Todo lo que necesitas para mejorar tu rendimiento de trading",
+      "mainTitle": "Características que Impulsan Resultados",
+      "mainSubtitle": "Herramientas diseñadas para mejorar tu rendimiento de trading",
+      "leverage": {
+        "title": "Apalancamiento y tamaño de posición por riesgo y stop",
+        "description": "Calcula el tamaño de posición correcto para cada operación basado en tu tolerancia al riesgo",
+        "action": "Configura tus parámetros de riesgo ahora"
+      },
+      "fees": {
+        "title": "Panel de comisiones y simulación maker vs taker con funding",
+        "description": "Comprende tus costos reales de trading y optimiza estructuras de comisiones",
+        "action": "Reduce costos cambiando pares con altas comisiones en un clic"
+      },
+      "heatmap": {
+        "title": "Mapa de calor semanal, mejores activos y horas",
+        "description": "Identifica tus patrones de trading más rentables y marcos de tiempo",
+        "action": "Encuentra tu ventaja con análisis visuales"
+      },
+      "mfeMae": {
+        "title": "MFE y MAE para ajustar objetivo y stop",
+        "description": "Optimiza tus estrategias de salida con análisis de excursión favorable y adversa máxima",
+        "action": "Mejora tus salidas hoy"
+      },
+      "riskAlerts": {
+        "title": "Alertas de riesgo y checklist pre-operación",
+        "description": "Mantén la disciplina con advertencias automáticas y validación sistemática de operaciones",
+        "action": "Activa protección inteligente"
+      },
       "smartLogging": {
         "title": "Registro Inteligente",
         "description": "Captura capturas de pantalla, añade etiquetas emocionales, rastrea errores—todo en un lugar.",
@@ -167,6 +194,10 @@
     "cta": {
       "title": "¿Listo para Mejorar Tu Trading?",
       "subtitle": "Únete a miles de traders mejorando su disciplina y rentabilidad.",
+      "mainTitle": "Comienza hoy",
+      "mainSubtitle": "Sube tus últimos 30 días y obtén insights de IA para elevar tu R promedio",
+      "buttonText": "Comenzar prueba gratis",
+      "disclaimer": "No se requiere tarjeta de crédito • Prueba gratis de 7 días",
       "button": "Comenzar Prueba Gratis",
       "note": "No se requiere tarjeta de crédito"
     },

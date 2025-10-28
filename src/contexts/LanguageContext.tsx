@@ -117,6 +117,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    console.log(`Changing language to: ${newLang}, updateURL: ${updateUrl}`);
+    
+    // Set loading state during language change
+    setIsLoading(true);
+
     // Update state and i18n
     setLanguage(newLang);
     await i18n.changeLanguage(newLang);
@@ -147,6 +152,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       }
     }
     // For protected routes, language change happens via state only (no URL update)
+    
+    // Clear loading state after everything is complete
+    setIsLoading(false);
   }, [user, location.pathname, navigate]);
 
   return (
