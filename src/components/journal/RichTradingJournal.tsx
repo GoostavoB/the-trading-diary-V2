@@ -12,6 +12,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import type { Trade } from '@/types/trade';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UnifiedTagSelector } from './UnifiedTagSelector';
+import { useXPSystem } from '@/hooks/useXPSystem';
+import { trackEvent } from '@/utils/analyticsEvents';
 
 interface JournalEntry {
   id?: string;
@@ -37,6 +39,7 @@ interface RichTradingJournalProps {
 export const RichTradingJournal = ({ trade, existingEntry, onSave }: RichTradingJournalProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { addXP } = useXPSystem();
   const [saving, setSaving] = useState(false);
   const [entry, setEntry] = useState<JournalEntry>({
     title: existingEntry?.title || `Journal Entry - ${new Date().toLocaleDateString()}`,
@@ -69,6 +72,9 @@ export const RichTradingJournal = ({ trade, existingEntry, onSave }: RichTrading
         trade_id: trade?.id || null,
       };
 
+      let savedEntryId = existingEntry?.id;
+      const isNewEntry = !existingEntry?.id;
+
       if (existingEntry?.id) {
         // Update existing entry
         const { error } = await supabase
@@ -79,11 +85,113 @@ export const RichTradingJournal = ({ trade, existingEntry, onSave }: RichTrading
         if (error) throw error;
       } else {
         // Create new entry
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('trading_journal')
-          .insert(journalData);
+          .insert(journalData)
+          .select('id')
+          .single();
 
         if (error) throw error;
+        savedEntryId = data?.id;
+      }
+
+      // Award XP for new entries only
+      if (isNewEntry && savedEntryId) {
+        try {
+          // Check daily cap (2 entries per day)
+          const { data: tierData } = await supabase
+            .from('user_xp_tiers')
+            .select('journal_entries_today')
+            .eq('user_id', user.id)
+            .single();
+
+          const entriesLogged = tierData?.journal_entries_today || 0;
+
+          if (entriesLogged < 2) {
+            // Calculate XP
+            let xpAmount = 20; // Base XP
+            const bonusReasons: string[] = [];
+
+            // +10 XP for content ≥ 50 characters
+            if (entry.content.length >= 50) {
+              xpAmount += 10;
+              bonusReasons.push('detailed entry');
+            }
+
+            // +5 XP for each reflection field ≥ 30 characters
+            if (entry.what_went_well.length >= 30) {
+              xpAmount += 5;
+              bonusReasons.push('what went well');
+            }
+            if (entry.what_to_improve.length >= 30) {
+              xpAmount += 5;
+              bonusReasons.push('improvements noted');
+            }
+            if (entry.lessons_learned.length >= 30) {
+              xpAmount += 5;
+              bonusReasons.push('lessons learned');
+            }
+
+            // +5 XP for ≥3 tags
+            if (entry.tags.length >= 3) {
+              xpAmount += 5;
+              bonusReasons.push('tags added');
+            }
+
+            // +5 XP for linking to a trade
+            if (trade?.id) {
+              xpAmount += 5;
+              bonusReasons.push('trade linked');
+              trackEvent('journal_entry_linked_to_trade', {
+                trade_id: trade.id,
+              });
+            }
+
+            // Award XP
+            const bonusText = bonusReasons.length > 0 ? ` (${bonusReasons.join(', ')})` : '';
+            await addXP(
+              xpAmount,
+              'journal_entry',
+              `Journal entry created${bonusText}`,
+              true // Skip multiplier
+            );
+
+            // Mark entry as rewarded
+            await supabase
+              .from('trading_journal')
+              .update({ xp_awarded: true })
+              .eq('id', savedEntryId);
+
+            // Increment daily counter
+            await supabase.rpc('increment_journal_entries_counter', {
+              p_user_id: user.id,
+            });
+
+            // Track analytics
+            trackEvent('journal_entry_created', {
+              xp_awarded: xpAmount,
+              has_trade: !!trade?.id,
+              tags_count: entry.tags.length,
+              mood: entry.mood,
+              is_detailed: entry.content.length >= 50,
+            });
+
+            if (bonusReasons.length > 0) {
+              trackEvent('journal_entry_detailed', {
+                bonus_reasons: bonusReasons,
+              });
+            }
+          } else {
+            // Daily cap reached
+            trackEvent('journal_entry_daily_cap_reached', {
+              entries_today: entriesLogged,
+              cap_limit: 2,
+            });
+          }
+        } catch (xpError) {
+          console.error('[JournalXP] Error awarding XP:', xpError);
+          // Don't fail the save if XP fails
+        }
       }
 
       toast({

@@ -242,7 +242,96 @@ This guide will help you thoroughly test all Phase 1 features before moving to P
 
 ---
 
-## 4. Emotion Tagging and Analytics Events
+## 4. Psychology Feature XP Rewards
+
+### A. Emotional State Logging
+**Location**: Psychology page > Log State tab  
+**Hook**: `useEmotionalLogXP`
+
+**XP Rewards**:
+- Base: 5 XP for logging any emotional state
+- Bonus: +5 XP for notes ≥ 20 characters
+- Bonus: +5 XP for extreme intensity (1-2 or 9-10)
+- Bonus: +3 XP for selecting ≥3 trading conditions
+- Daily Cap: 3 emotional logs per day (max 54 XP/day)
+
+**Test Cases**:
+1. **Basic Emotional Log** (5 XP)
+   - Action: Log emotional state with intensity, no notes
+   - Expected: "+5 XP Emotional state logged"
+   - Verify: `emotional_log_created` event
+
+2. **Detailed Emotional Log** (15 XP)
+   - Action: Log with notes ≥20 chars + extreme intensity (1 or 10)
+   - Expected: "+15 XP Emotional state logged (detailed notes, extreme emotion)"
+   - Verify: `emotional_log_with_notes` and `extreme_emotion_logged` events
+
+3. **Complete Emotional Log** (18 XP)
+   - Action: Log with notes + extreme intensity + ≥3 conditions
+   - Expected: "+18 XP Emotional state logged (detailed notes, extreme emotion, detailed conditions)"
+   - Verify: All bonus analytics events fire
+
+4. **Daily Cap Enforcement**
+   - Action: Log 4th emotional state in same day
+   - Expected: No XP awarded, console log "Daily cap reached (3 logs)"
+   - Verify: `emotional_log_daily_cap_reached` event
+   - Check: `user_xp_tiers.psychology_logs_today` = 3
+
+5. **Midnight Reset**
+   - Setup: Hit daily cap (3 logs)
+   - Action: Wait for midnight UTC or simulate with SQL
+   - Expected: Counter resets to 0, can earn XP again
+   - Verify: `psychology_logs_today` = 0
+
+### B. Trading Journal Entries
+**Location**: Journal page / Trade detail > Journal tab  
+**Component**: `RichTradingJournal`
+
+**XP Rewards**:
+- Base: 20 XP for creating entry
+- Bonus: +10 XP for content ≥ 50 characters
+- Bonus: +5 XP for "What Went Well" ≥ 30 characters
+- Bonus: +5 XP for "What To Improve" ≥ 30 characters
+- Bonus: +5 XP for "Lessons Learned" ≥ 30 characters
+- Bonus: +5 XP for ≥3 tags
+- Bonus: +5 XP for linking to a trade
+- Daily Cap: 2 journal entries per day (max 110 XP/day)
+
+**Test Cases**:
+1. **Basic Journal Entry** (20 XP)
+   - Action: Create entry with title only
+   - Expected: "+20 XP Journal entry created"
+   - Verify: `journal_entry_created` event
+
+2. **Detailed Journal Entry** (30 XP)
+   - Action: Create entry with content ≥50 characters
+   - Expected: "+30 XP Journal entry created (detailed entry)"
+   - Verify: `is_detailed: true` in analytics
+
+3. **Complete Journal Entry** (55 XP)
+   - Action: Fill all sections (content, reflections, tags, linked trade)
+   - Expected: "+55 XP Journal entry created (detailed entry, what went well, improvements noted, lessons learned, tags added, trade linked)"
+   - Verify: `journal_entry_detailed` event with all bonus_reasons
+
+4. **Daily Cap Enforcement**
+   - Action: Create 3rd journal entry in same day
+   - Expected: Entry saved but no XP awarded
+   - Verify: `journal_entry_daily_cap_reached` event
+   - Check: `user_xp_tiers.journal_entries_today` = 2
+
+5. **Update Existing Entry**
+   - Action: Edit and save existing journal entry
+   - Expected: Entry saved but no XP awarded (only new entries)
+   - Verify: No XP analytics events fired
+
+### C. Combined Daily Potential
+**Psychology Features Combined**: 164 XP/day
+- Emotional Logs: 3 × 18 XP = 54 XP
+- Journal Entries: 2 × 55 XP = 110 XP
+
+---
+
+## 5. Emotion Tagging and Analytics Events
 
 ### Emotion Tags Available
 **File**: `src/constants/tradingTags.ts`

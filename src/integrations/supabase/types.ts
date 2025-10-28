@@ -2119,6 +2119,7 @@ export type Database = {
           logged_at: string
           notes: string | null
           user_id: string
+          xp_awarded: boolean | null
         }
         Insert: {
           conditions?: string[] | null
@@ -2129,6 +2130,7 @@ export type Database = {
           logged_at?: string
           notes?: string | null
           user_id: string
+          xp_awarded?: boolean | null
         }
         Update: {
           conditions?: string[] | null
@@ -2139,6 +2141,7 @@ export type Database = {
           logged_at?: string
           notes?: string | null
           user_id?: string
+          xp_awarded?: boolean | null
         }
         Relationships: []
       }
@@ -3243,6 +3246,7 @@ export type Database = {
           user_id: string
           what_to_improve: string | null
           what_went_well: string | null
+          xp_awarded: boolean | null
         }
         Insert: {
           content: string
@@ -3258,6 +3262,7 @@ export type Database = {
           user_id: string
           what_to_improve?: string | null
           what_went_well?: string | null
+          xp_awarded?: boolean | null
         }
         Update: {
           content?: string
@@ -3273,6 +3278,7 @@ export type Database = {
           user_id?: string
           what_to_improve?: string | null
           what_went_well?: string | null
+          xp_awarded?: boolean | null
         }
         Relationships: [
           {
@@ -4076,7 +4082,9 @@ export type Database = {
           daily_xp_cap: number
           daily_xp_earned: number
           id: string
+          journal_entries_today: number | null
           last_reset_at: string | null
+          psychology_logs_today: number | null
           updated_at: string | null
           user_id: string
         }
@@ -4088,7 +4096,9 @@ export type Database = {
           daily_xp_cap?: number
           daily_xp_earned?: number
           id?: string
+          journal_entries_today?: number | null
           last_reset_at?: string | null
+          psychology_logs_today?: number | null
           updated_at?: string | null
           user_id: string
         }
@@ -4100,7 +4110,9 @@ export type Database = {
           daily_xp_cap?: number
           daily_xp_earned?: number
           id?: string
+          journal_entries_today?: number | null
           last_reset_at?: string | null
+          psychology_logs_today?: number | null
           updated_at?: string | null
           user_id?: string
         }
@@ -4373,6 +4385,14 @@ export type Database = {
         Returns: undefined
       }
       increment_daily_alert_count: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
+      increment_journal_entries_counter: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
+      increment_psychology_logs_counter: {
         Args: { p_user_id: string }
         Returns: undefined
       }
