@@ -514,7 +514,21 @@
         "metricValue": 10000,
         "proofPoint": "Phản hồi của trader được tích hợp"
       }
-    },
+    }
+  },
+  "pricing": {
+    "title": "Giá cả đơn giản, minh bạch",
+    "subtitle": "Chọn gói phù hợp với hành trình giao dịch của bạn",
+    "mostPopular": "Phổ Biến Nhất",
+    "perMonth": "tháng",
+    "perMonthBilledAnnually": "tháng, thanh toán hàng năm",
+    "savingsAmount": "Tiết kiệm ${{amount}}/năm",
+    "guaranteeNote": "Đảm bảo hoàn tiền trong 7 ngày • Hủy bất cứ lúc nào • Không có phí ẩn",
+    "uploadNote": "Tối đa 10 giao dịch mỗi lần tải lên",
+    "speedBanner": "Nhận thông tin chi tiết được hỗ trợ bởi AI ngay sau lần tải lên đầu tiên",
+    "saveBadge": "Tiết kiệm 2 tháng",
+    "trialTerms": "Dùng thử 7 ngày • Hủy bất cứ lúc nào • Hoàn tiền theo tỷ lệ trong 14 ngày đầu khi đăng ký hàng năm",
+    "noCardRequired": "Không cần thẻ tín dụng",
     "billing": {
       "monthly": "Hàng Tháng",
       "annual": "Hàng Năm",
@@ -528,14 +542,20 @@
         "tradeLimit": "20 lần tải lên/tháng",
         "cta": "Bắt đầu dùng thử 7 ngày miễn phí",
         "features": {
-          "uploads": "50 lần tải lên giao dịch AI/tháng",
-          "manualUploads": "Tải lên thủ công không giới hạn",
-          "dashboard": "Bảng điều khiển tùy chỉnh với hơn 15 widget",
-          "charts": "Biểu đồ nâng cao & phân tích",
-          "basicJournal": "Nhật ký cơ bản với theo dõi cảm xúc",
-          "feeAnalytics": "Phân tích phí với cảnh báo",
-          "csv": "Nhập & xuất CSV",
-          "social": "Truy cập feed xã hội & bảng xếp hạng"
+          "uploads": "20 lần tải lên/tháng • Tối đa 10 giao dịch mỗi lần tải",
+          "accounts": "1 tài khoản kết nối",
+          "aiInsights": "Thông tin chi tiết AI trên trang chủ",
+          "tradingHistory": "Lịch sử giao dịch",
+          "manualEntry": "Nhập giao dịch thủ công",
+          "spotWallet": "Ví Spot",
+          "journal": "Nhật ký giao dịch",
+          "drawdown": "Phân tích sụt giảm",
+          "leverageCalculator": "Máy tính stop đòn bẩy",
+          "marketData": "Dữ liệu thị trường",
+          "equityForecast": "Dự báo vốn chủ sở hữu thông minh",
+          "emailSupport": "Hỗ trợ qua email",
+          "csvExport": "Chỉ xuất CSV",
+          "noFeeAnalysis": "Phân tích phí: không bao gồm"
         }
       },
       "pro": {
@@ -544,14 +564,17 @@
         "tradeLimit": "50 lần tải lên/tháng",
         "cta": "Bắt đầu dùng thử 7 ngày",
         "features": {
-          "uploads": "100 lần tải lên giao dịch AI/tháng",
-          "aiAnalysis": "1 Phân tích Hiệu suất AI mỗi tuần",
-          "tradingPlan": "Trình tạo Kế hoạch Giao dịch với danh sách kiểm tra",
-          "goals": "Theo dõi mục tiêu & tiến độ",
-          "richJournal": "Nhật ký phong phú với phân tích tâm trạng & mẫu",
-          "customWidgets": "5 widget KPI tùy chỉnh",
-          "fullSocial": "Tính năng xã hội đầy đủ (bài đăng, XP, huy hiệu)",
-          "everythingBasic": "Mọi thứ trong Basic"
+          "uploads": "50 lần tải lên/tháng • Tối đa 10 giao dịch mỗi lần tải",
+          "unlimitedAccounts": "Tài khoản không giới hạn",
+          "feeAnalysis": "Phân tích phí",
+          "tradingPlan": "Kế hoạch giao dịch",
+          "goals": "Mục tiêu",
+          "psychology": "Tâm lý giao dịch",
+          "reports": "Báo cáo",
+          "taxReports": "Báo cáo thuế",
+          "customMetrics": "Chỉ số AI tùy chỉnh: 3 mỗi tháng",
+          "csvExport": "Xuất CSV",
+          "everythingBasic": "Mọi thứ trong Cơ Bản"
         }
       },
       "elite": {
@@ -560,13 +583,13 @@
         "tradeLimit": "120 lần tải lên/tháng",
         "cta": "Bắt đầu dùng thử 7 ngày",
         "features": {
-          "uploads": "300 lần tải lên giao dịch AI/tháng",
-          "aiAnalysis": "5 Phân tích Hiệu suất AI mỗi tuần",
-          "tradeReplay": "Trade Replay (đánh giá từng bước)",
-          "positionCalculator": "Máy tính Kích thước Vị thế Nâng cao",
-          "riskDashboard": "Bảng điều khiển Rủi ro với phân tích sụt giảm",
-          "advancedAlerts": "Cảnh báo hiệu suất & phí nâng cao",
-          "customWidgets": "Widget KPI tùy chỉnh không giới hạn",
+          "uploads": "120 lần tải lên/tháng • Tối đa 10 giao dịch mỗi lần tải",
+          "unlimitedAccounts": "Tài khoản không giới hạn",
+          "customMetrics": "Chỉ số AI tùy chỉnh: 10 mỗi tháng",
+          "earlyAccess": "Truy cập sớm các tính năng mới",
+          "prioritySupport": "Hỗ trợ ưu tiên cao cấp",
+          "extraCreditsDiscount": "Giảm giá 50% cho tín dụng bổ sung",
+          "csvExport": "Xuất CSV",
           "everythingPro": "Mọi thứ trong Pro"
         }
       }
