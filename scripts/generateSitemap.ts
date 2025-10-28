@@ -385,6 +385,46 @@ const blogArticles = [
   {
     slug: 'metric-hub/trade-duration',
     lastmod: '2025-10-28',
+  },
+  {
+    slug: 'calculators/risk-reward-ratio',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'calculators/position-size',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'calculators/max-safe-leverage',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'calculators/liquidation-price',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'calculators/breakeven-with-fees',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'calculators/margin-required',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'calculators/expectancy',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'calculators/kelly-fraction',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'calculators/win-rate-from-log',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'calculators/sample-size-win-rate',
+    lastmod: '2025-10-28',
   }
 ];
 

@@ -8472,5 +8472,465 @@ Yes. You can export clean CSVs and reports any time.
 ## Next step
 Start your free trial and import your last 90 days: [TheTradingDiary.com](https://www.thetradingdiary.com)
 `
+  },
+  {
+    title: "Risk-Reward Ratio Calculator",
+    slug: "calculators/risk-reward-ratio",
+    metaTitle: "Risk-Reward Ratio Calculator | Calculate Your Trade R:R",
+    metaDescription: "Compute risk-reward and example outcomes.",
+    description: "Calculate your risk-reward ratio to evaluate trade potential before entry.",
+    focusKeyword: "risk-reward ratio calculator",
+    readTime: "3 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Calculators",
+    tags: ["risk-reward", "calculator", "risk management", "trading tools"],
+    canonical: "https://www.thetradingdiary.com/blog/calculators/risk-reward-ratio",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+You want clean tracking and faster reviews. A dedicated trading journal imports data, calculates metrics, and keeps one source of truth.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com)
+
+## Why this matters
+- Less manual work, fewer errors.
+- Clear metrics like win rate, profit factor, drawdown, and expectancy.
+- One place for all exchanges and strategies.
+
+## Quick steps
+1. Create your account on [TheTradingDiary.com](https://www.thetradingdiary.com).
+2. Connect your exchange or upload CSV.
+3. Tag strategies and timeframes.
+4. Review metrics and export reports.
+
+## FAQs
+### Is this free to try
+Yes. You can start a free trial and import recent trades.
+
+### Do you support multiple exchanges
+Yes. You can connect major exchanges and keep one unified journal.
+
+### Can I export my data
+Yes. You can export clean CSVs and reports any time.
+
+## Next step
+Start your free trial and import your last 90 days: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "Position Size Calculator",
+    slug: "calculators/position-size",
+    metaTitle: "Position Size Calculator | Calculate Optimal Trade Size",
+    metaDescription: "Compute position size from risk percent and stop distance.",
+    description: "Calculate the optimal position size based on your risk tolerance and stop loss.",
+    focusKeyword: "position size calculator",
+    readTime: "3 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Calculators",
+    tags: ["position sizing", "calculator", "risk management", "trading tools"],
+    canonical: "https://www.thetradingdiary.com/blog/calculators/position-size",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+You want clean tracking and faster reviews. A dedicated trading journal imports data, calculates metrics, and keeps one source of truth.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com)
+
+## Why this matters
+- Less manual work, fewer errors.
+- Clear metrics like win rate, profit factor, drawdown, and expectancy.
+- One place for all exchanges and strategies.
+
+## Quick steps
+1. Create your account on [TheTradingDiary.com](https://www.thetradingdiary.com).
+2. Connect your exchange or upload CSV.
+3. Tag strategies and timeframes.
+4. Review metrics and export reports.
+
+## FAQs
+### Is this free to try
+Yes. You can start a free trial and import recent trades.
+
+### Do you support multiple exchanges
+Yes. You can connect major exchanges and keep one unified journal.
+
+### Can I export my data
+Yes. You can export clean CSVs and reports any time.
+
+## Next step
+Start your free trial and import your last 90 days: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "Max Safe Leverage Calculator",
+    slug: "calculators/max-safe-leverage",
+    metaTitle: "Max Safe Leverage Calculator | Calculate Safe Leverage Levels",
+    metaDescription: "Estimate a safe leverage level for your trade.",
+    description: "Calculate the maximum safe leverage to use based on your risk parameters.",
+    focusKeyword: "max safe leverage calculator",
+    readTime: "3 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Calculators",
+    tags: ["leverage", "calculator", "risk management", "trading tools"],
+    canonical: "https://www.thetradingdiary.com/blog/calculators/max-safe-leverage",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+You want clean tracking and faster reviews. A dedicated trading journal imports data, calculates metrics, and keeps one source of truth.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com)
+
+## Why this matters
+- Less manual work, fewer errors.
+- Clear metrics like win rate, profit factor, drawdown, and expectancy.
+- One place for all exchanges and strategies.
+
+## Quick steps
+1. Create your account on [TheTradingDiary.com](https://www.thetradingdiary.com).
+2. Connect your exchange or upload CSV.
+3. Tag strategies and timeframes.
+4. Review metrics and export reports.
+
+## FAQs
+### Is this free to try
+Yes. You can start a free trial and import recent trades.
+
+### Do you support multiple exchanges
+Yes. You can connect major exchanges and keep one unified journal.
+
+### Can I export my data
+Yes. You can export clean CSVs and reports any time.
+
+## Next step
+Start your free trial and import your last 90 days: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "Liquidation Price Estimator",
+    slug: "calculators/liquidation-price",
+    metaTitle: "Liquidation Price Calculator | Estimate Your Liquidation Price",
+    metaDescription: "Estimate liquidation price with a safety buffer.",
+    description: "Calculate your liquidation price to avoid forced position closure.",
+    focusKeyword: "liquidation price calculator",
+    readTime: "3 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Calculators",
+    tags: ["liquidation", "calculator", "risk management", "leverage trading"],
+    canonical: "https://www.thetradingdiary.com/blog/calculators/liquidation-price",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+You want clean tracking and faster reviews. A dedicated trading journal imports data, calculates metrics, and keeps one source of truth.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com)
+
+## Why this matters
+- Less manual work, fewer errors.
+- Clear metrics like win rate, profit factor, drawdown, and expectancy.
+- One place for all exchanges and strategies.
+
+## Quick steps
+1. Create your account on [TheTradingDiary.com](https://www.thetradingdiary.com).
+2. Connect your exchange or upload CSV.
+3. Tag strategies and timeframes.
+4. Review metrics and export reports.
+
+## FAQs
+### Is this free to try
+Yes. You can start a free trial and import recent trades.
+
+### Do you support multiple exchanges
+Yes. You can connect major exchanges and keep one unified journal.
+
+### Can I export my data
+Yes. You can export clean CSVs and reports any time.
+
+## Next step
+Start your free trial and import your last 90 days: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "Breakeven with Fees Calculator",
+    slug: "calculators/breakeven-with-fees",
+    metaTitle: "Breakeven Calculator | Calculate Breakeven Price with Fees",
+    metaDescription: "Compute breakeven price including fees and funding.",
+    description: "Calculate your true breakeven price including all trading fees and funding costs.",
+    focusKeyword: "breakeven calculator with fees",
+    readTime: "3 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Calculators",
+    tags: ["breakeven", "calculator", "trading fees", "cost analysis"],
+    canonical: "https://www.thetradingdiary.com/blog/calculators/breakeven-with-fees",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+You want clean tracking and faster reviews. A dedicated trading journal imports data, calculates metrics, and keeps one source of truth.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com)
+
+## Why this matters
+- Less manual work, fewer errors.
+- Clear metrics like win rate, profit factor, drawdown, and expectancy.
+- One place for all exchanges and strategies.
+
+## Quick steps
+1. Create your account on [TheTradingDiary.com](https://www.thetradingdiary.com).
+2. Connect your exchange or upload CSV.
+3. Tag strategies and timeframes.
+4. Review metrics and export reports.
+
+## FAQs
+### Is this free to try
+Yes. You can start a free trial and import recent trades.
+
+### Do you support multiple exchanges
+Yes. You can connect major exchanges and keep one unified journal.
+
+### Can I export my data
+Yes. You can export clean CSVs and reports any time.
+
+## Next step
+Start your free trial and import your last 90 days: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "Margin Required Calculator",
+    slug: "calculators/margin-required",
+    metaTitle: "Margin Calculator | Calculate Required Margin for Trading",
+    metaDescription: "Estimate margin needed for your position.",
+    description: "Calculate the margin required to open and maintain your leveraged positions.",
+    focusKeyword: "margin required calculator",
+    readTime: "3 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Calculators",
+    tags: ["margin", "calculator", "leverage trading", "risk management"],
+    canonical: "https://www.thetradingdiary.com/blog/calculators/margin-required",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+You want clean tracking and faster reviews. A dedicated trading journal imports data, calculates metrics, and keeps one source of truth.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com)
+
+## Why this matters
+- Less manual work, fewer errors.
+- Clear metrics like win rate, profit factor, drawdown, and expectancy.
+- One place for all exchanges and strategies.
+
+## Quick steps
+1. Create your account on [TheTradingDiary.com](https://www.thetradingdiary.com).
+2. Connect your exchange or upload CSV.
+3. Tag strategies and timeframes.
+4. Review metrics and export reports.
+
+## FAQs
+### Is this free to try
+Yes. You can start a free trial and import recent trades.
+
+### Do you support multiple exchanges
+Yes. You can connect major exchanges and keep one unified journal.
+
+### Can I export my data
+Yes. You can export clean CSVs and reports any time.
+
+## Next step
+Start your free trial and import your last 90 days: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "Expectancy Calculator",
+    slug: "calculators/expectancy",
+    metaTitle: "Expectancy Calculator | Calculate Your Trading Edge",
+    metaDescription: "Compute expectancy from win rate and R-multiples.",
+    description: "Calculate your trading expectancy to understand your edge in the market.",
+    focusKeyword: "expectancy calculator",
+    readTime: "3 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Calculators",
+    tags: ["expectancy", "calculator", "trading edge", "performance"],
+    canonical: "https://www.thetradingdiary.com/blog/calculators/expectancy",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+You want clean tracking and faster reviews. A dedicated trading journal imports data, calculates metrics, and keeps one source of truth.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com)
+
+## Why this matters
+- Less manual work, fewer errors.
+- Clear metrics like win rate, profit factor, drawdown, and expectancy.
+- One place for all exchanges and strategies.
+
+## Quick steps
+1. Create your account on [TheTradingDiary.com](https://www.thetradingdiary.com).
+2. Connect your exchange or upload CSV.
+3. Tag strategies and timeframes.
+4. Review metrics and export reports.
+
+## FAQs
+### Is this free to try
+Yes. You can start a free trial and import recent trades.
+
+### Do you support multiple exchanges
+Yes. You can connect major exchanges and keep one unified journal.
+
+### Can I export my data
+Yes. You can export clean CSVs and reports any time.
+
+## Next step
+Start your free trial and import your last 90 days: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "Kelly Fraction Estimator",
+    slug: "calculators/kelly-fraction",
+    metaTitle: "Kelly Criterion Calculator | Calculate Optimal Bet Size",
+    metaDescription: "Estimate Kelly fraction using win rate and payoff.",
+    description: "Calculate the optimal position size using the Kelly Criterion formula.",
+    focusKeyword: "Kelly criterion calculator",
+    readTime: "3 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Calculators",
+    tags: ["Kelly criterion", "calculator", "position sizing", "money management"],
+    canonical: "https://www.thetradingdiary.com/blog/calculators/kelly-fraction",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+You want clean tracking and faster reviews. A dedicated trading journal imports data, calculates metrics, and keeps one source of truth.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com)
+
+## Why this matters
+- Less manual work, fewer errors.
+- Clear metrics like win rate, profit factor, drawdown, and expectancy.
+- One place for all exchanges and strategies.
+
+## Quick steps
+1. Create your account on [TheTradingDiary.com](https://www.thetradingdiary.com).
+2. Connect your exchange or upload CSV.
+3. Tag strategies and timeframes.
+4. Review metrics and export reports.
+
+## FAQs
+### Is this free to try
+Yes. You can start a free trial and import recent trades.
+
+### Do you support multiple exchanges
+Yes. You can connect major exchanges and keep one unified journal.
+
+### Can I export my data
+Yes. You can export clean CSVs and reports any time.
+
+## Next step
+Start your free trial and import your last 90 days: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "Win Rate From Trade Log",
+    slug: "calculators/win-rate-from-log",
+    metaTitle: "Win Rate Calculator | Calculate Win Rate from Trade Log",
+    metaDescription: "Calculate win rate from uploaded CSV.",
+    description: "Calculate your actual win rate by uploading your trade log or CSV file.",
+    focusKeyword: "win rate calculator from log",
+    readTime: "3 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Calculators",
+    tags: ["win rate", "calculator", "trade log", "performance analysis"],
+    canonical: "https://www.thetradingdiary.com/blog/calculators/win-rate-from-log",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+You want clean tracking and faster reviews. A dedicated trading journal imports data, calculates metrics, and keeps one source of truth.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com)
+
+## Why this matters
+- Less manual work, fewer errors.
+- Clear metrics like win rate, profit factor, drawdown, and expectancy.
+- One place for all exchanges and strategies.
+
+## Quick steps
+1. Create your account on [TheTradingDiary.com](https://www.thetradingdiary.com).
+2. Connect your exchange or upload CSV.
+3. Tag strategies and timeframes.
+4. Review metrics and export reports.
+
+## FAQs
+### Is this free to try
+Yes. You can start a free trial and import recent trades.
+
+### Do you support multiple exchanges
+Yes. You can connect major exchanges and keep one unified journal.
+
+### Can I export my data
+Yes. You can export clean CSVs and reports any time.
+
+## Next step
+Start your free trial and import your last 90 days: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "Sample Size for Win Rate",
+    slug: "calculators/sample-size-win-rate",
+    metaTitle: "Sample Size Calculator | Determine Required Trade Sample",
+    metaDescription: "Estimate trades needed to measure win rate within a margin of error.",
+    description: "Calculate how many trades you need to accurately measure your win rate.",
+    focusKeyword: "sample size calculator win rate",
+    readTime: "3 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Calculators",
+    tags: ["sample size", "calculator", "win rate", "statistics"],
+    canonical: "https://www.thetradingdiary.com/blog/calculators/sample-size-win-rate",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+You want clean tracking and faster reviews. A dedicated trading journal imports data, calculates metrics, and keeps one source of truth.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com)
+
+## Why this matters
+- Less manual work, fewer errors.
+- Clear metrics like win rate, profit factor, drawdown, and expectancy.
+- One place for all exchanges and strategies.
+
+## Quick steps
+1. Create your account on [TheTradingDiary.com](https://www.thetradingdiary.com).
+2. Connect your exchange or upload CSV.
+3. Tag strategies and timeframes.
+4. Review metrics and export reports.
+
+## FAQs
+### Is this free to try
+Yes. You can start a free trial and import recent trades.
+
+### Do you support multiple exchanges
+Yes. You can connect major exchanges and keep one unified journal.
+
+### Can I export my data
+Yes. You can export clean CSVs and reports any time.
+
+## Next step
+Start your free trial and import your last 90 days: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
   }
 ];
