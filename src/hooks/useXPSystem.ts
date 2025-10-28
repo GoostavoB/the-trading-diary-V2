@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getStreakMultiplier } from '@/utils/xpEngine';
 import { trackStreakEvents } from '@/utils/analyticsEvents';
+import { analytics } from '@/utils/analytics';
 
 interface XPData {
   currentXP: number;
@@ -155,6 +156,16 @@ export const useXPSystem = () => {
         currentLevel: newLevel,
         totalXPEarned: newTotalXP,
         levelUpCount: didLevelUp ? xpData.levelUpCount + 1 : xpData.levelUpCount
+      });
+
+      // Track XP award in analytics
+      analytics.trackXPAwarded({
+        amount: finalAmount,
+        activityType,
+        description,
+        multiplier,
+        totalXP: newTotalXP,
+        currentLevel: newLevel,
       });
 
       // Show notifications

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { analytics } from '@/utils/analytics';
 
 interface AuthContextType {
   user: User | null;
@@ -47,6 +48,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           localStorage.removeItem('rememberMe');
         } else if (event === 'USER_UPDATED') {
           console.log('User data updated');
+        } else if (event === 'SIGNED_IN' && session?.user) {
+          // Identify user in analytics
+          setTimeout(() => {
+            analytics.identify(session.user.id, {
+              email: session.user.email,
+              created_at: session.user.created_at,
+            });
+          }, 0);
         }
       }
     );
@@ -86,12 +95,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem('rememberMe', 'false');
     }
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     
-    if (!error) {
+    if (!error && data.user) {
+      // Track successful login
+      analytics.track('user_signed_in', {
+        method: 'email',
+        user_id: data.user.id,
+      });
       navigate('/dashboard');
     }
     return { error };
@@ -99,7 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signUp = async (email: string, password: string, fullName: string, country: string, marketingConsent: boolean) => {
     const redirectUrl = `${window.location.origin}/dashboard`;
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -112,7 +126,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     });
-    if (!error) {
+    if (!error && data.user) {
+      // Track successful signup
+      analytics.track('user_signed_up', {
+        method: 'email',
+        user_id: data.user.id,
+        country,
+        marketing_consent: marketingConsent,
+      });
       navigate('/dashboard');
     }
     return { error };

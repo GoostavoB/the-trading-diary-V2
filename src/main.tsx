@@ -6,9 +6,15 @@ import "./index.css";
 import { reportWebVitals, sendVitalsToAnalytics } from "./utils/webVitals";
 import { setupGlobalErrorHandling } from "./utils/errorTracking";
 import { swCleanup } from "./utils/swCleanup";
+import { initPostHog } from "./lib/posthog";
+import { initMixpanel } from "./lib/mixpanel";
 
 // Set up global error tracking
 setupGlobalErrorHandling();
+
+// Initialize analytics (PostHog + optional Mixpanel)
+initPostHog();
+initMixpanel();
 
 // Declare global BUILD_ID
 declare const __BUILD_ID__: string;
