@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Upload as UploadIcon } from 'lucide-react';
 import { isValidDecimal } from '@/utils/numberFormatting';
+import { cn } from '@/lib/utils';
 
 interface ManualTradeFormProps {
   formData: any;
@@ -16,6 +17,11 @@ interface ManualTradeFormProps {
   setupOptions: React.ReactNode;
 }
 
+const emotionOptions = [
+  'Confident', 'Fearful', 'Greedy', 'Disciplined', 'Impulsive',
+  'Patient', 'Anxious', 'Calm', 'FOMO', 'Revenge', 'Overconfident'
+];
+
 export const ManualTradeForm = memo(({
   formData,
   onFormChange,
@@ -24,6 +30,20 @@ export const ManualTradeForm = memo(({
   brokerOptions,
   setupOptions,
 }: ManualTradeFormProps) => {
+  const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
+
+  const handleEmotionToggle = (emotion: string) => {
+    if (selectedEmotions.includes(emotion)) {
+      const updated = selectedEmotions.filter(e => e !== emotion);
+      setSelectedEmotions(updated);
+      onFormChange('emotions', updated);
+    } else if (selectedEmotions.length < 3) {
+      const updated = [...selectedEmotions, emotion];
+      setSelectedEmotions(updated);
+      onFormChange('emotions', updated);
+    }
+  };
+
   return (
     <Card className="p-6">
       <div className="space-y-4">
@@ -193,6 +213,30 @@ export const ManualTradeForm = memo(({
             onChange={(e) => onFormChange('notes', e.target.value)}
             rows={3}
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Emotions (Optional - Max 3)</Label>
+          <div className="flex flex-wrap gap-2">
+            {emotionOptions.map((emotion) => (
+              <button
+                key={emotion}
+                type="button"
+                onClick={() => handleEmotionToggle(emotion)}
+                className={cn(
+                  "px-3 py-1 rounded-full text-xs font-medium transition-colors",
+                  selectedEmotions.includes(emotion)
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                )}
+              >
+                {emotion}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {selectedEmotions.length}/3 selected
+          </p>
         </div>
 
         <Button

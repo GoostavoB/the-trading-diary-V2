@@ -52,6 +52,8 @@ import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useUserTier } from '@/hooks/useUserTier';
 import { UpgradePrompt } from '@/components/UpgradePrompt';
+import { DailyMissionBar } from '@/components/dashboard/DailyMissionBar';
+import { Tier3PreviewModal } from '@/components/tier/Tier3PreviewModal';
 
 // Lazy load heavy components
 const TradeHistory = lazy(() => import('@/components/TradeHistory').then(m => ({ default: m.TradeHistory })));
@@ -208,7 +210,7 @@ const Dashboard = () => {
   }, [isCustomizing, positions, originalPositions]);
 
   // Gamification system
-  const { xpData, showLevelUp, setShowLevelUp } = useXPSystem();
+  const { xpData, showLevelUp, setShowLevelUp, showTier3Preview, setShowTier3Preview } = useXPSystem();
   const { updateChallengeProgress } = useDailyChallenges();
   
   // Award XP for trades
@@ -948,6 +950,12 @@ const Dashboard = () => {
         level={xpData.currentLevel} 
         onClose={() => setShowLevelUp(false)} 
       />
+      <Tier3PreviewModal
+        open={showTier3Preview}
+        onClose={() => setShowTier3Preview(false)}
+        totalXP={xpData.totalXPEarned}
+        currentTier={0}
+      />
       
       {/* Skip to main content link for keyboard navigation */}
       <a 
@@ -1025,6 +1033,11 @@ const Dashboard = () => {
           </Card>
         ) : (
           <>
+            {/* Daily Mission Bar */}
+            <div className="mb-6 animate-fade-in" style={{animationDelay: '0.3s'}}>
+              <DailyMissionBar />
+            </div>
+
             {/* AI Insights Box */}
             <div className="mb-6 animate-fade-in" style={{animationDelay: '0.4s'}}>
               <AIInsightsBox />

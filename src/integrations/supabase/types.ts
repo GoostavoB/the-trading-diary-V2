@@ -644,6 +644,7 @@ export type Database = {
           position_x: number
           position_y: number
           query_config: Json
+          tier_required: number | null
           title: string
           updated_at: string
           user_id: string
@@ -665,6 +666,7 @@ export type Database = {
           position_x?: number
           position_y?: number
           query_config?: Json
+          tier_required?: number | null
           title: string
           updated_at?: string
           user_id: string
@@ -686,6 +688,7 @@ export type Database = {
           position_x?: number
           position_y?: number
           query_config?: Json
+          tier_required?: number | null
           title?: string
           updated_at?: string
           user_id?: string
@@ -4068,6 +4071,7 @@ export type Database = {
         Row: {
           created_at: string | null
           current_tier: number
+          daily_upload_count: number | null
           daily_upload_limit: number
           daily_xp_cap: number
           daily_xp_earned: number
@@ -4079,6 +4083,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           current_tier?: number
+          daily_upload_count?: number | null
           daily_upload_limit?: number
           daily_xp_cap?: number
           daily_xp_earned?: number
@@ -4090,6 +4095,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           current_tier?: number
+          daily_upload_count?: number | null
           daily_upload_limit?: number
           daily_xp_cap?: number
           daily_xp_earned?: number

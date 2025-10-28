@@ -49,11 +49,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } else if (event === 'USER_UPDATED') {
           console.log('User data updated');
         } else if (event === 'SIGNED_IN' && session?.user) {
-          // Identify user in analytics
-          setTimeout(() => {
+          // Identify user in analytics with full profile data
+          setTimeout(async () => {
+            // Fetch user tier data
+            const { data: xpData } = await supabase
+              .from('user_xp_levels')
+              .select('total_xp_earned, current_level')
+              .eq('user_id', session.user.id)
+              .single();
+
+            const { data: tierData } = await supabase
+              .from('user_xp_tiers')
+              .select('current_tier, daily_xp_earned, daily_xp_cap')
+              .eq('user_id', session.user.id)
+              .single();
+
+            const { data: subscription } = await supabase
+              .from('subscriptions')
+              .select('plan_type, status')
+              .eq('user_id', session.user.id)
+              .eq('status', 'active')
+              .single();
+
             analytics.identify(session.user.id, {
               email: session.user.email,
               created_at: session.user.created_at,
+              tier: tierData?.current_tier || 0,
+              total_xp: xpData?.total_xp_earned || 0,
+              current_level: xpData?.current_level || 1,
+              subscription_plan: subscription?.plan_type || 'free',
+              subscription_status: subscription?.status || 'none',
+              daily_xp_earned: tierData?.daily_xp_earned || 0,
+              daily_xp_cap: tierData?.daily_xp_cap || 750,
             });
           }, 0);
         }

@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getStreakMultiplier } from '@/utils/xpEngine';
+import { getStreakMultiplier, calculateTier, getTierName } from '@/utils/xpEngine';
 import { trackStreakEvents } from '@/utils/analyticsEvents';
 import { analytics } from '@/utils/analytics';
 
@@ -40,7 +40,8 @@ export const useXPSystem = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [showLevelUp, setShowLevelUp] = useState(false);
-  const [newLevelRef, setNewLevelRef] = useState<number | null>(null);
+  const [showTier3Preview, setShowTier3Preview] = useState(false);
+  const newLevelRef = useRef<number | null>(null);
 
   const { data: xpData = {
     currentXP: 0,
@@ -211,9 +212,55 @@ export const useXPSystem = () => {
         currentLevel: newLevel,
       });
 
+      // Check for tier unlock after XP award
+      const oldTier = calculateTier(xpData.totalXPEarned);
+      const newTier = calculateTier(newTotalXP);
+
+      if (newTier > oldTier) {
+        analytics.trackTierUnlocked({
+          tier: newTier,
+          totalXP: newTotalXP,
+          previousTier: oldTier,
+        });
+        
+        toast.success(`🎉 Tier Unlocked: ${getTierName(newTier)}!`, {
+          description: `You've reached Tier ${newTier}!`,
+          duration: 5000,
+        });
+      }
+
+      // Check for Tier 3 preview trigger (2K XP milestone)
+      if (newTotalXP >= 2000 && xpData.totalXPEarned < 2000) {
+        // Check if user has already seen the preview
+        const { data: existingPreview } = await supabase
+          .from('tier_preview_unlocks')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('tier_previewed', 3)
+          .single();
+
+        if (!existingPreview) {
+          // Show modal and record in database
+          setShowTier3Preview(true);
+          
+          await supabase
+            .from('tier_preview_unlocks')
+            .insert({
+              user_id: user.id,
+              tier_previewed: 3,
+              previewed_at: new Date().toISOString(),
+            });
+
+          analytics.trackTier3PreviewOpened({
+            totalXP: newTotalXP,
+            currentTier: calculateTier(newTotalXP),
+          });
+        }
+      }
+
       // Show notifications
       if (didLevelUp) {
-        setNewLevelRef(newLevel);
+        newLevelRef.current = newLevel;
         setShowLevelUp(true);
         
         toast.success(`🎉 Level Up! You're now level ${newLevel}!`, {
@@ -281,6 +328,8 @@ export const useXPSystem = () => {
     showLevelUp,
     setShowLevelUp,
     newLevel: newLevelRef,
-    refresh
+    refresh,
+    showTier3Preview,
+    setShowTier3Preview,
   };
 };
