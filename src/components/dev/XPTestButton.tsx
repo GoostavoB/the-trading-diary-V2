@@ -18,11 +18,20 @@ export function XPTestButton() {
 
   const handleTestXP = async () => {
     try {
+      if (!user) {
+        toast.error('Please sign in to award XP');
+        return;
+      }
+      console.debug('[XPTestButton] Adding +100 XP for user:', user.id);
       await addXP(100, 'test', 'Dev test XP award');
+      // Refresh both XP and tier data immediately
+      await Promise.all([refreshXP?.(), refreshTier?.()]);
       toast.success('Test XP awarded! Check DailyMissionBar above.', {
         description: '+100 XP added to your daily total',
       });
+      console.debug('[XPTestButton] XP added successfully');
     } catch (error) {
+      console.error('[XPTestButton] Failed to add XP:', error);
       toast.error('Failed to award test XP', {
         description: error instanceof Error ? error.message : 'Unknown error',
       });
@@ -32,10 +41,10 @@ export function XPTestButton() {
   const handleResetDailyXP = async () => {
     try {
       if (!user) {
-        toast.error('Not signed in');
+        toast.error('Please sign in to reset XP');
         return;
       }
-      if (!confirm("Reset today's XP to 0?")) return;
+      console.debug('[XPTestButton] Resetting daily XP for user:', user.id);
       const { error } = await supabase
         .from('user_xp_tiers')
         .upsert(
@@ -55,7 +64,9 @@ export function XPTestButton() {
       ]);
       
       toast.success("Today's XP reset to 0");
+      console.debug('[XPTestButton] Daily XP reset successfully');
     } catch (error) {
+      console.error('[XPTestButton] Failed to reset daily XP:', error);
       toast.error('Failed to reset daily XP', {
         description: error instanceof Error ? error.message : 'Unknown error',
       });
@@ -63,12 +74,13 @@ export function XPTestButton() {
   };
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 space-y-2">
+    <div className="fixed bottom-4 left-4 z-[9999] pointer-events-auto space-y-2">
       <Button
         onClick={handleTestXP}
         variant="outline"
         className="gap-2 bg-yellow-500/10 border-yellow-500/50 hover:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400"
         size="lg"
+        disabled={!user}
       >
         <FlaskConical className="w-4 h-4" />
         <Zap className="w-4 h-4" />
@@ -79,6 +91,7 @@ export function XPTestButton() {
         variant="outline"
         className="gap-2"
         size="lg"
+        disabled={!user}
       >
         <RotateCcw className="w-4 h-4" />
         Reset Daily XP (Dev)

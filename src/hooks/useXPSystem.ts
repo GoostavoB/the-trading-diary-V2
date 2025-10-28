@@ -180,11 +180,13 @@ export const useXPSystem = () => {
 
       if (updateError) throw updateError;
 
-      // Update daily XP earned in user_xp_tiers
+      // Update daily XP earned in user_xp_tiers (upsert to create row if missing)
       await supabase
         .from('user_xp_tiers')
-        .update({ daily_xp_earned: dailyXPEarned + finalAmount })
-        .eq('user_id', user.id);
+        .upsert(
+          { user_id: user.id, daily_xp_earned: dailyXPEarned + finalAmount },
+          { onConflict: 'user_id' }
+        );
 
       // Log activity
       const { error: logError } = await supabase

@@ -10,6 +10,14 @@ export function DailyMissionBar() {
   const { dailyXPEarned, dailyXPCap, tierName, tier, tierLevel, isLoading } = useUserTier();
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
 
+  // Dev diagnostics
+  console.debug('[DailyMissionBar]', {
+    dailyXPEarned,
+    dailyXPCap,
+    tierLevel,
+    tierName
+  });
+
   if (isLoading) return null;
 
   const progress = dailyXPCap > 0 ? (dailyXPEarned / dailyXPCap) * 100 : 0;
