@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Check, HelpCircle } from "lucide-react";
+import { Check, HelpCircle, Clock } from "lucide-react";
 import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { usePromoStatus } from "@/hooks/usePromoStatus";
 import { PublicHeader } from "@/components/PublicHeader";
 import Footer from "@/components/Footer";
 import { trackLandingEvents } from "@/utils/analyticsEvents";
@@ -15,6 +17,7 @@ import FirstWeekBlock from "@/components/pricing/FirstWeekBlock";
 const PricingPage = () => {
   const navigate = useNavigate();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly');
+  const promoStatus = usePromoStatus();
 
   useEffect(() => {
     trackLandingEvents.trackViewPricing();
@@ -64,9 +67,11 @@ const PricingPage = () => {
       id: 'pro',
       name: 'Pro',
       description: 'Active traders optimizing risk and costs',
-      monthlyPrice: 15,
-      yearlyPrice: 12,
-      yearlyTotal: 144,
+      monthlyPrice: promoStatus.isActive ? 12 : 15,
+      yearlyPrice: promoStatus.isActive ? 10 : 12,
+      yearlyTotal: promoStatus.isActive ? 120 : 144,
+      regularMonthlyPrice: 15,
+      regularYearlyPrice: 12,
       features: [
         '50 uploads per month. Up to 10 trades per upload',
         'Unlimited accounts',
@@ -218,6 +223,19 @@ const PricingPage = () => {
                       Recommended
                     </div>
                   )}
+                  
+                  {promoStatus.isActive && plan.id === 'pro' && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-3 right-4 animate-pulse flex items-center gap-1"
+                    >
+                      <Clock className="w-3 h-3" />
+                      {promoStatus.daysRemaining > 0 
+                        ? `Offer ends in ${promoStatus.daysRemaining}d`
+                        : `Ends in ${promoStatus.hoursRemaining}h`
+                      }
+                    </Badge>
+                  )}
 
                   <div className="mb-6">
                     <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
@@ -226,11 +244,21 @@ const PricingPage = () => {
                     {plan.monthlyPrice > 0 ? (
                       <>
                         <div className="flex items-baseline gap-2 mb-2">
+                          {promoStatus.isActive && plan.id === 'pro' && (
+                            <span className="text-2xl font-bold text-muted-foreground line-through mr-1">
+                              ${billingCycle === 'yearly' ? plan.regularYearlyPrice : plan.regularMonthlyPrice}
+                            </span>
+                          )}
                           <span className="text-4xl font-bold">${getPrice(plan)}</span>
                           <span className="text-sm text-muted-foreground">
                             /month
                           </span>
                         </div>
+                        {promoStatus.isActive && plan.id === 'pro' && (
+                          <div className="text-sm font-semibold text-green-600 dark:text-green-400 mb-2">
+                            🎉 Save 40% during launch offer
+                          </div>
+                        )}
                         {billingCycle === 'yearly' && plan.yearlyTotal && (
                           <div className="text-sm text-muted-foreground mb-2">
                             Billed ${plan.yearlyTotal} once

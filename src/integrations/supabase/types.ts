@@ -2052,6 +2052,7 @@ export type Database = {
           id: string
           marketing_consent: boolean | null
           profile_visibility: string | null
+          promo_expires_at: string | null
           provider: string | null
           public_stats: Json | null
           subscription_status: string | null
@@ -2075,6 +2076,7 @@ export type Database = {
           id: string
           marketing_consent?: boolean | null
           profile_visibility?: string | null
+          promo_expires_at?: string | null
           provider?: string | null
           public_stats?: Json | null
           subscription_status?: string | null
@@ -2098,6 +2100,7 @@ export type Database = {
           id?: string
           marketing_consent?: boolean | null
           profile_visibility?: string | null
+          promo_expires_at?: string | null
           provider?: string | null
           public_stats?: Json | null
           subscription_status?: string | null

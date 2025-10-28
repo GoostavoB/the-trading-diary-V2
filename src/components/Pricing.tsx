@@ -1,16 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { Check, Sparkles } from "lucide-react";
+import { Check, Sparkles, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { addStructuredData } from "@/utils/seoHelpers";
 import PricingComparison from "./PricingComparison";
+import { usePromoStatus } from "@/hooks/usePromoStatus";
+import { Badge } from "@/components/ui/badge";
 
 const Pricing = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
   const currentLang = i18n.language;
+  const promoStatus = usePromoStatus();
   
   const handleAuthNavigate = () => {
     const authPath = currentLang === 'en' ? '/auth' : `/${currentLang}/auth`;
@@ -49,9 +52,11 @@ const Pricing = () => {
       id: 'pro',
       nameKey: "pricing.plans.pro.name",
       descriptionKey: "pricing.plans.pro.description",
-      monthlyPrice: 15,
-      annualPrice: 12,
-      annualTotal: 144,
+      monthlyPrice: promoStatus.isActive ? 12 : 15,
+      annualPrice: promoStatus.isActive ? 10 : 12,
+      annualTotal: promoStatus.isActive ? 120 : 144,
+      regularMonthlyPrice: 15,
+      regularAnnualPrice: 12,
       tradeLimitKey: "pricing.plans.pro.tradeLimit",
       featuresKeys: [
         "pricing.plans.pro.features.uploads",
@@ -197,6 +202,19 @@ const Pricing = () => {
                     {t('pricing.mostPopular')}
                   </div>
                 )}
+                
+                {promoStatus.isActive && plan.id === 'pro' && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-3 right-4 animate-pulse flex items-center gap-1"
+                  >
+                    <Clock className="w-3 h-3" />
+                    {promoStatus.daysRemaining > 0 
+                      ? `Offer ends in ${promoStatus.daysRemaining}d`
+                      : `Ends in ${promoStatus.hoursRemaining}h`
+                    }
+                  </Badge>
+                )}
 
                 <div className="mb-5">
                   <h3 className="text-xl md:text-2xl font-bold mb-1.5">{t(plan.nameKey)}</h3>
@@ -206,6 +224,11 @@ const Pricing = () => {
                   {plan.monthlyPrice > 0 ? (
                     <>
                       <div className="flex items-baseline gap-2 mb-2">
+                        {promoStatus.isActive && plan.id === 'pro' && (
+                          <span className="text-2xl font-bold text-muted-foreground line-through mr-1">
+                            ${billingCycle === 'monthly' ? plan.regularMonthlyPrice : plan.regularAnnualPrice}
+                          </span>
+                        )}
                         <span className="text-3xl md:text-4xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
                           ${getDisplayPrice(plan)}
                         </span>
@@ -213,6 +236,11 @@ const Pricing = () => {
                           /{billingCycle === 'monthly' ? t('pricing.perMonth') : t('pricing.perMonthBilledAnnually')}
                         </span>
                       </div>
+                      {promoStatus.isActive && plan.id === 'pro' && (
+                        <div className="text-sm font-semibold text-green-600 dark:text-green-400 mb-2">
+                          🎉 Save 40% during launch offer
+                        </div>
+                      )}
                       {billingCycle === 'annual' && (
                         <div className="text-xs text-green-600 dark:text-green-400 font-medium">
                           {t('pricing.savingsAmount', { amount: getSavings(plan) })}

@@ -6,8 +6,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Crown, Check, ArrowRight, Sparkles } from 'lucide-react';
+import { Crown, Check, ArrowRight, Sparkles, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { usePromoStatus } from '@/hooks/usePromoStatus';
+import { Badge } from '@/components/ui/badge';
 
 interface UpgradePromptProps {
   open: boolean;
@@ -18,6 +20,7 @@ interface UpgradePromptProps {
 
 export function UpgradePrompt({ open, onClose, feature = 'this feature', trigger = 'widget_lock' }: UpgradePromptProps) {
   const navigate = useNavigate();
+  const promoStatus = usePromoStatus();
 
   const getContent = () => {
     switch (trigger) {
@@ -83,6 +86,31 @@ export function UpgradePrompt({ open, onClose, feature = 'this feature', trigger
         </DialogHeader>
 
         <div className="space-y-4 py-4">
+          {promoStatus.isActive && (
+            <div className="p-4 rounded-lg bg-gradient-to-r from-amber-500/10 to-amber-600/10 border border-amber-500/30">
+              <div className="flex items-center justify-between mb-2">
+                <Badge variant="destructive" className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  Limited Time Offer
+                </Badge>
+                <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">
+                  {promoStatus.daysRemaining > 0 
+                    ? `${promoStatus.daysRemaining} days remaining`
+                    : `${promoStatus.hoursRemaining} hours remaining`
+                  }
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-bold line-through text-muted-foreground">$15</span>
+                <span className="text-3xl font-bold text-primary">$12</span>
+                <span className="text-sm text-muted-foreground">/month</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                🎉 Save 40% during launch offer
+              </p>
+            </div>
+          )}
+          
           <div className="space-y-2">
             {content.features.map((feature, index) => (
               <div key={index} className="flex items-start gap-3">
