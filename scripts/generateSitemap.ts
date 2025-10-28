@@ -29,6 +29,46 @@ const blogArticles = [
   {
     slug: 'ai-powered-trading-journal',
     lastmod: '2025-10-13',
+  },
+  {
+    slug: 'journal-vs-excel',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'journal-vs-notion',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'journal-vs-google-sheets',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'integrations/binance-trading-journal',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'integrations/bybit-trading-journal',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'integrations/okx-trading-journal',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'integrations/coinbase-trading-journal',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'integrations/kraken-trading-journal',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'trading-journal/bybit-bitcoin',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'trading-journal/binance-ethereum',
+    lastmod: '2025-10-28',
   }
 ];
 
