@@ -27,16 +27,40 @@ export const useSubscription = (): UseSubscriptionReturn => {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchSubscription = async () => {
-    // Temporary: Grant elite subscription to all users
-    setSubscription({
-      id: 'temp-elite',
-      plan_type: 'elite',
-      status: 'active',
-      billing_cycle: 'annual',
-      current_period_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-      cancel_at_period_end: false,
-    });
-    setIsLoading(false);
+    if (!user) {
+      setSubscription(null);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('id, plan_type, status, billing_cycle, current_period_end, cancel_at_period_end')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      
+      if (data) {
+        setSubscription({
+          id: data.id,
+          plan_type: data.plan_type as PlanType,
+          status: data.status as SubscriptionStatus,
+          billing_cycle: data.billing_cycle as 'monthly' | 'annual' | null,
+          current_period_end: data.current_period_end,
+          cancel_at_period_end: data.cancel_at_period_end
+        });
+      } else {
+        setSubscription(null);
+      }
+    } catch (error) {
+      console.error('Error fetching subscription:', error);
+      setSubscription(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {

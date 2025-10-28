@@ -17,21 +17,42 @@ export const useUserRole = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Temporary: Grant elite subscription to all users
-    if (!user) {
-      setRole(null);
-      setSubscription(null);
-      setLoading(false);
-      return;
-    }
+    const fetchUserRole = async () => {
+      if (!user) {
+        setRole(null);
+        setSubscription(null);
+        setLoading(false);
+        return;
+      }
 
-    setRole('user');
-    setSubscription({
-      tier: 'elite',
-      status: 'active',
-      trialEndDate: undefined
-    });
-    setLoading(false);
+      try {
+        const { data: subscriptionData } = await supabase
+          .from('subscriptions')
+          .select('plan_type, status')
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .single();
+
+        setRole('user');
+        setSubscription({
+          tier: (subscriptionData?.plan_type as 'free' | 'basic' | 'pro' | 'elite') || 'free',
+          status: (subscriptionData?.status as 'active' | 'inactive' | 'trial' | 'cancelled') || 'inactive',
+          trialEndDate: undefined
+        });
+      } catch (error) {
+        console.error('Error fetching subscription:', error);
+        setRole('user');
+        setSubscription({
+          tier: 'free',
+          status: 'inactive',
+          trialEndDate: undefined
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserRole();
   }, [user]);
 
   const isAdmin = role === 'admin';
