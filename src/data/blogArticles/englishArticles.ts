@@ -3345,5 +3345,1900 @@ Import your last 90 days and see the difference automation makes.
 
 Your trading deserves proper tracking. Choose the tool that fits your trading style and commit to consistent use.
 `
+  },
+  // BATCH 02 ARTICLES
+  {
+    title: "KuCoin Trading Journal Integration",
+    slug: "integrations/kucoin-trading-journal",
+    metaTitle: "KuCoin Trading Journal Integration | Auto-Import Trades",
+    metaDescription: "Connect KuCoin to your crypto trading journal. Automatically import spot and futures trades, calculate metrics, and track performance.",
+    description: "Complete guide to integrating KuCoin with your trading journal for automated trade tracking.",
+    focusKeyword: "KuCoin trading journal",
+    readTime: "5 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Exchange Integration",
+    tags: ["KuCoin", "exchange integration", "trade import", "automation"],
+    canonical: "https://www.thetradingdiary.com/blog/integrations/kucoin-trading-journal",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+KuCoin is one of the largest crypto exchanges globally, offering extensive trading options. Integrating it with your trading journal eliminates manual data entry and provides instant performance insights.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com) to connect KuCoin in minutes.
+
+## Why Integrate KuCoin
+
+**Automatic benefits:**
+- All trades import automatically via API
+- Exact prices, fees, and timestamps
+- Zero manual data entry
+- Multi-exchange consolidation
+
+**Compare to manual tracking:**
+- Manual: 3 minutes per trade
+- Automatic: 0 minutes per trade
+- **Active traders save 5-10 hours weekly**
+
+Internal link: See [Trading Journal vs Excel](https://www.thetradingdiary.com/blog/journal-vs-excel) for detailed comparison.
+
+## What Gets Imported
+
+- Spot trades (all pairs)
+- Futures/perpetuals  
+- Margin trades
+- Entry/exit prices
+- Position sizes
+- Fees and commissions
+- Exact timestamps
+
+## Quick Setup
+
+1. Create read-only API key in KuCoin
+2. Connect at [TheTradingDiary.com](https://www.thetradingdiary.com)
+3. Import historical trades (last 90 days)
+4. Begin automatic tracking
+
+**Setup time:** 10 minutes
+
+## Available Metrics
+
+- Win rate by coin and strategy
+- Profit factor
+- Maximum drawdown
+- Risk/reward ratios
+- Performance by time of day
+- Expectancy
+
+Internal link: Learn about [Data-Driven Trading](https://www.thetradingdiary.com/blog/data-driven-trading).
+
+## Multi-Exchange Support
+
+Combine KuCoin with:
+- [Binance](https://www.thetradingdiary.com/blog/integrations/binance-trading-journal)
+- [Bybit](https://www.thetradingdiary.com/blog/integrations/bybit-trading-journal)
+- [Coinbase](https://www.thetradingdiary.com/blog/integrations/coinbase-trading-journal)
+- [Kraken](https://www.thetradingdiary.com/blog/integrations/kraken-trading-journal)
+
+View consolidated performance across all platforms.
+
+## FAQs
+
+**Is this free to try?**
+Yes. Start a free trial and import recent trades at [TheTradingDiary.com](https://www.thetradingdiary.com).
+
+**Do you support multiple exchanges?**
+Yes. Connect all major exchanges into one unified journal.
+
+**Can I export my data?**
+Yes. Export CSVs and PDF reports anytime.
+
+## Next Step
+
+Stop manual data entry. Connect KuCoin today: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "TradingView to Trading Journal",
+    slug: "integrations/tradingview-trading-journal",
+    metaTitle: "TradingView to Trading Journal | Export & Track Performance",
+    metaDescription: "Export TradingView data and import into your crypto trading journal for comprehensive performance tracking and advanced analytics.",
+    description: "Guide to connecting TradingView charting with trading journal performance tracking.",
+    focusKeyword: "TradingView trading journal",
+    readTime: "5 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Platform Integration",
+    tags: ["TradingView", "charting", "export", "integration"],
+    canonical: "https://www.thetradingdiary.com/blog/integrations/tradingview-trading-journal",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+TradingView offers exceptional charting but limited performance tracking. Combining it with a dedicated trading journal provides complete trade analysis.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com) to enhance your TradingView workflow.
+
+## The TradingView Gap
+
+**TradingView excels at:**
+- Advanced charting
+- Technical indicators
+- Drawing tools
+- Community ideas
+
+**TradingView lacks:**
+- Comprehensive metrics
+- Multi-strategy comparison
+- AI-powered insights
+- Tax reporting
+- Emotional tracking
+
+Internal link: [Trading Psychology](https://www.thetradingdiary.com/blog/trading-psychology-control-emotions)
+
+## Integration Methods
+
+### Method 1: Paper Trading Export
+
+1. Trade in TradingView paper account
+2. Export trade history as CSV
+3. Import into trading journal
+
+**Best for:** Strategy testing before live trading.
+
+### Method 2: Exchange Connection
+
+1. Use TradingView with connected broker
+2. Connect same broker to journal
+3. Trades auto-sync
+
+**Best for:** Supported broker/exchange users.
+
+### Method 3: Screenshot + Manual Entry
+
+1. Analyze on TradingView
+2. Execute on exchange
+3. Screenshot chart
+4. Log trade with chart attached
+
+**Best for:** Maximum flexibility, works with any exchange.
+
+## Recommended Workflow
+
+**Daily:**
+1. Analyze setups on TradingView
+2. Screenshot before entry
+3. Execute on exchange
+4. Journal auto-imports trade
+5. Attach screenshot and notes (30 seconds)
+
+**Weekly:**
+1. Review which TradingView setups worked
+2. Check journal metrics
+3. Identify profitable patterns
+4. Eliminate losers
+
+Internal link: [Data-Driven Trading](https://www.thetradingdiary.com/blog/data-driven-trading)
+
+## Enhanced Analysis
+
+**Journal adds:**
+- Win rate by indicator (RSI, MACD, etc.)
+- Performance by timeframe
+- Pattern effectiveness
+- Emotional correlation
+- AI pattern recognition
+
+Internal link: [AI-Powered Trading Journal](https://www.thetradingdiary.com/blog/ai-powered-trading-journal)
+
+## FAQs
+
+**Can TradingView connect directly?**
+Most journals don't have direct TradingView API. Export from TradingView or connect your exchange instead.
+
+**Is this free to try?**
+Yes. Start at [TheTradingDiary.com](https://www.thetradingdiary.com) and test the workflow.
+
+**Do I need TradingView Pro?**
+No. Basic TradingView works fine.
+
+## Next Step
+
+Stop guessing which TradingView strategies work. Start measuring: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "MetaTrader 5 Trading Journal Integration",
+    slug: "integrations/metatrader5-trading-journal",
+    metaTitle: "MetaTrader 5 Trading Journal | MT5 Export & Analysis",
+    metaDescription: "Connect MT5 to your crypto trading journal. Export trade history, import for analysis, and track performance with advanced metrics.",
+    description: "Complete guide to integrating MetaTrader 5 with your trading journal.",
+    focusKeyword: "MetaTrader 5 trading journal",
+    readTime: "5 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Platform Integration",
+    tags: ["MetaTrader 5", "MT5", "export", "integration"],
+    canonical: "https://www.thetradingdiary.com/blog/integrations/metatrader5-trading-journal",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+MetaTrader 5 provides basic reporting, but a dedicated trading journal offers deeper performance analysis and tracking capabilities.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com) to enhance your MT5 workflow.
+
+## Why Integrate MT5
+
+**MT5 shows:**
+- Basic trade history
+- Simple P&L
+- Win/loss ratios
+
+**Trading journal adds:**
+- Profit factor and expectancy
+- Multi-strategy comparison
+- Emotional tracking
+- AI pattern recognition
+- Tax-ready reports
+
+Internal link: [Data-Driven Trading](https://www.thetradingdiary.com/blog/data-driven-trading)
+
+## Export from MT5
+
+### Simple Method
+
+1. Open MT5 → Toolbox → History
+2. Right-click → Report
+3. Save as Detailed Report (HTML or XML)
+4. Convert to CSV
+5. Import into journal
+
+**Time:** 3 minutes
+
+### Automated Method
+
+Use MQL5 script for one-click CSV export.
+Search MT5 community for "trade history CSV export script."
+
+## What to Export
+
+- Order numbers and times
+- Symbols (BTC/USD, ETH/USD, etc.)
+- Entry/exit prices
+- Volume
+- Stop loss and take profit
+- Commission and swap
+- Profit/loss
+
+## Enhanced Analysis
+
+**Trading journal provides:**
+
+**Advanced metrics:**
+- Win rate by instrument
+- Performance by session time
+- Maximum drawdown
+- Sharpe ratio
+
+**Multi-dimensional views:**
+- Best/worst trading days
+- Strategy comparison
+- Risk analysis
+
+**Psychological tracking:**
+- Emotional state correlation
+- Rule adherence
+- Confidence tracking
+
+Internal link: [Trading Psychology](https://www.thetradingdiary.com/blog/trading-psychology-control-emotions)
+
+## Recommended Workflow
+
+**Daily:** 
+- Export end-of-day trades
+- Import to journal (2 minutes)
+- Add strategy tags
+
+**Weekly:**
+- Review metrics
+- Identify patterns
+- Plan improvements
+
+**Monthly:**
+- Deep performance analysis
+- Strategy adjustments
+- Goal setting
+
+## For Crypto Traders
+
+Many traders use:
+- MT5 for charting
+- Native exchanges (Binance, Bybit) for execution
+- Journal consolidates all data
+
+Internal links:
+- [Binance Integration](https://www.thetradingdiary.com/blog/integrations/binance-trading-journal)
+- [Bybit Integration](https://www.thetradingdiary.com/blog/integrations/bybit-trading-journal)
+
+## FAQs
+
+**Can journals connect to MT5 automatically?**
+Typically via export/import. Some support MT5 broker APIs.
+
+**Do I need MT5 Pro?**
+No. Standard MT5 (free from brokers) includes all export features.
+
+**Is this free to try?**
+Yes. Start at [TheTradingDiary.com](https://www.thetradingdiary.com).
+
+## Next Step
+
+Export your MT5 trades and import for comprehensive analysis: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "OKX Bitcoin Trading Journal",
+    slug: "trading-journal/okx-bitcoin",
+    metaTitle: "OKX Bitcoin Trading Journal | Track BTC Performance",
+    metaDescription: "Track your Bitcoin trades from OKX with automated imports, detailed metrics, and comprehensive performance analysis.",
+    description: "Complete guide to tracking OKX Bitcoin trades in your crypto journal.",
+    focusKeyword: "OKX Bitcoin trading",
+    readTime: "4 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Trading Guides",
+    tags: ["OKX", "Bitcoin", "BTC", "performance tracking"],
+    canonical: "https://www.thetradingdiary.com/blog/trading-journal/okx-bitcoin",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+Bitcoin trading on OKX requires systematic tracking for consistent improvement. A dedicated journal automates data collection and provides actionable insights.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com) to track your OKX Bitcoin trades.
+
+## Why Track OKX Bitcoin Trades
+
+**Benefits of dedicated tracking:**
+- Identify profitable BTC strategies
+- Analyze performance by timeframe
+- Calculate true risk/reward
+- Understand fee impact
+- Compare spot vs. futures results
+
+**Without tracking:** Repeat mistakes, unclear edge, emotional decisions.
+
+Internal link: [Trading Psychology](https://www.thetradingdiary.com/blog/trading-psychology-control-emotions)
+
+## Auto-Import from OKX
+
+Connect OKX via API:
+- All BTC trades import automatically
+- Exact prices and fees
+- Spot and futures/perps
+- Zero manual entry
+
+Internal link: [OKX Integration Guide](https://www.thetradingdiary.com/blog/integrations/okx-trading-journal)
+
+**Setup time:** 10 minutes
+
+## Key Metrics to Track
+
+**Performance:**
+- BTC-specific win rate
+- Profit factor on Bitcoin trades
+- Average hold time
+- Best/worst entry times
+
+**Risk:**
+- Maximum BTC drawdown
+- Position size distribution
+- Leverage impact (if using futures)
+
+**Strategy:**
+- Scalping vs. swing results
+- Breakout vs. reversal success
+- Long vs. short bias
+
+Internal links:
+- [Scalping Strategy](https://www.thetradingdiary.com/blog/strategy-tracker/scalping-bitcoin)
+- [Swing Strategy](https://www.thetradingdiary.com/blog/strategy-tracker/swing-trading-bitcoin)
+
+## Recommended Workflow
+
+**Per trade:**
+1. Execute on OKX
+2. Trade auto-imports (1-5 minutes)
+3. Add quick note (30 seconds)
+
+**Weekly:**
+- Review BTC performance
+- Identify best setups
+- Adjust strategy
+
+**Monthly:**
+- Compare to other coins/exchanges
+- Calculate ROI
+- Set new goals
+
+Internal link: [Data-Driven Trading](https://www.thetradingdiary.com/blog/data-driven-trading)
+
+## Multi-Exchange Bitcoin Tracking
+
+Compare BTC trading across:
+- OKX
+- Binance
+- Bybit
+- Coinbase
+
+**Question to answer:** Which exchange offers best execution for YOUR Bitcoin strategy?
+
+Internal links:
+- [Binance Bitcoin](https://www.thetradingdiary.com/blog/trading-journal/binance-bitcoin)
+- [Bybit Bitcoin](https://www.thetradingdiary.com/blog/trading-journal/bybit-bitcoin)
+- [Coinbase Bitcoin](https://www.thetradingdiary.com/blog/trading-journal/coinbase-bitcoin)
+
+## Common Insights
+
+**Typical findings:**
+- Specific timeframes outperform others
+- Certain sessions (Asian, US, European) work better
+- Particular strategies excel on OKX
+- Fee structures favor specific approaches
+
+## FAQs
+
+**Is this free to try?**
+Yes. Start trial at [TheTradingDiary.com](https://www.thetradingdiary.com).
+
+**Do you support OKX futures?**
+Yes. Both spot and futures/perpetuals import automatically.
+
+**Can I compare with other exchanges?**
+Yes. Connect multiple exchanges for consolidated tracking.
+
+## Next Step
+
+Start tracking your OKX Bitcoin performance: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "Kraken Ethereum Trading Journal",
+    slug: "trading-journal/kraken-ethereum",
+    metaTitle: "Kraken Ethereum Trading Journal | Track ETH Performance",
+    metaDescription: "Track Ethereum trades from Kraken with automated imports, detailed metrics, and performance analysis for consistent improvement.",
+    description: "Complete guide to tracking Kraken Ethereum trades in your crypto journal.",
+    focusKeyword: "Kraken Ethereum trading",
+    readTime: "4 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Trading Guides",
+    tags: ["Kraken", "Ethereum", "ETH", "performance tracking"],
+    canonical: "https://www.thetradingdiary.com/blog/trading-journal/kraken-ethereum",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+Ethereum trading on Kraken requires systematic tracking for optimization. Automate data collection and gain actionable insights with dedicated journaling.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com) to track your Kraken ETH trades.
+
+## Why Track Kraken ETH Trades
+
+**Dedicated tracking provides:**
+- Clear ETH strategy performance
+- Fee impact analysis
+- Optimal timeframe identification
+- Risk management insights
+- Comparative exchange analysis
+
+**Without tracking:** Unclear results, repeated mistakes, emotional trading.
+
+Internal link: [Data-Driven Trading](https://www.thetradingdiary.com/blog/data-driven-trading)
+
+## Auto-Import from Kraken
+
+**Connect via API:**
+- All ETH trades import automatically
+- Accurate prices and fees
+- Spot and margin trades
+- Zero manual work
+
+Internal link: [Kraken Integration Guide](https://www.thetradingdiary.com/blog/integrations/kraken-trading-journal)
+
+**Setup time:** 10 minutes
+
+## Key ETH Metrics
+
+**Performance indicators:**
+- Ethereum-specific win rate
+- Profit factor on ETH trades
+- Average risk/reward
+- Hold time analysis
+
+**Risk metrics:**
+- Maximum ETH drawdown
+- Position sizing effectiveness
+- Correlation with BTC moves
+
+**Strategy analysis:**
+- Day trading vs. swing results
+- Long vs. short bias
+- Best entry/exit patterns
+
+Internal link: [Day Trading Strategy](https://www.thetradingdiary.com/blog/strategy-tracker/day-trading-ethereum)
+
+## Recommended Tracking Workflow
+
+**Per trade:**
+1. Execute on Kraken
+2. Auto-import (1-5 minutes)
+3. Add strategy tag (30 seconds)
+
+**Weekly review:**
+- Analyze ETH performance
+- Identify winning patterns
+- Eliminate losing setups
+
+**Monthly analysis:**
+- Compare to BTC and other coins
+- Evaluate Kraken fees vs. alternatives
+- Set improvement goals
+
+## Multi-Exchange ETH Comparison
+
+Track Ethereum across:
+- Kraken
+- Binance
+- Coinbase
+- Bybit
+
+**Discover:** Which platform suits YOUR Ethereum strategy best?
+
+Internal link: [Binance Ethereum](https://www.thetradingdiary.com/blog/trading-journal/binance-ethereum)
+
+## Common Findings
+
+**Typical discoveries:**
+- Specific hours offer best volatility
+- Certain days outperform (often linked to macro events)
+- ETH/BTC vs. ETH/USD pair preferences
+- Fee optimization opportunities
+
+## FAQs
+
+**Is this free to try?**
+Yes. Start your trial at [TheTradingDiary.com](https://www.thetradingdiary.com).
+
+**Does it support Kraken margin?**
+Yes. Spot and margin trades both import.
+
+**Can I track other coins too?**
+Yes. Track all coins across multiple exchanges.
+
+## Next Step
+
+Begin tracking your Kraken Ethereum performance: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "Coinbase Bitcoin Trading Journal",
+    slug: "trading-journal/coinbase-bitcoin",
+    metaTitle: "Coinbase Bitcoin Trading Journal | Track BTC Performance",
+    metaDescription: "Track Bitcoin trades from Coinbase with automated imports, clear metrics, and comprehensive performance analysis.",
+    description: "Guide to tracking Coinbase Bitcoin trades for improved results.",
+    focusKeyword: "Coinbase Bitcoin trading",
+    readTime: "4 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Trading Guides",
+    tags: ["Coinbase", "Bitcoin", "BTC", "performance tracking"],
+    canonical: "https://www.thetradingdiary.com/blog/trading-journal/coinbase-bitcoin",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+Tracking Bitcoin trades on Coinbase systematically reveals what works and what doesn't. Automated journaling eliminates guesswork.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com) to track Coinbase Bitcoin trades.
+
+## Why Track Coinbase BTC
+
+**Systematic tracking shows:**
+- Which Bitcoin strategies profit
+- Fee impact on returns
+- Best entry/exit timing
+- Risk exposure accuracy
+- Improvement opportunities
+
+Internal link: [Trading Psychology](https://www.thetradingdiary.com/blog/trading-psychology-control-emotions)
+
+## Automatic Import
+
+**Connect Coinbase API:**
+- All BTC trades auto-import
+- Precise prices and fees
+- Complete trade history
+- No manual entry
+
+Internal link: [Coinbase Integration](https://www.thetradingdiary.com/blog/integrations/coinbase-trading-journal)
+
+**Setup:** 10 minutes
+
+## Critical Metrics
+
+**Performance:**
+- Bitcoin win rate
+- Profit factor on BTC
+- Risk/reward ratios
+- Average gains vs. losses
+
+**Risk analysis:**
+- Maximum BTC drawdown
+- Position size consistency
+- Exposure management
+
+**Strategy effectiveness:**
+- Swing vs. day trading results
+- Breakout vs. reversal success
+- Market timing accuracy
+
+Internal link: [Swing Trading Bitcoin](https://www.thetradingdiary.com/blog/strategy-tracker/swing-trading-bitcoin)
+
+## Simple Workflow
+
+**Per trade:**
+1. Execute on Coinbase
+2. Auto-sync (minutes)
+3. Add quick note (30 sec)
+
+**Weekly:**
+- Review BTC metrics
+- Spot patterns
+- Refine approach
+
+**Monthly:**
+- Deep analysis
+- Exchange comparison
+- Goal adjustment
+
+Internal link: [Data-Driven Trading](https://www.thetradingdiary.com/blog/data-driven-trading)
+
+## Compare Exchanges
+
+Track Bitcoin on:
+- Coinbase
+- Binance
+- Bybit
+- OKX
+
+**Determine:** Best exchange for YOUR strategy.
+
+Internal links:
+- [Binance Bitcoin](https://www.thetradingdiary.com/blog/trading-journal/binance-bitcoin)
+- [OKX Bitcoin](https://www.thetradingdiary.com/blog/trading-journal/okx-bitcoin)
+
+## Typical Insights
+
+**Common discoveries:**
+- Specific times favor your style
+- Fee structures impact profits
+- Particular setups work best
+- Emotional patterns emerge
+
+## FAQs
+
+**Is there a free trial?**
+Yes. Try it at [TheTradingDiary.com](https://www.thetradingdiary.com).
+
+**Does it track Coinbase Pro?**
+Yes. Both Coinbase and Coinbase Pro supported.
+
+**Can I export for taxes?**
+Yes. Generate tax reports anytime.
+
+## Next Step
+
+Track your Coinbase Bitcoin trades: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "Binance Bitcoin Trading Journal",
+    slug: "trading-journal/binance-bitcoin",
+    metaTitle: "Binance Bitcoin Trading Journal | Track BTC Performance",
+    metaDescription: "Track Bitcoin trades from Binance with automated imports, detailed metrics, and comprehensive performance analysis.",
+    description: "Complete guide to tracking Binance Bitcoin trades for consistent improvement.",
+    focusKeyword: "Binance Bitcoin trading",
+    readTime: "4 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Trading Guides",
+    tags: ["Binance", "Bitcoin", "BTC", "performance tracking"],
+    canonical: "https://www.thetradingdiary.com/blog/trading-journal/binance-bitcoin",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+Binance is the world's largest crypto exchange. Tracking your Bitcoin trades systematically transforms results.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com) to track Binance Bitcoin trades.
+
+## Why Track Binance BTC
+
+**Benefits:**
+- Identify profitable BTC strategies
+- Understand fee impact (spot, futures, maker/taker)
+- Optimize entry and exit timing
+- Track risk exposure accurately
+- Compare leverage strategies
+
+Internal link: [Data-Driven Trading](https://www.thetradingdiary.com/blog/data-driven-trading)
+
+## Automatic Binance Import
+
+**API connection provides:**
+- All Bitcoin trades auto-import
+- Spot and futures/perpetuals
+- Accurate fees (including BNB discounts)
+- Complete historical data
+- Real-time sync
+
+Internal link: [Binance Integration](https://www.thetradingdiary.com/blog/integrations/binance-trading-journal)
+
+**Setup time:** 10 minutes
+
+## Essential Metrics
+
+**Performance:**
+- BTC win rate (spot vs. futures)
+- Profit factor
+- Average R:R ratio
+- Hold time analysis
+
+**Risk:**
+- Maximum drawdown on BTC
+- Leverage impact
+- Position sizing effectiveness
+
+**Strategy:**
+- Scalping vs. swing comparison
+- Long vs. short bias
+- Best timeframes
+
+Internal links:
+- [Scalping Bitcoin](https://www.thetradingdiary.com/blog/strategy-tracker/scalping-bitcoin)
+- [Swing Trading Bitcoin](https://www.thetradingdiary.com/blog/strategy-tracker/swing-trading-bitcoin)
+
+## Simple Workflow
+
+**Each trade:**
+1. Execute on Binance
+2. Auto-import (instant to 5 minutes)
+3. Add strategy note (30 seconds)
+
+**Weekly:**
+- Review performance
+- Identify best setups
+- Eliminate losers
+
+**Monthly:**
+- Compare to other coins
+- Assess fee optimization
+- Set new targets
+
+## Cross-Exchange Comparison
+
+Track BTC across:
+- Binance
+- Bybit
+- OKX
+- Coinbase
+
+**Discover:** Where YOUR Bitcoin strategy performs best.
+
+Internal links:
+- [Bybit Bitcoin](https://www.thetradingdiary.com/blog/trading-journal/bybit-bitcoin)
+- [OKX Bitcoin](https://www.thetradingdiary.com/blog/trading-journal/okx-bitcoin)
+- [Coinbase Bitcoin](https://www.thetradingdiary.com/blog/trading-journal/coinbase-bitcoin)
+
+## Common Insights
+
+**Traders often find:**
+- Specific hours offer best setups
+- Futures vs. spot performance varies
+- Leverage sweet spot (often lower than expected)
+- Fee tier matters significantly
+
+## FAQs
+
+**Is there a free trial?**
+Yes. Start at [TheTradingDiary.com](https://www.thetradingdiary.com).
+
+**Does it support Binance futures?**
+Yes. Spot, futures, and margin all supported.
+
+**Can I track multiple exchanges?**
+Yes. Consolidate all platforms in one journal.
+
+## Next Step
+
+Start tracking Binance Bitcoin performance: [TheTradingDiary.com](https://www.thetradingdiary.com)
+`
+  },
+  {
+    title: "Scalping Bitcoin Strategy Tracker",
+    slug: "strategy-tracker/scalping-bitcoin",
+    metaTitle: "Bitcoin Scalping Strategy Tracker | Metrics & Analysis",
+    metaDescription: "Track your Bitcoin scalping strategy with win rate, profit factor, drawdown, and detailed performance metrics for consistent improvement.",
+    description: "Complete guide to tracking and optimizing Bitcoin scalping strategies.",
+    focusKeyword: "Bitcoin scalping strategy",
+    readTime: "5 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Strategy Tracking",
+    tags: ["scalping", "Bitcoin", "BTC", "strategy", "day trading"],
+    canonical: "https://www.thetradingdiary.com/blog/strategy-tracker/scalping-bitcoin",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+Bitcoin scalping requires precision execution and systematic tracking. Measure what works, eliminate what doesn't.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com) to track your BTC scalping strategy.
+
+## Why Track Scalping Separately
+
+**Scalping characteristics:**
+- High trade frequency (10-100+ per day)
+- Small targets (0.1-0.5%)
+- Tight stops
+- Fee-sensitive
+- Requires different analysis than swing trading
+
+**Track separately to:**
+- Calculate true fee impact
+- Identify optimal trading hours
+- Measure execution quality
+- Compare to other strategies
+
+Internal link: [Swing Trading Bitcoin](https://www.thetradingdiary.com/blog/strategy-tracker/swing-trading-bitcoin) for comparison.
+
+## Critical Scalping Metrics
+
+### Win Rate
+
+Target: **55-65%** for profitable scalping
+
+Lower is acceptable IF:
+- Risk/reward > 1.5:1
+- Profit factor > 1.5
+
+### Profit Factor
+
+```
+Profit Factor = Gross Profit / Gross Loss
+```
+
+**Scalping target:** 1.5-2.0+
+
+Higher frequency = more data = clearer edge identification
+
+### Fee Impact
+
+**Calculate:**
+- Total fees per day/week/month
+- Fees as % of gross profit
+- Maker vs. taker ratio
+
+**Optimize:**
+- Use limit orders (maker fees)
+- Consider fee-reducing platforms
+- Account for VIP tier discounts
+
+**Example:**
+- 100 trades/day
+- 0.1% fee each side = 0.2% per roundtrip
+- 100 × 0.2% = 20% of capital exposed to fees daily
+- If targeting 0.3% per trade, fees consume 66% of gross profit
+
+**Fees matter enormously in scalping.**
+
+### Average Trade Duration
+
+**Typical scalping:** 30 seconds to 10 minutes
+
+**Track by duration:**
+- 0-2 minutes: ?% win rate
+- 2-5 minutes: ?% win rate  
+- 5-10 minutes: ?% win rate
+- 10+ minutes: ?% win rate
+
+**Common finding:** Optimal hold time window exists. Too fast = noise. Too slow = not scalping.
+
+### Time of Day Performance
+
+**High liquidity hours typically best:**
+- US market open (9:30 AM EST)
+- London open (3:00 AM EST)
+- Asia open (8:00 PM EST)
+
+**Track separately:**
+- 12 AM - 6 AM
+- 6 AM - 12 PM
+- 12 PM - 6 PM
+- 6 PM - 12 AM
+
+**Common discovery:** 1-2 hour windows significantly outperform.
+
+Internal link: [Data-Driven Trading](https://www.thetradingdiary.com/blog/data-driven-trading)
+
+## Recommended Setup
+
+### Exchange Selection
+
+**Best for scalping:**
+- Low fees (VIP tiers, BNB discounts)
+- High liquidity (tight spreads)
+- Fast execution (low latency)
+- Reliable API (no downtime)
+
+**Popular choices:**
+- Binance (volume + fee tiers)
+- Bybit (interface + speed)
+- OKX (liquidity + tools)
+
+Internal links:
+- [Binance Integration](https://www.thetradingdiary.com/blog/integrations/binance-trading-journal)
+- [Bybit Integration](https://www.thetradingdiary.com/blog/integrations/bybit-trading-journal)
+- [OKX Integration](https://www.thetradingdiary.com/blog/integrations/okx-trading-journal)
+
+### Pair Selection
+
+**BTC/USDT typically best for scalping:**
+- Highest liquidity
+- Tightest spreads
+- Most stable (relatively)
+- 24/7 volume
+
+### Timeframe
+
+**Chart timeframes:**
+- 1-minute for entries
+- 5-minute for context
+- 15-minute for trend direction
+
+### Indicators (Track Which Work)
+
+**Common scalping indicators:**
+- Volume profile
+- Order flow
+- Level 2 data
+- EMA crosses (9/21)
+- RSI (fast settings: 7 or 9)
+
+**Track separately:**
+- Volume-based entries: ?% win rate
+- EMA cross entries: ?% win rate
+- RSI div entries: ?% win rate
+
+Internal link: [AI-Powered Trading Journal](https://www.thetradingdiary.com/blog/ai-powered-trading-journal) for pattern recognition.
+
+## Workflow for High-Frequency Tracking
+
+**Challenge:** 50-100 trades/day = impossible to log manually
+
+**Solution:** Automatic import + batch tagging
+
+**Daily process:**
+1. Trade throughout session
+2. All trades auto-import from exchange
+3. End of day: bulk-tag strategy ("BTC scalp")
+4. Add session note (3 minutes)
+5. Review daily metrics
+
+**Weekly process:**
+1. Review full week of scalps
+2. Calculate metrics
+3. Identify best hours
+4. Adjust schedule/strategy
+
+**Time investment:** 20 minutes weekly
+
+## Common Scalping Mistakes to Track
+
+### Overtrading
+
+**Symptom:** 100+ trades when 30-50 would suffice
+
+**Track:**
+- Win rate by # of daily trades
+- Performance on 20-trade days vs. 100-trade days
+
+**Common finding:** Less is often more.
+
+### Ignoring Spread
+
+**Problem:** Tight stops hit by spread, not price action
+
+**Solution:**
+- Factor in spread/slippage
+- Use limit orders
+- Track execution quality
+
+### Revenge Trading
+
+**Symptom:** Increasing frequency after losses
+
+**Track:**
+- Trades after 2+ consecutive losses
+- Win rate when "chasing losses"
+
+Internal link: [Trading Psychology](https://www.thetradingdiary.com/blog/trading-psychology-control-emotions)
+
+**Typical result:** Revenge trades have 20-30% win rate vs. 60% planned trades.
+
+### Fee Blindness
+
+**Problem:** Gross profits look good, net profits disappointing
+
+**Solution:**
+- Calculate net profit factor (after fees)
+- Track fees daily
+- Optimize maker/taker ratio
+
+## Advanced Analysis
+
+### Session Comparison
+
+**Track by session:**
+- Asian session: ??% win rate
+- London session: ??% win rate
+- US session: ??% win rate
+- Overlap periods: ??% win rate
+
+### Volatility Correlation
+
+**Compare:**
+- High volatility (BTC moving >2% daily)
+- Medium volatility (0.5-2% daily)
+- Low volatility (<0.5% daily)
+
+**Common finding:** Scalping thrives in medium volatility, struggles in extremes.
+
+### Pair Correlation
+
+If scalping multiple coins:
+- BTC/USDT: ?% win rate
+- ETH/USDT: ?% win rate
+- Altcoins: ?% win rate
+
+**Discovery:** Focus on what works for YOUR edge.
+
+## Example: Successful Scalper Profile
+
+**Strategy:** BTC/USDT scalping on Binance
+
+**Results after 3 months tracking:**
+- 1,847 trades
+- 58% win rate
+- 1.9 profit factor
+- Best time: 9-11 AM EST (US open)
+- Worst time: 2-5 AM EST (low volume)
+- Fee impact: 18% of gross profit (optimized with BNB)
+
+**Adjustments made:**
+- Eliminated 2-5 AM trading (raised win rate 4%)
+- Focused 70% of capital during 9-11 AM
+- Increased from 0.2% targets to 0.3% (better R:R)
+- Reduced daily trade count from 80 to 45 (higher quality)
+
+**New results:**
+- 63% win rate
+- 2.3 profit factor
+- Same gross profit with less stress
+
+**Key insight:** Data revealed quality > quantity.
+
+## FAQs
+
+**Is scalping profitable?**
+Can be, but requires:
+- Very tight execution
+- Fee optimization
+- High win rate or excellent R:R
+- Systematic tracking
+
+**How many trades before I know if strategy works?**
+Minimum 100 trades. Preferably 200-500 for statistical significance.
+
+**Should I scalp during news events?**
+Track separately. Many scalpers avoid major news (spreads widen, execution quality drops).
+
+**What's better: scalping or swing trading?**
+Depends on your personality and schedule. Track both and compare.
+
+Internal link: [Day Trading Ethereum](https://www.thetradingdiary.com/blog/strategy-tracker/day-trading-ethereum) for middle ground.
+
+**Is this free to try?**
+Yes. Start tracking at [TheTradingDiary.com](https://www.thetradingdiary.com).
+
+## Next Step
+
+Track your Bitcoin scalping strategy with precision: [TheTradingDiary.com](https://www.thetradingdiary.com)
+
+Stop guessing. Start measuring. Optimize your edge.
+`
+  },
+  {
+    title: "Day Trading Ethereum Strategy Tracker",
+    slug: "strategy-tracker/day-trading-ethereum",
+    metaTitle: "Ethereum Day Trading Strategy Tracker | Track ETH Performance",
+    metaDescription: "Track your Ethereum day trading strategy with comprehensive metrics, performance analysis, and optimization insights.",
+    description: "Complete guide to tracking and improving Ethereum day trading strategies.",
+    focusKeyword: "Ethereum day trading strategy",
+    readTime: "5 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Strategy Tracking",
+    tags: ["day trading", "Ethereum", "ETH", "strategy", "intraday"],
+    canonical: "https://www.thetradingdiary.com/blog/strategy-tracker/day-trading-ethereum",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+Ethereum day trading combines intraday opportunities with overnight risk avoidance. Track systematically to identify your edge.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com) to track your ETH day trading strategy.
+
+## Why Track Day Trading Separately
+
+**Day trading characteristics:**
+- Positions closed daily
+- 2-10 trades per session
+- Targets: 0.5-3% per trade
+- Lower frequency than scalping
+- Higher targets than scalping
+- Different risk profile than swing trading
+
+**Track separately from:**
+- [Scalping](https://www.thetradingdiary.com/blog/strategy-tracker/scalping-bitcoin) (higher frequency, smaller targets)
+- [Swing trading](https://www.thetradingdiary.com/blog/strategy-tracker/swing-trading-bitcoin) (multi-day holds)
+
+## Key Day Trading Metrics
+
+### Win Rate
+
+**Target:** 50-60% for profitable day trading
+
+**Context matters:**
+- 45% win rate + 2:1 R:R = profitable
+- 65% win rate + 0.8:1 R:R = unprofitable
+
+### Profit Factor
+
+```
+Profit Factor = Gross Profit / Gross Loss
+```
+
+**Day trading target:** 1.6-2.5+
+
+**Track over 30+ trades** for meaningful data.
+
+### Average Risk/Reward
+
+**Target:** Minimum 1.5:1, ideally 2:1+
+
+**Calculate:**
+```
+Average Win Size / Average Loss Size
+```
+
+**Key question:** Are your winners bigger than your losers?
+
+### Hold Time Analysis
+
+**Typical day trades:** 30 minutes to 6 hours
+
+**Track by duration:**
+- <1 hour: ?% win rate
+- 1-3 hours: ?% win rate
+- 3-6 hours: ?% win rate
+- 6+ hours: ?% win rate
+
+**Optimize:** Find your sweet spot.
+
+### Time of Day Performance
+
+**ETH typically volatile during:**
+- US stock market open (9:30 AM EST)
+- London open (3:00 AM EST)
+- Crypto-specific news releases
+
+**Track performance by hour:**
+- 12 AM - 4 AM: ?% win rate
+- 4 AM - 8 AM: ?% win rate
+- 8 AM - 12 PM: ?% win rate
+- 12 PM - 4 PM: ?% win rate
+- 4 PM - 8 PM: ?% win rate
+- 8 PM - 12 AM: ?% win rate
+
+**Common discovery:** 2-3 hour windows significantly outperform.
+
+Internal link: [Data-Driven Trading](https://www.thetradingdiary.com/blog/data-driven-trading)
+
+## Ethereum-Specific Considerations
+
+### ETH/BTC Correlation
+
+**Track:**
+- Trades when ETH/BTC ratio rising: ?% win rate
+- Trades when ETH/BTC ratio falling: ?% win rate
+- Trades when ratio stable: ?% win rate
+
+**Common pattern:** ETH outperforms when ETH/BTC rising, underperforms when falling.
+
+### Gas Fees & Network Activity
+
+**Consider tracking:**
+- Win rate during high gas fees (network congestion)
+- Win rate during low gas fees
+- DeFi activity correlation
+
+**Why it matters:** Network activity often precedes price moves.
+
+### ETH 2.0 & Macro Events
+
+**Major ETH events:**
+- Ethereum upgrades
+- EIP implementations
+- Regulatory news
+- DeFi hacks or exploits
+
+**Track separately:** Performance around major events.
+
+## Recommended Tracking Setup
+
+### Exchange Selection
+
+**Best for ETH day trading:**
+- Binance (liquidity + volume)
+- Coinbase (US regulation + insurance)
+- Bybit (interface + tools)
+
+Internal links:
+- [Binance Integration](https://www.thetradingdiary.com/blog/integrations/binance-trading-journal)
+- [Coinbase Integration](https://www.thetradingdiary.com/blog/integrations/coinbase-trading-journal)
+- [Bybit Integration](https://www.thetradingdiary.com/blog/integrations/bybit-trading-journal)
+
+### Pair Selection
+
+**Primary:** ETH/USDT or ETH/USD
+**Alternative:** ETH/BTC (for relative strength plays)
+
+**Track separately:** Performance by pair.
+
+### Timeframe
+
+**Chart timeframes:**
+- 5-minute for entries
+- 15-minute for timing
+- 1-hour for trend direction
+- 4-hour for major support/resistance
+
+### Strategy Tags
+
+**Tag each trade by setup:**
+- Breakout
+- Pullback
+- Reversal
+- Range trade
+- Trend continuation
+
+**Over time, discover:** Which setups work best for YOU.
+
+## Common Day Trading Strategies
+
+### Breakout Trading
+
+**Setup:**
+- ETH consolidates in range
+- Volume decreases
+- Breakout with volume spike
+- Enter on confirmation
+
+**Track:**
+- Win rate on breakout trades
+- False breakout frequency
+- Optimal entry timing (immediate vs. retest)
+
+### Pullback Trading
+
+**Setup:**
+- Clear trend established
+- Price pulls back to support/resistance
+- Enter on bounce/reversal signal
+
+**Track:**
+- Which indicators confirm best (EMA, RSI, volume)
+- Optimal pullback depth (50%, 61.8% Fib, etc.)
+- Win rate in uptrends vs. downtrends
+
+### Range Trading
+
+**Setup:**
+- ETH trading in defined range
+- Buy support, sell resistance
+- Flat overall market
+
+**Track:**
+- Win rate in ranging markets
+- When ranges break (avoid getting caught)
+- Optimal range size for your strategy
+
+## Workflow for Day Traders
+
+**Morning routine (10 minutes):**
+1. Check overnight ETH action
+2. Identify key levels (support/resistance)
+3. Review yesterday's trades in journal
+4. Plan potential setups
+
+**During trading:**
+1. Execute setups per plan
+2. Trades auto-import from exchange
+3. Screenshot charts (optional but valuable)
+
+**Evening routine (10 minutes):**
+1. Add strategy tags to today's trades
+2. Quick performance check
+3. Note any observations
+4. Plan tomorrow
+
+**Weekly review (30 minutes):**
+1. Calculate key metrics
+2. Identify best/worst setups
+3. Review all losing trades (mistakes or variance?)
+4. Adjust strategy if needed
+
+Internal link: [Trading Psychology](https://www.thetradingdiary.com/blog/trading-psychology-control-emotions)
+
+## Common Day Trading Mistakes
+
+### Holding Overnight
+
+**Problem:** Day trade turns into swing trade (often to avoid loss)
+
+**Track:**
+- Win rate on planned day trades
+- Win rate on "accidental" overnight holds
+
+**Typical result:** Overnight holds underperform significantly.
+
+**Solution:** Use hard exit rule (e.g., close all by 4 PM EST, no exceptions).
+
+### Overtrading
+
+**Symptom:** Taking 10+ trades when 2-3 A-grade setups existed
+
+**Track:**
+- Performance on days with 2-4 trades
+- Performance on days with 8+ trades
+
+**Common finding:** Less is more. Quality > quantity.
+
+### Ignoring Correlation
+
+**Problem:** Multiple ETH trades = concentrated risk
+
+**Solution:**
+- Track: Performance when >50% account in ETH simultaneously
+- Consider: Position sizing adjustments
+- Diversify: Trade other uncorrelated assets
+
+### FOMO Trading
+
+**Symptom:** Chasing price after initial setup missed
+
+**Track:**
+- "Planned entry" trades: ?% win rate
+- "Chase" trades: ?% win rate
+
+**Typical gap:** 20-30% win rate difference.
+
+## Advanced Analysis
+
+### Comparison to Bitcoin
+
+**Track parallel:**
+- ETH day trading results
+- BTC day trading results (if applicable)
+
+**Questions:**
+- Which coin suits your style better?
+- Should you focus on one or trade both?
+- Do your ETH strategies work on BTC?
+
+Internal link: [Binance Bitcoin Journal](https://www.thetradingdiary.com/blog/trading-journal/binance-bitcoin)
+
+### Market Regime Analysis
+
+**Track separately:**
+- Bull market performance
+- Bear market performance
+- Sideways market performance
+
+**Adjust:** Strategy allocation based on regime.
+
+### Volatility Impact
+
+**Compare:**
+- High volatility days (ETH moving >5%)
+- Medium volatility (2-5%)
+- Low volatility (<2%)
+
+**Typical finding:** Each trader has optimal volatility range.
+
+## Example: Successful ETH Day Trader
+
+**Strategy:** ETH/USDT pullback trading on Binance
+
+**Initial results (first month):**
+- 87 trades
+- 49% win rate
+- 1.4 profit factor
+- Inconsistent results
+
+**After tracking & analysis (month 2-3):**
+
+**Discoveries:**
+- 9-11 AM EST: 62% win rate
+- 2-5 PM EST: 38% win rate
+- Pullbacks to 21 EMA: 68% win rate
+- Pullbacks to 50 EMA: 41% win rate
+- Bull market: 61% win rate
+- Bear market: 34% win rate (avoid!)
+
+**Adjustments:**
+- Focus trading 9-11 AM EST
+- Only trade pullbacks to 21 EMA
+- Reduce/avoid in bear markets
+- Decreased daily trades from 5 to 2-3
+
+**New results:**
+- 58% win rate
+- 2.1 profit factor
+- Consistent monthly profits
+- Less screen time, less stress
+
+**Key insight:** Data showed when and how to trade.
+
+## FAQs
+
+**How many trades before strategy is validated?**
+Minimum 30-50 trades. Ideally 100+ for statistical confidence.
+
+**Should I day trade and swing trade simultaneously?**
+Yes, but track separately. Different strategies require different analysis.
+
+**What's better: day trading ETH or BTC?**
+Depends on your strategy. Track both and compare results.
+
+**How do I know if my strategy stopped working?**
+Track rolling 20-trade metrics. Significant deviation = time to reassess.
+
+**Is this free to try?**
+Yes. Start at [TheTradingDiary.com](https://www.thetradingdiary.com).
+
+## Next Step
+
+Track your Ethereum day trading strategy: [TheTradingDiary.com](https://www.thetradingdiary.com)
+
+Measure performance. Identify edge. Optimize results.
+`
+  },
+  {
+    title: "Swing Trading Bitcoin Strategy Tracker",
+    slug: "strategy-tracker/swing-trading-bitcoin",
+    metaTitle: "Bitcoin Swing Trading Strategy Tracker | Multi-Day Analysis",
+    metaDescription: "Track your Bitcoin swing trading strategy with comprehensive metrics, hold time analysis, and performance tracking across exchanges.",
+    description: "Complete guide to tracking and optimizing Bitcoin swing trading strategies.",
+    focusKeyword: "Bitcoin swing trading strategy",
+    readTime: "5 min read",
+    author: "Gustavo",
+    date: "2025-10-28",
+    category: "Strategy Tracking",
+    tags: ["swing trading", "Bitcoin", "BTC", "strategy", "position trading"],
+    canonical: "https://www.thetradingdiary.com/blog/strategy-tracker/swing-trading-bitcoin",
+    language: "en",
+    heroImage: undefined,
+    heroImageAlt: undefined,
+    content: `
+Bitcoin swing trading captures multi-day moves with less screen time than day trading. Systematic tracking reveals which setups work over time.
+
+Visit [TheTradingDiary.com](https://www.thetradingdiary.com) to track your BTC swing strategy.
+
+## Why Track Swing Trading Separately
+
+**Swing trading characteristics:**
+- Hold time: 2-14 days
+- Frequency: 1-10 trades per week
+- Targets: 3-15% per trade
+- Overnight and weekend exposure
+- Different risk profile than day trading
+
+**Track separately from:**
+- [Scalping](https://www.thetradingdiary.com/blog/strategy-tracker/scalping-bitcoin) (seconds to minutes)
+- [Day trading](https://www.thetradingdiary.com/blog/strategy-tracker/day-trading-ethereum) (intraday only)
+
+## Key Swing Trading Metrics
+
+### Win Rate
+
+**Target:** 40-55% for profitable swing trading
+
+**Lower win rate acceptable because:**
+- Larger R:R ratios (2:1, 3:1, or higher)
+- Winners compensate for losers
+
+**Calculate over 20+ trades** for meaningful data.
+
+### Profit Factor
+
+```
+Profit Factor = Gross Profit / Gross Loss
+```
+
+**Swing trading target:** 1.8-3.0+
+
+**Key:** One 15% winner can offset three 5% losers.
+
+### Average Risk/Reward
+
+**Target:** 2:1 minimum, ideally 3:1+
+
+**Example:**
+- Risk 3% per trade (stop loss)
+- Target 9% gain (take profit)
+- R:R = 3:1
+
+**Only need 35% win rate** to break even at 3:1 R:R.
+
+### Hold Time Analysis
+
+**Typical swing holds:** 2-14 days
+
+**Track by duration:**
+- 2-4 days: ?% win rate
+- 5-7 days: ?% win rate
+- 8-14 days: ?% win rate
+- 14+ days: ?% win rate
+
+**Discover:** Your optimal hold period.
+
+### Maximum Favorable/Adverse Excursion
+
+**MFE (Max Favorable Excursion):**
+How far into profit did the trade go before exit?
+
+**MAE (Max Adverse Excursion):**
+How far into loss did the trade go before stop or profit?
+
+**Analysis reveals:**
+- Are you exiting winners too early? (high MFE, moderate profit)
+- Are your stops too tight? (frequent MAE hits)
+- Should you use trailing stops?
+
+## Bitcoin Swing Trading Strategies
+
+### Trend Following
+
+**Setup:**
+- BTC in clear uptrend (higher highs, higher lows)
+- Buy pullbacks to support (20/50 EMA, trendlines)
+- Hold for trend continuation
+
+**Track:**
+- Win rate in strong uptrends
+- Win rate in weak/choppy trends
+- Optimal pullback depth (percentage from high)
+
+### Breakout Trading
+
+**Setup:**
+- BTC consolidating in range
+- Decreasing volume
+- Breakout above resistance on volume
+- Hold for continuation
+
+**Track:**
+- True breakout vs. false breakout ratio
+- Optimal entry timing (immediate, first pullback, etc.)
+- Win rate by breakout size (% above resistance)
+
+### Support/Resistance Trading
+
+**Setup:**
+- BTC at major support level
+- Buy with defined risk
+- Target previous resistance
+
+**Track:**
+- Which support levels work best (psychological, technical, etc.)
+- First bounce vs. second test success rate
+- Distance from support to resistance (R:R potential)
+
+### Pattern Trading
+
+**Chart patterns:**
+- Bull flags
+- Cup and handle
+- Ascending triangles
+- Inverse head and shoulders
+
+**Track each separately:**
+- Bull flag trades: ?% win rate
+- Cup and handle: ?% win rate
+- Etc.
+
+**Discover:** Which patterns you execute well.
+
+## Recommended Tracking Setup
+
+### Exchange Selection
+
+**Best for swing trading:**
+- Security (holding overnight/weekends)
+- Liquidity (easy entries/exits)
+- Fee structure (maker rebates help)
+
+**Popular:**
+- Binance
+- Bybit
+- Coinbase
+- OKX
+
+Internal links:
+- [Binance Integration](https://www.thetradingdiary.com/blog/integrations/binance-trading-journal)
+- [Bybit Integration](https://www.thetradingdiary.com/blog/integrations/bybit-trading-journal)
+- [Coinbase Integration](https://www.thetradingdiary.com/blog/integrations/coinbase-trading-journal)
+- [OKX Integration](https://www.thetradingdiary.com/blog/integrations/okx-trading-journal)
+
+### Timeframe
+
+**Chart timeframes:**
+- 4-hour for entries
+- Daily for trend direction
+- Weekly for major support/resistance
+
+**Lower timeframes (1h, 15m) for fine-tuning entries.**
+
+### Position Sizing
+
+**Risk per trade:** 1-3% of account
+
+**Track:**
+- Performance at 1% risk
+- Performance at 2% risk
+- Performance at 3% risk
+
+**Find your comfort zone** (often 1-2% optimal).
+
+### Stop Loss Management
+
+**Initial stop:**
+- Below recent swing low
+- Below support level
+- 3-5% depending on volatility
+
+**Track:**
+- How often stopped out
+- Average adverse excursion before stops hit
+- Would wider stops improve results? Or tighten?
+
+**Adjust based on data, not emotion.**
+
+Internal link: [Data-Driven Trading](https://www.thetradingdiary.com/blog/data-driven-trading)
+
+## Workflow for Swing Traders
+
+**Weekend review (30-45 minutes):**
+1. Review open positions
+2. Scan for new setups
+3. Set alerts for entries
+4. Review last week's closed trades
+5. Calculate metrics
+
+**Daily check-in (5-10 minutes):**
+1. Check open positions
+2. Any stop adjustments needed?
+3. Any new alerts triggered?
+4. Execute setups if criteria met
+
+**Monthly deep dive (1-2 hours):**
+1. Calculate all metrics
+2. Compare strategies
+3. Analyze winning vs. losing trades
+4. Adjust approach based on findings
+
+**Time commitment:** 2-3 hours weekly (vs. 20-40 hours for day trading)
+
+## Common Swing Trading Mistakes
+
+### Overtrading
+
+**Problem:** Taking every marginal setup instead of waiting for best
+
+**Track:**
+- A-grade setup win rate: ?%
+- B-grade setup win rate: ?%
+- C-grade setup win rate: ?%
+
+**Common result:** A-grade significantly outperforms.
+
+**Solution:** Wait for quality, skip mediocre setups.
+
+### Cutting Winners Short
+
+**Symptom:** Exiting at 5% when trade had 15% potential
+
+**Track:**
+- Average win: ?%
+- Average MFE (max profit reached): ?%
+
+**If MFE >> average win:** You're exiting too early.
+
+**Solutions:**
+- Use trailing stops
+- Scale out (sell 50% at target, hold rest with stop)
+- Let winners run to technical targets
+
+### Holding Losers Too Long
+
+**Symptom:** Hoping losers recover instead of taking stop
+
+**Track:**
+- Planned stop losses: ?% win rate on remaining
+- Trades where you held past stop: ?% eventual profit
+
+**Common result:** Holding past stop rarely profitable, often leads to bigger losses.
+
+**Solution:** Respect stops always. Rules > emotions.
+
+Internal link: [Trading Psychology](https://www.thetradingdiary.com/blog/trading-psychology-control-emotions)
+
+### Weekend Gaps
+
+**Risk:** Bitcoin can gap significantly over weekends (10-20%+)
+
+**Track:**
+- Performance on trades held through weekends
+- Friday close → Monday open gap impact
+- Major news over weekends
+
+**Options:**
+- Close before weekends (safer, miss moves)
+- Hold through weekends (more exposure, bigger potential)
+- Reduce size for weekend holds
+
+**Decide based on data and risk tolerance.**
+
+## Advanced Analysis
+
+### Market Regime Performance
+
+**Track separately:**
+- Bull market (BTC up >20% from lows): ?% win rate
+- Bear market (BTC down >20% from highs): ?% win rate
+- Sideways (within 20% range): ?% win rate
+
+**Common findings:**
+- Swing trading excels in trending markets
+- Struggles in choppy ranges
+- Long bias works in bulls, short bias in bears
+
+**Adjust:** Strategy allocation based on market regime.
+
+### Correlation with Macro
+
+**Track:**
+- Performance during Fed meetings
+- Performance around CPI/inflation data
+- Performance during stock market volatility
+- Bitcoin halving cycles
+
+**Discover:** Which macro conditions favor your approach.
+
+### Bitcoin-Specific Events
+
+**Track around:**
+- Bitcoin ETF news
+- Regulatory announcements
+- Major exchange events
+- Mining difficulty adjustments
+- Whale movements
+
+**Some traders avoid major events, others seek them.**
+
+## Example: Successful BTC Swing Trader
+
+**Strategy:** Trend-following pullbacks on daily timeframe
+
+**Initial results (3 months):**
+- 34 trades
+- 47% win rate
+- 1.8 profit factor
+- Inconsistent months
+
+**After detailed tracking (months 4-6):**
+
+**Discoveries:**
+- Strong trend trades: 68% win rate
+- Weak trend trades: 29% win rate
+- Trades with RSI >50: 62% win rate
+- Trades with RSI <50: 31% win rate
+- Weekend holds: -15% underperformance (gap risk)
+
+**Adjustments:**
+- Only trade clear uptrends (200 SMA rising, BTC above it)
+- Require RSI >50 at entry (momentum confirmation)
+- Close 50% of position Friday, hold rest
+- Reduced trade frequency from 12/month to 6/month (quality)
+
+**New results:**
+- 59% win rate
+- 2.6 profit factor
+- Consistent profitable months
+- Less stress, more free time
+
+**Key insight:** Less trading, better setups, superior results.
+
+## Comparison to Other Strategies
+
+Track multiple strategies simultaneously:
+
+**Swing trading BTC:**
+- Win rate: ?%
+- Profit factor: ?%
+- Time required: 3 hours/week
+- Stress level: Medium
+
+**Day trading ETH:**
+- Win rate: ?%
+- Profit factor: ?%
+- Time required: 20 hours/week
+- Stress level: High
+
+**Compare and allocate capital** based on results and lifestyle fit.
+
+Internal link: [Day Trading Ethereum](https://www.thetradingdiary.com/blog/strategy-tracker/day-trading-ethereum)
+
+## FAQs
+
+**How many swing trades before I know if it works?**
+Minimum 20-30 trades. Preferably 50+ for confidence.
+
+**Should I swing trade and day trade simultaneously?**
+Yes, but track separately. They require different analysis.
+
+**What's better: swing trading BTC or altcoins?**
+BTC typically more predictable (less volatility). Track both and compare.
+
+**How do I handle overnight risk?**
+Size positions appropriately, use stop losses, track weekend gap performance.
+
+**Can I swing trade with a full-time job?**
+Yes. Swing trading requires less screen time than day trading—perfect for busy schedules.
+
+**Is this free to try?**
+Yes. Start tracking at [TheTradingDiary.com](https://www.thetradingdiary.com).
+
+## Next Step
+
+Track your Bitcoin swing trading strategy: [TheTradingDiary.com](https://www.thetradingdiary.com)
+
+Measure performance. Refine approach. Capture bigger moves with less effort.
+`
   }
 ];

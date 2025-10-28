@@ -69,6 +69,46 @@ const blogArticles = [
   {
     slug: 'trading-journal/binance-ethereum',
     lastmod: '2025-10-28',
+  },
+  {
+    slug: 'integrations/kucoin-trading-journal',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'integrations/tradingview-trading-journal',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'integrations/metatrader5-trading-journal',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'trading-journal/okx-bitcoin',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'trading-journal/kraken-ethereum',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'trading-journal/coinbase-bitcoin',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'trading-journal/binance-bitcoin',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'strategy-tracker/scalping-bitcoin',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'strategy-tracker/day-trading-ethereum',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'strategy-tracker/swing-trading-bitcoin',
+    lastmod: '2025-10-28',
   }
 ];
 
