@@ -305,6 +305,46 @@ const blogArticles = [
   {
     slug: 'strategy-tracker/copy-trading-avalanche',
     lastmod: '2025-10-28',
+  },
+  {
+    slug: 'strategy-tracker/scalping-bitcoin-5min',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'strategy-tracker/scalping-bitcoin-15min',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'strategy-tracker/day-trading-bitcoin-1h',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'strategy-tracker/swing-trading-bitcoin-daily',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'strategy-tracker/breakout-bitcoin-4h',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'strategy-tracker/scalping-ethereum-5min',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'strategy-tracker/day-trading-ethereum-1h',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'strategy-tracker/swing-trading-ethereum-daily',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'strategy-tracker/breakout-ethereum-4h',
+    lastmod: '2025-10-28',
+  },
+  {
+    slug: 'strategy-tracker/grid-bots-ethereum-daily',
+    lastmod: '2025-10-28',
   }
 ];
 
