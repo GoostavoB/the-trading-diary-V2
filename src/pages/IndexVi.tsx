@@ -17,13 +17,20 @@ import { SUPPORTED_LANGUAGES } from "@/utils/languageRouting";
 
 const IndexVi = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, language, changeLanguage, isLoading } = useTranslation();
 
   // Add hreflang tags for SEO
   useHreflang({
     languages: [...SUPPORTED_LANGUAGES],
     defaultLanguage: 'en'
   });
+
+  // Force Vietnamese language on mount
+  useEffect(() => {
+    if (language !== 'vi') {
+      changeLanguage('vi', false);
+    }
+  }, []);
 
   useEffect(() => {
     // Update meta tags and SEO
@@ -39,8 +46,17 @@ const IndexVi = () => {
     navigate('/auth?lang=vi');
   };
 
+  // Loading guard
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/30 to-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
-    <div key="vi" className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-background">
+    <div key={`landing-${language}`} className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-background">
       <MobileHeader />
       
       <main className="pt-14">

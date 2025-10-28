@@ -99,18 +99,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, [location.pathname, navigate, language]);
 
-  // Sync with URL path changes (only for public routes)
-  useEffect(() => {
-    if (!isPublicRoute(location.pathname)) return;
-    
-    const pathLang = getLanguageFromPath(location.pathname);
-    if (pathLang !== language && !isLoading) {
-      setLanguage(pathLang);
-      i18n.changeLanguage(pathLang);
-      localStorage.setItem('app-language', pathLang);
-    }
-  }, [location.pathname, language, isLoading]);
-
   const changeLanguage = useCallback(async (newLang: SupportedLanguage, updateUrl: boolean = true) => {
     if (!SUPPORTED_LANGUAGES.includes(newLang)) {
       console.error('Unsupported language:', newLang);
@@ -156,6 +144,17 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     // Clear loading state after everything is complete
     setIsLoading(false);
   }, [user, location.pathname, navigate]);
+
+  // Sync with URL path changes (only for public routes)
+  useEffect(() => {
+    if (!isPublicRoute(location.pathname)) return;
+    
+    const pathLang = getLanguageFromPath(location.pathname);
+    if (pathLang !== language) {
+      // Call the proper changeLanguage function which handles loading state
+      changeLanguage(pathLang, false);
+    }
+  }, [location.pathname, language, changeLanguage]);
 
   return (
     <LanguageContext.Provider value={{ language, changeLanguage, isLoading }}>

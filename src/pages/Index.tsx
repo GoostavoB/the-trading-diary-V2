@@ -27,13 +27,20 @@ import { swCleanup } from "@/utils/swCleanup";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, language, changeLanguage, isLoading } = useTranslation();
 
   // Add hreflang tags for SEO
   useHreflang({
     languages: [...SUPPORTED_LANGUAGES],
     defaultLanguage: 'en'
   });
+
+  // Force English language on mount
+  useEffect(() => {
+    if (language !== 'en') {
+      changeLanguage('en', false);
+    }
+  }, []);
 
   useEffect(() => {
     // Temporary: clear old service worker and caches to avoid stale UI
@@ -52,8 +59,17 @@ const Index = () => {
     navigate('/auth?lang=en');
   };
 
+  // Loading guard
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-950 via-gray-900 to-black">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
-    <div key="en" className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black overflow-x-hidden">
+    <div key={`landing-${language}`} className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black overflow-x-hidden">
       <SkipToContent />
       <ValueBar />
       <MobileHeader />
