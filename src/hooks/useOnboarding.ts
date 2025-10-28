@@ -22,7 +22,25 @@ export const useOnboarding = () => {
         .from('user_settings')
         .select('onboarding_completed')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
+
+      // If no user settings exist, create them
+      if (error && error.code === 'PGRST116') {
+        const { error: insertError } = await supabase
+          .from('user_settings')
+          .insert({
+            user_id: user.id,
+            onboarding_completed: false
+          });
+
+        if (insertError) {
+          console.error('Error creating user settings:', insertError);
+        }
+        
+        setShowOnboarding(true);
+        setLoading(false);
+        return;
+      }
 
       if (error) {
         console.error('Error checking onboarding status:', error);
@@ -39,8 +57,28 @@ export const useOnboarding = () => {
     }
   };
 
-  const completeOnboarding = () => {
-    setShowOnboarding(false);
+  const completeOnboarding = async () => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user.id,
+          onboarding_completed: true
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (error) {
+        console.error('Error updating onboarding status:', error);
+        return;
+      }
+
+      setShowOnboarding(false);
+    } catch (error) {
+      console.error('Error in completeOnboarding:', error);
+    }
   };
 
   return {

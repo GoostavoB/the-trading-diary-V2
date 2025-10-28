@@ -28,6 +28,7 @@ import { usePageTracking } from "@/hooks/usePageTracking";
 import { ConversionTracking } from "@/components/ConversionTracking";
 import { LanguageSync } from "@/components/LanguageSync";
 import { WelcomeBackToast } from "@/components/gamification/WelcomeBackToast";
+import { OnboardingWrapper } from "@/components/onboarding/OnboardingWrapper";
 
 // Eagerly load critical pages (landing and auth)
 import Index from "./pages/Index";
@@ -137,6 +138,7 @@ const AppRoutes = () => {
     <>
       <LanguageSync />
       {user && <WelcomeBackToast />}
+      {user && <OnboardingWrapper />}
       <Suspense fallback={<PageLoader />}>
         <Routes>
         {/* Landing page (English only) */}
