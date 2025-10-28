@@ -14,11 +14,6 @@ interface Language {
 
 const languages: Language[] = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
-  // TEMPORARILY HIDDEN
-  // { code: 'es', name: 'Español', flag: '🇪🇸' },
-  // { code: 'pt', name: 'Português', flag: '🇧🇷' },
-  // { code: 'ar', name: 'العربية', flag: '🇸🇦' },
-  { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
 ];
 
 export const LanguageToggle = () => {

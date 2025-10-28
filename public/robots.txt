@@ -2,6 +2,16 @@
 User-agent: *
 Allow: /
 
+# Block all non-English language versions
+Disallow: /vi
+Disallow: /vi/
+Disallow: /pt
+Disallow: /pt/
+Disallow: /es
+Disallow: /es/
+Disallow: /ar
+Disallow: /ar/
+
 # Block dashboard and private pages from indexing
 Disallow: /dashboard
 Disallow: /upload
@@ -14,9 +24,8 @@ Disallow: /api/
 # Allow blog content (explicitly)
 Allow: /blog
 
-# Sitemap locations
+# Sitemap location
 Sitemap: https://www.thetradingdiary.com/sitemap.xml
-Sitemap: https://www.thetradingdiary.com/image-sitemap.xml
 
 # Crawl-delay for polite crawling
 Crawl-delay: 1

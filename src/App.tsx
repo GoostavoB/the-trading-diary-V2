@@ -29,11 +29,6 @@ import { LanguageSync } from "@/components/LanguageSync";
 
 // Eagerly load critical pages (landing and auth)
 import Index from "./pages/Index";
-// TEMPORARILY HIDDEN
-// import IndexPt from "./pages/IndexPt";
-// import IndexEs from "./pages/IndexEs";
-// import IndexAr from "./pages/IndexAr";
-import IndexVi from "./pages/IndexVi";
 import Auth from "./pages/Auth";
 
 // Lazy load all other pages for better performance
@@ -140,15 +135,12 @@ const AppRoutes = () => {
       <LanguageSync />
       <Suspense fallback={<PageLoader />}>
         <Routes>
-        {/* Landing pages by language - wrapped with default theme */}
+        {/* Landing page (English only) */}
         <Route path="/" element={<PublicPageThemeWrapper><Index /></PublicPageThemeWrapper>} />
-        {/* TEMPORARILY HIDDEN - Portuguese, Spanish, Arabic */}
-        {/* <Route path="/pt" element={<PublicPageThemeWrapper><IndexPt /></PublicPageThemeWrapper>} /> */}
-        {/* <Route path="/es" element={<PublicPageThemeWrapper><IndexEs /></PublicPageThemeWrapper>} /> */}
-        {/* <Route path="/ar" element={<PublicPageThemeWrapper><IndexAr /></PublicPageThemeWrapper>} /> */}
-        <Route path="/vi" element={<PublicPageThemeWrapper><IndexVi /></PublicPageThemeWrapper>} />
         
-        {/* Redirect hidden languages to English */}
+        {/* Redirect all language-prefixed routes to English */}
+        <Route path="/vi" element={<Navigate to="/" replace />} />
+        <Route path="/vi/*" element={<Navigate to="/" replace />} />
         <Route path="/pt" element={<Navigate to="/" replace />} />
         <Route path="/pt/*" element={<Navigate to="/" replace />} />
         <Route path="/es" element={<Navigate to="/" replace />} />
@@ -158,29 +150,21 @@ const AppRoutes = () => {
         
         {/* Auth routes - wrapped with default theme */}
         <Route path="/auth" element={<PublicPageThemeWrapper><Auth /></PublicPageThemeWrapper>} />
-        <Route path="/:lang/auth" element={<PublicPageThemeWrapper><Auth /></PublicPageThemeWrapper>} />
         
-        {/* Public pages with language support - wrapped with default theme */}
+        {/* Public pages - wrapped with default theme */}
         <Route path="/pricing" element={<PublicPageThemeWrapper><PricingPage /></PublicPageThemeWrapper>} />
-        <Route path="/:lang/pricing" element={<PublicPageThemeWrapper><PricingPage /></PublicPageThemeWrapper>} />
         
         <Route path="/contact" element={<PublicPageThemeWrapper><Contact /></PublicPageThemeWrapper>} />
-        <Route path="/:lang/contact" element={<PublicPageThemeWrapper><Contact /></PublicPageThemeWrapper>} />
         
         <Route path="/legal" element={<PublicPageThemeWrapper><Legal /></PublicPageThemeWrapper>} />
-        <Route path="/:lang/legal" element={<PublicPageThemeWrapper><Legal /></PublicPageThemeWrapper>} />
         
         <Route path="/terms" element={<PublicPageThemeWrapper><Terms /></PublicPageThemeWrapper>} />
-        <Route path="/:lang/terms" element={<PublicPageThemeWrapper><Terms /></PublicPageThemeWrapper>} />
         
         <Route path="/privacy" element={<PublicPageThemeWrapper><Privacy /></PublicPageThemeWrapper>} />
-        <Route path="/:lang/privacy" element={<PublicPageThemeWrapper><Privacy /></PublicPageThemeWrapper>} />
         
-        {/* Blog routes with language support - wrapped with default theme */}
+        {/* Blog routes - wrapped with default theme */}
         <Route path="/blog" element={<PublicPageThemeWrapper><Blog /></PublicPageThemeWrapper>} />
-        <Route path="/:lang/blog" element={<PublicPageThemeWrapper><Blog /></PublicPageThemeWrapper>} />
         <Route path="/blog/:slug" element={<PublicPageThemeWrapper><BlogPost /></PublicPageThemeWrapper>} />
-        <Route path="/:lang/blog/:slug" element={<PublicPageThemeWrapper><BlogPost /></PublicPageThemeWrapper>} />
         <Route path="/author/:authorSlug" element={<PublicPageThemeWrapper><Author /></PublicPageThemeWrapper>} />
         
         {/* Other public pages - wrapped with default theme */}
@@ -190,7 +174,6 @@ const AppRoutes = () => {
         <Route path="/crypto-trading-faq" element={<PublicPageThemeWrapper><CryptoTradingFAQ /></PublicPageThemeWrapper>} />
         <Route path="/sitemap" element={<PublicPageThemeWrapper><Sitemap /></PublicPageThemeWrapper>} />
         <Route path="/about" element={<PublicPageThemeWrapper><About /></PublicPageThemeWrapper>} />
-        <Route path="/:lang/about" element={<PublicPageThemeWrapper><About /></PublicPageThemeWrapper>} />
         <Route path="/seo-dashboard" element={<PublicPageThemeWrapper><SEODashboard /></PublicPageThemeWrapper>} />
         
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -238,7 +221,6 @@ const AppRoutes = () => {
         <Route path="/accessibility" element={<ProtectedRoute><AccessibilityGuide /></ProtectedRoute>} />
         <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
         <Route path="/cookie-policy" element={<PublicPageThemeWrapper><CookiePolicy /></PublicPageThemeWrapper>} />
-        <Route path="/:lang/cookie-policy" element={<PublicPageThemeWrapper><CookiePolicy /></PublicPageThemeWrapper>} />
         <Route path="/blog/article/:slug" element={<PublicPageThemeWrapper><BlogArticle /></PublicPageThemeWrapper>} />
         <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
         <Route path="/api-docs" element={<ProtectedRoute><ApiDocs /></ProtectedRoute>} />

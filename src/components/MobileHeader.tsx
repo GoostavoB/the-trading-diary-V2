@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
-import { LanguageToggle } from './LanguageToggle';
 import { getLocalizedPath, isPublicRoute } from '../utils/languageRouting';
 
 export const MobileHeader = () => {
@@ -39,8 +38,6 @@ export const MobileHeader = () => {
         </Link>
 
         <div className="flex items-center gap-3">
-          <LanguageToggle />
-          
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="p-2 text-white hover:bg-gray-800 rounded-lg transition-colors"

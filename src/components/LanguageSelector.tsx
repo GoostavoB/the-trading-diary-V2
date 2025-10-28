@@ -12,10 +12,6 @@ import { SupportedLanguage } from "@/utils/languageRouting";
 
 const languages = [
   { code: "en", name: "English", flag: "🇬🇧" },
-  { code: "pt", name: "Português", flag: "🇧🇷" },
-  { code: "es", name: "Español", flag: "🇪🇸" },
-  { code: "ar", name: "العربية", flag: "🇸🇦" },
-  { code: "vi", name: "Tiếng Việt", flag: "🇻🇳" },
 ];
 
 export const LanguageSelector = () => {

@@ -96,50 +96,33 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }, [location.pathname, navigate, language]);
 
   const changeLanguage = useCallback(async (newLang: SupportedLanguage, updateUrl: boolean = true) => {
-    if (!SUPPORTED_LANGUAGES.includes(newLang)) {
-      console.error('Unsupported language:', newLang);
+    // English-only: Always use 'en', no-op for other languages
+    if (newLang !== 'en') {
+      console.log('English-only mode: ignoring language change request');
       return;
     }
 
-    console.log(`Changing language to: ${newLang}, updateURL: ${updateUrl}`);
+    console.log(`Language set to: ${newLang}`);
     
-    // Set loading state during language change
     setIsLoading(true);
-
-    // Update state and i18n
-    setLanguage(newLang);
-    await i18n.changeLanguage(newLang);
-    
-    // Update localStorage
-    localStorage.setItem('app-language', newLang);
+    setLanguage('en');
+    await i18n.changeLanguage('en');
+    localStorage.setItem('app-language', 'en');
 
     // Update database for authenticated users
     if (user) {
       try {
         await supabase
           .from('user_settings')
-          .update({ language: newLang })
+          .update({ language: 'en' })
           .eq('user_id', user.id);
       } catch (error) {
         console.error('Error saving language to database:', error);
       }
     }
 
-    // Update URL if requested (only for public routes)
-    if (updateUrl && isPublicRoute(location.pathname)) {
-      const currentPath = location.pathname;
-      const pathWithoutLang = currentPath.replace(/^\/(en|pt|es|ar|vi)/, '') || '/';
-      const newPath = getLocalizedPath(pathWithoutLang, newLang);
-      
-      if (currentPath !== newPath) {
-        navigate(newPath, { replace: true });
-      }
-    }
-    // For protected routes, language change happens via state only (no URL update)
-    
-    // Clear loading state after everything is complete
     setIsLoading(false);
-  }, [user, location.pathname, navigate]);
+  }, [user]);
 
   // URL sync is no longer needed - i18n.ts handles initialization from URL
 

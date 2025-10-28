@@ -4,7 +4,6 @@ import { AppSidebar } from './AppSidebar';
 import { UserMenu } from './UserMenu';
 import { useReminderNotifications } from '@/hooks/useReminderNotifications';
 import { useSidebarState } from '@/hooks/useSidebarState';
-import { LanguageToggle } from '@/components/LanguageToggle';
 import { KeyboardShortcutsHelp } from '@/components/KeyboardShortcutsHelp';
 import { ThemeStudio } from '@/components/theme-studio/ThemeStudio';
 import { ThemeUnlockNotification } from '@/components/theme-studio/ThemeUnlockNotification';
@@ -64,7 +63,6 @@ const AppLayout = ({ children, isGamificationOpen, onGamificationToggle }: AppLa
               <CurrencySelector />
               <BlurToggle variant="icon" />
               <KeyboardShortcutsHelp />
-              <LanguageToggle />
               <div data-tour="theme-toggle">
                 <ThemeStudio />
               </div>
@@ -85,7 +83,6 @@ const AppLayout = ({ children, isGamificationOpen, onGamificationToggle }: AppLa
               <CurrencySelector />
               <BlurToggle variant="icon" />
               <KeyboardShortcutsHelp />
-              <LanguageToggle />
               <ThemeStudio />
               <UserMenu />
             </div>
