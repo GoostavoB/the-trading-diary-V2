@@ -104,6 +104,7 @@ const Testimonials = lazy(() => import("./pages/Testimonials"));
 const ChangelogPage = lazy(() => import("./pages/ChangelogPage"));
 const HowItWorks = lazy(() => import("./pages/HowItWorks"));
 const FeaturesPage = lazy(() => import("./pages/FeaturesPage"));
+const TierPreview = lazy(() => import("./pages/TierPreview"));
 
 // Loading fallback
 const PageLoader = () => (
@@ -201,6 +202,7 @@ const AppRoutes = () => {
         <Route path="/forecast" element={<ProtectedRoute><Forecast /></ProtectedRoute>} />
         <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
         <Route path="/gamification" element={<ProtectedRoute><Gamification /></ProtectedRoute>} />
+        <Route path="/tier-preview" element={<ProtectedRoute><TierPreview /></ProtectedRoute>} />
         <Route path="/market-data" element={<ProtectedRoute><MarketData /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         {/* Phase 2: Social features - temporarily disabled for backlog #34 */}

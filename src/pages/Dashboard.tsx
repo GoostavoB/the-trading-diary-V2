@@ -76,6 +76,7 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 import { pageMeta } from '@/utils/seoHelpers';
 import { DailyStreakFlame } from '@/components/DailyStreakFlame';
 import { QuickShareButtons } from '@/components/social/QuickShareButtons';
+import { TierPreviewButton } from '@/components/tier/TierPreviewButton';
 
 interface TradeStats {
   total_pnl: number;
@@ -1052,6 +1053,11 @@ const Dashboard = () => {
                 contentType="general"
               />
             </Card>
+
+            {/* Tier Preview Section */}
+            <div className="mb-6 animate-fade-in" style={{animationDelay: '0.475s'}}>
+              <TierPreviewButton />
+            </div>
 
             {/* Main Content Tabs */}
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6 animate-fade-in" style={{animationDelay: '0.5s'}}>
