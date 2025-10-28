@@ -75,6 +75,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { pageMeta } from '@/utils/seoHelpers';
 import { DailyStreakFlame } from '@/components/DailyStreakFlame';
+import { QuickShareButtons } from '@/components/social/QuickShareButtons';
 
 interface TradeStats {
   total_pnl: number;
@@ -1039,6 +1040,18 @@ const Dashboard = () => {
             <div className="mb-6 animate-fade-in" style={{animationDelay: '0.4s'}}>
               <AIInsightsBox />
             </div>
+
+            {/* Social Share Section */}
+            <Card className="p-6 mb-6 animate-fade-in glass" style={{animationDelay: '0.45s'}}>
+              <h3 className="text-lg font-semibold mb-4">Share Your Trading Journey</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Share your progress on social media and earn XP rewards!
+              </p>
+              <QuickShareButtons 
+                text="Check out my trading progress! 📈 #TradingJournal #CryptoTrading"
+                contentType="general"
+              />
+            </Card>
 
             {/* Main Content Tabs */}
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6 animate-fade-in" style={{animationDelay: '0.5s'}}>

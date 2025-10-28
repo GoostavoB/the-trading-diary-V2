@@ -2578,6 +2578,42 @@ export type Database = {
           },
         ]
       }
+      social_share_log: {
+        Row: {
+          content_id: string | null
+          content_type: string
+          created_at: string
+          id: string
+          platform: string
+          shared_at: string
+          user_id: string
+          week_start_date: string
+          xp_awarded: number
+        }
+        Insert: {
+          content_id?: string | null
+          content_type: string
+          created_at?: string
+          id?: string
+          platform: string
+          shared_at?: string
+          user_id: string
+          week_start_date?: string
+          xp_awarded?: number
+        }
+        Update: {
+          content_id?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          platform?: string
+          shared_at?: string
+          user_id?: string
+          week_start_date?: string
+          xp_awarded?: number
+        }
+        Relationships: []
+      }
       social_shares: {
         Row: {
           created_at: string
@@ -4520,7 +4556,16 @@ export type Database = {
         Args: { p_template_id: string }
         Returns: undefined
       }
-      record_social_share: { Args: { p_platform: string }; Returns: Json }
+      record_social_share:
+        | {
+            Args: {
+              p_content_id?: string
+              p_content_type: string
+              p_platform: string
+            }
+            Returns: Json
+          }
+        | { Args: { p_platform: string }; Returns: Json }
       reset_daily_xp: { Args: never; Returns: undefined }
       reset_daily_xp_caps: { Args: never; Returns: undefined }
       reset_monthly_credits: { Args: never; Returns: undefined }
