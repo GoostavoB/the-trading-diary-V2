@@ -33,9 +33,89 @@
   },
   "landing": {
     "hero": {
-      "title": "Trade with clarity.",
-      "subtitle": "An AI-powered trading diary for crypto investors. Capture every trade, find patterns, and track your edge.",
-      "cta": "Start Free Trial"
+      "title": "Your crypto trading journal, 40x faster.",
+      "subtitle": "Upload screenshots → AI extracts entries, exits, fees, and R → See weekly heatmap, top assets, and net PnL → Get practical actions you can apply today.",
+      "uploadNote": "Trading decisions aren't easy. But tracking them shouldn't be.",
+      "primaryCta": "Start for free",
+      "secondaryCta": "See how it works"
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "subtitle": "From upload to insights in minutes",
+      "step1": {
+        "title": "Upload screenshots (images only)",
+        "description": "Drag and drop your trade screenshots; AI handles the rest."
+      },
+      "step2": {
+        "title": "AI extracts entries, exits, fees, and R",
+        "description": "Our AI automatically fills your journal with all trade details"
+      },
+      "step3": {
+        "title": "Cockpit shows weekly heatmap, top assets, and net PnL",
+        "description": "See your performance at a glance with visual insights"
+      },
+      "step4": {
+        "title": "Get practical actions you can apply today",
+        "description": "• See what to adjust next, with clear, data-based suggestions"
+      },
+      "dashboardAlt": "Trading cockpit showing weekly heatmap and performance metrics"
+    },
+    "completeTradingJournal": {
+      "title": "The Complete Trading Journal",
+      "subtitle": "Everything you need to track, analyze, and improve your trading performance",
+      "dreamOutcome": {
+        "title": "Dream Outcome",
+        "description": "More R, less drawdown, weekly consistency"
+      },
+      "likelihood": {
+        "title": "Likelihood",
+        "description": "Clear mechanism and numeric proof"
+      },
+      "timeDelay": {
+        "title": "Time Delay",
+        "description": "First insights the same day you upload"
+      },
+      "effort": {
+        "title": "Effort",
+        "description": "Up to 40x faster than manual, no spreadsheets"
+      }
+    },
+    "tradingFramework": {
+      "title": "Your Trading Success Framework",
+      "blueprint": {
+        "title": "Blueprint",
+        "description": "Set per trade risk and weekly R target"
+      },
+      "unblock": {
+        "title": "Unblock",
+        "description": "Remove typing and fee blindness"
+      },
+      "install": {
+        "title": "Install",
+        "description": "Upload your trade history instantly"
+      },
+      "launch": {
+        "title": "Launch",
+        "description": "Get AI-powered insights instantly"
+      },
+      "deliver": {
+        "title": "Deliver",
+        "description": "See impact on win rate and drawdown"
+      }
+    },
+    "security": {
+      "encryptedData": {
+        "title": "Encrypted data",
+        "description": "Bank-level encryption"
+      },
+      "localImports": {
+        "title": "Local imports",
+        "description": "Process data securely"
+      },
+      "accessControl": {
+        "title": "Access control",
+        "description": "Per account security"
+      }
     },
     "stats": {
       "fasterUploads": {
@@ -337,6 +417,51 @@
     "shareText": "Check out my trading portfolio performance",
     "shareNotSupported": "Sharing not supported on this browser",
     "snapshotNote": "Snapshots help track your portfolio growth over time"
+  },
+  "pricingComparison": {
+    "title": "Compare plans",
+    "feature": "Feature",
+    "basic": "Basic",
+    "pro": "Pro",
+    "elite": "Elite",
+    "categories": {
+      "results": "Results",
+      "dataCapture": "Data capture",
+      "riskTools": "Risk tools",
+      "costs": "Costs",
+      "analytics": "Analytics",
+      "ops": "Ops"
+    },
+    "features": {
+      "winRateTracking": "Win-rate tracking",
+      "maxWeeklyDrawdown": "Max weekly drawdown limit",
+      "costImpactAnalysis": "Cost impact analysis on R",
+      "csvUploads": "CSV uploads",
+      "screenshotOcr": "Screenshot OCR uploads",
+      "aiAccuracyTier": "AI accuracy tier",
+      "customFields": "Custom data fields/tags",
+      "leverageCalculator": "Leverage and position size calculator",
+      "preTradeChecklist": "Pre-trade checklist",
+      "riskAlerts": "Risk alerts",
+      "feesDashboard": "Fees dashboard by exchange and pair",
+      "makerTakerSimulation": "Maker vs taker simulation",
+      "fundingRebates": "Funding and rebates",
+      "weeklyHeatmap": "Weekly heatmap",
+      "bestAssetsHours": "Best assets and hours",
+      "mfeMaeExpectancy": "MFE/MAE and expectancy",
+      "weeklyEmailReports": "Weekly email reports",
+      "exportCsvPdf": "Export CSV and PDF",
+      "integrations": "Integrations",
+      "integrationsTooltip": "See all supported exchanges"
+    },
+    "tiers": {
+      "standard": "Standard",
+      "enhanced": "Enhanced",
+      "premium": "Premium",
+      "oneExchange": "1 exchange",
+      "threeExchanges": "3 exchanges",
+      "fiveExchanges": "5 exchanges"
+    }
   },
   "pricing": {
     "title": "Simple, Transparent Pricing",

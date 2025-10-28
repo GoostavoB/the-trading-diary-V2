@@ -1,31 +1,34 @@
 import { Target, TrendingUp, Clock, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { GlassCard } from "@/components/ui/glass-card";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const PainToValue = () => {
+  const { t } = useTranslation();
+  
   const values = [
     {
       icon: Target,
-      title: "Dream Outcome",
-      description: "More R, less drawdown, weekly consistency",
+      titleKey: "landing.completeTradingJournal.dreamOutcome.title",
+      descriptionKey: "landing.completeTradingJournal.dreamOutcome.description",
       color: "text-green-500"
     },
     {
       icon: TrendingUp,
-      title: "Likelihood",
-      description: "Clear mechanism and numeric proof",
+      titleKey: "landing.completeTradingJournal.likelihood.title",
+      descriptionKey: "landing.completeTradingJournal.likelihood.description",
       color: "text-blue-500"
     },
     {
       icon: Clock,
-      title: "Time Delay",
-      description: "First insights the same day you upload",
+      titleKey: "landing.completeTradingJournal.timeDelay.title",
+      descriptionKey: "landing.completeTradingJournal.timeDelay.description",
       color: "text-purple-500"
     },
     {
       icon: Zap,
-      title: "Effort",
-      description: "Up to 40x faster than manual, no spreadsheets",
+      titleKey: "landing.completeTradingJournal.effort.title",
+      descriptionKey: "landing.completeTradingJournal.effort.description",
       color: "text-yellow-500"
     }
   ];
@@ -41,10 +44,10 @@ const PainToValue = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            The Complete Trading Journal
+            {t('landing.completeTradingJournal.title')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Everything you need to track, analyze, and improve your trading performance
+            {t('landing.completeTradingJournal.subtitle')}
           </p>
         </motion.div>
 
@@ -63,9 +66,9 @@ const PainToValue = () => {
                   <div className={`mb-4 ${value.color}`}>
                     <Icon className="w-8 h-8" />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">{value.title}</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t(value.titleKey)}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {value.description}
+                    {t(value.descriptionKey)}
                   </p>
                 </GlassCard>
               </motion.div>

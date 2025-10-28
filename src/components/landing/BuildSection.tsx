@@ -1,32 +1,35 @@
 import { motion } from "framer-motion";
 import { Pencil, Unlock, Plug, Rocket, Award } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const BuildSection = () => {
+  const { t } = useTranslation();
+  
   const steps = [
     {
       icon: Pencil,
-      title: "Blueprint",
-      description: "Set per trade risk and weekly R target"
+      titleKey: "landing.tradingFramework.blueprint.title",
+      descriptionKey: "landing.tradingFramework.blueprint.description"
     },
     {
       icon: Unlock,
-      title: "Unblock",
-      description: "Remove typing and fee blindness"
+      titleKey: "landing.tradingFramework.unblock.title",
+      descriptionKey: "landing.tradingFramework.unblock.description"
     },
     {
       icon: Plug,
-      title: "Install",
-      description: "Upload your trade history instantly"
+      titleKey: "landing.tradingFramework.install.title",
+      descriptionKey: "landing.tradingFramework.install.description"
     },
     {
       icon: Rocket,
-      title: "Launch",
-      description: "Get AI-powered insights instantly"
+      titleKey: "landing.tradingFramework.launch.title",
+      descriptionKey: "landing.tradingFramework.launch.description"
     },
     {
       icon: Award,
-      title: "Deliver",
-      description: "See impact on win rate and drawdown"
+      titleKey: "landing.tradingFramework.deliver.title",
+      descriptionKey: "landing.tradingFramework.deliver.description"
     }
   ];
 
@@ -41,7 +44,7 @@ const BuildSection = () => {
           className="text-center mb-12"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Your Trading Success Framework
+            {t('landing.tradingFramework.title')}
           </h2>
         </motion.div>
 
@@ -60,9 +63,9 @@ const BuildSection = () => {
                 <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 hover:bg-primary/20 transition-colors">
                   <Icon className="w-8 h-8 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
+                <h3 className="text-lg font-semibold mb-2">{t(step.titleKey)}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  {step.description}
+                  {t(step.descriptionKey)}
                 </p>
               </motion.div>
             );

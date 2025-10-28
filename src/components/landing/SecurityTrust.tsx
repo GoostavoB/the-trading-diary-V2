@@ -1,22 +1,25 @@
 import { Shield, Lock, Database } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const SecurityTrust = () => {
+  const { t } = useTranslation();
+  
   const features = [
     {
       icon: Shield,
-      title: "Encrypted data",
-      description: "Bank-level encryption"
+      titleKey: "landing.security.encryptedData.title",
+      descriptionKey: "landing.security.encryptedData.description"
     },
     {
       icon: Database,
-      title: "Local imports",
-      description: "Process data securely"
+      titleKey: "landing.security.localImports.title",
+      descriptionKey: "landing.security.localImports.description"
     },
     {
       icon: Lock,
-      title: "Access control",
-      description: "Per account security"
+      titleKey: "landing.security.accessControl.title",
+      descriptionKey: "landing.security.accessControl.description"
     }
   ];
 
@@ -38,8 +41,8 @@ const SecurityTrust = () => {
                 <div className="mb-3 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
                   <Icon className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-base font-semibold mb-1">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground">{feature.description}</p>
+                <h3 className="text-base font-semibold mb-1">{t(feature.titleKey)}</h3>
+                <p className="text-sm text-muted-foreground">{t(feature.descriptionKey)}</p>
               </motion.div>
             );
           })}

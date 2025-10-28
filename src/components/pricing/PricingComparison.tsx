@@ -1,55 +1,58 @@
 import { Check, X, HelpCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const PricingComparison = () => {
+  const { t } = useTranslation();
+  
   const features = [
     {
-      category: "Results",
+      categoryKey: "pricingComparison.categories.results",
       items: [
-        { name: "Win-rate tracking", basic: true, pro: true, elite: true },
-        { name: "Max weekly drawdown limit", basic: false, pro: true, elite: true },
-        { name: "Cost impact analysis on R", basic: false, pro: true, elite: true }
+        { nameKey: "pricingComparison.features.winRateTracking", basic: true, pro: true, elite: true },
+        { nameKey: "pricingComparison.features.maxWeeklyDrawdown", basic: false, pro: true, elite: true },
+        { nameKey: "pricingComparison.features.costImpactAnalysis", basic: false, pro: true, elite: true }
       ]
     },
     {
-      category: "Data capture",
+      categoryKey: "pricingComparison.categories.dataCapture",
       items: [
-        { name: "CSV uploads", basic: true, pro: true, elite: true },
-        { name: "Screenshot OCR uploads", basic: true, pro: true, elite: true },
-        { name: "AI accuracy tier", basic: "Standard", pro: "Enhanced", elite: "Premium" },
-        { name: "Custom data fields/tags", basic: false, pro: true, elite: true }
+        { nameKey: "pricingComparison.features.csvUploads", basic: true, pro: true, elite: true },
+        { nameKey: "pricingComparison.features.screenshotOcr", basic: true, pro: true, elite: true },
+        { nameKey: "pricingComparison.features.aiAccuracyTier", basic: "pricingComparison.tiers.standard", pro: "pricingComparison.tiers.enhanced", elite: "pricingComparison.tiers.premium" },
+        { nameKey: "pricingComparison.features.customFields", basic: false, pro: true, elite: true }
       ]
     },
     {
-      category: "Risk tools",
+      categoryKey: "pricingComparison.categories.riskTools",
       items: [
-        { name: "Leverage and position size calculator", basic: false, pro: true, elite: true },
-        { name: "Pre-trade checklist", basic: false, pro: true, elite: true },
-        { name: "Risk alerts", basic: false, pro: true, elite: true }
+        { nameKey: "pricingComparison.features.leverageCalculator", basic: false, pro: true, elite: true },
+        { nameKey: "pricingComparison.features.preTradeChecklist", basic: false, pro: true, elite: true },
+        { nameKey: "pricingComparison.features.riskAlerts", basic: false, pro: true, elite: true }
       ]
     },
     {
-      category: "Costs",
+      categoryKey: "pricingComparison.categories.costs",
       items: [
-        { name: "Fees dashboard by exchange and pair", basic: false, pro: true, elite: true },
-        { name: "Maker vs taker simulation", basic: false, pro: true, elite: true },
-        { name: "Funding and rebates", basic: false, pro: true, elite: true }
+        { nameKey: "pricingComparison.features.feesDashboard", basic: false, pro: true, elite: true },
+        { nameKey: "pricingComparison.features.makerTakerSimulation", basic: false, pro: true, elite: true },
+        { nameKey: "pricingComparison.features.fundingRebates", basic: false, pro: true, elite: true }
       ]
     },
     {
-      category: "Analytics",
+      categoryKey: "pricingComparison.categories.analytics",
       items: [
-        { name: "Weekly heatmap", basic: true, pro: true, elite: true },
-        { name: "Best assets and hours", basic: true, pro: true, elite: true },
-        { name: "MFE/MAE and expectancy", basic: false, pro: false, elite: true }
+        { nameKey: "pricingComparison.features.weeklyHeatmap", basic: true, pro: true, elite: true },
+        { nameKey: "pricingComparison.features.bestAssetsHours", basic: true, pro: true, elite: true },
+        { nameKey: "pricingComparison.features.mfeMaeExpectancy", basic: false, pro: false, elite: true }
       ]
     },
     {
-      category: "Ops",
+      categoryKey: "pricingComparison.categories.ops",
       items: [
-        { name: "Weekly email reports", basic: false, pro: false, elite: true },
-        { name: "Export CSV and PDF", basic: false, pro: false, elite: true },
-        { name: "Integrations", basic: "1 exchange", pro: "3 exchanges", elite: "5 exchanges", tooltip: "See all supported exchanges" }
+        { nameKey: "pricingComparison.features.weeklyEmailReports", basic: false, pro: false, elite: true },
+        { nameKey: "pricingComparison.features.exportCsvPdf", basic: false, pro: false, elite: true },
+        { nameKey: "pricingComparison.features.integrations", basic: "pricingComparison.tiers.oneExchange", pro: "pricingComparison.tiers.threeExchanges", elite: "pricingComparison.tiers.fiveExchanges", tooltipKey: "pricingComparison.features.integrationsTooltip" }
       ]
     }
   ];
@@ -62,22 +65,23 @@ const PricingComparison = () => {
         <X className="w-5 h-5 text-muted-foreground/30 mx-auto" />
       );
     }
-    return <span className="text-sm">{value}</span>;
+    // If value is a translation key, translate it
+    return <span className="text-sm">{t(value)}</span>;
   };
 
   return (
     <section className="px-6 mb-16">
       <div className="container mx-auto max-w-6xl">
-        <h2 className="text-3xl font-bold text-center mb-8">Compare plans</h2>
+        <h2 className="text-3xl font-bold text-center mb-8">{t('pricingComparison.title')}</h2>
         
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b border-primary/20">
-                <th className="text-left py-4 px-4 font-semibold">Feature</th>
-                <th className="text-center py-4 px-4 font-semibold">Basic</th>
-                <th className="text-center py-4 px-4 font-semibold">Pro</th>
-                <th className="text-center py-4 px-4 font-semibold">Elite</th>
+                <th className="text-left py-4 px-4 font-semibold">{t('pricingComparison.feature')}</th>
+                <th className="text-center py-4 px-4 font-semibold">{t('pricingComparison.basic')}</th>
+                <th className="text-center py-4 px-4 font-semibold">{t('pricingComparison.pro')}</th>
+                <th className="text-center py-4 px-4 font-semibold">{t('pricingComparison.elite')}</th>
               </tr>
             </thead>
             <tbody>
@@ -85,22 +89,22 @@ const PricingComparison = () => {
                 <>
                   <tr key={`category-${categoryIndex}`} className="bg-primary/5">
                     <td colSpan={4} className="py-3 px-4 font-semibold text-sm uppercase tracking-wide">
-                      {category.category}
+                      {t(category.categoryKey)}
                     </td>
                   </tr>
                   {category.items.map((item, itemIndex) => (
                     <tr key={`item-${categoryIndex}-${itemIndex}`} className="border-b border-primary/10 hover:bg-secondary/20">
                       <td className="py-3 px-4 text-sm">
                         <div className="flex items-center gap-2">
-                          {item.name}
-                          {item.tooltip && (
+                          {t(item.nameKey)}
+                          {item.tooltipKey && (
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger>
                                   <HelpCircle className="w-4 h-4 text-muted-foreground" />
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>{item.tooltip}</p>
+                                  <p>{t(item.tooltipKey)}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>

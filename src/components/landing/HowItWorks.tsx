@@ -1,28 +1,31 @@
 import { Upload, Sparkles, BarChart3, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import dashboardScreenshot from "@/assets/dashboard-screenshot-new.png";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const HowItWorks = () => {
+  const { t } = useTranslation();
+  
   const steps = [
     {
       icon: Upload,
-      title: "Upload screenshots (images only)",
-      description: "Drag and drop your trade screenshots; AI handles the rest."
+      titleKey: "landing.howItWorks.step1.title",
+      descriptionKey: "landing.howItWorks.step1.description"
     },
     {
       icon: Sparkles,
-      title: "AI extracts entries, exits, fees, and R",
-      description: "Our AI automatically fills your journal with all trade details"
+      titleKey: "landing.howItWorks.step2.title",
+      descriptionKey: "landing.howItWorks.step2.description"
     },
     {
       icon: BarChart3,
-      title: "Cockpit shows weekly heatmap, top assets, and net PnL",
-      description: "See your performance at a glance with visual insights"
+      titleKey: "landing.howItWorks.step3.title",
+      descriptionKey: "landing.howItWorks.step3.description"
     },
     {
       icon: CheckCircle,
-      title: "Get practical actions you can apply today",
-      description: "• See what to adjust next, with clear, data-based suggestions"
+      titleKey: "landing.howItWorks.step4.title",
+      descriptionKey: "landing.howItWorks.step4.description"
     }
   ];
 
@@ -37,10 +40,10 @@ const HowItWorks = () => {
           className="text-center mb-16"
         >
           <h2 id="how-it-works-heading" className="text-3xl md:text-4xl font-bold mb-4">
-            How it works
+            {t('landing.howItWorks.title')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            From upload to insights in minutes
+            {t('landing.howItWorks.subtitle')}
           </p>
         </motion.div>
 
@@ -60,9 +63,9 @@ const HowItWorks = () => {
                   <Icon className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t(step.titleKey)}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {step.description}
+                    {t(step.descriptionKey)}
                   </p>
                 </div>
               </motion.div>
@@ -79,7 +82,7 @@ const HowItWorks = () => {
         >
           <img 
             src={dashboardScreenshot}
-            alt="Trading cockpit showing weekly heatmap and performance metrics"
+            alt={t('landing.howItWorks.dashboardAlt')}
             className="w-full h-auto"
             loading="lazy"
           />

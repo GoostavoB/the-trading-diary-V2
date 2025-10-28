@@ -32,6 +32,91 @@
     "settings": "Cài đặt"
   },
   "landing": {
+    "hero": {
+      "title": "Nhật ký giao dịch crypto của bạn, nhanh hơn 40 lần.",
+      "subtitle": "Tải lên ảnh chụp màn hình → AI trích xuất điểm vào, điểm ra, phí và R → Xem bản đồ nhiệt hàng tuần, tài sản hàng đầu và PnL ròng → Nhận các hành động thực tế bạn có thể áp dụng ngay hôm nay.",
+      "uploadNote": "Quyết định giao dịch không dễ dàng. Nhưng theo dõi chúng không nên khó khăn.",
+      "primaryCta": "Bắt đầu miễn phí",
+      "secondaryCta": "Xem cách hoạt động"
+    },
+    "howItWorks": {
+      "title": "Cách hoạt động",
+      "subtitle": "Từ tải lên đến thông tin chi tiết trong vài phút",
+      "step1": {
+        "title": "Tải lên ảnh chụp màn hình (chỉ hình ảnh)",
+        "description": "Kéo và thả ảnh chụp màn hình giao dịch của bạn; AI xử lý phần còn lại."
+      },
+      "step2": {
+        "title": "AI trích xuất điểm vào, điểm ra, phí và R",
+        "description": "AI của chúng tôi tự động điền nhật ký của bạn với tất cả các chi tiết giao dịch"
+      },
+      "step3": {
+        "title": "Bảng điều khiển hiển thị bản đồ nhiệt hàng tuần, tài sản hàng đầu và PnL ròng",
+        "description": "Xem hiệu suất của bạn trong nháy mắt với thông tin chi tiết trực quan"
+      },
+      "step4": {
+        "title": "Nhận các hành động thực tế bạn có thể áp dụng ngay hôm nay",
+        "description": "• Xem những gì cần điều chỉnh tiếp theo, với các đề xuất rõ ràng dựa trên dữ liệu"
+      },
+      "dashboardAlt": "Bảng điều khiển giao dịch hiển thị bản đồ nhiệt hàng tuần và các chỉ số hiệu suất"
+    },
+    "completeTradingJournal": {
+      "title": "Nhật Ký Giao Dịch Hoàn Chỉnh",
+      "subtitle": "Mọi thứ bạn cần để theo dõi, phân tích và cải thiện hiệu suất giao dịch của bạn",
+      "dreamOutcome": {
+        "title": "Kết Quả Mơ Ước",
+        "description": "Nhiều R hơn, ít sụt giảm hơn, nhất quán hàng tuần"
+      },
+      "likelihood": {
+        "title": "Khả Năng",
+        "description": "Cơ chế rõ ràng và bằng chứng số"
+      },
+      "timeDelay": {
+        "title": "Thời Gian Chờ",
+        "description": "Thông tin chi tiết đầu tiên trong cùng ngày bạn tải lên"
+      },
+      "effort": {
+        "title": "Nỗ Lực",
+        "description": "Nhanh hơn tới 40 lần so với thủ công, không cần bảng tính"
+      }
+    },
+    "tradingFramework": {
+      "title": "Khung Thành Công Giao Dịch Của Bạn",
+      "blueprint": {
+        "title": "Bản Thiết Kế",
+        "description": "Đặt rủi ro mỗi giao dịch và mục tiêu R hàng tuần"
+      },
+      "unblock": {
+        "title": "Mở Khóa",
+        "description": "Loại bỏ việc nhập tay và mù phí"
+      },
+      "install": {
+        "title": "Cài Đặt",
+        "description": "Tải lên lịch sử giao dịch của bạn ngay lập tức"
+      },
+      "launch": {
+        "title": "Khởi Chạy",
+        "description": "Nhận thông tin chi tiết được hỗ trợ bởi AI ngay lập tức"
+      },
+      "deliver": {
+        "title": "Giao Hàng",
+        "description": "Xem tác động đến tỷ lệ thắng và sụt giảm"
+      }
+    },
+    "security": {
+      "encryptedData": {
+        "title": "Dữ liệu được mã hóa",
+        "description": "Mã hóa cấp ngân hàng"
+      },
+      "localImports": {
+        "title": "Nhập cục bộ",
+        "description": "Xử lý dữ liệu an toàn"
+      },
+      "accessControl": {
+        "title": "Kiểm soát truy cập",
+        "description": "Bảo mật theo tài khoản"
+      }
+    },
     "stats": {
       "fasterUploads": {
         "title": "Nhanh Hơn 40 Lần",
