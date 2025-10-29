@@ -59,7 +59,7 @@ const Hero = () => {
                   hidden: { opacity: 0, y: 20 },
                   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
                 }}
-                className="block text-[clamp(32px,4vw,48px)] font-medium tracking-tight text-foreground/90"
+                className="block text-[clamp(40px,5vw,64px)] font-medium tracking-tight text-foreground/90"
               >
                 Train Your Mind.
               </motion.span>
@@ -68,7 +68,7 @@ const Hero = () => {
                   hidden: { opacity: 0, y: 20 },
                   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
                 }}
-                className="block text-[clamp(36px,4.5vw,56px)] font-bold tracking-tight text-primary"
+                className="block text-[clamp(48px,6vw,80px)] font-bold tracking-tight text-primary"
               >
                 Track Your Trades.
               </motion.span>
@@ -77,7 +77,7 @@ const Hero = () => {
                   hidden: { opacity: 0, y: 20 },
                   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
                 }}
-                className="block text-[clamp(32px,4vw,48px)] font-light tracking-wide text-muted-foreground"
+                className="block text-[clamp(40px,5vw,64px)] font-light tracking-wide text-muted-foreground"
               >
                 Transform Your Results.
               </motion.span>
@@ -85,12 +85,12 @@ const Hero = () => {
 
             {/* Subtitle - Refined hierarchy */}
             <div className="space-y-4 max-w-md lg:max-w-xl">
-              <p className="text-lg text-muted-foreground/80 font-light tracking-wide leading-relaxed" style={{
+              <p className="text-xl text-muted-foreground/80 font-light tracking-wide leading-relaxed" style={{
                 textWrap: 'balance' as any
               }}>
                 Multi-exchange sync • AI insights • Psychology tracking
               </p>
-              <p className="text-sm text-primary/80 font-medium">
+              <p className="text-base text-primary/80 font-medium">
                 Free 14-day trial • No credit card • Cancel anytime
               </p>
             </div>
@@ -104,7 +104,7 @@ const Hero = () => {
 
             {/* Trust Bar */}
             <div className="pt-4 w-full">
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-muted-foreground/60 font-medium">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-sm text-muted-foreground/60 font-medium">
                 <span>10,000+ traders</span>
                 <span className="text-primary/20">•</span>
                 <span>500,000+ trades tracked</span>
