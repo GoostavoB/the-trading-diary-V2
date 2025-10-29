@@ -3,6 +3,7 @@ import Hero from "@/components/Hero";
 import MobileHero from "@/components/landing/MobileHero";
 import FeatureBlocks from "@/components/landing/FeatureBlocks";
 import VideoSection from "@/components/landing/VideoSection";
+import { HeroFeatureBanner } from "@/components/landing/HeroFeatureBanner";
 import { ValueBar } from "@/components/landing/ValueBar";
 import { WaveDivider } from "@/components/landing/WaveDivider";
 import KeyBenefits from "@/components/landing/KeyBenefits";
@@ -73,6 +74,9 @@ const Index = () => {
         
         {/* Desktop Hero */}
         <Hero />
+        
+        {/* SEO Feature Banner - Keywords below hero */}
+        <HeroFeatureBanner />
         
         {/* Mobile Feature Blocks */}
         <FeatureBlocks />
