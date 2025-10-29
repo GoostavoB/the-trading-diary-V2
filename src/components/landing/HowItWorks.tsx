@@ -9,23 +9,18 @@ const HowItWorks = () => {
   const steps = [
     {
       icon: Upload,
-      titleKey: "landing.howItWorks.step1.title",
-      descriptionKey: "landing.howItWorks.step1.description"
+      title: "Upload your trades — no API needed.",
+      description: "Supports screenshots, CSVs, or manual entry. Full privacy, no exchange access required."
     },
     {
       icon: Sparkles,
-      titleKey: "landing.howItWorks.step2.title",
-      descriptionKey: "landing.howItWorks.step2.description"
+      title: "Analyze automatically.",
+      description: "Performance, emotions, and decision data all in one dashboard."
     },
     {
       icon: BarChart3,
-      titleKey: "landing.howItWorks.step3.title",
-      descriptionKey: "landing.howItWorks.step3.description"
-    },
-    {
-      icon: CheckCircle,
-      titleKey: "landing.howItWorks.step4.title",
-      descriptionKey: "landing.howItWorks.step4.description"
+      title: "Improve through XP and rewards.",
+      description: "Earn XP, unlock advanced tools, and build consistency through dopamine-driven progress."
     }
   ];
 
@@ -40,14 +35,14 @@ const HowItWorks = () => {
           className="text-center mb-16"
         >
           <h2 id="how-it-works-heading" className="text-3xl md:text-4xl font-bold mb-4">
-            {t('landing.howItWorks.title')}
+            How It Works
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            {t('landing.howItWorks.subtitle')}
+            Get started in three simple steps
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
           {steps.map((step, index) => {
             const Icon = step.icon;
             return (
@@ -57,15 +52,15 @@ const HowItWorks = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="flex gap-4 items-start"
+                className="text-center space-y-4"
               >
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Icon className="w-6 h-6 text-primary" />
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10">
+                  <Icon className="w-7 h-7 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">{t(step.titleKey)}</h3>
+                  <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {t(step.descriptionKey)}
+                    {step.description}
                   </p>
                 </div>
               </motion.div>

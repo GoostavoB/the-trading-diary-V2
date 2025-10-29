@@ -7,6 +7,8 @@ import { addStructuredData } from "@/utils/seoHelpers";
 import PricingComparison from "./PricingComparison";
 import { usePromoStatus } from "@/hooks/usePromoStatus";
 import { Badge } from "@/components/ui/badge";
+import UrgencyBanner from "./pricing/UrgencyBanner";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -22,13 +24,16 @@ const Pricing = () => {
 
   const plans = [
     {
-      id: 'starter',
-      nameKey: "pricing.plans.basic.name",
-      descriptionKey: "pricing.plans.basic.description",
-      monthlyPrice: 10,
-      annualPrice: 8,
-      annualTotal: 96,
-      tradeLimitKey: "pricing.plans.basic.tradeLimit",
+      id: 'free',
+      name: "Free",
+      description: "Get started with basic tracking",
+      monthlyPrice: 0,
+      annualPrice: 0,
+      annualTotal: 0,
+      uploads: "5 uploads/month",
+      xp: "Unlimited XP",
+      widgets: "Tiers 1–2",
+      customization: "Default Colors (light/dark)",
       featuresKeys: [
         "pricing.plans.basic.features.uploads",
         "pricing.plans.basic.features.accounts",
@@ -44,20 +49,23 @@ const Pricing = () => {
         "pricing.plans.basic.features.emailSupport",
         "pricing.plans.basic.features.noFeeAnalysis",
       ],
-      ctaKey: "pricing.plans.basic.cta",
+      cta: "Start Free",
       popular: false,
       priceCurrency: "USD",
     },
     {
       id: 'pro',
-      nameKey: "pricing.plans.pro.name",
-      descriptionKey: "pricing.plans.pro.description",
+      name: "Pro",
+      description: "For serious traders",
       monthlyPrice: promoStatus.isActive ? 12 : 15,
       annualPrice: promoStatus.isActive ? 10 : 12,
       annualTotal: promoStatus.isActive ? 120 : 144,
       regularMonthlyPrice: 15,
       regularAnnualPrice: 12,
-      tradeLimitKey: "pricing.plans.pro.tradeLimit",
+      uploads: "30 uploads/month",
+      xp: "Unlimited XP",
+      widgets: "Tiers 1–4",
+      customization: "3 Color Controls (Primary, Secondary, Accent)",
       featuresKeys: [
         "pricing.plans.pro.features.uploads",
         "pricing.plans.pro.features.unlimitedAccounts",
@@ -70,18 +78,23 @@ const Pricing = () => {
         "pricing.plans.pro.features.customMetrics",
         "pricing.plans.pro.features.everythingBasic",
       ],
-      ctaKey: "pricing.plans.pro.cta",
+      cta: "Go Pro",
       popular: true,
       priceCurrency: "USD",
     },
     {
       id: 'elite',
-      nameKey: "pricing.plans.elite.name",
-      descriptionKey: "pricing.plans.elite.description",
-      monthlyPrice: 25,
-      annualPrice: 20,
-      annualTotal: 240,
-      tradeLimitKey: "pricing.plans.elite.tradeLimit",
+      name: "Elite",
+      description: "Maximum power and flexibility",
+      monthlyPrice: promoStatus.isActive ? 25 : 30,
+      annualPrice: promoStatus.isActive ? 20 : 25,
+      annualTotal: promoStatus.isActive ? 240 : 300,
+      regularMonthlyPrice: 30,
+      regularAnnualPrice: 25,
+      uploads: "150 uploads/month",
+      xp: "Unlimited XP",
+      widgets: "All Widgets",
+      customization: "Full Color + Background Customization",
       featuresKeys: [
         "pricing.plans.elite.features.uploads",
         "pricing.plans.elite.features.unlimitedAccounts",
@@ -91,7 +104,7 @@ const Pricing = () => {
         "pricing.plans.elite.features.extraCreditsDiscount",
         "pricing.plans.elite.features.everythingPro",
       ],
-      ctaKey: "pricing.plans.elite.cta",
+      cta: "Join Elite",
       popular: false,
       priceCurrency: "USD",
     },
@@ -115,8 +128,8 @@ const Pricing = () => {
         "position": index + 1,
         "item": {
           "@type": "Offer",
-          "name": t(plan.nameKey),
-          "description": t(plan.descriptionKey),
+          "name": plan.name,
+          "description": plan.description,
           "price": billingCycle === 'monthly' ? plan.monthlyPrice : plan.annualPrice,
           "priceCurrency": plan.priceCurrency,
           "availability": "https://schema.org/InStock",
@@ -136,21 +149,17 @@ const Pricing = () => {
 
   return (
     <>
-      <section className="py-16 md:py-20 px-6" aria-labelledby="pricing-heading">
+      <section id="pricing-section" className="py-16 md:py-20 px-6" aria-labelledby="pricing-heading">
         <div className="container mx-auto max-w-6xl">
-          {/* Speed banner */}
-          <div className="text-center mb-6 p-4 bg-primary/10 rounded-lg border border-primary/20">
-            <p className="text-base font-medium text-primary">
-              {t('pricing.speedBanner', '🚀 Start Improving Your Trading Results Today — Get 3 AI Insights Instantly')}
-            </p>
-          </div>
+          {/* Urgency Banner */}
+          <UrgencyBanner />
 
           <div className="text-center mb-8 md:mb-12 animate-fade-in">
             <h2 id="pricing-heading" className="text-3xl md:text-4xl font-bold mb-3">
-              {t('pricing.title')}
+              Choose your plan. Train like a pro.
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
-              {t('pricing.subtitle')}
+              7-day free trial. No credit card required. Lock in your discount.
             </p>
 
             {/* Billing Toggle */}
@@ -217,9 +226,9 @@ const Pricing = () => {
                 )}
 
                 <div className="mb-5">
-                  <h3 className="text-xl md:text-2xl font-bold mb-1.5">{t(plan.nameKey)}</h3>
+                  <h3 className="text-xl md:text-2xl font-bold mb-1.5">{plan.name}</h3>
                   <p className="text-muted-foreground text-xs md:text-sm mb-3">
-                    {t(plan.descriptionKey)}
+                    {plan.description}
                   </p>
                   {plan.monthlyPrice > 0 ? (
                     <>
@@ -252,9 +261,19 @@ const Pricing = () => {
                       Free
                     </div>
                   )}
-                  <div className="text-xs text-muted-foreground mt-2">
-                    {t(plan.tradeLimitKey)} • {t('pricing.uploadNote', 'Up to 10 trades per upload')}
-                  </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="text-xs text-muted-foreground mt-2 cursor-help border-b border-dotted border-muted-foreground/30 inline-block">
+                          {plan.uploads} • {plan.widgets}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-xs">1 upload = up to 10 trades</p>
+                        <p className="text-xs">{plan.uploads.includes('5') ? '50' : plan.uploads.includes('30') ? '300' : '1,500'} trades/month max</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
 
                 <Button
@@ -266,7 +285,7 @@ const Pricing = () => {
                   }`}
                   variant={plan.popular ? "default" : "outline"}
                 >
-                  {t(plan.ctaKey)}
+                  {plan.cta}
                 </Button>
 
                 {plan.monthlyPrice > 0 ? (

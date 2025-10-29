@@ -8,24 +8,34 @@ const SecurityTrust = () => {
   const features = [
     {
       icon: Shield,
-      titleKey: "landing.security.encryptedData.title",
-      descriptionKey: "landing.security.encryptedData.description"
+      title: "Bank-level encryption",
+      description: "SSL protection and encrypted data storage."
     },
     {
       icon: Database,
-      titleKey: "landing.security.localImports.title",
-      descriptionKey: "landing.security.localImports.description"
+      title: "No API connections",
+      description: "Full control over your data. Works with any exchange."
     },
     {
       icon: Lock,
-      titleKey: "landing.security.accessControl.title",
-      descriptionKey: "landing.security.accessControl.description"
+      title: "100% privacy-first",
+      description: "Your trades, your data, your security."
     }
   ];
 
   return (
     <section className="py-16 px-6 bg-primary/5" aria-label="Security features">
-      <div className="container mx-auto max-w-4xl">
+      <div className="container mx-auto max-w-5xl">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold mb-2">Safe. Private. Secure.</h2>
+        </motion.div>
+        
         <div className="grid md:grid-cols-3 gap-6">
           {features.map((feature, index) => {
             const Icon = feature.icon;
@@ -41,8 +51,8 @@ const SecurityTrust = () => {
                 <div className="mb-3 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
                   <Icon className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-base font-semibold mb-1">{t(feature.titleKey)}</h3>
-                <p className="text-sm text-muted-foreground">{t(feature.descriptionKey)}</p>
+                <h3 className="text-base font-semibold mb-1">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground">{feature.description}</p>
               </motion.div>
             );
           })}

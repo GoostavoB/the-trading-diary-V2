@@ -7,18 +7,14 @@ const Testimonials = () => {
 
   const testimonials = [
     {
-      quoteKey: "landing.testimonials.testimonial3.quote",
-      authorKey: "landing.testimonials.testimonial3.author",
-      roleKey: "landing.testimonials.testimonial3.role",
-      exchangeKey: "landing.testimonials.testimonial3.exchange",
-      timeframeKey: "landing.testimonials.testimonial3.timeframe"
+      quote: "Finally, a journal that is easy to build and keeps me engaged. Writing trades manually made me lose track, but now I upload them all at once and everything's there — simple and perfect.",
+      author: "Mark L.",
+      role: "Day Trader"
     },
     {
-      quoteKey: "landing.testimonials.testimonial4.quote",
-      authorKey: "landing.testimonials.testimonial4.author",
-      roleKey: "landing.testimonials.testimonial4.role",
-      exchangeKey: "landing.testimonials.testimonial4.exchange",
-      timeframeKey: "landing.testimonials.testimonial4.timeframe"
+      quote: "I stopped making emotional decisions and became more aware of my mistakes. My numbers simply improved. The gamification makes you want to stay consistent.",
+      author: "Gustavo B.",
+      role: "Day Trader"
     },
   ];
 
@@ -42,7 +38,7 @@ const Testimonials = () => {
           className="text-center mb-12"
         >
           <h2 id="testimonials-heading" className="text-2xl md:text-3xl font-bold mb-3">
-            {t('landing.testimonials.sectionTitle')}
+            Join thousands of traders mastering their craft.
           </h2>
           <div className="flex items-center justify-center gap-1 text-primary" aria-label="5 star rating">
             {[...Array(5)].map((_, i) => (
@@ -68,22 +64,22 @@ const Testimonials = () => {
                   className="flex-shrink-0 h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold text-sm"
                   aria-hidden="true"
                 >
-                  {getInitials(t(testimonial.authorKey))}
+                  {getInitials(testimonial.author)}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   {/* Quote */}
-                  <blockquote className="text-sm md:text-base text-foreground mb-4 italic leading-relaxed line-clamp-3">
-                    "{t(testimonial.quoteKey)}"
+                  <blockquote className="text-sm md:text-base text-foreground mb-4 italic leading-relaxed">
+                    "{testimonial.quote}"
                   </blockquote>
 
                   {/* Author Info */}
                   <div className="space-y-0.5">
                     <div className="font-semibold text-sm text-foreground">
-                      {t(testimonial.authorKey)}
+                      {testimonial.author}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {t(testimonial.roleKey)} • {t(testimonial.exchangeKey)} • {t(testimonial.timeframeKey)}
+                      {testimonial.role}
                     </div>
                   </div>
                 </div>

@@ -5,12 +5,11 @@ import FeatureBlocks from "@/components/landing/FeatureBlocks";
 import VideoSection from "@/components/landing/VideoSection";
 import { ValueBar } from "@/components/landing/ValueBar";
 import { WaveDivider } from "@/components/landing/WaveDivider";
+import KeyBenefits from "@/components/landing/KeyBenefits";
+import ProductShowcase from "@/components/landing/ProductShowcase";
+import PainFOMO from "@/components/landing/PainFOMO";
 import HowItWorks from "@/components/landing/HowItWorks";
-import DashboardShowcase from "@/components/DashboardShowcase";
-import Features from "@/components/Features";
-import PainToValue from "@/components/landing/PainToValue";
-import BuildSection from "@/components/landing/BuildSection";
-import BenefitsGrid from "@/components/landing/BenefitsGrid";
+import GamificationExplainer from "@/components/landing/GamificationExplainer";
 import Testimonials from "@/components/Testimonials";
 import Pricing from "@/components/Pricing";
 import SecurityTrust from "@/components/landing/SecurityTrust";
@@ -18,6 +17,7 @@ import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SkipToContent } from "@/components/SkipToContent";
+import StickyMobileCTA from "@/components/landing/StickyMobileCTA";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "@/hooks/useTranslation";
 import { updateLandingMeta, addStructuredData, trackLandingView, trackCTAClick } from "@/utils/i18nLandingMeta";
@@ -61,6 +61,7 @@ const Index = () => {
       <SkipToContent />
       <ValueBar />
       <PublicHeader />
+      <StickyMobileCTA />
       
       <main id="main-content" className="pt-28 overflow-x-hidden">
         {/* Mobile Hero with Dashboard Preview */}
@@ -75,18 +76,33 @@ const Index = () => {
         {/* Mobile Video Section */}
         <VideoSection />
         
+        {/* Key Benefits */}
+        <KeyBenefits />
+        
+        {/* Product Showcase */}
+        <ProductShowcase />
+        
+        {/* Pain + FOMO */}
+        <PainFOMO />
+        
+        {/* How It Works */}
         <WaveDivider color="hsl(var(--background))" className="text-background -mt-1" />
         <HowItWorks />
-        <DashboardShowcase />
-        <WaveDivider color="hsl(var(--background))" className="text-background -mt-1" />
-        <PainToValue />
-        <Features />
-        <BuildSection />
-        <BenefitsGrid />
+        
+        {/* Gamification Layer */}
+        <GamificationExplainer />
+        
+        {/* Social Proof */}
         <WaveDivider color="hsl(var(--background))" flip className="text-background -mb-1" />
         <Testimonials />
+        
+        {/* Pricing */}
         <Pricing />
+        
+        {/* Trust & Security */}
         <SecurityTrust />
+        
+        {/* Final CTA */}
         <CTA />
       </main>
       

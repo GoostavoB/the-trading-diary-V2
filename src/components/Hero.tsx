@@ -41,38 +41,38 @@ const Hero = () => {
             <h1 id="hero-title" className="text-[clamp(40px,6vw,68px)] font-bold leading-[1.1] tracking-tight max-w-md lg:max-w-3xl" style={{
             textWrap: 'balance' as any
           }}>
-              {t('landing.hero.mainTitle', 'Maximize your trading performance')}
+              Stop Guessing. Start Winning.
             </h1>
 
             {/* Subtitle - Centered on mobile, left-aligned on desktop */}
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-md lg:max-w-xl" style={{
             textWrap: 'balance' as any
-          }}>{t('landing.hero.mainSubtitle', 'Upload your trades. TD tracks, analyzes, and reveals your performance with AI-powered insights')}</p>
+          }}>
+              Upload your trades in seconds. Get AI-powered insights that actually improve your win rate.
+              Train discipline through XP, streaks, and rewards that make consistency addictive.
+            </p>
 
             {/* CTA Buttons */}
             <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-stretch sm:items-center w-full sm:w-auto">
-              <Button onClick={() => navigate('/auth')} size="lg" className="h-14 px-10 text-base font-semibold rounded-xl bg-primary hover:bg-primary/90 transition-all duration-300" aria-label={t('landing.hero.ctaStartTrial', 'Start free trial')}>
-                {t('landing.hero.ctaStartTrial', 'Start free trial')}
+              <Button onClick={() => navigate('/auth')} size="lg" className="h-14 px-10 text-base font-semibold rounded-xl bg-primary hover:bg-primary/90 transition-all duration-300" aria-label="Start free trial">
+                Start Free Trial
               </Button>
-              
+              <Button onClick={() => navigate('/demo')} variant="outline" size="lg" className="h-14 px-10 text-base font-semibold rounded-xl" aria-label="Watch demo">
+                Watch 2-Min Demo
+              </Button>
             </div>
 
-            {/* Proof Badges */}
-            <div className="pt-6 space-y-3 w-full">
-              <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
-              <div className="px-4 py-2 bg-primary/10 border border-primary/20 rounded-lg text-sm font-medium whitespace-nowrap">
-                {t('landing.hero.proofBadge1', 'Up to 40x faster logging')}
+            {/* Trust Bar */}
+            <div className="pt-6 w-full">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-sm text-muted-foreground">
+                <span className="font-semibold">10,000+ traders</span>
+                <span className="text-primary/30">•</span>
+                <span className="font-semibold">500,000+ trades tracked</span>
+                <span className="text-primary/30">•</span>
+                <span className="font-semibold flex items-center gap-1">
+                  4.8★ average rating
+                </span>
               </div>
-              <div className="px-4 py-2 bg-primary/10 border border-primary/20 rounded-lg text-sm font-medium whitespace-nowrap">
-                {t('landing.hero.proofBadge2', 'Win rate up to +8 points')}
-              </div>
-              <div className="px-4 py-2 bg-primary/10 border border-primary/20 rounded-lg text-sm font-medium whitespace-nowrap">
-                {t('landing.hero.proofBadge3', 'Max weekly drawdown −30%')}
-              </div>
-              </div>
-            <p className="text-xs text-muted-foreground text-center lg:text-left px-2">
-              {t('landing.hero.proofDisclaimer', 'Results observed in pilot groups, vary by risk, market, and discipline')}
-            </p>
             </div>
           </motion.div>
 
