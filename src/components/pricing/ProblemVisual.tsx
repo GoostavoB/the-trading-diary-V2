@@ -20,26 +20,37 @@ export const ProblemVisual = () => {
         </div>
         
         <div className="space-y-3">
-          {[40, 60, 30, 70, 20].map((height, i) => (
+          {[
+            { height: 40, label: "Inconsistent journaling" },
+            { height: 60, label: "Missed trades" },
+            { height: 30, label: "No structure" },
+            { height: 70, label: "Emotional decisions" },
+            { height: 20, label: "Poor risk management" }
+          ].map((item, i) => (
             <motion.div
               key={i}
               initial={{ scaleX: 0 }}
               animate={inView ? { scaleX: 1 } : {}}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="h-8 bg-destructive/20 rounded origin-left relative overflow-hidden"
-              style={{ width: `${height}%` }}
+              className="relative"
             >
-              <motion.div
-                animate={{
-                  x: ['-100%', '100%'],
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-                className="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-destructive/30 to-transparent"
-              />
+              <div
+                className="h-8 bg-destructive/20 rounded origin-left relative overflow-hidden"
+                style={{ width: `${item.height}%` }}
+              >
+                <motion.div
+                  animate={{
+                    x: ['-100%', '100%'],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                  className="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-destructive/30 to-transparent"
+                />
+              </div>
+              <p className="text-[11px] text-muted-foreground/70 mt-1">{item.label}</p>
             </motion.div>
           ))}
         </div>
@@ -58,19 +69,29 @@ export const ProblemVisual = () => {
         </div>
         
         <div className="space-y-3">
-          {[70, 75, 85, 90, 95].map((height, i) => (
+          {[
+            { height: 70, label: "Daily routine", percent: "70%" },
+            { height: 75, label: "100% tracked", percent: "75%" },
+            { height: 85, label: "Disciplined approach", percent: "85%" },
+            { height: 90, label: "Emotional control", percent: "90%" },
+            { height: 95, label: "Consistent risk rules", percent: "95%" }
+          ].map((item, i) => (
             <motion.div
               key={i}
               initial={{ scaleX: 0 }}
               animate={inView ? { scaleX: 1 } : {}}
               transition={{ duration: 0.6, delay: 1.2 + i * 0.1 }}
-              className="flex items-center gap-2"
+              className="relative"
             >
-              <div
-                className="h-8 bg-primary/30 rounded origin-left flex items-center justify-end pr-2"
-                style={{ width: `${height}%` }}
-              >
-                <CheckCircle2 className="w-4 h-4 text-primary" />
+              <div className="flex items-center gap-2">
+                <div
+                  className="h-8 bg-primary/30 rounded origin-left flex items-center justify-between px-2"
+                  style={{ width: `${item.height}%` }}
+                >
+                  <span className="text-[11px] text-foreground/80">{item.label}</span>
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-[11px] text-primary font-semibold">{item.percent}</span>
               </div>
             </motion.div>
           ))}
@@ -80,7 +101,7 @@ export const ProblemVisual = () => {
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ duration: 0.5, delay: 2 }}
-          className="flex items-center gap-2 text-[13px] text-primary font-semibold pt-2"
+          className="flex items-center gap-2 text-[13px] text-primary font-semibold pt-2 border-t border-primary/20 mt-2"
         >
           <BarChart3 className="w-4 h-4" />
           <span>+23% performance improvement</span>

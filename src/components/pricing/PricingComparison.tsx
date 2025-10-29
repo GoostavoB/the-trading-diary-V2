@@ -1,61 +1,62 @@
 import { Check, X, HelpCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useTranslation } from "@/hooks/useTranslation";
 import { motion } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const PricingComparison = () => {
-  const { t } = useTranslation();
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
   
   const features = [
     {
-      categoryKey: "pricingComparison.categories.results",
+      categoryKey: "Core Features",
       items: [
-        { nameKey: "pricingComparison.features.winRateTracking", basic: true, pro: true, elite: true },
-        { nameKey: "pricingComparison.features.maxWeeklyDrawdown", basic: false, pro: true, elite: true },
-        { nameKey: "pricingComparison.features.costImpactAnalysis", basic: false, pro: true, elite: true }
+        { 
+          nameKey: "XP Discipline System", 
+          free: "Basic",
+          pro: "Full", 
+          elite: "Full + Custom Rewards",
+          description: "Earn XP points for consistency, build discipline streaks, and unlock higher trading tiers"
+        },
+        { 
+          nameKey: "Trade Upload Speed", 
+          free: "Manual",
+          pro: "10x faster", 
+          elite: "40x faster",
+          description: "Upload up to 10 trades at once with AI image recognition. Save hours every week."
+        },
+        { 
+          nameKey: "Analytics", 
+          free: "Basic",
+          pro: "Advanced", 
+          elite: "Pro-level Reports",
+          description: "Track win rate, drawdown, expectancy, and consistency metrics in real time"
+        },
+        { 
+          nameKey: "Customization", 
+          free: "Limited",
+          pro: "Widgets", 
+          elite: "Full Dashboard",
+          description: "Build your own dashboard with custom widgets for psychology, risk, or PnL metrics"
+        },
       ]
     },
     {
-      categoryKey: "pricingComparison.categories.dataCapture",
+      categoryKey: "Support & Security",
       items: [
-        { nameKey: "pricingComparison.features.csvUploads", basic: true, pro: true, elite: true },
-        { nameKey: "pricingComparison.features.screenshotOcr", basic: true, pro: true, elite: true },
-        { nameKey: "pricingComparison.features.aiAccuracyTier", basic: "pricingComparison.tiers.standard", pro: "pricingComparison.tiers.enhanced", elite: "pricingComparison.tiers.premium" },
-        { nameKey: "pricingComparison.features.customFields", basic: false, pro: true, elite: true }
-      ]
-    },
-    {
-      categoryKey: "pricingComparison.categories.riskTools",
-      items: [
-        { nameKey: "pricingComparison.features.leverageCalculator", basic: false, pro: true, elite: true },
-        { nameKey: "pricingComparison.features.preTradeChecklist", basic: false, pro: true, elite: true },
-        { nameKey: "pricingComparison.features.riskAlerts", basic: false, pro: true, elite: true }
-      ]
-    },
-    {
-      categoryKey: "pricingComparison.categories.costs",
-      items: [
-        { nameKey: "pricingComparison.features.feesDashboard", basic: false, pro: true, elite: true },
-        { nameKey: "pricingComparison.features.makerTakerSimulation", basic: false, pro: true, elite: true },
-        { nameKey: "pricingComparison.features.fundingRebates", basic: false, pro: true, elite: true }
-      ]
-    },
-    {
-      categoryKey: "pricingComparison.categories.analytics",
-      items: [
-        { nameKey: "pricingComparison.features.weeklyHeatmap", basic: true, pro: true, elite: true },
-        { nameKey: "pricingComparison.features.bestAssetsHours", basic: true, pro: true, elite: true },
-        { nameKey: "pricingComparison.features.mfeMaeExpectancy", basic: false, pro: false, elite: true }
-      ]
-    },
-    {
-      categoryKey: "pricingComparison.categories.ops",
-      items: [
-        { nameKey: "pricingComparison.features.weeklyEmailReports", basic: false, pro: false, elite: true },
-        { nameKey: "pricingComparison.features.exportCsvPdf", basic: false, pro: false, elite: true },
-        { nameKey: "pricingComparison.features.integrations", basic: "pricingComparison.tiers.oneExchange", pro: "pricingComparison.tiers.threeExchanges", elite: "pricingComparison.tiers.fiveExchanges", tooltipKey: "pricingComparison.features.integrationsTooltip" }
+        { 
+          nameKey: "Support", 
+          free: "Community",
+          pro: "Email", 
+          elite: "Priority",
+          description: "Get help when you need it, from community forums to dedicated priority support"
+        },
+        { 
+          nameKey: "Privacy & Security", 
+          free: "Encrypted",
+          pro: "Encrypted", 
+          elite: "Encrypted + Backups",
+          description: "Your trades are encrypted end-to-end. No exchange connections. Your data stays yours."
+        },
       ]
     }
   ];
@@ -68,8 +69,8 @@ const PricingComparison = () => {
         <X className="w-5 h-5 text-muted-foreground/30 mx-auto" />
       );
     }
-    // If value is a translation key, translate it
-    return <span className="text-sm">{t(value)}</span>;
+    // Render the string value directly (not a translation key)
+    return <span className="text-[13px] font-medium">{value}</span>;
   };
 
   return (
@@ -91,10 +92,10 @@ const PricingComparison = () => {
               letterSpacing: '-0.01em'
             }}
           >
-            {t('pricingComparison.title')}
+            Complete Feature Comparison
           </h2>
           <p className="text-[17px] text-muted-foreground/80 max-w-2xl mx-auto">
-            Compare features across all plans
+            See exactly what's included in each plan. Hover over features for detailed explanations.
           </p>
         </motion.div>
         
@@ -108,10 +109,10 @@ const PricingComparison = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-primary/20 bg-primary/5">
-                  <th className="text-left py-4 px-4 font-semibold text-[14px]">{t('pricingComparison.feature')}</th>
-                  <th className="text-center py-4 px-4 font-semibold text-[14px]">{t('pricingComparison.basic')}</th>
-                  <th className="text-center py-4 px-4 font-semibold text-[14px]">{t('pricingComparison.pro')}</th>
-                  <th className="text-center py-4 px-4 font-semibold text-[14px]">{t('pricingComparison.elite')}</th>
+                  <th className="text-left py-4 px-4 font-semibold text-[14px]">Feature</th>
+                  <th className="text-center py-4 px-4 font-semibold text-[14px]">Free</th>
+                  <th className="text-center py-4 px-4 font-semibold text-[14px]">Pro</th>
+                  <th className="text-center py-4 px-4 font-semibold text-[14px]">Elite</th>
                 </tr>
               </thead>
               <tbody>
@@ -119,7 +120,7 @@ const PricingComparison = () => {
                   <>
                     <tr key={`category-${categoryIndex}`} className="bg-primary/10">
                       <td colSpan={4} className="py-4 px-4 font-semibold text-[13px] uppercase tracking-wide text-primary">
-                        {t(category.categoryKey)}
+                        {category.categoryKey}
                       </td>
                     </tr>
                     {category.items.map((item, itemIndex) => (
@@ -128,26 +129,28 @@ const PricingComparison = () => {
                         initial={{ opacity: 0 }}
                         animate={isVisible ? { opacity: 1 } : {}}
                         transition={{ duration: 0.3, delay: (categoryIndex * 0.1) + (itemIndex * 0.05) }}
-                        className="border-b border-primary/10 hover:bg-primary/5 transition-colors group"
+                        className="border-b border-primary/10 hover:bg-primary/5 transition-colors group relative"
                       >
                         <td className="py-4 px-4 text-[14px]">
-                          <div className="flex items-center gap-2">
-                            <span className="group-hover:text-foreground transition-colors">{t(item.nameKey)}</span>
-                            {item.tooltipKey && (
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <HelpCircle className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors cursor-help" />
-                                  </TooltipTrigger>
-                                  <TooltipContent className="max-w-xs">
-                                    <p className="text-[13px]">{t(item.tooltipKey)}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            )}
-                          </div>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center gap-2 cursor-help">
+                                  <span className="group-hover:text-foreground transition-colors">{item.nameKey}</span>
+                                  {item.description && (
+                                    <HelpCircle className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors" />
+                                  )}
+                                </div>
+                              </TooltipTrigger>
+                              {item.description && (
+                                <TooltipContent className="max-w-xs">
+                                  <p className="text-[13px]">{item.description}</p>
+                                </TooltipContent>
+                              )}
+                            </Tooltip>
+                          </TooltipProvider>
                         </td>
-                        <td className="py-4 px-4 text-center">{renderCell(item.basic)}</td>
+                        <td className="py-4 px-4 text-center">{renderCell(item.free)}</td>
                         <td className="py-4 px-4 text-center">{renderCell(item.pro)}</td>
                         <td className="py-4 px-4 text-center">{renderCell(item.elite)}</td>
                       </motion.tr>

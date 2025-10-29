@@ -52,62 +52,63 @@ const PricingPage = () => {
 
   const plans = [
     {
-      id: 'starter',
-      name: 'Starter',
-      description: 'Beginner traders tracking performance',
-      monthlyPrice: 10,
-      yearlyPrice: 8,
-      yearlyTotal: 96,
+      id: 'free',
+      name: 'Free',
+      description: 'Start your trading discipline journey',
+      monthlyPrice: 0,
+      yearlyPrice: 0,
+      yearlyTotal: 0,
       features: [
-        '20 uploads per month. Up to 10 trades per upload',
-        '1 connected account',
-        'AI Insights on the homepage',
-        'Trading history, manual trades, spot wallet',
-        'Trading journal, drawdown, leverage stop calculator',
-        'Market data and smart equity forecast',
-        'Email support',
-        'Fee analysis not included'
+        '5 uploads total',
+        'Basic analytics and XP system',
+        'Limited widgets',
+        'Community leaderboard',
+        'CSV upload support',
+        'Basic win rate tracking'
       ],
-      cta: 'Start free',
+      cta: 'Start Free',
       popular: false
     },
     {
       id: 'pro',
       name: 'Pro',
-      description: 'Active traders optimizing risk and costs',
+      description: 'Active traders optimizing discipline and costs',
       monthlyPrice: promoStatus.isActive ? 12 : 15,
-      yearlyPrice: promoStatus.isActive ? 10 : 12,
-      yearlyTotal: promoStatus.isActive ? 120 : 144,
+      yearlyPrice: promoStatus.isActive ? 8 : 10,
+      yearlyTotal: promoStatus.isActive ? 96 : 120,
       regularMonthlyPrice: 15,
-      regularYearlyPrice: 12,
+      regularYearlyPrice: 10,
       features: [
-        '50 uploads per month. Up to 10 trades per upload',
-        'Unlimited accounts',
-        'Fee analysis',
-        'Trading plan, goals, trading psychology',
-        'Reports and tax reports',
-        'Custom AI metrics: 3 per month'
+        '50 uploads per month',
+        'Full XP system + gamified progression',
+        'Advanced analytics suite',
+        'Custom widgets and color themes',
+        'Upload up to 10 trades at once',
+        'Fee analysis and optimization',
+        'Weekly drawdown alerts',
+        'Email support'
       ],
-      cta: 'Start 7-day trial',
+      cta: 'Go Pro Now',
       popular: true
     },
     {
       id: 'elite',
       name: 'Elite',
-      description: 'Professional traders needing advanced analysis and reports',
+      description: 'Professional traders with unlimited needs',
       monthlyPrice: 25,
       yearlyPrice: 20,
       yearlyTotal: 240,
       features: [
-        '120 uploads per month. Up to 10 trades per upload',
-        'Unlimited accounts',
-        'Everything in Pro',
-        'Custom AI metrics: 10 per month',
-        'Early access to new features',
-        'Premium priority support',
-        '50% off extra credits'
+        'Unlimited uploads',
+        'Elite XP tiers and rewards',
+        'Priority analytics reports',
+        'Full customization and API exports',
+        'MFE/MAE analysis',
+        'Automated weekly email reports',
+        'Priority support',
+        'Early access to new features'
       ],
-      cta: 'Start 7-day trial',
+      cta: 'Join Elite',
       popular: false
     }
   ];
@@ -416,16 +417,18 @@ const PricingPage = () => {
                       // Determine if this feature needs a tooltip
                       let tooltipContent = null;
                       
-                      if (feature.includes('uploads per month')) {
-                        tooltipContent = "One upload spends 1 credit and can include up to 10 trades. To save credits, upload every 10 trades.";
-                      } else if (feature.includes('connected account') || feature.includes('Unlimited accounts')) {
-                        tooltipContent = "Connect your exchange or broker. Starter supports 1 account. Pro and Elite are unlimited.";
-                      } else if (feature.includes('Custom AI metrics')) {
-                        tooltipContent = "Create your own metric and add it to your dashboard. Choose the rule, the inputs, and the alert. You can create 3 per month on Pro and 10 per month on Elite.";
+                      if (feature.includes('uploads')) {
+                        tooltipContent = "One upload can include up to 10 trades. Upload 10 trades at once to maximize efficiency.";
+                      } else if (feature.includes('XP system')) {
+                        tooltipContent = "Earn XP points for consistency, build discipline streaks, and unlock higher trading tiers.";
+                      } else if (feature.includes('analytics')) {
+                        tooltipContent = "Track win rate, drawdown, expectancy, and consistency metrics in real time.";
+                      } else if (feature.includes('widgets')) {
+                        tooltipContent = "Build your own dashboard with custom widgets for psychology, risk, or PnL metrics.";
                       } else if (feature.includes('Fee analysis')) {
-                        tooltipContent = "Detailed fees and funding by trade and by day. Available on Pro and Elite.";
-                      } else if (feature.includes('extra credits')) {
-                        tooltipContent = "Add 10 uploads for $2. Elite pays $1.";
+                        tooltipContent = "Analyze maker vs taker fees, funding rates, and optimize your trading costs.";
+                      } else if (feature.includes('MFE/MAE')) {
+                        tooltipContent = "Maximum Favorable Excursion and Maximum Adverse Excursion analysis to refine your entries and exits.";
                       }
                       
                       return (

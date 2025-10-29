@@ -26,7 +26,18 @@ const PricingAddOns = () => {
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-3xl font-bold text-center mb-8">Add-ons</h2>
+          <h2 
+            className="font-bold text-center mb-3 leading-tight tracking-tight"
+            style={{ 
+              fontSize: 'clamp(28px, 4vw, 42px)',
+              letterSpacing: '-0.01em'
+            }}
+          >
+            Optional Add-ons
+          </h2>
+          <p className="text-[16px] text-muted-foreground/70 text-center mb-12 max-w-2xl mx-auto">
+            Scale your plan with extra capacity or team features when you need them
+          </p>
           
           <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {addOns.map((addon, index) => (

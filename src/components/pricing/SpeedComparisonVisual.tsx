@@ -14,26 +14,50 @@ export const SpeedComparisonVisual = () => {
           <span className="text-[14px] font-semibold text-muted-foreground">Manual Entry</span>
         </div>
         
+        <p className="text-[13px] text-muted-foreground/70 mb-4">
+          Manually filling in each trade field...
+        </p>
+        
         <div className="space-y-2">
-          {Array.from({ length: 10 }).map((_, i) => (
+          {[
+            "Trade #1: Pair, Entry, Exit, Size...",
+            "Trade #2: Pair, Entry, Exit, Size...",
+            "Trade #3: Pair, Entry, Exit, Size...",
+            "Trade #4: Pair, Entry, Exit, Size...",
+            "Trade #5: Pair, Entry, Exit, Size...",
+            "Trade #6: Pair, Entry, Exit, Size...",
+            "Trade #7: Pair, Entry, Exit, Size...",
+            "Trade #8: Pair, Entry, Exit, Size...",
+            "Trade #9: Pair, Entry, Exit, Size...",
+            "Trade #10: Pair, Entry, Exit, Size..."
+          ].map((label, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, x: -20 }}
               animate={inView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.3, delay: i * 0.2 }}
-              className="h-6 bg-muted/30 rounded-md"
-            />
+              transition={{ duration: 0.3, delay: i * 0.15 }}
+              className="flex items-center gap-2"
+            >
+              <div className="h-6 bg-muted/30 rounded-md flex-1 flex items-center px-2">
+                <span className="text-[11px] text-muted-foreground/50">{label}</span>
+              </div>
+            </motion.div>
           ))}
         </div>
         
-        <motion.p
+        <motion.div
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.5, delay: 2 }}
-          className="text-[13px] text-muted-foreground mt-4 text-center"
+          transition={{ duration: 0.5, delay: 1.8 }}
+          className="mt-4 pt-4 border-t border-muted/20"
         >
-          ⏱️ 20 minutes for 10 trades
-        </motion.p>
+          <p className="text-[13px] text-destructive font-semibold text-center">
+            ⏱️ 20 minutes for 10 trades
+          </p>
+          <p className="text-[11px] text-muted-foreground/70 text-center mt-1">
+            Tedious. Time-consuming. Often skipped.
+          </p>
+        </motion.div>
       </div>
 
       {/* AI Upload */}
