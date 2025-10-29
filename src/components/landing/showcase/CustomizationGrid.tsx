@@ -40,8 +40,8 @@ const CUSTOMIZATION_FEATURES = [
   {
     id: 'charts',
     icon: BarChart3,
-    title: 'Chart Styles',
-    description: 'Customize chart types, timeframes, and visual indicators',
+    title: 'Chart Timeframes',
+    description: 'Customize timeframes to analyze your trading performance over any period',
     color: '217 91% 60%'
   },
   {
