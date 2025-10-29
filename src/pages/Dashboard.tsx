@@ -239,6 +239,16 @@ const Dashboard = () => {
     });
   }, [savedColumnCount]);
 
+  // Safety: ensure the dashboard never gets stuck in loading
+  useEffect(() => {
+    if (!loading) return;
+    const timer = setTimeout(() => {
+      console.warn('[Dashboard] Safety timeout: forcing loading=false');
+      setLoading(false);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [loading]);
+
   // Save column count to backend when user changes it
   const handleColumnCountChange = useCallback((newCount: number) => {
     setSelectedColumnCount(newCount);
