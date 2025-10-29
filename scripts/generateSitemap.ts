@@ -43,6 +43,14 @@ const blogArticles = [
     lastmod: '2025-10-29',
   },
   {
+    slug: 'altcoin-trading-strategies',
+    lastmod: '2025-10-29',
+  },
+  {
+    slug: 'bitcoin-trading-tips',
+    lastmod: '2025-10-29',
+  },
+  {
     slug: 'data-driven-trading',
     lastmod: '2025-10-15',
   },

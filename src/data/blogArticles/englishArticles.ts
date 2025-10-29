@@ -15764,5 +15764,745 @@ Connect your OKX account and import your complete trade history automatically.
     canonical: "https://www.thetradingdiary.com/blog/trading-journal-for-day-traders-crypto",
     language: "en",
     content: `Day trading specialized guide with session analysis, lunch break review routine, rapid logging techniques, and day trader vs swing trader comparison. Includes real transformation story and links to calculators.`
-  }
+  },
+  {
+    title: "Altcoin Trading Strategies: Complete Guide for 2025",
+    slug: "altcoin-trading-strategies",
+    metaTitle: "Altcoin Trading Strategies | Proven Methods for 2025",
+    metaDescription: "Master profitable altcoin trading strategies. Learn market cap tiers, correlation analysis, risk management, and timing techniques from professional altcoin traders.",
+    description: "Discover proven altcoin trading strategies that work in bull and bear markets. Learn selection criteria, entry timing, and risk management from pro traders.",
+    focusKeyword: "altcoin trading strategies",
+    readTime: "12 min read",
+    author: "Gustavo",
+    date: "2025-10-29",
+    category: "Trading Guides",
+    tags: ["altcoin trading", "cryptocurrency strategies", "trading techniques", "market analysis"],
+    canonical: "https://www.thetradingdiary.com/blog/altcoin-trading-strategies",
+    language: "en",
+    heroImage: "/images/blog/altcoin-strategies-hero.jpg",
+    heroImageAlt: "Crypto trader analyzing altcoin charts with multiple technical indicators",
+    content: `
+Altcoin trading offers higher potential returns than Bitcoin—but with significantly higher risk. Professional altcoin traders don't chase pumps or trade based on Twitter hype. They follow systematic strategies proven to work across market cycles.
+
+## Understanding Altcoin Market Tiers
+
+Not all altcoins are created equal. Professionals categorize them by market cap and liquidity:
+
+### Large-Cap Altcoins ($10B+)
+**Examples**: Ethereum (ETH), BNB, Solana (SOL), XRP
+
+**Characteristics**:
+- Lower volatility than smaller caps
+- Higher liquidity (easier entry/exit)
+- More established fundamentals
+- Strong correlation with Bitcoin
+- Lower potential for 10x gains
+- Better for larger position sizes
+
+**Best strategy**: Trend following with 4-hour or daily timeframes.
+
+### Mid-Cap Altcoins ($1B-$10B)
+**Examples**: Polygon (MATIC), Avalanche (AVAX), Chainlink (LINK)
+
+**Characteristics**:
+- Moderate volatility
+- Decent liquidity on major exchanges
+- Emerging narratives and use cases
+- Still tracks BTC but with higher beta
+- 3-5x potential during bull runs
+- Sweet spot for most traders
+
+**Best strategy**: Swing trading with combination of fundamentals and technicals.
+
+### Small-Cap Altcoins ($100M-$1B)
+**Examples**: Recent DeFi projects, new L1/L2 solutions
+
+**Characteristics**:
+- High volatility (±20% daily moves)
+- Lower liquidity (slippage risk)
+- Narrative-driven price action
+- Weaker BTC correlation
+- 10x+ potential but also -90% risk
+- Requires strict risk management
+
+**Best strategy**: Momentum trading with tight stops.
+
+### Micro-Cap Altcoins (<$100M)
+**Characteristics**:
+- Extreme volatility
+- Manipulation risk
+- Very low liquidity
+- Pure speculation
+- Could 100x or go to zero
+
+**Professional approach**: Less than 5% of portfolio, treat as lottery tickets.
+
+Internal link: Learn how to track all altcoin trades with [crypto trading journal dashboard](/blog/crypto-journal-with-dashboard).
+
+## Strategy 1: Bitcoin Correlation Trading
+
+Most altcoins move with Bitcoin, but with varying intensity and lag.
+
+### How It Works
+
+1. **Identify BTC trend**: Is Bitcoin trending up, down, or sideways?
+2. **Select high-beta alts**: ETH, SOL, AVAX typically amplify BTC moves
+3. **Time the entry**: Wait for BTC to establish direction
+4. **Monitor divergences**: If BTC rallies but your alt doesn't, exit
+5. **Take profit faster**: Alts can reverse quicker than BTC
+
+### Real Example
+
+**Date**: March 2024
+**Setup**: BTC broke above $70K with strong volume
+**Trade**: Entered SOL at $140
+**Reasoning**: SOL typically gains 1.5x BTC's move percentage
+**Result**: BTC +8%, SOL +14%, exited at $159.60
+**Key insight**: Exited when SOL failed to keep pace with BTC's continued rally
+
+### When This Strategy Fails
+
+- During alt season (alts decouple from BTC)
+- When your specific alt has negative news
+- During low liquidity periods (holidays, weekends)
+- If BTC is chopping sideways (alts bleed)
+
+Internal link: Calculate optimal position sizing with our [position size calculator](/calculators/position-size).
+
+## Strategy 2: Narrative Trading
+
+Crypto moves in narratives. Early identification = profit.
+
+### Current Narratives (2025)
+
+**Layer 2 Solutions**: Arbitrum, Optimism, zkSync
+**AI Crypto**: Projects combining AI and blockchain
+**Real-World Assets (RWA)**: Tokenized real estate, bonds
+**DeFi 2.0**: Next-gen lending and derivatives
+**Gaming/Metaverse**: Gaming tokens with actual revenue
+
+### How to Trade Narratives
+
+1. **Identify early**: Follow crypto Twitter, Discord communities
+2. **Find leaders**: Usually 2-3 projects dominate each narrative
+3. **Confirm with volume**: Narrative without volume is just noise
+4. **Enter on dips**: Don't FOMO into 50% daily pumps
+5. **Set target**: Most narrative pumps are 2-4 weeks, take profit systematically
+6. **Rotate**: When one narrative cools, find the next
+
+### Real Example
+
+**Narrative**: AI crypto boom (January 2024)
+**Selected leaders**: Render (RNDR), Fetch.ai (FET)
+**Entry**: RNDR at $2.80 after -20% dip
+**Exit plan**: 50% at $4, 30% at $5, 20% trailing stop
+**Result**: Sold 50% at $4.10, 30% at $5.60, final 20% at $4.80 (trailing stop hit)
+**Total gain**: +62% average
+
+Internal link: Track narrative trades effectively using [bitcoin trading tips](/blog/bitcoin-trading-tips).
+
+## Strategy 3: Technical Breakout Trading
+
+Price action doesn't lie. Breakouts from consolidation patterns work.
+
+### Ideal Breakout Setup
+
+**Requirements**:
+1. At least 3 weeks of consolidation
+2. Decreasing volume during consolidation
+3. Volume spike on breakout (2x average)
+4. Breakout above key resistance
+5. Retest of breakout level as support
+
+### Entry Rules
+
+- Enter on breakout with stop below consolidation low
+- Or wait for retest of breakout level (safer but miss some moves)
+- Position size based on distance to stop loss
+- Target: Measured move (height of consolidation pattern)
+
+### Real Example
+
+**Asset**: Avalanche (AVAX)
+**Pattern**: 4-week range between $35-$42
+**Breakout**: Volume spike, broke $42 with 3x average volume
+**Entry**: $43.20 (small pullback after initial breakout)
+**Stop**: $40.50 (below consolidation low)
+**Target**: $50 (measured move: $7 range + $43 breakout)
+**Result**: Hit $51.20, exited $49.80
+
+**Key lesson**: When target hit, don't get greedy. Take profit and find next setup.
+
+Internal link: Avoid mistakes with our guide on [common crypto trading mistakes](/blog/common-crypto-trading-mistakes).
+
+## Strategy 4: Mean Reversion During Altseason
+
+In altseason (Bitcoin dominance falling, alts outperforming), oversold alts bounce hard.
+
+### Altseason Indicators
+
+1. **Bitcoin dominance** falling (check TradingView: BTC.D chart)
+2. **Alt/BTC pairs** making higher highs
+3. **Volume** increasing across altcoin markets
+4. **Funding rates** positive but not extreme
+
+### How to Play It
+
+1. **Find oversold alts**: Down 30%+ while market is up
+2. **Check fundamentals**: Make sure there's no bad news
+3. **Identify support**: Previous support level or major moving average
+4. **Enter with confirmation**: Bullish candlestick pattern
+5. **Quick profit target**: Mean reversion plays are 7-20% moves
+6. **Tight stop**: If it drops another 10%, you were wrong
+
+### Real Example
+
+**Scenario**: March 2024 altseason, everything pumping
+**Asset**: Chainlink (LINK)
+**Observation**: LINK down -25% while ETH, SOL, AVAX up 15%+
+**No bad news**: Just market rotation
+**Entry**: $17.50 after bullish engulfing candle at 200-day MA
+**Target**: $20.50 (back to mean of recent alt performers)
+**Stop**: $16.20
+**Result**: Hit $20.90 in 9 days
+
+Internal link: Implement proper [risk management in crypto trading](/blog/risk-management-in-crypto-trading).
+
+## Strategy 5: Accumulation During Bear Markets
+
+The best time to build alt positions is when everyone's capitulating.
+
+### Bear Market Accumulation Rules
+
+1. **Only trade top 20 market cap** alts (survivors)
+2. **Dollar-cost average** over 3-6 months
+3. **Use limit orders** 10-20% below current price
+4. **Focus on alts with real usage** (not just speculation)
+5. **Target 40-60% of final position size** before reversal
+
+### Asset Selection Criteria
+
+- **Still developing**: GitHub activity continuing
+- **Treasury runway**: 2+ years of funding
+- **Institutional backing**: VCs not dumping
+- **Community active**: Discord/Telegram engagement
+- **Survived previous bear**: Proven resilience
+
+### Real Example
+
+**Period**: June-December 2022 (crypto winter)
+**Selected**: Ethereum (fundamentally sound, Merge upcoming)
+**Strategy**: Buy $500 worth every Monday
+**Average entry**: $1,680
+**Bull market exit** (January 2024): $2,870
+**Return**: +71%
+
+**Patience required**: 18 months from start of DCA to exit.
+
+Internal link: Use [trading journal best practices](/blog/trading-journal-best-practices) to track long-term positions.
+
+## Risk Management for Altcoin Trading
+
+### Position Sizing Formula
+
+\`\`\`
+Position Size = (Account Risk × Account Size) / (Entry Price - Stop Loss)
+\`\`\`
+
+**Example**:
+- Account: $10,000
+- Risk per trade: 2% ($200)
+- Entry: $50
+- Stop: $45
+- Position Size: $200 / $5 = 40 tokens × $50 = $2,000
+
+**Maximum position**: Never more than 10% in one altcoin.
+
+### Portfolio Allocation
+
+**Conservative**:
+- 40% BTC
+- 40% ETH
+- 15% large-cap alts
+- 5% mid-cap alts
+
+**Aggressive**:
+- 20% BTC
+- 30% ETH  
+- 30% large-cap alts
+- 15% mid-cap alts
+- 5% small-cap alts
+
+**Never**: 100% in alts. You need BTC/ETH stability.
+
+Internal link: Analyze your alt performance with [trading analytics platform](/blog/trading-analytics-platform).
+
+## Common Altcoin Trading Mistakes
+
+### Mistake 1: Trading Every Pump
+
+You don't need to trade 50 alts. Focus on 5-10 you understand deeply.
+
+### Mistake 2: Ignoring Bitcoin
+
+When BTC dumps, alts follow. No alt is immune during BTC crashes.
+
+### Mistake 3: Falling for Low Market Cap Shills
+
+Twitter influencers promote their bags. Always verify with your own research.
+
+### Mistake 4: Holding Through -80% Drawdowns
+
+Set a maximum loss per position (e.g., -30%). Cut losses before disaster.
+
+### Mistake 5: No Exit Strategy
+
+Plan your exit before entering. Greed kills more traders than fear.
+
+Internal link: Compare your results with [spot vs futures trading journal](/blog/spot-vs-futures-trading-journal).
+
+## Tools and Resources
+
+### Essential Charting Platforms
+- TradingView (best for technical analysis)
+- CoinGecko (market overview and rankings)
+- Glassnode (on-chain metrics)
+- DefiLlama (DeFi protocol metrics)
+
+### Community Research
+- Crypto Twitter (follow credible analysts)
+- Discord alpha groups (be selective)
+- Reddit (r/CryptoCurrency, specific project subs)
+- YouTube (educational content, not shills)
+
+### Data Tracking
+- [TheTradingDiary.com](https://www.thetradingdiary.com) for trade journaling
+- Nansen (wallet tracking for whales)
+- Dune Analytics (custom blockchain data)
+
+Internal link: Track everything with our [trade tracking software](/blog/trade-tracking-software).
+
+## Getting Started This Week
+
+**Day 1**: Select 3 large-cap and 2 mid-cap alts to focus on
+**Day 2**: Study their charts, identify key levels
+**Day 3**: Set alerts for potential setups
+**Day 4-5**: Paper trade one strategy
+**Day 6-7**: Execute first real trade with 0.5% risk
+
+Remember: Professional altcoin traders aren't lucky. They're systematic, patient, and disciplined. Start with one strategy, master it, then expand.
+
+Internal link: Learn [what to track in crypto trading journal](/blog/what-to-track-in-crypto-trading-journal) for altcoin success.
+    `
+  },
+  {
+    title: "Bitcoin Trading Tips: 2025 Strategy Guide",
+    slug: "bitcoin-trading-tips",
+    metaTitle: "Bitcoin Trading Tips | Proven Strategies for 2025",
+    metaDescription: "Master Bitcoin trading with expert tips on timing entries, reading BTC dominance, halving cycles, and macro factors that drive price action.",
+    description: "Learn professional Bitcoin trading tips that work in all market conditions. Discover how to read BTC dominance, time entries, and manage risk effectively.",
+    focusKeyword: "bitcoin trading tips",
+    readTime: "11 min read",
+    author: "Gustavo",
+    date: "2025-10-29",
+    category: "Trading Guides",
+    tags: ["bitcoin trading", "BTC strategies", "cryptocurrency", "technical analysis"],
+    canonical: "https://www.thetradingdiary.com/blog/bitcoin-trading-tips",
+    language: "en",
+    heroImage: "/images/blog/bitcoin-tips-hero.jpg",
+    heroImageAlt: "Bitcoin trading chart with technical indicators and price action analysis",
+    content: `
+Bitcoin trading differs fundamentally from altcoin trading. BTC moves markets, doesn't follow them. These professional tips reveal how to trade Bitcoin profitably across all market conditions—bull, bear, and sideways.
+
+## Tip 1: Master BTC Dominance
+
+Bitcoin dominance (BTC.D) shows Bitcoin's market cap as a percentage of total crypto market cap. This single metric tells you what to trade.
+
+### How to Read BTC Dominance
+
+**Rising dominance (>50% and increasing)**:
+- Money flowing from alts into Bitcoin
+- Trade BTC, avoid alts
+- Usually happens during uncertainty or early bear markets
+- Alt/BTC pairs bleed
+
+**Falling dominance (<45% and decreasing)**:
+- Money flowing from BTC into alts (altseason)
+- Consider rotating some BTC profits to quality alts
+- Happens during bull market euphoria
+- BTC still rises but alts outperform
+
+**Stable dominance (45-50%, sideways)**:
+- Equilibrium state
+- Trade both BTC and alts based on individual setups
+- Most common during mid-bull market
+
+### Real Trading Example
+
+**Date**: November 2023
+**BTC Dominance**: 52% and rising
+**Market**: BTC breaking $40K while ETH/SOL stagnant
+**Decision**: 100% in BTC, exited all altcoin positions
+**Result**: BTC rallied to $49K while most alts flat or down
+
+**Key lesson**: When dominance rises aggressively, alts will underperform even if BTC pumps.
+
+Internal link: Track your BTC trades with our [crypto trading journal dashboard](/blog/crypto-journal-with-dashboard).
+
+## Tip 2: Understand Halving Cycles
+
+Bitcoin halvings happen every ~4 years, cutting miner rewards in half. These events create predictable patterns.
+
+### The 4-Year Cycle Pattern
+
+**Year 1 (Halving year - 2024)**:
+- Accumulation phase in early months
+- Breakout typically 6-12 months post-halving
+- Volatility increases
+- New all-time highs possible by end of year
+
+**Year 2 (2025)**:
+- Peak euphoria phase
+- Parabolic price action
+- All-time highs extended
+- Best year for selling near top
+
+**Year 3 (2026)**:
+- Bear market begins
+- -80% drawdowns common
+- Despair and capitulation
+- Smart money accumulates
+
+**Year 4 (2027)**:
+- Bottoming process
+- Slow recovery
+- Institutional interest returns
+- Build positions for next cycle
+
+### How to Trade the Cycle
+
+**Early cycle (Year 1)**: Accumulate aggressively on dips
+**Mid cycle (Year 2 first half)**: Hold and add on -20% corrections
+**Late cycle (Year 2 second half)**: Begin taking profits, reduce risk
+**Bear market (Year 3-4)**: Trade cautiously, focus on cash preservation
+
+**Current phase (2025)**: We're in prime bull market territory post-halving.
+
+Internal link: Learn from past cycles using [bitcoin trading tips](/blog/bitcoin-trading-tips).
+
+## Tip 3: Follow Macro Economic Indicators
+
+Bitcoin increasingly correlates with traditional markets. Watch these indicators:
+
+### Federal Reserve Policy
+
+**Dovish (rate cuts, QE)**: 
+- Bullish for Bitcoin
+- More liquidity in system
+- Risk-on environment
+- BTC tends to rally
+
+**Hawkish (rate hikes, QT)**:
+- Bearish for Bitcoin
+- Less liquidity
+- Risk-off environment
+- BTC tends to fall
+
+**How to track**: Follow FOMC meetings, Fed Chair speeches, CPI reports
+
+### Dollar Strength (DXY Index)
+
+**Inverse correlation**: When dollar weakens, BTC typically rises
+**Watch DXY**: If breaking below 100, bullish for BTC
+**Exception**: During massive risk-off events, both USD and BTC can rise
+
+### Stock Market (S&P 500)
+
+**High correlation since 2020**: BTC moves with stocks ~70% of the time
+**Watch**: If S&P dumps >3% in a day, BTC likely follows
+**Decoupling**: Rare but happens during crypto-specific events
+
+### Real Example
+
+**Date**: June 2024
+**Event**: Fed signals rate cut in September
+**Immediate reaction**: DXY falls, S&P rallies
+**BTC response**: Breaks $65K resistance within 48 hours
+**Trade**: Entered BTC long at $65,500, targeting $72K
+**Result**: Hit $71,800 before profit taking
+
+Internal link: Calculate precise risk with our [risk-reward calculator](/calculators/risk-reward-ratio).
+
+## Tip 4: Time Your Entries with Key Levels
+
+Bitcoin respects technical levels better than most assets.
+
+### Major Support/Resistance Levels
+
+**Current (2025) key levels**:
+- **$100K**: Psychological barrier, heavy resistance
+- **$85K**: Previous all-time high, now support
+- **$69K**: 2021 peak, tested multiple times
+- **$40K**: Bull market confirmation level
+- **$30K**: Major accumulation zone
+- **$20K**: Bear market bottom (2022)
+
+### How to Use These Levels
+
+1. **Never chase**: If BTC is at resistance with no pullback, wait
+2. **Buy the dip**: When BTC drops to support with panic, accumulate
+3. **Confirmation**: Enter after level holds with strong bounce
+4. **Stop placement**: Below support levels with cushion for wicks
+
+### Candlestick Patterns at Key Levels
+
+**Bullish signs at support**:
+- Hammer candles
+- Bullish engulfing
+- Morning star formations
+- Long lower wicks (rejection of lower prices)
+
+**Bearish signs at resistance**:
+- Shooting star candles
+- Bearish engulfing
+- Evening star formations
+- Long upper wicks (rejection of higher prices)
+
+Internal link: Avoid entry mistakes with [common crypto trading mistakes](/blog/common-crypto-trading-mistakes) guide.
+
+## Tip 5: Read On-Chain Metrics
+
+Bitcoin's transparent blockchain provides unique trading signals.
+
+### Exchange Net Flow
+
+**Negative (outflow)**: 
+- BTC leaving exchanges
+- Holders not planning to sell
+- Bullish signal
+- Supply squeeze likely
+
+**Positive (inflow)**:
+- BTC entering exchanges
+- Holders preparing to sell
+- Bearish warning
+- Potential supply dump
+
+**Tool**: CryptoQuant, Glassnode
+
+### MVRV Ratio (Market Value to Realized Value)
+
+**Below 1.0**: 
+- BTC trading below average cost basis
+- Historically great accumulation zone
+- Most holders underwater
+
+**1.0-2.5**: 
+- Healthy bull market range
+- Holders in profit but not euphoric
+- Safe to hold
+
+**Above 3.5**: 
+- Danger zone
+- Historical sell signals
+- Take profits
+
+**Above 5.0**:
+- Extreme greed
+- Top likely forming
+- Exit most position
+
+### Real Example
+
+**Date**: December 2022
+**MVRV**: 0.78 (deep undervalue)
+**BTC price**: $16,500
+**Action**: Started dollar-cost averaging
+**Result**: MVRV hit 2.8 at $73,000 (March 2024)
+**Return**: +342%
+
+Internal link: Track long-term positions with [trading journal best practices](/blog/trading-journal-best-practices).
+
+## Tip 6: Master Position Sizing
+
+Don't bet the farm on one trade. Professional position sizing = survival.
+
+### The 2% Rule
+
+**Never risk more than 2% per trade**
+
+**Example**:
+- Account: $50,000
+- Max risk: $1,000 (2%)
+- Entry: $68,000
+- Stop loss: $65,000
+- Risk per BTC: $3,000
+- Position size: $1,000 / $3,000 = 0.33 BTC ($22,400 position)
+
+**Why it works**: You can be wrong 20 times in a row and still survive.
+
+### Scaling In Strategy
+
+Instead of one large entry:
+
+**33% at initial entry** (e.g., $67,000)
+**33% at first support** (e.g., $65,000)
+**34% at final support** (e.g., $63,000)
+
+**Benefits**:
+- Average down if wrong initially
+- Don't miss move if price never pulls back
+- Sleep better with partial position
+
+Internal link: Calculate optimal sizes with our [position size calculator](/calculators/position-size).
+
+## Tip 7: Use Multiple Timeframes
+
+One timeframe = one perspective. Professionals use 3.
+
+### The 3-Timeframe Approach
+
+**Higher timeframe (Daily/Weekly)**: 
+- Overall trend direction
+- Major support/resistance
+- Macro sentiment
+- Position bias (long vs short)
+
+**Trading timeframe (4H)**: 
+- Entry and exit signals
+- Setup identification
+- Trade management
+- Where you execute
+
+**Lower timeframe (1H)**: 
+- Precise entries
+- Stop loss placement
+- Early exit warnings
+- Confirmation signals
+
+### Example Multi-Timeframe Trade
+
+**Weekly**: Uptrend intact, above 20-week MA
+**Daily**: Pullback to 50-day MA, holding as support
+**4-Hour**: Bullish divergence on RSI, consolidation
+**1-Hour**: Bullish engulfing, volume surge
+**Decision**: Enter long with confidence (3 timeframes align)
+
+Internal link: Analyze timeframe performance with [trading analytics platform](/blog/trading-analytics-platform).
+
+## Tip 8: Know When NOT to Trade
+
+The best trades are often the ones you don't take.
+
+### Avoid These Conditions
+
+**Low liquidity periods**:
+- Christmas week
+- Thanksgiving
+- Weekend Asia sessions
+- Major holidays
+
+**During these times**: Spread widens, slippage increases, stop hunts common
+
+**High uncertainty events**:
+- Major Fed announcements (wait for reaction)
+- Geopolitical crises
+- Exchange hacks
+- Regulatory news
+
+**Wait 2-4 hours** after major news before entering.
+
+**Personal conditions**:
+- Tired (less than 6 hours sleep)
+- Emotional (after big loss or win)
+- Distracted (family issues, work stress)
+- Sick
+
+**Rule**: If you're not at 80% mental capacity, don't trade.
+
+Internal link: Learn more about discipline in [risk management in crypto trading](/blog/risk-management-in-crypto-trading).
+
+## Tip 9: Set Realistic Profit Targets
+
+Greed kills. Plan your exit before entry.
+
+### Target Setting Formula
+
+**Swing trades (days to weeks)**:
+- Minimum R:R: 2:1
+- Typical targets: 10-20% moves
+- Time horizon: 3-14 days
+
+**Position trades (weeks to months)**:
+- Minimum R:R: 3:1
+- Typical targets: 30-50% moves
+- Time horizon: 1-3 months
+
+**HODLing (months to years)**:
+- Target: New all-time highs
+- Exit strategy: Scale out 25% at key resistance levels
+- Time horizon: 6+ months
+
+### Taking Profits Systematically
+
+**Example BTC long at $65,000**:
+
+Exit 25% at $72,000 (+10.8%)
+Exit 25% at $78,000 (+20%)
+Exit 25% at $85,000 (+30.8%)
+Trail stop on final 25% at 10% below peak
+
+**Never**: Hold entire position hoping for 100% move.
+
+Internal link: Track profit-taking with [spot vs futures trading journal](/blog/spot-vs-futures-trading-journal).
+
+## Tip 10: Journal Every Trade
+
+Memory is unreliable. Data isn't.
+
+### What to Track
+
+**Entry details**:
+- Price
+- Position size
+- Reasoning
+- Setup quality (1-10)
+- Market conditions
+- Technical setup
+- Emotional state
+
+**Exit details**:
+- Exit price
+- Reason for exit
+- Did you follow plan?
+- Lessons learned
+- What to improve
+
+**Post-trade analysis**:
+- Win or loss
+- R:R achieved
+- Mistakes made
+- What went right
+
+### Monthly Review Process
+
+**Week 1**: Review all trades from previous month
+**Week 2**: Calculate win rate, profit factor, expectancy
+**Week 3**: Identify your 3 best and 3 worst trades
+**Week 4**: Write down lessons and adjust strategy
+
+Internal link: Start tracking with [what to track in crypto trading journal](/blog/what-to-track-in-crypto-trading-journal).
+
+## Getting Started with These Tips
+
+**Week 1**: Set up BTC dominance alerts and macro calendar
+**Week 2**: Mark key technical levels on your charts
+**Week 3**: Open position with proper sizing
+**Week 4**: Review first month's trades
+
+Remember: These tips work only with consistency. One perfect trade doesn't make you profitable. 100 systematic trades following these principles do.
+
+Internal link: Track everything with our [trade tracking software](/blog/trade-tracking-software).
+    `
+  },
 ];
