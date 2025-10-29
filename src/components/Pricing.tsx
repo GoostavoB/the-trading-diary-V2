@@ -26,14 +26,17 @@ const Pricing = () => {
     {
       id: 'free',
       name: "Free",
-      description: "Get started with basic tracking",
+      description: "Perfect for getting started",
       monthlyPrice: 0,
       annualPrice: 0,
       annualTotal: 0,
-      uploads: "5 uploads/month",
+      uploads: "5 uploads total",
+      uploadSubtext: "(starter gift)",
       xp: "Unlimited XP",
       widgets: "Tiers 1–2",
       customization: "Default Colors (light/dark)",
+      accounts: "One account only",
+      extraUploads: "Add 10 for $5",
       featuresKeys: [
         "pricing.plans.basic.features.uploads",
         "pricing.plans.basic.features.accounts",
@@ -57,15 +60,15 @@ const Pricing = () => {
       id: 'pro',
       name: "Pro",
       description: "For serious traders",
-      monthlyPrice: promoStatus.isActive ? 12 : 15,
-      annualPrice: promoStatus.isActive ? 10 : 12,
-      annualTotal: promoStatus.isActive ? 120 : 144,
-      regularMonthlyPrice: 15,
-      regularAnnualPrice: 12,
+      monthlyPrice: 12,
+      annualPrice: 10,
+      annualTotal: 120,
       uploads: "30 uploads/month",
       xp: "Unlimited XP",
       widgets: "Tiers 1–4",
-      customization: "3 Color Controls (Primary, Secondary, Accent)",
+      customization: "Primary, Secondary, Accent color control",
+      accounts: "Unlimited accounts",
+      extraUploads: "$2 per 10 extra uploads",
       featuresKeys: [
         "pricing.plans.pro.features.uploads",
         "pricing.plans.pro.features.unlimitedAccounts",
@@ -86,15 +89,15 @@ const Pricing = () => {
       id: 'elite',
       name: "Elite",
       description: "Maximum power and flexibility",
-      monthlyPrice: promoStatus.isActive ? 25 : 30,
-      annualPrice: promoStatus.isActive ? 20 : 25,
-      annualTotal: promoStatus.isActive ? 240 : 300,
-      regularMonthlyPrice: 30,
-      regularAnnualPrice: 25,
+      monthlyPrice: 25,
+      annualPrice: 20,
+      annualTotal: 240,
       uploads: "150 uploads/month",
       xp: "Unlimited XP",
       widgets: "All Widgets",
-      customization: "Full Color + Background Customization",
+      customization: "Full color + background customization",
+      accounts: "Unlimited accounts",
+      extraUploads: "$1 per 10 extra uploads (50% off)",
       featuresKeys: [
         "pricing.plans.elite.features.uploads",
         "pricing.plans.elite.features.unlimitedAccounts",
@@ -159,7 +162,7 @@ const Pricing = () => {
               Choose your plan. Train like a pro.
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
-              7-day free trial. No credit card required. Lock in your discount.
+              No credit card required • Upgrade anytime • Offer ending soon
             </p>
 
             {/* Billing Toggle */}
@@ -212,18 +215,6 @@ const Pricing = () => {
                   </div>
                 )}
                 
-                {promoStatus.isActive && plan.id === 'pro' && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-3 right-4 animate-pulse flex items-center gap-1"
-                  >
-                    <Clock className="w-3 h-3" />
-                    {promoStatus.daysRemaining > 0 
-                      ? `Offer ends in ${promoStatus.daysRemaining}d`
-                      : `Ends in ${promoStatus.hoursRemaining}h`
-                    }
-                  </Badge>
-                )}
 
                 <div className="mb-5">
                   <h3 className="text-xl md:text-2xl font-bold mb-1.5">{plan.name}</h3>
@@ -233,11 +224,6 @@ const Pricing = () => {
                   {plan.monthlyPrice > 0 ? (
                     <>
                       <div className="flex items-baseline gap-2 mb-2">
-                        {promoStatus.isActive && plan.id === 'pro' && (
-                          <span className="text-2xl font-bold text-muted-foreground line-through mr-1">
-                            ${billingCycle === 'monthly' ? plan.regularMonthlyPrice : plan.regularAnnualPrice}
-                          </span>
-                        )}
                         <span className="text-3xl md:text-4xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
                           ${getDisplayPrice(plan)}
                         </span>
@@ -245,15 +231,15 @@ const Pricing = () => {
                           /{billingCycle === 'monthly' ? t('pricing.perMonth') : t('pricing.perMonthBilledAnnually')}
                         </span>
                       </div>
-                      {promoStatus.isActive && plan.id === 'pro' && (
-                        <div className="text-sm font-semibold text-green-600 dark:text-green-400 mb-2">
-                          🎉 Save 40% during launch offer
-                        </div>
-                      )}
                       {billingCycle === 'annual' && (
                         <div className="text-xs text-green-600 dark:text-green-400 font-medium">
-                          {t('pricing.savingsAmount', { amount: getSavings(plan) })}
+                          Save ${getSavings(plan)} annually
                         </div>
+                      )}
+                      {plan.monthlyPrice > 0 && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {billingCycle === 'annual' ? `$${plan.annualTotal}/year billed annually` : 'Billed monthly'}
+                        </p>
                       )}
                     </>
                   ) : (
@@ -265,12 +251,24 @@ const Pricing = () => {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div className="text-xs text-muted-foreground mt-2 cursor-help border-b border-dotted border-muted-foreground/30 inline-block">
-                          {plan.uploads} • {plan.widgets}
+                          {plan.uploads} {plan.uploadSubtext && plan.uploadSubtext} • {plan.widgets}
                         </div>
                       </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="text-xs">1 upload = up to 10 trades</p>
-                        <p className="text-xs">{plan.uploads.includes('5') ? '50' : plan.uploads.includes('30') ? '300' : '1,500'} trades/month max</p>
+                      <TooltipContent className="max-w-xs">
+                        <div className="space-y-1">
+                          <p className="text-xs font-semibold">Upload Logic</p>
+                          <p className="text-xs">1 upload = up to 10 trades</p>
+                          <p className="text-xs text-primary">
+                            {plan.uploads.includes('5') ? '50 trades total' : 
+                             plan.uploads.includes('30') ? '300 trades/month' : 
+                             '1,500 trades/month'}
+                          </p>
+                          {plan.extraUploads && (
+                            <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
+                              Extra uploads: {plan.extraUploads}
+                            </p>
+                          )}
+                        </div>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -290,11 +288,11 @@ const Pricing = () => {
 
                 {plan.monthlyPrice > 0 ? (
                   <p className="text-xs text-muted-foreground text-center mb-5 leading-relaxed">
-                    {t('pricing.trialTerms', '7-day trial • Cancel anytime • Prorated refund in first 14 days on annual')}
+                    No credit card required • Upgrade anytime • Offer ending soon
                   </p>
                 ) : (
                   <p className="text-xs text-muted-foreground text-center mb-5 leading-relaxed">
-                    {t('pricing.noCardRequired', 'No credit card required')}
+                    No credit card required • Upgrade anytime
                   </p>
                 )}
 
@@ -316,7 +314,7 @@ const Pricing = () => {
           </div>
 
           <p className="text-center text-muted-foreground text-xs md:text-sm mt-10 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            {t('pricing.guaranteeNote')}
+            No credit card required • Upgrade anytime • Offer ending soon
           </p>
         </div>
       </section>

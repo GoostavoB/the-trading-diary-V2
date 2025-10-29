@@ -16,8 +16,9 @@ const PricingComparison = () => {
     {
       category: t('pricing.comparison.categories.uploads'),
       items: [
-        { name: t('pricing.comparison.features.imageUploads'), basic: "20/mo", pro: "50/mo", elite: "120/mo" },
+        { name: t('pricing.comparison.features.imageUploads'), basic: "5 total (starter gift)", pro: "30/month", elite: "150/month" },
         { name: t('pricing.comparison.features.tradesPerUpload'), basic: "10", pro: "10", elite: "10" },
+        { name: t('pricing.comparison.features.extraUploadCost'), basic: "$5 per 10", pro: "$2 per 10", elite: "$1 per 10 (50% off)" },
         { name: t('pricing.comparison.features.manualEntry'), basic: true, pro: true, elite: true },
         { name: t('pricing.comparison.features.csvExport'), basic: true, pro: true, elite: true },
       ]
@@ -26,6 +27,19 @@ const PricingComparison = () => {
       category: t('pricing.comparison.categories.accounts'),
       items: [
         { name: t('pricing.comparison.features.connectedAccounts'), basic: "1", pro: "Unlimited", elite: "Unlimited" },
+      ]
+    },
+    {
+      category: "XP & Widgets",
+      items: [
+        { name: "XP System", basic: "Unlimited", pro: "Unlimited", elite: "Unlimited" },
+        { name: "Widget Access", basic: "Tiers 1-2", pro: "Tiers 1-4", elite: "All Widgets" },
+      ]
+    },
+    {
+      category: "Customization",
+      items: [
+        { name: "Color Themes", basic: "Default (light/dark)", pro: "Primary, Secondary, Accent", elite: "Full color + background" },
       ]
     },
     {
@@ -190,7 +204,7 @@ const PricingComparison = () => {
           <div className="inline-flex items-center gap-2 px-6 py-3 bg-primary/5 backdrop-blur-sm border border-primary/20 rounded-full">
             <Check className="w-5 h-5 text-primary" />
             <span className="text-sm font-medium">
-              {t('pricing.guaranteeNote')}
+              No credit card required • Upgrade anytime • Offer ending soon
             </span>
           </div>
         </motion.div>
@@ -201,9 +215,9 @@ const PricingComparison = () => {
           <div className="hidden md:block sticky top-20 z-20 backdrop-blur-xl bg-background/80 rounded-2xl border border-border/50 p-6 mb-6">
             <div className="grid grid-cols-4 gap-4">
               <div className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                {t('pricing.comparison.feature')}
+                Feature
               </div>
-              <div className="text-center text-sm font-bold">Basic</div>
+              <div className="text-center text-sm font-bold">Free</div>
               <div className="text-center text-sm font-bold relative">
                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-primary text-primary-foreground text-[10px] font-medium rounded-full whitespace-nowrap">
                   Most Popular
@@ -220,7 +234,7 @@ const PricingComparison = () => {
               <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Feature
               </div>
-              <div className="text-center text-xs font-bold">Basic</div>
+              <div className="text-center text-xs font-bold">Free</div>
               <div className="text-center text-xs font-bold relative">
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-primary text-primary-foreground text-[8px] font-medium rounded-full whitespace-nowrap">
                   Popular

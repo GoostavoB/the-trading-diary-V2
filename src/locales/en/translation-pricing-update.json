@@ -1,12 +1,16 @@
 {
   "pricing": {
     "uploadNote": "Up to 10 trades per upload",
+    "noCardRequired": "No credit card required",
+    "upgradeAnytime": "Upgrade anytime",
+    "offerEnding": "Offer ending soon",
+    "launchOffer": "🔥 Launch offer ending soon – up to 40% off early access pricing. Prices will increase by 20% after this offer.",
     "plans": {
       "basic": {
-        "name": "Starter",
-        "description": "Perfect for beginners",
+        "name": "Free",
+        "description": "Perfect for getting started",
         "features": {
-          "uploads": "20 uploads/month • Up to 10 trades per upload",
+          "uploads": "5 uploads total (starter gift) • Up to 10 trades per upload",
           "accounts": "1 connected account",
           "aiInsights": "AI Insights on the homepage",
           "tradingHistory": "Trading history",
@@ -23,7 +27,7 @@
       },
       "pro": {
         "features": {
-          "uploads": "50 uploads/month • Up to 10 trades per upload",
+          "uploads": "30 uploads/month • Up to 10 trades per upload",
           "unlimitedAccounts": "Unlimited accounts",
           "feeAnalysis": "Fee analysis",
           "tradingPlan": "Trading plan",
@@ -37,7 +41,7 @@
       },
       "elite": {
         "features": {
-          "uploads": "120 uploads/month • Up to 10 trades per upload",
+          "uploads": "150 uploads/month • Up to 10 trades per upload",
           "unlimitedAccounts": "Unlimited accounts",
           "customMetrics": "Custom AI metrics: 10 per month",
           "earlyAccess": "Early access to new features",
@@ -56,10 +60,11 @@
         "extras": "Extras"
       },
       "features": {
-        "imageUploads": "Image uploads per month",
+        "imageUploads": "Image uploads",
         "tradesPerUpload": "Trades per upload",
+        "extraUploadCost": "Extra upload cost",
         "manualEntry": "Manual trade entry",
-        "csvExport": "CSV export only",
+        "csvExport": "CSV export",
         "connectedAccounts": "Connected accounts",
         "customMetrics": "Custom AI metrics"
       }
