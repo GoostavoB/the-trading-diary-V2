@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Expand } from "lucide-react";
-import dashboardScreenshot from "@/assets/dashboard-screenshot-new.png";
+import dashboardScreenshot from "@/assets/dashboard-screenshot.png";
 import { useState } from "react";
 const Hero = () => {
   const navigate = useNavigate();
@@ -116,58 +116,94 @@ const Hero = () => {
             </div>
           </motion.div>
 
-          {/* RIGHT SIDE - Dashboard Preview */}
-          <motion.div initial={{
-          opacity: 0,
-          x: 30
-        }} animate={{
-          opacity: 1,
-          x: 0
-        }} transition={{
-          duration: 0.6,
-          delay: 0.2
-        }} className="relative mx-auto">
-            {/* Browser-like mockup frame */}
-            <div className="relative glass-strong rounded-2xl overflow-hidden shadow-2xl border border-primary/20 mx-auto max-w-[900px] md:max-w-none">
-              {/* Browser chrome */}
-              <div className="bg-gray-800/50 px-4 py-3 flex items-center gap-2 border-b border-primary/10">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/60"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/60"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500/60"></div>
-                </div>
-                <div className="flex-1 mx-4 bg-background/30 rounded px-3 py-1 text-xs text-muted-foreground">
-                  thetradingdiary.com/dashboard
-                </div>
-              </div>
-              
-              {/* Dashboard content - Real Screenshot */}
-              <Dialog open={isImageOpen} onOpenChange={setIsImageOpen}>
-                <DialogTrigger asChild>
-                  <button className="aspect-[16/10] bg-background relative overflow-hidden cursor-pointer group w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label="View full dashboard screenshot">
-                    <img src={dashboardScreenshot} alt="Trading Dashboard showing real-time analytics, win rate, ROI, and capital growth charts" className="w-full h-full object-contain object-center" width={1920} height={1200} loading="eager" />
-                    
-                    {/* Centered expand icon - hidden by default, shows on hover/focus */}
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                      <div className="p-4 rounded-full bg-primary backdrop-blur-sm">
-                        <Expand className="h-6 w-6 text-primary-foreground" aria-hidden="true" />
-                      </div>
-                    </div>
-                    
-                    {/* Subtle glow overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-primary/5 via-transparent to-transparent pointer-events-none"></div>
-                  </button>
-                </DialogTrigger>
-                <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden">
-                  <div className="relative w-full h-full flex items-center justify-center bg-background/95 backdrop-blur-xl p-4">
-                    <img src={dashboardScreenshot} alt="Full Trading Dashboard with detailed analytics and performance metrics" className="max-w-full max-h-[90vh] object-contain rounded-lg" width={1920} height={1200} loading="lazy" decoding="async" />
+          {/* RIGHT SIDE - Dashboard Preview with 3D Effect */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30, rotateX: 10 }} 
+            animate={{ opacity: 1, y: 0, rotateX: 0 }} 
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="relative mx-auto"
+            style={{ perspective: '1500px' }}
+          >
+            {/* Ambient glow layers */}
+            <div className="absolute -inset-20 bg-gradient-to-br from-primary/20 via-purple-500/10 to-cyan-500/20 rounded-full blur-[100px] -z-10 animate-pulse-slow"></div>
+            <div className="absolute -inset-16 bg-gradient-to-tl from-cyan-500/15 via-transparent to-purple-500/15 rounded-full blur-[80px] -z-10 animate-pulse-slow" style={{ animationDelay: '1.5s' }}></div>
+            
+            {/* 3D Floating Card Container */}
+            <motion.div
+              animate={{ 
+                y: [0, -10, 0],
+                rotateX: [0, 2, 0],
+                rotateY: [0, -1, 0]
+              }}
+              transition={{ 
+                duration: 6,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="relative"
+              style={{ transformStyle: 'preserve-3d' }}
+            >
+              {/* Glass-morphism frame with enhanced depth */}
+              <div className="relative rounded-3xl overflow-hidden backdrop-blur-xl bg-gradient-to-br from-white/[0.07] to-white/[0.02] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] mx-auto max-w-[900px] md:max-w-none">
+                {/* Enhanced browser chrome with glass effect */}
+                <div className="bg-gradient-to-r from-gray-900/60 via-gray-800/50 to-gray-900/60 backdrop-blur-md px-4 py-3 flex items-center gap-2 border-b border-white/5">
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-gradient-to-br from-red-400 to-red-600 shadow-lg shadow-red-500/50"></div>
+                    <div className="w-3 h-3 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg shadow-yellow-500/50"></div>
+                    <div className="w-3 h-3 rounded-full bg-gradient-to-br from-green-400 to-green-600 shadow-lg shadow-green-500/50"></div>
                   </div>
-                </DialogContent>
-              </Dialog>
-            </div>
+                  <div className="flex-1 mx-4 bg-background/40 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs text-muted-foreground border border-white/5">
+                    thetradingdiary.com/dashboard
+                  </div>
+                </div>
+                
+                {/* Dashboard content - Real Screenshot with enhanced effects */}
+                <Dialog open={isImageOpen} onOpenChange={setIsImageOpen}>
+                  <DialogTrigger asChild>
+                    <button 
+                      className="aspect-[16/10] bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 relative overflow-hidden cursor-pointer group w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" 
+                      aria-label="View full dashboard screenshot"
+                    >
+                      <img 
+                        src={dashboardScreenshot} 
+                        alt="Trading Dashboard showing real-time analytics, win rate, ROI, and capital growth charts" 
+                        className="w-full h-full object-contain object-center transform group-hover:scale-[1.02] transition-transform duration-500" 
+                        width={1920} 
+                        height={1200} 
+                        loading="eager" 
+                      />
+                      
+                      {/* Enhanced hover overlay with glass effect */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                        <div className="p-4 rounded-full bg-primary/90 backdrop-blur-md shadow-2xl shadow-primary/50 transform group-hover:scale-110 transition-transform duration-300">
+                          <Expand className="h-6 w-6 text-primary-foreground" aria-hidden="true" />
+                        </div>
+                      </div>
+                      
+                      {/* Ambient gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-primary/[0.03] via-transparent to-cyan-500/[0.03] pointer-events-none"></div>
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden">
+                    <div className="relative w-full h-full flex items-center justify-center bg-background/95 backdrop-blur-xl p-4">
+                      <img 
+                        src={dashboardScreenshot} 
+                        alt="Full Trading Dashboard with detailed analytics and performance metrics" 
+                        className="max-w-full max-h-[90vh] object-contain rounded-lg" 
+                        width={1920} 
+                        height={1200} 
+                        loading="lazy" 
+                        decoding="async" 
+                      />
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
 
-            {/* Decorative glow */}
-            <div className="absolute -inset-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-3xl blur-2xl -z-10 opacity-50"></div>
+              {/* Enhanced 3D shadow layers for depth */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple-500/10 to-cyan-500/10 rounded-3xl blur-2xl -z-10 transform translate-y-8" style={{ transform: 'translateZ(-50px) translateY(32px)' }}></div>
+              <div className="absolute inset-0 bg-black/20 rounded-3xl blur-xl -z-20 transform translate-y-6" style={{ transform: 'translateZ(-100px) translateY(24px)' }}></div>
+            </motion.div>
           </motion.div>
         </div>
       </div>
