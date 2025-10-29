@@ -28,14 +28,47 @@ export interface HomeInsightsResponse {
 }
 
 export const useHomeInsights = (refreshInterval = 60000) => {
+  const defaultData: HomeInsightsResponse = {
+    asOf: new Date().toISOString(),
+    pair: 'BTCUSDT',
+    timeframe: '1h',
+    user_insights: [],
+    market_insights: [],
+  };
+
+  const invokeWithTimeout = async (ms = 2500): Promise<HomeInsightsResponse> => {
+    try {
+      const timeoutPromise = new Promise<HomeInsightsResponse>((resolve) =>
+        setTimeout(() => resolve(defaultData), ms)
+      );
+
+      const invokePromise = supabase.functions
+        .invoke<HomeInsightsResponse>('ai-insights-home')
+        .then(({ data, error }) => {
+          if (error || !data) {
+            console.error('ai-insights-home error:', error);
+            return defaultData;
+          }
+          return data;
+        })
+        .catch((err) => {
+          console.error('ai-insights-home invoke failed:', err);
+          return defaultData;
+        });
+
+      return Promise.race([invokePromise, timeoutPromise]);
+    } catch (e) {
+      console.error('ai-insights-home exception:', e);
+      return defaultData;
+    }
+  };
+
   return useQuery({
     queryKey: ['home-insights'],
-    queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke<HomeInsightsResponse>('ai-insights-home');
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => invokeWithTimeout(),
     refetchInterval: refreshInterval,
     staleTime: 30000,
+    retry: 0,
+    refetchOnWindowFocus: false,
   });
 };

@@ -29,10 +29,19 @@ export const AIInsightsBox = memo(({
     localStorage.setItem('ai-insights-collapsed', isCollapsed.toString());
   }, [isCollapsed]);
 
+  const [timedOut, setTimedOut] = useState(false);
+  useEffect(() => {
+    if (!isLoading) {
+      setTimedOut(false);
+      return;
+    }
+    const id = setTimeout(() => setTimedOut(true), 1500);
+    return () => clearTimeout(id);
+  }, [isLoading]);
+
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
   };
-
   const allInsights = data ? [...data.user_insights, ...data.market_insights] : [];
 
   const {
@@ -49,7 +58,7 @@ export const AIInsightsBox = memo(({
     );
   }
 
-  if (isLoading) {
+  if (isLoading && !timedOut) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {Array.from({ length: 8 }).map((_, i) => (
@@ -64,6 +73,9 @@ export const AIInsightsBox = memo(({
         ))}
       </div>
     );
+  }
+  if (isLoading && timedOut) {
+    return null;
   }
 
   if (!visibleInsights.length) {
