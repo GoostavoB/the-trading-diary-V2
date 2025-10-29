@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface Account {
   id: string;
@@ -45,8 +46,8 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) {
-        console.error('Error fetching accounts:', error);
-        // Set empty state on error to allow dashboard to load
+        console.error('Error fetching accounts:', error, error.message);
+        toast.error('Failed to load accounts. Using default view.');
         setAccounts([]);
         setActiveAccountId(null);
         return;
@@ -56,7 +57,7 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
       setActiveAccountId(data.activeAccountId);
     } catch (error) {
       console.error('Error fetching accounts:', error);
-      // Set empty state on error to allow dashboard to load
+      toast.error('Unable to connect to accounts service');
       setAccounts([]);
       setActiveAccountId(null);
     } finally {

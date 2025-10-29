@@ -14,6 +14,7 @@ export const useOnboarding = () => {
   const checkOnboardingStatus = async () => {
     if (!user) {
       setLoading(false);
+      setShowOnboarding(false);
       return;
     }
 
@@ -34,16 +35,18 @@ export const useOnboarding = () => {
           });
 
         if (insertError) {
-          console.error('Error creating user settings:', insertError);
+          console.warn('Could not create user settings:', insertError);
+          setShowOnboarding(false);
+        } else {
+          setShowOnboarding(true);
         }
-        
-        setShowOnboarding(true);
         setLoading(false);
         return;
       }
 
       if (error) {
-        console.error('Error checking onboarding status:', error);
+        console.warn('Could not check onboarding status:', error);
+        setShowOnboarding(false);
         setLoading(false);
         return;
       }
@@ -51,7 +54,8 @@ export const useOnboarding = () => {
       // Show onboarding if not completed
       setShowOnboarding(!data?.onboarding_completed);
     } catch (error) {
-      console.error('Error in checkOnboardingStatus:', error);
+      console.warn('Error in checkOnboardingStatus:', error);
+      setShowOnboarding(false);
     } finally {
       setLoading(false);
     }
