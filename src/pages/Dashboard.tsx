@@ -1033,8 +1033,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Customize Dashboard Controls - Only show on Overview tab */}
-        {!loading && stats && stats.total_trades > 0 && activeTab === 'overview' && (
+        {/* Customize Dashboard Controls - Always show on Overview tab */}
+        {!loading && activeTab === 'overview' && (
           <div data-tour="dashboard-customization">
             <CustomizeDashboardControls
               isCustomizing={isCustomizing}
@@ -1084,23 +1084,6 @@ const Dashboard = () => {
             {/* AI Insights Box */}
             <div className="mb-6 animate-fade-in" style={{animationDelay: '0.4s'}}>
               <AIInsightsBox />
-            </div>
-
-            {/* Social Share Section */}
-            <Card className="p-6 mb-6 animate-fade-in glass" style={{animationDelay: '0.45s'}}>
-              <h3 className="text-lg font-semibold mb-4">Share Your Trading Journey</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Share your progress on social media and earn XP rewards!
-              </p>
-              <QuickShareButtons 
-                text="Check out my trading progress! 📈 #TradingJournal #CryptoTrading"
-                contentType="general"
-              />
-            </Card>
-
-            {/* Gamification Hub */}
-            <div className="mb-6 animate-fade-in" style={{animationDelay: '0.475s'}}>
-              <GamificationHub />
             </div>
 
             {/* Main Content Tabs */}
@@ -1203,6 +1186,23 @@ const Dashboard = () => {
                 </Suspense>
               </TabsContent>
             </Tabs>
+
+            {/* Social Share Section - Moved to bottom */}
+            <Card className="p-6 mb-6 animate-fade-in glass">
+              <h3 className="text-lg font-semibold mb-4">Share Your Trading Journey</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Share your progress on social media and earn XP rewards!
+              </p>
+              <QuickShareButtons 
+                text="Check out my trading progress! 📈 #TradingJournal #CryptoTrading"
+                contentType="general"
+              />
+            </Card>
+
+            {/* Gamification Hub - Moved to bottom */}
+            <div className="mb-6 animate-fade-in">
+              <GamificationHub />
+            </div>
           </>
         )}
         

@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { TourButton } from '@/components/tour/TourButton';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -66,6 +67,7 @@ const AppLayout = ({ children, isGamificationOpen, onGamificationToggle }: AppLa
               <div data-tour="theme-toggle">
                 <ThemeStudio />
               </div>
+              <TourButton />
               <div data-tour="settings">
                 <UserMenu />
               </div>
@@ -84,6 +86,7 @@ const AppLayout = ({ children, isGamificationOpen, onGamificationToggle }: AppLa
               <BlurToggle variant="icon" />
               <KeyboardShortcutsHelp />
               <ThemeStudio />
+              <TourButton />
               <UserMenu />
             </div>
           </header>
