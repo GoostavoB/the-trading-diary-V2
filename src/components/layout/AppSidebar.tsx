@@ -61,7 +61,6 @@ export function AppSidebar() {
       defaultOpen: true,
       items: [
         { title: t('navigation.dashboard'), url: '/dashboard', icon: BarChart3, iconName: 'BarChart3', keywords: ['home', 'overview', 'main', 'summary', 'stats', 'statistics', 'metrics', 'performance', 'snapshot', 'widgets', 'customize', 'view', 'monitor', 'landing', 'central', 'hub'] },
-        { title: t('navigation.myMetrics'), url: '/my-metrics', icon: Star, iconName: 'Star', keywords: ['metrics', 'custom', 'kpi', 'benchmarks', 'personal', 'indicators', 'measure', 'track', 'performance', 'own', 'create', 'define', 'personalized'] },
       ],
     },
     {
