@@ -130,8 +130,26 @@ const Pricing = () => {
 
   return (
     <>
-      <section id="pricing-section" className="py-16 md:py-20 px-6" aria-labelledby="pricing-heading">
-        <div className="container mx-auto max-w-6xl">
+      <section id="pricing-section" className="py-16 md:py-20 px-6 relative overflow-hidden" aria-labelledby="pricing-heading">
+        {/* Ambient Background Glow */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div 
+            className="absolute top-1/2 left-[30%] w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2"
+            style={{
+              background: 'radial-gradient(circle, rgba(45,104,255,0.08), transparent 60%)',
+              filter: 'blur(120px)',
+            }}
+          />
+          <div 
+            className="absolute top-1/2 right-[30%] w-[600px] h-[600px] translate-x-1/2 -translate-y-1/2"
+            style={{
+              background: 'radial-gradient(circle, rgba(255,200,45,0.08), transparent 60%)',
+              filter: 'blur(120px)',
+            }}
+          />
+        </div>
+
+        <div className="container mx-auto max-w-6xl relative z-10">
           {/* Urgency Banner */}
           <UrgencyBanner />
 
@@ -189,139 +207,193 @@ const Pricing = () => {
             )}
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4 md:gap-6" role="list">
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto" role="list">
             {plans.map((plan, index) => {
               const isFree = plan.id === 'free';
               const isElite = plan.id === 'elite';
               
               return (
-              <article
+              <motion.article
                 role="listitem"
                 key={plan.id}
-                className={`relative rounded-2xl p-6 md:p-7 transition-all shadow-sm animate-fade-in overflow-hidden
-                  ${plan.popular 
-                    ? "bg-white/[0.08] backdrop-blur-xl border-2 border-primary/50 shadow-2xl shadow-primary/20 md:scale-110 hover:shadow-2xl hover:shadow-primary/30 before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.12] before:to-transparent before:rounded-2xl before:pointer-events-none" 
-                    : isFree 
-                    ? "bg-white/[0.03] backdrop-blur-lg border border-white/[0.08] opacity-80 md:scale-95 hover:opacity-90" 
-                    : isElite
-                    ? "bg-gradient-to-br from-amber-500/[0.08] to-white/[0.06] backdrop-blur-xl border-2 border-amber-500/40 shadow-xl shadow-amber-500/15 hover:shadow-amber-500/25 before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.1] before:to-transparent before:rounded-2xl before:pointer-events-none"
-                    : ""
-                }`}
-                style={{ animationDelay: `${index * 0.1}s` }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ 
+                  y: -6, 
+                  scale: plan.popular ? 1.07 : isElite ? 1.04 : 1.02,
+                  transition: { duration: 0.3, ease: "easeOut" }
+                }}
+                className={`relative rounded-3xl p-7 md:p-8 transition-all duration-300 group
+                  ${plan.popular ? 'md:scale-105' : isElite ? 'md:scale-102' : 'md:scale-100'}
+                `}
+                style={{
+                  background: isFree 
+                    ? 'rgba(255,255,255,0.02)'
+                    : plan.popular
+                    ? 'linear-gradient(180deg, rgba(45,104,255,0.12), rgba(45,104,255,0.05))'
+                    : 'linear-gradient(180deg, rgba(255,200,45,0.12), rgba(255,200,45,0.05))',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  boxShadow: plan.popular
+                    ? '0 4px 25px rgba(0,0,0,0.45), 0 0 0 rgba(45,104,255,0)'
+                    : '0 4px 25px rgba(0,0,0,0.45)',
+                }}
               >
-                {/* Animated inner glow for Pro plan */}
-                {plan.popular && (
-                  <>
-                    <motion.div
-                      className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent opacity-60"
-                      animate={{
-                        opacity: [0.4, 0.7, 0.4],
-                      }}
-                      transition={{
-                        duration: 3,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    />
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent" />
-                  </>
-                )}
-
-                {/* Elite card inner glow */}
-                {isElite && (
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-400/10 via-transparent to-transparent opacity-50" />
-                )}
+                {/* Hover glow effect */}
+                <motion.div
+                  className="absolute inset-0 rounded-3xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{
+                    boxShadow: plan.popular
+                      ? '0 0 30px rgba(45,104,255,0.4)'
+                      : isElite
+                      ? '0 0 30px rgba(255,200,45,0.35)'
+                      : 'none'
+                  }}
+                />
 
                 {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded-full flex items-center gap-1 shadow-md z-10">
-                    <Sparkles size={12} />
-                    {t('pricing.mostPopular')}
-                  </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-xl text-[11px] font-semibold uppercase tracking-wider text-white z-20 shadow-lg"
+                    style={{
+                      background: 'linear-gradient(90deg, #2D68FF, #5A8CFF)',
+                      boxShadow: '0 4px 12px rgba(45,104,255,0.4)',
+                    }}
+                  >
+                    <span className="flex items-center gap-1">
+                      <Sparkles size={12} />
+                      Most Popular
+                    </span>
+                  </motion.div>
                 )}
                 
 
-                <div className="mb-5 relative z-10">
-                  <h3 className={`text-xl md:text-2xl font-bold mb-1.5 ${
-                    isElite ? 'bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent' : ''
+                <div className="mb-6 relative z-10">
+                  <h3 className={`text-2xl md:text-3xl font-bold mb-2 ${
+                    isElite ? 'bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent' : 'text-foreground'
                   }`}>
                     {plan.name}
                   </h3>
-                  <p className="text-muted-foreground text-xs md:text-sm mb-3">
+                  <p className="text-muted-foreground/65 text-sm mb-6 font-light">
                     {plan.description}
                   </p>
                   {plan.monthlyPrice > 0 ? (
                     <>
                       <div className="flex items-baseline gap-2 mb-2">
-                        <span className="text-3xl md:text-4xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
+                        <span className={`font-bold ${plan.popular ? 'text-5xl' : 'text-4xl'}`} style={{ color: 'hsl(var(--primary))' }}>
                           ${getDisplayPrice(plan)}
                         </span>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-muted-foreground/65 font-light">
                           /{billingCycle === 'monthly' ? t('pricing.perMonth') : t('pricing.perMonthBilledAnnually')}
                         </span>
                       </div>
                       {billingCycle === 'annual' && (
-                        <div className="text-xs text-green-600 dark:text-green-400 font-medium">
+                        <div className="text-sm text-green-400 font-semibold mb-1">
                           Save ${getSavings(plan)} annually
                         </div>
                       )}
                       {plan.monthlyPrice > 0 && (
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-muted-foreground/50 font-light">
                           {billingCycle === 'annual' ? `$${plan.annualTotal}/year billed annually` : 'Billed monthly'}
                         </p>
                       )}
                     </>
                   ) : (
-                    <div className="text-3xl md:text-4xl font-bold mb-2" style={{ color: 'hsl(var(--primary))' }}>
+                    <div className="text-4xl md:text-5xl font-bold mb-2" style={{ color: 'hsl(var(--primary))' }}>
                       Free
                     </div>
                   )}
                 </div>
 
-                <Button
+                <motion.button
                   onClick={handleAuthNavigate}
-                  className={`w-full h-12 mb-3 rounded-xl font-medium transition-all group relative z-10 ${
-                    plan.popular
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl hover:shadow-2xl hover:scale-105"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`w-full h-12 mb-4 rounded-xl font-semibold transition-all relative z-10 overflow-hidden shadow-lg group/btn
+                    ${plan.popular
+                      ? ""
                       : isElite
-                      ? "bg-amber-500/20 border-2 border-amber-500/40 text-amber-400 hover:bg-amber-500/30 hover:border-amber-500/60 backdrop-blur-sm"
-                      : "bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] backdrop-blur-sm"
+                      ? "bg-amber-500/15 border-2 border-amber-500/30 text-amber-400 hover:bg-amber-500/25 hover:border-amber-500/50"
+                      : "bg-white/5 border border-white/10 hover:bg-white/10 text-muted-foreground hover:text-foreground"
                   }`}
-                  variant={plan.popular ? "default" : "outline"}
+                  style={plan.popular ? {
+                    background: 'linear-gradient(90deg, #2D68FF, #5A8CFF)',
+                    boxShadow: '0 4px 15px rgba(45,104,255,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+                  } : undefined}
                 >
-                  {plan.cta}
-                  {plan.popular && <span className="ml-2 group-hover:translate-x-1 transition-transform inline-block">→</span>}
-                </Button>
+                  {plan.popular && (
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                      initial={{ x: '-100%' }}
+                      animate={{ x: '200%' }}
+                      transition={{ 
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatDelay: 3,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    {plan.cta}
+                    {plan.popular && (
+                      <motion.span
+                        animate={{ x: [0, 4, 0] }}
+                        transition={{ 
+                          duration: 1.5,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                      >
+                        →
+                      </motion.span>
+                    )}
+                  </span>
+                </motion.button>
 
-                <p className="text-xs text-muted-foreground text-center mb-5 leading-relaxed relative z-10">
-                  No credit card required • Upgrade anytime
+                <p className="text-xs text-muted-foreground/50 text-center mb-6 leading-relaxed relative z-10 font-light">
+                  {isFree 
+                    ? "Get started with the essentials" 
+                    : plan.popular 
+                    ? "Unlock your full trading potential" 
+                    : "Experience total control and customization"}
                 </p>
 
-                <ul className="space-y-2.5 relative z-10">
+                <ul className="space-y-3 relative z-10">
                   {plan.features.map((feature, i) => {
                     const Icon = feature.icon;
                     return (
-                      <li key={i} className="flex items-start gap-2.5">
+                      <motion.li 
+                        key={i} 
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 + (i * 0.05) }}
+                        className="flex items-start gap-3"
+                      >
                         {Icon ? (
                           <Icon
-                            size={18}
+                            size={20}
                             className="mt-0.5 flex-shrink-0 text-primary"
+                            strokeWidth={2.5}
                           />
                         ) : (
                           <Check
-                            size={18}
+                            size={20}
                             className={`mt-0.5 flex-shrink-0 ${
-                              plan.popular ? "text-primary" : "text-foreground"
+                              plan.popular ? "text-primary" : isElite ? "text-amber-400" : "text-foreground/60"
                             }`}
+                            strokeWidth={2.5}
                           />
                         )}
-                        <span className="text-xs md:text-sm text-muted-foreground leading-relaxed">
+                        <span className="text-sm text-muted-foreground/80 leading-relaxed font-light">
                           {feature.text}
                         </span>
-                      </li>
+                      </motion.li>
                     );
                   })}
                 </ul>
-              </article>
+              </motion.article>
             );
             })}
           </div>
