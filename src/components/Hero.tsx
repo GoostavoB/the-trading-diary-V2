@@ -36,42 +36,80 @@ const Hero = () => {
           x: 0
         }} transition={{
           duration: 0.6
-        }} className="space-y-8 text-center lg:text-left flex flex-col items-center lg:items-start w-full max-w-[560px] lg:max-w-none">
-            {/* Hero Title - Centered on mobile, left-aligned on desktop */}
-            <h1 id="hero-title" className="text-[clamp(40px,6vw,68px)] font-bold leading-[1.1] tracking-tight max-w-md lg:max-w-3xl" style={{
-            textWrap: 'balance' as any
-          }}>
-              Train Your Mind.
-              <span className="block text-primary">Track Your Trades.</span>
-              <span className="block">Transform Your Results.</span>
-            </h1>
+        }} className="space-y-12 text-center lg:text-left flex flex-col items-center lg:items-start w-full max-w-[560px] lg:max-w-none">
+            {/* Hero Title - Staggered Animation */}
+            <motion.h1 
+              id="hero-title"
+              className="space-y-3 max-w-md lg:max-w-3xl"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.15,
+                    delayChildren: 0.2
+                  }
+                }
+              }}
+            >
+              <motion.span 
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+                }}
+                className="block text-[clamp(32px,4vw,48px)] font-medium tracking-tight text-foreground/90"
+              >
+                Train Your Mind.
+              </motion.span>
+              <motion.span 
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+                }}
+                className="block text-[clamp(36px,4.5vw,56px)] font-bold tracking-tight text-primary"
+              >
+                Track Your Trades.
+              </motion.span>
+              <motion.span 
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+                }}
+                className="block text-[clamp(32px,4vw,48px)] font-light tracking-wide text-muted-foreground"
+              >
+                Transform Your Results.
+              </motion.span>
+            </motion.h1>
 
-            {/* Subtitle - Centered on mobile, left-aligned on desktop */}
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-md lg:max-w-xl" style={{
-            textWrap: 'balance' as any
-          }}>
-              Multi-exchange sync • AI insights • Psychology tracking • One platform.
-              <span className="block mt-3 text-sm font-semibold text-primary">
+            {/* Subtitle - Refined hierarchy */}
+            <div className="space-y-4 max-w-md lg:max-w-xl">
+              <p className="text-lg text-muted-foreground/80 font-light tracking-wide leading-relaxed" style={{
+                textWrap: 'balance' as any
+              }}>
+                Multi-exchange sync • AI insights • Psychology tracking
+              </p>
+              <p className="text-sm text-primary/80 font-medium">
                 Free 14-day trial • No credit card • Cancel anytime
-              </span>
-            </p>
+              </p>
+            </div>
 
             {/* CTA Buttons */}
-            <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-stretch sm:items-center w-full sm:w-auto">
-              <Button onClick={() => navigate('/auth')} size="lg" className="h-14 px-10 text-base font-semibold rounded-xl bg-primary hover:bg-primary/90 transition-all duration-300" aria-label="Start free trial">
+            <div className="pt-2 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-stretch sm:items-center w-full sm:w-auto">
+              <Button onClick={() => navigate('/auth')} size="lg" className="h-12 px-8 text-[15px] font-medium rounded-full bg-primary hover:bg-primary/90 transition-all duration-300 shadow-lg shadow-primary/10 hover:shadow-xl hover:shadow-primary/20" aria-label="Start free trial">
                 Start Free Trial
               </Button>
-              
             </div>
 
             {/* Trust Bar */}
-            <div className="pt-6 w-full">
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-sm text-muted-foreground">
-                <span className="font-semibold">10,000+ traders</span>
-                <span className="text-primary/30">•</span>
-                <span className="font-semibold">500,000+ trades tracked</span>
-                <span className="text-primary/30">•</span>
-                <span className="font-semibold flex items-center gap-1">
+            <div className="pt-4 w-full">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-muted-foreground/60 font-medium">
+                <span>10,000+ traders</span>
+                <span className="text-primary/20">•</span>
+                <span>500,000+ trades tracked</span>
+                <span className="text-primary/20">•</span>
+                <span className="flex items-center gap-1">
                   4.8★ average rating
                 </span>
               </div>

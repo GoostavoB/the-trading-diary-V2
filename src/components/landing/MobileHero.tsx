@@ -10,51 +10,80 @@ const MobileHero = () => {
   return (
     <section className="relative flex flex-col px-4 pt-8 pb-4 overflow-hidden lg:hidden">
       {/* Hero Content */}
-      <div className="flex flex-col items-center text-center space-y-5 pb-4">
-        {/* Headline */}
+      <div className="flex flex-col items-center text-center space-y-8 pb-4">
+        {/* Headline - Staggered Animation */}
         <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-[44px] leading-[1.1] font-bold tracking-tight max-w-[320px]"
-          style={{ textWrap: 'balance' as any }}
+          className="space-y-2 max-w-[280px]"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.12,
+                delayChildren: 0.1
+              }
+            }
+          }}
         >
-          Automate your trading journal with AI
+          <motion.span 
+            variants={{
+              hidden: { opacity: 0, y: 15 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+            }}
+            className="block text-[32px] leading-[1.15] font-medium tracking-tight"
+          >
+            Train Your Mind.
+          </motion.span>
+          <motion.span 
+            variants={{
+              hidden: { opacity: 0, y: 15 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+            }}
+            className="block text-[36px] leading-[1.15] font-bold tracking-tight text-primary"
+          >
+            Track Your Trades.
+          </motion.span>
+          <motion.span 
+            variants={{
+              hidden: { opacity: 0, y: 15 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+            }}
+            className="block text-[32px] leading-[1.15] font-light tracking-wide text-muted-foreground/80"
+          >
+            Transform Results.
+          </motion.span>
         </motion.h1>
 
         {/* Subheadline */}
-        <motion.p
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-lg text-muted-foreground max-w-[300px]"
-          style={{ textWrap: 'balance' as any }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="space-y-3 max-w-[300px]"
         >
-          Upload your trades — TD tracks, analyzes, and reveals your performance.
-        </motion.p>
+          <p className="text-base text-muted-foreground/80 font-light tracking-wide">
+            Multi-exchange sync • AI insights • Psychology tracking
+          </p>
+          <p className="text-xs text-primary/80 font-medium">
+            Free 14-day trial • No credit card • Cancel anytime
+          </p>
+        </motion.div>
 
         {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex flex-col gap-3 w-full max-w-[320px] pt-6"
+          transition={{ duration: 0.5, delay: 0.7 }}
+          className="flex flex-col gap-3 w-full max-w-[320px] pt-4"
         >
           <Button
             onClick={() => navigate('/auth')}
             size="lg"
-            className="h-14 text-base font-semibold rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30"
+            className="h-12 text-[15px] font-medium rounded-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30"
           >
-            Start Free Trial – 10 Trades On Us
-          </Button>
-          
-          <Button
-            onClick={() => navigate('/demo')}
-            size="lg"
-            variant="outline"
-            className="h-14 text-base font-semibold rounded-xl border-2 border-foreground bg-foreground text-background hover:bg-foreground/90"
-          >
-            See It in Action (2-min Demo)
+            Start Free Trial
           </Button>
         </motion.div>
 
@@ -62,11 +91,11 @@ const MobileHero = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex items-center gap-2 text-sm text-muted-foreground pt-2"
+          transition={{ duration: 0.5, delay: 0.85 }}
+          className="flex items-center gap-2 text-xs text-muted-foreground/60 font-medium pt-2"
         >
           <Star className="h-4 w-4 fill-primary text-primary" />
-          <span>Trusted by professional crypto traders worldwide</span>
+          <span>10,000+ professional traders</span>
         </motion.div>
 
         {/* Bounce Arrow */}
