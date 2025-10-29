@@ -44,9 +44,9 @@ const PricingPage = () => {
   const includedFeatures = [
     "AI uploads from image screenshots",
     "Weekly heatmap and best assets",
-    "Fees dashboard with maker vs taker and funding",
+    "Fees dashboard. Compare how much fee you are paying in each exchange",
     "Leverage and position size calculator",
-    "Risk alerts and pre-trade checklist",
+    "Pre-trade checklist",
     "Encrypted data and CSV export"
   ];
 
