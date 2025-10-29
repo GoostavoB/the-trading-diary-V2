@@ -80,16 +80,19 @@ export const ProblemVisual = () => {
               key={i}
               initial={{ scaleX: 0 }}
               animate={inView ? { scaleX: 1 } : {}}
-              transition={{ duration: 0.6, delay: 1.2 + i * 0.1 }}
+              transition={{ duration: 1.2, delay: 1.2 + i * 0.25 }}
               className="relative"
             >
               <div className="flex items-center gap-2">
                 <div
-                  className="h-8 bg-primary/30 rounded origin-left flex items-center justify-between px-2"
-                  style={{ width: `${item.height}%` }}
+                  className="h-8 rounded origin-left flex items-center justify-between px-2 bg-gradient-to-r from-blue-500 via-blue-600 to-primary"
+                  style={{ 
+                    width: `${item.height}%`,
+                    boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
+                  }}
                 >
-                  <span className="text-[11px] text-foreground/80">{item.label}</span>
-                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                  <span className="text-[11px] text-white font-medium">{item.label}</span>
+                  <CheckCircle2 className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-[11px] text-primary font-semibold">{item.percent}</span>
               </div>
