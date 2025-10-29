@@ -1,37 +1,60 @@
 import { Clock, X, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { usePromoStatus } from "@/hooks/usePromoStatus";
 import { useState, useEffect } from "react";
 import { posthog } from "@/lib/posthog";
 
 const UrgencyBanner = () => {
-  const promoStatus = usePromoStatus();
   const [dismissed, setDismissed] = useState(false);
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  
+  // Fixed end date: November 1, 2025 at 23:59:59
+  const PROMO_END_DATE = new Date('2025-11-01T23:59:59').getTime();
 
   useEffect(() => {
     const isDismissed = sessionStorage.getItem('urgency-banner-dismissed');
     if (isDismissed) {
       setDismissed(true);
     }
+
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const distance = PROMO_END_DATE - now;
+
+      if (distance < 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      setTimeLeft({ days, hours, minutes, seconds });
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleDismiss = () => {
     setDismissed(true);
     sessionStorage.setItem('urgency-banner-dismissed', 'true');
     posthog.capture('urgency_banner_dismissed', {
-      days_remaining: promoStatus.daysRemaining,
-      hours_remaining: promoStatus.hoursRemaining,
+      days_remaining: timeLeft.days,
+      hours_remaining: timeLeft.hours,
     });
   };
 
-  if (dismissed || promoStatus.isLoading || !promoStatus.isActive) return null;
+  if (dismissed || (timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0)) return null;
 
   const formatCountdown = () => {
-    if (promoStatus.daysRemaining > 0) {
-      const hours = promoStatus.hoursRemaining % 24;
-      return `${promoStatus.daysRemaining}d ${hours}h`;
+    if (timeLeft.days > 0) {
+      return `${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m`;
     }
-    return `${promoStatus.hoursRemaining}h`;
+    return `${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`;
   };
 
   return (
@@ -80,18 +103,18 @@ const UrgencyBanner = () => {
             </motion.div>
           </div>
           
-          <div>
+          <div className="flex-1">
             <p className="text-sm md:text-base font-bold">
-              <span className="text-orange-400">Early Access Ends Soon</span>
+              <span className="text-orange-400">Early Access Ends November 1</span>
               <span className="text-foreground mx-2">•</span>
-              <span className="text-green-400">Save up to 20% with annual billing</span>
+              <span className="text-green-400">Save up to $60/year with annual billing</span>
             </p>
             <div className="flex items-center justify-center gap-2 text-xs md:text-sm mt-1">
               <Clock className="w-4 h-4 text-orange-400" />
-              <span className="font-mono font-bold text-orange-400 text-base">
+              <span className="font-mono font-bold text-orange-400 text-base md:text-lg tabular-nums">
                 {formatCountdown()}
               </span>
-              <span className="text-muted-foreground">remaining at launch pricing</span>
+              <span className="text-muted-foreground">left at launch pricing</span>
             </div>
           </div>
         </div>

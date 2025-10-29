@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Check, Sparkles, Clock } from "lucide-react";
+import { Check, Sparkles, Clock, Upload, Palette, Trophy, BarChart3 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
@@ -9,6 +9,8 @@ import { usePromoStatus } from "@/hooks/usePromoStatus";
 import { Badge } from "@/components/ui/badge";
 import UrgencyBanner from "./pricing/UrgencyBanner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import SocialProof from "./pricing/SocialProof";
+import { motion } from "framer-motion";
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -32,18 +34,12 @@ const Pricing = () => {
       annualTotal: 0,
       uploads: "5 uploads total",
       uploadSubtext: "(starter gift)",
-      xp: "Unlimited XP",
-      widgets: "Tiers 1–2",
-      customization: "Default Colors (light/dark)",
-      accounts: "One account only",
-      extraUploads: "Add 10 for $5",
-      featuresKeys: [
-        "pricing.plans.basic.features.essentialWidgets",
-        "pricing.plans.basic.features.colorTheme",
-        "pricing.plans.basic.features.emotionTagging",
-        "pricing.plans.basic.features.xpSystem",
-        "pricing.plans.basic.features.oneAccount",
-        "pricing.plans.basic.features.extraUploads",
+      features: [
+        { icon: Upload, text: "5 uploads total" },
+        { icon: Palette, text: "Essential widgets (Tiers 1-2)" },
+        { icon: Trophy, text: "Basic XP system" },
+        { icon: BarChart3, text: "Starter analytics" },
+        { text: "One account only" },
       ],
       cta: "Start Free",
       popular: false,
@@ -58,22 +54,16 @@ const Pricing = () => {
       annualTotal: 120,
       uploads: "30 uploads/month",
       uploadSubtext: "",
-      xp: "Unlimited XP",
-      widgets: "Tiers 1–4",
-      customization: "Primary, Secondary, Accent color control",
-      accounts: "Unlimited accounts",
-      extraUploads: "$2 per 10 extra uploads",
-      featuresKeys: [
-        "pricing.plans.pro.features.uploads",
-        "pricing.plans.pro.features.unlimitedAccounts",
-        "pricing.plans.pro.features.fullAnalytics",
-        "pricing.plans.pro.features.feeTracking",
-        "pricing.plans.pro.features.colorCustomization",
-        "pricing.plans.pro.features.proWidgets",
-        "pricing.plans.pro.features.extraUploads",
-        "pricing.plans.pro.features.everythingFree",
+      features: [
+        { icon: Upload, text: "30 uploads per month" },
+        { icon: Palette, text: "Advanced widgets & customization" },
+        { icon: Trophy, text: "Full XP system with leaderboards" },
+        { icon: BarChart3, text: "Advanced analytics & tracking" },
+        { text: "Unlimited trading accounts" },
+        { text: "Fee tracking & reporting" },
+        { text: "Add 10 uploads for $2" },
       ],
-      cta: "Go Pro Now",
+      cta: "Go Pro Now • Offer Ends Soon",
       popular: true,
       priceCurrency: "USD",
     },
@@ -86,22 +76,16 @@ const Pricing = () => {
       annualTotal: 240,
       uploads: "150 uploads/month",
       uploadSubtext: "",
-      xp: "Unlimited XP",
-      widgets: "All Widgets",
-      customization: "Full color + background customization",
-      accounts: "Unlimited accounts",
-      extraUploads: "$1 per 10 extra uploads (50% off)",
-      featuresKeys: [
-        "pricing.plans.elite.features.uploads",
-        "pricing.plans.elite.features.allWidgets",
-        "pricing.plans.elite.features.unlimitedAccounts",
-        "pricing.plans.elite.features.fullCustomization",
-        "pricing.plans.elite.features.prioritySupport",
-        "pricing.plans.elite.features.systemCustomization",
-        "pricing.plans.elite.features.extraUploads",
-        "pricing.plans.elite.features.everythingPro",
+      features: [
+        { icon: Upload, text: "150 uploads per month" },
+        { text: "All widgets unlocked" },
+        { text: "Full color & background customization" },
+        { text: "Premium priority support" },
+        { text: "Custom branding options" },
+        { text: "Add 10 uploads for $1 (50% off)" },
+        { text: "Everything in Pro" },
       ],
-      cta: "Join Elite",
+      cta: "Join Elite • Save $60/Year",
       popular: false,
       priceCurrency: "USD",
     },
@@ -152,11 +136,14 @@ const Pricing = () => {
           <UrgencyBanner />
 
           <div className="text-center mb-8 md:mb-12 animate-fade-in">
-            <h2 id="pricing-heading" className="text-3xl md:text-4xl font-bold mb-3">
-              Choose your plan. Trade like a pro.
+            <h2 id="pricing-heading" className="text-3xl md:text-5xl font-bold mb-3">
+              Get pro trading tools today. Early access ends soon.
             </h2>
-            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
-              No credit card required • Upgrade anytime
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-2">
+              Start free. Upgrade anytime. Save up to $60/year.
+            </p>
+            <p className="text-sm text-orange-400 font-semibold">
+              Launch pricing available until November 1, 2025
             </p>
 
             {/* Billing Toggle */}
@@ -191,24 +178,52 @@ const Pricing = () => {
                 {t('pricing.saveBadge', 'Save up to $60/year')}
               </span>
             </div>
+            {billingCycle === 'annual' && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-sm text-muted-foreground mt-2"
+              >
+                Save up to 16.7% when billed annually
+              </motion.p>
+            )}
           </div>
 
           <div className="grid md:grid-cols-3 gap-4 md:gap-6" role="list">
-            {plans.map((plan, index) => (
+            {plans.map((plan, index) => {
+              const isFree = plan.id === 'free';
+              const isElite = plan.id === 'elite';
+              
+              return (
               <article
                 role="listitem"
                 key={plan.id}
                 className={`glass backdrop-blur-[12px] rounded-2xl p-6 md:p-7 relative transition-all shadow-sm animate-fade-in ${
                   plan.popular 
-                    ? "ring-2 ring-primary shadow-lg shadow-primary/30 md:scale-105 hover:shadow-xl hover:shadow-primary/40" 
-                    : plan.id === 'free' 
-                    ? "opacity-90 hover:opacity-100" 
-                    : plan.id === 'elite'
-                    ? "ring-1 ring-amber-500/30 hover:ring-amber-500/50"
+                    ? "ring-2 ring-primary shadow-2xl shadow-primary/30 md:scale-110 hover:shadow-2xl hover:shadow-primary/50" 
+                    : isFree 
+                    ? "opacity-75 md:scale-95 hover:opacity-90" 
+                    : isElite
+                    ? "ring-2 ring-amber-500/40 shadow-lg shadow-amber-500/20 hover:ring-amber-500/60"
                     : ""
                 }`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
+                {/* Animated glow for Pro plan */}
+                {plan.popular && (
+                  <motion.div
+                    className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/10 to-primary/5 -z-10"
+                    animate={{
+                      opacity: [0.5, 0.8, 0.5],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
+                )}
+
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded-full flex items-center gap-1 shadow-md">
                     <Sparkles size={12} />
@@ -218,7 +233,9 @@ const Pricing = () => {
                 
 
                 <div className="mb-5">
-                  <h3 className={`text-xl md:text-2xl font-bold mb-1.5 ${plan.id === 'elite' ? 'text-amber-500' : ''}`}>
+                  <h3 className={`text-xl md:text-2xl font-bold mb-1.5 ${
+                    isElite ? 'bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent' : ''
+                  }`}>
                     {plan.name}
                   </h3>
                   <p className="text-muted-foreground text-xs md:text-sm mb-3">
@@ -250,39 +267,14 @@ const Pricing = () => {
                       Free
                     </div>
                   )}
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="text-xs text-muted-foreground mt-2 cursor-help border-b border-dotted border-muted-foreground/30 inline-block">
-                          {plan.uploads} {plan.uploadSubtext && plan.uploadSubtext} • {plan.widgets}
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs">
-                        <div className="space-y-1">
-                          <p className="text-xs font-semibold">Upload Logic</p>
-                          <p className="text-xs">1 upload = up to 10 trades</p>
-                          <p className="text-xs text-primary">
-                            {plan.uploads.includes('5') ? '50 trades total' : 
-                             plan.uploads.includes('30') ? '300 trades/month' : 
-                             '1,500 trades/month'}
-                          </p>
-                          {plan.extraUploads && (
-                            <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
-                              Extra uploads: {plan.extraUploads}
-                            </p>
-                          )}
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
                 </div>
 
                 <Button
                   onClick={handleAuthNavigate}
                   className={`w-full h-12 mb-3 rounded-xl font-medium transition-all group ${
                     plan.popular
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl hover:scale-[1.02]"
-                      : plan.id === 'elite'
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl hover:scale-105"
+                      : isElite
                       ? "bg-amber-500/10 border border-amber-500/30 text-amber-500 hover:bg-amber-500/20 hover:border-amber-500/50"
                       : "glass border border-border/50 hover:bg-accent/50"
                   }`}
@@ -297,25 +289,41 @@ const Pricing = () => {
                 </p>
 
                 <ul className="space-y-2.5">
-                  {plan.featuresKeys.map((featureKey, i) => (
-                    <li key={i} className="flex items-start gap-2.5">
-                      <Check
-                        size={18}
-                        className={`mt-0.5 flex-shrink-0 ${
-                          plan.popular ? "text-primary" : "text-foreground"
-                        }`}
-                      />
-                      <span className="text-xs md:text-sm text-muted-foreground leading-relaxed">{t(featureKey)}</span>
-                    </li>
-                  ))}
+                  {plan.features.map((feature, i) => {
+                    const Icon = feature.icon;
+                    return (
+                      <li key={i} className="flex items-start gap-2.5">
+                        {Icon ? (
+                          <Icon
+                            size={18}
+                            className="mt-0.5 flex-shrink-0 text-primary"
+                          />
+                        ) : (
+                          <Check
+                            size={18}
+                            className={`mt-0.5 flex-shrink-0 ${
+                              plan.popular ? "text-primary" : "text-foreground"
+                            }`}
+                          />
+                        )}
+                        <span className="text-xs md:text-sm text-muted-foreground leading-relaxed">
+                          {feature.text}
+                        </span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </article>
-            ))}
+            );
+            })}
           </div>
 
           <p className="text-center text-muted-foreground text-xs md:text-sm mt-10 animate-fade-in" style={{ animationDelay: '0.3s' }}>
             No credit card required • Upgrade anytime
           </p>
+
+          {/* Social Proof */}
+          <SocialProof />
         </div>
       </section>
 
