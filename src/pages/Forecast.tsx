@@ -61,54 +61,73 @@ const Forecast = () => {
   }, [days, avgDailyPnl]);
 
   const fetchAvgPnl = async () => {
-    if (!user) return;
-
-    const { data: trades } = await supabase
-      .from('trades')
-      .select('pnl, trade_date, trading_fee, funding_fee')
-      .eq('user_id', user.id)
-      .is('deleted_at', null);
-
-    if (trades && trades.length > 0) {
-      // Calculate P&L after fees
-      const totalPnl = trades.reduce((sum, t) => {
-        const pnl = t.pnl || 0;
-        const tradingFee = t.trading_fee || 0;
-        const fundingFee = t.funding_fee || 0;
-        return sum + (pnl - tradingFee - fundingFee);
-      }, 0);
-      const uniqueDays = new Set(trades.map(t => new Date(t.trade_date).toDateString())).size;
-      setAvgDailyPnl(totalPnl / (uniqueDays || 1));
-    } else {
-      setAvgDailyPnl(0);
+    if (!user) {
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+
+    try {
+      const { data: trades, error } = await supabase
+        .from('trades')
+        .select('pnl, trade_date, trading_fee, funding_fee')
+        .eq('user_id', user.id)
+        .is('deleted_at', null);
+
+      if (error) {
+        console.warn('Forecast: fetchAvgPnl error', error);
+        setAvgDailyPnl(0);
+        return;
+      }
+
+      if (trades && trades.length > 0) {
+        // Calculate P&L after fees
+        const totalPnl = trades.reduce((sum, t) => {
+          const pnl = t.pnl || 0;
+          const tradingFee = t.trading_fee || 0;
+          const fundingFee = t.funding_fee || 0;
+          return sum + (pnl - tradingFee - fundingFee);
+        }, 0);
+        const uniqueDays = new Set(trades.map(t => new Date(t.trade_date).toDateString())).size;
+        setAvgDailyPnl(totalPnl / (uniqueDays || 1));
+      } else {
+        setAvgDailyPnl(0);
+      }
+    } catch (e) {
+      console.warn('Forecast: unexpected fetchAvgPnl error', e);
+      setAvgDailyPnl(0);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchAdvancedStats = async () => {
     if (!user) return;
 
-    // Fetch trades with ROI and margin data
-    const { data: trades } = await supabase
-      .from('trades')
-      .select('roi, margin, pnl')
-      .eq('user_id', user.id)
-      .is('deleted_at', null);
+    try {
+      // Fetch trades with ROI and margin data
+      const { data: trades, error: tradesError } = await supabase
+        .from('trades')
+        .select('roi, margin, pnl')
+        .eq('user_id', user.id)
+        .is('deleted_at', null);
 
-    // Fetch user settings for balance
-    const { data: settings } = await supabase
-      .from('user_settings')
-      .select('initial_investment')
-      .eq('user_id', user.id)
-      .single();
+      // Fetch user settings for balance
+      const { data: settings, error: settingsError } = await supabase
+        .from('user_settings')
+        .select('initial_investment')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-    if (settings) {
-      setCurrentBalance(settings.initial_investment || 0);
-    }
+      if (!settingsError && settings) {
+        setCurrentBalance(settings.initial_investment || 0);
+      }
 
-    if (trades) {
-      const stats = calculateAdvancedStats(trades);
-      setAdvancedStats(stats);
+      if (!tradesError && trades) {
+        const stats = calculateAdvancedStats(trades);
+        setAdvancedStats(stats);
+      }
+    } catch (e) {
+      console.warn('Forecast: unexpected fetchAdvancedStats error', e);
     }
   };
 

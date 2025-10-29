@@ -320,7 +320,8 @@ const Dashboard = () => {
       .order('log_date', { ascending: true });
 
     if (error) {
-      console.error('Error fetching capital log:', error);
+      console.warn('Error fetching capital log:', error);
+      setCapitalLog([]); // ensure state updates to trigger stats fetch
     } else {
       setCapitalLog(data || []);
     }
@@ -336,7 +337,8 @@ const Dashboard = () => {
       .order('withdrawal_date', { ascending: true });
 
     if (error) {
-      console.error('Error fetching withdrawal log:', error);
+      console.warn('Error fetching withdrawal log:', error);
+      setWithdrawalLog([]);
     } else {
       setWithdrawalLog(data || []);
     }
@@ -364,6 +366,8 @@ const Dashboard = () => {
       fetchWithdrawalLog(); // Fetch withdrawal log
       fetchInitialInvestment();
       fetchCustomWidgets();
+      // Kick off stats immediately so UI doesn't block on the above
+      fetchStats();
     }
     
     // Set up realtime subscription for trades and capital changes
@@ -465,81 +469,105 @@ const Dashboard = () => {
   }, [trades, updateChallengeProgress]);
 
   const fetchStats = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-    const { data: trades } = await supabase
-      .from('trades')
-      .select('*')
-      .eq('user_id', user.id)
-      .is('deleted_at', null)
-      .not('closed_at', 'is', null); // Only count closed trades for accurate P&L
+    try {
+      const { data: trades, error } = await supabase
+        .from('trades')
+        .select('*')
+        .eq('user_id', user.id)
+        .is('deleted_at', null)
+        .not('closed_at', 'is', null); // Only count closed trades for accurate P&L
 
-    if (trades) {
-      // Deduplicate trades based on closed_at + profit_loss combination
-      const uniqueTradesMap = trades.reduce((acc, trade) => {
-        const key = `${trade.closed_at}_${trade.profit_loss}`;
-        if (!acc.has(key)) {
-          acc.set(key, trade);
-        }
-        return acc;
-      }, new Map());
-      const deduplicatedTrades = Array.from(uniqueTradesMap.values());
-      
-      setTrades(deduplicatedTrades.map(trade => ({
-        ...trade,
-        side: trade.side as 'long' | 'short' | null
-      })));
-      
-      // Calculate total P&L using profit_loss from deduplicated trades
-      const totalPnL = deduplicatedTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
-      
-      const winningTrades = deduplicatedTrades.filter(t => (t.profit_loss || 0) > 0).length;
-      const avgDuration = deduplicatedTrades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (deduplicatedTrades.length || 1);
-
-      // Calculate unique trading days
-      const uniqueDays = new Set(deduplicatedTrades.map(t => new Date(t.trade_date).toDateString())).size;
-      
-      // Calculate average P&L per trade
-      const avgPnLPerTrade = deduplicatedTrades.length > 0
-        ? totalPnL / deduplicatedTrades.length
-        : 0;
-      
-      // Calculate average P&L per day
-      const avgPnLPerDay = uniqueDays > 0 
-        ? totalPnL / uniqueDays 
-        : 0;
-      
-      // Calculate total added capital from capital_log (sum of all additions)
-      const totalAddedCapital = capitalLog.reduce((sum, entry) => sum + (entry.amount_added || 0), 0);
-      
-      // Use total added capital as the "initial investment" for ROI calculation
-      // If no capital log exists, fallback to initialInvestment from settings
-      const baseCapital = totalAddedCapital > 0 ? totalAddedCapital : initialInvestment;
-      
-      // Calculate total withdrawals
-      const totalWithdrawals = withdrawalLog.reduce((sum, entry) => sum + (entry.amount_withdrawn || 0), 0);
-      
-      // Calculate current balance (subtract withdrawals)
-      const currentBalance = baseCapital + totalPnL - totalWithdrawals;
-      
-      // Calculate current ROI: Total profit regardless of withdrawals
-      let currentROI = 0;
-      if (baseCapital > 0) {
-        currentROI = (totalPnL / baseCapital) * 100;
+      if (error) {
+        console.warn('Error fetching trades for stats:', error);
+        setTrades([]);
+        setStats({
+          total_pnl: 0,
+          win_rate: 0,
+          total_trades: 0,
+          avg_duration: 0,
+          avg_pnl_per_trade: 0,
+          avg_pnl_per_day: 0,
+          trading_days: 0,
+          current_roi: 0,
+        });
+        return;
       }
 
-      setStats({
-        total_pnl: totalPnL,
-        win_rate: deduplicatedTrades.length > 0 ? (winningTrades / deduplicatedTrades.length) * 100 : 0,
-        total_trades: deduplicatedTrades.length,
-        avg_duration: avgDuration,
-        avg_pnl_per_trade: avgPnLPerTrade,
-        avg_pnl_per_day: avgPnLPerDay,
-        trading_days: uniqueDays,
-        current_roi: currentROI,
-      });
+      if (trades) {
+        // Deduplicate trades based on closed_at + profit_loss combination
+        const uniqueTradesMap = trades.reduce((acc, trade) => {
+          const key = `${trade.closed_at}_${trade.profit_loss}`;
+          if (!acc.has(key)) {
+            acc.set(key, trade);
+          }
+          return acc;
+        }, new Map());
+        const deduplicatedTrades = Array.from(uniqueTradesMap.values());
+        
+        setTrades(deduplicatedTrades.map(trade => ({
+          ...trade,
+          side: trade.side as 'long' | 'short' | null
+        })));
+        
+        // Calculate total P&L using profit_loss from deduplicated trades
+        const totalPnL = deduplicatedTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+        
+        const winningTrades = deduplicatedTrades.filter(t => (t.profit_loss || 0) > 0).length;
+        const avgDuration = deduplicatedTrades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (deduplicatedTrades.length || 1);
+
+        // Calculate unique trading days
+        const uniqueDays = new Set(deduplicatedTrades.map(t => new Date(t.trade_date).toDateString())).size;
+        
+        // Calculate average P&L per trade
+        const avgPnLPerTrade = deduplicatedTrades.length > 0
+          ? totalPnL / deduplicatedTrades.length
+          : 0;
+        
+        // Calculate average P&L per day
+        const avgPnLPerDay = uniqueDays > 0 
+          ? totalPnL / uniqueDays 
+          : 0;
+        
+        // Calculate total added capital from capital_log (sum of all additions)
+        const totalAddedCapital = capitalLog.reduce((sum, entry) => sum + (entry.amount_added || 0), 0);
+        
+        // Use total added capital as the "initial investment" for ROI calculation
+        // If no capital log exists, fallback to initialInvestment from settings
+        const baseCapital = totalAddedCapital > 0 ? totalAddedCapital : initialInvestment;
+        
+        // Calculate total withdrawals
+        const totalWithdrawals = withdrawalLog.reduce((sum, entry) => sum + (entry.amount_withdrawn || 0), 0);
+        
+        // Calculate current balance (subtract withdrawals)
+        const currentBalance = baseCapital + totalPnL - totalWithdrawals;
+        
+        // Calculate current ROI: Total profit regardless of withdrawals
+        let currentROI = 0;
+        if (baseCapital > 0) {
+          currentROI = (totalPnL / baseCapital) * 100;
+        }
+
+        setStats({
+          total_pnl: totalPnL,
+          win_rate: deduplicatedTrades.length > 0 ? (winningTrades / deduplicatedTrades.length) * 100 : 0,
+          total_trades: deduplicatedTrades.length,
+          avg_duration: avgDuration,
+          avg_pnl_per_trade: avgPnLPerTrade,
+          avg_pnl_per_day: avgPnLPerDay,
+          trading_days: uniqueDays,
+          current_roi: currentROI,
+        });
+      }
+    } catch (err) {
+      console.error('Unexpected error in fetchStats:', err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const fetchInitialInvestment = async () => {

@@ -36,26 +36,42 @@ export const useSpotWallet = () => {
   const { data: holdings, isLoading } = useQuery({
     queryKey: ['spot-holdings'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('spot_holdings')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as SpotHolding[];
+      try {
+        const { data, error } = await supabase
+          .from('spot_holdings')
+          .select('*')
+          .order('created_at', { ascending: false });
+  
+        if (error) {
+          console.warn('useSpotWallet: holdings fetch error', error);
+          return [] as SpotHolding[];
+        }
+        return data as SpotHolding[];
+      } catch (e) {
+        console.warn('useSpotWallet: unexpected holdings error', e);
+        return [] as SpotHolding[];
+      }
     },
   });
 
   const { data: transactions } = useQuery({
     queryKey: ['spot-transactions'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('spot_transactions')
-        .select('*')
-        .order('transaction_date', { ascending: false });
-
-      if (error) throw error;
-      return data as SpotTransaction[];
+      try {
+        const { data, error } = await supabase
+          .from('spot_transactions')
+          .select('*')
+          .order('transaction_date', { ascending: false });
+  
+        if (error) {
+          console.warn('useSpotWallet: transactions fetch error', error);
+          return [] as SpotTransaction[];
+        }
+        return data as SpotTransaction[];
+      } catch (e) {
+        console.warn('useSpotWallet: unexpected transactions error', e);
+        return [] as SpotTransaction[];
+      }
     },
   });
 
