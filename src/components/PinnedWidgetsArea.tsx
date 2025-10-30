@@ -6,6 +6,13 @@ import { PersonalGoalsWidget } from '@/components/widgets/PersonalGoalsWidget';
 import { CapitalGrowthWidget } from '@/components/widgets/CapitalGrowthWidget';
 import { SpotWalletWidget } from '@/components/widgets/SpotWalletWidget';
 import { TotalBalanceWidget } from '@/components/widgets/TotalBalanceWidget';
+import { TopMoversWidget } from '@/components/widgets/TopMoversWidget';
+import { RecentTransactionsWidget } from '@/components/widgets/RecentTransactionsWidget';
+import { QuickActionsWidget } from '@/components/widgets/QuickActionsWidget';
+import { AIInsightsWidget } from '@/components/widgets/AIInsightsWidget';
+import { AvgPnLPerTradeWidget } from '@/components/widgets/AvgPnLPerTradeWidget';
+import { AvgPnLPerDayWidget } from '@/components/widgets/AvgPnLPerDayWidget';
+import { Trade } from '@/types/trade';
 
 // Import pinnable stats widgets
 import { 
@@ -29,6 +36,10 @@ interface PinnedWidgetsAreaProps {
   spotChange24h?: number;
   spotChangePercent24h?: number;
   tokenCount?: number;
+  trades?: Trade[];
+  avgPnLPerTrade?: number;
+  avgPnLPerDay?: number;
+  tradingDays?: number;
 }
 
 const renderWidget = (widgetId: WidgetId, props: PinnedWidgetsAreaProps) => {
@@ -47,6 +58,18 @@ const renderWidget = (widgetId: WidgetId, props: PinnedWidgetsAreaProps) => {
       return <SpotWalletWidget id={widgetId} totalValue={props.spotTotalValue || 0} change24h={props.spotChange24h || 0} changePercent24h={props.spotChangePercent24h || 0} tokenCount={props.tokenCount || 0} />;
     case 'capitalGrowth':
       return <CapitalGrowthWidget id={widgetId} />;
+    case 'topMovers':
+      return <TopMoversWidget id={widgetId} trades={props.trades || []} />;
+    case 'recentTransactions':
+      return <RecentTransactionsWidget id={widgetId} trades={props.trades || []} />;
+    case 'quickActions':
+      return <QuickActionsWidget id={widgetId} />;
+    case 'aiInsights':
+      return <AIInsightsWidget id={widgetId} trades={props.trades || []} />;
+    case 'avgPnLPerTrade':
+      return <AvgPnLPerTradeWidget id={widgetId} avgPnLPerTrade={props.avgPnLPerTrade || 0} />;
+    case 'avgPnLPerDay':
+      return <AvgPnLPerDayWidget id={widgetId} avgPnLPerDay={props.avgPnLPerDay || 0} tradingDays={props.tradingDays || 0} />;
     case 'lsrMarketData':
       return <LongShortRatioWidget />;
     case 'openInterestChart':

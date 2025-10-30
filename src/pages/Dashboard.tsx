@@ -1108,6 +1108,10 @@ const Dashboard = () => {
               spotChange24h={0}
               spotChangePercent24h={0}
               tokenCount={holdings?.length || 0}
+              trades={trades}
+              avgPnLPerTrade={stats?.avg_pnl_per_trade || 0}
+              avgPnLPerDay={stats?.avg_pnl_per_day || 0}
+              tradingDays={stats?.trading_days || 0}
             />
 
             {/* Main Content Tabs */}
