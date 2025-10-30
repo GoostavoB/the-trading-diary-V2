@@ -15,7 +15,7 @@ interface LSRData {
 export function LongShortRatioWidget() {
   const [lsrData, setLsrData] = useState<LSRData | null>(null);
   const { isPinned, togglePin } = usePinnedWidgets();
-  const widgetId = 'long-short-ratio';
+  const widgetId = 'lsrMarketData' as const;
 
   useEffect(() => {
     const fetchLSR = async () => {

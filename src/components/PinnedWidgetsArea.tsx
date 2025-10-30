@@ -31,11 +31,11 @@ const renderWidget = (widgetId: WidgetId, props: PinnedWidgetsAreaProps) => {
       return <CurrentROIWidget currentROI={props.currentROI} />;
     case 'total-trades':
       return <TotalTradesWidget totalTrades={props.totalTrades} />;
-    case 'long-short-ratio':
+    case 'lsrMarketData':
       return <LongShortRatioWidget />;
-    case 'open-interest':
+    case 'openInterestChart':
       return <OpenInterestWidget />;
-    case 'personal-goals':
+    case 'goals':
       return <PersonalGoalsWidget />;
     default:
       return null;

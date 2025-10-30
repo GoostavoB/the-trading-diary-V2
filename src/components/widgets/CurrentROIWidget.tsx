@@ -3,6 +3,8 @@ import { WidgetWrapper } from './WidgetWrapper';
 import { AnimatedCounter } from '@/components/AnimatedCounter';
 import { formatCurrency, formatPercent } from '@/utils/formatNumber';
 import { TrendingUp, TrendingDown, Edit2, Info } from 'lucide-react';
+import { PinButton } from '@/components/widgets/PinButton';
+import { usePinnedWidgets } from '@/contexts/PinnedWidgetsContext';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -35,6 +37,10 @@ export const CurrentROIWidget = memo(({
 }: CurrentROIWidgetProps) => {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { isPinned, togglePin } = usePinnedWidgets();
+  // Map catalog widget ID to pinned widget ID
+  const catalogId = id;
+  const pinnedId = catalogId === 'currentROI' ? 'current-roi' as const : undefined;
   const isPositive = currentROI >= 0;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [capitalValue, setCapitalValue] = useState(initialInvestment.toString());
@@ -82,6 +88,14 @@ export const CurrentROIWidget = memo(({
       title={t('widgets.currentROI.title')}
       isEditMode={isEditMode}
       onRemove={onRemove}
+      headerActions={
+        !isEditMode && pinnedId && (
+          <PinButton
+            isPinned={isPinned(pinnedId)}
+            onToggle={() => togglePin(pinnedId)}
+          />
+        )
+      }
     >
       <div className="space-y-3">
         <div className="flex items-baseline gap-2">

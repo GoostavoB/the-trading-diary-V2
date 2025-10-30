@@ -5,9 +5,20 @@ export type WidgetId =
   | 'total-profit'
   | 'current-roi'
   | 'total-trades'
-  | 'long-short-ratio'
-  | 'open-interest'
-  | 'personal-goals';
+  | 'lsrMarketData'
+  | 'openInterestChart'
+  | 'goals';
+
+// Map catalog widget IDs to pinned widget IDs
+export const CATALOG_TO_PINNED_MAP: Record<string, WidgetId> = {
+  'winRate': 'win-rate',
+  'absoluteProfit': 'total-profit',
+  'currentROI': 'current-roi',
+  'totalTrades': 'total-trades',
+  'lsrMarketData': 'lsrMarketData',
+  'openInterestChart': 'openInterestChart',
+  'goals': 'goals',
+};
 
 interface PinnedWidgetsContextType {
   pinnedWidgets: WidgetId[];

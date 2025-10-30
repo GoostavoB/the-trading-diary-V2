@@ -14,7 +14,7 @@ interface OIData {
 export function OpenInterestWidget() {
   const [oiData, setOiData] = useState<OIData | null>(null);
   const { isPinned, togglePin } = usePinnedWidgets();
-  const widgetId = 'open-interest';
+  const widgetId = 'openInterestChart' as const;
 
   useEffect(() => {
     const fetchOI = async () => {

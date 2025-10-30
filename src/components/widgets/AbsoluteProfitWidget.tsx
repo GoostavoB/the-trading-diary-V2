@@ -5,6 +5,8 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { formatCurrency } from '@/utils/formatNumber';
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { PinButton } from '@/components/widgets/PinButton';
+import { usePinnedWidgets } from '@/contexts/PinnedWidgetsContext';
 
 interface AbsoluteProfitWidgetProps {
   id: string;
@@ -24,6 +26,10 @@ export const AbsoluteProfitWidget = memo(({
   chartData,
 }: AbsoluteProfitWidgetProps) => {
   const { t } = useTranslation();
+  const { isPinned, togglePin } = usePinnedWidgets();
+  // Map catalog widget ID to pinned widget ID
+  const catalogId = id;
+  const pinnedId = catalogId === 'absoluteProfit' ? 'total-profit' as const : undefined;
   const isPositive = totalPnL >= 0;
 
   return (
@@ -32,6 +38,14 @@ export const AbsoluteProfitWidget = memo(({
       title="Total Trading Profit"
       isEditMode={isEditMode}
       onRemove={onRemove}
+      headerActions={
+        !isEditMode && pinnedId && (
+          <PinButton
+            isPinned={isPinned(pinnedId)}
+            onToggle={() => togglePin(pinnedId)}
+          />
+        )
+      }
     >
       <div className="space-y-4">
         {/* Main Metric */}

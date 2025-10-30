@@ -4,6 +4,8 @@ import { formatPercent } from '@/utils/formatNumber';
 import { WidgetProps } from '@/types/widget';
 import { WidgetWrapper } from './WidgetWrapper';
 import { useTranslation } from '@/hooks/useTranslation';
+import { PinButton } from '@/components/widgets/PinButton';
+import { usePinnedWidgets } from '@/contexts/PinnedWidgetsContext';
 
 interface WinRateWidgetProps extends WidgetProps {
   winRate: number;
@@ -21,6 +23,10 @@ export const WinRateWidget = memo(({
   losses,
 }: WinRateWidgetProps) => {
   const { t } = useTranslation();
+  const { isPinned, togglePin } = usePinnedWidgets();
+  // Map catalog widget ID to pinned widget ID
+  const catalogId = id;
+  const pinnedId = catalogId === 'winRate' ? 'win-rate' as const : undefined;
   
   return (
     <WidgetWrapper
@@ -28,6 +34,14 @@ export const WinRateWidget = memo(({
       isEditMode={isEditMode}
       onRemove={onRemove}
       onExpand={onExpand}
+      headerActions={
+        !isEditMode && pinnedId && (
+          <PinButton
+            isPinned={isPinned(pinnedId)}
+            onToggle={() => togglePin(pinnedId)}
+          />
+        )
+      }
     >
       <div className="space-y-3">
         <div className="flex items-center justify-between">

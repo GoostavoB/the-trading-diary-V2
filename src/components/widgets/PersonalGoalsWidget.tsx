@@ -20,7 +20,7 @@ export function PersonalGoalsWidget() {
   const [activeGoal, setActiveGoal] = useState<Goal | null>(null);
   const { user } = useAuth();
   const { isPinned, togglePin } = usePinnedWidgets();
-  const widgetId = 'personal-goals';
+  const widgetId = 'goals' as const;
 
   const fetchActiveGoal = async () => {
     if (!user) return;
