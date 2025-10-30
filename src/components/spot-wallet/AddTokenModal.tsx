@@ -54,7 +54,7 @@ export const AddTokenModal = ({ open, onClose, onAdd }: AddTokenModalProps) => {
   const [tokenName, setTokenName] = useState('');
   const [quantity, setQuantity] = useState('');
   const [purchasePrice, setPurchasePrice] = useState('');
-  const [purchaseDate, setPurchaseDate] = useState<Date>();
+  const [purchaseDate, setPurchaseDate] = useState<Date>(new Date()); // Auto-fill to today
   const [exchange, setExchange] = useState('');
   const [notes, setNotes] = useState('');
   const [openExchange, setOpenExchange] = useState(false);
@@ -64,13 +64,6 @@ export const AddTokenModal = ({ open, onClose, onAdd }: AddTokenModalProps) => {
   
   const { results: tokenResults, loading: searchLoading } = useTokenSearch(searchQuery);
   const { data: priceData, isLoading: priceLoading } = useTokenPrice(tokenSymbol);
-
-  // Auto-fill purchase date to today when symbol is entered
-  useEffect(() => {
-    if (tokenSymbol && !purchaseDate) {
-      setPurchaseDate(new Date());
-    }
-  }, [tokenSymbol]);
 
   // Auto-fill purchase price from CoinGecko when available
   useEffect(() => {
@@ -97,7 +90,7 @@ export const AddTokenModal = ({ open, onClose, onAdd }: AddTokenModalProps) => {
     setTokenName('');
     setQuantity('');
     setPurchasePrice('');
-    setPurchaseDate(undefined);
+    setPurchaseDate(new Date()); // Reset to today's date
     setExchange('');
     setNotes('');
     setIsManualPrice(false);
@@ -109,16 +102,20 @@ export const AddTokenModal = ({ open, onClose, onAdd }: AddTokenModalProps) => {
   const handleTokenSelect = (symbol: string, name: string) => {
     setTokenSymbol(symbol.toUpperCase());
     setTokenName(name);
-    setSearchQuery('');
+    setSearchQuery(symbol); // Keep search query in sync
     setShowTokenResults(false);
     setIsManualPrice(false); // Reset manual price flag when selecting new token
   };
 
   const handleSymbolChange = (value: string) => {
-    setTokenSymbol(value.toUpperCase());
-    setSearchQuery(value);
+    setSearchQuery(value); // Only update search query, not symbol
     setShowTokenResults(value.length >= 2);
     setIsManualPrice(false); // Reset when user changes symbol
+    
+    // If user types and doesn't select from dropdown, still set the symbol
+    if (value.length >= 2) {
+      setTokenSymbol(value.toUpperCase());
+    }
   };
 
   const handlePriceManualChange = (value: string) => {
@@ -141,11 +138,14 @@ export const AddTokenModal = ({ open, onClose, onAdd }: AddTokenModalProps) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2 relative">
-              <Label htmlFor="symbol">Symbol *</Label>
+              <Label htmlFor="symbol" className="flex items-center gap-2">
+                Symbol *
+                {searchLoading && <Loader2 className="h-3 w-3 animate-spin" />}
+              </Label>
               <Input
                 id="symbol"
                 placeholder="BTC"
-                value={tokenSymbol}
+                value={searchQuery || tokenSymbol}
                 onChange={(e) => handleSymbolChange(e.target.value)}
                 onFocus={() => setShowTokenResults(searchQuery.length >= 2)}
                 required
@@ -190,9 +190,9 @@ export const AddTokenModal = ({ open, onClose, onAdd }: AddTokenModalProps) => {
                 onChange={(e) => setTokenName(e.target.value)}
                 required
               />
-              {tokenName && (
-                <p className="text-xs text-muted-foreground">
-                  ✓ Auto-filled from search
+              {tokenName && tokenSymbol && (
+                <p className="text-xs text-success">
+                  ✓ Auto-filled from CoinGecko
                 </p>
               )}
             </div>
@@ -235,12 +235,17 @@ export const AddTokenModal = ({ open, onClose, onAdd }: AddTokenModalProps) => {
               />
               {priceData && !isManualPrice && (
                 <p className="text-xs text-success">
-                  ✓ Current market price (live)
+                  ✓ Live price from CoinGecko
+                </p>
+              )}
+              {!priceData && !priceLoading && tokenSymbol && !isManualPrice && (
+                <p className="text-xs text-muted-foreground">
+                  Price not available - enter manually
                 </p>
               )}
               {isManualPrice && (
                 <p className="text-xs text-muted-foreground">
-                  Manual price entered
+                  Manual entry
                 </p>
               )}
             </div>
