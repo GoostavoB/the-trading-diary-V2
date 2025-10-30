@@ -11,7 +11,7 @@ import { GoalProjection } from "@/components/goals/GoalProjection";
 // GamificationSidebar temporarily disabled - XP/Level/Challenges hidden
 // import { GamificationSidebar } from "@/components/gamification/GamificationSidebar";
 import { AchievementBadges } from "@/components/AchievementBadges";
-import { Target, TrendingUp, AlertCircle, CheckCircle, X, Trophy, Star } from "lucide-react";
+import { Target, TrendingUp, AlertTriangle, CheckCircle2, X, Trophy, Star, CircleDashed } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -94,26 +94,29 @@ export default function Goals() {
     {
       label: "Active Goals",
       value: activeGoals.length,
-      icon: Target,
-      color: "text-blue-500 dark:text-blue-400",
-      bgColor: "bg-blue-500/10",
-      hoverColor: "hover:bg-blue-500/20"
+      icon: CircleDashed,
+      color: "text-blue-400",
+      bgColor: "bg-gradient-to-br from-blue-500/10 to-blue-600/5",
+      hoverColor: "hover:from-blue-500/15 hover:to-blue-600/10",
+      iconStroke: 1.5
     },
     {
       label: "Completed",
       value: completedGoals.length,
-      icon: CheckCircle,
-      color: "text-emerald-500 dark:text-emerald-400",
-      bgColor: "bg-emerald-500/10",
-      hoverColor: "hover:bg-emerald-500/20"
+      icon: CheckCircle2,
+      color: "text-emerald-400",
+      bgColor: "bg-gradient-to-br from-emerald-500/10 to-emerald-600/5",
+      hoverColor: "hover:from-emerald-500/15 hover:to-emerald-600/10",
+      iconStroke: 1.5
     },
     {
       label: "Overdue",
       value: overdueGoals.length,
-      icon: AlertCircle,
-      color: "text-red-500 dark:text-red-400",
-      bgColor: "bg-red-500/10",
-      hoverColor: "hover:bg-red-500/20"
+      icon: AlertTriangle,
+      color: "text-red-400",
+      bgColor: "bg-gradient-to-br from-red-500/10 to-red-600/5",
+      hoverColor: "hover:from-red-500/15 hover:to-red-600/10",
+      iconStroke: 1.5
     },
     {
       label: "Total Progress",
@@ -121,9 +124,10 @@ export default function Goals() {
         ? `${(activeGoals.reduce((sum, g) => sum + (g.current_value / g.target_value * 100), 0) / activeGoals.length).toFixed(0)}%`
         : "0%",
       icon: TrendingUp,
-      color: "text-purple-500 dark:text-purple-400",
-      bgColor: "bg-purple-500/10",
-      hoverColor: "hover:bg-purple-500/20"
+      color: "text-purple-400",
+      bgColor: "bg-gradient-to-br from-purple-500/10 to-purple-600/5",
+      hoverColor: "hover:from-purple-500/15 hover:to-purple-600/10",
+      iconStroke: 1.5
     }
   ];
 
@@ -156,16 +160,16 @@ export default function Goals() {
             {stats.map((stat, index) => (
               <Card 
                 key={index} 
-                className={`p-5 transition-all duration-200 cursor-default ${stat.hoverColor} hover:scale-[1.02]`} 
+                className={`p-6 transition-all duration-300 cursor-default ${stat.bgColor} ${stat.hoverColor} hover:scale-[1.02] border-border/50 backdrop-blur-sm`} 
                 role="article"
               >
                 <div className={layout.flex.between}>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                    <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{stat.label}</p>
+                    <p className="text-4xl font-bold tracking-tight">{stat.value}</p>
                   </div>
-                  <div className={`p-3 rounded-xl ${stat.bgColor} transition-transform duration-200 group-hover:scale-110`}>
-                    <stat.icon className={`h-7 w-7 ${stat.color}`} aria-hidden="true" strokeWidth={2} />
+                  <div className="flex items-center justify-center">
+                    <stat.icon className={`h-8 w-8 ${stat.color}`} aria-hidden="true" strokeWidth={stat.iconStroke} />
                   </div>
                 </div>
               </Card>
@@ -225,7 +229,7 @@ export default function Goals() {
             {completedGoals.length === 0 ? (
               <Card className="p-16 text-center glass">
                 <div className="mx-auto w-fit p-6 rounded-2xl bg-muted/20 mb-6">
-                  <CheckCircle className="h-12 w-12 mx-auto text-muted-foreground/60" strokeWidth={1.5} />
+                  <CheckCircle2 className="h-12 w-12 mx-auto text-muted-foreground/60" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">No Completed Goals Yet</h3>
                 <p className="text-sm text-muted-foreground max-w-md mx-auto">
