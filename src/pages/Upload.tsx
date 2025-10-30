@@ -501,8 +501,19 @@ const Upload = () => {
       
       console.log('📊 Extraction payload size (approx bytes):', Math.floor((imageToSend?.length || 0) * 0.75));
       
-      // Add hard timeout for backend call (15 seconds)
-      const INVOKE_TIMEOUT_MS = 15000;
+      // Progressive timeout messages
+      const progressTimer1 = setTimeout(() => {
+        setProcessingMessage('Still processing your image... This can take up to 45 seconds.');
+        toast.info('Still processing...', { duration: 2000 });
+      }, 15000);
+      
+      const progressTimer2 = setTimeout(() => {
+        setProcessingMessage('Almost done... Thanks for your patience!');
+        toast.info('Almost there...', { duration: 2000 });
+      }, 30000);
+      
+      // Extended timeout for backend call (45 seconds)
+      const INVOKE_TIMEOUT_MS = 45000;
       const invokePromise = supabase.functions.invoke('extract-trade-info', {
         body: { 
           imageBase64: imageToSend,
@@ -517,10 +528,14 @@ const Upload = () => {
       });
       
       const timeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Extraction timed out after 15s')), INVOKE_TIMEOUT_MS)
+        setTimeout(() => reject(new Error('Extraction timed out after 45 seconds. Please try again or use manual entry.')), INVOKE_TIMEOUT_MS)
       );
       
       const { data, error } = await Promise.race([invokePromise, timeoutPromise]) as any;
+      
+      // Clear progress timers
+      clearTimeout(progressTimer1);
+      clearTimeout(progressTimer2);
 
       if (error) {
         console.error('Extraction error:', error);
@@ -609,17 +624,29 @@ const Upload = () => {
     } catch (error) {
       console.error('Error extracting trade info:', error);
       
-      const isTimeout = error instanceof Error && error.message.includes('timed out');
+      // More helpful error messages
+      let errorTitle = 'Extraction Failed';
+      let errorDescription = 'Please try again or use manual entry';
       
-      if (isTimeout) {
-        toast.error('Extraction timed out', {
-          description: 'Please try again. The image will be recompressed if needed.'
-        });
-      } else {
-        toast.error('Failed to extract trade information', {
-          description: 'An unexpected error occurred'
-        });
+      if (error instanceof Error) {
+        if (error.message.includes('timed out')) {
+          errorTitle = 'Extraction Timed Out';
+          errorDescription = 'The image took too long to process. Try a clearer screenshot or use manual entry below.';
+        } else if (error.message.includes('credits')) {
+          errorTitle = 'No Credits Available';
+          errorDescription = error.message;
+        } else if (error.message.includes('Rate limit')) {
+          errorTitle = 'Too Many Requests';
+          errorDescription = 'Please wait a moment before trying again.';
+        } else {
+          errorDescription = error.message;
+        }
       }
+      
+      toast.error(errorTitle, {
+        description: errorDescription,
+        duration: 6000
+      });
     } finally {
       const duration = Date.now() - startedAt;
       console.log('⏱️ Extraction duration (ms):', duration);

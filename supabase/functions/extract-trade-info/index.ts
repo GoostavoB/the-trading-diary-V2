@@ -318,21 +318,29 @@ NEVER return empty array. If uncertain, return best-effort rows. Max 10 trades p
       tokensIn = result.usage?.prompt_tokens || 0;
       tokensOut = result.usage?.completion_tokens || 0;
 
-      // Parse JSON with robust extraction
+      // Parse JSON with robust extraction and multiple retry strategies
       try {
         trades = extractJSON(aiResponse);
         
+        // Validate trades array
+        if (!Array.isArray(trades)) {
+          console.error('❌ Response is not an array:', typeof trades);
+          trades = [];
+        }
+        
         // Check if we got fewer trades than expected - retry with deep model
-        if (Array.isArray(trades) && trades.length < estimatedTradeCount && estimatedTradeCount > 1) {
+        if (trades.length < estimatedTradeCount && estimatedTradeCount > 1) {
           console.log(`⚠️ Expected ${estimatedTradeCount} trades but got ${trades.length}, retrying with vision model`);
-          // Fall through to deep route by not returning here
-        } else {
-          // Success - skip deep route
+          // Fall through to deep route
+        } else if (trades.length > 0) {
+          // Success - skip deep route by continuing
+          console.log(`✅ Successfully extracted ${trades.length} trade(s) using lite route`);
         }
       } catch (parseError) {
-        console.error('JSON parse error:', parseError, 'Raw response:', aiResponse);
-        // Do not fail here; fallback to deep vision model for full extraction
-        trades = [] as any[];
+        console.error('❌ JSON parse error on lite route:', parseError);
+        console.error('Raw AI response:', aiResponse.substring(0, 500));
+        // Fallback to deep vision model for full extraction
+        trades = [];
       }
 
       // If lite extraction was incomplete or parsing failed, fall through to deep route
@@ -409,9 +417,39 @@ NEVER return empty array. If uncertain, return best-effort rows. Max 10 trades p
 
         try {
           trades = extractJSON(deepAiResponse);
+          
+          if (!Array.isArray(trades)) {
+            console.error('❌ Deep response is not an array:', typeof trades);
+            throw new Error('AI returned invalid data format');
+          }
+          
+          if (trades.length === 0) {
+            console.warn('⚠️ Deep model returned empty array');
+            throw new Error('No trades found in image. Please ensure the screenshot shows trade data clearly.');
+          }
+          
+          console.log(`✅ Deep model extracted ${trades.length} trade(s)`);
         } catch (parseError) {
-          console.error('JSON parse error:', parseError, 'Raw response:', deepAiResponse);
-          throw new Error('Failed to parse AI response. The model returned invalid JSON.');
+          console.error('❌ JSON parse error on deep route:', parseError);
+          console.error('Raw deep response:', deepAiResponse.substring(0, 500));
+          
+          // Last resort: try to extract partial data
+          if (deepAiResponse.includes('{') && deepAiResponse.includes('}')) {
+            console.log('🔧 Attempting partial extraction...');
+            try {
+              const partialMatch = deepAiResponse.match(/\[[\s\S]*\]/);
+              if (partialMatch) {
+                trades = JSON.parse(partialMatch[0]);
+                console.log(`⚠️ Partial extraction successful: ${trades.length} trade(s)`);
+              } else {
+                throw new Error('Could not extract valid JSON from response');
+              }
+            } catch {
+              throw new Error('Failed to parse AI response. Please try again with a clearer screenshot.');
+            }
+          } else {
+            throw new Error('AI response contains no valid trade data. Try a different screenshot.');
+          }
         }
       }
 
@@ -424,18 +462,25 @@ NEVER return empty array. If uncertain, return best-effort rows. Max 10 trades p
       const maxTokens = calculateMaxTokens(estimatedTradeCount, 'deep');
       console.log(`🎯 Allocating ${maxTokens} tokens for ${estimatedTradeCount} estimated trade(s)`);
 
-      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: modelUsed,
-          messages: [
-            {
-              role: "system",
-              content: `Extract ALL trades from trading screenshot. Treat this like a table: one trade per row. BUY => long, SELL => short. Return ONLY valid JSON array. Schema: ${JSON.stringify(TRADE_SCHEMA)}.
+      // Add retry logic for vision model (2 attempts)
+      let response;
+      let retryCount = 0;
+      const MAX_RETRIES = 1;
+      
+      while (retryCount <= MAX_RETRIES) {
+        try {
+          response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: modelUsed,
+              messages: [
+                {
+                  role: "system",
+                  content: `Extract ALL trades from trading screenshot. Treat this like a table: one trade per row. BUY => long, SELL => short. Return ONLY valid JSON array. Schema: ${JSON.stringify(TRADE_SCHEMA)}.
 
 CRITICAL EXTRACTION RULES:
 1. Position Type: if entry > exit AND profit > 0 = SHORT, if entry < exit AND profit > 0 = LONG
@@ -450,19 +495,41 @@ CRITICAL EXTRACTION RULES:
 10. Duration: Calculate from opened_at and closed_at timestamps
 
 NEVER return empty array. If uncertain, return best-effort rows. Max 10 trades per image. Expected ~${estimatedTradeCount} trade(s). End with "\\n\\nEND".${brokerContext}${annotationContext}`
-            },
-            {
-              role: "user",
-              content: [
-                { type: "text", text: "Extract ALL trades from this screenshot." },
-                { type: "image_url", image_url: { url: imageBase64 } }
-              ]
-            }
-          ],
-          max_tokens: maxTokens,
-          stop: ["\\n\\nEND"]
-        }),
-      });
+                },
+                {
+                  role: "user",
+                  content: [
+                    { type: "text", text: "Extract ALL trades from this screenshot." },
+                    { type: "image_url", image_url: { url: imageBase64 } }
+                  ]
+                }
+              ],
+              max_tokens: maxTokens,
+              stop: ["\\n\\nEND"]
+            }),
+          });
+          
+          if (response.ok) break; // Success
+          
+          // Handle retryable errors
+          if (response.status === 429 && retryCount < MAX_RETRIES) {
+            console.log(`⏳ Rate limit hit, waiting 2s before retry ${retryCount + 1}/${MAX_RETRIES}`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            retryCount++;
+            continue;
+          }
+          
+          break; // Non-retryable error
+        } catch (fetchError) {
+          console.error(`❌ Fetch error on attempt ${retryCount + 1}:`, fetchError);
+          if (retryCount < MAX_RETRIES) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            retryCount++;
+          } else {
+            throw fetchError;
+          }
+        }
+      }
 
       if (!response.ok) {
         if (response.status === 429) {
