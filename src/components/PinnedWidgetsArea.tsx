@@ -45,7 +45,13 @@ const renderWidget = (widgetId: WidgetId, props: PinnedWidgetsAreaProps) => {
 export function PinnedWidgetsArea(props: PinnedWidgetsAreaProps) {
   const { pinnedWidgets } = usePinnedWidgets();
 
-  if (pinnedWidgets.length === 0) {
+  // Filter to only include widgets that can be rendered
+  const renderableWidgets = pinnedWidgets.filter((widgetId) => {
+    const widget = renderWidget(widgetId, props);
+    return widget !== null;
+  });
+
+  if (renderableWidgets.length === 0) {
     return null;
   }
 
@@ -55,12 +61,12 @@ export function PinnedWidgetsArea(props: PinnedWidgetsAreaProps) {
         <Pin className="h-5 w-5 text-primary" />
         <h2 className="text-xl font-bold">Pinned Widgets</h2>
         <span className="text-xs text-muted-foreground">
-          ({pinnedWidgets.length} pinned)
+          ({renderableWidgets.length} pinned)
         </span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {pinnedWidgets.map((widgetId) => (
+        {renderableWidgets.map((widgetId) => (
           <div key={widgetId}>{renderWidget(widgetId, props)}</div>
         ))}
       </div>
