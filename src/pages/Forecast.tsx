@@ -159,6 +159,27 @@ const Forecast = () => {
           <p className="text-muted-foreground text-lg">Project your future equity based on historical performance</p>
         </header>
 
+        {loadingTimeout && (
+          <Card className="p-4 mb-6 bg-warning/10 border-warning">
+            <p className="text-sm text-warning">
+              Loading is taking longer than usual. Your forecasts may still appear.
+            </p>
+          </Card>
+        )}
+
+        {avgDailyPnl === 0 && !loading && (
+          <Card className="p-6 text-center glass-subtle border-primary/20 mb-6">
+            <TrendingDown className="w-12 h-12 mx-auto mb-3 text-primary/70" />
+            <h3 className="text-lg font-semibold mb-2">Upload Your Trades to See Forecasts</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              Add your trading history to unlock personalized equity projections and growth analysis
+            </p>
+            <Button onClick={() => window.location.href = '/upload'} size="sm">
+              Upload Trades
+            </Button>
+          </Card>
+        )}
+
         {loading ? (
           <div className="text-center py-16">
             <div className="inline-flex items-center gap-3">
@@ -166,17 +187,6 @@ const Forecast = () => {
               <p className="text-muted-foreground">Calculating projections...</p>
             </div>
           </div>
-        ) : loadingTimeout || avgDailyPnl === 0 ? (
-          <Card className="p-8 text-center glass-subtle">
-            <TrendingDown className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
-            <h3 className="text-xl font-semibold mb-2">No Trading Data Yet</h3>
-            <p className="text-muted-foreground mb-4">
-              Upload your trades to see personalized equity forecasts and projections
-            </p>
-            <Button onClick={() => window.location.href = '/upload'}>
-              Upload Trades
-            </Button>
-          </Card>
         ) : (
           <>
             <Card className="p-6 glass-card border-border/50">
