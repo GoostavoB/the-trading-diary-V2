@@ -33,6 +33,16 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
     e.preventDefault();
     if (!user) return;
 
+    // Validate target date is not in the past
+    const targetDate = new Date(formData.target_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day
+    
+    if (targetDate < today) {
+      toast.error("Target date cannot be in the past");
+      return;
+    }
+
     setLoading(true);
     try {
       const goalData = {
@@ -52,14 +62,20 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
           .update(goalData)
           .eq('id', editingGoal.id);
         
-        if (error) throw error;
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
         toast.success("Goal updated successfully");
       } else {
         const { error } = await supabase
           .from('trading_goals')
           .insert(goalData);
         
-        if (error) throw error;
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
         toast.success("Goal created successfully");
       }
 
@@ -75,9 +91,9 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
         target_value: '',
         target_date: '',
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving goal:', error);
-      toast.error("Failed to save goal");
+      toast.error(error?.message || "Failed to save goal");
     } finally {
       setLoading(false);
     }
@@ -167,6 +183,7 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
               type="date"
               value={formData.target_date}
               onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
+              min={format(new Date(), 'yyyy-MM-dd')}
               required
             />
           </div>
