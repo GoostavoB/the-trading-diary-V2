@@ -35,6 +35,8 @@ import { PerformanceHighlights } from '@/components/insights/PerformanceHighligh
 import { TradingQualityMetrics } from '@/components/insights/TradingQualityMetrics';
 import { TradingHeatmap } from '@/components/TradingHeatmap';
 import { GoalWidget } from '@/components/goals/GoalWidget';
+import { LSRWidget } from '@/components/widgets/LSRWidget';
+import { OpenInterestWidget } from '@/components/widgets/OpenInterestWidget';
 
 /**
  * Widget Catalog - Registry of all available dashboard widgets
@@ -246,6 +248,26 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     icon: Target,
     defaultSize: 'large',
     component: GoalWidget as any,
+    requiresData: [],
+  },
+  lsrMarketData: {
+    id: 'lsrMarketData',
+    title: 'Market Sentiment',
+    description: 'Real-time Long/Short Ratio and Open Interest for BTCUSDT',
+    category: 'market',
+    icon: Activity,
+    defaultSize: 'small',
+    component: LSRWidget as any,
+    requiresData: [],
+  },
+  openInterestChart: {
+    id: 'openInterestChart',
+    title: 'Open Interest Chart',
+    description: 'Historical open interest trends with customizable symbols',
+    category: 'market',
+    icon: TrendingUp,
+    defaultSize: 'large',
+    component: OpenInterestWidget as any,
     requiresData: [],
   },
 };

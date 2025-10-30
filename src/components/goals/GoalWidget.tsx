@@ -61,7 +61,29 @@ export function GoalWidget() {
   });
 
   if (goals.length === 0) {
-    return null;
+    return (
+      <Card className="col-span-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5" />
+            Active Goals
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-center py-8">
+          <Target className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
+          <h3 className="text-lg font-semibold mb-2">No Active Goals</h3>
+          <p className="text-muted-foreground text-sm mb-4">
+            Set trading goals to track your progress and stay motivated
+          </p>
+          <button
+            onClick={() => window.location.href = '/goals'}
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+          >
+            Create Your First Goal
+          </button>
+        </CardContent>
+      </Card>
+    );
   }
 
   const formatValue = (value: number, type: string) => {
