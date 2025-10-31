@@ -182,8 +182,8 @@ export const FeatureCarousel = () => {
               );
             })}
           </CarouselContent>
-          <CarouselPrevious className="glass" />
-          <CarouselNext className="glass" />
+          <CarouselPrevious className="glass bg-primary/20 border-primary/40 hover:bg-primary/30 hover:border-primary/60 text-primary" />
+          <CarouselNext className="glass bg-primary/20 border-primary/40 hover:bg-primary/30 hover:border-primary/60 text-primary" />
         </Carousel>
       </div>
 
