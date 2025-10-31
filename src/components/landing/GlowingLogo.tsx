@@ -12,7 +12,7 @@ export const GlowingLogo = () => {
       {/* Ocean Blue glow orb */}
       <div className="absolute inset-0 flex items-center justify-center">
         <motion.div
-          className="absolute w-64 h-64 rounded-full"
+          className="absolute w-80 h-80 rounded-full"
           style={{
             background: 'radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0.2) 30%, rgba(59, 130, 246, 0) 70%)',
             filter: 'blur(40px)',
@@ -50,7 +50,7 @@ export const GlowingLogo = () => {
 
       {/* Dark circle with logo */}
       <motion.div
-        className="relative z-10 w-48 h-48 rounded-full flex items-center justify-center"
+        className="relative z-10 w-64 h-64 rounded-full flex flex-col items-center justify-center gap-3"
         style={{
           background: 'radial-gradient(circle, rgba(10, 10, 10, 1) 0%, rgba(20, 20, 20, 0.95) 100%)',
           boxShadow: '0 0 80px rgba(59, 130, 246, 0.5), inset 0 0 40px rgba(0, 0, 0, 0.8)',
@@ -98,11 +98,18 @@ export const GlowingLogo = () => {
             }}
           />
         </div>
+
+        {/* The Trading Diary text */}
+        <div className="relative z-10">
+          <p className="text-white text-lg font-semibold tracking-wide">
+            The Trading Diary
+          </p>
+        </div>
       </motion.div>
 
       {/* Orbital rings */}
       <motion.div
-        className="absolute inset-0 w-64 h-64"
+        className="absolute inset-0 w-80 h-80"
         style={{
           border: '1px solid rgba(59, 130, 246, 0.2)',
           borderRadius: '50%',
@@ -123,28 +130,6 @@ export const GlowingLogo = () => {
             boxShadow: '0 0 10px rgba(59, 130, 246, 0.8)',
           }}
         />
-      </motion.div>
-
-      {/* "The Trading Diary" text below logo */}
-      <motion.div
-        className="absolute top-60 left-1/2 -translate-x-1/2 text-center whitespace-nowrap"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.5 }}
-      >
-        <h2
-          className="text-3xl md:text-4xl font-bold tracking-wide"
-          style={{
-            background: 'linear-gradient(180deg, #ffffff 0%, #c0c0c0 50%, #ffffff 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            textShadow: '0 0 30px rgba(255, 255, 255, 0.3), 0 2px 4px rgba(0, 0, 0, 0.5)',
-            filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.2))',
-          }}
-        >
-          The Trading Diary
-        </h2>
       </motion.div>
     </motion.div>
   );
