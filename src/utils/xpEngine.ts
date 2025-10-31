@@ -158,7 +158,7 @@ export const predictNextDayXP = (
 
 export const TIER_THRESHOLDS = [0, 1000, 4000, 10000, 25000] as const;
 
-export const TIER_NAMES = ['Rookie', 'Trader', 'Pro', 'Expert', 'Master'] as const;
+export const TIER_NAMES = ['Starter', 'Skilled', 'Advanced', 'Pro', 'Elite'] as const;
 
 export const TIER_DAILY_XP_CAPS = [750, 750, 1500, 1500, 999999] as const;
 

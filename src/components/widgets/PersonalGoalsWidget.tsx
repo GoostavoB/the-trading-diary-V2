@@ -7,6 +7,7 @@ import { usePinnedWidgets } from '@/contexts/PinnedWidgetsContext';
 import { CreateGoalDialog } from '@/components/goals/CreateGoalDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface Goal {
   id: string;
@@ -50,6 +51,9 @@ export function PersonalGoalsWidget({ id, isEditMode, onRemove }: PersonalGoalsW
 
   useEffect(() => {
     fetchActiveGoal();
+    
+    const interval = setInterval(fetchActiveGoal, 10000);
+    return () => clearInterval(interval);
   }, [user]);
 
   const progress = activeGoal 
@@ -106,7 +110,12 @@ export function PersonalGoalsWidget({ id, isEditMode, onRemove }: PersonalGoalsW
           ) : (
             <div className="py-4 text-center">
               <p className="text-sm text-muted-foreground mb-3">No active goals</p>
-              <CreateGoalDialog onGoalCreated={fetchActiveGoal} />
+              <CreateGoalDialog 
+                onGoalCreated={() => {
+                  fetchActiveGoal();
+                  toast.success("Goal created!");
+                }} 
+              />
             </div>
           )}
         </div>

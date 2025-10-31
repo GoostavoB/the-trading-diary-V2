@@ -25,6 +25,16 @@ export interface WidgetConfig {
   component: React.ComponentType<WidgetProps>;
   isPremium?: boolean;
   requiresData?: string[]; // Dependencies like 'trades', 'holdings'
+  
+  // Gamification unlock requirements (Phase 1)
+  requiredTier?: 0 | 1 | 2 | 3 | 4;
+  requiredPlan?: 'free' | 'pro' | 'elite';
+  xpToUnlock?: number;
+  tierName?: string;
+  educationalPurpose?: string;
+  dopamineTrigger?: 'micro' | 'meso' | 'macro';
+  isNew?: boolean;
+  popularity?: number;
 }
 
 export interface WidgetProps {

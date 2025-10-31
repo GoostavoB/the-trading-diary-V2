@@ -56,6 +56,13 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     component: TotalBalanceWidget,
     requiresData: ['stats'],
+    // Tier 0: Starter (0 XP, Free)
+    requiredTier: 0,
+    requiredPlan: 'free',
+    xpToUnlock: 0,
+    tierName: 'Starter',
+    educationalPurpose: 'Track your overall trading capital',
+    dopamineTrigger: 'micro',
   },
   
   winRate: {
@@ -67,6 +74,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     component: WinRateWidget,
     requiresData: ['stats'],
+    requiredTier: 0,
+    requiredPlan: 'free',
+    xpToUnlock: 0,
+    tierName: 'Starter',
+    educationalPurpose: 'Monitor win/loss percentage',
+    dopamineTrigger: 'micro',
   },
   
   totalTrades: {
@@ -78,6 +91,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     component: TotalTradesWidget,
     requiresData: ['stats'],
+    requiredTier: 0,
+    requiredPlan: 'free',
+    xpToUnlock: 0,
+    tierName: 'Starter',
+    educationalPurpose: 'Count your trading activity',
+    dopamineTrigger: 'micro',
   },
   
   spotWallet: {
@@ -89,6 +108,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     component: SpotWalletWidget,
     requiresData: ['holdings'],
+    requiredTier: 1,
+    requiredPlan: 'free',
+    xpToUnlock: 1000,
+    tierName: 'Skilled',
+    educationalPurpose: 'Portfolio holdings overview',
+    dopamineTrigger: 'micro',
   },
   
   absoluteProfit: {
@@ -100,6 +125,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     component: AbsoluteProfitWidget,
     requiresData: ['trades'],
+    requiredTier: 4,
+    requiredPlan: 'elite',
+    xpToUnlock: 25000,
+    tierName: 'Elite',
+    educationalPurpose: 'Pure trading profit metric',
+    dopamineTrigger: 'macro',
   },
   
   topMovers: {
@@ -111,6 +142,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     component: TopMoversWidget,
     requiresData: ['trades'],
+    requiredTier: 1,
+    requiredPlan: 'free',
+    xpToUnlock: 1000,
+    tierName: 'Skilled',
+    educationalPurpose: 'Best performing assets',
+    dopamineTrigger: 'micro',
   },
   
   aiInsights: {
@@ -122,6 +159,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     component: AIInsightsWidget,
     isPremium: false,
+    requiredTier: 4,
+    requiredPlan: 'elite',
+    xpToUnlock: 25000,
+    tierName: 'Elite',
+    educationalPurpose: 'AI-powered trading recommendations',
+    dopamineTrigger: 'macro',
   },
   
   recentTransactions: {
@@ -133,6 +176,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'medium',
     component: RecentTransactionsWidget,
     requiresData: ['trades'],
+    requiredTier: 2,
+    requiredPlan: 'free',
+    xpToUnlock: 4000,
+    tierName: 'Advanced',
+    educationalPurpose: 'Latest trade activity',
+    dopamineTrigger: 'micro',
   },
   
   quickActions: {
@@ -143,6 +192,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     icon: Zap,
     defaultSize: 'small',
     component: QuickActionsWidget,
+    requiredTier: 0,
+    requiredPlan: 'free',
+    xpToUnlock: 0,
+    tierName: 'Starter',
+    educationalPurpose: 'Access common features quickly',
+    dopamineTrigger: 'micro',
   },
 
   avgPnLPerTrade: {
@@ -154,6 +209,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     component: AvgPnLPerTradeWidget,
     requiresData: ['stats'],
+    requiredTier: 1,
+    requiredPlan: 'free',
+    xpToUnlock: 1000,
+    tierName: 'Skilled',
+    educationalPurpose: 'Average profit per trade',
+    dopamineTrigger: 'meso',
   },
 
   avgPnLPerDay: {
@@ -165,6 +226,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     component: AvgPnLPerDayWidget,
     requiresData: ['stats'],
+    requiredTier: 1,
+    requiredPlan: 'free',
+    xpToUnlock: 1000,
+    tierName: 'Skilled',
+    educationalPurpose: 'Daily profit average',
+    dopamineTrigger: 'meso',
   },
 
   currentROI: {
@@ -176,6 +243,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     component: CurrentROIWidget,
     requiresData: ['stats'],
+    requiredTier: 2,
+    requiredPlan: 'free',
+    xpToUnlock: 4000,
+    tierName: 'Advanced',
+    educationalPurpose: 'Return on investment metric',
+    dopamineTrigger: 'meso',
   },
 
   capitalGrowth: {
@@ -187,6 +260,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'large',
     component: CapitalGrowthWidget,
     requiresData: [],
+    requiredTier: 3,
+    requiredPlan: 'pro',
+    xpToUnlock: 10000,
+    tierName: 'Pro',
+    educationalPurpose: 'Portfolio growth chart',
+    dopamineTrigger: 'meso',
   },
 
   behaviorAnalytics: {
@@ -198,6 +277,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'large',
     component: BehaviorAnalytics as any,
     requiresData: ['trades'],
+    requiredTier: 3,
+    requiredPlan: 'pro',
+    xpToUnlock: 10000,
+    tierName: 'Pro',
+    educationalPurpose: 'Trading behavior insights',
+    dopamineTrigger: 'macro',
   },
 
   costEfficiency: {
@@ -209,6 +294,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'medium',
     component: CostEfficiencyPanel as any,
     requiresData: ['trades'],
+    requiredTier: 3,
+    requiredPlan: 'pro',
+    xpToUnlock: 10000,
+    tierName: 'Pro',
+    educationalPurpose: 'Fee analysis and optimization',
+    dopamineTrigger: 'meso',
   },
 
   performanceHighlights: {
@@ -220,6 +311,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'medium',
     component: PerformanceHighlights as any,
     requiresData: ['trades'],
+    requiredTier: 3,
+    requiredPlan: 'pro',
+    xpToUnlock: 10000,
+    tierName: 'Pro',
+    educationalPurpose: 'Key performance metrics',
+    dopamineTrigger: 'macro',
   },
 
   tradingQuality: {
@@ -231,6 +328,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'medium',
     component: TradingQualityMetrics as any,
     requiresData: ['stats'],
+    requiredTier: 4,
+    requiredPlan: 'elite',
+    xpToUnlock: 25000,
+    tierName: 'Elite',
+    educationalPurpose: 'Advanced quality metrics',
+    dopamineTrigger: 'macro',
   },
 
   heatmap: {
@@ -242,6 +345,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'large',
     component: TradingHeatmap as any,
     requiresData: ['trades'],
+    requiredTier: 4,
+    requiredPlan: 'elite',
+    xpToUnlock: 25000,
+    tierName: 'Elite',
+    educationalPurpose: 'Time-based performance visualization',
+    dopamineTrigger: 'macro',
   },
 
   goals: {
@@ -253,6 +362,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     component: PersonalGoalsWidget as any,
     requiresData: [],
+    requiredTier: 0,
+    requiredPlan: 'free',
+    xpToUnlock: 0,
+    tierName: 'Starter',
+    educationalPurpose: 'Set and track trading objectives',
+    dopamineTrigger: 'meso',
   },
   lsrMarketData: {
     id: 'lsrMarketData',
@@ -263,6 +378,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     component: LSRWidget as any,
     requiresData: [],
+    requiredTier: 2,
+    requiredPlan: 'free',
+    xpToUnlock: 4000,
+    tierName: 'Advanced',
+    educationalPurpose: 'Long/short ratio analysis',
+    dopamineTrigger: 'micro',
   },
   openInterestChart: {
     id: 'openInterestChart',
@@ -273,6 +394,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'large',
     component: OpenInterestWidget as any,
     requiresData: [],
+    requiredTier: 4,
+    requiredPlan: 'elite',
+    xpToUnlock: 25000,
+    tierName: 'Elite',
+    educationalPurpose: 'Market open interest data',
+    dopamineTrigger: 'meso',
   },
   leverageCalculator: {
     id: 'leverageCalculator',
@@ -283,6 +410,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'large',
     component: LeverageCalculatorWidget as any,
     requiresData: [],
+    requiredTier: 2,
+    requiredPlan: 'free',
+    xpToUnlock: 4000,
+    tierName: 'Advanced',
+    educationalPurpose: 'Calculate position sizing',
+    dopamineTrigger: 'micro',
   },
   weekPerformance: {
     id: 'weekPerformance',
@@ -293,6 +426,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     component: WeekPerformanceWidget as any,
     requiresData: ['trades'],
+    requiredTier: 0,
+    requiredPlan: 'free',
+    xpToUnlock: 0,
+    tierName: 'Starter',
+    educationalPurpose: 'Weekly profit/loss summary',
+    dopamineTrigger: 'micro',
   },
   weeklyPnLChart: {
     id: 'weeklyPnLChart',
@@ -303,6 +442,12 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'large',
     component: WeeklyPnLChartWidget as any,
     requiresData: [],
+    requiredTier: 4,
+    requiredPlan: 'elite',
+    xpToUnlock: 25000,
+    tierName: 'Elite',
+    educationalPurpose: 'Weekly profit/loss trends',
+    dopamineTrigger: 'meso',
   },
 };
 

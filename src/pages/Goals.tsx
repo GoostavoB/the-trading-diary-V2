@@ -148,7 +148,10 @@ export default function Goals() {
               </p>
             </div>
             <CreateGoalDialog 
-              onGoalCreated={refetch}
+              onGoalCreated={() => {
+                refetch();
+                toast.success("Goal saved successfully!");
+              }}
               editingGoal={editingGoal}
               onClose={() => setEditingGoal(null)}
             />

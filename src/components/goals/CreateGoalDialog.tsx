@@ -54,11 +54,12 @@ const formSchema = z.object({
     }, 'Target value must be greater than 0'),
   target_date: z.string()
     .min(1, 'Target date is required')
-    .refine((date) => {
-      const selected = new Date(date + 'T00:00:00');
-      const today = new Date(getTodayLocal() + 'T00:00:00');
-      return selected >= today;
-    }, 'Target date must be today or in the future'),
+  .refine((date) => {
+    const selected = new Date(date + 'T00:00:00Z');
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+    return selected >= today;
+  }, 'Target date must be today or in the future'),
 });
 
 interface CreateGoalDialogProps {
@@ -96,7 +97,9 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
       const normalizedValue = normalizeNumericInput(values.target_value);
       
       // Convert date to end-of-day local time as ISO timestamptz
-      const deadlineISO = new Date(values.target_date + 'T23:59:59').toISOString();
+    const deadlineDate = new Date(values.target_date);
+    deadlineDate.setUTCHours(23, 59, 59, 999);
+    const deadlineISO = deadlineDate.toISOString();
 
       console.info('[CreateGoal] Submitting goal:', { 
         title: values.title, 
@@ -155,7 +158,14 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
       
     } catch (error: any) {
       console.error('[CreateGoal] Error saving goal:', error);
-      toast.error(error?.message || "Failed to save goal. Please check your inputs and try again.");
+      
+      if (error.message?.includes('Target date cannot be in the past')) {
+        toast.error("Target date must be today or in the future. Please check your date selection.");
+      } else if (error.message?.includes('violates check constraint')) {
+        toast.error("Invalid goal data. Please check all fields and try again.");
+      } else {
+        toast.error(error?.message || "Failed to save goal. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

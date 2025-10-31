@@ -4178,6 +4178,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_widget_unlocks: {
+        Row: {
+          id: string
+          unlock_method: string
+          unlocked_at: string
+          user_id: string
+          widget_id: string
+        }
+        Insert: {
+          id?: string
+          unlock_method: string
+          unlocked_at?: string
+          user_id: string
+          widget_id: string
+        }
+        Update: {
+          id?: string
+          unlock_method?: string
+          unlocked_at?: string
+          user_id?: string
+          widget_id?: string
+        }
+        Relationships: []
+      }
       user_xp_levels: {
         Row: {
           created_at: string
@@ -4412,6 +4436,45 @@ export type Database = {
           style_id?: string
           style_name?: string
           unlock_requirement?: string
+        }
+        Relationships: []
+      }
+      widget_tier_requirements: {
+        Row: {
+          dopamine_trigger: string | null
+          educational_purpose: string | null
+          is_new: boolean | null
+          plan_required: string | null
+          popularity: number | null
+          tier_name: string
+          tier_required: number
+          widget_id: string
+          widget_title: string
+          xp_to_unlock: number
+        }
+        Insert: {
+          dopamine_trigger?: string | null
+          educational_purpose?: string | null
+          is_new?: boolean | null
+          plan_required?: string | null
+          popularity?: number | null
+          tier_name: string
+          tier_required: number
+          widget_id: string
+          widget_title: string
+          xp_to_unlock: number
+        }
+        Update: {
+          dopamine_trigger?: string | null
+          educational_purpose?: string | null
+          is_new?: boolean | null
+          plan_required?: string | null
+          popularity?: number | null
+          tier_name?: string
+          tier_required?: number
+          widget_id?: string
+          widget_title?: string
+          xp_to_unlock?: number
         }
         Relationships: []
       }
@@ -4657,6 +4720,10 @@ export type Database = {
       reset_daily_xp: { Args: never; Returns: undefined }
       reset_daily_xp_caps: { Args: never; Returns: undefined }
       reset_monthly_credits: { Args: never; Returns: undefined }
+      setup_elite_test_account: {
+        Args: { user_email: string }
+        Returns: undefined
+      }
       update_lsr_latest_value: {
         Args: {
           p_binance_ratio?: number
