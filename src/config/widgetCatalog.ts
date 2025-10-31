@@ -452,34 +452,14 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
 };
 
 /**
- * Default dashboard layout for new users - simplified to just widget IDs in order
+ * Default dashboard layout for new users - Only 4 starter widgets
  */
 export const DEFAULT_DASHBOARD_LAYOUT = [
-  // Most important widget
-  'absoluteProfit',
-  
-  // Top row
+  // Starter Pack - Only 4 core metrics (always unlocked)
   'currentROI',
   'winRate',
-  'avgPnLPerTrade',
   'avgPnLPerDay',
-  
-  // Second row
-  'capitalGrowth',
-  'heatmap',
-  'topMovers',
-  
-  // Third row
-  'behaviorAnalytics',
-  
-  // Additional widgets
-  'totalBalance',
-  'spotWallet',
   'totalTrades',
-  'goals',
-  'recentTransactions',
-  'aiInsights',
-  'quickActions',
 ];
 
 /**
