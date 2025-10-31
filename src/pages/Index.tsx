@@ -38,6 +38,7 @@ import { BenefitsSection } from "@/components/landing/BenefitsSection";
 import { UploadSpeedCalculator } from "@/components/landing/UploadSpeedCalculator";
 import { CustomizationOptions } from "@/components/landing/CustomizationOptions";
 import { FeatureComparison } from "@/components/landing/FeatureComparison";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { motion } from "framer-motion";
 const Index = () => {
   const navigate = useNavigate();
@@ -74,7 +75,8 @@ const Index = () => {
 
   // Loading is handled at App level - no need for page-level guard
 
-  return <div key={`landing-${language}`} className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black overflow-x-hidden">
+  return <div key={`landing-${language}`} className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black overflow-x-hidden relative">
+      <AnimatedBackground />
       <SkipToContent />
       <ValueBar />
       <PublicHeader />
@@ -121,8 +123,10 @@ const Index = () => {
         </section>
 
         {/* Pain Points Section */}
-        <section className="px-6 py-20">
-          <div className="container mx-auto max-w-4xl">
+        <section className="px-6 py-20 relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent pointer-events-none" />
+          
+          <div className="container mx-auto max-w-5xl relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -130,60 +134,95 @@ const Index = () => {
               transition={{ duration: 0.6 }}
               className="text-center"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <motion.h2 
+                className="text-3xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-white to-white/70 bg-clip-text text-transparent"
+                initial={{ opacity: 0, y: -20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+              >
                 Stop trading blind. Stop leaking profits.
-              </h2>
-              <p className="text-[17px] text-muted-foreground/70 mb-12">
+              </motion.h2>
+              <p className="text-[18px] text-muted-foreground mb-16 max-w-3xl mx-auto leading-relaxed">
                 Most traders don't fail because of strategy — they fail because of emotion and lack of structure.
               </p>
 
-              <div className="space-y-4 mb-8 max-w-2xl mx-auto">
+              <div className="grid md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
                 {[
-                  "You trade impulsively when emotional.",
-                  "You repeat the same mistakes.",
-                  "You don't know what's really costing you money."
+                  { text: "You trade impulsively when emotional.", icon: "💔" },
+                  { text: "You repeat the same mistakes.", icon: "🔄" },
+                  { text: "You don't know what's really costing you money.", icon: "💸" }
                 ].map((pain, index) => (
                   <motion.div
                     key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: index * 0.1 }}
-                    className="flex items-center gap-4 p-4 border border-destructive/30 bg-destructive/5 rounded-lg"
+                    transition={{ duration: 0.5, delay: index * 0.15 }}
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="relative group"
                   >
-                    <div className="flex-shrink-0 w-5 h-5 text-destructive">
-                      <svg className="w-full h-full" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
+                    <div className="absolute inset-0 bg-gradient-to-br from-destructive/20 to-destructive/5 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-50 group-hover:opacity-100" />
+                    
+                    <div className="relative glass-card p-6 border border-destructive/30 bg-destructive/10 backdrop-blur-xl rounded-xl hover:border-destructive/50 transition-all duration-300 h-full">
+                      <div className="absolute top-4 right-4 text-3xl opacity-20 group-hover:opacity-40 transition-opacity">
+                        {pain.icon}
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 mt-1">
+                          <div className="relative">
+                            <div className="absolute inset-0 bg-destructive/30 rounded-full blur-md" />
+                            <svg className="w-6 h-6 text-destructive relative z-10" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        </div>
+                        <p className="text-[16px] font-medium text-foreground text-left leading-relaxed pt-0.5">
+                          {pain.text}
+                        </p>
+                      </div>
                     </div>
-                    <span className="text-[15px] font-medium text-foreground">{pain}</span>
                   </motion.div>
                 ))}
               </div>
 
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="flex items-center justify-center gap-2 mb-6 text-[15px] font-semibold"
-                style={{ color: 'hsl(var(--warning))' }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="relative inline-block mb-8"
               >
-                <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-                <span>Thousands of traders are already mastering consistency with The Trading Diary.</span>
+                <div className="absolute inset-0 bg-warning/20 rounded-2xl blur-2xl" />
+                <div className="relative flex items-center justify-center gap-3 px-8 py-4 border border-warning/40 bg-warning/10 backdrop-blur-xl rounded-2xl">
+                  <svg className="w-6 h-6 text-warning flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-[16px] font-bold text-warning">
+                    Thousands of traders are already mastering consistency with The Trading Diary.
+                  </span>
+                </div>
               </motion.div>
 
-              <p className="text-muted-foreground mb-8">Don't fall behind.</p>
+              <p className="text-[17px] text-muted-foreground/90 mb-10 font-medium">
+                Don't fall behind.
+              </p>
 
-              <Button
-                onClick={() => handleCTAClick('pain-section')}
-                size="lg"
-                className="text-[15px] font-semibold px-8"
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.6 }}
               >
-                Start Free Trial – Offer Ending Soon
-              </Button>
+                <Button
+                  onClick={() => handleCTAClick('pain-section')}
+                  size="lg"
+                  className="text-[16px] font-bold px-10 py-6 shadow-2xl shadow-primary/30 hover:shadow-primary/50 transition-all duration-300"
+                >
+                  Start Free Trial – Offer Ending Soon
+                </Button>
+              </motion.div>
             </motion.div>
           </div>
         </section>
