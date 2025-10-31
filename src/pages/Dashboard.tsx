@@ -82,6 +82,11 @@ import { GamificationHub } from '@/components/gamification/GamificationHub';
 import { XPBoostIndicator } from '@/components/gamification/XPBoostIndicator';
 import { ComebackModal } from '@/components/gamification/ComebackModal';
 import { useComebackRewards } from '@/hooks/useComebackRewards';
+import { WelcomeOnboardingModal } from '@/components/onboarding/WelcomeOnboardingModal';
+import { XPRewardAnimation } from '@/components/onboarding/XPRewardAnimation';
+import { NextMissionCard } from '@/components/dashboard/NextMissionCard';
+import { WelcomeBackToast } from '@/components/onboarding/WelcomeBackToast';
+import { useOnboardingState } from '@/hooks/useOnboardingState';
 
 interface TradeStats {
   total_pnl: number;
@@ -222,6 +227,15 @@ const Dashboard = () => {
   const { xpData, showLevelUp, setShowLevelUp, showTier3Preview, setShowTier3Preview } = useXPSystem();
   const { updateChallengeProgress } = useDailyChallenges();
   const { showComebackModal, setShowComebackModal, comebackReward } = useComebackRewards();
+  
+  // Onboarding state
+  const { 
+    shouldShowWelcome, 
+    shouldShowFirstUploadReward,
+    markWelcomeSeen, 
+    markFirstUploadComplete,
+    hasCompletedFirstUpload
+  } = useOnboardingState();
   
   // Award XP for trades
   useTradeXPRewards(trades);
@@ -1035,6 +1049,27 @@ const Dashboard = () => {
         currentTier={0}
       />
       
+      {/* Onboarding Modals */}
+      <WelcomeOnboardingModal
+        isOpen={shouldShowWelcome}
+        onClose={() => markWelcomeSeen()}
+        onComplete={() => {
+          markWelcomeSeen();
+          // Optionally scroll to upload section
+        }}
+      />
+      
+      <XPRewardAnimation
+        xpAmount={150}
+        message="Great start! You just unlocked your performance dashboard."
+        isVisible={shouldShowFirstUploadReward}
+        onComplete={() => markFirstUploadComplete()}
+        type="milestone"
+      />
+      
+      {/* Welcome Back Toast */}
+      <WelcomeBackToast />
+      
       {/* Skip to main content link for keyboard navigation */}
       <a 
         href="#main-dashboard-content" 
@@ -1118,6 +1153,13 @@ const Dashboard = () => {
             <div className="mb-6 animate-fade-in" style={{animationDelay: '0.3s'}}>
               <DailyMissionBar />
             </div>
+
+            {/* Next Mission Card - Onboarding */}
+            {!hasCompletedFirstUpload && (
+              <div className="mb-6 animate-fade-in" style={{animationDelay: '0.4s'}}>
+                <NextMissionCard />
+              </div>
+            )}
 
             {/* Pinned Widgets Area */}
             <PinnedWidgetsArea 
