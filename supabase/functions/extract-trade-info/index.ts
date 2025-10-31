@@ -44,24 +44,44 @@ function extractJSON(text: string): any {
   cleaned = cleaned.replace(/\s*```\s*$/gim, '');
   cleaned = cleaned.trim();
   
-  // Find the JSON array/object boundaries
-  const startIdx = cleaned.search(/[\[{]/);
+  // Find the JSON array start
+  const startIdx = cleaned.search(/\[/);
   if (startIdx === -1) {
-    throw new Error('No JSON found in response');
+    throw new Error('No JSON array found in response');
   }
   
-  // Find the last closing bracket/brace
-  let endIdx = cleaned.length - 1;
-  while (endIdx >= startIdx) {
-    const char = cleaned[endIdx];
-    if (char === ']' || char === '}') {
-      break;
+  // Find matching closing bracket by counting brackets
+  let bracketCount = 0;
+  let endIdx = -1;
+  
+  for (let i = startIdx; i < cleaned.length; i++) {
+    if (cleaned[i] === '[') bracketCount++;
+    if (cleaned[i] === ']') {
+      bracketCount--;
+      if (bracketCount === 0) {
+        endIdx = i;
+        break;
+      }
     }
-    endIdx--;
   }
   
-  if (endIdx < startIdx) {
-    throw new Error('Invalid JSON structure in response');
+  if (endIdx === -1) {
+    // JSON is truncated - try to recover what we can
+    console.warn('⚠️ JSON appears truncated, attempting partial extraction');
+    
+    // Find the last complete trade object
+    const lastCompleteObject = cleaned.lastIndexOf('},');
+    if (lastCompleteObject > startIdx) {
+      const partial = cleaned.substring(startIdx, lastCompleteObject + 1) + ']';
+      try {
+        const trades = JSON.parse(partial);
+        console.log(`✅ Recovered ${trades.length} trades from truncated response`);
+        return trades;
+      } catch (e) {
+        throw new Error('Failed to parse truncated JSON response');
+      }
+    }
+    throw new Error('JSON is incomplete and cannot be recovered');
   }
   
   const jsonStr = cleaned.substring(startIdx, endIdx + 1);
@@ -96,11 +116,11 @@ function estimateTradeCount(ocrText: string): number {
 }
 
 function calculateMaxTokens(estimatedTrades: number, route: 'lite' | 'deep'): number {
-  const baseTokens = route === 'lite' ? 500 : 800;
-  const tokensPerTrade = route === 'lite' ? 250 : 350;
+  const baseTokens = route === 'lite' ? 600 : 900; // +100 buffer
+  const tokensPerTrade = route === 'lite' ? 280 : 380; // +30 buffer per trade
   
   if (estimatedTrades <= 1) return baseTokens;
-  return Math.min(baseTokens + (tokensPerTrade * (estimatedTrades - 1)), 4000);
+  return Math.min(baseTokens + (tokensPerTrade * (estimatedTrades - 1)), 4500); // +500 max buffer
 }
 
 serve(async (req) => {

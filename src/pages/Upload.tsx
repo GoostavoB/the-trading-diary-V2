@@ -196,6 +196,13 @@ const Upload = () => {
     fetchUserSetups();
   }, [editId]);
 
+  // Cleanup loading state on unmount
+  useEffect(() => {
+    return () => {
+      setLoading(false);
+    };
+  }, []);
+
   const fetchTrade = async (id: string) => {
     const { data, error } = await supabase
       .from('trades')
@@ -731,17 +738,50 @@ const Upload = () => {
 
     setLoading(true);
 
+    // Timeout protection (30 seconds)
+    const savePromise = executeSave();
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Save operation timed out after 30 seconds')), 30000)
+    );
+
+    try {
+      await Promise.race([savePromise, timeoutPromise]);
+    } catch (error) {
+      console.error('Error saving trades:', error);
+      toast.error('Failed to save trades', {
+        description: error instanceof Error ? error.message : 'Unknown error'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const executeSave = async () => {
+    if (!user || extractedTrades.length === 0) return;
+
     try {
       // Validate all trades have required fields
       const invalidTrades: string[] = [];
+      const warnings: string[] = [];
+      
       extractedTrades.forEach((trade, index) => {
         const edits = tradeEdits[index] || {};
         const finalTrade = { ...trade, ...edits };
+        
+        // Required field validation
         if (!finalTrade.symbol || finalTrade.symbol.trim() === '') {
           invalidTrades.push(`Trade #${index + 1}: Missing symbol`);
         }
         if (!finalTrade.side || (finalTrade.side !== 'long' && finalTrade.side !== 'short')) {
           invalidTrades.push(`Trade #${index + 1}: Invalid side (must be long or short)`);
+        }
+        
+        // Warning validations (incomplete data)
+        if (!finalTrade.exit_price || finalTrade.exit_price === 0) {
+          warnings.push(`Trade #${index + 1} (${finalTrade.symbol}): Exit price is 0 or missing`);
+        }
+        if (!finalTrade.opened_at || finalTrade.opened_at === 'N/A') {
+          warnings.push(`Trade #${index + 1} (${finalTrade.symbol}): Missing open timestamp`);
         }
       });
 
@@ -750,8 +790,15 @@ const Upload = () => {
         toast.error('Cannot save trades with missing data', {
           description: invalidTrades.join(', ')
         });
-        setLoading(false);
         return;
+      }
+      
+      if (warnings.length > 0) {
+        console.warn('Trade warnings:', warnings);
+        toast.warning('Incomplete Trade Data', {
+          description: `${warnings.length} trade(s) have missing data. Review before saving.`,
+          duration: 8000
+        });
       }
 
       // Check for duplicates before saving
@@ -795,23 +842,46 @@ const Upload = () => {
         };
       });
 
-      // Check for duplicates (ONLY in active trades, not deleted ones)
+      // Check for duplicates with error handling and timeout
       const hashes = tradesData.map(t => t.trade_hash);
-      const { data: existingTrades } = await supabase
-        .from('trades')
-        .select('trade_hash, symbol, trade_date, pnl, opened_at, closed_at, position_size')
-        .eq('user_id', user.id)
-        .is('deleted_at', null)
-        .in('trade_hash', hashes);
+      let existingTrades = null;
+      let nearDuplicates = null;
+      
+      try {
+        const { data: existing, error: existingError } = await supabase
+          .from('trades')
+          .select('trade_hash, symbol, trade_date, pnl, opened_at, closed_at, position_size')
+          .eq('user_id', user.id)
+          .is('deleted_at', null)
+          .in('trade_hash', hashes)
+          .abortSignal(AbortSignal.timeout(5000)); // 5 second timeout
+        
+        if (existingError) throw existingError;
+        existingTrades = existing;
+      } catch (error) {
+        console.error('Duplicate check query failed:', error);
+        toast.warning('Could not check for duplicates', {
+          description: 'Proceeding with save. Please review your trade history manually.'
+        });
+      }
 
       // Also check for near-duplicates with time tolerance (±2 seconds)
-      const symbols = [...new Set(tradesData.map(t => t.symbol))];
-      const { data: nearDuplicates } = await supabase
-        .from('trades')
-        .select('symbol, opened_at, closed_at, position_size, pnl')
-        .eq('user_id', user.id)
-        .is('deleted_at', null)
-        .in('symbol', symbols);
+      try {
+        const symbols = [...new Set(tradesData.map(t => t.symbol))];
+        const { data: near, error: nearError } = await supabase
+          .from('trades')
+          .select('symbol, opened_at, closed_at, position_size, pnl')
+          .eq('user_id', user.id)
+          .is('deleted_at', null)
+          .in('symbol', symbols)
+          .abortSignal(AbortSignal.timeout(5000)); // 5 second timeout
+        
+        if (nearError) throw nearError;
+        nearDuplicates = near;
+      } catch (error) {
+        console.error('Near-duplicate check query failed:', error);
+        // Continue without near-duplicate check
+      }
 
       // Find exact hash matches
       let duplicateMatches: Array<{
@@ -884,7 +954,6 @@ const Upload = () => {
           duplicates: duplicateMatches,
         });
         
-        setLoading(false);
         return;
       }
 
@@ -958,10 +1027,8 @@ const Upload = () => {
         }, 1500);
       }
     } catch (error) {
-      console.error('Error saving trades:', error);
-      toast.error('Failed to save trades');
-    } finally {
-      setLoading(false);
+      console.error('Error in executeSave:', error);
+      throw error; // Re-throw to be caught by timeout wrapper
     }
   };
 

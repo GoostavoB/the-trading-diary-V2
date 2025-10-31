@@ -205,7 +205,6 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
             if (data?.trades && Array.isArray(data.trades)) {
               console.log(`✅ Success: ${data.trades.length} trades detected`);
               const successImg: UploadedImage = { ...image, status: 'success', trades: data.trades };
-              results.push(successImg);
               setImages(prev => prev.map((img, idx) => (idx === globalIndex ? successImg : img)));
               success = true;
               return successImg;
@@ -255,7 +254,6 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
 
                 console.error('Edge function error:', { status, serverErr, raw: error });
                 const failed: UploadedImage = { ...image, status: 'error', trades: [] };
-                results.push(failed);
                 setImages(prev => prev.map((img, idx) => (idx === globalIndex ? failed : img)));
                 toast.error('Analysis Failed', { description: errorMessage });
                 success = true; // Exit retry loop
@@ -263,7 +261,6 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
               } else {
                 console.warn('⚠️ No trades found');
                 const noTrades: UploadedImage = { ...image, status: 'error', trades: [] };
-                results.push(noTrades);
                 setImages(prev => prev.map((img, idx) => (idx === globalIndex ? noTrades : img)));
                 success = true; // Exit retry loop
                 return noTrades;
@@ -272,17 +269,25 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
           } catch (err) {
             console.error('Network error:', err);
             const failed: UploadedImage = { ...image, status: 'error', trades: [] };
-            results.push(failed);
             setImages(prev => prev.map((img, idx) => (idx === globalIndex ? failed : img)));
             toast.error('Network Error', { description: 'Failed to connect to the server' });
             success = true; // Exit retry loop
             return failed;
           }
         }
+
+        return null; // Should never reach here but TypeScript needs a return
       });
 
-      // Wait for all images in batch to complete in parallel
-      await Promise.allSettled(batchPromises);
+      // Wait for all images in batch to complete in parallel and collect results
+      const settledPromises = await Promise.allSettled(batchPromises);
+      
+      // Collect successful results (remove race condition)
+      settledPromises.forEach((result) => {
+        if (result.status === 'fulfilled' && result.value) {
+          results.push(result.value);
+        }
+      });
     }
 
     setIsAnalyzing(false);
