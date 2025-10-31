@@ -50,7 +50,7 @@ export const GlowingLogo = () => {
 
       {/* Dark circle with logo */}
       <motion.div
-        className="relative z-10 w-64 h-64 rounded-full flex flex-col items-center justify-center gap-1"
+        className="relative z-10 w-64 h-64 rounded-full flex flex-col items-center justify-center"
         style={{
           background: 'radial-gradient(circle, rgba(10, 10, 10, 1) 0%, rgba(20, 20, 20, 0.95) 100%)',
           boxShadow: '0 0 80px rgba(59, 130, 246, 0.5), inset 0 0 40px rgba(0, 0, 0, 0.8)',
@@ -100,7 +100,7 @@ export const GlowingLogo = () => {
         </div>
 
         {/* The Trading Diary text */}
-        <div className="relative z-10">
+        <div className="relative z-10 -mt-4">
           <p className="text-white text-lg font-semibold tracking-wide">
             The Trading Diary
           </p>
