@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Camera, DollarSign, CheckSquare, TrendingUp, Calculator, FileText, Receipt, Globe, Target, Brain, BarChart3, Shield, BookOpen, Wallet } from "lucide-react";
+import { Camera, DollarSign, CheckSquare, TrendingUp, Calculator, FileText, Receipt, Globe, Target, Brain, BarChart3, Shield, BookOpen, Wallet, Activity } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -48,6 +48,12 @@ const FeatureBlocks = () => {
       title: 'Personal Goal Planner',
       description: 'Set and track your trading objectives with progress monitoring.',
       gradient: "from-pink-500/20 to-pink-500/5"
+    },
+    {
+      icon: Activity,
+      title: 'Market Data',
+      description: 'Long/Short Ratio and Open Interest always available on your dashboard for better market insights.',
+      gradient: "from-purple-500/20 to-purple-500/5"
     },
     {
       icon: TrendingUp,
