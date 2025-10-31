@@ -37,6 +37,7 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
   const [batchProgress, setBatchProgress] = useState<string>('');
   const [queuedCount, setQueuedCount] = useState(0);
   const [broker, setBroker] = useState<string>('');
+  const [batchBroker, setBatchBroker] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const credits = useUploadCredits();
 
@@ -103,7 +104,7 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
     });
   };
 
-  const startAnalysis = async () => {
+  const startAnalysis = () => {
     console.log('🔵 Analyze button clicked', {
       imagesLength: images.length,
       creditsLoading: credits.isLoading,
@@ -111,18 +112,16 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
       isAnalyzing
     });
     
-    try {
-      if (credits.isLoading) {
-        console.log('⏳ Credits loading, refetching...');
-        await credits.refetch();
-        console.log('✅ Credits refetched:', credits.balance);
-      }
-      
-      console.log('🎬 Opening pre-analysis dialog');
-      setShowPreAnalysisDialog(true);
-    } catch (error) {
-      console.error('❌ Error in startAnalysis:', error);
-      toast.error('Failed to open analysis dialog');
+    // Open dialog immediately - don't block on credits refetch
+    console.log('🎬 Opening pre-analysis dialog');
+    setShowPreAnalysisDialog(true);
+    
+    // Refetch credits in background without blocking
+    if (credits.isLoading) {
+      console.log('⏳ Credits loading, background refetch...');
+      credits.refetch()
+        .then(() => console.log('✅ Credits refetched:', credits.balance))
+        .catch((e) => console.error('❌ Refetch error:', e));
     }
   };
 
@@ -201,7 +200,7 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
                 imageHash: ocrResult?.imageHash || null,
                 perceptualHash: ocrResult?.perceptualHash || null,
                 bypassCache: bypassCache,
-                broker: broker || null,
+                broker: batchBroker || null,
               },
             });
 
@@ -311,7 +310,7 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
       // Pre-fill broker on all detected trades
       const allTrades = results.flatMap(r => r.trades || []).map(trade => ({
         ...trade,
-        broker: trade.broker || broker,
+        broker: trade.broker || batchBroker,
       }));
       setDetectedTrades(allTrades);
       setSelectedTrades(new Set(allTrades.map((_, idx) => idx)));
@@ -342,6 +341,7 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
       setImages([]);
       setDetectedTrades([]);
       setSelectedTrades(new Set());
+      setBatchBroker(null); // Clear locked broker for next batch
       
       await credits.refetch();
     } catch (error) {
@@ -542,7 +542,16 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
         imageCount={images.length}
         creditsRequired={images.length}
         currentBalance={credits.balance}
-        onConfirm={analyzeImages}
+        onConfirm={() => {
+          if (!broker) {
+            toast.error('Please select a broker');
+            return;
+          }
+          // Lock the broker for this batch and start analysis
+          setBatchBroker(broker);
+          setShowPreAnalysisDialog(false);
+          analyzeImages();
+        }}
         onPurchaseCredits={() => {
           setShowPreAnalysisDialog(false);
           setShowPurchaseDialog(true);
