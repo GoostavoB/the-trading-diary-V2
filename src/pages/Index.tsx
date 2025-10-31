@@ -81,7 +81,7 @@ const Index = () => {
       <PublicHeader />
       <StickyMobileCTA />
       
-      <main id="main-content" className="pt-28 overflow-x-hidden my-0 py-[28px]">
+      <main id="main-content" className="pt-28 overflow-x-hidden my-0 py-[33px]">
         {/* Mobile Hero with Dashboard Preview */}
         <MobileHero />
         
@@ -155,20 +155,28 @@ const Index = () => {
         {/* Pain Points Section */}
         <section className="px-6 py-20 relative">
           <div className="container mx-auto max-w-5xl relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center"
-            >
-              <motion.h2 
-                className="text-3xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-white to-white/70 bg-clip-text text-transparent"
-                initial={{ opacity: 0, y: -20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-              >
+            <motion.div initial={{
+            opacity: 0,
+            y: 20
+          }} whileInView={{
+            opacity: 1,
+            y: 0
+          }} viewport={{
+            once: true
+          }} transition={{
+            duration: 0.6
+          }} className="text-center">
+              <motion.h2 className="text-3xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-white to-white/70 bg-clip-text text-transparent" initial={{
+              opacity: 0,
+              y: -20
+            }} whileInView={{
+              opacity: 1,
+              y: 0
+            }} viewport={{
+              once: true
+            }} transition={{
+              duration: 0.8
+            }}>
                 Stop trading blind. Stop leaking profits.
               </motion.h2>
               <p className="text-[18px] text-muted-foreground mb-16 max-w-3xl mx-auto leading-relaxed">
@@ -176,20 +184,27 @@ const Index = () => {
               </p>
 
               <div className="grid md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
-                {[
-                  { text: "You trade impulsively when emotional." },
-                  { text: "You repeat the same mistakes." },
-                  { text: "You don't know what's really costing you money." }
-                ].map((pain, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.15 }}
-                    whileHover={{ scale: 1.05, y: -5 }}
-                    className="relative group"
-                  >
+                {[{
+                text: "You trade impulsively when emotional."
+              }, {
+                text: "You repeat the same mistakes."
+              }, {
+                text: "You don't know what's really costing you money."
+              }].map((pain, index) => <motion.div key={index} initial={{
+                opacity: 0,
+                y: 30
+              }} whileInView={{
+                opacity: 1,
+                y: 0
+              }} viewport={{
+                once: true
+              }} transition={{
+                duration: 0.5,
+                delay: index * 0.15
+              }} whileHover={{
+                scale: 1.05,
+                y: -5
+              }} className="relative group">
                     <div className="absolute inset-0 bg-gradient-to-br from-destructive/20 to-destructive/5 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-50 group-hover:opacity-100" />
                     
                     <div className="relative glass-card p-6 border border-destructive/30 bg-destructive/10 backdrop-blur-xl rounded-xl hover:border-destructive/50 transition-all duration-300 h-full">
@@ -207,17 +222,21 @@ const Index = () => {
                         </p>
                       </div>
                     </div>
-                  </motion.div>
-                ))}
+                  </motion.div>)}
               </div>
 
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                className="relative inline-block mb-8"
-              >
+              <motion.div initial={{
+              opacity: 0,
+              scale: 0.95
+            }} whileInView={{
+              opacity: 1,
+              scale: 1
+            }} viewport={{
+              once: true
+            }} transition={{
+              duration: 0.6,
+              delay: 0.5
+            }} className="relative inline-block mb-8">
                 <div className="absolute inset-0 bg-warning/20 rounded-2xl blur-2xl" />
                 <div className="relative flex items-center justify-center gap-3 px-8 py-4 border border-warning/40 bg-warning/10 backdrop-blur-xl rounded-2xl">
                   <svg className="w-6 h-6 text-warning flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
@@ -233,17 +252,19 @@ const Index = () => {
                 Don't fall behind.
               </p>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-              >
-                <Button
-                  onClick={() => handleCTAClick('pain-section')}
-                  size="lg"
-                  className="text-[16px] font-bold px-10 py-6 shadow-2xl shadow-primary/30 hover:shadow-primary/50 transition-all duration-300"
-                >
+              <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} whileInView={{
+              opacity: 1,
+              y: 0
+            }} viewport={{
+              once: true
+            }} transition={{
+              duration: 0.6,
+              delay: 0.6
+            }}>
+                <Button onClick={() => handleCTAClick('pain-section')} size="lg" className="text-[16px] font-bold px-10 py-6 shadow-2xl shadow-primary/30 hover:shadow-primary/50 transition-all duration-300">
                   Start Free Trial – Offer Ending Soon
                 </Button>
               </motion.div>
@@ -254,13 +275,17 @@ const Index = () => {
         {/* Gamification Discipline Section */}
         <section className="px-6 py-20">
           <div className="container mx-auto max-w-5xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center"
-            >
+            <motion.div initial={{
+            opacity: 0,
+            y: 20
+          }} whileInView={{
+            opacity: 1,
+            y: 0
+          }} viewport={{
+            once: true
+          }} transition={{
+            duration: 0.6
+          }} className="text-center">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
                 The only trading tool that trains your discipline.
               </h2>
@@ -272,43 +297,52 @@ const Index = () => {
               </p>
 
               <div className="grid md:grid-cols-3 gap-6 mb-12">
-                {[
-                  { icon: "⚡", label: "Every trade", title: "XP" },
-                  { icon: "🔥", label: "Every streak", title: "Reward" },
-                  { icon: "🏆", label: "Every tier", title: "New tools" }
-                ].map((item, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="glass-card p-8 border border-primary/20 hover:border-primary/40 transition-colors"
-                  >
+                {[{
+                icon: "⚡",
+                label: "Every trade",
+                title: "XP"
+              }, {
+                icon: "🔥",
+                label: "Every streak",
+                title: "Reward"
+              }, {
+                icon: "🏆",
+                label: "Every tier",
+                title: "New tools"
+              }].map((item, index) => <motion.div key={index} initial={{
+                opacity: 0,
+                y: 20
+              }} whileInView={{
+                opacity: 1,
+                y: 0
+              }} viewport={{
+                once: true
+              }} transition={{
+                duration: 0.5,
+                delay: index * 0.1
+              }} className="glass-card p-8 border border-primary/20 hover:border-primary/40 transition-colors">
                     <div className="mb-4 text-5xl flex items-center justify-center">
                       {item.icon}
                     </div>
                     <p className="text-[13px] text-muted-foreground mb-2">{item.label}</p>
                     <h3 className="text-[24px] font-bold text-foreground">{item.title}</h3>
-                  </motion.div>
-                ))}
+                  </motion.div>)}
               </div>
 
-              <motion.p
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="text-[16px] font-semibold mb-8"
-              >
+              <motion.p initial={{
+              opacity: 0
+            }} whileInView={{
+              opacity: 1
+            }} viewport={{
+              once: true
+            }} transition={{
+              duration: 0.5,
+              delay: 0.4
+            }} className="text-[16px] font-semibold mb-8">
                 Gamification makes consistency addictive — not stressful.
               </motion.p>
 
-              <Button
-                onClick={() => handleCTAClick('gamification-section')}
-                size="lg"
-                className="text-[15px] font-semibold px-8"
-              >
+              <Button onClick={() => handleCTAClick('gamification-section')} size="lg" className="text-[15px] font-semibold px-8">
                 Earn Your First XP – Start Free
               </Button>
             </motion.div>
