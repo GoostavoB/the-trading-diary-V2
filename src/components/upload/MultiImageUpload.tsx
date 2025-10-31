@@ -103,7 +103,10 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
     });
   };
 
-  const startAnalysis = () => {
+  const startAnalysis = async () => {
+    if (credits.isLoading) {
+      await credits.refetch();
+    }
     setShowPreAnalysisDialog(true);
   };
 
@@ -497,7 +500,7 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
           )}
           <Button
             onClick={startAnalysis}
-            disabled={images.length === 0 || isAnalyzing || credits.isLoading}
+            disabled={images.length === 0 || isAnalyzing}
             className="w-full"
             size="lg"
           >
