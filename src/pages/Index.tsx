@@ -8,7 +8,6 @@ import { ValueBar } from "@/components/landing/ValueBar";
 import { WaveDivider } from "@/components/landing/WaveDivider";
 import KeyBenefits from "@/components/landing/KeyBenefits";
 import ProductShowcase from "@/components/landing/ProductShowcase";
-import PainFOMO from "@/components/landing/PainFOMO";
 import HowItWorks from "@/components/landing/HowItWorks";
 import GamificationExplainer from "@/components/landing/GamificationExplainer";
 import Testimonials from "@/components/Testimonials";
@@ -337,9 +336,6 @@ const Index = () => {
             </div>
           </div>
         </section>
-        
-        {/* Pain + FOMO */}
-        <PainFOMO />
 
         {/* Speed Chart Section */}
         <section className="px-6 py-20">
