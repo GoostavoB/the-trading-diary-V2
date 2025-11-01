@@ -9,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Logo } from '@/components/Logo';
 
 export const PublicHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +48,7 @@ export const PublicHeader = () => {
   return (
     <>
       {/* Desktop & Mobile Header Bar */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="container mx-auto max-w-7xl">
           <div className="flex items-center justify-between px-4 py-4">
             {/* Logo - visible on all devices */}
@@ -55,14 +56,7 @@ export const PublicHeader = () => {
               to={isPublic ? getLocalizedPath('/', language) : '/'}
               className="flex items-center gap-3 hover:opacity-80 transition-opacity"
             >
-              <img 
-                src="/logo-512.png" 
-                alt="The Trading Diary Logo" 
-                className="w-8 h-8 md:w-10 md:h-10"
-              />
-              <span className="text-lg md:text-xl font-bold text-white">
-                The Trading Diary
-              </span>
+              <Logo size="md" variant="horizontal" showText={true} clickable={false} />
             </Link>
 
             {/* Desktop Navigation */}
