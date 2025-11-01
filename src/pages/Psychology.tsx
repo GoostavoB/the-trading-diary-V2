@@ -6,11 +6,11 @@ import { BehaviorPatternAnalysis } from "@/components/psychology/BehaviorPattern
 import { EmotionPerformanceCorrelation } from "@/components/psychology/EmotionPerformanceCorrelation";
 import { Brain, Clock, BarChart3, Lightbulb, Tags } from "lucide-react";
 import { PremiumFeatureLock } from "@/components/PremiumFeatureLock";
-import { usePremiumFeatures } from "@/hooks/usePremiumFeatures";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useEmotionalLogXP } from "@/hooks/useEmotionalLogXP";
 
 export default function Psychology() {
-  const { isFeatureLocked } = usePremiumFeatures();
+  const { isFeatureLocked } = useSubscription();
   const isPremiumLocked = isFeatureLocked('pro');
   
   // Process XP rewards for emotional logging

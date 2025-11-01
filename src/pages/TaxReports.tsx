@@ -14,13 +14,13 @@ import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency, formatNumber } from "@/utils/formatNumber";
 import { PremiumFeatureLock } from "@/components/PremiumFeatureLock";
-import { usePremiumFeatures } from "@/hooks/usePremiumFeatures";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 const TaxReports = () => {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear.toString());
   const { toast } = useToast();
-  const { isFeatureLocked } = usePremiumFeatures();
+  const { isFeatureLocked } = useSubscription();
   const isPremiumLocked = isFeatureLocked('pro');
 
   const { data: trades = [], isLoading } = useQuery({

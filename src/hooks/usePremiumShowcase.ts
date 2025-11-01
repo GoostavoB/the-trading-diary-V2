@@ -1,4 +1,4 @@
-import { usePremiumFeatures } from './usePremiumFeatures';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 export interface PremiumFeature {
   id: string;
@@ -11,7 +11,7 @@ export interface PremiumFeature {
 }
 
 export const usePremiumShowcase = () => {
-  const { currentPlan, canAccessFeature } = usePremiumFeatures();
+  const { currentPlan, canAccessFeature } = useSubscription();
 
   const features: PremiumFeature[] = [
     {

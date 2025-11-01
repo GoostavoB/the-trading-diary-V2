@@ -17,12 +17,12 @@ import { calculateGrowth } from '@/utils/growthFormatting';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { Sparkles, Settings2, TrendingDown } from 'lucide-react';
 import { PremiumFeatureLock } from '@/components/PremiumFeatureLock';
-import { usePremiumFeatures } from '@/hooks/usePremiumFeatures';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 const Forecast = () => {
   useKeyboardShortcuts();
   const { user } = useAuth();
-  const { isFeatureLocked } = usePremiumFeatures();
+  const { isFeatureLocked } = useSubscription();
   const isPremiumLocked = isFeatureLocked('pro');
   const [days, setDays] = useState([30]);
   const [avgDailyPnl, setAvgDailyPnl] = useState(0);

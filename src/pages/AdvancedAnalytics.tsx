@@ -5,7 +5,7 @@ import { ABTestingPanel } from '@/components/analytics/ABTestingPanel';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PremiumFeatureLock } from '@/components/PremiumFeatureLock';
-import { usePremiumFeatures } from '@/hooks/usePremiumFeatures';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 // Mock data
 const performanceData = Array.from({ length: 30 }, (_, i) => ({
@@ -24,7 +24,7 @@ const profitData = Array.from({ length: 30 }, (_, i) => ({
 }));
 
 export default function AdvancedAnalytics() {
-  const { isFeatureLocked } = usePremiumFeatures();
+  const { isFeatureLocked } = useSubscription();
   const isPremiumLocked = isFeatureLocked('pro');
 
   return (

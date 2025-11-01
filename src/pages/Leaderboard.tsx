@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
 import { PremiumFeatureLock } from '@/components/PremiumFeatureLock';
-import { usePremiumFeatures } from '@/hooks/usePremiumFeatures';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 import { SkipToContent } from '@/components/SkipToContent';
 
 interface LeaderboardEntry {
@@ -28,7 +28,7 @@ interface LeaderboardEntry {
 
 const Leaderboard = () => {
   const { user } = useAuth();
-  const { isFeatureLocked } = usePremiumFeatures();
+  const { isFeatureLocked } = useSubscription();
   const isPremiumLocked = isFeatureLocked('pro');
   const [currentSeason, setCurrentSeason] = useState<any>(null);
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);

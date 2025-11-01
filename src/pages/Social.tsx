@@ -9,10 +9,10 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import AppLayout from "@/components/layout/AppLayout";
 import { PremiumFeatureLock } from "@/components/PremiumFeatureLock";
-import { usePremiumFeatures } from "@/hooks/usePremiumFeatures";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 export default function Social() {
-  const { isFeatureLocked } = usePremiumFeatures();
+  const { isFeatureLocked } = useSubscription();
   const isPremiumLocked = isFeatureLocked('pro');
   const [posts, setPosts] = useState<SocialPost[]>([]);
   const [followingPosts, setFollowingPosts] = useState<SocialPost[]>([]);

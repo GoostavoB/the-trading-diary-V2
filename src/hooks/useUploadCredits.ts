@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -14,6 +15,7 @@ interface UploadCredits {
 
 export const useUploadCredits = () => {
   const { user } = useAuth();
+  const { subscription, isLoading: subscriptionLoading } = useSubscription();
   const { toast } = useToast();
   const [credits, setCredits] = useState<UploadCredits>({
     balance: 0,
@@ -57,13 +59,9 @@ export const useUploadCredits = () => {
         return;
       }
 
-      // First try to get subscription data
-      const { data: subscriptionData, error: subscriptionError } = await supabase
-        .from('subscriptions')
-        .select('upload_credits_balance, upload_credits_used_this_month, monthly_upload_limit, extra_credits_purchased, plan_type, status')
-        .eq('user_id', user.id)
-        .in('status', ['active', 'trial'])
-        .maybeSingle();
+      // Use subscription data from context
+      const subscriptionData = subscription;
+      const subscriptionError = null;
 
       console.log('[Credits-Debug]', {
         timestamp: new Date().toISOString(),
@@ -230,29 +228,10 @@ export const useUploadCredits = () => {
   };
 
   useEffect(() => {
-    fetchCredits();
-
-    // Subscribe to subscription changes
-    const channel = supabase
-      .channel('subscription-credits-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'subscriptions',
-          filter: `user_id=eq.${user?.id}`,
-        },
-        () => {
-          fetchCredits();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user]);
+    if (!subscriptionLoading) {
+      fetchCredits();
+    }
+  }, [user, subscription, subscriptionLoading]);
 
   const deductCredit = async (): Promise<boolean> => {
     if (!user) return false;

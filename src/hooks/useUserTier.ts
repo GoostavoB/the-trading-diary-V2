@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   calculateTier, 
@@ -32,6 +33,7 @@ export interface TierData {
 
 export const useUserTier = () => {
   const { user } = useAuth();
+  const { subscription, isLoading: subscriptionLoading } = useSubscription();
   const queryClient = useQueryClient();
 
   const { data: tierData, isLoading } = useQuery({
@@ -54,17 +56,12 @@ export const useUserTier = () => {
           .eq('user_id', user.id)
           .maybeSingle();
 
-        // Fetch subscription to determine legacy tier mapping
-        const { data: subscription } = await supabase
-          .from('subscriptions')
-          .select('plan_type, status')
-          .eq('user_id', user.id)
-          .in('status', ['active', 'trial'])
-          .maybeSingle();
+        // Use subscription from context (passed from closure)
+        const subscriptionData = subscription;
 
         console.log('[UserTier-Debug]', {
           userId: user.id,
-          subscription,
+          subscription: subscriptionData,
           tierInfo,
           xpData,
         });
@@ -82,9 +79,9 @@ export const useUserTier = () => {
 
         // Map to legacy tier system for backwards compatibility
         let legacyTier: UserTier = 'free';
-        if (subscription?.plan_type === 'elite') {
+        if (subscriptionData?.plan_type === 'elite') {
           legacyTier = 'elite';
-        } else if (subscription?.plan_type === 'pro') {
+        } else if (subscriptionData?.plan_type === 'pro') {
           legacyTier = 'pro';
         } else if (tierLevel >= 2) {
           legacyTier = 'basic';
@@ -123,7 +120,7 @@ export const useUserTier = () => {
         };
       }
     },
-    enabled: !!user,
+    enabled: !!user && !subscriptionLoading,
     staleTime: 1000 * 30, // Consider data fresh for 30 seconds
     gcTime: 1000 * 60 * 5, // Keep in cache for 5 minutes
   });

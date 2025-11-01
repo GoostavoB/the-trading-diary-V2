@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useColorSystem, ColorType, hslToHex } from '@/hooks/useColorSystem';
-import { useSubscription } from '@/hooks/useSubscription';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 import { Lock, Palette, Paintbrush, Sparkles, Layout, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
