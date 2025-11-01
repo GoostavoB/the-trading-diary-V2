@@ -20,9 +20,33 @@ export const usePremiumFeatures = (): PremiumFeaturesHook => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Temporary: Grant elite plan to all users
-    setCurrentPlan('elite');
-    setIsLoading(false);
+    const fetchPlan = async () => {
+      if (!user?.id) {
+        setCurrentPlan('basic');
+        setIsLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('plan_type, status')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      console.log('[PremiumFeatures]', { data, error, userId: user.id });
+
+      if (error) {
+        console.error('[PremiumFeatures] Error:', error);
+        setCurrentPlan('basic');
+      } else {
+        setCurrentPlan((data?.plan_type as PlanType) || 'basic');
+      }
+      
+      setIsLoading(false);
+    };
+
+    fetchPlan();
   }, [user]);
 
   const planHierarchy: Record<PlanType, number> = {

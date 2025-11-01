@@ -60,10 +60,21 @@ export const useUploadCredits = () => {
       // First try to get subscription data
       const { data: subscriptionData, error: subscriptionError } = await supabase
         .from('subscriptions')
-        .select('upload_credits_balance, upload_credits_used_this_month, monthly_upload_limit, extra_credits_purchased')
+        .select('upload_credits_balance, upload_credits_used_this_month, monthly_upload_limit, extra_credits_purchased, plan_type, status')
         .eq('user_id', user.id)
         .in('status', ['active', 'trial'])
         .maybeSingle();
+
+      console.log('[Credits-Debug]', {
+        timestamp: new Date().toISOString(),
+        userId: user?.id,
+        subscriptionData,
+        subscriptionError,
+        rawBalance: subscriptionData?.upload_credits_balance,
+        rawLimit: subscriptionData?.monthly_upload_limit,
+        rawPlan: subscriptionData?.plan_type,
+        rawStatus: subscriptionData?.status,
+      });
 
       // If no active subscription, check user_xp_tiers for daily upload limits
       if (!subscriptionData) {
