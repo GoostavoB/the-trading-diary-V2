@@ -8,7 +8,6 @@ import {
 import { ThemeStudioHeader } from './ThemeStudioHeader';
 import { QuickThemesGrid } from './QuickThemesGrid';
 import { CustomThemeManager } from './CustomThemeManager';
-import { SeasonalThemeBanner } from './SeasonalThemeBanner';
 import { AIThemeSuggestion } from './AIThemeSuggestion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ThemeUnlockBadge } from './ThemeUnlockBadge';
@@ -59,9 +58,6 @@ export const ThemeStudio = () => {
 
           <ScrollArea className="h-[500px]">
             <div className="space-y-6 py-4">
-              {/* Seasonal Theme Banner */}
-              <SeasonalThemeBanner />
-
               {/* AI Suggestion */}
               <AIThemeSuggestion />
 

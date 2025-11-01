@@ -52,7 +52,6 @@ import { DropZone } from '@/components/widgets/DropZone';
 import { useUserTier } from '@/hooks/useUserTier';
 import { UpgradePrompt } from '@/components/UpgradePrompt';
 import { DailyMissionBar } from '@/components/dashboard/DailyMissionBar';
-import { XPTestButton } from '@/components/dev/XPTestButton';
 import { Tier3PreviewModal } from '@/components/tier/Tier3PreviewModal';
 import { useSearchParams } from 'react-router-dom';
 import { ProgressTrigger } from '@/components/progress/ProgressTrigger';
@@ -1360,9 +1359,6 @@ const Dashboard = () => {
         />
       </div>
     </AppLayout>
-    
-    {/* Dev-only XP Test Button */}
-    <XPTestButton />
     
     {/* XP Boost Indicator */}
     <XPBoostIndicator />
