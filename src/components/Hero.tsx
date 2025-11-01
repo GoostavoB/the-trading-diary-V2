@@ -38,10 +38,10 @@ const Hero = () => {
 
       {/* Content */}
       <div className="container mx-auto max-w-6xl relative z-10">
-        <div className="flex flex-col items-center justify-center text-center space-y-[33px]">
+        <div className="flex flex-col items-center justify-center text-center space-y-[33px]" style={{ willChange: 'auto' }}>
           
           {/* Text Above Logo */}
-          <motion.div className="space-y-4" initial={{
+          <motion.div className="space-y-4" layout={false} initial={{
           opacity: 0,
           y: -30
         }} animate={{
@@ -74,7 +74,7 @@ const Hero = () => {
           <GlowingLogo />
 
           {/* Subtitle */}
-          <motion.div className="space-y-6 max-w-2xl" initial={{
+          <motion.div className="space-y-6 max-w-2xl" layout={false} initial={{
           opacity: 0,
           y: 30
         }} animate={{
