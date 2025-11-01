@@ -118,17 +118,21 @@ export const useUploadCredits = () => {
       const usedSub = subscriptionData?.upload_credits_used_this_month ?? 0;
       const limitSub = subscriptionData?.monthly_upload_limit ?? 0;
       const extraSub = subscriptionData?.extra_credits_purchased ?? 0;
-      let balanceSub = subscriptionData?.upload_credits_balance;
-      if (balanceSub === null || balanceSub === undefined) {
-        balanceSub = Math.max(0, limitSub - usedSub) + extraSub;
-      }
+
+      // Prefer a computed balance when stored balance is unset or stale (0)
+      const storedBalance = subscriptionData?.upload_credits_balance;
+      const computedBalance = Math.max(0, limitSub - usedSub) + extraSub;
+      const finalBalance =
+        storedBalance === null || storedBalance === undefined || storedBalance < computedBalance
+          ? computedBalance
+          : storedBalance;
 
       setCredits({
-        balance: balanceSub || 0,
+        balance: finalBalance,
         used: usedSub,
         limit: limitSub,
         extraPurchased: extraSub,
-        canUpload: (balanceSub || 0) > 0,
+        canUpload: finalBalance > 0,
         isLoading: false,
       });
     } catch (error) {
