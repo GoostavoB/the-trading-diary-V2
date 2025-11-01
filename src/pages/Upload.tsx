@@ -32,6 +32,7 @@ import { runOCR, type OCRResult } from '@/utils/ocrPipeline';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { pageMeta } from '@/utils/seoHelpers';
 import { CSVUpload } from '@/components/upload/CSVUpload';
+import { uploadLogger } from '@/utils/uploadLogger';
 import { TradeEditCard } from '@/components/upload/TradeEditCard';
 import { useQuery } from '@tanstack/react-query';
 import { useTradeXPRewards } from '@/hooks/useTradeXPRewards';
