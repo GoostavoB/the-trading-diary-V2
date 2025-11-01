@@ -71,11 +71,21 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
   // Fetch subscription when user changes
   useEffect(() => {
-    if (!authLoading && user) {
+    console.log('[SubscriptionContext-Debug] useEffect triggered:', { 
+      authLoading, 
+      hasUser: !!user, 
+      userId: user?.id 
+    });
+
+    if (!authLoading && user?.id) {
+      console.log('[SubscriptionContext-Debug] Conditions met, calling fetchSubscription');
       fetchSubscription();
-    } else if (!user) {
+    } else if (!authLoading && !user) {
+      console.log('[SubscriptionContext-Debug] No user, clearing subscription');
       setSubscription(null);
       setIsLoading(false);
+    } else {
+      console.log('[SubscriptionContext-Debug] Still loading auth or waiting for user');
     }
   }, [user?.id, authLoading]);
 
