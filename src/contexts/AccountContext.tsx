@@ -41,9 +41,11 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       setIsLoading(true);
+      console.log('[AccountContext] Fetching accounts...');
       const { data, error } = await supabase.functions.invoke('accounts', {
         method: 'GET',
       });
+      console.log('[AccountContext] Fetch result:', { error, data });
 
       if (error) {
         console.error('Error fetching accounts:', error, error.message);
@@ -88,6 +90,7 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
     fetchAccounts();
 
     // Subscribe to account changes
+    // Subscribe to account and profile changes
     const channel = supabase
       .channel('account-changes')
       .on(
@@ -95,8 +98,20 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
         {
           event: '*',
           schema: 'public',
-          table: 'accounts',
+          table: 'trading_accounts',
           filter: `user_id=eq.${user?.id}`,
+        },
+        () => {
+          fetchAccounts();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${user?.id}`,
         },
         () => {
           fetchAccounts();

@@ -189,9 +189,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
+    console.log('[Auth] signOut clicked');
     try {
       // Invalidate tokens across devices and this device
       await supabase.auth.signOut({ scope: 'global' } as any);
+      console.log('[Auth] supabase.auth.signOut completed');
     } catch (e) {
       console.warn('signOut error (ignored):', e);
     }
@@ -200,13 +202,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       Object.keys(localStorage)
         .filter((k) => k.startsWith('sb-') || k === 'rememberMe')
         .forEach((k) => localStorage.removeItem(k));
+      console.log('[Auth] localStorage cleared');
     } catch {}
 
     // Immediately clear local state and hard-redirect
     setUser(null);
     setSession(null);
+    console.log('[Auth] state cleared, navigating to /auth');
     navigate('/auth');
-    setTimeout(() => window.location.reload(), 50);
+    setTimeout(() => {
+      console.log('[Auth] reloading page');
+      window.location.reload();
+    }, 50);
   };
 
   return (

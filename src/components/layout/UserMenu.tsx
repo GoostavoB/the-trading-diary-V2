@@ -72,9 +72,9 @@ export const UserMenu = () => {
   }, [user]);
 
   const handleLogout = async () => {
+    console.log('[UserMenu] Logout clicked');
     try {
       await signOut();
-      navigate('/auth');
       toast.success(t('auth.toast.signOutSuccess'));
     } catch (error) {
       console.error('Logout error:', error);
