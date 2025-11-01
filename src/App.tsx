@@ -23,6 +23,7 @@ import i18n from "@/i18n";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { InstallPrompt } from "@/components/mobile/InstallPrompt";
+import { DebugHUD } from "@/components/debug/DebugHUD";
 import { ThemeInitializer } from "@/components/ThemeInitializer";
 import { PublicPageThemeWrapper } from "@/components/PublicPageThemeWrapper";
 import { usePageTracking } from "@/hooks/usePageTracking";
@@ -325,6 +326,7 @@ const App = () => {
                               <GlobalSearch />
                               <OfflineIndicator />
                               <InstallPrompt />
+                              <DebugHUD />
                             </DateRangeProvider>
                           </AIAssistantProvider>
                         </BlurProvider>

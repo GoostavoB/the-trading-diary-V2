@@ -102,13 +102,40 @@ export const useUploadCredits = () => {
       }
 
       if (subscriptionError) {
-        console.error('Error fetching upload credits:', subscriptionError);
+        console.error('[Credits] Subscription error, falling back to tier:', subscriptionError);
+        
+        // Attempt tier fallback
+        const { data: tierData } = await supabase
+          .from('user_xp_tiers')
+          .select('daily_upload_count, daily_upload_limit')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (tierData) {
+          const tierUsed = tierData.daily_upload_count || 0;
+          const tierLimit = tierData.daily_upload_limit || 5;
+          const tierRemaining = Math.max(0, tierLimit - tierUsed);
+          
+          console.log('[Credits] source: tier (error fallback), values:', { tierUsed, tierLimit, tierRemaining });
+          setCredits({
+            balance: tierRemaining,
+            used: tierUsed,
+            limit: tierLimit,
+            extraPurchased: 0,
+            canUpload: tierRemaining > 0,
+            isLoading: false,
+          });
+          return;
+        }
+
+        // Default fallback
+        console.log('[Credits] source: default (error fallback), values:', { balance: 5, limit: 5 });
         setCredits({
-          balance: 0,
+          balance: 5,
           used: 0,
-          limit: 20,
+          limit: 5,
           extraPurchased: 0,
-          canUpload: false,
+          canUpload: true,
           isLoading: false,
         });
         return;
@@ -119,7 +146,6 @@ export const useUploadCredits = () => {
       const limitSub = subscriptionData?.monthly_upload_limit ?? 0;
       const extraSub = subscriptionData?.extra_credits_purchased ?? 0;
 
-      // Prefer a computed balance when stored balance is unset or stale (0)
       const storedBalance = subscriptionData?.upload_credits_balance;
       const computedBalance = Math.max(0, limitSub - usedSub) + extraSub;
       const finalBalance =
@@ -127,6 +153,48 @@ export const useUploadCredits = () => {
           ? computedBalance
           : storedBalance;
 
+      // If subscription yields 0 or negative, fallback to tier
+      if (finalBalance <= 0 || limitSub <= 0) {
+        console.log('[Credits] Subscription balance 0, falling back to tier...');
+        const { data: tierData } = await supabase
+          .from('user_xp_tiers')
+          .select('daily_upload_count, daily_upload_limit')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (tierData) {
+          const tierUsed = tierData.daily_upload_count || 0;
+          const tierLimit = tierData.daily_upload_limit || 5;
+          const tierRemaining = Math.max(0, tierLimit - tierUsed);
+          
+          if (tierRemaining > 0) {
+            console.log('[Credits] source: tier, values:', { tierUsed, tierLimit, tierRemaining });
+            setCredits({
+              balance: tierRemaining,
+              used: tierUsed,
+              limit: tierLimit,
+              extraPurchased: 0,
+              canUpload: true,
+              isLoading: false,
+            });
+            return;
+          }
+        }
+
+        // Ultimate fallback: default to 5
+        console.log('[Credits] source: default, values:', { balance: 5, limit: 5 });
+        setCredits({
+          balance: 5,
+          used: 0,
+          limit: 5,
+          extraPurchased: 0,
+          canUpload: true,
+          isLoading: false,
+        });
+        return;
+      }
+
+      console.log('[Credits] source: subscription, values:', { usedSub, limitSub, extraSub, finalBalance });
       setCredits({
         balance: finalBalance,
         used: usedSub,

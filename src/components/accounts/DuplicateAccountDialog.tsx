@@ -39,24 +39,29 @@ export const DuplicateAccountDialog = ({
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.functions.invoke(
-        `accounts/${sourceAccount.id}/duplicate`,
+      const response = await fetch(
+        `https://qziawervfvptoretkjrn.supabase.co/functions/v1/accounts/${sourceAccount.id}/duplicate`,
         {
           method: 'POST',
-          body: {
+          headers: {
+            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
             copy_data: copyData,
             include: copyData ? include : undefined,
-          },
+          }),
         }
       );
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(`Account duplication failed: ${response.status}`);
+      }
 
       toast.success('Account duplicated successfully');
       await refetchAccounts();
       onOpenChange(false);
       
-      // Reload to show new account data
       setTimeout(() => window.location.reload(), 500);
     } catch (error) {
       console.error('Error duplicating account:', error);

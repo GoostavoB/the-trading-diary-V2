@@ -81,7 +81,7 @@ const Index = () => {
       <PublicHeader />
       <StickyMobileCTA />
       
-      <main id="main-content" className="pt-28 overflow-x-hidden py-[33px]">
+      <main id="main-content" className="overflow-x-hidden" style={{ paddingTop: '33px', paddingBottom: '33px' }}>
         {/* Mobile Hero with Dashboard Preview */}
         <MobileHero />
         

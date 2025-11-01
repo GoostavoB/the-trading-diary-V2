@@ -189,31 +189,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    console.log('[Auth] signOut clicked');
     try {
-      // Invalidate tokens across devices and this device
-      await supabase.auth.signOut({ scope: 'global' } as any);
-      console.log('[Auth] supabase.auth.signOut completed');
-    } catch (e) {
-      console.warn('signOut error (ignored):', e);
+      console.log('[Auth] Signing out...');
+      await supabase.auth.signOut();
+      
+      // Clear all sb-* keys from localStorage
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('sb-')) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      localStorage.removeItem('rememberMe');
+      
+      console.log('[Auth] Cleared localStorage, redirecting...');
+      
+      // Hard redirect to guarantee clean state
+      window.location.href = '/auth?loggedOut=1';
+    } catch (error) {
+      console.error('[Auth] Sign out error:', error);
     }
-    // Extra safety: purge any cached auth keys
-    try {
-      Object.keys(localStorage)
-        .filter((k) => k.startsWith('sb-') || k === 'rememberMe')
-        .forEach((k) => localStorage.removeItem(k));
-      console.log('[Auth] localStorage cleared');
-    } catch {}
-
-    // Immediately clear local state and hard-redirect
-    setUser(null);
-    setSession(null);
-    console.log('[Auth] state cleared, navigating to /auth');
-    navigate('/auth');
-    setTimeout(() => {
-      console.log('[Auth] reloading page');
-      window.location.reload();
-    }, 50);
   };
 
   return (

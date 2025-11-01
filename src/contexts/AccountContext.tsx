@@ -41,25 +41,31 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       setIsLoading(true);
-      console.log('[AccountContext] Fetching accounts...');
-      const { data, error } = await supabase.functions.invoke('accounts', {
-        method: 'GET',
-      });
-      console.log('[AccountContext] Fetch result:', { error, data });
+      console.log('[Accounts] Fetching accounts...');
+      
+      const response = await fetch(
+        `https://qziawervfvptoretkjrn.supabase.co/functions/v1/accounts`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
-      if (error) {
-        console.error('Error fetching accounts:', error, error.message);
-        toast.error('Failed to load accounts. Using default view.');
-        setAccounts([]);
-        setActiveAccountId(null);
-        return;
+      if (!response.ok) {
+        throw new Error(`Accounts fetch failed: ${response.status}`);
       }
+
+      const data = await response.json();
+      console.log('[Accounts] Fetched:', { accounts: data.accounts?.length, activeAccountId: data.activeAccountId });
 
       setAccounts(data.accounts || []);
       setActiveAccountId(data.activeAccountId);
     } catch (error) {
-      console.error('Error fetching accounts:', error);
-      toast.error('Unable to connect to accounts service');
+      console.error('[Accounts] Error fetching accounts:', error);
+      toast.error('Failed to load accounts. Using default view.');
       setAccounts([]);
       setActiveAccountId(null);
     } finally {
@@ -69,19 +75,27 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
 
   const switchAccount = async (accountId: string) => {
     try {
-      // Direct API call for activation only
-      const { error: activateError } = await supabase.functions.invoke(
-        `accounts/${accountId}/activate`,
-        { method: 'POST' }
+      console.log('[Accounts] Activating account:', accountId);
+      
+      const response = await fetch(
+        `https://qziawervfvptoretkjrn.supabase.co/functions/v1/accounts/${accountId}/activate`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+            'Content-Type': 'application/json',
+          },
+        }
       );
 
-      if (activateError) throw activateError;
+      if (!response.ok) {
+        throw new Error(`Account activation failed: ${response.status}`);
+      }
 
       setActiveAccountId(accountId);
-      // Reload the page to refresh all data with new account context
       window.location.reload();
     } catch (error) {
-      console.error('Error switching account:', error);
+      console.error('[Accounts] Error switching account:', error);
       throw error;
     }
   };

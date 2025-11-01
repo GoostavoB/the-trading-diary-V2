@@ -64,13 +64,21 @@ export const CreateAccountDialog = ({ open, onOpenChange }: CreateAccountDialogP
 
     setIsSubmitting(true);
     try {
-      const { data, error } = await supabase.functions.invoke('accounts', {
-        method: 'POST',
-        body: values,
-      });
+      const response = await fetch(
+        `https://qziawervfvptoretkjrn.supabase.co/functions/v1/accounts`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(values),
+        }
+      );
 
-      if (error) {
-        if (error.message?.includes('Plan limit reached')) {
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        if (errorData.error?.includes('Plan limit reached')) {
           toast.error('Starter supports 1 account. Upgrade to Pro for unlimited accounts.', {
             action: {
               label: 'Upgrade',
@@ -80,7 +88,7 @@ export const CreateAccountDialog = ({ open, onOpenChange }: CreateAccountDialogP
           onOpenChange(false);
           return;
         }
-        throw error;
+        throw new Error(`Account creation failed: ${response.status}`);
       }
 
       toast.success('Account created successfully');
