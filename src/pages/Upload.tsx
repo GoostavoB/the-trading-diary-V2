@@ -483,16 +483,24 @@ const Upload = () => {
   const extractTradeInfo = async () => {
     setExtractedTrades([]);
     const startedAt = Date.now();
+    
+    uploadLogger.extraction('Starting trade extraction', {
+      hasAnnotations: annotations.length > 0,
+      preSelectedBroker,
+      hasOCRResult: !!ocrResult
+    });
 
     try {
       // Step 1: Uploading
       setUploadStep(1);
       setProcessingMessage('Preparing your image...');
+      uploadLogger.extraction('Step 1: Preparing image');
       await new Promise(resolve => setTimeout(resolve, 500));
 
       // Step 2: Extracting data
       setUploadStep(2);
       setProcessingMessage(getRandomThinkingPhrase());
+      uploadLogger.extraction('Step 2: Extracting data from image');
       
       // Guard against oversized payloads - recompress if needed
       let imageToSend = extractionPreview;
@@ -500,23 +508,33 @@ const Upload = () => {
       const LIMIT = 10 * 1024 * 1024; // 10MB
       
       if (approxBytes > LIMIT && extractionImage) {
-        console.warn('⚠️ Image >10MB base64, recompressing...');
+        uploadLogger.compression('Image exceeds 10MB, recompressing', { approxBytes, limit: LIMIT });
         toast.info('Compressing large image...', { duration: 1000 });
         imageToSend = await compressAndResizeImage(extractionImage, false);
         setExtractionPreview(imageToSend);
+        uploadLogger.compression('Image compressed successfully', {
+          originalBytes: approxBytes,
+          newBytes: Math.floor((imageToSend?.length || 0) * 0.75)
+        });
       }
       
-      console.log('📊 Extraction payload size (approx bytes):', Math.floor((imageToSend?.length || 0) * 0.75));
+      uploadLogger.extraction('Sending image to AI', {
+        payloadSizeBytes: Math.floor((imageToSend?.length || 0) * 0.75),
+        broker: preSelectedBroker,
+        annotationCount: annotations.length
+      });
       
       // Progressive timeout messages
       const progressTimer1 = setTimeout(() => {
         setProcessingMessage('Still processing your image... This can take up to 45 seconds.');
         toast.info('Still processing...', { duration: 2000 });
+        uploadLogger.extraction('Processing taking longer than 15s');
       }, 15000);
       
       const progressTimer2 = setTimeout(() => {
         setProcessingMessage('Almost done... Thanks for your patience!');
         toast.info('Almost there...', { duration: 2000 });
+        uploadLogger.extraction('Processing taking longer than 30s');
       }, 30000);
       
       // Extended timeout for backend call (45 seconds)
@@ -535,7 +553,10 @@ const Upload = () => {
       });
       
       const timeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Extraction timed out after 45 seconds. Please try again or use manual entry.')), INVOKE_TIMEOUT_MS)
+        setTimeout(() => {
+          uploadLogger.extractionError('Extraction timeout after 45 seconds', new Error('Timeout'));
+          reject(new Error('Extraction timed out after 45 seconds. Please try again or use manual entry.'));
+        }, INVOKE_TIMEOUT_MS)
       );
       
       const { data, error } = await Promise.race([invokePromise, timeoutPromise]) as any;
@@ -545,7 +566,7 @@ const Upload = () => {
       clearTimeout(progressTimer2);
 
       if (error) {
-        console.error('Extraction error:', error);
+        uploadLogger.extractionError('Edge function returned error', error);
         const status = (error as any)?.status || (error as any)?.cause?.status;
         const errMsg = (data as any)?.error || (error as any)?.message || 'Failed to extract trade information';
         const errDetails = (data as any)?.details || '';
@@ -561,20 +582,25 @@ const Upload = () => {
         let description = 'Please try again or enter manually';
         
         if (isCredits) {
-          title = 'AI Credits Exhausted';
-          description = 'Please contact support or try again later.';
+          title = 'Upload Credits Exhausted';
+          description = 'You have no upload credits remaining. Purchase more credits to continue.';
+          uploadLogger.extractionError('Credits exhausted', new Error(errMsg));
         } else if (isRateLimited) {
-          title = 'Too Many Requests';
-          description = 'Please wait a minute and try again.';
+          title = 'Rate Limit Reached';
+          description = 'Too many uploads in a short time. Please wait 60 seconds and try again.';
+          uploadLogger.extractionError('Rate limit hit', new Error(errMsg));
         } else if (isParseError) {
           title = 'Data Processing Error';
           description = 'The AI returned invalid data. Try a clearer screenshot or enter manually.';
+          uploadLogger.extractionError('Parse error from AI', new Error(errMsg));
         } else if (isAuthError) {
           title = 'Authentication Required';
           description = 'Please sign in again to continue.';
+          uploadLogger.extractionError('Auth error', new Error(errMsg));
         } else if (errMsg && errMsg !== 'Failed to extract trade information') {
           title = errMsg;
           description = errDetails || 'Please try again or enter manually';
+          uploadLogger.extractionError('Extraction failed', new Error(`${errMsg}: ${errDetails}`));
         }
         
         toast.error(title, { description });
@@ -582,14 +608,21 @@ const Upload = () => {
       }
 
       if (data?.trades && data.trades.length > 0) {
+        uploadLogger.success('Extraction', `Extracted ${data.trades.length} trades`, {
+          tradeCount: data.trades.length,
+          cached: data.cached
+        });
+        
         // Step 3: Checking duplicates
         setUploadStep(3);
         setProcessingMessage('Scanning for duplicate trades...');
+        uploadLogger.extraction('Step 3: Scanning for duplicates');
         await new Promise(resolve => setTimeout(resolve, 800));
 
         // Step 4: Complete
         setUploadStep(4);
         setProcessingMessage('Trade extraction complete!');
+        uploadLogger.success('Extraction', 'All steps complete');
         
         // Normalize trades (defensive fallback for older edge function versions)
         const normalizedTrades = data.trades.map((t: any) => ({

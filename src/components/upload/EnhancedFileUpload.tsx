@@ -53,7 +53,7 @@ const fileInputRef = useRef<HTMLInputElement>(null);
   // For display: treat values >1024 as bytes, otherwise MB
   const displayMaxMB = maxSize > 1024 ? Math.round(maxSize / (1024 * 1024)) : maxSize;
 
-  const validateFile = useCallback((file: File): string | null => {
+  const validateFileLocal = useCallback((file: File): string | null => {
     // Determine acceptance via MIME or file extension
     const lowerName = file.name.toLowerCase();
     const ext = lowerName.includes('.') ? lowerName.split('.').pop() || '' : '';
@@ -85,7 +85,7 @@ const fileInputRef = useRef<HTMLInputElement>(null);
     // Simulate validation delay for better UX
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    const error = validateFile(file);
+    const error = validateFileLocal(file);
     setIsValidating(false);
 
     if (error) {
@@ -95,7 +95,7 @@ const fileInputRef = useRef<HTMLInputElement>(null);
     }
 
     onFileSelected(file);
-  }, [validateFile, onFileSelected]);
+  }, [validateFileLocal, onFileSelected]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();

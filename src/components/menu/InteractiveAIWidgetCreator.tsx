@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Sparkles, Loader2, ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { uploadLogger } from '@/utils/uploadLogger';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -138,25 +139,71 @@ Based on this conversation, generate a widget configuration.`;
 
   const saveWidget = async () => {
     setLoading(true);
+    
+    uploadLogger.widgetSave('Starting widget save', {
+      title: widgetPreview?.title,
+      type: widgetPreview?.widget_type,
+      menuItemId
+    });
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user) {
+        const error = new Error('Not authenticated');
+        uploadLogger.widgetSaveError('Authentication failed', error);
+        throw error;
+      }
 
-      const { error } = await supabase.from('custom_dashboard_widgets').insert({
-        user_id: user.id,
-        menu_item_id: menuItemId || null,
-        title: widgetPreview.title,
-        description: widgetPreview.description,
-        widget_type: widgetPreview.widget_type,
-        query_config: widgetPreview.query_config,
-        display_config: widgetPreview.display_config,
-        position_x: 0,
-        position_y: 0,
-        width: widgetPreview.widget_type === 'metric' ? 3 : 6,
-        height: widgetPreview.widget_type === 'metric' ? 2 : 4,
-      });
+      uploadLogger.widgetSave('User authenticated, inserting widget', { userId: user.id });
 
-      if (error) throw error;
+      // Insert with .select() to get back the inserted row
+      const { data: insertedWidget, error } = await supabase
+        .from('custom_dashboard_widgets')
+        .insert({
+          user_id: user.id,
+          menu_item_id: menuItemId || null,
+          title: widgetPreview.title,
+          description: widgetPreview.description,
+          widget_type: widgetPreview.widget_type,
+          query_config: widgetPreview.query_config,
+          display_config: widgetPreview.display_config,
+          position_x: 0,
+          position_y: 0,
+          width: widgetPreview.widget_type === 'metric' ? 3 : 6,
+          height: widgetPreview.widget_type === 'metric' ? 2 : 4,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        uploadLogger.widgetSaveError('Database insert failed', error);
+        throw error;
+      }
+
+      if (!insertedWidget) {
+        const err = new Error('Widget insert succeeded but no data returned');
+        uploadLogger.widgetSaveError('No data returned from insert', err);
+        throw err;
+      }
+
+      uploadLogger.success('WidgetSave', 'Widget inserted successfully', { widgetId: insertedWidget.id });
+
+      // Verify the widget persists by reading it back
+      uploadLogger.widgetVerification('Verifying widget persists', { widgetId: insertedWidget.id });
+      
+      const { data: verifiedWidget, error: verifyError } = await supabase
+        .from('custom_dashboard_widgets')
+        .select('*')
+        .eq('id', insertedWidget.id)
+        .single();
+
+      if (verifyError || !verifiedWidget) {
+        const err = new Error('Widget was inserted but could not be verified');
+        uploadLogger.widgetSaveError('Widget verification failed', err);
+        throw err;
+      }
+
+      uploadLogger.success('WidgetVerify', 'Widget verified and persists', { widgetId: verifiedWidget.id });
 
       toast({
         title: 'Widget Created!',
@@ -167,10 +214,20 @@ Based on this conversation, generate a widget configuration.`;
       setOpen(false);
       onWidgetCreated?.();
     } catch (error: any) {
-      console.error('Error saving widget:', error);
+      uploadLogger.widgetSaveError('Widget save failed', error);
+      
+      let errorMessage = 'Failed to save widget';
+      if (error.message.includes('authentication')) {
+        errorMessage = 'Please sign in again to save widgets';
+      } else if (error.code === '23505') {
+        errorMessage = 'A widget with this name already exists';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: 'Error',
-        description: 'Failed to save widget',
+        title: 'Error Saving Widget',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
