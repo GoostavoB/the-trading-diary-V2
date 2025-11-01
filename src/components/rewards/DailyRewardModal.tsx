@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -21,9 +21,19 @@ export const DailyRewardModal = ({ open, onClose, reward, onClaim }: DailyReward
   const [isClaiming, setIsClaiming] = useState(false);
   const { success, warning } = useHapticFeedback();
   
+  // Safety mechanism: Reset claiming state if modal closes
+  useEffect(() => {
+    if (!open) {
+      setIsClaiming(false);
+    }
+  }, [open]);
+  
   if (!reward) return null;
 
   const handleClaim = async () => {
+    // Prevent double clicks
+    if (isClaiming) return;
+    
     try {
       setIsClaiming(true);
       success();

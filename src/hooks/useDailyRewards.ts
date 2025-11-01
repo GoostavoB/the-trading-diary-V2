@@ -108,108 +108,133 @@ export const useDailyRewards = () => {
   const claimReward = async () => {
     if (!user || !reward || !reward.canClaim) return;
 
-    try {
-      const today = new Date().toISOString().split('T')[0];
+    // Wrap entire operation in a timeout promise
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Claim timeout - operation took too long')), 15000);
+    });
 
-      console.log('📝 Step 1: Fetching current tier data...');
-      // Fetch current tier data for total_rewards_claimed
-      const { data: currentTierData, error: tierFetchError } = await supabase
-        .from('user_xp_tiers')
-        .select('total_rewards_claimed')
-        .eq('user_id', user.id)
-        .single();
+    const claimPromise = async () => {
+      try {
+        const today = new Date().toISOString().split('T')[0];
 
-      if (tierFetchError) {
-        console.error('❌ Failed to fetch tier data:', tierFetchError);
-        throw new Error('Failed to fetch user tier data');
-      }
+        console.log('📝 Step 1: Fetching current tier data...');
+        const { data: currentTierData, error: tierFetchError } = await Promise.race([
+          supabase
+            .from('user_xp_tiers')
+            .select('total_rewards_claimed')
+            .eq('user_id', user.id)
+            .single(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Tier fetch timeout')), 5000))
+        ]) as any;
 
-      console.log('📝 Step 2: Inserting reward log...');
-      // Insert reward log
-      const { error: logError } = await supabase
-        .from('daily_rewards_log')
-        .insert({
+        if (tierFetchError) {
+          console.error('❌ Failed to fetch tier data:', tierFetchError);
+          throw new Error('Failed to fetch user tier data');
+        }
+
+        console.log('📝 Step 2: Inserting reward log...');
+        const { error: logError } = await Promise.race([
+          supabase
+            .from('daily_rewards_log')
+            .insert({
+              user_id: user.id,
+              reward_date: today,
+              consecutive_days: reward.consecutiveDays,
+              xp_awarded: reward.xpReward,
+              bonus_multiplier: reward.bonusMultiplier,
+              reward_tier: reward.rewardTier
+            }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Log insert timeout')), 5000))
+        ]) as any;
+
+        if (logError) {
+          console.error('❌ Failed to insert reward log:', logError);
+          throw logError;
+        }
+
+        console.log('📝 Step 3: Updating user_xp_tiers...');
+        const { error: updateError } = await Promise.race([
+          supabase
+            .from('user_xp_tiers')
+            .update({
+              consecutive_login_days: reward.consecutiveDays,
+              last_reward_claimed_date: today,
+              total_rewards_claimed: (currentTierData?.total_rewards_claimed || 0) + 1
+            })
+            .eq('user_id', user.id),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Tier update timeout')), 5000))
+        ]) as any;
+
+        if (updateError) {
+          console.error('❌ Failed to update tier:', updateError);
+          throw updateError;
+        }
+
+        console.log('📝 Step 4: Fetching current XP...');
+        const { data: xpData, error: xpFetchError } = await Promise.race([
+          supabase
+            .from('user_xp_levels')
+            .select('total_xp_earned')
+            .eq('user_id', user.id)
+            .single(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('XP fetch timeout')), 5000))
+        ]) as any;
+
+        if (xpFetchError) {
+          console.error('❌ Failed to fetch XP data:', xpFetchError);
+          throw xpFetchError;
+        }
+
+        console.log('📝 Step 5: Updating XP...');
+        const { error: xpError } = await Promise.race([
+          supabase
+            .from('user_xp_levels')
+            .update({
+              total_xp_earned: (xpData?.total_xp_earned || 0) + reward.xpReward
+            })
+            .eq('user_id', user.id),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('XP update timeout')), 5000))
+        ]) as any;
+
+        if (xpError) {
+          console.error('❌ Failed to update XP:', xpError);
+          throw xpError;
+        }
+
+        console.log('✅ Reward claimed successfully!');
+
+        // Track analytics
+        analytics.track('daily_reward_claimed', {
           user_id: user.id,
-          reward_date: today,
-          consecutive_days: reward.consecutiveDays,
           xp_awarded: reward.xpReward,
-          bonus_multiplier: reward.bonusMultiplier,
-          reward_tier: reward.rewardTier
+          consecutive_days: reward.consecutiveDays,
+          reward_tier: reward.rewardTier,
+          bonus_multiplier: reward.bonusMultiplier
         });
 
-      if (logError) {
-        console.error('❌ Failed to insert reward log:', logError);
-        throw logError;
+        toast.success(`🎉 Daily reward claimed! +${reward.xpReward} XP`, {
+          description: `${reward.consecutiveDays} day streak!`
+        });
+
+        // Update reward state
+        setReward({
+          ...reward,
+          canClaim: false,
+          alreadyClaimed: true
+        });
+
+        setShowRewardModal(false);
+
+        // Refresh data
+        await checkDailyReward();
+      } catch (error) {
+        console.error('❌ Error in claim operation:', error);
+        throw error;
       }
+    };
 
-      console.log('📝 Step 3: Updating user_xp_tiers...');
-      // Update user_xp_tiers with new consecutive days and claim date
-      const { error: updateError } = await supabase
-        .from('user_xp_tiers')
-        .update({
-          consecutive_login_days: reward.consecutiveDays,
-          last_reward_claimed_date: today,
-          total_rewards_claimed: (currentTierData?.total_rewards_claimed || 0) + 1
-        })
-        .eq('user_id', user.id);
-
-      if (updateError) {
-        console.error('❌ Failed to update tier:', updateError);
-        throw updateError;
-      }
-
-      console.log('📝 Step 4: Fetching current XP...');
-      // Award XP to user - fetch current XP first
-      const { data: xpData, error: xpFetchError } = await supabase
-        .from('user_xp_levels')
-        .select('total_xp_earned')
-        .eq('user_id', user.id)
-        .single();
-
-      if (xpFetchError) {
-        console.error('❌ Failed to fetch XP data:', xpFetchError);
-        throw xpFetchError;
-      }
-
-      console.log('📝 Step 5: Updating XP...');
-      const { error: xpError } = await supabase
-        .from('user_xp_levels')
-        .update({
-          total_xp_earned: (xpData?.total_xp_earned || 0) + reward.xpReward
-        })
-        .eq('user_id', user.id);
-
-      if (xpError) {
-        console.error('❌ Failed to update XP:', xpError);
-        throw xpError;
-      }
-
-      console.log('✅ Reward claimed successfully!');
-
-      // Track analytics
-      analytics.track('daily_reward_claimed', {
-        user_id: user.id,
-        xp_awarded: reward.xpReward,
-        consecutive_days: reward.consecutiveDays,
-        reward_tier: reward.rewardTier,
-        bonus_multiplier: reward.bonusMultiplier
-      });
-
-      toast.success(`🎉 Daily reward claimed! +${reward.xpReward} XP`, {
-        description: `${reward.consecutiveDays} day streak!`
-      });
-
-      // Update reward state
-      setReward({
-        ...reward,
-        canClaim: false,
-        alreadyClaimed: true
-      });
-
-      setShowRewardModal(false);
-
-      // Refresh data
-      await checkDailyReward();
+    try {
+      await Promise.race([claimPromise(), timeoutPromise]);
     } catch (error) {
       console.error('❌ Error claiming reward:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
