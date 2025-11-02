@@ -18,8 +18,9 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, CreditCard, Zap, TrendingUp, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { useSubscriptionContext } from '@/contexts/SubscriptionContext';
+import { getCreditProduct } from '@/config/stripe-products';
+import { initiateStripeCheckout } from '@/utils/stripeCheckout';
 
 export const CreditsCheckout = ({ onSuccess }) => {
   const navigate = useNavigate();
@@ -66,44 +67,25 @@ export const CreditsCheckout = ({ onSuccess }) => {
     setError(null);
 
     try {
-      // Get current session
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        throw new Error('Please log in to purchase credits');
-      }
+      // Determine which credit product to use based on subscription
+      const hasSubscription = plan === 'pro' || plan === 'elite';
+      const creditProduct = getCreditProduct(hasSubscription);
 
-      // Call Supabase Edge Function to create Stripe checkout session
-      const { data, error: functionError } = await supabase.functions.invoke(
-        'create-stripe-checkout',
-        {
-          body: {
-            type: 'credits',
-            credits: actualCredits,
-          },
-        }
-      );
-
-      if (functionError) {
-        throw new Error(functionError.message || 'Failed to create checkout session');
-      }
-
-      if (!data?.url) {
-        throw new Error('No checkout URL received');
-      }
-
-      // Redirect to Stripe Checkout
-      window.location.href = data.url;
+      // Initiate Stripe checkout
+      await initiateStripeCheckout({
+        priceId: creditProduct.priceId,
+        productType: creditProduct.productType as any,
+      });
 
     } catch (err) {
       console.error('Purchase error:', err);
-      setError(err.message);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to start checkout';
+      setError(errorMessage);
       toast({
         title: 'Purchase Failed',
-        description: err.message,
+        description: errorMessage,
         variant: 'destructive',
       });
-    } finally {
       setLoading(false);
     }
   };

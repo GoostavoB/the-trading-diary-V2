@@ -4,6 +4,12 @@ import { GlassCard } from './GlassCard';
 import { MagneticButton } from './MagneticButton';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { getSubscriptionProduct } from '@/config/stripe-products';
+import { initiateStripeCheckout } from '@/utils/stripeCheckout';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 interface PricingPlan {
   id: string;
@@ -28,12 +34,43 @@ interface PremiumPricingCardProps {
 export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPricingCardProps) => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const currentLang = i18n.language;
+  const [loading, setLoading] = useState(false);
   
-  const handleCTA = () => {
+  const handleCTA = async () => {
     if (plan.comingSoon) return;
-    const authPath = currentLang === 'en' ? '/auth?mode=signup' : `/${currentLang}/auth?mode=signup`;
-    navigate(authPath);
+    
+    // If not logged in, redirect to signup
+    if (!user) {
+      const authPath = currentLang === 'en' ? '/auth?mode=signup' : `/${currentLang}/auth?mode=signup`;
+      navigate(authPath);
+      return;
+    }
+
+    // User is logged in, initiate Stripe checkout
+    setLoading(true);
+    
+    try {
+      // Determine tier and get the correct product
+      const tier = plan.id.toLowerCase() as 'pro' | 'elite';
+      const stripeProduct = getSubscriptionProduct(tier, billingCycle);
+      
+      // Initiate checkout
+      await initiateStripeCheckout({
+        priceId: stripeProduct.priceId,
+        productType: stripeProduct.productType as any,
+      });
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast({
+        title: 'Checkout Failed',
+        description: error instanceof Error ? error.message : 'Failed to start checkout',
+        variant: 'destructive',
+      });
+      setLoading(false);
+    }
   };
   
   const getDisplayPrice = () => {
@@ -139,9 +176,16 @@ export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPric
         <MagneticButton
           onClick={handleCTA}
           variant={plan.popular ? 'default' : 'outline'}
-          className={`w-full mb-8 py-6 text-[15px] font-semibold ${plan.comingSoon ? 'opacity-60 cursor-not-allowed pointer-events-none' : ''}`}
+          className={`w-full mb-8 py-6 text-[15px] font-semibold ${plan.comingSoon || loading ? 'opacity-60 cursor-not-allowed pointer-events-none' : ''}`}
         >
-          {plan.comingSoon ? plan.ctaKey : t(plan.ctaKey)}
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            plan.comingSoon ? plan.ctaKey : t(plan.ctaKey)
+          )}
         </MagneticButton>
 
         <ul className="space-y-4 flex-1">

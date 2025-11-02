@@ -107,6 +107,8 @@ const HowItWorks = lazy(() => import("./pages/HowItWorks"));
 const FeaturesPage = lazy(() => import("./pages/FeaturesPage"));
 const TierPreview = lazy(() => import("./pages/TierPreview"));
 const PremiumFeatures = lazy(() => import("./pages/PremiumFeatures"));
+const CheckoutSuccess = lazy(() => import("./pages/CheckoutSuccess"));
+const CheckoutCancel = lazy(() => import("./pages/CheckoutCancel"));
 
 // Loading fallback
 const PageLoader = () => (
@@ -224,6 +226,8 @@ const AppRoutes = () => {
         <Route path="/gamification" element={<ProtectedRoute><Gamification /></ProtectedRoute>} />
         <Route path="/tier-preview" element={<ProtectedRoute><TierPreview /></ProtectedRoute>} />
         <Route path="/premium-features" element={<ProtectedRoute><PremiumFeatures /></ProtectedRoute>} />
+        <Route path="/checkout-success" element={<ProtectedRoute><CheckoutSuccess /></ProtectedRoute>} />
+        <Route path="/checkout-cancel" element={<ProtectedRoute><CheckoutCancel /></ProtectedRoute>} />
         <Route path="/market-data" element={<ProtectedRoute><MarketData /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         {/* Phase 2: Social features - temporarily disabled for backlog #34 */}
