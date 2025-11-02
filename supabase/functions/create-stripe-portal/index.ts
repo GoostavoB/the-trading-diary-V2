@@ -1,16 +1,3 @@
-/**
- * STRIPE CUSTOMER PORTAL
- * Creates a Stripe customer portal session for managing subscriptions
- * 
- * Endpoint: POST /functions/v1/create-stripe-portal
- * 
- * Allows users to:
- * - Update payment method
- * - View billing history
- * - Cancel subscription
- * - Update billing address
- */
-
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import Stripe from 'https://esm.sh/stripe@14.5.0';
@@ -51,39 +38,34 @@ serve(async (req) => {
     // Get authenticated user
     const {
       data: { user },
-      error: authError,
+      error: userError,
     } = await supabaseClient.auth.getUser();
 
-    if (authError || !user) {
-      throw new Error('Authentication failed');
+    if (userError || !user) {
+      throw new Error('Unauthorized');
     }
 
-    // Get user's Stripe customer ID
-    const { data: userData, error: userError } = await supabaseClient
-      .from('users')
+    // Get user's Stripe customer ID from subscription
+    const { data: subscription, error: subError } = await supabaseClient
+      .from('subscriptions')
       .select('stripe_customer_id')
-      .eq('id', user.id)
+      .eq('user_id', user.id)
       .single();
 
-    if (userError || !userData?.stripe_customer_id) {
-      throw new Error('No Stripe customer found. Please subscribe first.');
+    if (subError || !subscription?.stripe_customer_id) {
+      throw new Error('No active subscription found');
     }
 
     // Create portal session
-    const session = await stripe.billingPortal.sessions.create({
-      customer: userData.stripe_customer_id,
-      return_url: `${Deno.env.get('FRONTEND_URL')}/settings`,
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: subscription.stripe_customer_id,
+      return_url: `${Deno.env.get('FRONTEND_URL')}/dashboard`,
     });
 
-    return new Response(
-      JSON.stringify({
-        url: session.url,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+    return new Response(JSON.stringify({ url: portalSession.url }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    });
   } catch (error) {
     console.error('Error creating portal session:', error);
     return new Response(
