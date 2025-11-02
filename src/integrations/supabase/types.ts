@@ -2134,6 +2134,7 @@ export type Database = {
           promo_expires_at: string | null
           provider: string | null
           public_stats: Json | null
+          stripe_customer_id: string | null
           subscription_status: string | null
           subscription_tier: string | null
           terms_accepted_at: string | null
@@ -2160,6 +2161,7 @@ export type Database = {
           promo_expires_at?: string | null
           provider?: string | null
           public_stats?: Json | null
+          stripe_customer_id?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
           terms_accepted_at?: string | null
@@ -2186,6 +2188,7 @@ export type Database = {
           promo_expires_at?: string | null
           provider?: string | null
           public_stats?: Json | null
+          stripe_customer_id?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
           terms_accepted_at?: string | null
@@ -3479,6 +3482,45 @@ export type Database = {
         }
         Relationships: []
       }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          credits: number | null
+          description: string | null
+          id: string
+          status: string
+          stripe_invoice_id: string | null
+          stripe_payment_intent_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          credits?: number | null
+          description?: string | null
+          id?: string
+          status: string
+          stripe_invoice_id?: string | null
+          stripe_payment_intent_id?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          credits?: number | null
+          description?: string | null
+          id?: string
+          status?: string
+          stripe_invoice_id?: string | null
+          stripe_payment_intent_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       unlocked_badges: {
         Row: {
           badge_id: string
@@ -4731,12 +4773,14 @@ export type Database = {
       }
       deduct_upload_credit: { Args: { p_user_id: string }; Returns: boolean }
       get_subscription_metrics: { Args: never; Returns: Json }
+      get_subscription_tier: { Args: { p_user_id: string }; Returns: string }
       get_trading_analytics: {
         Args: { end_date?: string; start_date?: string; user_uuid: string }
         Returns: Json
       }
       get_user_dashboard_stats: { Args: { user_uuid: string }; Returns: Json }
       get_week_start: { Args: { date_input?: string }; Returns: string }
+      has_active_subscription: { Args: { p_user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
