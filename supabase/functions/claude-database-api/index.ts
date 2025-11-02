@@ -31,7 +31,7 @@ const MAX_RESPONSE_SIZE = 5 * 1024 * 1024; // 5MB
 const QUERY_TIMEOUT_MS = 10000; // 10 seconds
 
 interface ApiRequest {
-  operation: 'read' | 'rpc';
+  operation: 'read' | 'write' | 'rpc' | 'migrate';
   table?: string;
   select?: string;
   filters?: Record<string, string>;
@@ -39,6 +39,11 @@ interface ApiRequest {
   order?: { column: string; ascending?: boolean };
   rpc_function?: string;
   rpc_params?: Record<string, any>;
+  // Write operations
+  action?: 'insert' | 'update' | 'delete';
+  data?: Record<string, any> | Record<string, any>[];
+  // Migration operations
+  sql?: string;
 }
 
 interface ApiResponse {
@@ -130,13 +135,13 @@ serve(async (req) => {
     queryParams = body;
 
     // Validate operation
-    if (operation !== 'read' && operation !== 'rpc') {
+    if (!['read', 'write', 'rpc', 'migrate'].includes(operation)) {
       const response: ApiResponse = {
         success: false,
         error: {
           code: 'INVALID_OPERATION',
-          message: `Operation '${operation}' is not allowed. Only 'read' and 'rpc' operations are supported (Phase 1: Read-Only Mode).`,
-          details: { allowed_operations: ['read', 'rpc'] }
+          message: `Operation '${operation}' is not allowed. Supported operations: read, write, rpc, migrate.`,
+          details: { allowed_operations: ['read', 'write', 'rpc', 'migrate'] }
         }
       };
       await logUsage(supabaseAdmin, operation, null, queryParams, Date.now() - startTime, false, 'INVALID_OPERATION', response.error?.message || 'Invalid operation');
@@ -353,6 +358,254 @@ serve(async (req) => {
       return new Response(responseJson, {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
+    }
+
+    // Handle WRITE operations
+    if (operation === 'write') {
+      const { table, action, data, filters = {} } = body;
+      tableName = table || null;
+
+      if (!table) {
+        const response: ApiResponse = {
+          success: false,
+          error: {
+            code: 'MISSING_TABLE',
+            message: 'table is required for write operations'
+          }
+        };
+        await logUsage(supabaseAdmin, operation, tableName, queryParams, Date.now() - startTime, false, 'MISSING_TABLE', response.error?.message || 'Missing table');
+        return new Response(JSON.stringify(response), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      if (!action) {
+        const response: ApiResponse = {
+          success: false,
+          error: {
+            code: 'MISSING_ACTION',
+            message: 'action is required for write operations (insert, update, delete)'
+          }
+        };
+        await logUsage(supabaseAdmin, operation, tableName, queryParams, Date.now() - startTime, false, 'MISSING_ACTION', response.error?.message || 'Missing action');
+        return new Response(JSON.stringify(response), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      // Validate table whitelist
+      if (!ALLOWED_TABLES.includes(table)) {
+        const response: ApiResponse = {
+          success: false,
+          error: {
+            code: 'TABLE_NOT_ALLOWED',
+            message: `Table '${table}' is not accessible via this API`,
+            details: { allowed_tables: ALLOWED_TABLES }
+          }
+        };
+        await logUsage(supabaseAdmin, operation, tableName, queryParams, Date.now() - startTime, false, 'TABLE_NOT_ALLOWED', response.error?.message || 'Table not allowed');
+        return new Response(JSON.stringify(response), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      let query: any;
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Query timeout exceeded')), QUERY_TIMEOUT_MS)
+      );
+
+      if (action === 'insert') {
+        if (!data) {
+          const response: ApiResponse = {
+            success: false,
+            error: {
+              code: 'MISSING_DATA',
+              message: 'data is required for insert operations'
+            }
+          };
+          await logUsage(supabaseAdmin, operation, tableName, queryParams, Date.now() - startTime, false, 'MISSING_DATA', response.error?.message || 'Missing data');
+          return new Response(JSON.stringify(response), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+
+        query = supabaseAdmin.from(table).insert(data).select();
+      } else if (action === 'update') {
+        if (!data) {
+          const response: ApiResponse = {
+            success: false,
+            error: {
+              code: 'MISSING_DATA',
+              message: 'data is required for update operations'
+            }
+          };
+          await logUsage(supabaseAdmin, operation, tableName, queryParams, Date.now() - startTime, false, 'MISSING_DATA', response.error?.message || 'Missing data');
+          return new Response(JSON.stringify(response), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+
+        query = supabaseAdmin.from(table).update(data);
+        
+        // Apply filters for update
+        Object.entries(filters).forEach(([key, value]) => {
+          const [column, operator] = key.split('.');
+          if (operator) {
+            query = query.filter(column, operator, value);
+          } else {
+            query = query.eq(key, value);
+          }
+        });
+
+        query = query.select();
+      } else if (action === 'delete') {
+        query = supabaseAdmin.from(table).delete();
+        
+        // Apply filters for delete
+        Object.entries(filters).forEach(([key, value]) => {
+          const [column, operator] = key.split('.');
+          if (operator) {
+            query = query.filter(column, operator, value);
+          } else {
+            query = query.eq(key, value);
+          }
+        });
+
+        query = query.select();
+      } else {
+        const response: ApiResponse = {
+          success: false,
+          error: {
+            code: 'INVALID_ACTION',
+            message: `Invalid action '${action}'. Must be: insert, update, or delete`
+          }
+        };
+        await logUsage(supabaseAdmin, operation, tableName, queryParams, Date.now() - startTime, false, 'INVALID_ACTION', response.error?.message || 'Invalid action');
+        return new Response(JSON.stringify(response), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const { data: resultData, error } = await Promise.race([
+        query,
+        timeoutPromise
+      ]) as any;
+
+      if (error) {
+        const response: ApiResponse = {
+          success: false,
+          error: {
+            code: 'WRITE_ERROR',
+            message: error.message,
+            details: error
+          }
+        };
+        await logUsage(supabaseAdmin, operation, tableName, queryParams, Date.now() - startTime, false, 'WRITE_ERROR', error.message);
+        return new Response(JSON.stringify(response), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const responseData: ApiResponse = {
+        success: true,
+        data: resultData,
+        metadata: {
+          count: resultData?.length || 0,
+          operation: `write_${action}`,
+          timestamp: new Date().toISOString()
+        }
+      };
+
+      const responseSize = JSON.stringify(responseData).length;
+      await logUsage(supabaseAdmin, operation, tableName, queryParams, Date.now() - startTime, true, null, null, resultData?.length || 0, responseSize);
+
+      return new Response(JSON.stringify(responseData), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Handle MIGRATE operations
+    if (operation === 'migrate') {
+      const { sql } = body;
+
+      if (!sql) {
+        const response: ApiResponse = {
+          success: false,
+          error: {
+            code: 'MISSING_SQL',
+            message: 'sql is required for migration operations'
+          }
+        };
+        await logUsage(supabaseAdmin, operation, null, queryParams, Date.now() - startTime, false, 'MISSING_SQL', response.error?.message || 'Missing SQL');
+        return new Response(JSON.stringify(response), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Query timeout exceeded')), QUERY_TIMEOUT_MS)
+      );
+
+      try {
+        const { data, error } = await Promise.race([
+          supabaseAdmin.rpc('exec_sql', { sql_query: sql }),
+          timeoutPromise
+        ]) as any;
+
+        if (error) {
+          const response: ApiResponse = {
+            success: false,
+            error: {
+              code: 'MIGRATION_ERROR',
+              message: error.message,
+              details: error
+            }
+          };
+          await logUsage(supabaseAdmin, operation, 'migration', queryParams, Date.now() - startTime, false, 'MIGRATION_ERROR', error.message);
+          return new Response(JSON.stringify(response), {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+
+        const responseData: ApiResponse = {
+          success: true,
+          data,
+          metadata: {
+            operation: 'migrate',
+            timestamp: new Date().toISOString()
+          }
+        };
+
+        const responseSize = JSON.stringify(responseData).length;
+        await logUsage(supabaseAdmin, operation, 'migration', queryParams, Date.now() - startTime, true, null, null, null, responseSize);
+
+        return new Response(JSON.stringify(responseData), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown migration error';
+        const response: ApiResponse = {
+          success: false,
+          error: {
+            code: 'MIGRATION_EXEC_ERROR',
+            message: errorMessage
+          }
+        };
+        await logUsage(supabaseAdmin, operation, 'migration', queryParams, Date.now() - startTime, false, 'MIGRATION_EXEC_ERROR', errorMessage);
+        return new Response(JSON.stringify(response), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
     }
 
     // Should never reach here

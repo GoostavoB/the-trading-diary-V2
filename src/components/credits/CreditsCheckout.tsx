@@ -24,7 +24,7 @@ import { useSubscriptionContext } from '@/contexts/SubscriptionContext';
 export const CreditsCheckout = ({ onSuccess }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { tier } = useSubscriptionContext();
+  const { plan } = useSubscriptionContext();
   
   const [credits, setCredits] = useState(10);
   const [loading, setLoading] = useState(false);
@@ -46,13 +46,13 @@ export const CreditsCheckout = ({ onSuccess }) => {
     };
   };
 
-  const pricing = getPricing(tier);
+  const pricing = getPricing(plan || 'basic');
   
   // Calculate total price (rounds to nearest 10 credits)
   const creditPacks = Math.ceil(credits / 10);
   const actualCredits = creditPacks * 10;
   const totalPrice = creditPacks * pricing.base;
-  const savingsVsFree = tier !== 'free' ? (creditPacks * 5.00) - totalPrice : 0;
+  const savingsVsFree = plan && plan !== 'basic' ? (creditPacks * 5.00) - totalPrice : 0;
 
   const handlePurchase = async (e) => {
     e.preventDefault();
@@ -130,11 +130,11 @@ export const CreditsCheckout = ({ onSuccess }) => {
 
       <CardContent className="space-y-6">
         {/* Tier Discount Banner */}
-        {tier !== 'free' && (
+        {plan && plan !== 'basic' && (
           <Alert className="border-primary/50 bg-primary/10">
             <Check className="h-4 w-4 text-primary" />
             <AlertDescription className="text-primary">
-              <strong>{tier.toUpperCase()} Member Discount:</strong> Save {pricing.discount}% on all credit purchases!
+              <strong>{plan.toUpperCase()} Member Discount:</strong> Save {pricing.discount}% on all credit purchases!
             </AlertDescription>
           </Alert>
         )}
@@ -198,7 +198,7 @@ export const CreditsCheckout = ({ onSuccess }) => {
               <span className="font-medium">${pricing.base.toFixed(2)}</span>
             </div>
 
-            {tier !== 'free' && (
+            {plan && plan !== 'basic' && (
               <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
                 <span className="flex items-center gap-1">
                   <TrendingUp className="h-3 w-3" />
