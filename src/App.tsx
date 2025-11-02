@@ -96,6 +96,7 @@ const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 const BlogArticle = lazy(() => import("./pages/BlogArticle"));
+const BlogCategory = lazy(() => import("./pages/BlogCategory"));
 const Learn = lazy(() => import("./pages/Learn"));
 const ApiDocs = lazy(() => import("./pages/ApiDocs"));
 const AdvancedAnalytics = lazy(() => import("./pages/AdvancedAnalytics"));
@@ -282,7 +283,10 @@ const AppRoutes = () => {
         <Route path="/accessibility" element={<ProtectedRoute><AccessibilityGuide /></ProtectedRoute>} />
         <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
         <Route path="/cookie-policy" element={<PublicPageThemeWrapper><CookiePolicy /></PublicPageThemeWrapper>} />
-        <Route path="/blog/article/:slug" element={<PublicPageThemeWrapper><BlogArticle /></PublicPageThemeWrapper>} />
+        <Route path="/blog/:slug" element={<PublicPageThemeWrapper><BlogArticle /></PublicPageThemeWrapper>} />
+        <Route path="/:lang/blog/:slug" element={<PublicPageThemeWrapper><BlogArticle /></PublicPageThemeWrapper>} />
+        <Route path="/blog/category/:category" element={<PublicPageThemeWrapper><BlogCategory /></PublicPageThemeWrapper>} />
+        <Route path="/:lang/blog/category/:category" element={<PublicPageThemeWrapper><BlogCategory /></PublicPageThemeWrapper>} />
         <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
         <Route path="/api-docs" element={<ProtectedRoute><ApiDocs /></ProtectedRoute>} />
         <Route path="/advanced-analytics" element={<ProtectedRoute><AdvancedAnalytics /></ProtectedRoute>} />

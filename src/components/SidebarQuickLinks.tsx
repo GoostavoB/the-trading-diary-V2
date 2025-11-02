@@ -15,7 +15,7 @@ export function SidebarQuickLinks() {
     { to: '/forecast', icon: TrendingUp, label: t('navigation.forecast') },
     { to: '/achievements', icon: Target, label: t('navigation.achievements') },
     { to: '/ai-tools', icon: Sparkles, label: t('navigation.aiTools') },
-    { to: '/logo-generator', icon: Image, label: 'Logo Generator' },
+    { to: '/blog', icon: Image, label: t('navigation.blog', 'Blog') },
   ];
 
   return (

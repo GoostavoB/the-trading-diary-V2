@@ -151,9 +151,14 @@ const Blog = () => {
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="secondary" className="text-xs">
-                        {article.category}
-                      </Badge>
+                      <Link 
+                        to={getLocalizedPath(`/blog/category/${encodeURIComponent(article.category)}`, currentLang)}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Badge variant="secondary" className="text-xs hover:bg-primary/20 transition-colors">
+                          {article.category}
+                        </Badge>
+                      </Link>
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
