@@ -1124,7 +1124,7 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">P&L</p>
-                  <p className={`font-medium ${selectedTrade.pnl === 0 ? 'text-foreground' : selectedTrade.pnl > 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+                  <p className={`font-medium ${selectedTrade.pnl === 0 ? 'text-foreground' : selectedTrade.pnl > 0 ? 'text-profit' : 'text-loss'}`}>
                     ${selectedTrade.pnl.toFixed(2)}
                   </p>
                 </div>

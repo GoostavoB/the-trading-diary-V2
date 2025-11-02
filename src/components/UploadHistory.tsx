@@ -456,7 +456,7 @@ export const UploadHistory = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-3 mt-3 border-t border-border/30">
                   <div>
                     <span className="text-xs text-muted-foreground">Total P&L: </span>
-                    <span className={`text-lg font-bold ${(batch.total_pnl || 0) >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+                    <span className={`text-lg font-bold ${(batch.total_pnl || 0) >= 0 ? 'text-profit' : 'text-loss'}`}>
                       ${(batch.total_pnl || 0).toFixed(2)}
                     </span>
                   </div>
@@ -614,7 +614,7 @@ export const UploadHistory = () => {
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-3 mt-3 border-t border-border/30">
                         <div>
                           <span className="text-xs text-muted-foreground">Total P&L: </span>
-                          <span className={`text-lg font-bold ${(batch.total_pnl || 0) >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+                          <span className={`text-lg font-bold ${(batch.total_pnl || 0) >= 0 ? 'text-profit' : 'text-loss'}`}>
                             ${(batch.total_pnl || 0).toFixed(2)}
                           </span>
                         </div>

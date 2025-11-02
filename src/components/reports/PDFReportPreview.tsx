@@ -101,7 +101,7 @@ export const PDFReportPreview = ({ data, onDownload, isGenerating = false }: PDF
             <div className="grid grid-cols-3 gap-6">
               <div>
                 <p className="text-sm text-gray-600">Total P&L</p>
-                <p className={`text-2xl font-bold ${data.totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                <p className={`text-2xl font-bold ${data.totalPnL >= 0 ? 'text-profit' : 'text-loss'}`}>
                   ${Math.abs(data.totalPnL).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
@@ -190,7 +190,7 @@ export const PDFReportPreview = ({ data, onDownload, isGenerating = false }: PDF
                     <p className="font-semibold text-gray-900">{asset.symbol}</p>
                     <p className="text-sm text-gray-600">{asset.trades} trades</p>
                   </div>
-                  <p className={`font-bold ${asset.pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <p className={`font-bold ${asset.pnl >= 0 ? 'text-profit' : 'text-loss'}`}>
                     {asset.pnl >= 0 ? '+' : ''}${asset.pnl.toFixed(2)}
                   </p>
                 </div>
@@ -209,7 +209,7 @@ export const PDFReportPreview = ({ data, onDownload, isGenerating = false }: PDF
                       <p className="font-semibold text-gray-900">{month.month}</p>
                       <p className="text-sm text-gray-600">{month.trades} trades</p>
                     </div>
-                    <p className={`font-bold ${month.pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <p className={`font-bold ${month.pnl >= 0 ? 'text-profit' : 'text-loss'}`}>
                       {month.pnl >= 0 ? '+' : ''}${month.pnl.toFixed(2)}
                     </p>
                   </div>

@@ -50,7 +50,7 @@ export function DuplicateTradeDialog({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">P&L:</span>
-                  <span className={`font-medium ${(duplicatePnl || 0) >= 0 ? 'text-neon-green' : 'text-neon-red'}`}>
+                  <span className={`font-medium ${(duplicatePnl || 0) >= 0 ? 'text-profit' : 'text-loss'}`}>
                     ${duplicatePnl?.toFixed(2)}
                   </span>
                 </div>

@@ -40,7 +40,7 @@ export const PerformanceAttributionChart = ({ trades }: PerformanceAttributionCh
           <div key={idx} className="p-3 rounded-lg bg-secondary/50">
             <div className="text-sm font-medium mb-1">{item.subcategory}</div>
             <div className="flex items-center justify-between">
-              <span className={`text-lg font-bold ${item.totalPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
+              <span className={`text-lg font-bold ${item.totalPnL >= 0 ? 'text-profit' : 'text-loss'}`}>
                 ${item.totalPnL.toFixed(2)}
               </span>
               <span className="text-sm text-muted-foreground">
@@ -69,7 +69,7 @@ export const PerformanceAttributionChart = ({ trades }: PerformanceAttributionCh
                   <div className="text-xs text-muted-foreground">{contrib.category}</div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-success">${contrib.totalPnL.toFixed(2)}</div>
+                  <div className="font-bold text-profit">${contrib.totalPnL.toFixed(2)}</div>
                   <div className="text-xs text-muted-foreground">{contrib.contribution.toFixed(1)}%</div>
                 </div>
               </div>
@@ -90,7 +90,7 @@ export const PerformanceAttributionChart = ({ trades }: PerformanceAttributionCh
                   <div className="text-xs text-muted-foreground">{contrib.category}</div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-destructive">${contrib.totalPnL.toFixed(2)}</div>
+                  <div className="font-bold text-loss">${contrib.totalPnL.toFixed(2)}</div>
                   <div className="text-xs text-muted-foreground">{contrib.contribution.toFixed(1)}%</div>
                 </div>
               </div>

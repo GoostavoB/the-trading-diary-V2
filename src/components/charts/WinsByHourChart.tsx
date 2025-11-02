@@ -141,7 +141,7 @@ const WinsByHourChartComponent = ({ trades }: WinsByHourChartProps) => {
           <p className="text-muted-foreground">
             Avg ROI: <span className="text-foreground font-medium">{formatPercent(data.avgROI)}</span>
           </p>
-          <p className={`font-medium ${data.totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+          <p className={`font-medium ${data.totalPnL >= 0 ? 'text-profit' : 'text-loss'}`}>
             Total P&L: ${formatNumber(data.totalPnL)}
           </p>
         </div>

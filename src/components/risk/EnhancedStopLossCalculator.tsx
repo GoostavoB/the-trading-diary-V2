@@ -331,7 +331,7 @@ export function EnhancedStopLossCalculator() {
                             </div>
                             <div className="text-right">
                               <div className="text-sm text-muted-foreground">Profit</div>
-                              <div className="font-bold text-success">{formatCurrency(tp.profit)}</div>
+                              <div className="font-bold text-profit">{formatCurrency(tp.profit)}</div>
                             </div>
                           </div>
                         ))}
@@ -386,7 +386,7 @@ export function EnhancedStopLossCalculator() {
                             </div>
                             <div className="text-right">
                               <div className="text-sm text-muted-foreground">Profit</div>
-                              <div className="font-bold text-success">{formatCurrency(tp.profit)}</div>
+                              <div className="font-bold text-profit">{formatCurrency(tp.profit)}</div>
                             </div>
                           </div>
                         ))}

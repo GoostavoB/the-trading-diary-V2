@@ -137,7 +137,7 @@ export function PerformancePrediction() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className={`text-2xl font-bold ${pred.predicted_pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <div className={`text-2xl font-bold ${pred.predicted_pnl >= 0 ? 'text-profit' : 'text-loss'}`}>
                       {pred.predicted_pnl >= 0 ? '+' : ''}{pred.predicted_pnl.toFixed(2)}%
                     </div>
                     <div className="text-xs text-muted-foreground">Predicted ROI</div>

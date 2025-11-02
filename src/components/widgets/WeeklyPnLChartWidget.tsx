@@ -72,7 +72,7 @@ export const WeeklyPnLChartWidget = ({ id, ...props }: WidgetProps) => {
       return (
         <div className="bg-popover border border-border rounded-lg shadow-lg p-3">
           <p className="text-sm font-medium mb-1">{data.week}</p>
-          <p className={`text-lg font-bold ${data.pnl >= 0 ? 'text-success' : 'text-destructive'}`}>
+          <p className={`text-lg font-bold ${data.pnl >= 0 ? 'text-profit' : 'text-loss'}`}>
             ${data.pnl.toFixed(2)}
           </p>
           <p className="text-xs text-muted-foreground mt-1">{data.trades} trades</p>
@@ -94,7 +94,7 @@ export const WeeklyPnLChartWidget = ({ id, ...props }: WidgetProps) => {
           <div className="flex items-center justify-between pb-4 border-b border-border/50">
             <div>
               <div className="text-sm text-muted-foreground">Total P&L</div>
-              <div className={`text-2xl font-bold ${totalPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
+              <div className={`text-2xl font-bold ${totalPnL >= 0 ? 'text-profit' : 'text-loss'}`}>
                 ${totalPnL.toFixed(2)}
               </div>
             </div>

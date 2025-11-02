@@ -424,6 +424,31 @@
     }
   }
 
+  /* Financial colors - Always green for profit, red for loss */
+  .text-profit {
+    color: hsl(142 76% 58%); /* Always neon green */
+  }
+  
+  .text-loss {
+    color: hsl(0 91% 61%); /* Always neon red */
+  }
+  
+  .bg-profit {
+    background-color: hsl(142 76% 58%);
+  }
+  
+  .bg-loss {
+    background-color: hsl(0 91% 61%);
+  }
+  
+  .border-profit {
+    border-color: hsl(142 76% 58%);
+  }
+  
+  .border-loss {
+    border-color: hsl(0 91% 61%);
+  }
+
   /* Animations */
   @keyframes fade-in {
     from {

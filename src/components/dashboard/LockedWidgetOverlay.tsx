@@ -26,8 +26,7 @@ export function LockedWidgetOverlay({
   }
 
   const handleUnlockClick = () => {
-    analytics.trackWidgetLocked({
-      widgetName,
+    analytics.trackWidgetLocked(widgetName, {
       requiredTier,
       currentTier,
       tierGap: requiredTier - currentTier,

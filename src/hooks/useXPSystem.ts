@@ -261,9 +261,7 @@ export const useXPSystem = () => {
       });
 
       // Track XP award in analytics
-      analytics.trackXPAwarded({
-        amount: finalAmount,
-        activityType,
+      analytics.trackXPAwarded(finalAmount, activityType, {
         description,
         multiplier,
         totalXP: newTotalXP,
@@ -275,8 +273,7 @@ export const useXPSystem = () => {
       const newTier = calculateTier(newTotalXP);
 
       if (newTier > oldTier) {
-        analytics.trackTierUnlocked({
-          tier: newTier,
+        analytics.trackTierUnlocked(newTier, {
           totalXP: newTotalXP,
           previousTier: oldTier,
         });

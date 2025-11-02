@@ -76,7 +76,7 @@ export const CategoryView = ({ categories, isDarkMode = true, baseCurrency = 'US
                       <p className="font-semibold">{data.name}</p>
                       <p className="text-sm">Value: {formatCurrency(data.value, baseCurrency)}</p>
                       <p className="text-sm">Weight: {data.weight.toFixed(2)}%</p>
-                      <p className={`text-sm ${data.pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      <p className={`text-sm ${data.pnl >= 0 ? 'text-profit' : 'text-loss'}`}>
                         P&L: {formatCurrency(data.pnl, baseCurrency)} ({formatPercent(data.pnl / (data.value - data.pnl))})
                       </p>
                     </div>
@@ -147,7 +147,7 @@ export const CategoryView = ({ categories, isDarkMode = true, baseCurrency = 'US
                   <td className="py-3 px-4 font-medium">{cat.category}</td>
                   <td className="text-right py-3 px-4">{formatCurrency(cat.value, baseCurrency)}</td>
                   <td className="text-right py-3 px-4">{cat.weight.toFixed(2)}%</td>
-                  <td className={`text-right py-3 px-4 ${cat.unrealizedPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  <td className={`text-right py-3 px-4 ${cat.unrealizedPnL >= 0 ? 'text-profit' : 'text-loss'}`}>
                     {formatCurrency(cat.unrealizedPnL, baseCurrency)}
                   </td>
                   <td className={`text-right py-3 px-4 ${cat.roi >= 0 ? 'text-green-500' : 'text-red-500'}`}>

@@ -105,7 +105,7 @@ export const MarketRegimeDetector = ({ trades }: MarketRegimeDetectorProps) => {
                     </div>
                     <div>
                       <div className="text-muted-foreground">Avg P&L</div>
-                      <div className={`font-semibold ${perf.avgPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
+                      <div className={`font-semibold ${perf.avgPnL >= 0 ? 'text-profit' : 'text-loss'}`}>
                         ${perf.avgPnL.toFixed(2)}
                       </div>
                     </div>

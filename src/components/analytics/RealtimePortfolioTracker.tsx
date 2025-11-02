@@ -66,7 +66,7 @@ export const RealtimePortfolioTracker = () => {
 
           <div className="p-4 rounded-lg bg-background/50">
             <div className="text-sm text-muted-foreground mb-1">Unrealized P&L</div>
-            <div className={`text-xl font-bold ${analytics.unrealizedPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
+            <div className={`text-xl font-bold ${analytics.unrealizedPnL >= 0 ? 'text-profit' : 'text-loss'}`}>
               ${analytics.unrealizedPnL.toFixed(2)}
             </div>
           </div>
