@@ -12,6 +12,7 @@ export interface CheckoutParams {
   productType: 'subscription_monthly' | 'subscription_annual' | 'credits_starter' | 'credits_pro';
   successUrl?: string;
   cancelUrl?: string;
+  upsellCredits?: number;
 }
 
 export interface CheckoutResponse {
@@ -26,7 +27,7 @@ export interface CheckoutResponse {
  */
 export const initiateStripeCheckout = async (params: CheckoutParams): Promise<string> => {
   console.log('🚀 initiateStripeCheckout called with:', params);
-  const { priceId, productType, successUrl, cancelUrl } = params;
+  const { priceId, productType, successUrl, cancelUrl, upsellCredits } = params;
 
   // Verify user is authenticated
   console.log('🔐 Checking authentication...');
@@ -50,6 +51,7 @@ export const initiateStripeCheckout = async (params: CheckoutParams): Promise<st
     productType,
     successUrl: successUrl || defaultSuccessUrl,
     cancelUrl: cancelUrl || defaultCancelUrl,
+    upsellCredits,
   });
   
   const invokePromise = supabase.functions.invoke('create-stripe-checkout', {
@@ -58,6 +60,7 @@ export const initiateStripeCheckout = async (params: CheckoutParams): Promise<st
       productType,
       successUrl: successUrl || defaultSuccessUrl,
       cancelUrl: cancelUrl || defaultCancelUrl,
+      upsellCredits,
     },
   });
 

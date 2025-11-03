@@ -21,6 +21,7 @@ const CheckoutRedirect = () => {
       const productType = searchParams.get('productType');
       const successUrl = searchParams.get('successUrl');
       const cancelUrl = searchParams.get('cancelUrl');
+      const upsellCredits = searchParams.get('upsellCredits');
 
       if (!priceId || !productType) {
         setError('Missing checkout information');
@@ -33,7 +34,11 @@ const CheckoutRedirect = () => {
         return;
       }
 
-      console.info('🛒 CheckoutRedirect: Starting checkout flow', { priceId, productType });
+      console.info('🛒 CheckoutRedirect: Starting checkout flow', { 
+        priceId, 
+        productType, 
+        upsellCredits: upsellCredits ? parseInt(upsellCredits) : undefined 
+      });
 
       try {
         const url = await initiateStripeCheckout({
@@ -41,6 +46,7 @@ const CheckoutRedirect = () => {
           productType: productType as any,
           successUrl,
           cancelUrl,
+          upsellCredits: upsellCredits ? parseInt(upsellCredits) : undefined,
         });
         
         // Store URL for manual redirect if automatic redirect fails
