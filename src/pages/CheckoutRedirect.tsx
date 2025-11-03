@@ -50,16 +50,31 @@ const CheckoutRedirect = () => {
     console.info('🔗 Redirecting to Stripe Payment Link:', finalUrl);
     setRedirectUrl(finalUrl);
     
-    // Immediate redirect using replace (doesn't add to history)
+    // Detect if running in iframe (like Lovable preview)
+    const inIframe = window.top !== window.self;
+    
+    if (inIframe) {
+      console.info('🖼️ Running in iframe - opening Stripe in new tab...');
+      setShowManualLink(true);
+      const newWindow = window.open(finalUrl, '_blank', 'noopener,noreferrer');
+      if (!newWindow) {
+        console.warn('⚠️ Popup blocked - showing manual button');
+      }
+      return;
+    }
+    
+    // Top-level window: immediate redirect using replace (doesn't add to history)
+    console.info('⚡ Top-level window - executing redirect...');
     const redirectTimer = setTimeout(() => {
-      console.info('⚡ Executing redirect now...');
+      console.info('🚀 Redirecting now...');
       window.location.replace(finalUrl);
     }, 50);
     
-    // Fallback: Show manual link if redirect doesn't happen within 3 seconds
+    // Fallback: Show manual link if redirect doesn't happen within 1 second
     const fallbackTimer = setTimeout(() => {
+      console.warn('⏱️ Redirect taking too long - showing manual link');
       setShowManualLink(true);
-    }, 3000);
+    }, 1000);
     
     return () => {
       clearTimeout(redirectTimer);
