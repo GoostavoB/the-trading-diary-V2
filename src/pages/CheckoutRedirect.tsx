@@ -55,6 +55,18 @@ const CheckoutRedirect = () => {
         upsellCredits: upsellCredits ? parseInt(upsellCredits) : undefined 
       });
 
+      // Detect iframe environment
+      const isInIframe = window.self !== window.top;
+      
+      // Start timeout BEFORE async call - this ensures fallback UI shows even if Edge Function hangs
+      timeoutRef.current = setTimeout(() => {
+        console.warn('⏰ Timeout fired - showing fallback UI', { 
+          isInIframe,
+          hasUrl: !!checkoutUrl 
+        });
+        setRedirectFailed(true);
+      }, isInIframe ? 1000 : 2000);
+
       try {
         const url = await initiateStripeCheckout({
           priceId,
@@ -67,15 +79,6 @@ const CheckoutRedirect = () => {
         // Store URL for manual redirect
         setCheckoutUrl(url);
         console.info('✅ Checkout URL received:', url);
-        
-        // Detect iframe environment
-        const isInIframe = window.self !== window.top;
-        
-        // Store timeout ref for cleanup
-        timeoutRef.current = setTimeout(() => {
-          console.warn('⏰ Showing manual redirect option', { isInIframe });
-          setRedirectFailed(true);
-        }, isInIframe ? 1000 : 2000);
         
       } catch (error) {
         console.error('❌ CheckoutRedirect: Checkout failed', error);
