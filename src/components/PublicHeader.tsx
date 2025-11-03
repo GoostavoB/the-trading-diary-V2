@@ -118,12 +118,6 @@ export const PublicHeader = () => {
               >
                 {t('navigation.pricing', 'Pricing')}
               </button>
-              <button
-                onClick={() => handleNavigate('/how-it-works')}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                {t('navigation.howItWorks', 'How it Works')}
-              </button>
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-1 text-gray-300 hover:text-white transition-colors focus:outline-none">
                   Resources
