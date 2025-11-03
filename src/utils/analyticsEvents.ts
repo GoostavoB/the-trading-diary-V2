@@ -69,3 +69,18 @@ export const trackLandingEvents = {
     trackEvent('track_checkout_completed', { plan, amount }),
   trackEvent: (eventName: string, properties?: Record<string, any>) => trackEvent(eventName, properties),
 };
+
+export const trackUserJourney = {
+  signupStarted: () => trackEvent('signup_started'),
+  signupCompleted: (userId: string) => trackEvent('signup_completed', { userId }),
+  planSelectionViewed: () => trackEvent('plan_selection_viewed'),
+  planSelected: (plan: string) => trackEvent('plan_selected', { plan_name: plan }),
+  checkoutStarted: (type: string, amount: number, priceId: string) => trackEvent('checkout_started', { type, amount, priceId }),
+  checkoutSuccess: (type: string, amount: number) => trackEvent('checkout_success', { type, amount }),
+  creditsChanged: (delta: number, reason: string, newBalance: number) => trackEvent('credits_changed', { delta, reason, newBalance }),
+  uploadBlockedNoCredits: () => trackEvent('upload_blocked_no_credits'),
+  paywallViewed: (feature: string) => trackEvent('paywall_viewed', { feature }),
+  upgradeClicked: (source: string) => trackEvent('upgrade_clicked', { source }),
+  creditsPurchaseViewed: () => trackEvent('credits_purchase_viewed'),
+  upgradePageViewed: () => trackEvent('upgrade_page_viewed')
+};

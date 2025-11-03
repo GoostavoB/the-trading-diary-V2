@@ -2128,9 +2128,12 @@ export type Database = {
           followers_count: number | null
           following_count: number | null
           full_name: string | null
+          gift_credits_awarded: boolean | null
           id: string
           marketing_consent: boolean | null
           onboarding_completed: boolean | null
+          plan_ends_at: string | null
+          plan_started_at: string | null
           profile_visibility: string | null
           promo_expires_at: string | null
           provider: string | null
@@ -2156,9 +2159,12 @@ export type Database = {
           followers_count?: number | null
           following_count?: number | null
           full_name?: string | null
+          gift_credits_awarded?: boolean | null
           id: string
           marketing_consent?: boolean | null
           onboarding_completed?: boolean | null
+          plan_ends_at?: string | null
+          plan_started_at?: string | null
           profile_visibility?: string | null
           promo_expires_at?: string | null
           provider?: string | null
@@ -2184,9 +2190,12 @@ export type Database = {
           followers_count?: number | null
           following_count?: number | null
           full_name?: string | null
+          gift_credits_awarded?: boolean | null
           id?: string
           marketing_consent?: boolean | null
           onboarding_completed?: boolean | null
+          plan_ends_at?: string | null
+          plan_started_at?: string | null
           profile_visibility?: string | null
           promo_expires_at?: string | null
           provider?: string | null
@@ -3710,6 +3719,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_analytics_events: {
+        Row: {
+          created_at: string | null
+          event_name: string
+          event_params: Json | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_name: string
+          event_params?: Json | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          event_name?: string
+          event_params?: Json | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_broker_preferences: {
         Row: {
           broker_name: string
@@ -4774,7 +4807,7 @@ export type Database = {
         Args: { p_amount: number; p_user_id: string }
         Returns: boolean
       }
-      deduct_upload_credit: { Args: { p_user_id: string }; Returns: boolean }
+      deduct_upload_credit: { Args: { p_user_id: string }; Returns: Json }
       get_subscription_metrics: { Args: never; Returns: Json }
       get_subscription_tier: { Args: { p_user_id: string }; Returns: string }
       get_trading_analytics: {
