@@ -63,7 +63,7 @@ export const MobileHeader = () => {
               {/* Navigation Links */}
               <nav className="space-y-2">
                 <button
-                  onClick={() => handleNavigate('/pricing')}
+                  onClick={() => (window.location.href = '/#pricing-section')}
                   className="w-full text-left px-4 py-3 text-white hover:bg-gray-800 rounded-lg transition-colors"
                 >
                   {t('navigation.pricing', 'Pricing')}

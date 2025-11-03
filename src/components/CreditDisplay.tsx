@@ -35,7 +35,7 @@ export const CreditDisplay = ({ variant = 'default', className }: CreditDisplayP
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate('/pricing')}
+            onClick={() => (window.location.href = '/#pricing-section')}
             className={cn(
               'gap-2 h-9',
               isLowCredits && 'text-destructive hover:text-destructive',

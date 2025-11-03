@@ -92,7 +92,7 @@ const Legal = lazy(() => import("./pages/Legal"));
 const Sitemap = lazy(() => import("./pages/Sitemap"));
 const About = lazy(() => import("./pages/About"));
 const SEODashboard = lazy(() => import("./pages/SEODashboard"));
-const PricingPage = lazy(() => import("./pages/PricingPage"));
+
 const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
@@ -160,7 +160,7 @@ const AppRoutes = () => {
   const isPublicPage =
     location.pathname === '/' ||
     location.pathname.startsWith('/blog') ||
-    location.pathname.startsWith('/pricing') ||
+    
     location.pathname.startsWith('/legal') ||
     location.pathname.startsWith('/terms') ||
     location.pathname.startsWith('/privacy');
@@ -204,7 +204,7 @@ const AppRoutes = () => {
         <Route path="/auth" element={<PublicPageThemeWrapper><Auth /></PublicPageThemeWrapper>} />
         
         {/* Public pages - wrapped with default theme */}
-        <Route path="/pricing" element={<PublicPageThemeWrapper><PricingPage /></PublicPageThemeWrapper>} />
+        
         
         <Route path="/contact" element={<PublicPageThemeWrapper><Contact /></PublicPageThemeWrapper>} />
         

@@ -42,7 +42,7 @@ export const UploadCreditsDisplay = () => {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => navigate('/pricing')}
+              onClick={() => (window.location.href = '/#pricing-section')}
               className="gap-1"
             >
               <Plus className="w-3 h-3" />

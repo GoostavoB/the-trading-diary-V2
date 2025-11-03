@@ -38,7 +38,7 @@ const CheckoutCancel = () => {
 
             <div className="space-y-3">
               <Button
-                onClick={() => navigate('/pricing')}
+                onClick={() => (window.location.href = '/#pricing-section')}
                 size="lg"
                 className="w-full"
               >

@@ -57,7 +57,7 @@ export const CreateAccountDialog = ({ open, onOpenChange }: CreateAccountDialogP
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (isStarterLimitReached) {
-      navigate('/pricing');
+      window.location.href = '/#pricing-section';
       onOpenChange(false);
       return;
     }

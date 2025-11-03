@@ -193,7 +193,7 @@ export const UserMenu = () => {
               variant="link"
               size="sm"
               className="w-full mt-1 h-auto p-1 text-xs"
-              onClick={() => navigate('/pricing')}
+              onClick={() => (window.location.href = '/#pricing-section')}
             >
               {balance < 5 ? 'Buy More Credits' : 'Manage Credits'}
             </Button>

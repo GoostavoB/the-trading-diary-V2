@@ -139,7 +139,7 @@ const CheckoutRedirect = () => {
                 Try Again
               </Button>
               <Button 
-                onClick={() => navigate('/pricing')}
+                onClick={() => (window.location.href = '/#pricing-section')}
                 variant="outline"
                 className="w-full"
               >
@@ -196,7 +196,7 @@ const CheckoutRedirect = () => {
                   </Button>
                 )}
                 <Button 
-                  onClick={() => navigate('/pricing')}
+                  onClick={() => (window.location.href = '/#pricing-section')}
                   variant="ghost"
                   className="w-full"
                 >
@@ -237,7 +237,7 @@ const CheckoutRedirect = () => {
                 Continue to Stripe
               </Button>
               <Button 
-                onClick={() => navigate('/pricing')}
+                onClick={() => (window.location.href = '/#pricing-section')}
                 variant="outline"
                 className="w-full"
               >
