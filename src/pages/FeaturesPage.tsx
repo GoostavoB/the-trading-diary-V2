@@ -9,6 +9,8 @@ import {
   Smartphone, Globe, Zap, FileText, Bell, Calendar,
   Target, Award, BookOpen, RefreshCw, CheckCircle, Star
 } from 'lucide-react';
+import MetaTags from '@/components/SEO/MetaTags';
+import SchemaMarkup from '@/components/SEO/SchemaMarkup';
 
 const features = [
   {
@@ -174,6 +176,13 @@ export default function FeaturesPage() {
   };
 
   return (
+    <>
+      <MetaTags
+        title="Features - The Trading Diary | Complete Trading Journal Solution"
+        description="Explore all features of The Trading Diary: AI-powered insights, advanced analytics, psychology tracking, multi-exchange integration, and gamification."
+        keywords="trading journal features, AI trading insights, trading analytics, psychology tracking, multi-exchange trading, gamified trading"
+      />
+      <SchemaMarkup type="product" />
     <AppLayout>
       <div className="max-w-7xl mx-auto space-y-16">
         {/* Hero */}
@@ -236,5 +245,6 @@ export default function FeaturesPage() {
         </Card>
       </div>
     </AppLayout>
+    </>
   );
 }

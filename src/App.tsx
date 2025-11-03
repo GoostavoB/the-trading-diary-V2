@@ -98,6 +98,7 @@ const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 const BlogArticle = lazy(() => import("./pages/BlogArticle"));
 const BlogCategory = lazy(() => import("./pages/BlogCategory"));
 const Learn = lazy(() => import("./pages/Learn"));
+const FAQPage = lazy(() => import("./pages/FAQPage"));
 const ApiDocs = lazy(() => import("./pages/ApiDocs"));
 const AdvancedAnalytics = lazy(() => import("./pages/AdvancedAnalytics"));
 // Phase 2: Social Feed - temporarily disabled for backlog #34
@@ -230,6 +231,7 @@ const AppRoutes = () => {
         <Route path="/logo-generator" element={<PublicPageThemeWrapper><LogoGenerator /></PublicPageThemeWrapper>} />
         <Route path="/calculators" element={<ProtectedRoute><Calculators /></ProtectedRoute>} />
         <Route path="/crypto-trading-faq" element={<PublicPageThemeWrapper><CryptoTradingFAQ /></PublicPageThemeWrapper>} />
+        <Route path="/faq" element={<PublicPageThemeWrapper><FAQPage /></PublicPageThemeWrapper>} />
         <Route path="/sitemap" element={<PublicPageThemeWrapper><Sitemap /></PublicPageThemeWrapper>} />
         <Route path="/about" element={<PublicPageThemeWrapper><About /></PublicPageThemeWrapper>} />
         <Route path="/seo-dashboard" element={<PublicPageThemeWrapper><SEODashboard /></PublicPageThemeWrapper>} />

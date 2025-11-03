@@ -8,6 +8,7 @@ import { setupGlobalErrorHandling } from "./utils/errorTracking";
 import { swCleanup } from "./utils/swCleanup";
 import { initPostHog } from "./lib/posthog";
 import { HelmetProvider } from "react-helmet-async";
+import { setupLazyLoading, optimizeImageLoading, addResourceHints, prefetchRoutes } from "./utils/coreWebVitals";
 
 // Set up global error tracking
 setupGlobalErrorHandling();
@@ -36,6 +37,21 @@ if (storedBuildId !== currentBuildId || forceCleanup) {
 
 // Update build ID
 localStorage.setItem('build-id', currentBuildId);
+
+// Initialize Core Web Vitals optimizations
+optimizeImageLoading();
+addResourceHints();
+
+// Setup lazy loading after DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setupLazyLoading();
+    prefetchRoutes(['/auth', '/pricing', '/blog']);
+  });
+} else {
+  setupLazyLoading();
+  prefetchRoutes(['/auth', '/pricing', '/blog']);
+}
 
 // React-Snap SSR support: hydrate if pre-rendered, render if not
 const rootElement = document.getElementById("root")!;
