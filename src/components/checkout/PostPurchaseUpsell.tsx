@@ -48,7 +48,7 @@ export const PostPurchaseUpsell = ({ onDismiss, subscriptionTier }: PostPurchase
       const priceId = 'price_1SOxyYFqnRj6eB66CnowBEBN';
       const productType = 'credits_pro';
       const successUrl = encodeURIComponent(`${window.location.origin}/dashboard?upsell=success`);
-      const cancelUrl = encodeURIComponent(`${window.location.origin}/checkout-cancel`);
+      const cancelUrl = encodeURIComponent(`${window.location.origin}/#pricing-section`);
       
       window.location.href = `/checkout?priceId=${priceId}&productType=${productType}&successUrl=${successUrl}&cancelUrl=${cancelUrl}`;
     } catch (error) {

@@ -55,9 +55,9 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/pricing" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                <a href="/#pricing-section" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                   {t('landing.footer.pricing')}
-                </Link>
+                </a>
               </li>
               <li>
                 <Link to="/faq" className="text-muted-foreground hover:text-foreground transition-colors text-sm">

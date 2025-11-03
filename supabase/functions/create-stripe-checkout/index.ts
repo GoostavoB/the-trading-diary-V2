@@ -61,13 +61,17 @@ serve(async (req) => {
       }
     )
 
-    // Get the user
-    const {
-      data: { user },
-    } = await supabaseClient.auth.getUser()
-
-    if (!user) {
-      throw new Error('No user found')
+    // Try to identify the user (optional)
+    let user: any = null
+    try {
+      const { data, error } = await supabaseClient.auth.getUser()
+      if (error) {
+        console.warn('Auth getUser error (non-blocking):', error.message)
+      } else {
+        user = data?.user ?? null
+      }
+    } catch (e) {
+      console.warn('Auth check failed (non-blocking)', e)
     }
 
     const { priceId, productType, successUrl, cancelUrl, upsellCredits } = await req.json()
@@ -77,8 +81,8 @@ serve(async (req) => {
     }
 
     console.log('Creating checkout session for:', {
-      userId: user.id,
-      email: user.email,
+      userId: user?.id || 'guest',
+      email: user?.email || 'guest',
       priceId,
       productType,
     })
@@ -105,14 +109,14 @@ serve(async (req) => {
 
     // Determine session configuration based on product type
     let sessionConfig: any = {
-      customer_email: user.email,
-      client_reference_id: user.id,
+      customer_email: user?.email,
+      client_reference_id: user?.id,
       line_items: lineItems,
       mode: 'payment', // Default to payment mode
       success_url: successUrl || `${Deno.env.get('FRONTEND_URL')}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancelUrl || `${Deno.env.get('FRONTEND_URL')}/pricing`,
+      cancel_url: cancelUrl || `${Deno.env.get('FRONTEND_URL')}/#pricing-section`,
       metadata: {
-        user_id: user.id,
+        user_id: user?.id || '',
         product_type: productType,
         upsell_credits: upsellCredits || 0,
       },
@@ -127,7 +131,7 @@ serve(async (req) => {
         // Enable customer portal access for subscriptions
         sessionConfig.subscription_data = {
           metadata: {
-            user_id: user.id,
+            user_id: user?.id || '',
           },
         }
         break

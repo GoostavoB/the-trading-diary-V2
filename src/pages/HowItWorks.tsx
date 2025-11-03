@@ -134,7 +134,7 @@ export default function HowItWorks() {
               <Link to="/auth">Start Free Trial</Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link to="/pricing">View Pricing</Link>
+              <a href="/#pricing-section">View Pricing</a>
             </Button>
           </div>
         </Card>

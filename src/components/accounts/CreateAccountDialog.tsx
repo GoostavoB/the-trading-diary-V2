@@ -82,7 +82,7 @@ export const CreateAccountDialog = ({ open, onOpenChange }: CreateAccountDialogP
           toast.error('Starter supports 1 account. Upgrade to Pro for unlimited accounts.', {
             action: {
               label: 'Upgrade',
-              onClick: () => navigate('/pricing'),
+              onClick: () => (window.location.href = '/#pricing-section'),
             },
           });
           onOpenChange(false);
@@ -122,7 +122,7 @@ export const CreateAccountDialog = ({ open, onOpenChange }: CreateAccountDialogP
               <p className="text-sm text-muted-foreground mb-4">
                 Upgrade to Pro for unlimited accounts.
               </p>
-              <Button onClick={() => navigate('/pricing')} className="w-full">
+              <Button onClick={() => (window.location.href = '/#pricing-section')} className="w-full">
                 Upgrade to Pro
               </Button>
             </div>

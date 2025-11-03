@@ -46,7 +46,7 @@ export const initiateStripeCheckout = async (params: CheckoutParams): Promise<st
   // Set default URLs if not provided
   const frontendUrl = window.location.origin;
   const defaultSuccessUrl = `${frontendUrl}/checkout-success?session_id={CHECKOUT_SESSION_ID}`;
-  const defaultCancelUrl = `${frontendUrl}/checkout-cancel`;
+  const defaultCancelUrl = `${frontendUrl}/#pricing-section`;
 
   // Call Edge Function to create Stripe checkout session
   // Build request body - only include upsellCredits if defined

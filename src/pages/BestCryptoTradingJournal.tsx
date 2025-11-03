@@ -247,9 +247,9 @@ export default function BestCryptoTradingJournal() {
                     <span>$2 per 10 extra uploads</span>
                   </li>
                 </ul>
-                <Link to="/pricing">
+                <a href="/#pricing-section">
                   <Button className="w-full">Get Pro</Button>
-                </Link>
+                </a>
               </Card>
 
               <Card className="p-6">
@@ -273,9 +273,9 @@ export default function BestCryptoTradingJournal() {
                     <span>No extra costs</span>
                   </li>
                 </ul>
-                <Link to="/pricing">
+                <a href="/#pricing-section">
                   <Button variant="outline" className="w-full">Get Elite</Button>
-                </Link>
+                </a>
               </Card>
             </div>
           </div>

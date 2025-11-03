@@ -590,7 +590,7 @@ const Upload = () => {
             description: 'You need at least 1 credit to extract trades. Purchase more credits or upgrade your plan.',
             action: {
               label: 'Get Credits',
-              onClick: () => navigate('/pricing')
+              onClick: () => (window.location.href = '/#pricing-section')
             }
           });
         } else if (status === 429 || /rate limit/i.test(errMsg)) {
@@ -600,7 +600,7 @@ const Upload = () => {
             duration: 6000,
             action: {
               label: 'Upgrade',
-              onClick: () => navigate('/pricing')
+              onClick: () => (window.location.href = '/#pricing-section')
             }
           });
         } else if (/timeout/i.test(errMsg)) {
