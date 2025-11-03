@@ -64,3 +64,6 @@ verify_jwt = true
 
 [functions.create-stripe-checkout]
 verify_jwt = false
+
+[functions.get-stripe-session]
+verify_jwt = false
