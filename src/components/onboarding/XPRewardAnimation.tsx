@@ -1,14 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import confetti from 'canvas-confetti';
+import { toast } from 'sonner';
+import { useGamificationHaptics } from '@/hooks/useGamificationHaptics';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Trophy, Zap } from 'lucide-react';
-import confetti from 'canvas-confetti';
 
 interface XPRewardAnimationProps {
   xpAmount: number;
   message: string;
   isVisible: boolean;
   onComplete: () => void;
-  type?: 'normal' | 'milestone' | 'unlock';
+  type?: 'normal' | 'milestone' | 'unlock' | 'first_upload';
 }
 
 export function XPRewardAnimation({ 
@@ -18,11 +20,36 @@ export function XPRewardAnimation({
   onComplete,
   type = 'normal'
 }: XPRewardAnimationProps) {
-  const [showDetails, setShowDetails] = useState(false);
+  const { onXPGain, onFirstUpload } = useGamificationHaptics();
 
   useEffect(() => {
     if (isVisible) {
-      // Trigger confetti based on type
+      // First upload celebration: short confetti + haptic
+      if (type === 'first_upload') {
+        confetti({
+          particleCount: 40,
+          spread: 60,
+          origin: { y: 0.6 },
+          colors: ['#10b981', '#3b82f6'],
+        });
+        
+        onFirstUpload();
+        
+        // Show non-blocking toast
+        toast.success('Nice! First upload complete 🎉', {
+          description: 'Want to see your stats?',
+          action: {
+            label: 'View Dashboard',
+            onClick: () => window.location.href = '/dashboard'
+          },
+          duration: 4000,
+        });
+        
+        setTimeout(onComplete, 2000);
+        return;
+      }
+
+      // Regular XP gains: confetti based on type
       const confettiConfig = {
         particleCount: type === 'unlock' ? 150 : type === 'milestone' ? 100 : 50,
         spread: type === 'unlock' ? 100 : 70,
@@ -33,18 +60,13 @@ export function XPRewardAnimation({
       };
       
       confetti(confettiConfig);
-
-      // Show details after initial animation
-      setTimeout(() => setShowDetails(true), 500);
+      onXPGain(xpAmount);
 
       // Auto-close after delay
-      const timer = setTimeout(() => {
-        onComplete();
-      }, 3500);
-
+      const timer = setTimeout(onComplete, 3500);
       return () => clearTimeout(timer);
     }
-  }, [isVisible, type, onComplete]);
+  }, [isVisible, type, onComplete, xpAmount, onXPGain, onFirstUpload]);
 
   const getIcon = () => {
     switch (type) {
@@ -56,6 +78,11 @@ export function XPRewardAnimation({
         return <Sparkles className="w-12 h-12 text-primary" />;
     }
   };
+
+  // First upload uses toast, so don't render overlay
+  if (type === 'first_upload') {
+    return null;
+  }
 
   return (
     <AnimatePresence>
@@ -129,58 +156,27 @@ export function XPRewardAnimation({
               </motion.div>
 
               {/* Message */}
-              <AnimatePresence>
-                {showDetails && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="space-y-2"
-                  >
-                    <p className="text-lg font-semibold">
-                      {message}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Keep going to unlock more insights and tools.
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="space-y-2"
+              >
+                <p className="text-lg font-semibold">
+                  {message}
+                </p>
+              </motion.div>
 
               {/* Tap to continue hint */}
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1.5 }}
+                transition={{ delay: 1 }}
                 className="text-xs text-muted-foreground pt-4"
               >
                 Tap anywhere to continue
               </motion.p>
             </div>
-
-            {/* Particles floating around */}
-            {[...Array(6)].map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ 
-                  x: 0, 
-                  y: 0, 
-                  opacity: 0,
-                  scale: 0
-                }}
-                animate={{ 
-                  x: Math.cos(i * 60 * Math.PI / 180) * 100,
-                  y: Math.sin(i * 60 * Math.PI / 180) * 100,
-                  opacity: [0, 1, 0],
-                  scale: [0, 1, 0]
-                }}
-                transition={{ 
-                  duration: 1.5,
-                  repeat: Infinity,
-                  delay: i * 0.2
-                }}
-                className="absolute top-1/2 left-1/2 w-3 h-3 bg-primary/60 rounded-full blur-sm"
-              />
-            ))}
           </motion.div>
         </motion.div>
       )}

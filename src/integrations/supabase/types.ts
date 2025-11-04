@@ -2119,12 +2119,14 @@ export type Database = {
         Row: {
           accepted_privacy_at: string | null
           accepted_terms_at: string | null
+          activation_source: string | null
           avatar_url: string | null
           bio: string | null
           country: string | null
           created_at: string | null
           credits_balance: number | null
           email: string | null
+          first_upload_at: string | null
           followers_count: number | null
           following_count: number | null
           full_name: string | null
@@ -2150,12 +2152,14 @@ export type Database = {
         Insert: {
           accepted_privacy_at?: string | null
           accepted_terms_at?: string | null
+          activation_source?: string | null
           avatar_url?: string | null
           bio?: string | null
           country?: string | null
           created_at?: string | null
           credits_balance?: number | null
           email?: string | null
+          first_upload_at?: string | null
           followers_count?: number | null
           following_count?: number | null
           full_name?: string | null
@@ -2181,12 +2185,14 @@ export type Database = {
         Update: {
           accepted_privacy_at?: string | null
           accepted_terms_at?: string | null
+          activation_source?: string | null
           avatar_url?: string | null
           bio?: string | null
           country?: string | null
           created_at?: string | null
           credits_balance?: number | null
           email?: string | null
+          first_upload_at?: string | null
           followers_count?: number | null
           following_count?: number | null
           full_name?: string | null
@@ -2360,6 +2366,36 @@ export type Database = {
           sections?: string[]
           status?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reward_events: {
+        Row: {
+          claimed_at: string | null
+          event_type: string
+          expires_at: string | null
+          id: string
+          reward_value: Json
+          triggered_at: string
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          event_type: string
+          expires_at?: string | null
+          id?: string
+          reward_value: Json
+          triggered_at?: string
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string | null
+          event_type?: string
+          expires_at?: string | null
+          id?: string
+          reward_value?: Json
+          triggered_at?: string
           user_id?: string
         }
         Relationships: []

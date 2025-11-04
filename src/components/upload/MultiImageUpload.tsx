@@ -12,10 +12,12 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronDown } from 'lucide-react';
 import { PreAnalysisConfirmDialog } from './PreAnalysisConfirmDialog';
 import { CreditPurchaseDialog } from './CreditPurchaseDialog';
-import { UploadCreditsGate } from '@/components/upload/UploadCreditsGate';
 import { runOCR } from '@/utils/ocrPipeline';
 import { uploadLogger } from '@/utils/uploadLogger';
 import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { trackPaywallShown } from '@/lib/analytics';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface UploadedImage {
   file: File;
@@ -43,11 +45,8 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
   const [batchBroker, setBatchBroker] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const credits = useUploadCredits();
-  
-  // Check if user has no credits and can't upload
-  if (!credits.isLoading && (!credits.canUpload || credits.balance <= 0)) {
-    return <UploadCreditsGate />;
-  }
+  const { user } = useAuth();
+  const canUpload = !credits.isLoading && credits.canUpload && credits.balance > 0;
 
   const processFiles = (files: File[]) => {
     uploadLogger.fileSelection(`Processing ${files.length} files`, { fileCount: files.length });
@@ -496,34 +495,52 @@ export function MultiImageUpload({ onTradesExtracted }: MultiImageUploadProps) {
             </Card>
           ))}
 
-          {/* Upload button */}
-          <label className="cursor-pointer">
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFileSelect}
-              className="hidden"
-              disabled={isAnalyzing}
-            />
-            <Card className={cn(
-              "aspect-square flex flex-col items-center justify-center transition-all duration-200",
-              isDragging
-                ? "bg-primary/10 border-primary"
-                : "hover:bg-accent/50"
-            )}>
-              <Upload className={cn(
-                "h-8 w-8 mb-2 transition-colors",
-                isDragging ? "text-primary" : "text-muted-foreground"
-              )} />
-              <p className={cn(
-                "text-sm text-center px-4 transition-colors",
-                isDragging ? "text-primary font-medium" : "text-muted-foreground"
-              )}>
-                {isDragging ? "Drop images here" : "Click or drag to upload"}
-              </p>
-            </Card>
-          </label>
+          {/* Upload button - with soft paywall */}
+          <TooltipProvider>
+            <Tooltip open={!canUpload}>
+              <TooltipTrigger asChild>
+                <div>
+                  <label 
+                    className={`cursor-pointer ${!canUpload ? 'opacity-40 pointer-events-none' : ''}`}
+                    onClick={() => {
+                      if (!canUpload && user) {
+                        trackPaywallShown(user.id, 'soft');
+                      }
+                    }}
+                  >
+                    <input
+                      type="file"
+                      disabled={!canUpload}
+                      accept="image/*"
+                      multiple
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                    <Card className={cn(
+                      "aspect-square flex flex-col items-center justify-center transition-all duration-200",
+                      isDragging
+                        ? "bg-primary/10 border-primary"
+                        : "hover:bg-accent/50"
+                    )}>
+                      <Upload className={cn(
+                        "h-8 w-8 mb-2 transition-colors",
+                        isDragging ? "text-primary" : "text-muted-foreground"
+                      )} />
+                      <p className={cn(
+                        "text-sm text-center px-4 transition-colors",
+                        isDragging ? "text-primary font-medium" : "text-muted-foreground"
+                      )}>
+                        {isDragging ? "Drop images here" : "Click or drag to upload"}
+                      </p>
+                    </Card>
+                  </label>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Used {credits.balance} uploads. <a href="/upgrade" className="underline">Upgrade to Pro</a> for 30/month + bonuses.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
         {/* Drag overlay */}

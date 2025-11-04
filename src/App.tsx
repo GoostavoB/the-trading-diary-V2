@@ -206,8 +206,7 @@ const AppRoutes = () => {
         {/* Auth routes - wrapped with default theme */}
         <Route path="/auth" element={<PublicPageThemeWrapper><Auth /></PublicPageThemeWrapper>} />
         
-        {/* Plan selection & upgrade routes */}
-        <Route path="/select-plan" element={<ProtectedRoute><SelectPlan /></ProtectedRoute>} />
+        {/* Upgrade routes */}
         <Route path="/upgrade" element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
         <Route path="/credits/purchase" element={<ProtectedRoute><CreditsPurchase /></ProtectedRoute>} />
         

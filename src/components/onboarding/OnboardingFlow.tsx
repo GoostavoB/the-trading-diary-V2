@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ArrowRight, Upload, TrendingUp, Trophy, Sparkles } from 'lucide-react';
+import { ArrowRight, Gift, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
 interface OnboardingFlowProps {
   open: boolean;
@@ -14,30 +15,26 @@ interface OnboardingFlowProps {
 export const OnboardingFlow = ({ open, onComplete }: OnboardingFlowProps) => {
   const [step, setStep] = useState(0);
   const { user } = useAuth();
+  const { success } = useHapticFeedback();
+
+  // Trigger haptic feedback on step 0 (welcome)
+  useEffect(() => {
+    if (open && step === 0) {
+      success();
+    }
+  }, [open, step, success]);
 
   const steps = [
     {
-      icon: Sparkles,
-      title: "Welcome to The Trading Diary!",
-      description: "Track trades, level up with XP, and master your trading discipline.",
-      buttonText: "Let's Get Started"
+      icon: Gift,
+      title: "Welcome! 🎁",
+      description: "You got 5 free uploads to start your trading journey.",
+      buttonText: "Let's Go"
     },
     {
-      icon: Upload,
-      title: "Upload Your First Trade",
-      description: "Import trades from CSV or add them manually. Start building your trading history.",
-      buttonText: "Got It"
-    },
-    {
-      icon: Trophy,
-      title: "Earn XP & Level Up",
-      description: "Every trade, journal entry, and daily login earns you XP. Unlock new widgets and features as you level up.",
-      buttonText: "Awesome"
-    },
-    {
-      icon: TrendingUp,
-      title: "Track Your Progress",
-      description: "View detailed analytics, set goals, and track your performance across all exchanges.",
+      icon: ArrowRight,
+      title: "Try it now",
+      description: "Upload your first trade and see the magic happen.",
       buttonText: "Start Trading"
     }
   ];
