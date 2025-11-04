@@ -21,6 +21,7 @@ interface ImageQueueItem {
   preview: string;
   status: 'queued' | 'processing' | 'success' | 'error';
   quality?: 'high' | 'medium' | 'low';
+  progress?: number;
   trades?: ExtractedTrade[];
   error?: string;
 }
@@ -61,7 +62,7 @@ export function SmartUpload({ onTradesExtracted, onShowAnnotator, maxImages = 10
         }
 
         const variance = sum / (data.length / 4);
-        const isBlurry = variance < 50; // Hard block only if extremely blurry
+        const isBlurry = variance < 100; // Hard block only if extremely blurry
         resolve(isBlurry);
       };
 
@@ -207,9 +208,23 @@ export function SmartUpload({ onTradesExtracted, onShowAnnotator, maxImages = 10
       // Update status to processing
       setImageQueue((prev) => {
         const updated = [...prev];
-        updated[i] = { ...updated[i], status: 'processing' };
+        updated[i] = { ...updated[i], status: 'processing', progress: 0 };
         return updated;
       });
+
+      // Simulate progress animation
+      const progressInterval = setInterval(() => {
+        setImageQueue((prev) => {
+          const updated = [...prev];
+          if (updated[i] && updated[i].progress !== undefined && updated[i].status === 'processing') {
+            updated[i] = { 
+              ...updated[i], 
+              progress: Math.min((updated[i].progress || 0) + 10, 90) 
+            };
+          }
+          return updated;
+        });
+      }, 300);
 
       try {
         // Convert file to base64
@@ -236,12 +251,19 @@ export function SmartUpload({ onTradesExtracted, onShowAnnotator, maxImages = 10
 
         const trades = data.trades || [];
         
+        // Determine quality by calculating variance
+        const variance = await getImageVariance(item.file);
+        const quality = variance > 1000 ? 'high' : variance > 500 ? 'medium' : 'low';
+        
         // Update status to success
+        clearInterval(progressInterval);
         setImageQueue((prev) => {
           const updated = [...prev];
           updated[i] = { 
             ...updated[i], 
             status: 'success',
+            quality,
+            progress: 100,
             trades,
           };
           return updated;
@@ -254,11 +276,13 @@ export function SmartUpload({ onTradesExtracted, onShowAnnotator, maxImages = 10
         console.error('Extraction error:', error);
         
         // Update status to error
+        clearInterval(progressInterval);
         setImageQueue((prev) => {
           const updated = [...prev];
           updated[i] = { 
             ...updated[i], 
             status: 'error',
+            progress: 0,
             error: error.message || 'Failed to extract',
           };
           return updated;
@@ -339,194 +363,181 @@ export function SmartUpload({ onTradesExtracted, onShowAnnotator, maxImages = 10
         </p>
       </div>
 
-      {/* Drop Zone - Premium with Maximum Contrast */}
+      {/* Drop Zone - Clean Premium Design */}
       {!hasQueuedImages && (
         <div className="relative group">
-          {/* Background glow on hover */}
-          <div className="absolute -inset-4 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-blue-600/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           
-          {/* Main drop zone */}
           <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
             className={cn(
-              "relative rounded-2xl p-16 text-center cursor-pointer",
-              "border-[3px] border-dashed transition-all duration-300",
-              "bg-gradient-to-br from-muted/50 to-muted/30",
+              "relative rounded-xl p-12 text-center cursor-pointer",
+              "border-2 border-dashed transition-all duration-300",
+              "bg-muted/30",
               isDragging 
-                ? "border-purple-500 bg-purple-500/10 scale-105 shadow-2xl shadow-purple-500/50" 
-                : "border-border/50 hover:border-purple-500/50 hover:bg-muted/60"
+                ? "border-blue-500 bg-blue-500/10 scale-[1.02]" 
+                : "border-border/50 hover:border-blue-500/50"
             )}
           >
-            {/* Upload icon - HUGE */}
-            <div className="mb-6">
-              <Upload 
-                className="w-24 h-24 mx-auto text-foreground/70 group-hover:text-purple-500 transition-colors duration-300" 
-                strokeWidth={1.5} 
-              />
-            </div>
+            <Upload className="w-8 h-8 mx-auto mb-4 text-muted-foreground" />
             
-            {/* Text - MAXIMUM CONTRAST */}
-            <h3 className="text-3xl font-bold mb-3 text-foreground">
-              {isDragging ? "Drop your files here" : "Drag & drop or click to upload"}
-            </h3>
-            
-            <p className="text-lg text-foreground/70 font-medium mb-8">
-              PNG, JPG, WEBP up to 10MB each
+            <p className="text-sm text-foreground mb-1">
+              <span className="text-blue-500 font-medium">Choose a file</span>
+              <span className="text-muted-foreground mx-2">or</span>
+              <span className="text-muted-foreground">drag and drop</span>
             </p>
             
-            {/* Feature badges */}
-            <div className="flex items-center justify-center gap-6 text-sm flex-wrap">
-              <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-green-500" />
-                <span className="font-medium text-foreground/80">All exchanges supported</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-green-500" />
-                <span className="font-medium text-foreground/80">Up to 10 trades per image</span>
-              </div>
-            </div>
+            <p className="text-xs text-muted-foreground">
+              PNG, JPG, WEBP formats, up to 10 MB
+            </p>
           </div>
         </div>
       )}
 
-      {/* Image Grid - Premium */}
+      {/* Image List - Premium */}
       {hasQueuedImages && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            <AnimatePresence>
-              {imageQueue.map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.8, y: -20 }}
-                  transition={{ 
-                    delay: index * 0.1,
-                    type: "spring",
-                    stiffness: 200,
-                    damping: 20
-                  }}
-                  className="relative group"
-                >
-                  {/* Card with premium styling */}
-                  <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-muted to-muted/50 border-2 border-border/50 group-hover:border-purple-500/50 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-purple-500/20">
-                    {/* Image */}
-                    <img
-                      src={item.preview}
-                      alt={`Upload ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                    
-                    {/* Status Overlay with Premium Styling */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex flex-col items-center justify-end p-4">
-                      {item.status === 'queued' && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="flex flex-col items-center gap-2"
-                        >
-                          <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                            <ImagePlus className="w-5 h-5 text-white" />
-                          </div>
-                          <span className="text-xs font-semibold text-white">Ready</span>
-                        </motion.div>
-                      )}
-                      
-                      {item.status === 'processing' && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="flex flex-col items-center gap-2"
-                        >
-                          <div className="w-10 h-10 rounded-full bg-purple-500/20 backdrop-blur-sm flex items-center justify-center">
-                            <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
-                          </div>
-                          <span className="text-xs font-semibold text-purple-300">Analyzing...</span>
-                        </motion.div>
-                      )}
-                      
-                      {item.status === 'success' && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ type: "spring", stiffness: 300 }}
-                          className="flex flex-col items-center gap-2"
-                        >
-                          <div className="w-10 h-10 rounded-full bg-green-500/20 backdrop-blur-sm flex items-center justify-center">
-                            <Check className="w-6 h-6 text-green-500" />
-                          </div>
-                          <span className="text-xs font-bold text-green-400">
-                            {item.trades?.length || 0} trades found
-                          </span>
-                        </motion.div>
-                      )}
-                      
-                      {item.status === 'error' && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="flex flex-col items-center gap-2"
-                        >
-                          <div className="w-10 h-10 rounded-full bg-red-500/20 backdrop-blur-sm flex items-center justify-center">
-                            <AlertCircle className="w-5 h-5 text-red-400" />
-                          </div>
-                          <span className="text-xs font-semibold text-red-400">Failed</span>
-                        </motion.div>
-                      )}
+        <div className="space-y-4">
+          <AnimatePresence>
+            {imageQueue.map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                transition={{ 
+                  delay: index * 0.05,
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 20
+                }}
+                className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 border border-border/50 hover:border-blue-500/30 transition-colors group"
+              >
+                <div className="relative flex-shrink-0 w-16 h-16 rounded-lg bg-muted overflow-hidden">
+                  <img src={item.preview} alt="" className="w-full h-full object-cover" />
+                  
+                  {item.status === 'queued' && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-blue-600/20 backdrop-blur-[2px] flex flex-col items-center justify-center gap-1">
+                      <ImagePlus className="w-5 h-5 text-primary" />
+                      <span className="text-[10px] font-bold text-primary">READY</span>
                     </div>
-
-                    {/* Quality Indicator */}
-                    {item.quality && (
-                      <div className="absolute top-2 left-2">
-                        <div className={cn(
-                          "quality-indicator",
-                          item.quality === 'high' && "quality-high",
-                          item.quality === 'medium' && "quality-medium",
-                          item.quality === 'low' && "quality-low"
-                        )}>
-                          <span className="text-xs uppercase font-bold">{item.quality}</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Remove Button - Premium */}
-                    {!processing && (
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => removeImage(index)}
-                        className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-sm flex items-center justify-center transition-colors group/btn"
+                  )}
+                  
+                  {item.status === 'processing' && (
+                    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center">
+                      <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+                    </div>
+                  )}
+                  
+                  {item.status === 'success' && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-emerald-600/20 backdrop-blur-[2px] flex items-center justify-center">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 300 }}
                       >
-                        <X className="w-4 h-4 text-white group-hover/btn:text-red-400 transition-colors" />
-                      </motion.button>
-                    )}
+                        <Check className="w-6 h-6 text-green-500" />
+                      </motion.div>
+                    </div>
+                  )}
+                  
+                  {item.status === 'error' && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-red-500/20 to-rose-600/20 backdrop-blur-[2px] flex items-center justify-center">
+                      <AlertCircle className="w-6 h-6 text-red-500" />
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate mb-1">
+                    {item.file.name}
+                  </p>
+                  
+                  <p className="text-xs text-muted-foreground mb-2">
+                    {(item.file.size / (1024 * 1024)).toFixed(2)} MB
+                    {item.status === 'processing' && ' • Analyzing...'}
+                    {item.status === 'success' && ' • Completed'}
+                    {item.status === 'error' && ' • Failed'}
+                  </p>
+                  
+                  {item.status === 'processing' && item.progress !== undefined && (
+                    <>
+                      <div className="h-1 bg-muted rounded-full overflow-hidden mb-1">
+                        <motion.div 
+                          className="h-full bg-blue-500"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${item.progress}%` }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      </div>
+                      <p className="text-xs text-blue-500 font-medium">
+                        {item.progress}%
+                      </p>
+                    </>
+                  )}
+                  
+                  {item.status === 'success' && item.trades && (
+                    <p className="text-xs text-green-500 font-medium">
+                      ✓ {item.trades.length} trade{item.trades.length !== 1 ? 's' : ''} found
+                    </p>
+                  )}
+                  
+                  {item.status === 'error' && item.error && (
+                    <p className="text-xs text-red-500 font-medium">
+                      {item.error}
+                    </p>
+                  )}
+                </div>
+                
+                {item.quality && item.quality !== 'high' && (
+                  <div className={cn(
+                    "quality-indicator flex-shrink-0",
+                    item.quality === 'medium' && "quality-medium",
+                    item.quality === 'low' && "quality-low"
+                  )}>
+                    <span className="text-xs uppercase font-bold">{item.quality}</span>
                   </div>
-                </motion.div>
-              ))}
+                )}
+                
+                {!processing && item.status === 'queued' && (
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => removeImage(index)}
+                    className="flex-shrink-0 w-8 h-8 rounded-full bg-muted hover:bg-destructive/20 flex items-center justify-center transition-colors"
+                  >
+                    <X className="w-4 h-4 text-muted-foreground hover:text-destructive" />
+                  </motion.button>
+                )}
+                
+                {item.status === 'success' && (
+                  <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                )}
+                {item.status === 'error' && (
+                  <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
+          
+          {imageQueue.length < maxImages && !processing && (
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full p-4 rounded-xl border-2 border-dashed border-border/50 hover:border-blue-500/50 bg-muted/20 hover:bg-muted/40 flex items-center justify-center gap-2 transition-all group"
+            >
+              <Plus className="w-5 h-5 text-muted-foreground group-hover:text-blue-500 transition-colors" />
+              <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                Add More Images
+              </span>
+            </motion.button>
+          )}
 
-              {/* Add More Card */}
-              {imageQueue.length < maxImages && !processing && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: imageQueue.length * 0.1 }}
-                  onClick={() => fileInputRef.current?.click()}
-                  className="aspect-square rounded-2xl border-2 border-dashed border-border/50 hover:border-purple-500/50 bg-muted/30 hover:bg-muted/50 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group"
-                >
-                  <Plus className="w-12 h-12 text-muted-foreground group-hover:text-purple-500 transition-colors mb-2" />
-                  <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
-                    Add More
-                  </span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Broker Select (Optional) */}
-          <div className="flex items-center gap-4">
+          {/* Broker Select */}
+          <div className="flex items-center gap-4 pt-2">
             <BrokerSelect
               value={broker}
               onChange={setBroker}
