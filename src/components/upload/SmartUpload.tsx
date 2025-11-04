@@ -309,12 +309,12 @@ export function SmartUpload({ onTradesExtracted, onShowAnnotator, maxImages = 10
 
   return (
     <div className="space-y-6">
-      {/* Hero Section - Premium */}
-      <div className="text-center mb-12">
-        {/* Massive Animated Icon with Particles */}
-        <div className="relative mb-8 inline-flex items-center justify-center">
-          {/* Floating particles background */}
-          <div className="absolute inset-0 -z-10">
+      {/* Hero Section - Mobile Optimized Premium */}
+      <div className="text-center mb-8 md:mb-12 px-4">
+        {/* Animated Icon - Responsive */}
+        <div className="relative mb-6 md:mb-8 inline-flex items-center justify-center">
+          {/* Floating particles - hidden on mobile */}
+          <div className="absolute inset-0 -z-10 hidden md:block">
             <div className="particle-float particle-1" />
             <div className="particle-float particle-2" />
             <div className="particle-float particle-3" />
@@ -324,46 +324,46 @@ export function SmartUpload({ onTradesExtracted, onShowAnnotator, maxImages = 10
           {/* Outer glow ring */}
           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 opacity-20 blur-3xl scale-150 animate-pulse-slow" />
           
-          {/* Inner gradient circle */}
-          <div className="relative w-32 h-32 rounded-full bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 p-1 shadow-2xl">
+          {/* Inner gradient circle - responsive size */}
+          <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 p-1 shadow-2xl">
             <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-              <Sparkles className="w-20 h-20 text-transparent bg-clip-text bg-gradient-to-br from-purple-400 to-blue-400" strokeWidth={1.5} />
+              <Sparkles className="w-14 h-14 md:w-20 md:h-20 text-transparent bg-clip-text bg-gradient-to-br from-purple-400 to-blue-400" strokeWidth={1.5} />
             </div>
           </div>
           
-          {/* Rotating ring */}
+          {/* Rotating ring - hidden on mobile for performance */}
           <div 
-            className="absolute inset-0 rounded-full border-2 border-transparent bg-gradient-to-br from-purple-500 to-blue-500 opacity-30 animate-spin-slow" 
+            className="absolute inset-0 rounded-full border-2 border-transparent bg-gradient-to-br from-purple-500 to-blue-500 opacity-30 animate-spin-slow hidden md:block" 
             style={{ clipPath: 'polygon(0 0, 100% 0, 100% 50%, 0 50%)' }}
           />
         </div>
 
-        {/* Title - MASSIVE and READABLE */}
-        <h1 className="text-5xl md:text-6xl font-black mb-4 tracking-tight">
+        {/* Title - Responsive */}
+        <h1 className="text-3xl md:text-5xl lg:text-6xl font-black mb-3 md:mb-4 tracking-tight">
           <span className="bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent drop-shadow-2xl">
             AI Trade Extraction
           </span>
         </h1>
 
-        {/* Subtitle - Clear white text */}
-        <p className="text-xl md:text-2xl font-medium text-foreground/90 mb-2">
+        {/* Subtitle - Responsive */}
+        <p className="text-base md:text-xl lg:text-2xl font-medium text-foreground/90 mb-2">
           Upload 1-{maxImages} screenshots. Extract everything.
         </p>
 
-        {/* Trust line */}
-        <p className="text-sm text-muted-foreground flex items-center justify-center gap-2 flex-wrap">
+        {/* Trust line - Stack on mobile */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-xs md:text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold">
             <Sparkles className="w-3 h-3" />
             95%+ Accuracy
           </span>
-          <span className="text-muted-foreground/60">•</span>
+          <span className="hidden sm:inline text-muted-foreground/60">•</span>
           <span>5-10s per image</span>
-          <span className="text-muted-foreground/60">•</span>
+          <span className="hidden sm:inline text-muted-foreground/60">•</span>
           <span>Trusted by 10,000+ traders</span>
-        </p>
+        </div>
       </div>
 
-      {/* Drop Zone - Clean Premium Design */}
+      {/* Drop Zone - Mobile-First Design */}
       {!hasQueuedImages && (
         <div className="relative group">
           <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-blue-600/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -374,24 +374,24 @@ export function SmartUpload({ onTradesExtracted, onShowAnnotator, maxImages = 10
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
             className={cn(
-              "relative rounded-xl p-12 text-center cursor-pointer",
+              "relative rounded-xl p-8 md:p-12 text-center cursor-pointer min-h-[180px] md:min-h-[220px]",
               "border-2 border-dashed transition-all duration-300",
-              "bg-muted/30",
+              "bg-muted/30 flex flex-col items-center justify-center",
               isDragging 
                 ? "border-blue-500 bg-blue-500/10 scale-[1.02]" 
-                : "border-border/50 hover:border-blue-500/50"
+                : "border-border/50 hover:border-blue-500/50 active:scale-[0.98]"
             )}
           >
-            <Upload className="w-8 h-8 mx-auto mb-4 text-muted-foreground" />
+            <Upload className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-3 md:mb-4 text-muted-foreground" />
             
-            <p className="text-sm text-foreground mb-1">
-              <span className="text-blue-500 font-medium">Choose a file</span>
-              <span className="text-muted-foreground mx-2">or</span>
-              <span className="text-muted-foreground">drag and drop</span>
+            <p className="text-sm md:text-base text-foreground mb-1">
+              <span className="text-blue-500 font-medium">Tap to select</span>
+              <span className="text-muted-foreground mx-2 hidden md:inline">or</span>
+              <span className="text-muted-foreground hidden md:inline">drag and drop</span>
             </p>
             
             <p className="text-xs text-muted-foreground">
-              PNG, JPG, WEBP formats, up to 10 MB
+              PNG, JPG, WEBP • Max 10 MB
             </p>
           </div>
         </div>
@@ -564,47 +564,51 @@ export function SmartUpload({ onTradesExtracted, onShowAnnotator, maxImages = 10
             </motion.div>
           )}
 
-          {/* Action Buttons - Premium */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-6 border-t">
-            <div className="text-sm">
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50">
-                <span className="font-bold text-lg text-foreground">{imageQueue.length}</span>
-                <span className="text-muted-foreground">
+          {/* Action Buttons - Mobile Optimized */}
+          <div className="flex flex-col gap-4 pt-6 border-t border-border/50">
+            {/* Info Badge - Mobile */}
+            <div className="flex items-center justify-center md:justify-start">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 text-sm">
+                <span className="font-bold text-base md:text-lg text-foreground">{imageQueue.length}</span>
+                <span className="text-muted-foreground text-xs md:text-sm">
                   image{imageQueue.length !== 1 ? 's' : ''} • {imageQueue.length} credit{imageQueue.length !== 1 ? 's' : ''}
                 </span>
               </span>
             </div>
-            <div className="flex items-center gap-3">
+            
+            {/* Buttons - Stack on mobile */}
+            <div className="flex flex-col sm:flex-row items-stretch gap-3">
               {!processing && (
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   onClick={clearAll}
                   disabled={imageQueue.length === 0}
                   size="lg"
+                  className="w-full sm:w-auto text-muted-foreground hover:text-foreground"
                 >
-                  Clear All
+                  Cancel
                 </Button>
               )}
               <Button
                 onClick={processImages}
                 disabled={processing || imageQueue.length === 0}
                 size="lg"
-                className="shimmer-button-premium text-white rounded-xl group relative overflow-hidden flex-1 sm:flex-initial"
+                className="w-full sm:flex-1 shimmer-button-premium text-white rounded-xl group relative overflow-hidden min-h-[44px]"
               >
                 {/* Background glow */}
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
                 
                 {/* Content */}
-                <div className="relative flex items-center justify-center gap-3">
+                <div className="relative flex items-center justify-center gap-2 md:gap-3">
                   {processing ? (
                     <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Processing...</span>
+                      <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
+                      <span className="text-sm md:text-base">Processing {currentImageIndex + 1}/{imageQueue.length}</span>
                     </>
                   ) : (
                     <>
-                      <Sparkles className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
-                      <span>Extract All Trades</span>
+                      <Sparkles className="w-4 h-4 md:w-5 md:h-5 group-hover:rotate-180 transition-transform duration-500" />
+                      <span className="text-sm md:text-base">Upload {imageQueue.filter(i => i.status === 'queued').length} File{imageQueue.filter(i => i.status === 'queued').length !== 1 ? 's' : ''}</span>
                     </>
                   )}
                 </div>
