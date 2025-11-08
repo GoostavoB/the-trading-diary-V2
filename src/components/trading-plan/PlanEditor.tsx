@@ -96,22 +96,39 @@ export function PlanEditor({ plan, onSave, onCancel }: PlanEditorProps) {
     }
 
     setIsSaving(true);
+    const startTime = performance.now();
 
     try {
+      console.info('[PlanEditor] Saving plan', { 
+        userId: user.id, 
+        isUpdate: !!plan?.id,
+        formData 
+      });
+
       if (plan?.id) {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('trading_plans')
           .update(formData)
-          .eq('id', plan.id);
+          .eq('id', plan.id)
+          .select('*')
+          .single();
         
         if (error) throw error;
+        
+        const elapsed = Math.round(performance.now() - startTime);
+        console.info('[PlanEditor] Update success', { id: data.id, ms: elapsed });
         toast.success("Plan updated successfully");
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('trading_plans')
-          .insert({ ...formData, user_id: user.id });
+          .insert({ ...formData, user_id: user.id })
+          .select('*')
+          .single();
         
         if (error) throw error;
+        
+        const elapsed = Math.round(performance.now() - startTime);
+        console.info('[PlanEditor] Insert success', { id: data.id, ms: elapsed });
         toast.success("Plan created successfully");
       }
       
@@ -119,7 +136,7 @@ export function PlanEditor({ plan, onSave, onCancel }: PlanEditorProps) {
       queryClient.invalidateQueries({ queryKey: ['active-trading-plan', user.id] });
       onSave();
     } catch (error: any) {
-      console.error('[PlanEditor] Error:', error);
+      console.error('[PlanEditor] Save failed:', error);
       toast.error("Failed to save plan", {
         description: error.message || "Please try again."
       });

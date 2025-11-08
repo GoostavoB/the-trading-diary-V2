@@ -4,8 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { FileText, Plus, Edit, Trash2, CheckCircle2, AlertCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 interface PlanOverviewProps {
   onCreatePlan: () => void;
@@ -14,6 +15,7 @@ interface PlanOverviewProps {
 
 export function PlanOverview({ onCreatePlan, onEditPlan }: PlanOverviewProps) {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data: plans, refetch } = useQuery({
     queryKey: ['trading-plans', user?.id],
@@ -37,6 +39,7 @@ export function PlanOverview({ onCreatePlan, onEditPlan }: PlanOverviewProps) {
       .eq('id', id);
 
     if (!error) {
+      queryClient.invalidateQueries({ queryKey: ['trading-plans', user?.id] });
       refetch();
     }
   };
@@ -48,7 +51,37 @@ export function PlanOverview({ onCreatePlan, onEditPlan }: PlanOverviewProps) {
       .eq('id', plan.id);
 
     if (!error) {
+      queryClient.invalidateQueries({ queryKey: ['trading-plans', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['active-trading-plan', user?.id] });
       refetch();
+    }
+  };
+
+  const testInsert = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const testPlan = {
+        name: `Test Plan ${Date.now()}`,
+        user_id: user.id,
+      };
+      
+      console.info('[PlanOverview] Test insert', testPlan);
+      
+      const { data, error } = await supabase
+        .from('trading_plans')
+        .insert(testPlan)
+        .select('*')
+        .single();
+      
+      if (error) throw error;
+      
+      console.info('[PlanOverview] Test insert success', data);
+      toast.success(`Test plan created: ${data.name}`);
+      queryClient.invalidateQueries({ queryKey: ['trading-plans', user.id] });
+    } catch (error: any) {
+      console.error('[PlanOverview] Test insert failed:', error);
+      toast.error(`Test insert failed: ${error.message}`);
     }
   };
 
@@ -76,10 +109,17 @@ export function PlanOverview({ onCreatePlan, onEditPlan }: PlanOverviewProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Your Trading Plans</h2>
-        <Button onClick={onCreatePlan}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Plan
-        </Button>
+        <div className="flex gap-2">
+          {import.meta.env.DEV && (
+            <Button variant="outline" onClick={testInsert}>
+              Test Insert
+            </Button>
+          )}
+          <Button onClick={onCreatePlan}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Plan
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -110,11 +150,11 @@ export function PlanOverview({ onCreatePlan, onEditPlan }: PlanOverviewProps) {
                 <div>
                   <p className="text-muted-foreground mb-1">Markets</p>
                   <div className="flex flex-wrap gap-1">
-                    {plan.markets?.slice(0, 3).map((market: string) => (
+                    {(plan.currency_types ?? plan.markets ?? []).slice(0, 3).map((market: string) => (
                       <Badge key={market} variant="outline">{market}</Badge>
                     ))}
-                    {plan.markets?.length > 3 && (
-                      <Badge variant="outline">+{plan.markets.length - 3}</Badge>
+                    {(plan.currency_types ?? plan.markets ?? []).length > 3 && (
+                      <Badge variant="outline">+{(plan.currency_types ?? plan.markets ?? []).length - 3}</Badge>
                     )}
                   </div>
                 </div>
