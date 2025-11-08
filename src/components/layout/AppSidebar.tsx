@@ -3,7 +3,8 @@ import {
   BarChart3, Upload, TrendingUp, Target, Brain, Trophy, Settings2, BookOpen, HelpCircle, 
   LineChart, LogOut, Zap, RefreshCw, Wallet, Receipt, BookMarked, Users, GitCompare, 
   Shield, FileBarChart, ClipboardList, Calendar, Bell, FileText, ChevronDown, Search,
-  Plus, Archive, Star, Flame, Award, PieChart, Heart, Image, Download, Info, Accessibility, TrendingDown, DollarSign
+  Plus, Archive, Star, Flame, Award, PieChart, Heart, Image, Download, Info, Accessibility, TrendingDown, DollarSign,
+  Loader2
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Logo } from '@/components/Logo';
@@ -53,7 +54,7 @@ export function AppSidebar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [archivedGroups, setArchivedGroups] = useState<string[]>([]);
   const [allExpanded, setAllExpanded] = useState(false);
-  const { favorites, isFavorite, toggleFavorite } = useFavorites();
+  const { favorites, isFavorite, toggleFavorite, isProcessing } = useFavorites();
   const { prefetch } = usePrefetchRoute();
 
   const menuStructure: MenuGroup[] = [
@@ -424,8 +425,9 @@ export function AppSidebar() {
                                     <Button
                                       variant="ghost"
                                       size="icon"
+                                      disabled={isProcessing}
                                       className={cn(
-                                        "h-8 w-8 opacity-0 group-hover/item:opacity-100 transition-opacity",
+                                        "h-8 w-8 opacity-0 group-hover/item:opacity-100 transition-opacity disabled:opacity-50",
                                         itemIsFavorite && "opacity-100"
                                       )}
                                       onClick={(e) => {
@@ -435,14 +437,18 @@ export function AppSidebar() {
                                       }}
                                       aria-pressed={itemIsFavorite}
                                     >
-                                      <Heart 
-                                        className={cn(
-                                          "h-4 w-4 transition-all",
-                                          itemIsFavorite 
-                                            ? "fill-primary text-primary" 
-                                            : "text-muted-foreground hover:text-primary"
-                                        )}
-                                      />
+                                      {isProcessing ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                      ) : (
+                                        <Heart 
+                                          className={cn(
+                                            "h-4 w-4 transition-all",
+                                            itemIsFavorite 
+                                              ? "fill-primary text-primary" 
+                                              : "text-muted-foreground hover:text-primary"
+                                          )}
+                                        />
+                                      )}
                                     </Button>
                                   </TooltipTrigger>
                   <TooltipContent side="right">
