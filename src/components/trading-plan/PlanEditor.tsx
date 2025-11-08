@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ensureAuthenticated } from "@/lib/dbWrite";
+import { ensureAuthenticated, withTimeout } from "@/lib/dbWrite";
 
 interface PlanEditorProps {
   plan?: any;
@@ -83,28 +83,39 @@ export function PlanEditor({ plan, onSave, onCancel }: PlanEditorProps) {
   // Mutation for saving trading plans
   const planMutation = useMutation({
     mutationFn: async (planData: any) => {
+      const startTime = Date.now();
+      console.info('[PlanEditor] Starting save mutation:', { isUpdate: !!plan?.id, planId: plan?.id });
+      
       const authenticatedUser = ensureAuthenticated(user);
       
-      if (plan?.id) {
-        const { data, error } = await supabase
-          .from('trading_plans')
-          .update(planData)
-          .eq('id', plan.id)
-          .select()
-          .single();
-        
-        if (error) throw error;
-        return { data, isUpdate: true };
-      } else {
-        const { data, error } = await supabase
-          .from('trading_plans')
-          .insert({ ...planData, user_id: authenticatedUser.id })
-          .select()
-          .single();
-        
-        if (error) throw error;
-        return { data, isUpdate: false };
-      }
+      const savePromise = async () => {
+        if (plan?.id) {
+          const { data, error } = await supabase
+            .from('trading_plans')
+            .update(planData)
+            .eq('id', plan.id)
+            .select()
+            .maybeSingle();
+          
+          if (error) throw error;
+          if (!data) throw new Error('Plan not found after update');
+          console.info('[PlanEditor] Update completed in', Date.now() - startTime, 'ms');
+          return { data, isUpdate: true };
+        } else {
+          const { data, error } = await supabase
+            .from('trading_plans')
+            .insert({ ...planData, user_id: authenticatedUser.id })
+            .select()
+            .maybeSingle();
+          
+          if (error) throw error;
+          if (!data) throw new Error('Failed to create plan');
+          console.info('[PlanEditor] Insert completed in', Date.now() - startTime, 'ms');
+          return { data, isUpdate: false };
+        }
+      };
+
+      return withTimeout(savePromise(), 10000, 'save trading plan');
     },
     onMutate: async (planData) => {
       // Cancel queries
@@ -125,30 +136,44 @@ export function PlanEditor({ plan, onSave, onCancel }: PlanEditorProps) {
       });
       
       console.info('[TradingPlan] Optimistic update applied');
-      toast.loading("Saving plan...", { id: 'plan-save' });
+      const toastId = toast.loading("Saving plan...");
       
-      return { previousPlans };
+      return { previousPlans, toastId };
     },
     onError: (error: any, planData, context) => {
       // Rollback
       queryClient.setQueryData(['trading-plans', user?.id], context?.previousPlans);
       
       console.error('[TradingPlan] Error:', error);
+      
+      // Dismiss loading toast and show error
+      if (context?.toastId) {
+        toast.dismiss(context.toastId);
+      }
+      
       toast.error("Failed to save plan", {
-        id: 'plan-save',
         description: error?.message || "Please try again."
       });
     },
-    onSuccess: ({ data, isUpdate }) => {
+    onSuccess: ({ data, isUpdate }, _, context) => {
       console.info('[TradingPlan] Success:', data);
-      toast.success(isUpdate ? "Plan updated successfully" : "Plan created successfully", {
-        id: 'plan-save'
-      });
+      
+      // Dismiss loading toast and show success
+      if (context?.toastId) {
+        toast.dismiss(context.toastId);
+      }
+      
+      toast.success(isUpdate ? "Plan updated successfully" : "Plan created successfully");
       
       // Switch to plans tab after saving
       onSave();
     },
-    onSettled: () => {
+    onSettled: (_, __, ___, context) => {
+      // Ensure any lingering toasts are dismissed
+      if (context?.toastId) {
+        toast.dismiss(context.toastId);
+      }
+      
       // Invalidate to sync with server
       queryClient.invalidateQueries({ queryKey: ['trading-plans', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['active-trading-plan', user?.id] });

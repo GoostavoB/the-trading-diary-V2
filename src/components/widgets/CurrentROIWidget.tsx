@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { withTimeout } from '@/lib/dbWrite';
 import { useTranslation } from '@/hooks/useTranslation';
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
 
@@ -45,72 +46,56 @@ export const CurrentROIWidget = memo(({
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
+    if (!user || !capitalValue) return;
+
     const newValue = parseFloat(capitalValue);
-    if (isNaN(newValue) || newValue < 0) {
-      toast.error(t('errors.invalidAmount'));
+    if (isNaN(newValue) || newValue <= 0) {
+      toast.error('Please enter a valid amount');
       return;
     }
 
     setIsSaving(true);
-    
-    // Store previous value for rollback
     const previousValue = initialInvestment;
-    
-    // Optimistic update
-    if (onInitialInvestmentUpdate) {
-      onInitialInvestmentUpdate(newValue);
-    }
-    
-    const optimisticToast = toast.loading("Updating initial capital...");
-    setIsDialogOpen(false);
-    
+    const startTime = Date.now();
+    const toastId = toast.loading('Updating initial capital...');
+
+    // Optimistically update UI immediately
+    onInitialInvestmentUpdate?.(newValue);
+
     try {
-      const { error } = await supabase
-        .from('user_settings')
-        .upsert({
-          user_id: user?.id,
-          initial_capital: newValue,
-        });
-
-      if (error) {
-        console.error('[ROI] Save failed:', error);
-        
-        // Rollback on error
-        if (onInitialInvestmentUpdate) {
-          onInitialInvestmentUpdate(previousValue);
-        }
-        
-        // Reopen dialog for retry
-        setIsDialogOpen(true);
-        
-        toast.error("Failed to update initial capital", {
-          id: optimisticToast,
-          description: error?.message || "Please try again."
-        });
-        
-        return;
-      }
-
-      console.info('[ROI] Saved successfully');
-      toast.success("Initial capital updated", {
-        id: optimisticToast,
-        description: "Your ROI calculations have been updated."
-      });
+      console.info('[CurrentROIWidget] Starting initial capital update');
       
+      const result = await withTimeout(
+        (async () => {
+          return await supabase
+            .from('user_settings')
+            .upsert({
+              user_id: user.id,
+              initial_capital: newValue,
+              updated_at: new Date().toISOString(),
+            }, {
+              onConflict: 'user_id'
+            });
+        })(),
+        10000,
+        'save initial capital'
+      );
+
+      if (result.error) throw result.error;
+
+      console.info('[CurrentROIWidget] Update completed in', Date.now() - startTime, 'ms');
+      toast.success('Initial capital updated', { id: toastId });
+      setIsDialogOpen(false);
     } catch (error: any) {
-      console.error('[ROI] Save error:', error);
+      console.error('[CurrentROIWidget] Failed to save initial capital:', error);
       
-      // Rollback
-      if (onInitialInvestmentUpdate) {
-        onInitialInvestmentUpdate(previousValue);
-      }
+      // Revert optimistic update on error
+      onInitialInvestmentUpdate?.(previousValue);
       
-      toast.error("Failed to update", {
-        id: optimisticToast,
-        description: error?.message || "Please try again."
+      toast.error('Failed to update capital', {
+        id: toastId,
+        description: error.message || 'Please try again'
       });
-      
-      setIsDialogOpen(true);
     } finally {
       setIsSaving(false);
     }

@@ -33,3 +33,20 @@ export const handleDbError = (error: any, operation: string): never => {
   
   throw new DbWriteError(message, error);
 };
+
+/**
+ * Wraps a promise with a timeout to prevent indefinite loading states
+ */
+export const withTimeout = <T>(
+  promise: Promise<T>,
+  ms: number = 10000,
+  label: string = 'request'
+): Promise<T> => {
+  const timeout = new Promise<never>((_, reject) => {
+    setTimeout(() => {
+      reject(new DbWriteError(`${label} timed out after ${ms}ms. Please check your connection and try again.`));
+    }, ms);
+  });
+
+  return Promise.race([promise, timeout]);
+};
