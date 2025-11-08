@@ -8,7 +8,6 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import AppLayout from '@/components/layout/AppLayout';
 import { toast } from 'sonner';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { X, FileSpreadsheet, Check, ChevronsUpDown, Plus, ChevronDown } from 'lucide-react';
@@ -431,12 +430,11 @@ const Upload = () => {
   };
 
   return (
-    <AppLayout>
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-4xl font-bold mb-2">{editId ? 'Edit Trade' : 'Upload Trade'}</h1>
-          <p className="text-muted-foreground">Record your trading activity</p>
-        </div>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div>
+        <h1 className="text-4xl font-bold mb-2">{editId ? 'Edit Trade' : 'Upload Trade'}</h1>
+        <p className="text-muted-foreground">Record your trading activity</p>
+      </div>
         
         <DailyUploadStatus />
 
@@ -712,7 +710,7 @@ const Upload = () => {
         trigger="upload_limit"
         feature="more daily uploads"
       />
-    </AppLayout>
+    </div>
   );
 };
 

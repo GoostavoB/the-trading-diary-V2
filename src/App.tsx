@@ -36,6 +36,7 @@ import { OnboardingWrapper } from "@/components/onboarding/OnboardingWrapper";
 import { DailyRewardModal } from "@/components/rewards/DailyRewardModal";
 import { DailyRewardIndicator } from "@/components/rewards/DailyRewardIndicator";
 import { useDailyRewards } from "@/hooks/useDailyRewards";
+import { AppShell } from "@/layouts/AppShell";
 
 // Eagerly load critical pages (landing, auth, and checkout)
 import Index from "./pages/Index";
@@ -249,12 +250,14 @@ const AppRoutes = () => {
         
         {/* Authenticated routes - redirect to /auth if logged out */}
         <Route element={<AuthRequiredGuard />}>
-          {/* Upgrade routes */}
-          <Route path="/upgrade" element={<Upgrade />} />
-          <Route path="/credits/purchase" element={<CreditsPurchase />} />
-          
-          {/* Core app routes */}
-          <Route path="/dashboard" element={<Dashboard />} />
+          {/* App Shell - Persistent sidebar and header */}
+          <Route element={<AppShell />}>
+            {/* Upgrade routes */}
+            <Route path="/upgrade" element={<Upgrade />} />
+            <Route path="/credits/purchase" element={<CreditsPurchase />} />
+            
+            {/* Core app routes */}
+            <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/forecast" element={<Forecast />} />
@@ -307,6 +310,7 @@ const AppRoutes = () => {
           <Route path="/api-docs" element={<ApiDocs />} />
           <Route path="/advanced-analytics" element={<AdvancedAnalytics />} />
           <Route path="/custom/:pageId" element={<CustomPage />} />
+          </Route>
         </Route>
         
         {/* Public content pages - no auth required */}

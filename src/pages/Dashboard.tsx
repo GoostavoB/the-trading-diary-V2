@@ -3,7 +3,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import AppLayout from '@/components/layout/AppLayout';
 import { Plus, Columns } from 'lucide-react';
 import { DndContext, rectIntersection, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragStartEvent, MeasuringStrategy } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy } from '@dnd-kit/sortable';
@@ -1019,7 +1018,6 @@ const Dashboard = () => {
 
   return (
     <>
-    <AppLayout>
       <FloatingXP />
       <MicroFeedbackOverlay />
       <WeeklySummaryRecap />
@@ -1364,7 +1362,6 @@ const Dashboard = () => {
           feature="dashboard customization"
         />
       </div>
-    </AppLayout>
     
     {/* XP Boost Indicator */}
     <XPBoostIndicator />
