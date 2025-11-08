@@ -65,6 +65,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // JavaScript modules - Always fetch fresh with correct MIME types (bypass cache)
+  if (request.destination === 'script' || url.pathname.endsWith('.js') || url.pathname.endsWith('.mjs')) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
   // Static assets - Stale while revalidate to prevent stale images
   if (request.destination === 'image' || request.destination === 'font' || request.destination === 'style') {
     event.respondWith(
