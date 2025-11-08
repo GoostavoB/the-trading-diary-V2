@@ -51,7 +51,6 @@ export function AppSidebar() {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [archivedGroups, setArchivedGroups] = useState<string[]>([]);
-  const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
   const [allExpanded, setAllExpanded] = useState(false);
   const { favorites, isFavorite, toggleFavorite } = useFavorites();
 
@@ -137,11 +136,53 @@ export function AppSidebar() {
     },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  // Enhanced active state detection for query params and nested routes
+  const isActive = (path: string): boolean => {
+    const currentPath = location.pathname;
+    const currentSearch = location.search;
+    
+    // Handle query params (e.g., /dashboard?tab=insights)
+    if (path.includes('?')) {
+      const [basePath, queryString] = path.split('?');
+      const isPathMatch = currentPath === basePath;
+      const isQueryMatch = currentSearch.includes(queryString);
+      return isPathMatch && isQueryMatch;
+    }
+    
+    // Exact match for routes without query params
+    if (currentPath === path) return true;
+    
+    // Match nested routes (e.g., /dashboard/something matches /dashboard)
+    if (currentPath.startsWith(`${path}/`)) return true;
+    
+    return false;
+  };
+
+  // Auto-expand groups that contain the active route
+  const getGroupsWithActiveRoute = (): string[] => {
+    const activeGroups: string[] = [];
+    menuStructure.forEach((group) => {
+      const hasActiveItem = group.items.some((item) => isActive(item.url));
+      if (hasActiveItem) {
+        activeGroups.push(group.label);
+      }
+    });
+    return activeGroups;
+  };
+
+  // Initialize expanded groups with groups containing active routes
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(() => {
+    return getGroupsWithActiveRoute();
+  });
+
+
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive
-      ? 'bg-muted text-foreground font-medium'
-      : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground';
+    cn(
+      'transition-all relative',
+      isActive
+        ? 'bg-muted text-foreground font-medium border-l-2 border-primary'
+        : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground border-l-2 border-transparent'
+    );
 
   const filteredMenuStructure = menuStructure
     .map(group => ({
@@ -182,7 +223,7 @@ export function AppSidebar() {
 
   const toggleExpandAll = () => {
     if (allExpanded) {
-      setExpandedGroups([]);
+      setExpandedGroups(getGroupsWithActiveRoute()); // Keep groups with active routes expanded
       setAllExpanded(false);
     } else {
       const allLabels = menuStructure.map(g => g.label);
@@ -193,10 +234,25 @@ export function AppSidebar() {
 
   const isGroupExpanded = (label: string) => {
     if (searchQuery !== '') return true; // Keep all expanded during search
+    
+    // Always keep groups with active routes expanded
+    const hasActiveRoute = menuStructure
+      .find(g => g.label === label)
+      ?.items.some(item => isActive(item.url));
+    
+    if (hasActiveRoute) return true;
+    
     return expandedGroups.includes(label);
   };
 
   const toggleGroup = (label: string) => {
+    // Don't allow collapsing groups with active routes
+    const hasActiveRoute = menuStructure
+      .find(g => g.label === label)
+      ?.items.some(item => isActive(item.url));
+    
+    if (hasActiveRoute) return;
+    
     setExpandedGroups(prev =>
       prev.includes(label)
         ? prev.filter(l => l !== label)
