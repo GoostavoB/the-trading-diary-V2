@@ -235,7 +235,21 @@ export function SmartUpload({
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         if (sessionError || !session) {
           console.error('❌ Session error:', sessionError);
-          throw new Error('Authentication expired. Please refresh the page and try again.');
+          throw new Error('Please log in to use Smart Upload. Refresh the page and sign in.');
+        }
+
+        // Check if session is about to expire (< 5 minutes) and refresh if needed
+        if (session.expires_at) {
+          const expiresIn = session.expires_at - (Date.now() / 1000);
+          if (expiresIn < 300) { // Less than 5 minutes
+            console.log('⏰ Session expiring soon, refreshing...');
+            const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+            if (refreshError) {
+              console.error('❌ Session refresh failed:', refreshError);
+              throw new Error('Session expired. Please refresh the page and try again.');
+            }
+            console.log('✅ Session refreshed successfully');
+          }
         }
 
         console.log('✅ Session valid, calling vision extraction...');
