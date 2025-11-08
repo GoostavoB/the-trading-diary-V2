@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/AppSidebar';
 import { UserMenu } from '@/components/layout/UserMenu';
@@ -157,8 +158,22 @@ export function AppShell() {
               aria-label="Main content"
             >
               <Breadcrumbs />
-              {/* React Router Outlet - Only this section changes on navigation */}
-              <Outlet />
+              {/* React Router Outlet with Page Transitions */}
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={location.pathname}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{
+                    duration: 0.2,
+                    ease: [0.4, 0, 0.2, 1], // cubic-bezier easing for smooth motion
+                  }}
+                  className="w-full"
+                >
+                  <Outlet />
+                </motion.div>
+              </AnimatePresence>
             </main>
           </div>
           
