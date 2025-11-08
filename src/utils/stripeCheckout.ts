@@ -110,8 +110,36 @@ export const initiateStripeCheckout = async (params: CheckoutParams): Promise<st
 
   console.log('📞 Calling edge function with body:', requestBody);
   
-  const invokePromise = supabase.functions.invoke('create-stripe-checkout', {
-    body: requestBody,
+  // CRITICAL FIX: Use direct fetch() instead of supabase.functions.invoke()
+  // This bypasses the broken Supabase SDK and calls the edge function directly
+  const invokePromise = fetch(
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-stripe-checkout`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify(requestBody),
+    }
+  ).then(async (response) => {
+    console.log('📥 Response received:', {
+      status: response.status,
+      ok: response.ok,
+      statusText: response.statusText,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      console.error('❌ Edge function returned error:', errorData);
+      throw new Error(errorData.error || `Edge function failed with status ${response.status}`);
+    }
+
+    const result = await response.json();
+    return { data: result, error: null };
+  }).catch((err) => {
+    console.error('❌ Fetch error:', err);
+    return { data: null, error: { message: err.message || 'Unknown error' } };
   });
 
   const timeout = new Promise((_, reject) =>
