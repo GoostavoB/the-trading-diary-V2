@@ -38,7 +38,7 @@ export function NextMissionCard({ mission, onDismiss }: NextMissionCardProps) {
     completed: false,
     action: {
       label: 'Upload Trades',
-      route: '/dashboard?tab=upload'
+      route: '/upload'
     }
   };
 
