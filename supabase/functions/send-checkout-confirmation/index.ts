@@ -18,7 +18,8 @@ serve(async (req) => {
       email, 
       name, 
       orderDetails,
-      productType 
+      productType,
+      invoicePdfUrl 
     } = await req.json();
 
     if (!email || !orderDetails) {
@@ -105,6 +106,18 @@ serve(async (req) => {
             <p style="font-size: 14px; color: #666; margin-bottom: 24px;">
               If you have any questions about your order, please don't hesitate to reach out to our support team.
             </p>
+            
+            ${invoicePdfUrl ? `
+            <div style="background: #f0fdf4; border: 1px solid #86efac; padding: 16px; margin-bottom: 24px; border-radius: 8px; text-align: center;">
+              <p style="margin: 0 0 12px 0; font-size: 14px; color: #166534;">
+                📄 <strong>Your official Stripe invoice is ready!</strong>
+              </p>
+              <a href="${invoicePdfUrl}" 
+                 style="display: inline-block; background: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px;">
+                Download Invoice PDF
+              </a>
+            </div>
+            ` : ''}
             
             <div style="text-align: center; margin-top: 32px;">
               <a href="${Deno.env.get('FRONTEND_URL') || 'http://localhost:3000'}" 

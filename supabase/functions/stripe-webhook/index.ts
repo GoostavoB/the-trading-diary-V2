@@ -15,7 +15,8 @@ async function sendOrderConfirmationEmail(
   email: string,
   name: string | null,
   orderDetails: any,
-  productType: string
+  productType: string,
+  invoicePdfUrl?: string
 ) {
   try {
     console.log(`Sending confirmation email to ${email}`)
@@ -30,6 +31,7 @@ async function sendOrderConfirmationEmail(
         name: name || 'Valued Customer',
         orderDetails,
         productType,
+        invoicePdfUrl,
       }),
     })
 
@@ -165,6 +167,18 @@ serve(async (req) => {
             })
             console.log('Order saved successfully')
 
+            // Fetch invoice PDF URL if available
+            let invoicePdfUrl: string | undefined
+            if (session.invoice) {
+              try {
+                const invoice = await stripe.invoices.retrieve(session.invoice as string)
+                invoicePdfUrl = invoice.invoice_pdf || undefined
+                console.log('Invoice PDF URL retrieved:', invoicePdfUrl)
+              } catch (err: any) {
+                console.error('Error fetching invoice PDF:', err.message)
+              }
+            }
+
             // Send confirmation email
             await sendOrderConfirmationEmail(
               session.customer_details?.email || '',
@@ -178,7 +192,8 @@ serve(async (req) => {
                   amount_total: session.amount_total || 0
                 }]
               },
-              productType || 'subscription'
+              productType || 'subscription',
+              invoicePdfUrl
             )
           } catch (err: any) {
             console.error('Error saving order:', err)
@@ -246,6 +261,18 @@ serve(async (req) => {
               })
               console.log('Order saved successfully')
 
+              // Fetch invoice PDF URL if available
+              let invoicePdfUrl: string | undefined
+              if (session.invoice) {
+                try {
+                  const invoice = await stripe.invoices.retrieve(session.invoice as string)
+                  invoicePdfUrl = invoice.invoice_pdf || undefined
+                  console.log('Invoice PDF URL retrieved:', invoicePdfUrl)
+                } catch (err: any) {
+                  console.error('Error fetching invoice PDF:', err.message)
+                }
+              }
+
               // Send confirmation email
               await sendOrderConfirmationEmail(
                 session.customer_details?.email || '',
@@ -259,7 +286,8 @@ serve(async (req) => {
                     amount_total: session.amount_total || 0
                   }]
                 },
-                productType || 'credits'
+                productType || 'credits',
+                invoicePdfUrl
               )
             } catch (err: any) {
               console.error('Error saving order:', err)
