@@ -8,6 +8,41 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+const frontendUrl = Deno.env.get('FRONTEND_URL') || 'http://localhost:3000'
+
+// Helper function to send order confirmation email
+async function sendOrderConfirmationEmail(
+  email: string,
+  name: string | null,
+  orderDetails: any,
+  productType: string
+) {
+  try {
+    console.log(`Sending confirmation email to ${email}`)
+    const response = await fetch(`${supabaseUrl}/functions/v1/send-checkout-confirmation`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabaseServiceKey}`,
+      },
+      body: JSON.stringify({
+        email,
+        name: name || 'Valued Customer',
+        orderDetails,
+        productType,
+      }),
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      console.error('Failed to send confirmation email:', error)
+    } else {
+      console.log('Confirmation email sent successfully')
+    }
+  } catch (error: any) {
+    console.error('Error sending confirmation email:', error.message)
+  }
+}
 
 serve(async (req) => {
   const signature = req.headers.get('Stripe-Signature')
@@ -129,6 +164,22 @@ serve(async (req) => {
               metadata: { mode: session.mode, interval, tier }
             })
             console.log('Order saved successfully')
+
+            // Send confirmation email
+            await sendOrderConfirmationEmail(
+              session.customer_details?.email || '',
+              session.customer_details?.name || null,
+              {
+                amount: session.amount_total || 0,
+                currency: session.currency || 'usd',
+                sessionId: session.id,
+                items: [{
+                  description: `${tier.toUpperCase()} ${interval === 'year' ? 'Annual' : 'Monthly'} Subscription`,
+                  amount_total: session.amount_total || 0
+                }]
+              },
+              productType || 'subscription'
+            )
           } catch (err: any) {
             console.error('Error saving order:', err)
           }
@@ -194,6 +245,22 @@ serve(async (req) => {
                 metadata: { mode: session.mode, credits: creditQuantity }
               })
               console.log('Order saved successfully')
+
+              // Send confirmation email
+              await sendOrderConfirmationEmail(
+                session.customer_details?.email || '',
+                session.customer_details?.name || null,
+                {
+                  amount: session.amount_total || 0,
+                  currency: session.currency || 'usd',
+                  sessionId: session.id,
+                  items: [{
+                    description: `${creditQuantity} Upload Credits`,
+                    amount_total: session.amount_total || 0
+                  }]
+                },
+                productType || 'credits'
+              )
             } catch (err: any) {
               console.error('Error saving order:', err)
             }
