@@ -122,7 +122,7 @@ Return as a JSON array where each trade is an object with the fields you found. 
             ]
           }
         ],
-        max_completion_tokens: 4000
+        max_tokens: 4000
       })
     });
 
