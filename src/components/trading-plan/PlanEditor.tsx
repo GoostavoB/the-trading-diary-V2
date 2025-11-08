@@ -10,8 +10,7 @@ import { Save, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ensureAuthenticated, withTimeout } from "@/lib/dbWrite";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface PlanEditorProps {
   plan?: any;
@@ -25,6 +24,7 @@ const availableTimeframes = ["1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w"];
 export function PlanEditor({ plan, onSave, onCancel }: PlanEditorProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [isSaving, setIsSaving] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -80,106 +80,6 @@ export function PlanEditor({ plan, onSave, onCancel }: PlanEditorProps) {
     }));
   };
 
-  // Mutation for saving trading plans
-  const planMutation = useMutation({
-    mutationFn: async (planData: any) => {
-      const startTime = Date.now();
-      console.info('[PlanEditor] Starting save mutation:', { isUpdate: !!plan?.id, planId: plan?.id });
-      
-      const authenticatedUser = ensureAuthenticated(user);
-      
-      const savePromise = async () => {
-        if (plan?.id) {
-          const { data, error } = await supabase
-            .from('trading_plans')
-            .update(planData)
-            .eq('id', plan.id)
-            .select()
-            .maybeSingle();
-          
-          if (error) throw error;
-          if (!data) throw new Error('Plan not found after update');
-          console.info('[PlanEditor] Update completed in', Date.now() - startTime, 'ms');
-          return { data, isUpdate: true };
-        } else {
-          const { data, error } = await supabase
-            .from('trading_plans')
-            .insert({ ...planData, user_id: authenticatedUser.id })
-            .select()
-            .maybeSingle();
-          
-          if (error) throw error;
-          if (!data) throw new Error('Failed to create plan');
-          console.info('[PlanEditor] Insert completed in', Date.now() - startTime, 'ms');
-          return { data, isUpdate: false };
-        }
-      };
-
-      return withTimeout(savePromise(), 10000, 'save trading plan');
-    },
-    onMutate: async (planData) => {
-      // Cancel queries
-      await queryClient.cancelQueries({ queryKey: ['trading-plans', user?.id] });
-      
-      // Snapshot
-      const previousPlans = queryClient.getQueryData(['trading-plans', user?.id]);
-      
-      // Optimistic update
-      queryClient.setQueryData(['trading-plans', user?.id], (old: any) => {
-        if (!old) return [{ ...planData, id: 'temp-' + Date.now(), created_at: new Date().toISOString() }];
-        
-        if (plan?.id) {
-          return old.map((p: any) => p.id === plan.id ? { ...p, ...planData } : p);
-        } else {
-          return [{ ...planData, id: 'temp-' + Date.now(), user_id: user?.id, created_at: new Date().toISOString() }, ...old];
-        }
-      });
-      
-      console.info('[TradingPlan] Optimistic update applied');
-      const toastId = toast.loading("Saving plan...");
-      
-      return { previousPlans, toastId };
-    },
-    onError: (error: any, planData, context) => {
-      // Rollback
-      queryClient.setQueryData(['trading-plans', user?.id], context?.previousPlans);
-      
-      console.error('[TradingPlan] Error:', error);
-      
-      // Dismiss loading toast and show error
-      if (context?.toastId) {
-        toast.dismiss(context.toastId);
-      }
-      
-      toast.error("Failed to save plan", {
-        description: error?.message || "Please try again."
-      });
-    },
-    onSuccess: ({ data, isUpdate }, _, context) => {
-      console.info('[TradingPlan] Success:', data);
-      
-      // Dismiss loading toast and show success
-      if (context?.toastId) {
-        toast.dismiss(context.toastId);
-      }
-      
-      toast.success(isUpdate ? "Plan updated successfully" : "Plan created successfully");
-      
-      // Switch to plans tab after saving
-      onSave();
-    },
-    onSettled: (_, __, ___, context) => {
-      // Ensure any lingering toasts are dismissed
-      if (context?.toastId) {
-        toast.dismiss(context.toastId);
-      }
-      
-      // Invalidate to sync with server
-      queryClient.invalidateQueries({ queryKey: ['trading-plans', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['active-trading-plan', user?.id] });
-    },
-  });
-
   const handleSave = async () => {
     if (!formData.name.trim()) {
       toast.error("Required field", {
@@ -195,7 +95,37 @@ export function PlanEditor({ plan, onSave, onCancel }: PlanEditorProps) {
       return;
     }
 
-    planMutation.mutate(formData);
+    setIsSaving(true);
+
+    try {
+      if (plan?.id) {
+        const { error } = await supabase
+          .from('trading_plans')
+          .update(formData)
+          .eq('id', plan.id);
+        
+        if (error) throw error;
+        toast.success("Plan updated successfully");
+      } else {
+        const { error } = await supabase
+          .from('trading_plans')
+          .insert({ ...formData, user_id: user.id });
+        
+        if (error) throw error;
+        toast.success("Plan created successfully");
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ['trading-plans', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['active-trading-plan', user.id] });
+      onSave();
+    } catch (error: any) {
+      console.error('[PlanEditor] Error:', error);
+      toast.error("Failed to save plan", {
+        description: error.message || "Please try again."
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -373,18 +303,18 @@ export function PlanEditor({ plan, onSave, onCancel }: PlanEditorProps) {
         <div className="flex gap-2 mt-6">
           <Button 
             onClick={handleSave} 
-            disabled={planMutation.isPending || !user}
+            disabled={isSaving || !user}
             type="button" 
             className="flex-1"
           >
             <Save className="h-4 w-4 mr-2" />
-            {planMutation.isPending ? "Saving..." : "Save Plan"}
+            {isSaving ? "Saving..." : "Save Plan"}
           </Button>
           <Button 
             variant="outline" 
             onClick={onCancel}
             type="button"
-            disabled={planMutation.isPending}
+            disabled={isSaving}
           >
             Cancel
           </Button>

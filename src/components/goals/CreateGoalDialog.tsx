@@ -13,8 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ensureAuthenticated, withTimeout } from "@/lib/dbWrite";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Get today's date in local timezone as YYYY-MM-DD
 const getTodayLocal = () => {
@@ -74,6 +73,7 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(!!editingGoal);
+  const [isSaving, setIsSaving] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -86,117 +86,15 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
     },
   });
 
-  // Mutation for creating/updating goals
-  const goalMutation = useMutation({
-    mutationFn: async (goalData: any) => {
-      const startTime = Date.now();
-      console.info('[CreateGoalDialog] Starting mutation:', { isEdit: !!editingGoal, goalId: editingGoal?.id });
-      
-      const authenticatedUser = ensureAuthenticated(user);
-      
-      const savePromise = async () => {
-        if (editingGoal) {
-          const { data, error } = await supabase
-            .from('trading_goals')
-            .update(goalData)
-            .eq('id', editingGoal.id)
-            .select()
-            .maybeSingle();
-          
-          if (error) throw error;
-          if (!data) throw new Error('Goal not found after update');
-          console.info('[CreateGoalDialog] Update completed in', Date.now() - startTime, 'ms');
-          return { data, isUpdate: true };
-        } else {
-          const { data, error } = await supabase
-            .from('trading_goals')
-            .insert({ ...goalData, user_id: authenticatedUser.id })
-            .select()
-            .maybeSingle();
-          
-          if (error) throw error;
-          if (!data) throw new Error('Failed to create goal');
-          console.info('[CreateGoalDialog] Insert completed in', Date.now() - startTime, 'ms');
-          return { data, isUpdate: false };
-        }
-      };
-
-      return withTimeout(savePromise(), 10000, 'save goal');
-    },
-    onMutate: async (goalData) => {
-      // Cancel outgoing queries
-      await queryClient.cancelQueries({ queryKey: ['trading-goals', user?.id] });
-      
-      // Snapshot previous value
-      const previousGoals = queryClient.getQueryData(['trading-goals', user?.id]);
-      
-      // Optimistically update cache
-      queryClient.setQueryData(['trading-goals', user?.id], (old: any) => {
-        if (!old) return [{ ...goalData, id: 'temp-' + Date.now(), created_at: new Date().toISOString() }];
-        
-        if (editingGoal) {
-          return old.map((g: any) => g.id === editingGoal.id ? { ...g, ...goalData } : g);
-        } else {
-          return [{ ...goalData, id: 'temp-' + Date.now(), user_id: user?.id, created_at: new Date().toISOString() }, ...old];
-        }
-      });
-      
-      // Close dialog and reset form optimistically
-      setOpen(false);
-      form.reset();
-      
-      console.info('[CreateGoal] Optimistic update applied');
-      const toastId = toast.loading(editingGoal ? "Updating goal..." : "Creating goal...");
-      
-      return { previousGoals, toastId };
-    },
-    onError: (error: any, goalData, context) => {
-      // Rollback to previous state
-      queryClient.setQueryData(['trading-goals', user?.id], context?.previousGoals);
-      
-      console.error('[CreateGoal] Error:', error);
-      
-      // Dismiss loading toast and show error
-      if (context?.toastId) {
-        toast.dismiss(context.toastId);
-      }
-      
-      // Reopen dialog for user to retry
-      setOpen(true);
-      
-      if (error.message?.includes('Target date cannot be in the past')) {
-        toast.error("Target date must be today or in the future. Please check your date selection.");
-      } else {
-        toast.error(editingGoal ? "Failed to update goal" : "Failed to create goal", {
-          description: error?.message || "Please try again."
-        });
-      }
-    },
-    onSuccess: ({ data, isUpdate }, _, context) => {
-      console.info('[CreateGoal] Success:', data);
-      
-      // Dismiss loading toast and show success
-      if (context?.toastId) {
-        toast.dismiss(context.toastId);
-      }
-      
-      toast.success(isUpdate ? "Goal updated successfully" : "Goal created successfully");
-      
-      if (onClose) onClose();
-    },
-    onSettled: (_, __, ___, context) => {
-      // Ensure any lingering toasts are dismissed
-      if (context?.toastId) {
-        toast.dismiss(context.toastId);
-      }
-      
-      // Always refetch to ensure cache is in sync with server
-      queryClient.invalidateQueries({ queryKey: ['trading-goals', user?.id] });
-      if (onGoalCreated) onGoalCreated();
-    },
-  });
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!user) {
+      toast.error("Not authenticated", {
+        description: "Please sign in to save your goal"
+      });
+      return;
+    }
+
+    setIsSaving(true);
     const normalizedValue = normalizeNumericInput(values.target_value);
     
     // Convert date to end-of-day local time as ISO timestamptz
@@ -221,7 +119,42 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
       period: editingGoal?.period || 'monthly',
     };
 
-    goalMutation.mutate(goalData);
+    try {
+      if (editingGoal) {
+        const { error } = await supabase
+          .from('trading_goals')
+          .update(goalData)
+          .eq('id', editingGoal.id);
+        
+        if (error) throw error;
+        toast.success("Goal updated successfully");
+      } else {
+        const { error } = await supabase
+          .from('trading_goals')
+          .insert({ ...goalData, user_id: user.id });
+        
+        if (error) throw error;
+        toast.success("Goal created successfully");
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ['trading-goals', user.id] });
+      setOpen(false);
+      form.reset();
+      if (onGoalCreated) onGoalCreated();
+      if (onClose) onClose();
+    } catch (error: any) {
+      console.error('[CreateGoal] Error:', error);
+      
+      if (error.message?.includes('Target date cannot be in the past')) {
+        toast.error("Target date must be today or in the future. Please check your date selection.");
+      } else {
+        toast.error(editingGoal ? "Failed to update goal" : "Failed to create goal", {
+          description: error?.message || "Please try again."
+        });
+      }
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const goalTypes = [
@@ -352,13 +285,13 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
                 variant="outline" 
                 onClick={() => setOpen(false)} 
                 className="flex-1"
-                disabled={goalMutation.isPending}
+                disabled={isSaving}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={goalMutation.isPending || !user} className="flex-1">
-                {goalMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {goalMutation.isPending ? 'Saving...' : editingGoal ? 'Update Goal' : 'Create Goal'}
+              <Button type="submit" disabled={isSaving || !user} className="flex-1">
+                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isSaving ? 'Saving...' : editingGoal ? 'Update Goal' : 'Create Goal'}
               </Button>
             </div>
           </form>

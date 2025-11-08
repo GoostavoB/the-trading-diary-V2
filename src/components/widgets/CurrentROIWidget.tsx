@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import { withTimeout } from '@/lib/dbWrite';
+
 import { useTranslation } from '@/hooks/useTranslation';
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
 
@@ -63,27 +63,18 @@ export const CurrentROIWidget = memo(({
     onInitialInvestmentUpdate?.(newValue);
 
     try {
-      console.info('[CurrentROIWidget] Starting initial capital update');
-      
-      const result = await withTimeout(
-        (async () => {
-          return await supabase
-            .from('user_settings')
-            .upsert({
-              user_id: user.id,
-              initial_capital: newValue,
-              updated_at: new Date().toISOString(),
-            }, {
-              onConflict: 'user_id'
-            });
-        })(),
-        10000,
-        'save initial capital'
-      );
+      const { error } = await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user.id,
+          initial_capital: newValue,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id'
+        });
 
-      if (result.error) throw result.error;
+      if (error) throw error;
 
-      console.info('[CurrentROIWidget] Update completed in', Date.now() - startTime, 'ms');
       toast.success('Initial capital updated', { id: toastId });
       setIsDialogOpen(false);
     } catch (error: any) {
