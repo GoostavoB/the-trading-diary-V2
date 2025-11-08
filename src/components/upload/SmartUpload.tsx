@@ -254,11 +254,11 @@ export function SmartUpload({
 
         console.log('✅ Session valid, calling vision extraction...');
 
-        // Call vision extraction
-        const {
-          data,
-          error
-        } = await supabase.functions.invoke('vision-extract-trades', {
+        // Call vision extraction with explicit auth header
+        const { data, error } = await supabase.functions.invoke('vision-extract-trades', {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
           body: {
             imageBase64: imageBase64,  // Send full data URL
             broker: broker || undefined,
