@@ -32,10 +32,12 @@ export default function Upgrade() {
     try {
       trackUserJourney.checkoutStarted('subscription', amount, priceId);
       
+      const productType = billingCycle === 'monthly' ? 'subscription_monthly' : 'subscription_annual';
+      
       const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
         body: {
           priceId,
-          productType: `subscription_${billingCycle}_${planType}`,
+          productType,
           successUrl: `${window.location.origin}/dashboard?upgraded=true`,
           cancelUrl: `${window.location.origin}/upgrade`,
         },

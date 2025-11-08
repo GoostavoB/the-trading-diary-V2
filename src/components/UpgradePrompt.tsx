@@ -10,7 +10,7 @@ import { Crown, Check, ArrowRight, Sparkles, Clock } from 'lucide-react';
 import { usePromoStatus } from '@/hooks/usePromoStatus';
 import { Badge } from '@/components/ui/badge';
 import { initiateStripeCheckout } from '@/utils/stripeCheckout';
-import { STRIPE_PRODUCTS } from '@/config/stripeProducts';
+import { getSubscriptionProduct } from '@/config/stripe-products';
 import { toast } from 'sonner';
 
 interface UpgradePromptProps {
@@ -25,8 +25,10 @@ export function UpgradePrompt({ open, onClose, feature = 'this feature', trigger
 
   const handleUpgrade = async () => {
     try {
+      const proProduct = getSubscriptionProduct('pro', 'monthly');
+      
       await initiateStripeCheckout({
-        priceId: STRIPE_PRODUCTS.PRO_MONTHLY.priceId,
+        priceId: proProduct.priceId,
         productType: 'subscription_monthly',
       });
       onClose();

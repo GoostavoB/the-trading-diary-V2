@@ -29,6 +29,20 @@ export const initiateStripeCheckout = async (params: CheckoutParams): Promise<st
   console.log('🚀 initiateStripeCheckout called with:', params);
   const { priceId, productType, successUrl, cancelUrl, upsellCredits } = params;
 
+  // Validate productType
+  const validProductTypes: Array<CheckoutParams['productType']> = [
+    'subscription_monthly',
+    'subscription_annual',
+    'credits_starter',
+    'credits_pro'
+  ];
+  
+  if (!validProductTypes.includes(productType)) {
+    const error = `Invalid productType: "${productType}". Must be one of: ${validProductTypes.join(', ')}`;
+    console.error('❌', error);
+    throw new Error(error);
+  }
+
   // Verify user is authenticated (non-blocking)
   console.log('🔐 Checking authentication (non-blocking)...');
   try {
@@ -78,12 +92,15 @@ export const initiateStripeCheckout = async (params: CheckoutParams): Promise<st
 
   if (error) {
     console.error('❌ Checkout error:', error);
-    throw new Error(error.message || 'Failed to create checkout session');
+    // Surface the exact error from the backend
+    const errorMessage = error.message || data?.error || 'Failed to create checkout session';
+    throw new Error(errorMessage);
   }
 
   if (!data?.url) {
     console.error('❌ No checkout URL in response:', data);
-    throw new Error('No checkout URL received from server');
+    const errorMessage = data?.error || 'No checkout URL received from server';
+    throw new Error(errorMessage);
   }
 
   // Track checkout initiation (before redirect)

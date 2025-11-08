@@ -4,17 +4,22 @@ import { Button } from './ui/button';
 import { Progress } from './ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { initiateStripeCheckout } from '@/utils/stripeCheckout';
-import { STRIPE_PRODUCTS } from '@/config/stripeProducts';
+import { getCreditProduct } from '@/config/stripe-products';
 import { toast } from 'sonner';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 export const UploadCreditsDisplay = () => {
   const { balance, limit, canUpload, isLoading } = useUploadCredits();
+  const { subscription } = useSubscription();
 
   const handleBuyCredits = async () => {
     try {
+      const hasSubscription = subscription?.status === 'active';
+      const creditProduct = getCreditProduct(hasSubscription);
+      
       await initiateStripeCheckout({
-        priceId: STRIPE_PRODUCTS.CREDITS_10.priceId,
-        productType: 'credits_starter',
+        priceId: creditProduct.priceId,
+        productType: hasSubscription ? 'credits_pro' : 'credits_starter',
       });
     } catch (error) {
       console.error('Checkout error:', error);
