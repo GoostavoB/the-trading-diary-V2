@@ -59,10 +59,6 @@ export function SmartUpload({
   const [showDebugModal, setShowDebugModal] = useState(false);
   const [selectedDebugData, setSelectedDebugData] = useState<DebugData | null>(null);
   const [showCreditsGate, setShowCreditsGate] = useState(false);
-  const [creditsChecked, setCreditsChecked] = useState(false);
-  const [checkingCredits, setCheckingCredits] = useState(false);
-  const [remainingCredits, setRemainingCredits] = useState(0);
-  const [hasCredits, setHasCredits] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { canUpload, balance, refetch: refetchCredits } = useUploadCredits();
@@ -135,46 +131,35 @@ export function SmartUpload({
       img.src = URL.createObjectURL(file);
     });
   };
-  // Proactive credit check function
-  const checkCredits = async (required: number = 1): Promise<boolean> => {
-    console.log('🔍 [CREDIT PRECHECK] Starting check, required:', required);
-    setCheckingCredits(true);
+  // Simplified credit check function
+  const checkCredits = async (): Promise<boolean> => {
+    console.log('🔍 Checking credits...');
     
     try {
       const { data, error } = await supabase.functions.invoke('check-upload-credits');
-      console.log('🔍 [CREDIT PRECHECK] Response:', { data, error });
       
       if (error) {
-        console.error('❌ [CREDIT PRECHECK] Error:', error);
-        toast.error('Unable to verify credits', { 
-          description: 'Please try again or contact support.' 
-        });
-        setCheckingCredits(false);
+        console.error('❌ Credit check failed:', error);
+        toast.error('Unable to check credits', { description: 'Please try again.' });
         return false;
       }
       
-      const remaining = data?.remaining ?? 0;
-      const allowed = data?.canUpload === true && remaining >= required;
+      const balance = data?.balance ?? 0;
+      console.log(`✅ Credit balance: ${balance}`);
       
-      console.log('🔍 [CREDIT PRECHECK] Result:', { 
-        remaining, 
-        required, 
-        allowed, 
-        canUpload: data?.canUpload 
-      });
+      if (balance === 0) {
+        console.log('❌ No credits - showing gate');
+        setShowCreditsGate(true);
+        toast.error('No credits remaining', { 
+          description: 'Purchase credits or upgrade to continue.' 
+        });
+        return false;
+      }
       
-      setCreditsChecked(true);
-      setRemainingCredits(remaining);
-      setHasCredits(allowed);
-      setCheckingCredits(false);
-      
-      return allowed;
+      return true;
     } catch (err) {
-      console.error('❌ [CREDIT PRECHECK] Exception:', err);
-      toast.error('Credit check failed', { 
-        description: 'Please try again.' 
-      });
-      setCheckingCredits(false);
+      console.error('❌ Credit check exception:', err);
+      toast.error('Credit check failed', { description: 'Please refresh and try again.' });
       return false;
     }
   };
@@ -185,29 +170,7 @@ export function SmartUpload({
     console.log('🔍 [FILE SELECT] Starting with', files.length, 'files');
     
     // Calculate how many files we can accept
-    const currentQueuedCount = imageQueue.filter(i => i.status === 'queued').length;
     const newFiles = Array.from(files).slice(0, maxImages - imageQueue.length);
-    const requestedCount = newFiles.length;
-    const totalNeeded = currentQueuedCount + requestedCount;
-    
-    console.log('🔍 [FILE SELECT] Credits needed:', {
-      currentQueued: currentQueuedCount,
-      newFiles: requestedCount,
-      totalNeeded
-    });
-    
-    // Check if we have enough credits for all queued + new files
-    const canProceed = await checkCredits(totalNeeded);
-    
-    if (!canProceed) {
-      console.log('❌ [FILE SELECT] Blocked - insufficient credits');
-      setShowCreditsGate(true);
-      toast.error('Not enough credits', { 
-        description: `You need ${totalNeeded} credits but only have ${remainingCredits}. Buy credits or upgrade to continue.`,
-        duration: 6000
-      });
-      return; // Block file addition
-    }
     
     console.log('✅ [FILE SELECT] Proceeding with file validation');
     
@@ -262,27 +225,30 @@ export function SmartUpload({
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    console.log('🔍 [DROP] Files dropped:', e.dataTransfer.files.length);
-    await handleFileSelect(e.dataTransfer.files);
-  };
-  
-  const handleDropzoneClick = async () => {
-    console.log('🔍 [DROPZONE CLICK] User clicked dropzone');
     
-    // Check if user has at least 1 credit before opening file picker
-    const canProceed = await checkCredits(1);
+    console.log('🔍 Files dropped');
     
-    if (!canProceed) {
-      console.log('❌ [DROPZONE CLICK] Blocked - no credits');
-      setShowCreditsGate(true);
-      toast.error('No credits', { 
-        description: 'Buy credits or upgrade to continue uploading.',
-        duration: 6000
-      });
+    // Check credits FIRST
+    const hasCredits = await checkCredits();
+    if (!hasCredits) {
+      console.log('❌ Blocked - no credits');
       return;
     }
     
-    console.log('✅ [DROPZONE CLICK] Opening file picker');
+    // Then process files
+    const files = e.dataTransfer.files;
+    if (files?.length > 0) {
+      await handleFileSelect(files);
+    }
+  };
+  
+  const handleDropzoneClick = async () => {
+    console.log('🔍 Dropzone clicked');
+    const hasCredits = await checkCredits();
+    if (!hasCredits) {
+      console.log('❌ Blocked - no credits');
+      return;
+    }
     fileInputRef.current?.click();
   };
   const removeImage = (index: number) => {
@@ -618,15 +584,10 @@ export function SmartUpload({
     
     // Defensive credit check at upload button (in case state is stale)
     console.log('🔍 [BUTTON CLICK] Running defensive credit check...');
-    const canProceed = await checkCredits(queuedCount);
+    const canProceed = await checkCredits();
     
     if (!canProceed) {
       console.log('❌ [BUTTON CLICK] Blocked - insufficient credits');
-      setShowCreditsGate(true);
-      toast.error('Not enough credits', { 
-        description: `You need ${queuedCount} credits but only have ${remainingCredits}. Buy credits or upgrade to continue.`,
-        duration: 6000
-      });
       return;
     }
     
@@ -697,7 +658,7 @@ export function SmartUpload({
               "border-2 border-dashed transition-all duration-300",
               "bg-muted/30 flex flex-col items-center justify-center",
               isDragging ? "border-blue-500 bg-blue-500/10 scale-[1.02]" : "border-border/50 hover:border-blue-500/50 active:scale-[0.98]",
-              !hasCredits && creditsChecked ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+              "cursor-pointer"
             )}
           >
             <Upload className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-3 md:mb-4 text-muted-foreground" />
@@ -711,12 +672,6 @@ export function SmartUpload({
             <p className="text-xs text-muted-foreground">
               PNG, JPG, WEBP • Max 10 MB
             </p>
-            
-            {!hasCredits && creditsChecked && (
-              <p className="text-xs text-amber-500 font-medium mt-2">
-                ⚠️ Credits required to upload
-              </p>
-            )}
           </div>
         </div>}
 
@@ -891,18 +846,9 @@ export function SmartUpload({
                 </Button>}
               <Button 
                 onClick={handleUploadClick} 
-                disabled={
-                  processing || 
-                  imageQueue.length === 0 || 
-                  (creditsChecked && remainingCredits < imageQueue.filter(i => i.status === 'queued').length)
-                } 
+                disabled={processing || imageQueue.length === 0} 
                 size="lg" 
                 className="w-full sm:flex-1 text-white rounded-xl group relative overflow-hidden min-h-[44px] bg-gradient-to-r from-primary to-primary/80"
-                title={
-                  creditsChecked && remainingCredits < imageQueue.filter(i => i.status === 'queued').length
-                    ? `Not enough credits (need ${imageQueue.filter(i => i.status === 'queued').length}, have ${remainingCredits})`
-                    : undefined
-                }
               >
                 {/* Background glow */}
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
