@@ -131,17 +131,6 @@ export function AppSidebar() {
         // { title: t('navigation.progressXP'), url: '/progress-analytics', icon: Zap, iconName: 'Zap', keywords: ['progress', 'xp', 'experience', 'level', 'achievements', 'gamification', 'points', 'rewards', 'streaks', 'challenges', 'daily', 'weekly', 'missions', 'unlock', 'growth', 'rank', 'leveling'] },
       ],
     },
-    {
-      label: 'Learning',
-      defaultOpen: false,
-      items: [
-        { title: 'Trading Lessons', url: '/learn', icon: BookOpen, iconName: 'BookOpen', keywords: ['learn', 'education', 'lessons', 'courses', 'training', 'tutorials', 'knowledge', 'improve', 'study'] },
-        { title: 'API Documentation', url: '/api-docs', icon: FileText, iconName: 'FileText', keywords: ['api', 'docs', 'documentation', 'developer', 'integration', 'endpoints', 'technical'] },
-        { title: 'Advanced Analytics', url: '/advanced-analytics', icon: TrendingUp, iconName: 'TrendingUp', keywords: ['advanced', 'analytics', 'metrics', 'deep', 'analysis', 'statistics', 'insights'] },
-        { title: 'Logo Download', url: '/logo-download', icon: Download, iconName: 'Download', keywords: ['logo', 'brand', 'assets', 'download', 'branding', 'official', 'icon', 'graphics'] },
-        { title: 'Logo Generator', url: '/logo-generator', icon: Image, iconName: 'Image', keywords: ['logo', 'branding', 'design', 'icon', 'graphics', 'variations', 'download', 'png', 'assets', 'visual', 'identity', 'experimental', 'colors'] },
-      ],
-    },
   ];
 
   const isActive = (path: string) => location.pathname === path;
