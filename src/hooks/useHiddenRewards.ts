@@ -71,23 +71,26 @@ export const useHiddenRewards = (trades: Trade[]) => {
           .from('user_xp_levels')
           .select('total_xp_earned')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
-        if (currentXP) {
-          await supabase
-            .from('user_xp_levels')
-            .update({
-              total_xp_earned: currentXP.total_xp_earned + xpReward,
-            })
-            .eq('user_id', user.id);
+        const totalXP = currentXP?.total_xp_earned || 0;
 
-          await supabase.from('xp_activity_log').insert({
+        // Upsert XP record
+        await supabase
+          .from('user_xp_levels')
+          .upsert({
             user_id: user.id,
-            activity_type: 'hidden_threshold_reward',
-            xp_earned: xpReward,
-            description: message,
-          });
-        }
+            total_xp_earned: totalXP + xpReward,
+            current_xp: totalXP + xpReward,
+            current_level: 1
+          }, { onConflict: 'user_id' });
+
+        await supabase.from('xp_activity_log').insert({
+          user_id: user.id,
+          activity_type: 'hidden_threshold_reward',
+          xp_earned: xpReward,
+          description: message,
+        });
 
         // Show notification
         toast.success(`Milestone Reached: ${message}`, {

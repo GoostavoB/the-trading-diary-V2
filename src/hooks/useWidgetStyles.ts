@@ -42,7 +42,7 @@ export const useWidgetStyles = () => {
         .from('user_xp_levels')
         .select('total_xp_earned')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       // Calculate level from total XP
       const calculateLevel = (totalXP: number): number => {

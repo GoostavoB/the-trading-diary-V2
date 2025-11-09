@@ -25,8 +25,8 @@ export function useWidgetAccess() {
         .from('user_xp_levels')
         .select('total_xp_earned')
         .eq('user_id', user.id)
-        .single();
-      return data;
+        .maybeSingle();
+      return data || { total_xp_earned: 0 };
     },
     enabled: !!user,
   });

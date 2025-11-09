@@ -33,17 +33,48 @@ export const useDailyRewards = () => {
     try {
       setLoading(true);
 
-      // Get user's current reward status
+      // Get user's current reward status (use maybeSingle to handle missing records)
       const { data: tierData, error: tierError } = await supabase
         .from('user_xp_tiers')
         .select('consecutive_login_days, last_reward_claimed_date, current_tier, last_login_date, total_rewards_claimed')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (tierError) {
         console.error('Error fetching tier data:', tierError);
         setLoading(false);
         return;
+      }
+
+      // If no tier data exists, create it
+      if (!tierData) {
+        const { error: insertError } = await supabase
+          .from('user_xp_tiers')
+          .insert({
+            user_id: user.id,
+            consecutive_login_days: 0,
+            consecutive_trade_days: 0,
+            daily_xp_earned: 0,
+            daily_upload_count: 0
+          });
+
+        if (insertError) {
+          console.error('Error creating tier data:', insertError);
+          setLoading(false);
+          return;
+        }
+
+        // Retry fetch
+        const { data: newTierData } = await supabase
+          .from('user_xp_tiers')
+          .select('consecutive_login_days, last_reward_claimed_date, current_tier, last_login_date, total_rewards_claimed')
+          .eq('user_id', user.id)
+          .single();
+
+        if (!newTierData) {
+          setLoading(false);
+          return;
+        }
       }
 
       const today = new Date().toISOString().split('T')[0];
@@ -121,90 +152,41 @@ export const useDailyRewards = () => {
     }
 
     try {
-      const today = new Date().toISOString().split('T')[0];
+      console.log('🎁 Claiming daily reward via RPC...');
+      
+      // Call the transactional RPC function
+      const { data: rawData, error: rpcError } = await supabase
+        .rpc('claim_daily_reward' as any);
 
-      console.log('📝 Step 1: Fetching current tier data...');
-      const { data: currentTierData, error: tierFetchError } = await supabase
-        .from('user_xp_tiers')
-        .select('total_rewards_claimed')
-        .eq('user_id', user.id)
-        .single();
-
-      if (tierFetchError) {
-        console.error('❌ Failed to fetch tier data:', tierFetchError);
-        throw new Error(`Failed to fetch user tier data: ${tierFetchError.message}`);
+      if (rpcError) {
+        console.error('❌ RPC error:', rpcError);
+        
+        // Handle specific errors
+        if (rpcError.message.includes('already claimed')) {
+          toast.error("Already claimed today", {
+            description: "Come back tomorrow for your next reward!"
+          });
+          setReward(prev => prev ? {...prev, canClaim: false, alreadyClaimed: true} : null);
+          return false;
+        }
+        
+        throw new Error(rpcError.message);
       }
 
-      console.log('📝 Step 2: Inserting reward log...');
-      const { error: logError } = await supabase
-        .from('daily_rewards_log')
-        .insert({
-          user_id: user.id,
-          reward_date: today,
-          consecutive_days: reward.consecutiveDays,
-          xp_awarded: reward.xpReward,
-          bonus_multiplier: reward.bonusMultiplier,
-          reward_tier: reward.rewardTier
-        });
-
-      if (logError) {
-        console.error('❌ Failed to insert reward log:', logError);
-        throw new Error(`Failed to log reward: ${logError.message}`);
-      }
-
-      console.log('📝 Step 3: Updating user_xp_tiers...');
-      const { error: updateError } = await supabase
-        .from('user_xp_tiers')
-        .update({
-          consecutive_login_days: reward.consecutiveDays,
-          last_reward_claimed_date: today,
-          total_rewards_claimed: (currentTierData?.total_rewards_claimed || 0) + 1
-        })
-        .eq('user_id', user.id);
-
-      if (updateError) {
-        console.error('❌ Failed to update tier:', updateError);
-        throw new Error(`Failed to update login streak: ${updateError.message}`);
-      }
-
-      console.log('📝 Step 4: Fetching current XP...');
-      const { data: xpData, error: xpFetchError } = await supabase
-        .from('user_xp_levels')
-        .select('total_xp_earned')
-        .eq('user_id', user.id)
-        .single();
-
-      if (xpFetchError) {
-        console.error('❌ Failed to fetch XP data:', xpFetchError);
-        throw new Error(`Failed to fetch XP data: ${xpFetchError.message}`);
-      }
-
-      console.log('📝 Step 5: Updating XP...');
-      const { error: xpError } = await supabase
-        .from('user_xp_levels')
-        .update({
-          total_xp_earned: (xpData?.total_xp_earned || 0) + reward.xpReward
-        })
-        .eq('user_id', user.id);
-
-      if (xpError) {
-        console.error('❌ Failed to update XP:', xpError);
-        throw new Error(`Failed to update XP: ${xpError.message}`);
-      }
-
-      console.log('✅ Reward claimed successfully!');
+      // Type assertion for RPC response
+      const data = rawData as any;
+      console.log('✅ Reward claimed successfully!', data);
 
       // Track analytics
       analytics.track('daily_reward_claimed', {
         user_id: user.id,
-        xp_awarded: reward.xpReward,
-        consecutive_days: reward.consecutiveDays,
-        reward_tier: reward.rewardTier,
-        bonus_multiplier: reward.bonusMultiplier
+        xp_awarded: data.xp_awarded,
+        consecutive_days: data.consecutive_days,
+        total_rewards: data.total_rewards_claimed
       });
 
-      toast.success(`🎉 Daily reward claimed! +${reward.xpReward} XP`, {
-        description: `${reward.consecutiveDays} day streak!`
+      toast.success(`🎉 Daily reward claimed! +${data.xp_awarded} XP`, {
+        description: `${data.consecutive_days} day streak!`
       });
 
       // Update reward state
@@ -222,8 +204,13 @@ export const useDailyRewards = () => {
       return true;
     } catch (error: any) {
       console.error('❌ Error claiming reward:', error);
+      
+      // Reset claiming state
+      setReward(prev => prev ? {...prev, canClaim: true, alreadyClaimed: false} : null);
+      
       toast.error("Failed to claim reward", {
-        description: error?.message || "Please try again."
+        description: error?.message || "Please try again later.",
+        duration: 5000
       });
       return false;
     }

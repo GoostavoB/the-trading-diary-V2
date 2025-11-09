@@ -24,6 +24,36 @@ export const useAuth = () => {
   return context;
 };
 
+/**
+ * Ensure user has both XP records initialized
+ */
+const ensureUserXPRecords = async (userId: string) => {
+  try {
+    // Upsert user_xp_levels
+    await supabase
+      .from('user_xp_levels')
+      .upsert({
+        user_id: userId,
+        total_xp_earned: 0,
+        current_xp: 0,
+        current_level: 1
+      }, { onConflict: 'user_id' });
+
+    // Upsert user_xp_tiers
+    await supabase
+      .from('user_xp_tiers')
+      .upsert({
+        user_id: userId,
+        consecutive_login_days: 0,
+        consecutive_trade_days: 0,
+        daily_xp_earned: 0,
+        daily_upload_count: 0
+      }, { onConflict: 'user_id' });
+  } catch (error) {
+    console.error('Error ensuring XP records:', error);
+  }
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -49,6 +79,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } else if (event === 'USER_UPDATED') {
           console.log('User data updated');
         } else if (event === 'SIGNED_IN' && session?.user) {
+          // Ensure XP records exist
+          await ensureUserXPRecords(session.user.id);
+
           // Update last login tracking for engagement reminders
           const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
           const todayLocal = new Date().toLocaleDateString('en-CA');
