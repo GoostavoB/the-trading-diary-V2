@@ -22,35 +22,31 @@ serve(async (req) => {
       });
     }
 
-    // Create Supabase client and verify token
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
+    // Extract user ID from JWT (already verified by Supabase when verify_jwt = true)
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
-    
-    if (userError) {
-      console.error('❌ Auth error:', userError.message);
-      return new Response(JSON.stringify({ 
-        error: 'Authentication failed',
-        details: userError.message 
-      }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-    
-    if (!user) {
-      console.error('❌ No user found');
-      return new Response(JSON.stringify({ error: 'User not authenticated' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+    let userId: string;
 
-    console.log('✅ User authenticated:', user.id);
+    try {
+      // Decode JWT to get user ID (JWT signature already verified by Supabase)
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      userId = payload.sub;
+      
+      if (!userId) {
+        console.error('❌ No user ID in JWT');
+        return new Response(JSON.stringify({ error: 'Invalid token - no user ID' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      
+      console.log('✅ User authenticated:', userId);
+    } catch (decodeError) {
+      console.error('❌ JWT decode failed:', decodeError);
+      return new Response(JSON.stringify({ error: 'Invalid token format' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
 
     const { imageBase64, broker, annotations, debug } = await req.json();
 
@@ -62,7 +58,7 @@ serve(async (req) => {
     }
 
     console.log('📸 Vision extraction request:', { 
-      userId: user.id, 
+      userId, 
       broker,
       hasAnnotations: !!annotations?.length,
       debug: !!debug
