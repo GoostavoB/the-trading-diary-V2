@@ -7,6 +7,12 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  console.log('🎯 vision-extract-trades invoked - Function is alive!', {
+    method: req.method,
+    url: req.url,
+    timestamp: new Date().toISOString()
+  });
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
