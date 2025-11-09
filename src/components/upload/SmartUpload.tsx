@@ -255,9 +255,9 @@ export function SmartUpload({
         console.log('✅ Session valid, calling vision extraction...');
 
         // Call vision extraction with direct fetch to expose HTTP status codes
-        const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vision-extract-trades`;
+        const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-trade-info`;
         
-        console.log('🚀 Calling vision-extract-trades...');
+        console.log('🚀 Calling extract-trade-info...');
         const response = await fetch(functionUrl, {
           method: 'POST',
           headers: {
