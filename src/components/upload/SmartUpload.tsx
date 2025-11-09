@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -62,6 +62,16 @@ export function SmartUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { canUpload, balance, refetch: refetchCredits } = useUploadCredits();
+
+  // Debug: Track showCreditsGate state changes
+  useEffect(() => {
+    console.log('🔍 [STATE CHANGE] showCreditsGate changed to:', showCreditsGate);
+    if (showCreditsGate) {
+      console.log('🔍 [RENDER] UploadCreditsGate modal SHOULD NOW BE VISIBLE');
+    } else {
+      console.log('🔍 [RENDER] UploadCreditsGate modal SHOULD BE HIDDEN');
+    }
+  }, [showCreditsGate]);
 
   // Client-side blur detection
   const detectBlur = async (file: File): Promise<boolean> => {
@@ -193,26 +203,82 @@ export function SmartUpload({
     setTotalTradesFound(0);
   };
   const processImages = async () => {
-    if (imageQueue.length === 0) return;
+    console.log('🔍 [UPLOAD START] processImages called');
+    console.log('🔍 [UPLOAD START] imageQueue.length:', imageQueue.length);
+    console.log('🔍 [UPLOAD START] imageQueue status breakdown:', {
+      queued: imageQueue.filter(i => i.status === 'queued').length,
+      processing: imageQueue.filter(i => i.status === 'processing').length,
+      success: imageQueue.filter(i => i.status === 'success').length,
+      error: imageQueue.filter(i => i.status === 'error').length,
+    });
+    
+    if (imageQueue.length === 0) {
+      console.log('🔍 [UPLOAD START] No images in queue, returning');
+      return;
+    }
     
     // Server-side credit check BEFORE any processing to avoid 90% stalls
+    console.log('🔍 [CREDIT CHECK] Starting server-side credit check...');
     try {
       const queuedCount = imageQueue.filter(i => i.status === 'queued').length;
+      console.log('🔍 [CREDIT CHECK] Queued images count:', queuedCount);
+      
+      console.log('🔍 [CREDIT CHECK] Calling check-upload-credits edge function...');
       const { data: creditData, error: creditErr } = await supabase.functions.invoke('check-upload-credits');
+      
+      console.log('🔍 [CREDIT CHECK] Response received');
+      console.log('🔍 [CREDIT CHECK] creditData:', JSON.stringify(creditData, null, 2));
+      console.log('🔍 [CREDIT CHECK] creditErr:', creditErr);
+      
       if (creditErr) {
-        console.error('❌ Credit check failed:', creditErr);
+        console.error('❌ [CREDIT CHECK] Credit check API error:', creditErr);
+        console.error('❌ [CREDIT CHECK] Error details:', JSON.stringify(creditErr, null, 2));
       }
+      
       const remaining = (creditData as any)?.remaining ?? 0;
-      const canUploadNow = (creditData as any)?.canUpload === true && remaining >= queuedCount;
+      const canUploadFlag = (creditData as any)?.canUpload ?? false;
+      const balance = (creditData as any)?.balance ?? 0;
+      
+      console.log('🔍 [CREDIT CHECK] Parsed values:');
+      console.log('🔍 [CREDIT CHECK]   - remaining:', remaining);
+      console.log('🔍 [CREDIT CHECK]   - canUpload flag:', canUploadFlag);
+      console.log('🔍 [CREDIT CHECK]   - balance:', balance);
+      console.log('🔍 [CREDIT CHECK]   - needed (queuedCount):', queuedCount);
+      
+      const canUploadNow = canUploadFlag === true && remaining >= queuedCount;
+      console.log('🔍 [CREDIT CHECK] Calculated canUploadNow:', canUploadNow);
+      console.log('🔍 [CREDIT CHECK] Logic: canUploadFlag (', canUploadFlag, ') === true && remaining (', remaining, ') >= queuedCount (', queuedCount, ')');
+      
       if (!canUploadNow) {
-        console.log('❌ Not enough credits. Needed:', queuedCount, 'Remaining:', remaining);
+        console.log('❌ [CREDIT GATE] BLOCKING UPLOAD - Not enough credits');
+        console.log('❌ [CREDIT GATE] Needed:', queuedCount, 'Remaining:', remaining);
+        console.log('❌ [CREDIT GATE] Setting showCreditsGate to TRUE');
         setShowCreditsGate(true);
+        
+        // Verify state change
+        setTimeout(() => {
+          console.log('🔍 [CREDIT GATE] State after 100ms - showCreditsGate should be true');
+        }, 100);
+        
         return;
       }
+      
+      console.log('✅ [CREDIT CHECK] Credits OK - proceeding with upload');
+      console.log('✅ [CREDIT CHECK] Available credits:', remaining, 'Needed:', queuedCount);
+      
     } catch (e) {
-      console.error('❌ Unexpected error during credit check:', e);
+      console.error('❌ [CREDIT CHECK] Unexpected exception during credit check:', e);
+      console.error('❌ [CREDIT CHECK] Exception type:', typeof e);
+      console.error('❌ [CREDIT CHECK] Exception details:', e);
+      console.error('❌ [CREDIT GATE] BLOCKING UPLOAD - Showing gate due to exception');
       // Fail closed: show gate to prevent bad UX
       setShowCreditsGate(true);
+      
+      // Verify state change
+      setTimeout(() => {
+        console.log('🔍 [CREDIT GATE] State after exception + 100ms - showCreditsGate should be true');
+      }, 100);
+      
       return;
     }
     
@@ -438,6 +504,17 @@ export function SmartUpload({
   const openDebugModal = (debugData: DebugData) => {
     setSelectedDebugData(debugData);
     setShowDebugModal(true);
+  };
+
+  // Wrapper for processImages with logging
+  const handleUploadClick = () => {
+    console.log('🔍 [BUTTON CLICK] Upload button clicked');
+    console.log('🔍 [BUTTON CLICK] Current state:');
+    console.log('🔍 [BUTTON CLICK]   - processing:', processing);
+    console.log('🔍 [BUTTON CLICK]   - imageQueue.length:', imageQueue.length);
+    console.log('🔍 [BUTTON CLICK]   - showCreditsGate:', showCreditsGate);
+    console.log('🔍 [BUTTON CLICK] Calling processImages()...');
+    processImages();
   };
 
   return <TooltipProvider>
@@ -676,7 +753,7 @@ export function SmartUpload({
               {!processing && <Button variant="ghost" onClick={clearAll} disabled={imageQueue.length === 0} size="lg" className="w-full sm:w-auto text-muted-foreground hover:text-foreground">
                   Cancel
                 </Button>}
-              <Button onClick={processImages} disabled={processing || imageQueue.length === 0} size="lg" className="w-full sm:flex-1 text-white rounded-xl group relative overflow-hidden min-h-[44px] bg-gradient-to-r from-primary to-primary/80">
+              <Button onClick={handleUploadClick} disabled={processing || imageQueue.length === 0} size="lg" className="w-full sm:flex-1 text-white rounded-xl group relative overflow-hidden min-h-[44px] bg-gradient-to-r from-primary to-primary/80">
                 {/* Background glow */}
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
                 
@@ -713,13 +790,19 @@ export function SmartUpload({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowCreditsGate(false)}
+            onClick={() => {
+              console.log('🔍 [MODAL] Backdrop clicked, closing modal');
+              setShowCreditsGate(false);
+            }}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                console.log('🔍 [MODAL] Modal content clicked (stopping propagation)');
+                e.stopPropagation();
+              }}
               className="max-w-lg w-full"
             >
               <UploadCreditsGate />
