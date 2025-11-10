@@ -69,6 +69,7 @@ import { ChevronLeft } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { pageMeta } from '@/utils/seoHelpers';
+import { TradeStationView } from '@/components/trade-station/TradeStationView';
 
 interface TradeStats {
   total_pnl: number;
@@ -930,11 +931,26 @@ const Dashboard = () => {
           <>
             {/* Main Content Tabs */}
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6 animate-fade-in" style={{animationDelay: '0.5s'}}>
-              <TabsList className="glass rounded-2xl grid w-full grid-cols-3 h-auto p-1.5">
+              <TabsList className="glass rounded-2xl grid w-full grid-cols-4 h-auto p-1.5">
+                <TabsTrigger value="station" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Trade Station</TabsTrigger>
                 <TabsTrigger value="overview" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('dashboard.overview')}</TabsTrigger>
                 <TabsTrigger value="insights" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('analytics.insights')}</TabsTrigger>
                 <TabsTrigger value="history" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('trades.tradeHistory')}</TabsTrigger>
               </TabsList>
+
+              <TabsContent value="station" className="space-y-6">
+                <TradeStationView
+                  currentEquity={totalCapitalAdditions > 0 ? totalCapitalAdditions + (stats?.total_pnl || 0) : initialInvestment + (stats?.total_pnl || 0)}
+                  initialCapital={initialInvestment}
+                  accumulatedProfit={stats?.total_pnl || 0}
+                  currentDailyPnL={processedTrades.filter(t => {
+                    const today = new Date().toISOString().split('T')[0];
+                    const tradeDate = new Date(t.trade_date).toISOString().split('T')[0];
+                    return today === tradeDate;
+                  }).reduce((sum, t) => sum + (t.pnl || 0), 0)}
+                  dailyLossLimit={(totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment) * 0.01}
+                />
+              </TabsContent>
 
               <TabsContent value="overview" className="space-y-6">
                 <DndContext

@@ -283,6 +283,57 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_training_profile: {
+        Row: {
+          common_challenges: string[] | null
+          consent_to_analyze: boolean | null
+          created_at: string
+          experience_level: string | null
+          id: string
+          main_goals: string[] | null
+          main_goals_other: string | null
+          market_focus: string[] | null
+          risk_per_trade: string | null
+          strategy_style: string | null
+          trading_schedule: string[] | null
+          trading_styles: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          common_challenges?: string[] | null
+          consent_to_analyze?: boolean | null
+          created_at?: string
+          experience_level?: string | null
+          id?: string
+          main_goals?: string[] | null
+          main_goals_other?: string | null
+          market_focus?: string[] | null
+          risk_per_trade?: string | null
+          strategy_style?: string | null
+          trading_schedule?: string[] | null
+          trading_styles?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          common_challenges?: string[] | null
+          consent_to_analyze?: boolean | null
+          created_at?: string
+          experience_level?: string | null
+          id?: string
+          main_goals?: string[] | null
+          main_goals_other?: string | null
+          market_focus?: string[] | null
+          risk_per_trade?: string | null
+          strategy_style?: string | null
+          trading_schedule?: string[] | null
+          trading_styles?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       alert_history: {
         Row: {
           alert_id: string
@@ -400,6 +451,42 @@ export type Database = {
         }
         Relationships: []
       }
+      broker_csv_templates: {
+        Row: {
+          broker_name: string
+          column_mappings: Json
+          created_at: string
+          id: string
+          is_global: boolean
+          last_used_at: string
+          sample_headers: string[]
+          usage_count: number
+          user_id: string
+        }
+        Insert: {
+          broker_name: string
+          column_mappings: Json
+          created_at?: string
+          id?: string
+          is_global?: boolean
+          last_used_at?: string
+          sample_headers: string[]
+          usage_count?: number
+          user_id: string
+        }
+        Update: {
+          broker_name?: string
+          column_mappings?: Json
+          created_at?: string
+          id?: string
+          is_global?: boolean
+          last_used_at?: string
+          sample_headers?: string[]
+          usage_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       browser_notifications: {
         Row: {
           created_at: string
@@ -484,6 +571,81 @@ export type Database = {
         }
         Relationships: []
       }
+      claude_api_usage: {
+        Row: {
+          created_at: string | null
+          error_code: string | null
+          error_message: string | null
+          id: string
+          operation: string
+          query_params: Json | null
+          response_size_bytes: number | null
+          response_time_ms: number | null
+          row_count: number | null
+          success: boolean
+          table_name: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          operation: string
+          query_params?: Json | null
+          response_size_bytes?: number | null
+          response_time_ms?: number | null
+          row_count?: number | null
+          success: boolean
+          table_name?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          operation?: string
+          query_params?: Json | null
+          response_size_bytes?: number | null
+          response_time_ms?: number | null
+          row_count?: number | null
+          success?: boolean
+          table_name?: string | null
+        }
+        Relationships: []
+      }
+      connected_accounts: {
+        Row: {
+          account_name: string | null
+          api_key_encrypted: string | null
+          created_at: string | null
+          exchange_name: string
+          id: string
+          is_active: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          account_name?: string | null
+          api_key_encrypted?: string | null
+          created_at?: string | null
+          exchange_name: string
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          account_name?: string | null
+          api_key_encrypted?: string | null
+          created_at?: string | null
+          exchange_name?: string
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       currency_rates: {
         Row: {
           base_currency: string
@@ -510,15 +672,21 @@ export type Database = {
       }
       custom_dashboard_widgets: {
         Row: {
+          ai_prompt: string | null
+          conversation_id: string | null
           created_at: string
+          created_via: string | null
+          data_snapshot: Json | null
           description: string | null
           display_config: Json
           height: number
           id: string
+          is_permanent: boolean | null
           menu_item_id: string | null
           position_x: number
           position_y: number
           query_config: Json
+          tier_required: number | null
           title: string
           updated_at: string
           user_id: string
@@ -526,15 +694,21 @@ export type Database = {
           width: number
         }
         Insert: {
+          ai_prompt?: string | null
+          conversation_id?: string | null
           created_at?: string
+          created_via?: string | null
+          data_snapshot?: Json | null
           description?: string | null
           display_config?: Json
           height?: number
           id?: string
+          is_permanent?: boolean | null
           menu_item_id?: string | null
           position_x?: number
           position_y?: number
           query_config?: Json
+          tier_required?: number | null
           title: string
           updated_at?: string
           user_id: string
@@ -542,15 +716,21 @@ export type Database = {
           width?: number
         }
         Update: {
+          ai_prompt?: string | null
+          conversation_id?: string | null
           created_at?: string
+          created_via?: string | null
+          data_snapshot?: Json | null
           description?: string | null
           display_config?: Json
           height?: number
           id?: string
+          is_permanent?: boolean | null
           menu_item_id?: string | null
           position_x?: number
           position_y?: number
           query_config?: Json
+          tier_required?: number | null
           title?: string
           updated_at?: string
           user_id?: string
@@ -610,6 +790,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      custom_metrics: {
+        Row: {
+          created_at: string | null
+          created_this_month: string | null
+          description: string | null
+          id: string
+          metric_formula: string
+          metric_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_this_month?: string | null
+          description?: string | null
+          id?: string
+          metric_formula: string
+          metric_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_this_month?: string | null
+          description?: string | null
+          id?: string
+          metric_formula?: string
+          metric_name?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       custom_tags: {
         Row: {
@@ -674,6 +884,75 @@ export type Database = {
           target_value?: number
           user_id?: string
           xp_reward?: number
+        }
+        Relationships: []
+      }
+      daily_loss_events: {
+        Row: {
+          action: string
+          created_at: string
+          event_date: string
+          id: string
+          limit_value: number
+          loss_value: number
+          override_expires_at: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          event_date?: string
+          id?: string
+          limit_value: number
+          loss_value: number
+          override_expires_at?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          event_date?: string
+          id?: string
+          limit_value?: number
+          loss_value?: number
+          override_expires_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_rewards_log: {
+        Row: {
+          bonus_multiplier: number | null
+          claimed_at: string
+          consecutive_days: number
+          created_at: string
+          id: string
+          reward_date: string
+          reward_tier: number | null
+          user_id: string
+          xp_awarded: number
+        }
+        Insert: {
+          bonus_multiplier?: number | null
+          claimed_at?: string
+          consecutive_days?: number
+          created_at?: string
+          id?: string
+          reward_date: string
+          reward_tier?: number | null
+          user_id: string
+          xp_awarded?: number
+        }
+        Update: {
+          bonus_multiplier?: number | null
+          claimed_at?: string
+          consecutive_days?: number
+          created_at?: string
+          id?: string
+          reward_date?: string
+          reward_tier?: number | null
+          user_id?: string
+          xp_awarded?: number
         }
         Relationships: []
       }
@@ -759,6 +1038,7 @@ export type Database = {
           sync_cursor: Json | null
           sync_error: string | null
           sync_status: string | null
+          trading_type: string | null
           updated_at: string | null
           user_id: string
         }
@@ -780,6 +1060,7 @@ export type Database = {
           sync_cursor?: Json | null
           sync_error?: string | null
           sync_status?: string | null
+          trading_type?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -801,6 +1082,7 @@ export type Database = {
           sync_cursor?: Json | null
           sync_error?: string | null
           sync_status?: string | null
+          trading_type?: string | null
           updated_at?: string | null
           user_id?: string
         }
@@ -1080,6 +1362,134 @@ export type Database = {
           },
         ]
       }
+      friend_challenge_notifications: {
+        Row: {
+          challenger_user_id: string
+          created_at: string
+          id: string
+          is_read: boolean | null
+          message: string
+          notification_type: string
+          user_id: string
+        }
+        Insert: {
+          challenger_user_id: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message: string
+          notification_type: string
+          user_id: string
+        }
+        Update: {
+          challenger_user_id?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          notification_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      friend_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          invitation_code: string
+          invitee_email: string | null
+          invitee_user_id: string | null
+          inviter_user_id: string
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invitation_code: string
+          invitee_email?: string | null
+          invitee_user_id?: string | null
+          inviter_user_id: string
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invitation_code?: string
+          invitee_email?: string | null
+          invitee_user_id?: string | null
+          inviter_user_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      friend_leaderboard_groups: {
+        Row: {
+          created_at: string
+          creator_user_id: string
+          description: string | null
+          id: string
+          invite_code: string
+          is_private: boolean | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_user_id: string
+          description?: string | null
+          id?: string
+          invite_code?: string
+          is_private?: boolean | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_user_id?: string
+          description?: string | null
+          id?: string
+          invite_code?: string
+          is_private?: boolean | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      friend_leaderboard_members: {
+        Row: {
+          group_id: string
+          id: string
+          joined_at: string
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          joined_at?: string
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          joined_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friend_leaderboard_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "friend_leaderboard_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       generated_reports: {
         Row: {
           generated_at: string
@@ -1167,6 +1577,7 @@ export type Database = {
         Row: {
           consistency_index: number
           created_at: string
+          group_id: string | null
           id: string
           performance_score: number
           rank: number
@@ -1179,6 +1590,7 @@ export type Database = {
         Insert: {
           consistency_index?: number
           created_at?: string
+          group_id?: string | null
           id?: string
           performance_score?: number
           rank?: number
@@ -1191,6 +1603,7 @@ export type Database = {
         Update: {
           consistency_index?: number
           created_at?: string
+          group_id?: string | null
           id?: string
           performance_score?: number
           rank?: number
@@ -1201,6 +1614,13 @@ export type Database = {
           win_rate?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "leaderboard_entries_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "friend_leaderboard_groups"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "leaderboard_entries_season_id_fkey"
             columns: ["season_id"]
@@ -1404,6 +1824,41 @@ export type Database = {
         }
         Relationships: []
       }
+      metric_conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          messages: Json
+          resulting_widget_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          messages?: Json
+          resulting_widget_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          messages?: Json
+          resulting_widget_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metric_conversations_resulting_widget_id_fkey"
+            columns: ["resulting_widget_id"]
+            isOneToOne: false
+            referencedRelation: "custom_dashboard_widgets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mystery_rewards: {
         Row: {
           created_at: string
@@ -1458,6 +1913,66 @@ export type Database = {
           created_at?: string | null
           email?: string
           id?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          amount_total: number
+          created_at: string
+          currency: string
+          customer_email: string
+          customer_name: string | null
+          id: string
+          metadata: Json | null
+          payment_status: string
+          product_name: string | null
+          product_type: string
+          quantity: number | null
+          stripe_invoice_id: string | null
+          stripe_invoice_pdf: string | null
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_total: number
+          created_at?: string
+          currency?: string
+          customer_email: string
+          customer_name?: string | null
+          id?: string
+          metadata?: Json | null
+          payment_status: string
+          product_name?: string | null
+          product_type: string
+          quantity?: number | null
+          stripe_invoice_id?: string | null
+          stripe_invoice_pdf?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_total?: number
+          created_at?: string
+          currency?: string
+          customer_email?: string
+          customer_name?: string | null
+          id?: string
+          metadata?: Json | null
+          payment_status?: string
+          product_name?: string | null
+          product_type?: string
+          quantity?: number | null
+          stripe_invoice_id?: string | null
+          stripe_invoice_pdf?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1697,69 +2212,99 @@ export type Database = {
         Row: {
           accepted_privacy_at: string | null
           accepted_terms_at: string | null
+          activation_source: string | null
           avatar_url: string | null
           bio: string | null
           country: string | null
           created_at: string | null
+          credits_balance: number | null
           email: string | null
+          first_upload_at: string | null
           followers_count: number | null
           following_count: number | null
           full_name: string | null
+          gift_credits_awarded: boolean | null
           id: string
           marketing_consent: boolean | null
+          onboarding_completed: boolean | null
+          plan_ends_at: string | null
+          plan_started_at: string | null
           profile_visibility: string | null
+          promo_expires_at: string | null
           provider: string | null
           public_stats: Json | null
+          stripe_customer_id: string | null
           subscription_status: string | null
           subscription_tier: string | null
           terms_accepted_at: string | null
           trial_end_date: string | null
+          unlocked_colors: Json | null
           updated_at: string | null
           username: string | null
         }
         Insert: {
           accepted_privacy_at?: string | null
           accepted_terms_at?: string | null
+          activation_source?: string | null
           avatar_url?: string | null
           bio?: string | null
           country?: string | null
           created_at?: string | null
+          credits_balance?: number | null
           email?: string | null
+          first_upload_at?: string | null
           followers_count?: number | null
           following_count?: number | null
           full_name?: string | null
+          gift_credits_awarded?: boolean | null
           id: string
           marketing_consent?: boolean | null
+          onboarding_completed?: boolean | null
+          plan_ends_at?: string | null
+          plan_started_at?: string | null
           profile_visibility?: string | null
+          promo_expires_at?: string | null
           provider?: string | null
           public_stats?: Json | null
+          stripe_customer_id?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
           terms_accepted_at?: string | null
           trial_end_date?: string | null
+          unlocked_colors?: Json | null
           updated_at?: string | null
           username?: string | null
         }
         Update: {
           accepted_privacy_at?: string | null
           accepted_terms_at?: string | null
+          activation_source?: string | null
           avatar_url?: string | null
           bio?: string | null
           country?: string | null
           created_at?: string | null
+          credits_balance?: number | null
           email?: string | null
+          first_upload_at?: string | null
           followers_count?: number | null
           following_count?: number | null
           full_name?: string | null
+          gift_credits_awarded?: boolean | null
           id?: string
           marketing_consent?: boolean | null
+          onboarding_completed?: boolean | null
+          plan_ends_at?: string | null
+          plan_started_at?: string | null
           profile_visibility?: string | null
+          promo_expires_at?: string | null
           provider?: string | null
           public_stats?: Json | null
+          stripe_customer_id?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
           terms_accepted_at?: string | null
           trial_end_date?: string | null
+          unlocked_colors?: Json | null
           updated_at?: string | null
           username?: string | null
         }
@@ -1775,6 +2320,7 @@ export type Database = {
           logged_at: string
           notes: string | null
           user_id: string
+          xp_awarded: boolean | null
         }
         Insert: {
           conditions?: string[] | null
@@ -1785,6 +2331,7 @@ export type Database = {
           logged_at?: string
           notes?: string | null
           user_id: string
+          xp_awarded?: boolean | null
         }
         Update: {
           conditions?: string[] | null
@@ -1795,6 +2342,7 @@ export type Database = {
           logged_at?: string
           notes?: string | null
           user_id?: string
+          xp_awarded?: boolean | null
         }
         Relationships: []
       }
@@ -1911,6 +2459,36 @@ export type Database = {
           sections?: string[]
           status?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reward_events: {
+        Row: {
+          claimed_at: string | null
+          event_type: string
+          expires_at: string | null
+          id: string
+          reward_value: Json
+          triggered_at: string
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          event_type: string
+          expires_at?: string | null
+          id?: string
+          reward_value: Json
+          triggered_at?: string
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string | null
+          event_type?: string
+          expires_at?: string | null
+          id?: string
+          reward_value?: Json
+          triggered_at?: string
           user_id?: string
         }
         Relationships: []
@@ -2189,6 +2767,75 @@ export type Database = {
           },
         ]
       }
+      social_share_log: {
+        Row: {
+          content_id: string | null
+          content_type: string
+          created_at: string
+          id: string
+          platform: string
+          shared_at: string
+          user_id: string
+          week_start_date: string
+          xp_awarded: number
+        }
+        Insert: {
+          content_id?: string | null
+          content_type: string
+          created_at?: string
+          id?: string
+          platform: string
+          shared_at?: string
+          user_id: string
+          week_start_date?: string
+          xp_awarded?: number
+        }
+        Update: {
+          content_id?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          platform?: string
+          shared_at?: string
+          user_id?: string
+          week_start_date?: string
+          xp_awarded?: number
+        }
+        Relationships: []
+      }
+      social_shares: {
+        Row: {
+          created_at: string
+          id: string
+          platform: string
+          rewards_amount: number
+          rewards_claimed: boolean
+          shared_at: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          platform: string
+          rewards_amount?: number
+          rewards_claimed?: boolean
+          shared_at?: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          platform?: string
+          rewards_amount?: number
+          rewards_claimed?: boolean
+          shared_at?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
       spot_holdings: {
         Row: {
           created_at: string
@@ -2329,47 +2976,143 @@ export type Database = {
         }
         Relationships: []
       }
+      streak_reminder_log: {
+        Row: {
+          clicked: boolean | null
+          clicked_at: string | null
+          created_at: string
+          id: string
+          last_login_at: string | null
+          last_reminder_sent_at: string | null
+          message_variant: string | null
+          notification_paused: boolean | null
+          reminder_count: number | null
+          user_id: string
+        }
+        Insert: {
+          clicked?: boolean | null
+          clicked_at?: string | null
+          created_at?: string
+          id?: string
+          last_login_at?: string | null
+          last_reminder_sent_at?: string | null
+          message_variant?: string | null
+          notification_paused?: boolean | null
+          reminder_count?: number | null
+          user_id: string
+        }
+        Update: {
+          clicked?: boolean | null
+          clicked_at?: string | null
+          created_at?: string
+          id?: string
+          last_login_at?: string | null
+          last_reminder_sent_at?: string | null
+          message_variant?: string | null
+          notification_paused?: boolean | null
+          reminder_count?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           billing_cycle: string | null
           cancel_at_period_end: boolean | null
+          connected_accounts_limit: number | null
           created_at: string
           current_period_end: string | null
           current_period_start: string | null
+          custom_metrics_limit: number | null
+          custom_metrics_used_this_month: number | null
+          daily_upload_limit: number | null
+          daily_xp_cap: number | null
+          extra_credits_purchased: number | null
+          has_fee_analysis_access: boolean | null
           id: string
+          interval: string | null
+          last_reset_date: string | null
+          monthly_upload_limit: number | null
           plan_type: string
           status: string
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           updated_at: string
+          upload_credits_balance: number | null
+          upload_credits_used_this_month: number | null
           user_id: string
         }
         Insert: {
           billing_cycle?: string | null
           cancel_at_period_end?: boolean | null
+          connected_accounts_limit?: number | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
+          custom_metrics_limit?: number | null
+          custom_metrics_used_this_month?: number | null
+          daily_upload_limit?: number | null
+          daily_xp_cap?: number | null
+          extra_credits_purchased?: number | null
+          has_fee_analysis_access?: boolean | null
           id?: string
+          interval?: string | null
+          last_reset_date?: string | null
+          monthly_upload_limit?: number | null
           plan_type: string
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           updated_at?: string
+          upload_credits_balance?: number | null
+          upload_credits_used_this_month?: number | null
           user_id: string
         }
         Update: {
           billing_cycle?: string | null
           cancel_at_period_end?: boolean | null
+          connected_accounts_limit?: number | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
+          custom_metrics_limit?: number | null
+          custom_metrics_used_this_month?: number | null
+          daily_upload_limit?: number | null
+          daily_xp_cap?: number | null
+          extra_credits_purchased?: number | null
+          has_fee_analysis_access?: boolean | null
           id?: string
+          interval?: string | null
+          last_reset_date?: string | null
+          monthly_upload_limit?: number | null
           plan_type?: string
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           updated_at?: string
+          upload_credits_balance?: number | null
+          upload_credits_used_this_month?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tier_preview_unlocks: {
+        Row: {
+          id: string
+          tier_previewed: number
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          tier_previewed: number
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          tier_previewed?: number
+          unlocked_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -2451,6 +3194,38 @@ export type Database = {
           },
         ]
       }
+      trade_emotions: {
+        Row: {
+          created_at: string | null
+          emotion: string
+          id: string
+          trade_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          emotion: string
+          id?: string
+          trade_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          emotion?: string
+          id?: string
+          trade_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_emotions_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trades: {
         Row: {
           account_id: string | null
@@ -2493,6 +3268,7 @@ export type Database = {
           trade_hash: string | null
           trade_type: string | null
           trading_fee: number | null
+          trading_type: string | null
           updated_at: string | null
           user_id: string
           xp_awarded: boolean
@@ -2538,6 +3314,7 @@ export type Database = {
           trade_hash?: string | null
           trade_type?: string | null
           trading_fee?: number | null
+          trading_type?: string | null
           updated_at?: string | null
           user_id: string
           xp_awarded?: boolean
@@ -2583,6 +3360,7 @@ export type Database = {
           trade_hash?: string | null
           trade_type?: string | null
           trading_fee?: number | null
+          trading_type?: string | null
           updated_at?: string | null
           user_id?: string
           xp_awarded?: boolean
@@ -2738,6 +3516,7 @@ export type Database = {
           user_id: string
           what_to_improve: string | null
           what_went_well: string | null
+          xp_awarded: boolean | null
         }
         Insert: {
           content: string
@@ -2753,6 +3532,7 @@ export type Database = {
           user_id: string
           what_to_improve?: string | null
           what_went_well?: string | null
+          xp_awarded?: boolean | null
         }
         Update: {
           content?: string
@@ -2768,6 +3548,7 @@ export type Database = {
           user_id?: string
           what_to_improve?: string | null
           what_went_well?: string | null
+          xp_awarded?: boolean | null
         }
         Relationships: [
           {
@@ -2781,7 +3562,9 @@ export type Database = {
       }
       trading_plans: {
         Row: {
+          checklist: string | null
           created_at: string
+          currency_types: string[] | null
           description: string | null
           entry_rules: string | null
           exit_rules: string | null
@@ -2793,12 +3576,15 @@ export type Database = {
           review_process: string | null
           risk_management: string | null
           timeframes: string[] | null
+          trade_setups: string | null
           trading_schedule: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          checklist?: string | null
           created_at?: string
+          currency_types?: string[] | null
           description?: string | null
           entry_rules?: string | null
           exit_rules?: string | null
@@ -2810,12 +3596,15 @@ export type Database = {
           review_process?: string | null
           risk_management?: string | null
           timeframes?: string[] | null
+          trade_setups?: string | null
           trading_schedule?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          checklist?: string | null
           created_at?: string
+          currency_types?: string[] | null
           description?: string | null
           entry_rules?: string | null
           exit_rules?: string | null
@@ -2827,8 +3616,90 @@ export type Database = {
           review_process?: string | null
           risk_management?: string | null
           timeframes?: string[] | null
+          trade_setups?: string | null
           trading_schedule?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      trading_sessions: {
+        Row: {
+          id: string
+          lsr_value: number | null
+          notes: string | null
+          pnl_day: number | null
+          preflight_bypassed: boolean
+          preflight_completed: boolean
+          session_date: string
+          spx_trend: string | null
+          started_at: string
+          trades_count: number | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          lsr_value?: number | null
+          notes?: string | null
+          pnl_day?: number | null
+          preflight_bypassed?: boolean
+          preflight_completed?: boolean
+          session_date?: string
+          spx_trend?: string | null
+          started_at?: string
+          trades_count?: number | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          lsr_value?: number | null
+          notes?: string | null
+          pnl_day?: number | null
+          preflight_bypassed?: boolean
+          preflight_completed?: boolean
+          session_date?: string
+          spx_trend?: string | null
+          started_at?: string
+          trades_count?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          credits: number | null
+          description: string | null
+          id: string
+          status: string
+          stripe_invoice_id: string | null
+          stripe_payment_intent_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          credits?: number | null
+          description?: string | null
+          id?: string
+          status: string
+          stripe_invoice_id?: string | null
+          stripe_payment_intent_id?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          credits?: number | null
+          description?: string | null
+          id?: string
+          status?: string
+          stripe_invoice_id?: string | null
+          stripe_payment_intent_id?: string | null
+          type?: string
           user_id?: string
         }
         Relationships: []
@@ -3019,6 +3890,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_analytics_events: {
+        Row: {
+          created_at: string | null
+          event_name: string
+          event_params: Json | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_name: string
+          event_params?: Json | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          event_name?: string
+          event_params?: Json | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_broker_preferences: {
         Row: {
           broker_name: string
@@ -3053,12 +3948,17 @@ export type Database = {
         Row: {
           active_theme: string
           animation_speed: string
+          background_gradient: Json | null
           calm_mode_enabled: boolean
           created_at: string
+          custom_background: string | null
           haptic_feedback_enabled: boolean
           id: string
+          last_theme_notification_date: string | null
           profile_frame: string | null
           sound_enabled: boolean
+          theme_studio_opened_count: number | null
+          theme_unlock_dates: Json | null
           unlocked_themes: string[]
           updated_at: string
           user_id: string
@@ -3066,12 +3966,17 @@ export type Database = {
         Insert: {
           active_theme?: string
           animation_speed?: string
+          background_gradient?: Json | null
           calm_mode_enabled?: boolean
           created_at?: string
+          custom_background?: string | null
           haptic_feedback_enabled?: boolean
           id?: string
+          last_theme_notification_date?: string | null
           profile_frame?: string | null
           sound_enabled?: boolean
+          theme_studio_opened_count?: number | null
+          theme_unlock_dates?: Json | null
           unlocked_themes?: string[]
           updated_at?: string
           user_id: string
@@ -3079,14 +3984,129 @@ export type Database = {
         Update: {
           active_theme?: string
           animation_speed?: string
+          background_gradient?: Json | null
           calm_mode_enabled?: boolean
           created_at?: string
+          custom_background?: string | null
           haptic_feedback_enabled?: boolean
           id?: string
+          last_theme_notification_date?: string | null
           profile_frame?: string | null
           sound_enabled?: boolean
+          theme_studio_opened_count?: number | null
+          theme_unlock_dates?: Json | null
           unlocked_themes?: string[]
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_daily_activity: {
+        Row: {
+          activity_date: string
+          challenges_completed: number | null
+          created_at: string | null
+          emotional_logs_created: number | null
+          id: string
+          journal_entries_created: number | null
+          last_reminder_shown_at: string | null
+          last_updated_at: string | null
+          reminder_clicked_count: number | null
+          trades_uploaded: number | null
+          user_id: string
+          widget_interaction_count: number | null
+          xp_earned_today: number | null
+        }
+        Insert: {
+          activity_date?: string
+          challenges_completed?: number | null
+          created_at?: string | null
+          emotional_logs_created?: number | null
+          id?: string
+          journal_entries_created?: number | null
+          last_reminder_shown_at?: string | null
+          last_updated_at?: string | null
+          reminder_clicked_count?: number | null
+          trades_uploaded?: number | null
+          user_id: string
+          widget_interaction_count?: number | null
+          xp_earned_today?: number | null
+        }
+        Update: {
+          activity_date?: string
+          challenges_completed?: number | null
+          created_at?: string | null
+          emotional_logs_created?: number | null
+          id?: string
+          journal_entries_created?: number | null
+          last_reminder_shown_at?: string | null
+          last_updated_at?: string | null
+          reminder_clicked_count?: number | null
+          trades_uploaded?: number | null
+          user_id?: string
+          widget_interaction_count?: number | null
+          xp_earned_today?: number | null
+        }
+        Relationships: []
+      }
+      user_errors: {
+        Row: {
+          created_at: string
+          error_text: string
+          expires_at: string
+          id: string
+          status: string
+          trade_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_text: string
+          expires_at: string
+          id?: string
+          status?: string
+          trade_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_text?: string
+          expires_at?: string
+          id?: string
+          status?: string
+          trade_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_errors_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_events: {
+        Row: {
+          created_at: string
+          event_data: Json | null
+          event_type: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: string
           user_id?: string
         }
         Relationships: []
@@ -3171,15 +4191,22 @@ export type Database = {
       }
       user_progression: {
         Row: {
+          combo_bonus_awarded_at: string | null
           created_at: string
           customization_count: number
           daily_streak: number
           id: string
           last_active_date: string
+          last_login_date: string | null
+          last_reengagement_sent_at: string | null
+          last_trade_date: string | null
           level: number
+          login_streak: number | null
           rank: string
           rank_expires_at: string | null
+          reengagement_cooldown_until: string | null
           total_badges_unlocked: number
+          trade_streak: number | null
           trader_identity_scores: Json | null
           updated_at: string
           user_id: string
@@ -3187,15 +4214,22 @@ export type Database = {
           xp: number
         }
         Insert: {
+          combo_bonus_awarded_at?: string | null
           created_at?: string
           customization_count?: number
           daily_streak?: number
           id?: string
           last_active_date?: string
+          last_login_date?: string | null
+          last_reengagement_sent_at?: string | null
+          last_trade_date?: string | null
           level?: number
+          login_streak?: number | null
           rank?: string
           rank_expires_at?: string | null
+          reengagement_cooldown_until?: string | null
           total_badges_unlocked?: number
+          trade_streak?: number | null
           trader_identity_scores?: Json | null
           updated_at?: string
           user_id: string
@@ -3203,15 +4237,22 @@ export type Database = {
           xp?: number
         }
         Update: {
+          combo_bonus_awarded_at?: string | null
           created_at?: string
           customization_count?: number
           daily_streak?: number
           id?: string
           last_active_date?: string
+          last_login_date?: string | null
+          last_reengagement_sent_at?: string | null
+          last_trade_date?: string | null
           level?: number
+          login_streak?: number | null
           rank?: string
           rank_expires_at?: string | null
+          reengagement_cooldown_until?: string | null
           total_badges_unlocked?: number
+          trade_streak?: number | null
           trader_identity_scores?: Json | null
           updated_at?: string
           user_id?: string
@@ -3299,22 +4340,47 @@ export type Database = {
           created_at: string | null
           crypto_display_mode: boolean | null
           currency: string | null
+          current_visit_streak: number | null
+          daily_loss_lock_enabled: boolean | null
+          daily_loss_lock_last_override: string | null
           display_currency: string | null
           email_notifications: boolean | null
+          error_clean_sheet: boolean | null
+          error_daily_reminder: boolean | null
+          error_pnl_prompt_enabled: boolean | null
+          error_pnl_threshold: number | null
+          error_pnl_threshold_unit: string | null
+          error_reminder_paused_until: string | null
           event_reminders: boolean | null
           guided_tour_completed: boolean | null
           id: string
           initial_investment: number | null
           language: string | null
           last_seen_updates_version: number | null
+          last_streak_milestone: number | null
+          last_visit_date: string | null
           layout_json: Json | null
+          longest_visit_streak: number | null
           monthly_report: boolean | null
           onboarding_completed: boolean | null
           performance_alerts: boolean | null
+          preflight_calendar_url: string | null
+          preflight_required: boolean | null
+          risk_currency: string | null
+          risk_daily_loss_pct: number | null
+          risk_day_pct: number | null
+          risk_max_drawdown: number | null
+          risk_position_pct: number | null
+          risk_profile: string | null
+          risk_scalp_pct: number | null
+          risk_swing_pct: number | null
+          risk_worst_streak: number | null
           sidebar_style: string | null
+          streak_reminders_enabled: boolean | null
           theme: string | null
           tour_version_completed: number | null
           trade_reminders: boolean | null
+          unlimited_uploads: boolean | null
           updated_at: string | null
           user_id: string
           weekly_summary: boolean | null
@@ -3325,22 +4391,47 @@ export type Database = {
           created_at?: string | null
           crypto_display_mode?: boolean | null
           currency?: string | null
+          current_visit_streak?: number | null
+          daily_loss_lock_enabled?: boolean | null
+          daily_loss_lock_last_override?: string | null
           display_currency?: string | null
           email_notifications?: boolean | null
+          error_clean_sheet?: boolean | null
+          error_daily_reminder?: boolean | null
+          error_pnl_prompt_enabled?: boolean | null
+          error_pnl_threshold?: number | null
+          error_pnl_threshold_unit?: string | null
+          error_reminder_paused_until?: string | null
           event_reminders?: boolean | null
           guided_tour_completed?: boolean | null
           id?: string
           initial_investment?: number | null
           language?: string | null
           last_seen_updates_version?: number | null
+          last_streak_milestone?: number | null
+          last_visit_date?: string | null
           layout_json?: Json | null
+          longest_visit_streak?: number | null
           monthly_report?: boolean | null
           onboarding_completed?: boolean | null
           performance_alerts?: boolean | null
+          preflight_calendar_url?: string | null
+          preflight_required?: boolean | null
+          risk_currency?: string | null
+          risk_daily_loss_pct?: number | null
+          risk_day_pct?: number | null
+          risk_max_drawdown?: number | null
+          risk_position_pct?: number | null
+          risk_profile?: string | null
+          risk_scalp_pct?: number | null
+          risk_swing_pct?: number | null
+          risk_worst_streak?: number | null
           sidebar_style?: string | null
+          streak_reminders_enabled?: boolean | null
           theme?: string | null
           tour_version_completed?: number | null
           trade_reminders?: boolean | null
+          unlimited_uploads?: boolean | null
           updated_at?: string | null
           user_id: string
           weekly_summary?: boolean | null
@@ -3351,22 +4442,47 @@ export type Database = {
           created_at?: string | null
           crypto_display_mode?: boolean | null
           currency?: string | null
+          current_visit_streak?: number | null
+          daily_loss_lock_enabled?: boolean | null
+          daily_loss_lock_last_override?: string | null
           display_currency?: string | null
           email_notifications?: boolean | null
+          error_clean_sheet?: boolean | null
+          error_daily_reminder?: boolean | null
+          error_pnl_prompt_enabled?: boolean | null
+          error_pnl_threshold?: number | null
+          error_pnl_threshold_unit?: string | null
+          error_reminder_paused_until?: string | null
           event_reminders?: boolean | null
           guided_tour_completed?: boolean | null
           id?: string
           initial_investment?: number | null
           language?: string | null
           last_seen_updates_version?: number | null
+          last_streak_milestone?: number | null
+          last_visit_date?: string | null
           layout_json?: Json | null
+          longest_visit_streak?: number | null
           monthly_report?: boolean | null
           onboarding_completed?: boolean | null
           performance_alerts?: boolean | null
+          preflight_calendar_url?: string | null
+          preflight_required?: boolean | null
+          risk_currency?: string | null
+          risk_daily_loss_pct?: number | null
+          risk_day_pct?: number | null
+          risk_max_drawdown?: number | null
+          risk_position_pct?: number | null
+          risk_profile?: string | null
+          risk_scalp_pct?: number | null
+          risk_swing_pct?: number | null
+          risk_worst_streak?: number | null
           sidebar_style?: string | null
+          streak_reminders_enabled?: boolean | null
           theme?: string | null
           tour_version_completed?: number | null
           trade_reminders?: boolean | null
+          unlimited_uploads?: boolean | null
           updated_at?: string | null
           user_id?: string
           weekly_summary?: boolean | null
@@ -3457,6 +4573,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_widget_unlocks: {
+        Row: {
+          id: string
+          unlock_method: string
+          unlocked_at: string
+          user_id: string
+          widget_id: string
+        }
+        Insert: {
+          id?: string
+          unlock_method: string
+          unlocked_at?: string
+          user_id: string
+          widget_id: string
+        }
+        Update: {
+          id?: string
+          unlock_method?: string
+          unlocked_at?: string
+          user_id?: string
+          widget_id?: string
+        }
+        Relationships: []
+      }
       user_xp_levels: {
         Row: {
           created_at: string
@@ -3489,6 +4629,69 @@ export type Database = {
           level_up_count?: number
           total_xp_earned?: number
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_xp_tiers: {
+        Row: {
+          consecutive_login_days: number | null
+          created_at: string | null
+          current_tier: number
+          daily_upload_count: number | null
+          daily_upload_limit: number
+          daily_xp_cap: number
+          daily_xp_earned: number
+          id: string
+          journal_entries_today: number | null
+          last_login_date: string | null
+          last_login_timezone: string | null
+          last_reset_at: string | null
+          last_reward_claimed_date: string | null
+          psychology_logs_today: number | null
+          reminder_intensity: string | null
+          total_rewards_claimed: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          consecutive_login_days?: number | null
+          created_at?: string | null
+          current_tier?: number
+          daily_upload_count?: number | null
+          daily_upload_limit?: number
+          daily_xp_cap?: number
+          daily_xp_earned?: number
+          id?: string
+          journal_entries_today?: number | null
+          last_login_date?: string | null
+          last_login_timezone?: string | null
+          last_reset_at?: string | null
+          last_reward_claimed_date?: string | null
+          psychology_logs_today?: number | null
+          reminder_intensity?: string | null
+          total_rewards_claimed?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          consecutive_login_days?: number | null
+          created_at?: string | null
+          current_tier?: number
+          daily_upload_count?: number | null
+          daily_upload_limit?: number
+          daily_xp_cap?: number
+          daily_xp_earned?: number
+          id?: string
+          journal_entries_today?: number | null
+          last_login_date?: string | null
+          last_login_timezone?: string | null
+          last_reset_at?: string | null
+          last_reward_claimed_date?: string | null
+          psychology_logs_today?: number | null
+          reminder_intensity?: string | null
+          total_rewards_claimed?: number | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -3565,6 +4768,42 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_pnl_snapshots: {
+        Row: {
+          created_at: string | null
+          id: string
+          losing_trades: number
+          total_pnl: number
+          trade_count: number
+          user_id: string
+          week_end: string
+          week_start: string
+          winning_trades: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          losing_trades?: number
+          total_pnl?: number
+          trade_count?: number
+          user_id: string
+          week_end: string
+          week_start: string
+          winning_trades?: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          losing_trades?: number
+          total_pnl?: number
+          trade_count?: number
+          user_id?: string
+          week_end?: string
+          week_start?: string
+          winning_trades?: number
+        }
+        Relationships: []
+      }
       widget_styles: {
         Row: {
           created_at: string
@@ -3592,6 +4831,45 @@ export type Database = {
           style_id?: string
           style_name?: string
           unlock_requirement?: string
+        }
+        Relationships: []
+      }
+      widget_tier_requirements: {
+        Row: {
+          dopamine_trigger: string | null
+          educational_purpose: string | null
+          is_new: boolean | null
+          plan_required: string | null
+          popularity: number | null
+          tier_name: string
+          tier_required: number
+          widget_id: string
+          widget_title: string
+          xp_to_unlock: number
+        }
+        Insert: {
+          dopamine_trigger?: string | null
+          educational_purpose?: string | null
+          is_new?: boolean | null
+          plan_required?: string | null
+          popularity?: number | null
+          tier_name: string
+          tier_required: number
+          widget_id: string
+          widget_title: string
+          xp_to_unlock: number
+        }
+        Update: {
+          dopamine_trigger?: string | null
+          educational_purpose?: string | null
+          is_new?: boolean | null
+          plan_required?: string | null
+          popularity?: number | null
+          tier_name?: string
+          tier_required?: number
+          widget_id?: string
+          widget_title?: string
+          xp_to_unlock?: number
         }
         Relationships: []
       }
@@ -3625,6 +4903,39 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawal_log: {
+        Row: {
+          amount_withdrawn: number
+          created_at: string
+          id: string
+          notes: string | null
+          total_after: number
+          updated_at: string
+          user_id: string
+          withdrawal_date: string
+        }
+        Insert: {
+          amount_withdrawn: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          total_after: number
+          updated_at?: string
+          user_id: string
+          withdrawal_date?: string
+        }
+        Update: {
+          amount_withdrawn?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          total_after?: number
+          updated_at?: string
+          user_id?: string
+          withdrawal_date?: string
+        }
+        Relationships: []
+      }
       xp_activity_log: {
         Row: {
           activity_type: string
@@ -3649,6 +4960,39 @@ export type Database = {
           id?: string
           user_id?: string
           xp_earned?: number
+        }
+        Relationships: []
+      }
+      xp_boosts: {
+        Row: {
+          activated_at: string
+          created_at: string | null
+          duration_minutes: number
+          expires_at: string
+          id: string
+          is_active: boolean | null
+          multiplier: number
+          user_id: string
+        }
+        Insert: {
+          activated_at?: string
+          created_at?: string | null
+          duration_minutes: number
+          expires_at: string
+          id?: string
+          is_active?: boolean | null
+          multiplier?: number
+          user_id: string
+        }
+        Update: {
+          activated_at?: string
+          created_at?: string | null
+          duration_minutes?: number
+          expires_at?: string
+          id?: string
+          is_active?: boolean | null
+          multiplier?: number
+          user_id?: string
         }
         Relationships: []
       }
@@ -3692,10 +5036,53 @@ export type Database = {
       }
     }
     Functions: {
+      add_credits: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: undefined
+      }
+      add_extra_credits: {
+        Args: { p_amount: number; p_credits: number; p_user_id: string }
+        Returns: boolean
+      }
+      add_xp: {
+        Args: { user_uuid: string; xp_amount: number }
+        Returns: undefined
+      }
+      calculate_daily_reward: {
+        Args: { p_consecutive_days: number; p_user_tier: number }
+        Returns: {
+          bonus_multiplier: number
+          reward_tier: number
+          xp_reward: number
+        }[]
+      }
+      can_add_account: { Args: { p_user_id: string }; Returns: boolean }
+      can_create_custom_metric: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
+      can_share_this_week: {
+        Args: { p_platform: string; p_user_id: string }
+        Returns: boolean
+      }
       check_daily_alert_cap: { Args: { p_user_id: string }; Returns: boolean }
       cleanup_deleted_trades: { Args: never; Returns: undefined }
       cleanup_expired_deleted_batches: { Args: never; Returns: undefined }
       cleanup_expired_pending_trades: { Args: never; Returns: undefined }
+      deduct_credits: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: boolean
+      }
+      deduct_upload_credit: { Args: { p_user_id: string }; Returns: Json }
+      get_subscription_metrics: { Args: never; Returns: Json }
+      get_subscription_tier: { Args: { p_user_id: string }; Returns: string }
+      get_trading_analytics: {
+        Args: { end_date?: string; start_date?: string; user_uuid: string }
+        Returns: Json
+      }
+      get_user_dashboard_stats: { Args: { user_uuid: string }; Returns: Json }
+      get_week_start: { Args: { date_input?: string }; Returns: string }
+      has_active_subscription: { Args: { p_user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -3711,8 +5098,45 @@ export type Database = {
         Args: { p_broker_name: string }
         Returns: undefined
       }
+      increment_challenges_counter: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       increment_daily_alert_count: {
         Args: { p_user_id: string }
+        Returns: undefined
+      }
+      increment_journal_entries_counter: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
+      increment_psychology_logs_counter: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
+      increment_template_usage: {
+        Args: { p_template_id: string }
+        Returns: undefined
+      }
+      increment_upload_credits: {
+        Args: { p_credits: number; p_user_id: string }
+        Returns: undefined
+      }
+      record_social_share:
+        | {
+            Args: {
+              p_content_id?: string
+              p_content_type: string
+              p_platform: string
+            }
+            Returns: Json
+          }
+        | { Args: { p_platform: string }; Returns: Json }
+      reset_daily_xp: { Args: never; Returns: undefined }
+      reset_daily_xp_caps: { Args: never; Returns: undefined }
+      reset_monthly_credits: { Args: never; Returns: undefined }
+      setup_elite_test_account: {
+        Args: { user_email: string }
         Returns: undefined
       }
       update_lsr_latest_value: {
@@ -3723,6 +5147,14 @@ export type Database = {
           p_ratio_value: number
           p_short_account: number
           p_symbol: string
+        }
+        Returns: undefined
+      }
+      upsert_daily_activity: {
+        Args: {
+          p_activity_type: string
+          p_increment?: number
+          p_user_id: string
         }
         Returns: undefined
       }
