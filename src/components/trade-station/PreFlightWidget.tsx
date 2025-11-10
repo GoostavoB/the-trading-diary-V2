@@ -35,21 +35,6 @@ export const PreFlightWidget = () => {
 
   const canStart = !settings.preflight_required || allChecksComplete();
 
-  if (sessionStarted && !bypassedToday) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Pre-flight Checklist</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-6">
-            <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-green-600" />
-            <p className="text-sm text-muted-foreground">Session active. Good trading!</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   if (bypassedToday) {
     return (
