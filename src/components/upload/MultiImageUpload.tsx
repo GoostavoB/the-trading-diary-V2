@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Upload, X, Image as ImageIcon, Loader2, CheckCircle2, AlertCircle, Info } from 'lucide-react';
@@ -10,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { runOCR } from '@/utils/ocrPipeline';
+import { TradeReviewEditor } from './TradeReviewEditor';
 
 interface UploadedImage {
   file: File;
@@ -33,7 +33,6 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
   const [totalTradesDetected, setTotalTradesDetected] = useState(0);
   const [creditsRequired, setCreditsRequired] = useState(0);
   const [extractedTrades, setExtractedTrades] = useState<any[]>([]);
-  const [selectedTradeIds, setSelectedTradeIds] = useState<Set<number>>(new Set());
   const [maxSelectableTrades, setMaxSelectableTrades] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -248,10 +247,6 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
       setMaxSelectableTrades(maxTrades);
       setExtractedTrades(allTrades);
       
-      // Auto-select trades up to limit
-      const autoSelect = new Set(allTrades.slice(0, maxTrades).map((_, idx) => idx));
-      setSelectedTradeIds(autoSelect);
-      
       setShowConfirmation(true);
     } catch (error) {
       toast.error('Failed to analyze images');
@@ -260,22 +255,8 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
     }
   };
 
-  const handleTradeToggle = (index: number) => {
-    const newSelected = new Set(selectedTradeIds);
-    if (newSelected.has(index)) {
-      newSelected.delete(index);
-    } else {
-      if (newSelected.size >= maxSelectableTrades) {
-        toast.error(`You can only select up to ${maxSelectableTrades} trades (${creditsRequired} images × 10 trades per image)`);
-        return;
-      }
-      newSelected.add(index);
-    }
-    setSelectedTradeIds(newSelected);
-  };
-
-  const handleConfirmImport = async () => {
-    if (selectedTradeIds.size === 0) {
+  const handleSaveTrades = async (tradesToSave: any[]) => {
+    if (tradesToSave.length === 0) {
       toast.error('Please select at least one trade to import');
       return;
     }
@@ -284,10 +265,7 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
 
-      // Get only selected trades
-      const selectedTrades = extractedTrades.filter((_, idx) => selectedTradeIds.has(idx));
-
-      // Process selected trades
+      // Process trades
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/process-multi-upload`,
         {
@@ -297,7 +275,7 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
             Authorization: `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({ 
-            trades: selectedTrades,
+            trades: tradesToSave,
             creditsToDeduct: creditsRequired
           }),
         }
@@ -310,7 +288,7 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
 
       const result = await response.json();
       
-      toast.success(`Successfully imported ${selectedTrades.length} trades!`);
+      toast.success(`Successfully imported ${tradesToSave.length} trades!`);
       onTradesExtracted(result.trades);
       
       // Reset state
@@ -318,7 +296,6 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
       setImages([]);
       setShowConfirmation(false);
       setExtractedTrades([]);
-      setSelectedTradeIds(new Set());
     } catch (error) {
       console.error('Import error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to import trades');
@@ -493,131 +470,17 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
         </div>
       )}
 
-      {/* Confirmation Dialog */}
-      <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Select Trades to Import</DialogTitle>
-            <DialogDescription>
-              Select up to {maxSelectableTrades} trades to save ({selectedTradeIds.size} selected)
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-4 flex-1 overflow-y-auto">
-            <div className="grid grid-cols-3 gap-3 px-1">
-              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                <span className="text-xs text-muted-foreground">Images processed:</span>
-                <span className="text-sm font-semibold">{images.filter(img => img.status === 'success').length}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                <span className="text-xs text-muted-foreground">Trades found:</span>
-                <span className="text-sm font-semibold">{totalTradesDetected}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-primary/10 rounded-lg">
-                <span className="text-xs text-muted-foreground">Cost:</span>
-                <span className="text-sm font-semibold text-primary">{creditsRequired} credits</span>
-              </div>
-            </div>
-
-            <div className="border-t pt-4">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium">
-                  Trades (select up to {maxSelectableTrades})
-                </p>
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => {
-                      const allIds = new Set(extractedTrades.slice(0, maxSelectableTrades).map((_, idx) => idx));
-                      setSelectedTradeIds(allIds);
-                    }}
-                  >
-                    Select All
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setSelectedTradeIds(new Set())}
-                  >
-                    Clear All
-                  </Button>
-                </div>
-              </div>
-              
-              <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                {extractedTrades.map((trade, idx) => (
-                  <div 
-                    key={idx}
-                    className={cn(
-                      "flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer",
-                      selectedTradeIds.has(idx) 
-                        ? "bg-primary/5 border-primary" 
-                        : "bg-background border-border hover:bg-muted/50"
-                    )}
-                    onClick={() => handleTradeToggle(idx)}
-                  >
-                    <Checkbox 
-                      checked={selectedTradeIds.has(idx)}
-                      onCheckedChange={() => handleTradeToggle(idx)}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    <div className="flex-1 grid grid-cols-4 gap-2 text-sm">
-                      <div>
-                        <span className="font-medium">{trade.symbol}</span>
-                      </div>
-                      <div>
-                        <span className={cn(
-                          "capitalize",
-                          trade.side === 'long' ? 'text-green-500' : 'text-red-500'
-                        )}>
-                          {trade.side}
-                        </span>
-                      </div>
-                      <div>
-                        <span className={cn(
-                          "font-semibold",
-                          trade.profit_loss >= 0 ? 'text-green-500' : 'text-red-500'
-                        )}>
-                          ${trade.profit_loss?.toFixed(2) || '0.00'}
-                        </span>
-                      </div>
-                      <div className="text-muted-foreground text-xs">
-                        {trade.opened_at ? new Date(trade.opened_at).toLocaleDateString() : 'N/A'}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {selectedTradeIds.size > maxSelectableTrades && (
-              <p className="text-sm text-destructive">
-                ⚠️ You can only select up to {maxSelectableTrades} trades with {creditsRequired} credits
-              </p>
-            )}
-          </div>
-
-          <DialogFooter className="border-t pt-4">
-            <div className="flex items-center justify-between w-full">
-              <p className="text-sm text-muted-foreground">
-                {selectedTradeIds.size} of {maxSelectableTrades} trades selected
-              </p>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setShowConfirmation(false)}>
-                  Cancel
-                </Button>
-                <Button 
-                  onClick={handleConfirmImport}
-                  disabled={selectedTradeIds.size === 0}
-                >
-                  Import {selectedTradeIds.size} {selectedTradeIds.size === 1 ? 'Trade' : 'Trades'}
-                </Button>
-              </div>
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Trade Review Editor - Full Page */}
+      {showConfirmation && (
+        <TradeReviewEditor
+          trades={extractedTrades}
+          maxSelectableTrades={maxSelectableTrades}
+          creditsRequired={creditsRequired}
+          imagesProcessed={images.filter(img => img.status === 'success').length}
+          onSave={handleSaveTrades}
+          onCancel={() => setShowConfirmation(false)}
+        />
+      )}
 
       {/* Clear All Confirmation */}
       <Dialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
