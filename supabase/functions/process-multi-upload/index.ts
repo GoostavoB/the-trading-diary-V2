@@ -47,13 +47,14 @@ serve(async (req) => {
     // TODO: Implement credit system when database schema is ready
     // Credit deduction will be added after database migration
 
-    // Insert all trades
+    // Insert all trades with proper field mapping
     const { data: insertedTrades, error } = await supabaseClient
       .from('trades')
       .insert(
         trades.map(t => ({
           ...t,
           user_id: user.id,
+          symbol_temp: t.symbol || t.symbol_temp, // Map symbol to symbol_temp for database
         }))
       )
       .select();
