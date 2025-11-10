@@ -69,6 +69,7 @@ import { ChevronLeft } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { pageMeta } from '@/utils/seoHelpers';
+import { TradeStationView } from '@/components/trade-station/TradeStationView';
 
 interface TradeStats {
   total_pnl: number;
@@ -930,11 +931,16 @@ const Dashboard = () => {
           <>
             {/* Main Content Tabs */}
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6 animate-fade-in" style={{animationDelay: '0.5s'}}>
-              <TabsList className="glass rounded-2xl grid w-full grid-cols-3 h-auto p-1.5">
+              <TabsList className="glass rounded-2xl grid w-full grid-cols-4 h-auto p-1.5">
+                <TabsTrigger value="tradestation" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Trade Station</TabsTrigger>
                 <TabsTrigger value="overview" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('dashboard.overview')}</TabsTrigger>
                 <TabsTrigger value="insights" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('analytics.insights')}</TabsTrigger>
                 <TabsTrigger value="history" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('trades.tradeHistory')}</TabsTrigger>
               </TabsList>
+
+              <TabsContent value="tradestation" className="space-y-6">
+                <TradeStationView />
+              </TabsContent>
 
               <TabsContent value="overview" className="space-y-6">
                 <DndContext
