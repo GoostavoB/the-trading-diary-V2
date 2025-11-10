@@ -23,9 +23,11 @@ interface MultiImageUploadProps {
   onTradesExtracted: (trades: any[]) => void;
   maxImages?: number;
   preSelectedBroker?: string;
+  onReviewStart?: () => void;
+  onReviewEnd?: () => void;
 }
 
-export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelectedBroker = '' }: MultiImageUploadProps) {
+export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelectedBroker = '', onReviewStart, onReviewEnd }: MultiImageUploadProps) {
   const { user } = useAuth();
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -242,12 +244,13 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
       const creditsNeeded = successCount;
       const maxTrades = creditsNeeded * 10;
 
-      setTotalTradesDetected(totalTrades);
-      setCreditsRequired(creditsNeeded);
-      setMaxSelectableTrades(maxTrades);
-      setExtractedTrades(allTrades);
-      
-      setShowConfirmation(true);
+setTotalTradesDetected(totalTrades);
+setCreditsRequired(creditsNeeded);
+setMaxSelectableTrades(maxTrades);
+setExtractedTrades(allTrades);
+
+setShowConfirmation(true);
+onReviewStart?.();
     } catch (error) {
       toast.error('Failed to analyze images');
     } finally {
@@ -286,16 +289,17 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
         throw new Error(error.error || 'Failed to process trades');
       }
 
-      const result = await response.json();
+const result = await response.json();
       
-      toast.success(`Successfully imported ${tradesToSave.length} trades!`);
-      onTradesExtracted(result.trades);
+toast.success(`Successfully imported ${tradesToSave.length} trades!`);
+onTradesExtracted(result.trades);
       
-      // Reset state
-      images.forEach(img => URL.revokeObjectURL(img.preview));
-      setImages([]);
-      setShowConfirmation(false);
-      setExtractedTrades([]);
+// Reset state
+images.forEach(img => URL.revokeObjectURL(img.preview));
+setImages([]);
+setShowConfirmation(false);
+onReviewEnd?.();
+setExtractedTrades([]);
     } catch (error) {
       console.error('Import error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to import trades');
@@ -472,14 +476,14 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
 
       {/* Trade Review Editor - Full Page */}
       {showConfirmation && (
-        <TradeReviewEditor
-          trades={extractedTrades}
-          maxSelectableTrades={maxSelectableTrades}
-          creditsRequired={creditsRequired}
-          imagesProcessed={images.filter(img => img.status === 'success').length}
-          onSave={handleSaveTrades}
-          onCancel={() => setShowConfirmation(false)}
-        />
+<TradeReviewEditor
+  trades={extractedTrades}
+  maxSelectableTrades={maxSelectableTrades}
+  creditsRequired={creditsRequired}
+  imagesProcessed={images.filter(img => img.status === 'success').length}
+  onSave={handleSaveTrades}
+  onCancel={() => { setShowConfirmation(false); onReviewEnd?.(); }}
+/>
       )}
 
       {/* Clear All Confirmation */}

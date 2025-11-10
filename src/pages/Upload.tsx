@@ -87,7 +87,8 @@ const Upload = () => {
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [extractionImage, setExtractionImage] = useState<File | null>(null);
   const [extractionPreview, setExtractionPreview] = useState<string | null>(null);
-  const [extractedTrades, setExtractedTrades] = useState<ExtractedTrade[]>([]);
+const [extractedTrades, setExtractedTrades] = useState<ExtractedTrade[]>([]);
+  const [isReviewing, setIsReviewing] = useState(false);
   const [savingTrades, setSavingTrades] = useState<Set<number>>(new Set());
   const [isDragging, setIsDragging] = useState(false);
   const [tradeEdits, setTradeEdits] = useState<Record<number, Partial<ExtractedTrade>>>({});
@@ -877,13 +878,16 @@ const Upload = () => {
                 {/* Left column - Primary upload area */}
                 <div className="lg:col-span-8 space-y-6">
                   {extractedTrades.length === 0 && (
-                    <MultiImageUpload 
+<MultiImageUpload 
                       onTradesExtracted={(trades) => {
-                        setExtractedTrades(trades.map(t => ({ ...t, broker: preSelectedBroker })));
-                        toast.success(`Extracted ${trades.length} trades from ${trades.length > 1 ? 'multiple images' : 'image'}`);
+                        setSavedTradesCount(trades.length);
+                        setShowSuccess(true);
+                        toast.success(`Imported ${trades.length} trade${trades.length !== 1 ? 's' : ''}!`);
                       }}
                       maxImages={10}
                       preSelectedBroker={preSelectedBroker}
+                      onReviewStart={() => setIsReviewing(true)}
+                      onReviewEnd={() => setIsReviewing(false)}
                     />
                   )}
                 </div>
