@@ -63,6 +63,7 @@ const CustomPage = lazy(() => import("./pages/CustomPage"));
 const ExchangeConnections = lazy(() => import("./pages/ExchangeConnections"));
 const SpotWallet = lazy(() => import("./pages/SpotWallet"));
 const FeeAnalysis = lazy(() => import("./pages/FeeAnalysis"));
+const CapitalManagementPage = lazy(() => import("./pages/CapitalManagementPage"));
 const LogoDownload = lazy(() => import("./pages/LogoDownload"));
 const LogoGenerator = lazy(() => import("./pages/LogoGenerator"));
 // Phase 2: Leaderboard feature - temporarily disabled for backlog #34
@@ -200,6 +201,7 @@ const AppRoutes = () => {
         <Route path="/exchanges" element={<ProtectedRoute><ExchangeConnections /></ProtectedRoute>} />
         <Route path="/spot-wallet" element={<ProtectedRoute><SpotWallet /></ProtectedRoute>} />
         <Route path="/fee-analysis" element={<ProtectedRoute><FeeAnalysis /></ProtectedRoute>} />
+        <Route path="/capital-management" element={<ProtectedRoute><CapitalManagementPage /></ProtectedRoute>} />
         <Route path="/faq" element={<ProtectedRoute><FAQ /></ProtectedRoute>} />
         {/* Phase 2: Leaderboard - temporarily disabled for backlog #34 */}
         {/* <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} /> */}

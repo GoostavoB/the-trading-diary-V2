@@ -9,7 +9,7 @@ import AppLayout from '@/components/layout/AppLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { X, Plus, Edit2, Check, Upload, Download, User, Bell, TrendingUp, Gift } from 'lucide-react';
+import { X, Plus, Edit2, Check, Upload, Download, User, Bell, TrendingUp, Gift, DollarSign, ExternalLink } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NotificationPreferences } from '@/components/NotificationPreferences';
 import { DataManagement } from '@/components/DataManagement';
@@ -21,9 +21,11 @@ import { SocialShareRewards } from '@/components/SocialShareRewards';
 import { ReferralProgram } from '@/components/ReferralProgram';
 import { useCalmMode } from '@/contexts/CalmModeContext';
 import { SkipToContent } from '@/components/SkipToContent';
+import { useNavigate } from 'react-router-dom';
 
 const Settings = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { calmModeEnabled, soundEnabled, toggleCalmMode, toggleSound } = useCalmMode();
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState({ full_name: '', email: '' });
@@ -389,7 +391,28 @@ const Settings = () => {
           </TabsContent>
 
           <TabsContent value="trading" className="space-y-6">
-            <CapitalManagement />
+            <Card className="p-6 glass">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-semibold flex items-center gap-2">
+                    <DollarSign className="h-5 w-5 text-accent" />
+                    Capital Management
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Track your capital additions for accurate ROI calculations
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => navigate('/capital-management')}
+                  className="gap-2"
+                  variant="default"
+                >
+                  Open Full Page
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </div>
+              <CapitalManagement />
+            </Card>
           </TabsContent>
 
           <TabsContent value="setups" className="space-y-6">

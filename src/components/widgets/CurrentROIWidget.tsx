@@ -169,7 +169,7 @@ export const CurrentROIWidget = memo(({
                         ⚠️ Note: Changing this will reset your Capital Management history and create a new starting point.
                       </p>
                       <p className="text-xs text-muted-foreground mt-2">
-                        💡 Tip: Use Capital Management in Settings → Trading to track capital additions over time for accurate ROI calculation.
+                        💡 Tip: Use <a href="/capital-management" className="text-primary hover:underline">Capital Management</a> to track capital additions over time for accurate ROI calculation.
                       </p>
                     </div>
                     <div className="flex gap-2 justify-end">
