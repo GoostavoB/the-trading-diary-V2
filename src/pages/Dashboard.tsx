@@ -920,7 +920,7 @@ const Dashboard = () => {
           <Card className="p-8 text-center glass">
             <h3 className="text-xl font-semibold mb-2">{t('trades.trades')}</h3>
             <p className="text-muted-foreground mb-4">
-              {t('upload.uploadSuccess')}
+              Upload your first trades to activate the dashboard and see your performance metrics
             </p>
             <a href="/upload" className="text-primary hover:underline">
               {t('trades.addTrade')} →

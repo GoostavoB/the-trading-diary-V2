@@ -31,51 +31,21 @@ serve(async (req) => {
       throw new Error('No trades provided');
     }
 
-    // Validate trade count (max 10 trades per credit)
+    // Validate trade count (max 10 trades per image)
     const maxAllowedTrades = creditsToDeduct * 10;
     if (trades.length > maxAllowedTrades) {
       return new Response(
         JSON.stringify({ 
-          error: `Cannot save ${trades.length} trades with ${creditsToDeduct} credits. Maximum allowed: ${maxAllowedTrades} trades.` 
+          error: `Cannot save ${trades.length} trades with ${creditsToDeduct} images. Maximum allowed: ${maxAllowedTrades} trades.` 
         }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log(`Processing ${trades.length} trades for user ${user.id}, deducting ${creditsToDeduct} credits`);
+    console.log(`Processing ${trades.length} trades for user ${user.id}`);
 
-    // Check and deduct credits
-    const { data: subscription, error: subError } = await supabaseClient
-      .from('subscriptions')
-      .select('upload_credits_balance')
-      .eq('user_id', user.id)
-      .single();
-
-    if (subError || !subscription) {
-      throw new Error('No active subscription found');
-    }
-
-    if (subscription.upload_credits_balance < creditsToDeduct) {
-      return new Response(
-        JSON.stringify({ 
-          error: `Insufficient credits. Required: ${creditsToDeduct}, Available: ${subscription.upload_credits_balance}` 
-        }),
-        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Deduct credits
-    const { error: deductError } = await supabaseClient
-      .from('subscriptions')
-      .update({ 
-        upload_credits_balance: subscription.upload_credits_balance - creditsToDeduct
-      })
-      .eq('user_id', user.id);
-
-    if (deductError) {
-      console.error('Credit deduction error:', deductError);
-      throw new Error('Failed to deduct credits');
-    }
+    // TODO: Implement credit system when database schema is ready
+    // Credit deduction will be added after database migration
 
     // Insert all trades
     const { data: insertedTrades, error } = await supabaseClient

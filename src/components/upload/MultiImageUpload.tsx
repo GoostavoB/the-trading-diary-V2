@@ -37,22 +37,7 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
   const [maxSelectableTrades, setMaxSelectableTrades] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [creditBalance, setCreditBalance] = useState<number | null>(null);
   const dragCounter = useRef(0);
-
-  // Fetch credit balance
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (!user) return;
-      const { data } = await supabase
-        .from('subscriptions')
-        .select('upload_credits_balance')
-        .eq('user_id', user.id)
-        .single();
-      setCreditBalance(data?.upload_credits_balance ?? 0);
-    };
-    fetchBalance();
-  }, [user]);
 
   // Global drag listeners for reliable drag feedback
   useEffect(() => {
@@ -173,13 +158,6 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
       return;
     }
 
-    // Check credit balance
-    const successfulImages = images.filter(img => img.status !== 'error').length;
-    if (creditBalance !== null && creditBalance < successfulImages) {
-      toast.error(`Insufficient credits. You need ${successfulImages} credits but have ${creditBalance}.`);
-      return;
-    }
-
     setIsAnalyzing(true);
     let totalTrades = 0;
     const allTrades: any[] = [];
@@ -261,7 +239,7 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
         }
       }
 
-      const successCount = images.filter(img => img.status === 'success').length;
+      const successCount = images.filter(img => img.status !== 'error').length;
       const creditsNeeded = successCount;
       const maxTrades = creditsNeeded * 10;
 
@@ -288,7 +266,7 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
       newSelected.delete(index);
     } else {
       if (newSelected.size >= maxSelectableTrades) {
-        toast.error(`You can only select up to ${maxSelectableTrades} trades (${creditsRequired} credits × 10 trades per credit)`);
+        toast.error(`You can only select up to ${maxSelectableTrades} trades (${creditsRequired} images × 10 trades per image)`);
         return;
       }
       newSelected.add(index);
@@ -309,7 +287,7 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
       // Get only selected trades
       const selectedTrades = extractedTrades.filter((_, idx) => selectedTradeIds.has(idx));
 
-      // Process selected trades and deduct credits
+      // Process selected trades
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/process-multi-upload`,
         {
@@ -341,14 +319,6 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
       setShowConfirmation(false);
       setExtractedTrades([]);
       setSelectedTradeIds(new Set());
-      
-      // Refresh credit balance
-      const { data } = await supabase
-        .from('subscriptions')
-        .select('upload_credits_balance')
-        .eq('user_id', user!.id)
-        .single();
-      setCreditBalance(data?.upload_credits_balance ?? 0);
     } catch (error) {
       console.error('Import error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to import trades');
@@ -495,39 +465,31 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
       </div>
 
       {images.length > 0 && (
-        <div className="space-y-3">
-          {creditBalance !== null && (
-            <div className="flex items-center justify-between px-4 py-2 bg-muted/50 rounded-lg">
-              <span className="text-sm text-muted-foreground">Your balance:</span>
-              <span className="text-sm font-semibold">{creditBalance} credits</span>
-            </div>
-          )}
-          <div className="flex items-center justify-between gap-3">
-            <Button
-              variant="outline"
-              onClick={() => setShowClearConfirm(true)}
-              disabled={isAnalyzing}
-            >
-              Clear all
-            </Button>
-            <Button
-              onClick={analyzeImages}
-              disabled={isAnalyzing || images.some(img => img.status === 'analyzing') || (creditBalance !== null && creditBalance < images.length)}
-              className="flex-1"
-            >
-              {isAnalyzing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Extracting...
-                </>
-              ) : (
-                <>
-                  <ImageIcon className="mr-2 h-4 w-4" />
-                  Extract Trades ({images.length} {images.length === 1 ? 'credit' : 'credits'})
-                </>
-              )}
-            </Button>
-          </div>
+        <div className="flex items-center justify-between gap-3">
+          <Button
+            variant="outline"
+            onClick={() => setShowClearConfirm(true)}
+            disabled={isAnalyzing}
+          >
+            Clear all
+          </Button>
+          <Button
+            onClick={analyzeImages}
+            disabled={isAnalyzing || images.some(img => img.status === 'analyzing')}
+            className="flex-1"
+          >
+            {isAnalyzing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Extracting...
+              </>
+            ) : (
+              <>
+                <ImageIcon className="mr-2 h-4 w-4" />
+                Extract Trades
+              </>
+            )}
+          </Button>
         </div>
       )}
 
