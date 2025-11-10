@@ -220,8 +220,8 @@ export const ErrorReflectionWidget = () => {
           </div>
 
           <div className="rounded-md bg-muted/50 p-3 mb-6 border border-border/50">
-            <p className="text-xs text-muted-foreground text-center">DID YOU KNOW? 
-Daily reflection can improve your performance by about 23%</p>
+            <p className="text-xs text-muted-foreground text-center font-semibold">DID YOU KNOW?</p>
+            <p className="text-xs text-muted-foreground text-center">Daily reflection can improve your performance by about 23%</p>
           </div>
 
           <DialogFooter className="gap-2">
