@@ -242,7 +242,7 @@ export const ErrorReflectionWidget = () => {
 
           <div className="rounded-md bg-muted/50 p-3 mb-6 border border-border/50">
             <p className="text-xs text-muted-foreground text-center">
-              Reflecting daily may improve your performance by about 23 percent
+              DID YOU KNOW? Daily reflection can improve your performance by about 23%
             </p>
           </div>
 
