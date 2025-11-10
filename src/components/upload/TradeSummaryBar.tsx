@@ -9,17 +9,18 @@ interface Trade {
 
 interface TradeSummaryBarProps {
   totalTrades: number;
-  approvedCount: number;
+  approvedIndices: Set<number>;
   trades: Trade[];
 }
 
-export function TradeSummaryBar({ totalTrades, approvedCount, trades }: TradeSummaryBarProps) {
-  const approvedTrades = trades.slice(0, approvedCount);
+export function TradeSummaryBar({ totalTrades, approvedIndices, trades }: TradeSummaryBarProps) {
+  const approvedTrades = trades.filter((_, index) => approvedIndices.has(index));
   
   const grossPnL = approvedTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
   const winningTrades = approvedTrades.filter(t => (t.profit_loss || 0) > 0).length;
   const losingTrades = approvedTrades.filter(t => (t.profit_loss || 0) < 0).length;
-  const winRate = approvedCount > 0 ? (winningTrades / approvedCount) * 100 : 0;
+  const winRate = approvedTrades.length > 0 ? (winningTrades / approvedTrades.length) * 100 : 0;
+  const approvedCount = approvedIndices.size;
 
   return (
     <Card 

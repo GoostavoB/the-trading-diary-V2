@@ -97,11 +97,6 @@ export function TradeReviewEditor({
     }));
   }, [editedTrades, debouncedSearch, brokerFilter, statusFilter, approvedTrades]);
 
-  const { containerRef, visibleRange, totalHeight, offsetY } = useVirtualScroll({
-    itemCount: filteredTrades.length,
-    itemHeight: 550,
-    overscan: 2,
-  });
 
   const handleTradeChange = (index: number, field: string, value: any) => {
     const newTrades = [...editedTrades];
@@ -149,8 +144,6 @@ export function TradeReviewEditor({
     onSave(tradesToSave);
   };
 
-  const visibleTrades = filteredTrades.slice(visibleRange.start, visibleRange.end + 1);
-
   return (
     <div className="w-full max-w-[1200px] mx-auto space-y-6 py-6">
       {/* Sticky Header */}
@@ -197,31 +190,25 @@ export function TradeReviewEditor({
       {/* Summary Bar */}
       <TradeSummaryBar
         totalTrades={editedTrades.length}
-        approvedCount={approvedTrades.size}
+        approvedIndices={approvedTrades}
         trades={editedTrades}
       />
 
-      {/* Virtualized Trade List */}
+      {/* Trade List */}
       {filteredTrades.length > 0 ? (
-        <div ref={containerRef} className="overflow-y-auto" style={{ height: '800px' }}>
-          <div style={{ height: totalHeight, position: 'relative' }}>
-            <div style={{ transform: `translateY(${offsetY}px)` }}>
-              <div className="space-y-6">
-                {visibleTrades.map(({ trade, originalIndex, filteredIndex }) => (
-                  <TradeCard
-                    key={originalIndex}
-                    trade={trade}
-                    index={originalIndex}
-                    isApproved={approvedTrades.has(originalIndex)}
-                    onTradeChange={(field, value) => handleTradeChange(originalIndex, field, value)}
-                    onApprove={() => handleApprove(originalIndex)}
-                    onDelete={() => handleDelete(originalIndex)}
-                    onDuplicate={() => handleDuplicate(originalIndex)}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
+        <div className="space-y-6 pb-12">
+          {filteredTrades.map(({ trade, originalIndex }) => (
+            <TradeCard
+              key={originalIndex}
+              trade={trade}
+              index={originalIndex}
+              isApproved={approvedTrades.has(originalIndex)}
+              onTradeChange={(field, value) => handleTradeChange(originalIndex, field, value)}
+              onApprove={() => handleApprove(originalIndex)}
+              onDelete={() => handleDelete(originalIndex)}
+              onDuplicate={() => handleDuplicate(originalIndex)}
+            />
+          ))}
         </div>
       ) : (
         <div className="text-center py-12">
