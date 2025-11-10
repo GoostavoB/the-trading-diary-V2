@@ -313,24 +313,22 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
                   <p className="text-xs font-medium text-white">Failed</p>
                 </div>
               )}
-            </div>
-            
-            {/* Bottom info bar */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-3 pt-8">
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5">
-                  <ImageIcon className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-white font-medium">
-                    {image.tradesDetected !== undefined 
-                      ? `${image.tradesDetected} ${image.tradesDetected === 1 ? 'trade' : 'trades'}`
-                      : 'Ready to extract'
-                    }
-                  </span>
-                </div>
+              
+              {/* Compact bottom status */}
+              <div className="absolute bottom-2 left-2 right-2">
                 {image.status === 'pending' && (
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/20 border border-primary/30">
-                    <span className="text-primary font-semibold">2</span>
-                    <span className="text-primary/80 text-[10px]">credits</span>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-black/80 backdrop-blur-sm border border-border/50">
+                    <span className="text-xs text-foreground font-medium">Ready to extract</span>
+                    <div className="h-3 w-px bg-border/60" />
+                    <span className="text-xs text-primary font-semibold">2 credits</span>
+                  </div>
+                )}
+                {image.tradesDetected !== undefined && image.status === 'success' && (
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-black/80 backdrop-blur-sm border border-green-500/50">
+                    <CheckCircle2 className="h-3 w-3 text-green-500" />
+                    <span className="text-xs text-foreground font-medium">
+                      {image.tradesDetected} {image.tradesDetected === 1 ? 'trade' : 'trades'}
+                    </span>
                   </div>
                 )}
               </div>
