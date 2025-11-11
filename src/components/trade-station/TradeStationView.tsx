@@ -243,7 +243,7 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
   
   return (
     <div className="space-y-4 relative">
-      {/* Floating Add Trade Button */}
+      {/* Floating Quick Actions */}
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -258,6 +258,21 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
           </TooltipTrigger>
           <TooltipContent side="left">
             <p>Add a trade</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={() => resetLayout()}
+              size="sm"
+              variant="outline"
+              className="fixed top-36 right-6 z-50"
+            >
+              Reset layout
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="left">
+            <p>Reset Trade Station layout</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
