@@ -32,9 +32,10 @@ interface BrokerSelectProps {
   value: string;
   onChange: (value: string) => void;
   required?: boolean;
+  error?: boolean;
 }
 
-export const BrokerSelect = ({ value, onChange, required = false }: BrokerSelectProps) => {
+export const BrokerSelect = ({ value, onChange, required = false, error = false }: BrokerSelectProps) => {
   const [open, setOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [customBroker, setCustomBroker] = useState('');
@@ -70,9 +71,11 @@ export const BrokerSelect = ({ value, onChange, required = false }: BrokerSelect
             variant="outline"
             role="combobox"
             aria-expanded={open}
+            aria-invalid={error}
             className={cn(
-              "w-full justify-between",
-              !value && "text-muted-foreground"
+              "w-full justify-between transition-all duration-200",
+              !value && "text-muted-foreground",
+              error && "border-destructive focus-visible:ring-destructive hover:border-destructive/80 shadow-[0_0_0_1px] shadow-destructive/20"
             )}
           >
             {value || "Select broker..."}
