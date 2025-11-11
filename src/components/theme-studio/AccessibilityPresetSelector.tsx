@@ -1,5 +1,6 @@
 import { Shield, Check } from 'lucide-react';
 import { useAccessibilityMode } from '@/hooks/useAccessibilityMode';
+import { useTheme } from 'next-themes';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import {
@@ -9,6 +10,15 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+
+// Recommended background lightness for each preset
+const LIGHTNESS_RECOMMENDATIONS = {
+  deuteranopia: { dark: 7, light: 96 },
+  protanopia: { dark: 7, light: 96 },
+  tritanopia: { dark: 5, light: 94 },
+  'high-contrast': { dark: 2, light: 100 },
+};
 
 export const AccessibilityPresetSelector = () => {
   const {
@@ -19,12 +29,34 @@ export const AccessibilityPresetSelector = () => {
     setShowIconsWithColor,
     setLinkUnderlines,
   } = useAccessibilityMode();
+  const { theme } = useTheme();
 
-  const recommendations: Record<string, string> = {
-    deuteranopia: 'Tip: neutral background lightness ~50% improves blue–orange contrast.',
-    protanopia: 'Tip: neutral background ~50% keeps purple–orange separation clear.',
-    tritanopia: 'Tip: slightly darker background ~45% improves rose/cyan legibility.',
-    'high-contrast': 'Tip: very dark background ~12–16% maximizes contrast.',
+  const applyRecommendedLightness = (presetId: string) => {
+    const isDark = theme === 'dark';
+    const storageKey = isDark ? 'theme:lightness-dark' : 'theme:lightness-light';
+    const recommendation = LIGHTNESS_RECOMMENDATIONS[presetId as keyof typeof LIGHTNESS_RECOMMENDATIONS];
+    
+    if (!recommendation) return null;
+
+    const recommendedValue = isDark ? recommendation.dark : recommendation.light;
+    const previousValue = localStorage.getItem(storageKey);
+    
+    // Apply the recommended lightness
+    const hslValue = `0 0% ${recommendedValue}%`;
+    const root = document.documentElement;
+    
+    root.style.setProperty('--background', hslValue);
+    root.style.setProperty('--card', hslValue);
+    root.style.setProperty('--popover', hslValue);
+    
+    const sidebarLightness = isDark 
+      ? Math.min(recommendedValue + 2, 15) 
+      : Math.max(recommendedValue - 2, 90);
+    root.style.setProperty('--sidebar-background', `0 0% ${sidebarLightness}%`);
+    
+    localStorage.setItem(storageKey, recommendedValue.toString());
+    
+    return { previousValue, recommendedValue, storageKey };
   };
 
   const handlePresetClick = (presetId: string) => {
@@ -36,9 +68,38 @@ export const AccessibilityPresetSelector = () => {
     } else {
       setPreset(presetId as any);
       const name = presets.find(p => p.id === presetId)?.name ?? 'Preset';
-      toast.success(`${name} activated`, {
-        description: recommendations[presetId] || 'Preset applied.',
-      });
+      const lightnessResult = applyRecommendedLightness(presetId);
+      
+      if (lightnessResult) {
+        const { previousValue, recommendedValue, storageKey } = lightnessResult;
+        
+        toast.success(`${name} activated`, {
+          description: `Background adjusted to ${recommendedValue}% for optimal contrast.`,
+          action: previousValue ? {
+            label: 'Undo',
+            onClick: () => {
+              const root = document.documentElement;
+              const prevValue = parseInt(previousValue, 10);
+              const hslValue = `0 0% ${prevValue}%`;
+              
+              root.style.setProperty('--background', hslValue);
+              root.style.setProperty('--card', hslValue);
+              root.style.setProperty('--popover', hslValue);
+              
+              const isDark = theme === 'dark';
+              const sidebarLightness = isDark 
+                ? Math.min(prevValue + 2, 15) 
+                : Math.max(prevValue - 2, 90);
+              root.style.setProperty('--sidebar-background', `0 0% ${sidebarLightness}%`);
+              
+              localStorage.setItem(storageKey, prevValue.toString());
+              toast.success('Background lightness restored');
+            },
+          } : undefined,
+        });
+      } else {
+        toast.success(`${name} activated`);
+      }
     }
   };
 
