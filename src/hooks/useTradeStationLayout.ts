@@ -4,17 +4,8 @@ import { toast } from 'sonner';
 
 export interface TradeStationWidgetPosition {
   id: string;
-  x: number;      // horizontal position (0-11 in 12-col grid)
-  y: number;      // vertical position
-  w: number;      // width in grid columns (1-12)
-  h: number;      // height in grid rows
-  minW?: number;  // minimum width
-  minH?: number;  // minimum height
-  maxW?: number;  // maximum width (optional)
-  maxH?: number;  // maximum height (optional)
-  // Legacy support
-  column?: number;
-  row?: number;
+  column: number;
+  row: number;
 }
 
 interface TradeStationLayoutData {
@@ -23,25 +14,17 @@ interface TradeStationLayoutData {
   version?: number;
 }
 
-// Default sizes for each widget type
-const WIDGET_DEFAULT_SIZES: Record<string, Pick<TradeStationWidgetPosition, 'w' | 'h' | 'minW' | 'minH' | 'maxW' | 'maxH'>> = {
-  simpleLeverage: { w: 4, h: 3, minW: 3, minH: 2, maxW: 6 },
-  riskCalculator: { w: 4, h: 3, minW: 3, minH: 2, maxW: 6 },
-  errorReflection: { w: 4, h: 3, minW: 3, minH: 2, maxW: 6 },
-  rollingTarget: { w: 12, h: 4, minW: 6, minH: 3, maxW: 12 },
-};
-
-// Default widgets for Trade Station (new format with x, y, w, h)
+// Default widgets for Trade Station
 const DEFAULT_TRADE_STATION_POSITIONS: TradeStationWidgetPosition[] = [
   // Row 1: Leverage, Risk, Error Reflection
-  { id: 'simpleLeverage', x: 0, y: 0, ...WIDGET_DEFAULT_SIZES.simpleLeverage },
-  { id: 'riskCalculator', x: 4, y: 0, ...WIDGET_DEFAULT_SIZES.riskCalculator },
-  { id: 'errorReflection', x: 8, y: 0, ...WIDGET_DEFAULT_SIZES.errorReflection },
+  { id: 'simpleLeverage', column: 0, row: 0 },
+  { id: 'riskCalculator', column: 1, row: 0 },
+  { id: 'errorReflection', column: 2, row: 0 },
   // Row 2: Rolling Target (spans all columns)
-  { id: 'rollingTarget', x: 0, y: 3, ...WIDGET_DEFAULT_SIZES.rollingTarget },
+  { id: 'rollingTarget', column: 0, row: 1 },
 ];
 
-const CURRENT_TRADE_STATION_LAYOUT_VERSION = 3;
+const CURRENT_TRADE_STATION_LAYOUT_VERSION = 2;
 
 export const useTradeStationLayout = (userId: string | undefined) => {
   const [positions, setPositions] = useState<TradeStationWidgetPosition[]>(DEFAULT_TRADE_STATION_POSITIONS);
@@ -79,28 +62,8 @@ if (data?.trade_station_layout_json) {
     if (layoutData.columnCount) {
       setColumnCount(layoutData.columnCount);
     }
-  } else if (layoutData.positions && Array.isArray(layoutData.positions)) {
-    // Migrate old format (column/row) to new format (x/y/w/h)
-    const migratedPositions = layoutData.positions.map((pos: any) => {
-      // Check if it's old format
-      if (pos.column !== undefined && pos.row !== undefined && pos.x === undefined) {
-        const defaultSize = WIDGET_DEFAULT_SIZES[pos.id] || { w: 4, h: 3, minW: 3, minH: 2 };
-        return {
-          id: pos.id,
-          x: pos.column * 4, // Convert column to x position (assuming 3 columns = 12 grid)
-          y: pos.row * 3,    // Convert row to y position
-          ...defaultSize,
-        };
-      }
-      return pos;
-    });
-    setPositions(migratedPositions);
-    if (layoutData.columnCount) {
-      setColumnCount(layoutData.columnCount);
-    }
-    await saveLayout(migratedPositions, layoutData.columnCount || 3);
   } else {
-    // Saved layout is missing - enforce latest defaults
+    // Saved layout is missing or outdated - enforce latest defaults
     setPositions(DEFAULT_TRADE_STATION_POSITIONS);
     setColumnCount(3);
     await saveLayout(DEFAULT_TRADE_STATION_POSITIONS, 3);
@@ -154,17 +117,11 @@ const layoutData: TradeStationLayoutData = {
     }
   }, [userId, columnCount]);
 
-  // Update position and size of a specific widget
-  const updatePosition = useCallback((widgetId: string, x: number, y: number, w?: number, h?: number) => {
+  // Update position of a specific widget
+  const updatePosition = useCallback((widgetId: string, column: number, row: number) => {
     setPositions(prev => {
       const updated = prev.map(p =>
-        p.id === widgetId ? { 
-          ...p, 
-          x, 
-          y,
-          ...(w !== undefined && { w }),
-          ...(h !== undefined && { h })
-        } : p
+        p.id === widgetId ? { ...p, column, row } : p
       );
       return updated;
     });
@@ -177,20 +134,31 @@ const layoutData: TradeStationLayoutData = {
       return;
     }
 
-    // Get default size for this widget
-    const defaultSize = WIDGET_DEFAULT_SIZES[widgetId] || { w: 4, h: 3, minW: 3, minH: 2 };
+    // Find the first available spot
+    const grid: { [col: number]: { [row: number]: boolean } } = {};
+    positions.forEach(pos => {
+      if (!grid[pos.column]) grid[pos.column] = {};
+      grid[pos.column][pos.row] = true;
+    });
 
-    // Find the lowest available Y position
-    const maxY = positions.length > 0 ? Math.max(...positions.map(p => p.y + p.h)) : 0;
+    // Find first empty slot
+    let targetCol = 0;
+    let targetRow = 0;
+    for (let col = 0; col < columnCount; col++) {
+      let row = 0;
+      while (grid[col]?.[row]) {
+        row++;
+      }
+      if (row < 10) { // Max 10 rows
+        targetCol = col;
+        targetRow = row;
+        break;
+      }
+    }
 
-    const newPositions = [...positions, { 
-      id: widgetId, 
-      x: 0, 
-      y: maxY,
-      ...defaultSize
-    }];
+    const newPositions = [...positions, { id: widgetId, column: targetCol, row: targetRow }];
     saveLayout(newPositions);
-  }, [positions, saveLayout]);
+  }, [positions, columnCount, saveLayout]);
 
   // Remove widget from layout
   const removeWidget = useCallback((widgetId: string) => {
@@ -204,11 +172,33 @@ const layoutData: TradeStationLayoutData = {
     toast.success('Trade Station reset to default');
   }, [saveLayout]);
 
-  // Update column count (kept for compatibility, but less relevant with free-form grid)
+  // Update column count
   const updateColumnCount = useCallback((count: number) => {
-    // Just update the column count - layout stays the same with react-grid-layout
-    setColumnCount(count);
-    saveLayout(positions, count);
+    // Reflow positions to fit new column count
+    const sortedPositions = [...positions].sort((a, b) => {
+      if (a.column !== b.column) return a.column - b.column;
+      return a.row - b.row;
+    });
+
+    const reflowed: TradeStationWidgetPosition[] = [];
+    let currentCol = 0;
+    let currentRow = 0;
+
+    sortedPositions.forEach(pos => {
+      reflowed.push({
+        ...pos,
+        column: currentCol,
+        row: currentRow,
+      });
+
+      currentCol++;
+      if (currentCol >= count) {
+        currentCol = 0;
+        currentRow++;
+      }
+    });
+
+    saveLayout(reflowed, count);
   }, [positions, saveLayout]);
 
   return {

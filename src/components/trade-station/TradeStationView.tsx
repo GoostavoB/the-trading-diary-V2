@@ -1,16 +1,17 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import GridLayout, { Layout } from 'react-grid-layout';
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
-import './TradeStationView.css';
+import { DndContext, DragEndEvent, DragStartEvent, rectIntersection, PointerSensor, KeyboardSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useTradeStationLayout, TradeStationWidgetPosition } from '@/hooks/useTradeStationLayout';
 import { TRADE_STATION_WIDGET_CATALOG } from '@/config/tradeStationWidgetCatalog';
+import { SortableWidget } from '@/components/widgets/SortableWidget';
+import { DropZone } from '@/components/widgets/DropZone';
+import { CustomizeDashboardControls } from '@/components/CustomizeDashboardControls';
 import { WidgetLibrary } from '@/components/widgets/WidgetLibrary';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Plus, X, GripVertical } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface TradeStationViewProps {
@@ -33,6 +34,7 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
   const navigate = useNavigate();
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [showWidgetLibrary, setShowWidgetLibrary] = useState(false);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const [originalPositions, setOriginalPositions] = useState<TradeStationWidgetPosition[]>([]);
   
   const {
@@ -45,25 +47,19 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
     updateColumnCount,
     resetLayout,
   } = useTradeStationLayout(user?.id);
+
+  // Sensors for drag and drop
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor)
+  );
   
   // Active widgets for library
   const activeWidgets = useMemo(() => positions.map(p => p.id), [positions]);
-  
-  // Convert positions to react-grid-layout format
-  const layout: Layout[] = useMemo(() => 
-    positions.map(pos => ({
-      i: pos.id,
-      x: pos.x,
-      y: pos.y,
-      w: pos.w,
-      h: pos.h,
-      minW: pos.minW,
-      minH: pos.minH,
-      maxW: pos.maxW,
-      maxH: pos.maxH,
-    })),
-    [positions]
-  );
   
   // Check for unsaved changes
   const hasChanges = useMemo(() => {
@@ -73,33 +69,84 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
     
     return positions.some(pos => {
       const original = originalPositions.find(o => o.id === pos.id);
-      return !original || original.x !== pos.x || original.y !== pos.y || original.w !== pos.w || original.h !== pos.h;
+      return !original || original.column !== pos.column || original.row !== pos.row;
     });
   }, [isCustomizing, positions, originalPositions]);
   
-  // Handle layout changes from react-grid-layout
-  const handleLayoutChange = useCallback((newLayout: Layout[]) => {
-    if (!isCustomizing) return;
-    
-    const updatedPositions: TradeStationWidgetPosition[] = newLayout.map(item => {
-      const existingPos = positions.find(p => p.id === item.i);
-      return {
-        id: item.i,
-        x: item.x,
-        y: item.y,
-        w: item.w,
-        h: item.h,
-        minW: existingPos?.minW,
-        minH: existingPos?.minH,
-        maxW: existingPos?.maxW,
-        maxH: existingPos?.maxH,
-      };
-    });
-    
-    saveLayout(updatedPositions);
-  }, [isCustomizing, positions, saveLayout]);
+  // Drag handlers
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
   
-  // Widget renderer
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) {
+      setActiveId(null);
+      return;
+    }
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    const activePos = positions.find(p => p.id === activeId);
+    if (!activePos) {
+      console.error('Active widget not found:', activeId);
+      setActiveId(null);
+      return;
+    }
+
+    let updatedPositions: TradeStationWidgetPosition[];
+
+    // Handle drop on another widget - swap positions
+    const overPos = positions.find(p => p.id === overId);
+    if (overPos) {
+      updatedPositions = positions.map(p => {
+        if (p.id === activeId) {
+          return { ...p, column: overPos.column, row: overPos.row };
+        }
+        if (p.id === overId) {
+          return { ...p, column: activePos.column, row: activePos.row };
+        }
+        return p;
+      });
+    }
+    // Handle drop on dropzone
+    else if (overId.startsWith('dropzone-')) {
+      const [, colStr, rowStr] = overId.split('-');
+      const targetCol = parseInt(colStr, 10);
+      const targetRow = parseInt(rowStr, 10);
+      
+      updatedPositions = positions.map(p =>
+        p.id === activeId ? { ...p, column: targetCol, row: targetRow } : p
+      );
+    }
+    else {
+      console.warn('Unknown drop target:', overId);
+      setActiveId(null);
+      return;
+    }
+
+    // Validate
+    const originalIds = new Set(positions.map(p => p.id));
+    const updatedIds = new Set(updatedPositions.map(p => p.id));
+    
+    if (originalIds.size !== updatedIds.size) {
+      console.error('Widget count mismatch!');
+      toast.error('Layout update failed');
+      setActiveId(null);
+      return;
+    }
+
+    // Save immediately
+    saveLayout(updatedPositions);
+    setActiveId(null);
+  }, [positions, saveLayout]);
+
+  const handleDragCancel = useCallback(() => {
+    setActiveId(null);
+  }, []);
+  
+  // Widget renderer for regular widgets
   const renderWidget = useCallback((widgetId: string) => {
     const widgetConfig = TRADE_STATION_WIDGET_CATALOG[widgetId];
     if (!widgetConfig) return null;
@@ -107,28 +154,39 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
     const WidgetComponent = widgetConfig.component;
     
     return (
-      <div className="relative h-full group">
-        {isCustomizing && (
-          <>
-            <div className="absolute top-2 left-2 z-10 cursor-move bg-background/80 backdrop-blur-sm rounded p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <GripVertical className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <Button
-              variant="destructive"
-              size="icon"
-              className="absolute top-2 right-2 z-10 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={() => removeWidget(widgetId)}
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          </>
-        )}
+      <SortableWidget
+        id={widgetId}
+        isEditMode={isCustomizing}
+        onRemove={() => removeWidget(widgetId)}
+      >
         <WidgetComponent 
           id={widgetId}
           isEditMode={isCustomizing} 
           onRemove={() => removeWidget(widgetId)} 
         />
-      </div>
+      </SortableWidget>
+    );
+  }, [isCustomizing, removeWidget]);
+  
+  // Render spanning widget (full width) - no extra wrapper
+  const renderSpanningWidget = useCallback((widgetId: string) => {
+    const widgetConfig = TRADE_STATION_WIDGET_CATALOG[widgetId];
+    if (!widgetConfig) return null;
+    
+    const WidgetComponent = widgetConfig.component;
+    
+    return (
+      <SortableWidget
+        id={widgetId}
+        isEditMode={isCustomizing}
+        onRemove={() => removeWidget(widgetId)}
+      >
+        <WidgetComponent 
+          id={widgetId}
+          isEditMode={isCustomizing} 
+          onRemove={() => removeWidget(widgetId)} 
+        />
+      </SortableWidget>
     );
   }, [isCustomizing, removeWidget]);
 
@@ -204,29 +262,74 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
         </Tooltip>
       </TooltipProvider>
 
-      {/* React Grid Layout */}
-      <div className="w-full">
-        <GridLayout
-          className="layout"
-          layout={layout}
-          cols={12}
-          rowHeight={60}
-          width={typeof window !== 'undefined' ? Math.min(window.innerWidth - 48, 1400) : 1200}
-          isDraggable={isCustomizing}
-          isResizable={isCustomizing}
-          onLayoutChange={handleLayoutChange}
-          compactType="vertical"
-          preventCollision={false}
-          margin={[16, 16]}
-          containerPadding={[0, 0]}
+      {/* Dynamic Grid with DnD */}
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+        collisionDetection={rectIntersection}
+      >
+        <SortableContext
+          items={positions.map(p => p.id)}
+          strategy={rectSortingStrategy}
         >
-          {positions.map((pos) => (
-            <div key={pos.id} className="widget-container">
-              {renderWidget(pos.id)}
-            </div>
-          ))}
-        </GridLayout>
-      </div>
+          {/* Single grid container - spanning widgets will use col-span-full */}
+          <div 
+            className="grid gap-4"
+            style={{ 
+              gridTemplateColumns: `repeat(${columnCount}, 1fr)`,
+            }}
+          >
+            {/* Sort all positions by row, then column */}
+            {[...positions]
+              .sort((a, b) => {
+                if (a.row !== b.row) return a.row - b.row;
+                return a.column - b.column;
+              })
+              .map((pos) => {
+                const isSpanning = pos.id === 'rollingTarget';
+                
+                return (
+                  <div
+                    key={pos.id}
+                    className={isSpanning ? 'col-span-full' : ''}
+                    style={
+                      isSpanning
+                        ? undefined
+                        : {
+                            gridColumn: pos.column + 1,
+                            gridRow: pos.row + 1,
+                          }
+                    }
+                  >
+                    {isSpanning ? renderSpanningWidget(pos.id) : renderWidget(pos.id)}
+                  </div>
+                );
+              })}
+            
+            {/* Drop zones for customization */}
+            {isCustomizing &&
+              Array.from({ length: columnCount }, (_, colIdx) => {
+                const maxRow = Math.max(
+                  0,
+                  ...positions.filter(p => p.column === colIdx).map(p => p.row)
+                );
+                return (
+                  <div
+                    key={`dropzone-${colIdx}`}
+                    style={{
+                      gridColumn: colIdx + 1,
+                      gridRow: maxRow + 2,
+                    }}
+                  >
+                    <DropZone id={`dropzone-${colIdx}-${maxRow + 1}`} />
+                  </div>
+                );
+              })}
+          </div>
+        </SortableContext>
+      </DndContext>
       
       {/* Widget Library */}
       <WidgetLibrary
