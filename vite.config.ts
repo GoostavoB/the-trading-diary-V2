@@ -78,30 +78,49 @@ export default defineConfig(({ mode }) => ({
   },
   // Phase 2: Bundle Size Optimization
   build: {
+    // Target modern browsers for better optimization
+    target: 'es2020',
+
+    // Optimize asset handling
+    assetsInlineLimit: 4096, // Inline assets < 4KB as base64
+
     rollupOptions: {
       output: {
+        // Optimize chunk file names
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+
         manualChunks: {
           // Framework core - 150KB
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          
-          // UI Library - 200KB (Radix UI is large)
-          'vendor-ui': [
+
+          // UI Library - Split into smaller chunks
+          'vendor-ui-core': [
             '@radix-ui/react-dialog',
             '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-select',
-            '@radix-ui/react-toast',
             '@radix-ui/react-tooltip',
-            '@radix-ui/react-tabs',
-            '@radix-ui/react-accordion',
             '@radix-ui/react-popover',
+          ],
+          'vendor-ui-forms': [
+            '@radix-ui/react-select',
             '@radix-ui/react-label',
             '@radix-ui/react-checkbox',
             '@radix-ui/react-switch',
+            '@radix-ui/react-slider',
           ],
-          
+          'vendor-ui-other': [
+            '@radix-ui/react-toast',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-accordion',
+          ],
+
           // Charts - only loaded on analytics pages
           'vendor-charts': ['recharts'],
-          
+
+          // Animation libraries
+          'vendor-animation': ['framer-motion', 'gsap'],
+
           // Heavy utilities
           'vendor-utils': [
             'date-fns',
@@ -109,30 +128,54 @@ export default defineConfig(({ mode }) => ({
             'crypto-js',
             '@tanstack/react-query',
           ],
-          
+
           // Supabase - only for authenticated pages
           'vendor-supabase': ['@supabase/supabase-js'],
-          
-          // AI/3D libraries - rarely used
+
+          // AI/3D libraries - rarely used, separate chunk
           'vendor-threejs': ['three', '@react-three/fiber', '@react-three/drei'],
         },
       },
+
+      // Tree-shaking optimizations
+      treeshake: {
+        moduleSideEffects: false,
+        propertyReadSideEffects: false,
+        tryCatchDeoptimization: false,
+      },
     },
-    
+
     // Enable minification and compression
     minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: mode === 'production',
         drop_debugger: mode === 'production',
-        pure_funcs: mode === 'production' ? ['console.log', 'console.info'] : [],
+        pure_funcs: mode === 'production' ? ['console.log', 'console.info', 'console.warn'] : [],
+        passes: 2, // Run compression twice for better results
+        unsafe_arrows: true,
+        unsafe_methods: true,
+        unsafe_proto: true,
+      },
+      mangle: {
+        safari10: true, // Fix Safari 10+ bugs
+      },
+      format: {
+        comments: false, // Remove all comments
       },
     },
-    
+
+    // Source maps only for production debugging (not in bundle)
+    sourcemap: mode === 'production' ? 'hidden' : true,
+
     // Chunk size warnings
-    chunkSizeWarningLimit: 600,
-    
+    chunkSizeWarningLimit: 500, // Stricter limit
+
     // Optimize CSS
     cssCodeSplit: true,
+    cssMinify: true,
+
+    // Report compressed file sizes
+    reportCompressedSize: true,
   },
 }));

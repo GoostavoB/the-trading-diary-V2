@@ -14,59 +14,48 @@ const PricingComparison = () => {
 
   const features = [
     {
-      category: t('pricing.comparison.categories.aiAnalytics'),
+      category: "Uploads & Trades",
       items: [
-        { name: t('pricing.comparison.features.aiUploads'), basic: "50/mo", pro: "100/mo", elite: "300/mo" },
-        { name: t('pricing.comparison.features.manualUploads'), basic: true, pro: true, elite: true },
-        { name: t('pricing.comparison.features.aiAnalysis'), basic: false, pro: "1/week", elite: "5/week" },
-        { name: t('pricing.comparison.features.customWidgets'), basic: "15+", pro: "3", elite: "10" },
-        { name: t('pricing.comparison.features.advancedCharts'), basic: true, pro: true, elite: true },
+        { name: "Onboarding gift", basic: "5 free uploads", pro: "5 free uploads", elite: "5 free uploads" },
+        { name: "Monthly uploads", basic: "0/month", pro: "30/month", elite: "Unlimited" },
+        { name: "Upload rollover", basic: false, pro: true, elite: true },
+        { name: "Extra uploads cost", basic: "$5 per 10", pro: "$2 per 10 (60% off)", elite: "N/A" },
+        { name: "Manual trade entry", basic: true, pro: true, elite: true },
       ]
     },
     {
-      category: t('pricing.comparison.categories.tradingTools'),
+      category: "Trading Tools & Analytics",
       items: [
-        { name: t('pricing.comparison.features.tradingPlan'), basic: false, pro: true, elite: true },
-        { name: t('pricing.comparison.features.preTradeChecklist'), basic: false, pro: true, elite: true },
-        { name: t('pricing.comparison.features.goalsTracking'), basic: false, pro: true, elite: true },
-        { name: t('pricing.comparison.features.tradeReplay'), basic: false, pro: false, elite: true },
-        { name: t('pricing.comparison.features.positionCalculator'), basic: false, pro: false, elite: true },
+        { name: "Widgets and metrics", basic: true, pro: true, elite: true },
+        { name: "Emotional, plans, and goals", basic: true, pro: true, elite: true },
+        { name: "Market data (LSR & OI)", basic: true, pro: true, elite: true },
+        { name: "Forecast tool", basic: true, pro: true, elite: true },
+        { name: "FII analysis to compare exchanges", basic: true, pro: true, elite: true },
+        { name: "Risk analysis", basic: true, pro: true, elite: true },
       ]
     },
     {
-      category: t('pricing.comparison.categories.journaling'),
+      category: "Journaling & Reports",
       items: [
-        { name: t('pricing.comparison.features.basicJournal'), basic: true, pro: true, elite: true },
-        { name: t('pricing.comparison.features.emotionalTimeline'), basic: true, pro: true, elite: true },
-        { name: t('pricing.comparison.features.richJournal'), basic: false, pro: true, elite: true },
-        { name: t('pricing.comparison.features.patternAnalysis'), basic: false, pro: true, elite: true },
+        { name: "Trading journal", basic: true, pro: true, elite: true },
+        { name: "Spot wallet", basic: true, pro: true, elite: true },
+        { name: "Tax report", basic: true, pro: true, elite: true },
+        { name: "Achievements board", basic: true, pro: true, elite: true },
       ]
     },
     {
-      category: t('pricing.comparison.categories.riskManagement'),
+      category: "Customization",
       items: [
-        { name: t('pricing.comparison.features.feeAnalytics'), basic: true, pro: true, elite: true },
-        { name: t('pricing.comparison.features.riskDashboard'), basic: false, pro: false, elite: true },
-        { name: t('pricing.comparison.features.drawdownAnalysis'), basic: false, pro: false, elite: true },
-        { name: t('pricing.comparison.features.performanceAlerts'), basic: false, pro: false, elite: true },
+        { name: "Themes", basic: "Blue & Gold Rush", pro: "All themes", elite: "All themes" },
+        { name: "Color customization", basic: false, pro: "Full (primary, secondary, accent)", elite: "Full (primary, secondary, accent)" },
       ]
     },
     {
-      category: t('pricing.comparison.categories.integrations'),
+      category: "Support & Access",
       items: [
-        { name: t('pricing.comparison.features.csvImport'), basic: true, pro: true, elite: true },
-        { name: t('pricing.comparison.features.exchangeConnections'), basic: true, pro: true, elite: true },
-        { name: t('pricing.comparison.features.autoRefresh'), basic: false, pro: true, elite: true },
-      ]
-    },
-    {
-      category: t('pricing.comparison.categories.social'),
-      items: [
-        { name: t('pricing.comparison.features.viewFeed'), basic: true, pro: true, elite: true },
-        { name: t('pricing.comparison.features.createPosts'), basic: false, pro: true, elite: true },
-        { name: t('pricing.comparison.features.leaderboard'), basic: true, pro: true, elite: true },
-        { name: t('pricing.comparison.features.xpBadges'), basic: false, pro: true, elite: true },
-        { name: t('pricing.comparison.features.challenges'), basic: false, pro: true, elite: true },
+        { name: "Email support", basic: false, pro: true, elite: true },
+        { name: "Priority customer support", basic: false, pro: false, elite: true },
+        { name: "First access to new features", basic: false, pro: false, elite: true },
       ]
     },
   ];
@@ -161,28 +150,28 @@ const PricingComparison = () => {
       <div className="container mx-auto max-w-6xl relative z-10">
         {/* Header */}
         <div className="text-center mb-12">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-bold mb-4"
           >
-            {t('pricing.comparison.title')}
+            Compare Plans
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
             viewport={{ once: true }}
             className="text-lg text-muted-foreground"
           >
-            {t('pricing.comparison.subtitle')}
+            See exactly what's included in each plan
           </motion.p>
         </div>
 
         {/* Guarantee Banner */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: 0.2 }}
@@ -192,7 +181,7 @@ const PricingComparison = () => {
           <div className="inline-flex items-center gap-2 px-6 py-3 bg-primary/5 backdrop-blur-sm border border-primary/20 rounded-full">
             <Check className="w-5 h-5 text-primary" />
             <span className="text-sm font-medium">
-              {t('pricing.guaranteeNote')}
+              1 upload = up to 10 trades
             </span>
           </div>
         </motion.div>
@@ -203,9 +192,9 @@ const PricingComparison = () => {
           <div className="sticky top-20 z-20 backdrop-blur-xl bg-background/80 rounded-2xl border border-border/50 p-6 mb-6">
             <div className="grid grid-cols-4 gap-4">
               <div className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                {t('pricing.comparison.feature')}
+                Feature
               </div>
-              <div className="text-center text-sm font-bold">Basic</div>
+              <div className="text-center text-sm font-bold">Starter</div>
               <div className="text-center text-sm font-bold relative">
                 <div className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-primary text-primary-foreground text-[10px] font-medium rounded-full whitespace-nowrap">
                   Most Popular

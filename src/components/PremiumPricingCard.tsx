@@ -3,7 +3,10 @@ import { Check } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import { MagneticButton } from './MagneticButton';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
+import { createCheckoutSession } from '@/utils/stripe';
+import { toast } from 'sonner';
+import { useState } from 'react';
 
 interface PricingPlan {
   id: string;
@@ -27,13 +30,31 @@ interface PremiumPricingCardProps {
 
 export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPricingCardProps) => {
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
-  const currentLang = i18n.language;
-  
-  const handleCTA = () => {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+
+  const handleCTA = async () => {
     if (plan.comingSoon) return;
-    const authPath = currentLang === 'en' ? '/auth?mode=signup' : `/${currentLang}/auth?mode=signup`;
-    navigate(authPath);
+
+    // If user is not logged in, redirect to auth
+    if (!user) {
+      navigate('/auth?mode=signup');
+      return;
+    }
+
+    // If user is logged in, start checkout
+    setLoading(true);
+    try {
+      await createCheckoutSession({
+        planId: plan.id as 'basic' | 'pro' | 'elite',
+        billingCycle,
+      });
+      // User will be redirected to Stripe checkout
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to start checkout. Please try again.');
+      setLoading(false);
+    }
   };
   
   const getDisplayPrice = () => {
@@ -88,10 +109,10 @@ export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPric
 
         <div className="mb-6">
           <h3 className="text-2xl font-bold mb-2 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
-            {plan.comingSoon ? plan.nameKey : t(plan.nameKey)}
+            {plan.nameKey}
           </h3>
           <p className="text-sm text-muted-foreground dark:text-muted-foreground/70 leading-relaxed">
-            {plan.comingSoon ? plan.descriptionKey : t(plan.descriptionKey)}
+            {plan.descriptionKey}
           </p>
         </div>
 
@@ -99,32 +120,34 @@ export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPric
           {getDisplayPrice() !== null ? (
             <>
               <div className="flex items-baseline gap-2 mb-2">
-                <motion.span 
+                <motion.span
                   key={`${billingCycle}-${getDisplayPrice()}`}
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                   className="text-5xl font-bold tracking-tight tabular-nums"
-                  style={{ 
+                  style={{
                     fontVariantNumeric: 'tabular-nums',
                     letterSpacing: '-0.02em'
                   }}
                 >
-                  ${getDisplayPrice()}
+                  {getDisplayPrice() === 0 ? 'Free' : `$${getDisplayPrice()}`}
                 </motion.span>
-                <span className="text-sm text-muted-foreground dark:text-muted-foreground/70">
-                  /{billingCycle === 'monthly' ? t('pricing.perMonth') : t('pricing.perMonthBilledAnnually')}
-                </span>
+                {getDisplayPrice() > 0 && (
+                  <span className="text-sm text-muted-foreground dark:text-muted-foreground/70">
+                    /month{billingCycle === 'annual' && ' billed annually'}
+                  </span>
+                )}
               </div>
-              {billingCycle === 'annual' && (
-                <motion.div 
+              {billingCycle === 'annual' && getSavings() > 0 && (
+                <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   transition={{ duration: 0.28 }}
                   className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20"
                 >
                   <span className="text-sm font-bold text-primary">
-                    {t('pricing.savingsAmount', { amount: getSavings() })}
+                    Save ${getSavings()}/year
                   </span>
                 </motion.div>
               )}
@@ -139,9 +162,10 @@ export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPric
         <MagneticButton
           onClick={handleCTA}
           variant={plan.popular ? 'default' : 'outline'}
-          className={`w-full mb-8 py-6 text-base font-medium ${plan.comingSoon ? 'opacity-60 cursor-not-allowed pointer-events-none' : ''}`}
+          className={`w-full mb-8 py-6 text-base font-medium ${plan.comingSoon || loading ? 'opacity-60 cursor-not-allowed pointer-events-none' : ''}`}
+          disabled={loading || plan.comingSoon}
         >
-          {plan.comingSoon ? plan.ctaKey : t(plan.ctaKey)}
+          {loading ? 'Loading...' : plan.ctaKey}
         </MagneticButton>
 
         <ul className="space-y-4 flex-1">
@@ -150,7 +174,7 @@ export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPric
               key={i}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ 
+              transition={{
                 duration: 0.28,
                 delay: index * 0.09 + i * 0.05,
                 ease: [0.22, 1, 0.36, 1]
@@ -161,7 +185,7 @@ export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPric
                 <Check size={14} className="text-accent" />
               </div>
               <span className="text-sm text-muted-foreground dark:text-muted-foreground/70 leading-relaxed group-hover:text-foreground transition-colors duration-280 ease-premium">
-                {plan.comingSoon ? featureKey : t(featureKey)}
+                {featureKey}
               </span>
             </motion.li>
           ))}

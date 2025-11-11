@@ -15,6 +15,7 @@ import { preloadImages } from '@/utils/preloadStrategies';
 import { useHreflang } from '@/hooks/useHreflang';
 import { SUPPORTED_LANGUAGES, getLocalizedPath, getLanguageFromPath, type SupportedLanguage } from '@/utils/languageRouting';
 import { useLocation } from 'react-router-dom';
+import { addStructuredData } from '@/utils/seoHelpers';
 
 const Blog = () => {
   const { lang } = useParams();
@@ -48,7 +49,57 @@ const Blog = () => {
     canonical: `https://www.thetradingdiary.com${getLocalizedPath('/blog', currentLang)}`,
     keywords: 'crypto trading blog, AI trading tools, trading journal, trading psychology, risk management'
   });
-  
+
+  // Add FAQ schema for blog landing page
+  useEffect(() => {
+    addStructuredData({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What topics does The Trading Diary blog cover?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Trading Diary blog covers crypto trading strategies, AI-powered trading tools, trading psychology, risk management, technical analysis, market trends, exchange comparisons, beginner guides, and data-driven trading techniques. All content is written by experienced traders and crypto experts."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How often is the blog updated?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Trading Diary blog is updated 2-3 times per week with fresh content on crypto trading, market analysis, tool reviews, and educational guides. Subscribe to our newsletter to get notified when new articles are published."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Are the blog articles written by real traders?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! All blog articles are written by experienced cryptocurrency traders with years of hands-on trading experience. Our authors share real strategies, lessons learned from actual trades, and practical tips based on proven results."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I learn crypto trading from The Trading Diary blog?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Our blog offers comprehensive beginner guides, step-by-step tutorials, risk management strategies, psychology tips, and advanced trading techniques. Whether you're a beginner or experienced trader, you'll find actionable insights to improve your trading skills."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do you review crypto trading tools and platforms?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The Trading Diary blog includes in-depth reviews and comparisons of crypto trading journals, analytics platforms, exchanges, and trading tools. We provide honest, unbiased reviews based on real testing and user feedback to help you choose the best tools for your trading needs."
+          }
+        }
+      ]
+    }, 'blog-faq-schema');
+  }, []);
+
   // Get articles for current language, fallback to English
   const languageArticles = useMemo(() => {
     const articles = getArticlesByLanguage(currentLang);

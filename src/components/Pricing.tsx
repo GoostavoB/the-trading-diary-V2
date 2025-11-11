@@ -6,78 +6,108 @@ import { useEffect, useState } from "react";
 import { addStructuredData } from "@/utils/seoHelpers";
 import PricingComparison from "./PricingComparison";
 import PricingRoadmap from "./PricingRoadmap";
+import { useAuth } from "@/contexts/AuthContext";
+import { createCheckoutSession } from "@/utils/stripe";
+import { toast } from "sonner";
 
 const Pricing = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const currentLang = i18n.language;
-  
+
   const handleAuthNavigate = () => {
     const authPath = currentLang === 'en' ? '/auth' : `/${currentLang}/auth`;
     navigate(authPath);
   };
 
+  const handlePlanSelect = async (planId: string) => {
+    // If user is not logged in, redirect to auth
+    if (!user) {
+      handleAuthNavigate();
+      return;
+    }
+
+    // If user is logged in, start checkout
+    setLoadingPlan(planId);
+    try {
+      await createCheckoutSession({
+        planId: planId as 'basic' | 'pro' | 'elite',
+        billingCycle,
+      });
+      // User will be redirected to Stripe checkout
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to start checkout. Please try again.');
+      setLoadingPlan(null);
+    }
+  };
+
   const plans = [
     {
       id: 'basic',
-      nameKey: "pricing.plans.basic.name",
-      descriptionKey: "pricing.plans.basic.description",
-      monthlyPrice: 15,
-      annualPrice: 12,
-      annualTotal: 144,
+      nameKey: "Starter",
+      descriptionKey: "Perfect for getting started",
+      monthlyPrice: 0,
+      annualPrice: 0,
+      annualTotal: 0,
       featuresKeys: [
-        "pricing.plans.basic.features.uploads",
-        "pricing.plans.basic.features.manualUploads",
-        "pricing.plans.basic.features.dashboard",
-        "pricing.plans.basic.features.charts",
-        "pricing.plans.basic.features.basicJournal",
-        "pricing.plans.basic.features.feeAnalytics",
-        "pricing.plans.basic.features.csv",
-        "pricing.plans.basic.features.social",
+        "Onboarding gift: 5 free uploads",
+        "Extra uploads: $5 per 10 uploads",
+        "Add trades manually",
+        "Widgets and metrics",
+        "Emotional, plans, and personal goals",
+        "Market data: long short ratio and open interest",
+        "Forecast tool",
+        "FII analysis to compare exchanges",
+        "Risk analysis",
+        "Trading journal",
+        "Spot wallet",
+        "Tax report",
+        "Achievements board",
+        "Themes: Default blue and Gold Rush only",
+        "No color customization",
       ],
-      ctaKey: "pricing.plans.cta",
+      ctaKey: "Start free",
       popular: false,
       priceCurrency: "USD",
     },
     {
       id: 'pro',
-      nameKey: "pricing.plans.pro.name",
-      descriptionKey: "pricing.plans.pro.description",
-      monthlyPrice: 35,
-      annualPrice: 28,
-      annualTotal: 336,
+      nameKey: "Pro",
+      descriptionKey: "Most popular for serious traders",
+      monthlyPrice: 15,
+      annualPrice: 12,
+      annualTotal: 144,
       featuresKeys: [
-        "pricing.plans.pro.features.uploads",
-        "pricing.plans.pro.features.aiAnalysis",
-        "pricing.plans.pro.features.tradingPlan",
-        "pricing.plans.pro.features.goals",
-        "pricing.plans.pro.features.richJournal",
-        "pricing.plans.pro.features.customWidgets",
-        "pricing.plans.pro.features.fullSocial",
-        "pricing.plans.pro.features.everythingBasic",
+        "Everything in Starter, plus:",
+        "30 uploads per month",
+        "Unused uploads roll over to next month",
+        "Extra uploads: $2 per 10 uploads (60% discount)",
+        "Full color customization: primary, secondary, and accent",
+        "Email support",
       ],
-      ctaKey: "pricing.plans.cta",
+      ctaKey: "Go Pro",
       popular: true,
       priceCurrency: "USD",
     },
     {
       id: 'elite',
-      nameKey: "pricing.plans.elite.name",
-      descriptionKey: "pricing.plans.elite.description",
-      monthlyPrice: 79,
-      annualPrice: 63,
-      annualTotal: 756,
+      nameKey: "Elite",
+      descriptionKey: "For professional traders",
+      monthlyPrice: 32,
+      annualPrice: 28,
+      annualTotal: 336,
       featuresKeys: [
-        "pricing.plans.elite.features.uploads",
-        "pricing.plans.elite.features.aiAnalysis",
-        "pricing.plans.elite.features.tradeReplay",
-        "pricing.plans.elite.features.positionCalculator",
-        "pricing.plans.elite.features.riskDashboard",
-        "pricing.plans.elite.features.advancedAlerts",
-        "pricing.plans.elite.features.everythingPro",
+        "Everything in Pro, plus:",
+        "Unlimited uploads and trades",
+        "Priority customer support",
+        "First access to new widgets and new metrics",
+        "Full color customization",
       ],
-      ctaKey: "pricing.plans.cta",
+      ctaKey: "Get Elite",
       popular: false,
       priceCurrency: "USD",
     },
@@ -178,39 +208,42 @@ const Pricing = () => {
                 )}
 
                 <div className="mb-5">
-                  <h3 className="text-xl md:text-2xl font-bold mb-1.5">{t(plan.nameKey)}</h3>
+                  <h3 className="text-xl md:text-2xl font-bold mb-1.5">{plan.nameKey}</h3>
                   <p className="text-muted-foreground text-xs md:text-sm mb-3">
-                    {t(plan.descriptionKey)}
+                    {plan.descriptionKey}
                   </p>
                   <div className="flex items-baseline gap-2 mb-2">
                     <span className="text-3xl md:text-4xl font-bold" style={{ color: 'hsl(var(--primary))' }}>
-                      ${getDisplayPrice(plan)}
+                      {getDisplayPrice(plan) === 0 ? 'Free' : `$${getDisplayPrice(plan)}`}
                     </span>
-                    <span className="text-sm text-muted-foreground">
-                      /{billingCycle === 'monthly' ? t('pricing.perMonth') : t('pricing.perMonthBilledAnnually')}
-                    </span>
+                    {getDisplayPrice(plan) > 0 && (
+                      <span className="text-sm text-muted-foreground">
+                        /month{billingCycle === 'annual' && ' billed annually'}
+                      </span>
+                    )}
                   </div>
-                  {billingCycle === 'annual' && (
+                  {billingCycle === 'annual' && getSavings(plan) > 0 && (
                     <div className="text-xs text-green-600 dark:text-green-400 font-medium">
-                      {t('pricing.savingsAmount', { amount: getSavings(plan) })}
+                      Save ${getSavings(plan)}/year
                     </div>
                   )}
                 </div>
 
                 <Button
-                  onClick={handleAuthNavigate}
+                  onClick={() => handlePlanSelect(plan.id)}
                   className={`w-full h-12 mb-3 rounded-xl font-medium transition-all ${
                     plan.popular
                       ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                       : "glass border border-primary/30 hover:bg-primary/10 hover:border-primary/50"
                   }`}
                   variant={plan.popular ? "default" : "outline"}
+                  disabled={loadingPlan === plan.id}
                 >
-                  {t(plan.ctaKey)}
+                  {loadingPlan === plan.id ? 'Loading...' : plan.ctaKey}
                 </Button>
 
                 <p className="text-xs text-muted-foreground text-center mb-5 leading-relaxed">
-                  {t('pricing.plans.terms')}
+                  1 upload = up to 10 trades
                 </p>
 
                 <ul className="space-y-2.5">
@@ -222,7 +255,7 @@ const Pricing = () => {
                           plan.popular ? "text-primary" : "text-foreground"
                         }`}
                       />
-                      <span className="text-xs md:text-sm text-muted-foreground leading-relaxed">{t(featureKey)}</span>
+                      <span className="text-xs md:text-sm text-muted-foreground leading-relaxed">{featureKey}</span>
                     </li>
                   ))}
                 </ul>

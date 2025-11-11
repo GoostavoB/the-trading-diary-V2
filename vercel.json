@@ -48,7 +48,16 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=86400"
+          "value": "public, max-age=604800, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, must-revalidate"
         }
       ]
     },
@@ -60,6 +69,28 @@
           "value": "public, max-age=0, must-revalidate"
         }
       ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/pt",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/es",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/ar",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/vi",
+      "destination": "/",
+      "permanent": true
     }
   ],
   "rewrites": [

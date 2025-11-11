@@ -1,190 +1,185 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
-  <!-- Landing EN (USA) -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
   <url>
     <loc>https://www.thetradingdiary.com/</loc>
-    <lastmod>2025-10-22</lastmod>
+    <lastmod>2025-11-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/pt" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/es" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/ar" />
-    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/vi" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.thetradingdiary.com/" />
   </url>
-  
-  <!-- Landing PT (Brasil) -->
-  <url>
-    <loc>https://www.thetradingdiary.com/pt</loc>
-    <lastmod>2025-10-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/pt" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/es" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/ar" />
-    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/vi" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.thetradingdiary.com/" />
-  </url>
-  
-  <!-- Landing ES (LATAM) -->
-  <url>
-    <loc>https://www.thetradingdiary.com/es</loc>
-    <lastmod>2025-10-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/pt" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/es" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/ar" />
-    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/vi" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.thetradingdiary.com/" />
-  </url>
-  
-  <!-- Landing AR (Emirates) -->
-  <url>
-    <loc>https://www.thetradingdiary.com/ar</loc>
-    <lastmod>2025-10-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/pt" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/es" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/ar" />
-    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/vi" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.thetradingdiary.com/" />
-  </url>
-  
-  <!-- Landing VI (Vietnam) -->
-  <url>
-    <loc>https://www.thetradingdiary.com/vi</loc>
-    <lastmod>2025-10-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/pt" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/es" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/ar" />
-    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/vi" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.thetradingdiary.com/" />
-  </url>
-  
-  <!-- App pages (sem hreflang - apenas single URL) -->
+
   <url>
     <loc>https://www.thetradingdiary.com/auth</loc>
-    <lastmod>2025-10-22</lastmod>
+    <lastmod>2025-11-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
+
   <url>
-    <loc>https://www.thetradingdiary.com/dashboard</loc>
-    <lastmod>2025-10-22</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.thetradingdiary.com/upload</loc>
-    <lastmod>2025-10-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.thetradingdiary.com/analytics</loc>
-    <lastmod>2025-10-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.thetradingdiary.com/tools</loc>
-    <lastmod>2025-10-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.thetradingdiary.com/faq</loc>
-    <lastmod>2025-10-22</lastmod>
+    <loc>https://www.thetradingdiary.com/pricing</loc>
+    <lastmod>2025-11-11</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://www.thetradingdiary.com/features</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://www.thetradingdiary.com/how-it-works</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.thetradingdiary.com/about</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.thetradingdiary.com/contact</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.thetradingdiary.com/testimonials</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.thetradingdiary.com/changelog</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
-  
+
   <url>
     <loc>https://www.thetradingdiary.com/blog</loc>
-    <lastmod>2025-10-22</lastmod>
+    <lastmod>2025-11-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  
-  <!-- Blog Article 1: AI Tools for Crypto Trading -->
+
+  <url>
+    <loc>https://www.thetradingdiary.com/vs-tradersync</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.thetradingdiary.com/vs-tradezella</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.thetradingdiary.com/vs-excel</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.thetradingdiary.com/terms</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://www.thetradingdiary.com/privacy</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://www.thetradingdiary.com/cookie-policy</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <url>
+    <loc>https://www.thetradingdiary.com/crypto-trading-faq</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.thetradingdiary.com/sitemap</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://www.thetradingdiary.com/logo-download</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Blog: best-crypto-trading-journal-2025 -->
+  <url>
+    <loc>https://www.thetradingdiary.com/blog/best-crypto-trading-journal-2025</loc>
+    <lastmod>2025-11-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Blog: ai-tools-for-crypto-trading -->
   <url>
     <loc>https://www.thetradingdiary.com/blog/ai-tools-for-crypto-trading</loc>
     <lastmod>2025-10-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/blog/ai-tools-for-crypto-trading" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/blog/ferramentas-ia-trading-cripto" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/blog/herramientas-ia-trading-cripto" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/blog/adawat-ai-trading-crypto-ar" />
-    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/blog/cong-cu-ai-giao-dich-crypto-vi" />
   </url>
-  
-  <!-- Blog Article 2: Trading Journal for Crypto -->
+
+  <!-- Blog: trading-journal-for-crypto -->
   <url>
     <loc>https://www.thetradingdiary.com/blog/trading-journal-for-crypto</loc>
-    <lastmod>2025-10-22</lastmod>
+    <lastmod>2025-10-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/blog/trading-journal-for-crypto" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/blog/diario-trading-cripto" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/blog/diario-trading-cripto-es" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/blog/daftar-trading-crypto-ar" />
-    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/blog/nhat-ky-giao-dich-crypto-vi" />
   </url>
-  
-  <!-- Blog Article 3: Trading Psychology -->
+
+  <!-- Blog: trading-psychology-control-emotions -->
   <url>
     <loc>https://www.thetradingdiary.com/blog/trading-psychology-control-emotions</loc>
-    <lastmod>2025-10-22</lastmod>
+    <lastmod>2025-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/blog/trading-psychology-control-emotions" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/blog/psicologia-trading-controlar-emocoes" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/blog/psicologia-trading-controlar-emocoes-es" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/blog/nafsia-trading-ar" />
-    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/blog/tam-ly-giao-dich-vi" />
   </url>
-  
-  <!-- Blog Article 4: Data-Driven Trading -->
+
+  <!-- Blog: data-driven-trading -->
   <url>
     <loc>https://www.thetradingdiary.com/blog/data-driven-trading</loc>
-    <lastmod>2025-10-22</lastmod>
+    <lastmod>2025-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/blog/data-driven-trading" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/blog/trading-orientado-dados" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/blog/trading-basado-datos-es" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/blog/trading-bayanat-ar" />
-    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/blog/giao-dich-du-lieu-vi" />
   </url>
-  
-  <!-- Blog Article 5: AI-Powered Trading Journal -->
+
+  <!-- Blog: ai-powered-trading-journal -->
   <url>
     <loc>https://www.thetradingdiary.com/blog/ai-powered-trading-journal</loc>
-    <lastmod>2025-10-22</lastmod>
+    <lastmod>2025-10-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/blog/ai-powered-trading-journal" />
-    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/blog/diario-trading-ia" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/blog/diario-trading-ia-es" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/blog/daftar-ai-ar" />
-    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/blog/nhat-ky-ai-vi" />
   </url>
 
 </urlset>

@@ -287,7 +287,7 @@ const LogoDownload = () => {
                 <div className="absolute inset-0 bg-background/70" />
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/15 to-primary/5" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <img src={tdLogoBlue} alt="TD Logo" className="w-16 h-16" />
+                  <img src={tdLogoBlue} alt="The Trading Diary logo - Crypto trading journal platform" className="w-16 h-16" width="64" height="64" loading="lazy" decoding="async" />
                   <span className="mt-4 text-sm font-semibold">The Trading Diary</span>
                 </div>
               </div>
@@ -310,7 +310,7 @@ const LogoDownload = () => {
                 <div className="absolute inset-0 bg-background/70" />
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/15 to-primary/5" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <img src={tdLogoBlue} alt="TD Logo" className="w-16 h-16" />
+                  <img src={tdLogoBlue} alt="The Trading Diary logo - Crypto trading journal platform" className="w-16 h-16" width="64" height="64" loading="lazy" decoding="async" />
                   <span className="mt-4 text-sm font-semibold">The Trading Diary</span>
                 </div>
               </div>

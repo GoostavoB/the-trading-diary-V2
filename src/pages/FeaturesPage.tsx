@@ -1,14 +1,16 @@
+import { useEffect } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { 
-  BarChart3, Upload, Brain, TrendingUp, Shield, Users, 
+import {
+  BarChart3, Upload, Brain, TrendingUp, Shield, Users,
   Smartphone, Globe, Zap, FileText, Bell, Calendar,
   Target, Award, BookOpen, RefreshCw, CheckCircle, Star
 } from 'lucide-react';
+import { addStructuredData } from '@/utils/seoHelpers';
 
 const features = [
   {
@@ -162,6 +164,72 @@ export default function FeaturesPage() {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const currentLang = i18n.language;
+
+  // Add FAQ schema for features page
+  useEffect(() => {
+    addStructuredData({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What features does The Trading Diary offer?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Trading Diary offers comprehensive features including automatic trade import from 20+ exchanges, advanced analytics and performance tracking, AI-powered insights, psychology and emotion tracking, risk management tools, trading journal, goal setting, performance forecasting, and mobile app access."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does The Trading Diary have AI features?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! The Trading Diary includes AI-powered features such as personalized trading recommendations based on your historical performance, pattern recognition to identify winning strategies, automated trade analysis, performance forecasting, and intelligent alerts for risk thresholds and milestones."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I track my trading psychology?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The Trading Diary includes psychology tracking tools where you can log emotions, thoughts, and mental state before and after trades. This helps you understand how psychology impacts your trading decisions and identify patterns that lead to wins or losses."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does The Trading Diary support multiple exchanges?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! The Trading Diary supports 20+ major cryptocurrency exchanges including Binance, Bybit, OKX, KuCoin, Gate.io, Kraken, Coinbase Pro, Bitfinex, BitMEX, Phemex, Huobi, and more. You can connect multiple exchanges and track all your trades in one place."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there a mobile app for The Trading Diary?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! The Trading Diary offers full-featured iOS and Android mobile apps (coming soon) that sync with your web account. Track trades, view analytics, set goals, and journal on the go from your smartphone or tablet."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What analytics does The Trading Diary provide?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Trading Diary provides comprehensive analytics including win rate, profit/loss tracking, risk/reward ratios, average trade duration, best and worst trading pairs, time-based performance analysis, drawdown tracking, position size analysis, and custom performance reports."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I set trading goals in The Trading Diary?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! The Trading Diary includes a goal-setting feature where you can set profit targets, win rate goals, risk management objectives, and trading frequency goals. Track your progress with milestone visualization and get automated notifications when you reach your targets."
+          }
+        }
+      ]
+    }, 'features-faq-schema');
+  }, []);
 
   const handleStartTrial = () => {
     const authPath = currentLang === 'en' ? '/auth' : `/${currentLang}/auth`;

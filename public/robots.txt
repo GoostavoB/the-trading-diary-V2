@@ -14,8 +14,17 @@ Disallow: /api/
 # Allow blog content (explicitly)
 Allow: /blog
 
+# Allow all SEO landing pages
+Allow: /how-to-*
+Allow: /vs-*
+Allow: /crypto-*
+Allow: /trading-*
+Allow: /*-trading-*
+Allow: /*-journal*
+
 # Sitemap locations
 Sitemap: https://www.thetradingdiary.com/sitemap.xml
+Sitemap: https://www.thetradingdiary.com/sitemap-seo.xml
 Sitemap: https://www.thetradingdiary.com/image-sitemap.xml
 
 # Crawl-delay for polite crawling

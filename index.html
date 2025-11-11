@@ -18,6 +18,10 @@
     <meta name="msapplication-TileImage" content="/logo-192.png" />
     <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
     <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Google Search Console Verification -->
+    <!-- TODO: Add your Google Search Console verification code here -->
+    <!-- <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE_HERE" /> -->
     <title>The #1 Crypto Trading Journal | Track &amp; Analyze Every Trade</title>
     <meta name="description" content="Track, analyze, and review every crypto trade with AI-powered insights. Built exclusively for crypto traders with advanced analytics, automated trade import, risk management tools, and real-time performance tracking. Free to start.">
     <meta name="author" content="The Trading Diary" />
@@ -26,10 +30,6 @@
     
     <!-- Hreflang alternates for language targeting -->
     <link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/" />
-    <link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/pt" />
-    <link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/es" />
-    <link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/ar" />
-    <link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/vi" />
     <link rel="alternate" hreflang="x-default" href="https://www.thetradingdiary.com/" />
     
     <!-- Structured Data - SoftwareApplication Schema -->
@@ -129,29 +129,36 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.thetradingdiary.com/" />
-    
-    
-    <meta property="og:image" content="https://www.thetradingdiary.com/og-image-en.png">
-    
+    <meta property="og:title" content="The #1 Crypto Trading Journal | Track & Analyze Every Trade" />
+    <meta property="og:description" content="Track, analyze, and review every crypto trade with AI-powered insights. Built exclusively for crypto traders with advanced analytics, automated trade import, and real-time performance tracking. Free to start." />
+    <meta property="og:image" content="https://www.thetradingdiary.com/og-image-en.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="The Trading Diary" />
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://www.thetradingdiary.com/" />
+    <meta name="twitter:title" content="The #1 Crypto Trading Journal | Track & Analyze Every Trade" />
+    <meta name="twitter:description" content="Track, analyze, and review every crypto trade with AI-powered insights. Built exclusively for crypto traders with advanced analytics and automated trade import. Free to start." />
+    <meta name="twitter:image" content="https://www.thetradingdiary.com/og-image-en.png" />
+    <meta name="twitter:site" content="@thetradingdiary" />
+    <meta name="twitter:creator" content="@thetradingdiary" />
     
-    
-    <meta name="twitter:image" content="https://www.thetradingdiary.com/og-image-en.png">
-    
-    <!-- Preconnect to external domains -->
+    <!-- Preconnect to external domains (critical) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://qziawervfvptoretkjrn.supabase.co">
+    <link rel="preconnect" href="https://qziawervfvptoretkjrn.supabase.co" crossorigin>
+
+    <!-- DNS prefetch for analytics (non-critical) -->
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <link rel="dns-prefetch" href="https://www.google-analytics.com">
     <link rel="dns-prefetch" href="https://analytics.google.com">
     
     <!-- Phase 1: Async Font Loading with Fallbacks -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet';document.body.classList.add('fonts-loaded')">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet';document.body.classList.add('fonts-loaded')" fetchpriority="low">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"></noscript>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" media="print" onload="this.media='all'" fetchpriority="low">
     
     <!-- Phase 4: Critical CSS Inline -->
     <style>
@@ -178,7 +185,7 @@
     <link rel="prefetch" href="/src/pages/Upload.tsx" as="script">
     
     <!-- Preload hero image for faster LCP -->
-    <link rel="preload" as="image" href="/src/assets/bull-bear-realistic.png" fetchpriority="high" imagesrcset="/src/assets/bull-bear-realistic.png 1x" imagesizes="100vw">
+    <link rel="preload" as="image" href="/src/assets/dashboard-screenshot-new.png" fetchpriority="high">
     
     <!-- RSS Feed -->
     <link rel="alternate" type="application/rss+xml" title="The Trading Diary Blog RSS" href="https://www.thetradingdiary.com/blog/rss.xml">

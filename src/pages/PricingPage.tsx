@@ -16,6 +16,7 @@ import { GlassCard } from "@/components/GlassCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import appStoreSoon from "@/assets/coming_soon_appstore.png";
 import googlePlaySoon from "@/assets/google-play-coming-soon.png";
+import { addStructuredData } from "@/utils/seoHelpers";
 
 const PricingPage = () => {
   const navigate = useNavigate();
@@ -45,65 +46,141 @@ const PricingPage = () => {
     canonical: 'https://www.thetradingdiary.com/pricing',
   });
 
+  // Add FAQ schema for pricing questions
+  useEffect(() => {
+    addStructuredData({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How much does The Trading Diary cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Trading Diary offers three plans: Starter (Free) with 5 free uploads and $5 per 10 additional uploads, Pro ($15/month or $144/year) with 30 uploads per month and rollover, and Elite ($32/month or $336/year) with unlimited uploads and priority support."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What's included in the free Starter plan?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Starter plan includes 5 free uploads, manual trade entry, widgets and metrics, emotional tracking, goals, market data (long/short ratio and open interest), forecast tool, FII analysis, risk analysis, trading journal, spot wallet, tax reports, achievements board, and default themes (blue and Gold Rush)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What happens to unused uploads in the Pro plan?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In the Pro plan, unused uploads roll over to the next month. For example, if you only use 20 out of your 30 monthly uploads, the remaining 10 carry forward to next month, giving you 40 uploads available."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I upgrade or downgrade my plan anytime?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! You can upgrade or downgrade your plan at any time. When upgrading, you'll get immediate access to new features. When downgrading, changes take effect at the end of your current billing period."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there a discount for annual billing?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Annual billing saves you 20% compared to monthly billing. Pro is $144/year (vs $180 monthly) and Elite is $336/year (vs $384 monthly), saving you $36 and $48 per year respectively."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What payment methods do you accept?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We accept all major credit cards (Visa, Mastercard, American Express), debit cards, and PayPal. All payments are processed securely through Stripe with bank-level encryption."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I try Pro or Elite before paying?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! We offer a 14-day free trial for both Pro and Elite plans. You can cancel anytime during the trial period with no charge. No credit card required to start your trial."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What's the difference between Pro and Elite?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pro includes 30 uploads/month with rollover, full color customization, and email support for $15/month. Elite includes unlimited uploads, priority customer support, early access to new features, and full color customization for $32/month. Elite is best for professional traders with high trading volume."
+          }
+        }
+      ]
+    }, 'pricing-faq-schema');
+  }, []);
 
   const plans = [
     {
       id: 'basic',
-      nameKey: "pricing.plans.basic.name",
-      descriptionKey: "pricing.plans.basic.description",
-      monthlyPrice: 15,
-      annualPrice: 12,
-      annualTotal: 144,
+      nameKey: "Starter",
+      descriptionKey: "Perfect for getting started",
+      monthlyPrice: 0,
+      annualPrice: 0,
+      annualTotal: 0,
       featuresKeys: [
-        "pricing.plans.basic.features.uploads",
-        "pricing.plans.basic.features.manualUploads",
-        "pricing.plans.basic.features.dashboard",
-        "pricing.plans.basic.features.charts",
-        "pricing.plans.basic.features.basicJournal",
-        "pricing.plans.basic.features.feeAnalytics",
-        "pricing.plans.basic.features.csv",
-        "pricing.plans.basic.features.social",
+        "Onboarding gift: 5 free uploads",
+        "Extra uploads: $5 per 10 uploads",
+        "Add trades manually",
+        "Widgets and metrics",
+        "Emotional, plans, and personal goals",
+        "Market data: long short ratio and open interest",
+        "Forecast tool",
+        "FII analysis to compare exchanges",
+        "Risk analysis",
+        "Trading journal",
+        "Spot wallet",
+        "Tax report",
+        "Achievements board",
+        "Themes: Default blue and Gold Rush only",
+        "No color customization",
       ],
-      ctaKey: "pricing.plans.cta",
+      ctaKey: "Start free",
       popular: false,
     },
     {
       id: 'pro',
-      nameKey: "pricing.plans.pro.name",
-      descriptionKey: "pricing.plans.pro.description",
-      monthlyPrice: 35,
-      annualPrice: 28,
-      annualTotal: 336,
+      nameKey: "Pro",
+      descriptionKey: "Most popular for serious traders",
+      monthlyPrice: 15,
+      annualPrice: 12,
+      annualTotal: 144,
       featuresKeys: [
-        "pricing.plans.pro.features.uploads",
-        "pricing.plans.pro.features.aiAnalysis",
-        "pricing.plans.pro.features.tradingPlan",
-        "pricing.plans.pro.features.goals",
-        "pricing.plans.pro.features.richJournal",
-        "pricing.plans.pro.features.customWidgets",
-        "pricing.plans.pro.features.fullSocial",
-        "pricing.plans.pro.features.everythingBasic",
+        "Everything in Starter, plus:",
+        "30 uploads per month",
+        "Unused uploads roll over to next month",
+        "Extra uploads: $2 per 10 uploads (60% discount)",
+        "Full color customization: primary, secondary, and accent",
+        "Email support",
       ],
-      ctaKey: "pricing.plans.cta",
+      ctaKey: "Go Pro",
       popular: true,
     },
     {
       id: 'elite',
-      nameKey: "pricing.plans.elite.name",
-      descriptionKey: "pricing.plans.elite.description",
-      monthlyPrice: 79,
-      annualPrice: 63,
-      annualTotal: 756,
+      nameKey: "Elite",
+      descriptionKey: "For professional traders",
+      monthlyPrice: 32,
+      annualPrice: 28,
+      annualTotal: 336,
       featuresKeys: [
-        "pricing.plans.elite.features.uploads",
-        "pricing.plans.elite.features.aiAnalysis",
-        "pricing.plans.elite.features.tradeReplay",
-        "pricing.plans.elite.features.positionCalculator",
-        "pricing.plans.elite.features.riskDashboard",
-        "pricing.plans.elite.features.advancedAlerts",
-        "pricing.plans.elite.features.everythingPro",
+        "Everything in Pro, plus:",
+        "Unlimited uploads and trades",
+        "Priority customer support",
+        "First access to new widgets and new metrics",
+        "Full color customization",
       ],
-      ctaKey: "pricing.plans.cta",
+      ctaKey: "Get Elite",
       popular: false,
     },
   ];
@@ -300,15 +377,23 @@ const PricingPage = () => {
                   {t('pricing.comingSoon.mobile.description', 'Native mobile apps are in development. Soon you\'ll be able to take your trading diary with you, track trades, analyze performance, and stay on top of your game from anywhere.')}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                  <img 
-                    src={appStoreSoon} 
+                  <img
+                    src={appStoreSoon}
                     alt={t('pricing.comingSoon.mobile.appStoreAlt', 'Coming soon to the App Store')}
                     className="h-14 hover:opacity-80 transition-opacity"
+                    width="150"
+                    height="56"
+                    loading="lazy"
+                    decoding="async"
                   />
-                  <img 
-                    src={googlePlaySoon} 
+                  <img
+                    src={googlePlaySoon}
                     alt={t('pricing.comingSoon.mobile.playStoreAlt', 'Coming soon to Google Play')}
                     className="h-14 hover:opacity-80 transition-opacity"
+                    width="150"
+                    height="56"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
               </div>

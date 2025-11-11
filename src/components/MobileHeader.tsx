@@ -1,9 +1,7 @@
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
-import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeStudio } from "@/components/theme-studio/ThemeStudio";
-import { useTranslation } from "@/hooks/useTranslation";
 import {
   Sheet,
   SheetContent,
@@ -12,24 +10,21 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 
 export const MobileHeader = () => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Define public routes where Theme Studio should be hidden
   const publicRoutes = [
-    '/', '/pt', '/es', '/ar', '/vi',
-    '/pricing', '/contact', '/legal', '/terms', '/privacy',
+    '/', '/pricing', '/contact', '/legal', '/terms', '/privacy',
     '/blog', '/about', '/testimonials', '/how-it-works', '/features',
-    '/changelog', '/cookie-policy', '/sitemap', '/logo-download', 
+    '/changelog', '/cookie-policy', '/sitemap', '/logo-download',
     '/logo-generator', '/crypto-trading-faq', '/seo-dashboard', '/author'
   ];
-  
-  const isPublicRoute = publicRoutes.some(route => 
-    location.pathname === route || 
+
+  const isPublicRoute = publicRoutes.some(route =>
+    location.pathname === route ||
     location.pathname.startsWith('/blog/') ||
-    location.pathname.startsWith('/author/') ||
-    location.pathname.match(/^\/(pt|es|ar|vi)\/(pricing|contact|legal|terms|privacy|blog|about|cookie-policy)/)
+    location.pathname.startsWith('/author/')
   );
 
   return (
@@ -54,23 +49,22 @@ export const MobileHeader = () => {
             onClick={() => navigate('/pricing')}
             className="h-11 px-4"
           >
-            {t('navigation.pricing')}
+            Pricing
           </Button>
           <Button
             variant="ghost"
             onClick={() => navigate('/contact')}
             className="h-11 px-4"
           >
-            {t('navigation.contact')}
+            Contact
           </Button>
           <Button
             variant="outline"
             onClick={() => navigate('/auth')}
             className="h-11 px-4"
           >
-            {t('navigation.signIn')}
+            Sign In
           </Button>
-          <LanguageToggle />
           {!isPublicRoute && <ThemeStudio />}
         </nav>
 
@@ -78,17 +72,17 @@ export const MobileHeader = () => {
         <div className="flex md:hidden items-center gap-2">
           <Sheet>
             <SheetTrigger asChild>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="icon"
                 className="h-11 w-11"
                 aria-label="Open menu"
               >
-                <Menu className="h-5 w-5" />
+                <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent 
-              side="right" 
+            <SheetContent
+              side="right"
               className="w-[280px] sm:w-[320px] glass-strong"
             >
               <nav className="flex flex-col gap-6 mt-8">
@@ -97,9 +91,9 @@ export const MobileHeader = () => {
                   onClick={() => navigate('/auth')}
                   className="h-12 w-full justify-start text-base"
                 >
-                  {t('navigation.signIn')}
+                  Sign In
                 </Button>
-                
+
                 <div className="flex flex-col gap-1">
                   <Button
                     variant="ghost"
@@ -113,29 +107,25 @@ export const MobileHeader = () => {
                     onClick={() => navigate('/pricing')}
                     className="h-12 w-full justify-start text-base"
                   >
-                    {t('navigation.pricing')}
+                    Pricing
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={() => navigate('/contact')}
                     className="h-12 w-full justify-start text-base"
                   >
-                    {t('navigation.contact')}
+                    Contact
                   </Button>
                 </div>
 
-                <div className="pt-6 border-t border-border/50 flex flex-col gap-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Language</span>
-                    <LanguageToggle />
-                  </div>
-                  {!isPublicRoute && (
+                {!isPublicRoute && (
+                  <div className="pt-6 border-t border-border/50">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Theme</span>
                       <ThemeStudio />
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </nav>
             </SheetContent>
           </Sheet>

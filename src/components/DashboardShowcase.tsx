@@ -80,13 +80,14 @@ const DashboardShowcase = () => {
                     className="aspect-[16/10] bg-background relative overflow-hidden cursor-pointer group w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                     aria-label="View full dashboard screenshot"
                   >
-                    <img 
+                    <img
                       src={dashboardScreenshot}
                       alt="Trading Dashboard showing real-time analytics, win rate, ROI, and capital growth charts"
                       className="w-full h-full object-contain object-center"
                       width={1920}
                       height={1200}
-                      loading="eager"
+                      loading="lazy"
+                      decoding="async"
                     />
                     
                     {/* Centered expand icon - hidden by default, shows on hover/focus */}

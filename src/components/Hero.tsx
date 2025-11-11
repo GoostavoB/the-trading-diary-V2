@@ -6,12 +6,14 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Expand } from "lucide-react";
 import dashboardScreenshot from "@/assets/dashboard-screenshot-new.png";
 import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 
 const Hero = () => {
   const navigate = useNavigate();
   const { t, isLoading } = useTranslation();
   const [isImageOpen, setIsImageOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   // Avoid rendering while language is switching
   if (isLoading) {
@@ -87,13 +89,15 @@ const Hero = () => {
                     className="aspect-[16/10] bg-background relative overflow-hidden cursor-pointer group w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                     aria-label="View full dashboard screenshot"
                   >
-                    <img 
+                    <img
                       src={dashboardScreenshot}
                       alt="Trading Dashboard showing real-time analytics, win rate, ROI, and capital growth charts"
                       className="w-full h-full object-contain object-center"
                       width={1920}
                       height={1200}
-                      loading="eager"
+                      loading={isMobile ? "lazy" : "eager"}
+                      fetchPriority={isMobile ? "auto" : "high"}
+                      decoding="async"
                     />
                     
                     {/* Centered expand icon - hidden by default, shows on hover/focus */}
