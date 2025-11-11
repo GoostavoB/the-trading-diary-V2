@@ -31,6 +31,7 @@ export const useTradeStationLayout = (userId: string | undefined) => {
   const [columnCount, setColumnCount] = useState(3);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [previousLayout, setPreviousLayout] = useState<{ positions: TradeStationWidgetPosition[], columnCount: number } | null>(null);
 
   // Load layout from database
   useEffect(() => {
@@ -172,9 +173,20 @@ const layoutData: TradeStationLayoutData = {
 
   // Reset to default layout
   const resetLayout = useCallback(() => {
+    // Save current layout for undo
+    setPreviousLayout({ positions: [...positions], columnCount });
     saveLayout(DEFAULT_TRADE_STATION_POSITIONS, 3);
     toast.success('Trade Station reset to default');
-  }, [saveLayout]);
+  }, [saveLayout, positions, columnCount]);
+
+  // Undo last reset
+  const undoReset = useCallback(() => {
+    if (previousLayout) {
+      saveLayout(previousLayout.positions, previousLayout.columnCount);
+      setPreviousLayout(null);
+      toast.success('Layout restored');
+    }
+  }, [previousLayout, saveLayout]);
 
   // Update column count
   const updateColumnCount = useCallback((count: number) => {
@@ -215,6 +227,8 @@ const layoutData: TradeStationLayoutData = {
     addWidget,
     removeWidget,
     resetLayout,
+    undoReset,
+    canUndo: previousLayout !== null,
     updateColumnCount,
   };
 };

@@ -11,7 +11,8 @@ import { CustomizeDashboardControls } from '@/components/CustomizeDashboardContr
 import { WidgetLibrary } from '@/components/widgets/WidgetLibrary';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Plus } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Plus, Undo2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface TradeStationViewProps {
@@ -36,6 +37,7 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
   const [showWidgetLibrary, setShowWidgetLibrary] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [originalPositions, setOriginalPositions] = useState<TradeStationWidgetPosition[]>([]);
+  const [showResetDialog, setShowResetDialog] = useState(false);
   
   const {
     positions,
@@ -46,6 +48,8 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
     saveLayout,
     updateColumnCount,
     resetLayout,
+    undoReset,
+    canUndo,
   } = useTradeStationLayout(user?.id);
 
   // Sensors for drag and drop
@@ -263,7 +267,7 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              onClick={() => resetLayout()}
+              onClick={() => setShowResetDialog(true)}
               size="sm"
               variant="outline"
               className="fixed top-36 right-6 z-50"
@@ -272,10 +276,49 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
             </Button>
           </TooltipTrigger>
           <TooltipContent side="left">
-            <p>Reset Trade Station layout</p>
+            <p>Reset Trade Station to defaults</p>
           </TooltipContent>
         </Tooltip>
+        {canUndo && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={undoReset}
+                size="sm"
+                variant="outline"
+                className="fixed top-52 right-6 z-50"
+              >
+                <Undo2 className="h-4 w-4 mr-2" />
+                Undo reset
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              <p>Restore previous layout</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
       </TooltipProvider>
+
+      {/* Reset Confirmation Dialog */}
+      <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset Trade Station Layout?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will reset your Trade Station to the default layout. Your current layout will be saved and you can undo this action.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              resetLayout();
+              setShowResetDialog(false);
+            }}>
+              Reset
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Dynamic Grid with DnD */}
       <DndContext
