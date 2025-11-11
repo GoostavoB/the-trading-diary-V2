@@ -289,8 +289,8 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
 
 /**
  * Default dashboard layout for new users - simplified to just widget IDs in order
- * First line: Total ROI, Win Rate (with total trades), Avg PnL per day
- * Second line: Capital Growth, Top Movers, Combined Avg PnL/ROI per trade
+ * Row 1 (3 columns): Current ROI | Win Rate (with total trades) | Avg P&L per day
+ * Row 2 (3 columns): Capital Growth | Top Movers | Combined Avg P&L/ROI per trade
  */
 export const DEFAULT_DASHBOARD_LAYOUT = [
   'currentROI',
