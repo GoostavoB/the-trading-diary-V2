@@ -57,9 +57,9 @@ export const TradeRowCard = memo(({
         density === 'compact' ? 'p-3' : 'p-4',
       )}
       style={{
-        background: 'rgba(17, 20, 24, 0.5)',
-        borderColor: 'rgba(255, 255, 255, 0.06)',
-        boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 4px 24px rgba(0, 0, 0, 0.35)',
+        background: 'white',
+        borderColor: 'rgba(0, 0, 0, 0.1)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
       }}
     >
       {/* Main row content */}
@@ -255,7 +255,7 @@ export const TradeRowCard = memo(({
         <div 
           className="mt-4 pt-4 space-y-3 animate-in slide-in-from-top-2 duration-200"
           style={{
-            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+            borderTop: '1px solid rgba(0, 0, 0, 0.1)',
           }}
         >
           <div className="grid grid-cols-3 gap-4 text-sm">
