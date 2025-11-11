@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { useThemeMode, ColorMode, hexToHsl } from '@/hooks/useThemeMode';
+import { useThemeGating } from '@/hooks/useThemeGating';
+import { validateThemeContrast, getContrastDescription } from '@/utils/contrastValidation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Plus, Trash2, Edit2, Check, X } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Plus, Trash2, Edit2, Check, X, Lock, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { z } from 'zod';
 
 // Helper function to convert HSL to hex
 function hslToHex(hsl: string): string {
@@ -42,10 +46,19 @@ function hslToHex(hsl: string): string {
   return `#${rHex}${gHex}${bHex}`;
 }
 
+// Input validation schema
+const themeNameSchema = z.string()
+  .trim()
+  .min(1, 'Theme name is required')
+  .max(50, 'Theme name must be less than 50 characters')
+  .regex(/^[a-zA-Z0-9\s\-_]+$/, 'Theme name can only contain letters, numbers, spaces, hyphens, and underscores');
+
 export const CustomThemeManager = () => {
   const { themeMode, setThemeMode, customModes, addCustomMode, deleteCustomMode, updateCustomMode } = useThemeMode();
+  const { canCreateCustomTheme, customThemeLimit, handleLockedCustomTheme, tier } = useThemeGating();
   const [isCreating, setIsCreating] = useState(false);
   const [editingMode, setEditingMode] = useState<string | null>(null);
+  const [contrastWarning, setContrastWarning] = useState<string | null>(null);
   
   const [newModeName, setNewModeName] = useState('');
   const [newPrimary, setNewPrimary] = useState('#4A90E2');
@@ -58,8 +71,16 @@ export const CustomThemeManager = () => {
   const [editAccent, setEditAccent] = useState('');
 
   const handleCreateMode = () => {
-    if (!newModeName.trim()) {
-      toast.error('Please enter a name for the theme');
+    // Validate theme name
+    const nameValidation = themeNameSchema.safeParse(newModeName);
+    if (!nameValidation.success) {
+      toast.error(nameValidation.error.errors[0].message);
+      return;
+    }
+
+    // Check tier limit
+    if (!canCreateCustomTheme(customModes.length)) {
+      handleLockedCustomTheme();
       return;
     }
 
@@ -67,6 +88,21 @@ export const CustomThemeManager = () => {
       const primaryHsl = hexToHsl(newPrimary);
       const secondaryHsl = hexToHsl(newSecondary);
       const accentHsl = hexToHsl(newAccent);
+
+      // Validate contrast (WCAG AA)
+      const validation = validateThemeContrast({
+        primary: primaryHsl,
+        secondary: secondaryHsl,
+        accent: accentHsl,
+        profit: primaryHsl,
+        loss: secondaryHsl,
+      });
+
+      if (!validation.isValid) {
+        toast.error(`Contrast too low: ${validation.failedPairs.join(', ')}. Text may be unreadable.`);
+        setContrastWarning(`Failed: ${validation.failedPairs.join(', ')}`);
+        return;
+      }
 
       const mode = addCustomMode({
         name: newModeName,
@@ -80,6 +116,7 @@ export const CustomThemeManager = () => {
       toast.success(`Theme "${newModeName}" created! 🎨`);
       setIsCreating(false);
       setNewModeName('');
+      setContrastWarning(null);
       setThemeMode(mode.id);
     } catch (error: any) {
       toast.error(error.message || 'Failed to create theme');
@@ -98,8 +135,10 @@ export const CustomThemeManager = () => {
   const handleSaveEdit = () => {
     if (!editingMode) return;
     
-    if (!editName.trim()) {
-      toast.error('Please enter a name for the theme');
+    // Validate theme name
+    const nameValidation = themeNameSchema.safeParse(editName);
+    if (!nameValidation.success) {
+      toast.error(nameValidation.error.errors[0].message);
       return;
     }
 
@@ -107,6 +146,20 @@ export const CustomThemeManager = () => {
       const primaryHsl = hexToHsl(editPrimary);
       const secondaryHsl = hexToHsl(editSecondary);
       const accentHsl = hexToHsl(editAccent);
+
+      // Validate contrast (WCAG AA)
+      const validation = validateThemeContrast({
+        primary: primaryHsl,
+        secondary: secondaryHsl,
+        accent: accentHsl,
+        profit: primaryHsl,
+        loss: secondaryHsl,
+      });
+
+      if (!validation.isValid) {
+        toast.error(`Contrast too low: ${validation.failedPairs.join(', ')}. Text may be unreadable.`);
+        return;
+      }
 
       updateCustomMode(editingMode, {
         name: editName,
@@ -140,17 +193,34 @@ export const CustomThemeManager = () => {
     }
   };
 
+  const canCreate = canCreateCustomTheme(customModes.length);
+  const isAtLimit = customModes.length >= customThemeLimit;
+
   if (customModes.length === 0 && !isCreating) {
     return (
-      <div className="px-4 pb-4">
+      <div className="px-4 pb-4 space-y-2">
+        {customThemeLimit === 0 ? (
+          <Alert>
+            <Lock className="h-4 w-4" />
+            <AlertDescription className="text-xs">
+              Custom themes require Pro or Elite.
+            </AlertDescription>
+          </Alert>
+        ) : null}
         <Button
           variant="outline"
-          onClick={() => setIsCreating(true)}
-          className="w-full"
-          disabled={customModes.length >= 3}
+          onClick={() => {
+            if (canCreate) {
+              setIsCreating(true);
+            } else {
+              handleLockedCustomTheme();
+            }
+          }}
+          className="w-full gap-2"
         >
-          <Plus className="h-4 w-4 mr-2" />
-          Create Custom Theme (0/3)
+          {!canCreate && <Lock className="h-4 w-4" />}
+          <Plus className="h-4 w-4" />
+          Create Custom Theme ({customModes.length}/{customThemeLimit === 0 ? 'Pro' : customThemeLimit})
         </Button>
       </div>
     );
@@ -158,7 +228,28 @@ export const CustomThemeManager = () => {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-semibold px-4">Your Custom Themes ({customModes.length}/3)</h3>
+      <div className="px-4 flex items-center justify-between">
+        <h3 className="text-sm font-semibold">Your Custom Themes</h3>
+        <span className="text-xs text-muted-foreground">
+          {customModes.length} of {customThemeLimit} used
+        </span>
+      </div>
+
+      {isAtLimit && tier !== 'elite' && (
+        <Alert className="mx-4">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription className="text-xs">
+            Limit reached. Delete one or{' '}
+            <button
+              onClick={handleLockedCustomTheme}
+              className="underline font-medium hover:text-primary"
+            >
+              upgrade to {tier === 'free' ? 'Pro' : 'Elite'}
+            </button>
+            .
+          </AlertDescription>
+        </Alert>
+      )}
       
       <div className="space-y-2 px-4">
         {customModes.map((mode) => {
@@ -319,6 +410,15 @@ export const CustomThemeManager = () => {
             </div>
           </div>
 
+          {contrastWarning && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription className="text-xs">
+                {contrastWarning}
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="flex gap-2">
             <Button onClick={handleCreateMode} className="flex-1" size="sm">
               <Check className="h-4 w-4 mr-2" />
@@ -329,6 +429,7 @@ export const CustomThemeManager = () => {
               onClick={() => {
                 setIsCreating(false);
                 setNewModeName('');
+                setContrastWarning(null);
               }}
               className="flex-1"
               size="sm"
@@ -340,16 +441,23 @@ export const CustomThemeManager = () => {
         </Card>
       )}
 
-      {!isCreating && customModes.length < 3 && (
+      {!isCreating && !isAtLimit && (
         <div className="px-4">
           <Button
             variant="outline"
-            onClick={() => setIsCreating(true)}
-            className="w-full"
+            onClick={() => {
+              if (canCreate) {
+                setIsCreating(true);
+              } else {
+                handleLockedCustomTheme();
+              }
+            }}
+            className="w-full gap-2"
             size="sm"
           >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Theme ({customModes.length}/3)
+            {!canCreate && <Lock className="h-4 w-4" />}
+            <Plus className="h-4 w-4" />
+            Add Theme ({customModes.length}/{customThemeLimit})
           </Button>
         </div>
       )}

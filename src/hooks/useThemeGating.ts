@@ -6,7 +6,7 @@ const CUSTOM_THEME_LIMITS: Record<UserTier, number> = {
   free: 0,
   basic: 0,
   pro: 5,
-  elite: 1000, // Soft cap
+  elite: 10,
 };
 
 export const useThemeGating = () => {
