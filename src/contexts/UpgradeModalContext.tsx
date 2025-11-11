@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { UpgradeModal, UpgradeSource, UpgradeIllustration } from '@/components/UpgradeModal';
+import { upgradeModalBus } from '@/lib/openUpgradeModal';
 
 interface UpgradeModalConfig {
   source: UpgradeSource;
@@ -22,6 +23,14 @@ const UpgradeModalContext = createContext<UpgradeModalContextType | undefined>(u
 export const UpgradeModalProvider = ({ children }: { children: ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [config, setConfig] = useState<UpgradeModalConfig | null>(null);
+
+  // Subscribe to global event bus
+  useEffect(() => {
+    const unsubscribe = upgradeModalBus.subscribe((modalConfig) => {
+      openModal(modalConfig);
+    });
+    return unsubscribe;
+  }, []);
 
   const openModal = (modalConfig: UpgradeModalConfig) => {
     setConfig(modalConfig);

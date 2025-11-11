@@ -11,6 +11,7 @@ import { BlurProvider } from "@/contexts/BlurContext";
 import { CalmModeProvider } from "@/contexts/CalmModeContext";
 import { DateRangeProvider } from "@/contexts/DateRangeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { UpgradeModalProvider } from "@/contexts/UpgradeModalContext";
 import { ThemeProvider } from "next-themes";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -250,22 +251,24 @@ const App = () => (
               <ThemeInitializer />
               <AuthProvider>
                 <SubscriptionProvider>
-                <CalmModeProvider>
-                  <CurrencyProvider>
-                    <BlurProvider>
-                      <AIAssistantProvider>
-                        <DateRangeProvider>
-                          <AppRoutes />
-                          <ConversionTracking />
-                          <PerformanceMonitor />
-                          <GlobalSearch />
-                          <OfflineIndicator />
-                          <InstallPrompt />
-                        </DateRangeProvider>
-                      </AIAssistantProvider>
-                    </BlurProvider>
-                  </CurrencyProvider>
-                </CalmModeProvider>
+                  <UpgradeModalProvider>
+                    <CalmModeProvider>
+                      <CurrencyProvider>
+                        <BlurProvider>
+                          <AIAssistantProvider>
+                            <DateRangeProvider>
+                              <AppRoutes />
+                              <ConversionTracking />
+                              <PerformanceMonitor />
+                              <GlobalSearch />
+                              <OfflineIndicator />
+                              <InstallPrompt />
+                            </DateRangeProvider>
+                          </AIAssistantProvider>
+                        </BlurProvider>
+                      </CurrencyProvider>
+                    </CalmModeProvider>
+                  </UpgradeModalProvider>
                 </SubscriptionProvider>
               </AuthProvider>
             </LanguageProvider>
