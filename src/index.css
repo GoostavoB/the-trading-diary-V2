@@ -159,6 +159,19 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
+  /* Accessibility: Link underlines */
+  .accessibility-link-underlines a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* Accessibility: Focus rings using semantic token */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--state-focus));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
   /* Mobile safe area support for notched devices */
   @supports (padding: env(safe-area-inset-bottom)) {
     .safe-area-bottom {

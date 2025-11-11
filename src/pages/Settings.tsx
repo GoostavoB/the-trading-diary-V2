@@ -9,7 +9,7 @@ import AppLayout from '@/components/layout/AppLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { X, Plus, Edit2, Check, Upload, Download, User, Bell, TrendingUp, Gift, DollarSign, ExternalLink } from 'lucide-react';
+import { X, Plus, Edit2, Check, Upload, Download, User, Bell, TrendingUp, Gift, DollarSign, ExternalLink, Shield } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NotificationPreferences } from '@/components/NotificationPreferences';
 import { DataManagement } from '@/components/DataManagement';
@@ -17,6 +17,7 @@ import { CapitalManagement } from '@/components/CapitalManagement';
 import { ThemeSelector } from '@/components/ThemeSelector';
 import { CurrencySelector } from '@/components/settings/CurrencySelector';
 import { BlurSettings } from '@/components/settings/BlurSettings';
+import { AccessibilitySettings } from '@/components/settings/AccessibilitySettings';
 import { SocialShareRewards } from '@/components/SocialShareRewards';
 import { ReferralProgram } from '@/components/ReferralProgram';
 import { useCalmMode } from '@/contexts/CalmModeContext';
@@ -291,7 +292,7 @@ const Settings = () => {
         </header>
 
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="profile">
               <User className="w-4 h-4 mr-2" aria-hidden="true" />
               Profile
@@ -307,6 +308,10 @@ const Settings = () => {
             <TabsTrigger value="appearance">
               <Badge className="w-4 h-4 mr-2" />
               Appearance
+            </TabsTrigger>
+            <TabsTrigger value="accessibility">
+              <Shield className="w-4 h-4 mr-2" />
+              Accessibility
             </TabsTrigger>
             <TabsTrigger value="notifications">
               <Bell className="w-4 h-4 mr-2" />
@@ -560,7 +565,11 @@ const Settings = () => {
             </Card>
           </TabsContent>
 
-      <TabsContent value="notifications" className="space-y-6">
+          <TabsContent value="accessibility" className="space-y-6">
+            <AccessibilitySettings />
+          </TabsContent>
+
+          <TabsContent value="notifications" className="space-y-6">
         <Card className="p-6 glass">
           <h2 className="text-xl font-semibold mb-4">Notification Preferences</h2>
           <p className="text-sm text-muted-foreground mb-6">Choose what updates you want to receive</p>

@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { validateThemeContrast } from '@/utils/contrastValidation';
 import { toast } from 'sonner';
+import { useAccessibilityMode } from './useAccessibilityMode';
 
 export type ThemeMode = 'default' | 'classic' | string;
 
@@ -49,6 +50,7 @@ export function useThemeMode() {
   const [customModes, setCustomModes] = useState<ColorMode[]>([]);
   const { activeSeasonalTheme } = useSeasonalThemes();
   const { user } = useAuth();
+  const { activePresetTheme } = useAccessibilityMode();
 
   // Load custom themes from database
   useEffect(() => {
@@ -124,7 +126,12 @@ export function useThemeMode() {
 
     if (foundMode) {
       // Merge with DEFAULT_THEME for missing tokens
-      const mode = mergeWithDefault(foundMode);
+      let mode = mergeWithDefault(foundMode);
+      
+      // If accessibility preset is active, override with accessibility colors
+      if (activePresetTheme) {
+        mode = mergeWithDefault({ ...mode, ...activePresetTheme });
+      }
 
       // WCAG AA Contrast Validation (4.5:1 minimum)
       const contrastValidation = validateThemeContrast({
