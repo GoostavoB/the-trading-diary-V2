@@ -145,7 +145,7 @@ export function TradeReviewEditor({
   };
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto space-y-6 py-6">
+    <div className="w-full max-w-[1200px] mx-auto space-y-6 py-6 pb-32">
       {/* Summary Bar */}
       <TradeSummaryBar
         totalTrades={editedTrades.length}
@@ -155,7 +155,7 @@ export function TradeReviewEditor({
 
       {/* Trade List */}
       {filteredTrades.length > 0 ? (
-        <div className="space-y-6 pb-12">
+        <div className="space-y-6">
           {filteredTrades.map(({ trade, originalIndex }) => (
             <TradeCard
               key={originalIndex}
@@ -178,6 +178,33 @@ export function TradeReviewEditor({
           </p>
         </div>
       )}
+
+      {/* Fixed Action Buttons */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border py-4 z-50">
+        <div className="w-full max-w-[1200px] mx-auto px-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={onCancel}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Cancel
+            </Button>
+            <p className="text-sm text-muted-foreground">
+              {approvedTrades.size} of {editedTrades.length} trades selected
+            </p>
+          </div>
+          <Button
+            onClick={handleSave}
+            disabled={approvedTrades.size === 0}
+            className="gap-2"
+          >
+            <Save className="h-4 w-4" />
+            Save {approvedTrades.size} Trade{approvedTrades.size !== 1 ? 's' : ''}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
