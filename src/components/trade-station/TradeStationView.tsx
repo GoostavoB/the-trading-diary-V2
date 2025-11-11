@@ -284,8 +284,12 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
             {/* Sort all positions by row, then column */}
             {[...positions]
               .sort((a, b) => {
-                if (a.row !== b.row) return a.row - b.row;
-                return a.column - b.column;
+                const ar = a.row ?? 0;
+                const br = b.row ?? 0;
+                if (ar !== br) return ar - br;
+                const ac = a.column ?? 0;
+                const bc = b.column ?? 0;
+                return ac - bc;
               })
               .map((pos) => {
                 const isSpanning = pos.id === 'rollingTarget';
@@ -298,8 +302,8 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
                       isSpanning
                         ? undefined
                         : {
-                            gridColumn: pos.column + 1,
-                            gridRow: pos.row + 1,
+                            gridColumn: (pos.column ?? 0) + 1,
+                            gridRow: (pos.row ?? 0) + 1,
                           }
                     }
                   >
@@ -313,7 +317,7 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
               Array.from({ length: columnCount }, (_, colIdx) => {
                 const maxRow = Math.max(
                   0,
-                  ...positions.filter(p => p.column === colIdx).map(p => p.row)
+                  ...positions.filter(p => (p.column ?? -1) === colIdx).map(p => (p.row ?? 0))
                 );
                 return (
                   <div

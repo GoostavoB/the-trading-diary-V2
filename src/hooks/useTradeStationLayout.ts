@@ -55,18 +55,40 @@ export const useTradeStationLayout = (userId: string | undefined) => {
 if (data?.trade_station_layout_json) {
   const layoutData = data.trade_station_layout_json as any;
   
-  const isOutdated = !layoutData.version || layoutData.version < CURRENT_TRADE_STATION_LAYOUT_VERSION;
+  // Consider newer/older versions or invalid shapes as outdated
+  const hasValidLegacyPositions = Array.isArray(layoutData.positions) && layoutData.positions.every((p: any) => 
+    p && typeof p.id === 'string' && typeof p.column === 'number' && typeof p.row === 'number'
+  );
+  const isVersionMismatch = !layoutData.version || layoutData.version !== CURRENT_TRADE_STATION_LAYOUT_VERSION;
   
-  if (layoutData.positions && Array.isArray(layoutData.positions) && !isOutdated) {
+  if (hasValidLegacyPositions && !isVersionMismatch) {
     setPositions(layoutData.positions);
-    if (layoutData.columnCount) {
+    if (typeof layoutData.columnCount === 'number') {
       setColumnCount(layoutData.columnCount);
     }
   } else {
-    // Saved layout is missing or outdated - enforce latest defaults
-    setPositions(DEFAULT_TRADE_STATION_POSITIONS);
-    setColumnCount(3);
-    await saveLayout(DEFAULT_TRADE_STATION_POSITIONS, 3);
+    // Attempt simple migration from x/y format (from a newer resizable layout), else fallback to defaults
+    const looksLikeXY = Array.isArray(layoutData.positions) && layoutData.positions.every((p: any) => 
+      p && typeof p.id === 'string' && typeof p.x === 'number' && typeof p.y === 'number'
+    );
+
+    if (looksLikeXY) {
+      const cols = typeof layoutData.columnCount === 'number' ? layoutData.columnCount : 3;
+      const migrated: TradeStationWidgetPosition[] = layoutData.positions.map((p: any) => ({
+        id: p.id,
+        column: Math.max(0, Math.min(cols - 1, Number.isFinite(p.x) ? p.x : 0)),
+        row: Math.max(0, Number.isFinite(p.y) ? p.y : 0),
+      }));
+
+      setPositions(migrated);
+      setColumnCount(cols);
+      await saveLayout(migrated, cols);
+    } else {
+      // Saved layout is missing or invalid - enforce latest defaults
+      setPositions(DEFAULT_TRADE_STATION_POSITIONS);
+      setColumnCount(3);
+      await saveLayout(DEFAULT_TRADE_STATION_POSITIONS, 3);
+    }
   }
 }
       } catch (error) {
