@@ -141,16 +141,21 @@ export const RiskCalculatorV2Widget = ({
               className="w-full"
             />
             <div className="flex items-center justify-between">
-              <Input
-                type="number"
-                value={riskPercent}
-                onChange={(e) => updateRiskPercent(parseFloat(e.target.value) || 0)}
-                min={0}
-                max={20}
-                step={0.1}
-                disabled={isLocked && !overrideUntil}
-                className="w-24 text-center"
-              />
+              <div className="relative">
+                <Input
+                  type="number"
+                  value={riskPercent}
+                  onChange={(e) => updateRiskPercent(parseFloat(e.target.value) || 0)}
+                  min={0}
+                  max={20}
+                  step={0.1}
+                  disabled={isLocked && !overrideUntil}
+                  className="w-24 text-center pr-8"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                  %
+                </span>
+              </div>
               <span className="text-2xl font-bold">{formatAmount(calculation.riskPerTrade)}</span>
             </div>
           </div>
@@ -170,16 +175,21 @@ export const RiskCalculatorV2Widget = ({
               className="w-full"
             />
             <div className="flex items-center justify-between">
-              <Input
-                type="number"
-                value={dailyLossPercent}
-                onChange={(e) => setDailyLossPercent(parseFloat(e.target.value) || 0)}
-                min={0}
-                max={10}
-                step={0.1}
-                disabled={isLocked && !overrideUntil}
-                className="w-24 text-center"
-              />
+              <div className="relative">
+                <Input
+                  type="number"
+                  value={dailyLossPercent}
+                  onChange={(e) => setDailyLossPercent(parseFloat(e.target.value) || 0)}
+                  min={0}
+                  max={10}
+                  step={0.1}
+                  disabled={isLocked && !overrideUntil}
+                  className="w-24 text-center pr-8"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                  %
+                </span>
+              </div>
               <span className="text-2xl font-bold">{formatAmount(calculation.dailyLossLimit)}</span>
             </div>
           </div>
