@@ -2,15 +2,6 @@ import { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useRequestCache } from '@/hooks/useRequestCache';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -20,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Pencil, Trash2, Eye, Search, Settings2, X, Share2, Download } from 'lucide-react';
+import { Search, X, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { BlurToggleButton } from '@/components/ui/BlurToggleButton';
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
@@ -51,15 +42,15 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Trade } from '@/types/trade';
 import { ShareTradeCard } from '@/components/ShareTradeCard';
-import { TradeFilters } from '@/components/trade-history/TradeFilters';
-import { TradeTableRow } from '@/components/trade-history/TradeTableRow';
-import { BulkActionsToolbar } from '@/components/trade-history/BulkActionsToolbar';
+import { TradeRowCard } from '@/components/trade-history/TradeRowCard';
+import { TradeFilterPanel } from '@/components/trade-history/TradeFilterPanel';
+import { DensityToggle } from '@/components/trade-history/DensityToggle';
 import { useTradePagination } from '@/components/trade-history/useTradePagination';
 import { PaginationControls } from '@/components/trade-history/PaginationControls';
-import { useBrokerPreferences } from '@/hooks/useBrokerPreferences';
 import { ExportTradesDialog } from '@/components/ExportTradesDialog';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { useDateRange } from '@/contexts/DateRangeContext';
+import { Skeleton } from '@/components/ui/skeleton';
 import { TradeTagSelector } from '@/components/trades/TradeTagSelector';
 
 type ColumnKey = 'date' | 'symbol' | 'setup' | 'broker' | 'type' | 'entry' | 'exit' | 'size' | 'pnl' | 'roi' | 'fundingFee' | 'tradingFee' | 'error';
@@ -92,14 +83,12 @@ interface TradeHistoryProps {
 
 export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) => {
   const { user } = useAuth();
-  const { sortedBrokers, incrementUsage: incrementBrokerUsage } = useBrokerPreferences();
   const { dateRange, setDateRange, clearDateRange } = useDateRange();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const [sortBy, setSortBy] = useState<'date' | 'pnl' | 'roi' | 'size' | 'fundingFee' | 'tradingFee'>('date');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [sortBy, setSortBy] = useState<'date' | 'pnl' | 'roi'>('date');
   const [filterType, setFilterType] = useState<'all' | 'wins' | 'losses'>('all');
   const [showDeleted, setShowDeleted] = useState(false);
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
@@ -107,23 +96,14 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingTrade, setEditingTrade] = useState<Trade | null>(null);
   const [selectedTradeIds, setSelectedTradeIds] = useState<Set<string>>(new Set());
-  const [columns, setColumns] = useState<ColumnConfig[]>(() => {
-    const saved = localStorage.getItem('tradeHistoryColumns');
-    return saved ? JSON.parse(saved) : DEFAULT_COLUMNS;
-  });
-  const [userSetups, setUserSetups] = useState<string[]>([]);
-  const [editingSetup, setEditingSetup] = useState<string | null>(null);
-  const [setupSearch, setSetupSearch] = useState('');
-  const [setupPopoverOpen, setSetupPopoverOpen] = useState(false);
-  const [editingBroker, setEditingBroker] = useState<string | null>(null);
-  const [brokerSearch, setBrokerSearch] = useState('');
-  const [brokerPopoverOpen, setBrokerPopoverOpen] = useState(false);
-  const [editingError, setEditingError] = useState<string | null>(null);
-  const [errorText, setErrorText] = useState('');
-  const [errorPopoverOpen, setErrorPopoverOpen] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [tradeToShare, setTradeToShare] = useState<Trade | null>(null);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [density, setDensity] = useState<'comfortable' | 'compact'>(() => {
+    const saved = localStorage.getItem('tradeHistoryDensity');
+    return (saved as 'comfortable' | 'compact') || 'comfortable';
+  });
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   // Filter and sort trades with memoization
   const filterAndSortTrades = useCallback(() => {
@@ -174,19 +154,13 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
         comparison = (b.pnl || 0) - (a.pnl || 0);
       } else if (sortBy === 'roi') {
         comparison = (b.roi || 0) - (a.roi || 0);
-      } else if (sortBy === 'size') {
-        comparison = (b.position_size || 0) - (a.position_size || 0);
-      } else if (sortBy === 'fundingFee') {
-        comparison = (b.funding_fee || 0) - (a.funding_fee || 0);
-      } else if (sortBy === 'tradingFee') {
-        comparison = (b.trading_fee || 0) - (a.trading_fee || 0);
       }
       
-      return sortDirection === 'desc' ? comparison : -comparison;
+      return comparison;
     });
 
     return filtered;
-  }, [trades, debouncedSearchTerm, filterType, sortBy, sortDirection, showDeleted, dateRange]);
+  }, [trades, debouncedSearchTerm, filterType, sortBy, showDeleted, dateRange]);
 
   // Memoized filtered trades
   const filteredTrades = useMemo(() => filterAndSortTrades(), [filterAndSortTrades]);
@@ -201,7 +175,6 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
   useEffect(() => {
     if (user) {
       fetchTrades();
-      fetchUserSetups();
     }
   }, [user, showDeleted]);
 
@@ -211,18 +184,8 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
   }, [debouncedSearchTerm, filterType, sortBy, showDeleted, dateRange]);
 
   useEffect(() => {
-    localStorage.setItem('tradeHistoryColumns', JSON.stringify(columns));
-  }, [columns]);
-
-  const toggleColumn = (key: ColumnKey) => {
-    setColumns(cols => cols.map(col => 
-      col.key === key ? { ...col, visible: !col.visible } : col
-    ));
-  };
-
-  const isColumnVisible = (key: ColumnKey) => {
-    return columns.find(col => col.key === key)?.visible ?? true;
-  };
+    localStorage.setItem('tradeHistoryDensity', density);
+  }, [density]);
 
   const toggleTradeSelection = (tradeId: string) => {
     setSelectedTradeIds(prev => {
@@ -242,6 +205,18 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
     } else {
       setSelectedTradeIds(new Set(filteredTrades.map(t => t.id)));
     }
+  };
+
+  const toggleRowExpand = (tradeId: string) => {
+    setExpandedRows(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(tradeId)) {
+        newSet.delete(tradeId);
+      } else {
+        newSet.add(tradeId);
+      }
+      return newSet;
+    });
   };
 
   const handleBulkDelete = async () => {
@@ -457,95 +432,24 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
     }
   };
 
-  const fetchUserSetups = async () => {
-    if (!user) return;
-    
-    const { data } = await supabase
-      .from('user_setups')
-      .select('name')
-      .eq('user_id', user.id);
-    
-    if (data) {
-      setUserSetups(data.map(s => s.name));
-    }
-  };
-
-
-  const handleSetupUpdate = async (tradeId: string, setup: string) => {
-    const { error } = await supabase
-      .from('trades')
-      .update({ setup })
-      .eq('id', tradeId);
-
-    if (error) {
-      toast.error('Failed to update setup');
-    } else {
-      // Check if setup exists in user_setups, if not create it
-      if (setup && !userSetups.includes(setup)) {
-        const { error: setupError } = await supabase
-          .from('user_setups')
-          .insert({ user_id: user?.id, name: setup });
-        
-        if (!setupError) {
-          setUserSetups([...userSetups, setup]);
-        }
-      }
-      
-      setTrades(trades.map(t => t.id === tradeId ? { ...t, setup } : t));
-      toast.success('Setup updated');
-      setEditingSetup(null);
-      setSetupSearch('');
-      onTradesChange?.();
-    }
-  };
-
-  const handleBrokerUpdate = async (tradeId: string, broker: string) => {
-    const { error } = await supabase
-      .from('trades')
-      .update({ broker })
-      .eq('id', tradeId);
-
-    if (error) {
-      toast.error('Failed to update broker');
-    } else {
-      // Track usage of this broker
-      incrementBrokerUsage(broker);
-      
-      setTrades(trades.map(t => t.id === tradeId ? { ...t, broker } : t));
-      toast.success('Broker updated');
-      setEditingBroker(null);
-      setBrokerSearch('');
-      onTradesChange?.();
-    }
-  };
-
-  const handleErrorUpdate = async (tradeId: string, error_description: string) => {
-    const { error } = await supabase
-      .from('trades')
-      .update({ error_description })
-      .eq('id', tradeId);
-
-    if (error) {
-      console.error('Error updating trade error description:', error);
-      toast.error('Failed to update error field');
-    } else {
-      setTrades(trades.map(t => t.id === tradeId ? { ...t, error_description } : t));
-      toast.success('Error field updated');
-      setEditingError(null);
-      setErrorText('');
-      setErrorPopoverOpen(false);
-      onTradesChange?.();
-    }
-  };
-
   if (loading) {
-    return <div className="text-center py-8">Loading trades...</div>;
+    return (
+      <div className="space-y-4 p-6">
+        <Skeleton className="h-8 w-48" />
+        <div className="space-y-3">
+          {[...Array(5)].map((_, i) => (
+            <Skeleton key={i} className="h-32 w-full rounded-xl" />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">Trade History</h2>
+    <div className="space-y-4 p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-semibold tracking-tight">Trade History</h1>
         <div className="flex items-center gap-2">
           <DateRangeFilter 
             dateRange={dateRange} 
@@ -556,7 +460,6 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
               variant="ghost"
               size="sm"
               onClick={clearDateRange}
-              className="h-9"
             >
               <X className="h-4 w-4 mr-1" />
               Clear
@@ -565,39 +468,71 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
           <BlurToggleButton />
         </div>
       </div>
-      
-      <div className="flex flex-col md:flex-row gap-4 items-start">
-        <TradeFilters
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          sortDirection={sortDirection}
-          onSortDirectionChange={setSortDirection}
+
+      {/* Toolbar */}
+      <div className="flex items-center gap-3 flex-wrap">
+        {/* Search */}
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by symbol, setup, or broker..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+
+        {/* Sort */}
+        <Select 
+          value={sortBy} 
+          onValueChange={(value) => setSortBy(value as 'date' | 'pnl' | 'roi')}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent className="bg-popover/95 backdrop-blur-sm">
+            <SelectItem value="date">Sort by Date</SelectItem>
+            <SelectItem value="pnl">Sort by P&L</SelectItem>
+            <SelectItem value="roi">Sort by ROI</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Filter Panel */}
+        <TradeFilterPanel
           filterType={filterType}
           onFilterChange={setFilterType}
-          showDeleted={showDeleted}
-          onShowDeletedChange={setShowDeleted}
-          columns={columns}
-          onColumnsChange={(newColumns) => {
-            setColumns(newColumns);
-            localStorage.setItem('tradeHistoryColumns', JSON.stringify(newColumns));
-          }}
         />
+
+        {/* Density Toggle */}
+        <DensityToggle
+          density={density}
+          onDensityChange={setDensity}
+        />
+
+        {/* Export */}
         {!showDeleted && trades.length > 0 && (
           <Button
             onClick={() => setExportDialogOpen(true)}
             variant="outline"
-            className="md:ml-auto"
           >
             <Download className="h-4 w-4 mr-2" />
-            Export CSV
+            Export
           </Button>
         )}
+
+        {/* Deleted toggle */}
+        <Button
+          variant={showDeleted ? 'default' : 'outline'}
+          onClick={() => setShowDeleted(!showDeleted)}
+          className="ml-auto"
+        >
+          {showDeleted ? 'Show Active' : 'Show Deleted'}
+        </Button>
       </div>
 
+      {/* Deleted warning banner */}
       {showDeleted && (
-        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-md">
+        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
           <p className="text-sm text-amber-600 dark:text-amber-400">
             ⚠️ <strong>Deleted Trades:</strong> These trades are available for recovery for 48 hours. 
             After that, they will be permanently removed from the system.
@@ -605,434 +540,87 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
         </div>
       )}
 
+      {/* Bulk selection toolbar */}
       {selectedTradeIds.size > 0 && (
-        <div className="flex items-center gap-3 p-3 bg-muted rounded-md">
+        <div 
+          className="flex items-center justify-between p-4 rounded-xl"
+          style={{
+            background: 'rgba(17, 20, 24, 0.7)',
+            backdropFilter: 'blur(16px)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+          }}
+        >
           <span className="text-sm text-muted-foreground">
             {selectedTradeIds.size} trade(s) selected
           </span>
-          {showDeleted ? (
-            <>
-              <Button
-                variant="default"
-                size="sm"
-                onClick={handleBulkUndelete}
-              >
-                Restore Selected
-              </Button>
+          <div className="flex gap-2">
+            {showDeleted ? (
+              <>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleBulkUndelete}
+                >
+                  Restore Selected
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                >
+                  Delete Permanently
+                </Button>
+              </>
+            ) : (
               <Button
                 variant="destructive"
                 size="sm"
                 onClick={handleBulkDelete}
               >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete Permanently
+                Delete Selected
               </Button>
-            </>
-          ) : (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleBulkDelete}
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete Selected
-            </Button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Trade list */}
+      {filteredTrades.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <p className="text-lg text-muted-foreground mb-4">
+            No trades found matching your filters
+          </p>
+          {!showDeleted && (
+            <p className="text-sm text-muted-foreground">
+              Try adjusting your filters or import trades to get started
+            </p>
           )}
         </div>
-      )}
-
-      {filteredTrades.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          No trades found matching your filters
-        </div>
       ) : (
-        <div className="rounded-md border border-border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">
-                  <Checkbox
-                    checked={selectedTradeIds.size === filteredTrades.length && filteredTrades.length > 0}
-                    onCheckedChange={toggleAllTrades}
-                  />
-                </TableHead>
-                {isColumnVisible('date') && <TableHead>Date</TableHead>}
-                {isColumnVisible('symbol') && <TableHead>Symbol</TableHead>}
-                {isColumnVisible('setup') && <TableHead>Setup</TableHead>}
-                {isColumnVisible('broker') && <TableHead>Broker</TableHead>}
-                {isColumnVisible('type') && <TableHead>Type</TableHead>}
-                {isColumnVisible('entry') && <TableHead>Entry</TableHead>}
-                {isColumnVisible('exit') && <TableHead>Exit</TableHead>}
-                {isColumnVisible('size') && <TableHead>Size</TableHead>}
-                {isColumnVisible('pnl') && <TableHead>P&L</TableHead>}
-                {isColumnVisible('roi') && <TableHead>ROI</TableHead>}
-                {isColumnVisible('fundingFee') && <TableHead>Funding Fee</TableHead>}
-                {isColumnVisible('tradingFee') && <TableHead>Trading Fee</TableHead>}
-                {isColumnVisible('error') && <TableHead>Error/Mistake</TableHead>}
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredTrades.map((trade) => (
-                <TableRow key={trade.id}>
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedTradeIds.has(trade.id)}
-                      onCheckedChange={() => toggleTradeSelection(trade.id)}
-                    />
-                  </TableCell>
-                  {isColumnVisible('date') && (
-                    <TableCell>{format(new Date(trade.trade_date), 'MMM dd, yyyy')}</TableCell>
-                  )}
-                  {isColumnVisible('symbol') && (
-                    <TableCell className="font-medium">{trade.symbol}</TableCell>
-                  )}
-                  {isColumnVisible('setup') && (
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span>{trade.setup || '-'}</span>
-                        <Popover 
-                          open={setupPopoverOpen && editingSetup === trade.id} 
-                          onOpenChange={(open) => {
-                            setSetupPopoverOpen(open);
-                            if (!open) {
-                              setEditingSetup(null);
-                              setSetupSearch('');
-                            }
-                          }}
-                        >
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() => {
-                                setEditingSetup(trade.id);
-                                setSetupSearch(trade.setup || '');
-                                setSetupPopoverOpen(true);
-                              }}
-                            >
-                              <Pencil size={12} />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[200px] p-0 bg-card border-border z-50" align="start">
-                            <Command>
-                              <CommandInput 
-                                placeholder="Search or add setup..." 
-                                value={setupSearch}
-                                onValueChange={setSetupSearch}
-                              />
-                              <CommandList>
-                                <CommandEmpty>
-                                  <button
-                                    className="w-full text-left px-2 py-1.5 text-sm hover:bg-accent rounded-sm"
-                                    onClick={() => {
-                                      if (setupSearch.trim()) {
-                                        handleSetupUpdate(trade.id, setupSearch.trim());
-                                      }
-                                    }}
-                                  >
-                                    + Add "{setupSearch}"
-                                  </button>
-                                </CommandEmpty>
-                                {userSetups.filter(s => 
-                                  s.toLowerCase().includes(setupSearch.toLowerCase())
-                                ).length > 0 && (
-                                  <CommandGroup heading="Existing Setups">
-                                    {userSetups
-                                      .filter(s => s.toLowerCase().includes(setupSearch.toLowerCase()))
-                                      .map(setup => (
-                                        <CommandItem
-                                          key={setup}
-                                          onSelect={() => handleSetupUpdate(trade.id, setup)}
-                                        >
-                                          {setup}
-                                        </CommandItem>
-                                      ))
-                                    }
-                                  </CommandGroup>
-                                )}
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                    </TableCell>
-                  )}
-                  {isColumnVisible('broker') && (
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span>{trade.broker || '-'}</span>
-                        <Popover 
-                          open={brokerPopoverOpen && editingBroker === trade.id} 
-                          onOpenChange={(open) => {
-                            setBrokerPopoverOpen(open);
-                            if (!open) {
-                              setEditingBroker(null);
-                              setBrokerSearch('');
-                            }
-                          }}
-                        >
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() => {
-                                setEditingBroker(trade.id);
-                                setBrokerSearch(trade.broker || '');
-                                setBrokerPopoverOpen(true);
-                              }}
-                            >
-                              <Pencil size={12} />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[240px] p-0 bg-card border-border z-50" align="start">
-                            <Command>
-                              <CommandInput 
-                                placeholder="Search or add broker..." 
-                                value={brokerSearch}
-                                onValueChange={setBrokerSearch}
-                              />
-                              <CommandList>
-                                <CommandGroup>
-                                  {sortedBrokers
-                                    .filter(b => b.toLowerCase().includes(brokerSearch.toLowerCase()))
-                                    .map(broker => (
-                                      <CommandItem
-                                        key={broker}
-                                        onSelect={() => handleBrokerUpdate(trade.id, broker)}
-                                      >
-                                        {broker}
-                                      </CommandItem>
-                                    ))
-                                  }
-                                </CommandGroup>
-                                {brokerSearch && !sortedBrokers.some(b => b.toLowerCase() === brokerSearch.toLowerCase()) && (
-                                  <CommandGroup>
-                                    <CommandItem
-                                      onSelect={() => {
-                                        if (brokerSearch.trim()) {
-                                          handleBrokerUpdate(trade.id, brokerSearch.trim());
-                                        }
-                                      }}
-                                      className="text-primary"
-                                    >
-                                      + Add "{brokerSearch}"
-                                    </CommandItem>
-                                  </CommandGroup>
-                                )}
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                    </TableCell>
-                  )}
-                  {isColumnVisible('type') && (
-                    <TableCell>
-                      {trade.side ? (
-                        <Badge 
-                          variant="outline" 
-                          className={trade.side === 'long' ? 'border-neon-green text-neon-green' : 'border-neon-red text-neon-red'}
-                        >
-                          {trade.side.toUpperCase()}
-                        </Badge>
-                      ) : '-'}
-                    </TableCell>
-                  )}
-                  {isColumnVisible('entry') && (
-                    <TableCell>{trade.entry_price != null ? `$${trade.entry_price.toFixed(2)}` : '-'}</TableCell>
-                  )}
-                  {isColumnVisible('exit') && (
-                    <TableCell>{trade.exit_price != null ? `$${trade.exit_price.toFixed(2)}` : '-'}</TableCell>
-                  )}
-                  {isColumnVisible('size') && (
-                    <TableCell>{trade.position_size}</TableCell>
-                  )}
-                  {isColumnVisible('pnl') && (
-                    <TableCell>
-                      {trade.pnl != null ? (
-                        <span className={(trade.pnl ?? 0) === 0 ? 'text-foreground' : (trade.pnl ?? 0) > 0 ? 'text-neon-green' : 'text-neon-red'}>
-                          ${trade.pnl.toFixed(2)}
-                        </span>
-                      ) : '-'}
-                    </TableCell>
-                  )}
-                  {isColumnVisible('roi') && (
-                    <TableCell>
-                      {trade.roi != null ? (
-                        <span className={(trade.roi ?? 0) === 0 ? 'text-foreground' : (trade.roi ?? 0) > 0 ? 'text-neon-green' : 'text-neon-red'}>
-                          {trade.roi.toFixed(2)}%
-                        </span>
-                      ) : '-'}
-                    </TableCell>
-                  )}
-                  {isColumnVisible('fundingFee') && (
-                    <TableCell>
-                      <span className={
-                        (trade.funding_fee || 0) === 0 
-                          ? 'text-foreground' 
-                          : (trade.funding_fee || 0) > 0 
-                          ? 'text-neon-green' 
-                          : 'text-neon-red'
-                      }>
-                        ${(trade.funding_fee || 0).toFixed(2)}
-                      </span>
-                    </TableCell>
-                  )}
-                  {isColumnVisible('tradingFee') && (
-                    <TableCell>
-                      <span className={
-                        (trade.trading_fee || 0) === 0 
-                          ? 'text-foreground' 
-                          : (trade.trading_fee || 0) > 0 
-                          ? 'text-neon-green' 
-                          : 'text-neon-red'
-                      }>
-                        ${(trade.trading_fee || 0).toFixed(2)}
-                      </span>
-                    </TableCell>
-                  )}
-                  {isColumnVisible('error') && (
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm truncate max-w-[200px]" title={trade.error_description || ''}>
-                          {trade.error_description || '-'}
-                        </span>
-                        <Popover 
-                          open={errorPopoverOpen && editingError === trade.id} 
-                          onOpenChange={(open) => {
-                            setErrorPopoverOpen(open);
-                            if (!open) {
-                              setEditingError(null);
-                              setErrorText('');
-                            }
-                          }}
-                        >
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() => {
-                                setEditingError(trade.id);
-                                setErrorText(trade.error_description || '');
-                                setErrorPopoverOpen(true);
-                              }}
-                            >
-                              <Pencil size={12} />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[300px] p-4 bg-card border-border z-50" align="start">
-                            <div className="space-y-3">
-                              <Label htmlFor="error-input">Error/Mistake</Label>
-                              <Textarea 
-                                id="error-input"
-                                placeholder="Describe what went wrong..." 
-                                value={errorText}
-                                onChange={(e) => setErrorText(e.target.value)}
-                                className="min-h-[100px]"
-                              />
-                              <div className="flex justify-end gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    setEditingError(null);
-                                    setErrorText('');
-                                    setErrorPopoverOpen(false);
-                                  }}
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleErrorUpdate(trade.id, errorText)}
-                                >
-                                  Save
-                                </Button>
-                              </div>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                    </TableCell>
-                  )}
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      {showDeleted ? (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleView(trade)}
-                          >
-                            <Eye size={16} />
-                          </Button>
-                          <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => handleUndelete(trade.id)}
-                          >
-                            Restore
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            onClick={() => handleDelete(trade.id)}
-                          >
-                            <Trash2 size={16} />
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleView(trade)}
-                            title="View Details"
-                          >
-                            <Eye size={16} />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              setTradeToShare(trade);
-                              setShareDialogOpen(true);
-                            }}
-                            title="Share Trade"
-                          >
-                            <Share2 size={16} />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(trade)}
-                            title="Edit Trade"
-                          >
-                            <Pencil size={16} />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(trade.id)}
-                            title="Delete Trade"
-                          >
-                            <Trash2 size={16} className="text-destructive" />
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <div className="space-y-3">
+          {paginatedTrades.map((trade) => (
+            <TradeRowCard
+              key={trade.id}
+              trade={trade}
+              isSelected={selectedTradeIds.has(trade.id)}
+              isExpanded={expandedRows.has(trade.id)}
+              density={density}
+              onSelect={toggleTradeSelection}
+              onToggleExpand={toggleRowExpand}
+              onView={handleView}
+              onEdit={handleEdit}
+              onShare={(trade) => {
+                setTradeToShare(trade);
+                setShareDialogOpen(true);
+              }}
+              onDelete={handleDelete}
+              onUndelete={handleUndelete}
+            />
+          ))}
         </div>
       )}
 
+      {/* Pagination */}
       {filteredTrades.length > 0 && (
         <PaginationControls
           currentPage={pagination.currentPage}
