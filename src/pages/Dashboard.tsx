@@ -150,12 +150,9 @@ const Dashboard = () => {
     });
   }, []);
   
-  // Fix positions state management
-  const [positions, setPositions] = useState<WidgetPosition[]>([]);
-
-  // Grid layout with free positioning
+  // Grid layout with free positioning - single source of truth
   const {
-    positions: loadedPositions,
+    positions,
     columnCount: savedColumnCount,
     isLoading: isLayoutLoading,
     updatePosition,
@@ -177,13 +174,6 @@ const Dashboard = () => {
   
   // User tier for feature restrictions
   const { tier, canCustomizeDashboard, isLoading: tierLoading } = useUserTier();
-
-  // Sync loaded positions and column count with local state
-  useEffect(() => {
-    if (!isCustomizing && loadedPositions.length > 0) {
-      setPositions(loadedPositions);
-    }
-  }, [loadedPositions, isCustomizing]);
 
   // Sync column count from saved settings
   useEffect(() => {
@@ -530,14 +520,14 @@ const Dashboard = () => {
   }, [positions, canCustomizeDashboard]);
 
   const handleSaveLayout = useCallback(() => {
-    saveGridLayout(positions);
+    // Positions are already managed by the hook
     setIsCustomizing(false);
     setOriginalPositions([]);
     toast.success('Layout saved');
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
     }, 100);
-  }, [positions, saveGridLayout]);
+  }, []);
 
   // Handle drag
   const handleDragStart = useCallback((event: DragStartEvent) => {
@@ -608,15 +598,10 @@ const Dashboard = () => {
       return;
     }
 
-    // Don't auto-save during customize mode - let user explicitly save
-    if (!isCustomizing) {
-      saveGridLayout(updatedPositions);
-    } else {
-      // Just update local state during customization
-      setPositions(updatedPositions);
-    }
+    // Save immediately - hook manages the state
+    saveGridLayout(updatedPositions);
     setActiveId(null);
-  }, [positions, saveGridLayout, isCustomizing]);
+  }, [positions, saveGridLayout]);
 
   const handleDragCancel = useCallback(() => {
     setActiveId(null);
@@ -625,11 +610,11 @@ const Dashboard = () => {
   const handleCancelCustomize = useCallback(() => {
     // Revert to original positions
     if (originalPositions.length > 0) {
-      setPositions(originalPositions);
+      saveGridLayout(originalPositions);
     }
     setIsCustomizing(false);
     setOriginalPositions([]);
-  }, [originalPositions]);
+  }, [originalPositions, saveGridLayout]);
 
   const spotWalletTotal = useMemo(() => {
     return holdings.reduce((sum, holding) => {

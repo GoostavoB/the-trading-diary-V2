@@ -4429,6 +4429,7 @@ export type Database = {
           theme: string | null
           tour_version_completed: number | null
           trade_reminders: boolean | null
+          trade_station_layout_json: Json | null
           unlimited_uploads: boolean | null
           updated_at: string | null
           user_id: string
@@ -4487,6 +4488,7 @@ export type Database = {
           theme?: string | null
           tour_version_completed?: number | null
           trade_reminders?: boolean | null
+          trade_station_layout_json?: Json | null
           unlimited_uploads?: boolean | null
           updated_at?: string | null
           user_id: string
@@ -4545,6 +4547,7 @@ export type Database = {
           theme?: string | null
           tour_version_completed?: number | null
           trade_reminders?: boolean | null
+          trade_station_layout_json?: Json | null
           unlimited_uploads?: boolean | null
           updated_at?: string | null
           user_id?: string

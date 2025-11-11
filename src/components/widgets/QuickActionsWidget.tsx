@@ -18,7 +18,7 @@ export const QuickActionsWidget = memo(({
       isEditMode={isEditMode}
       onRemove={onRemove}
     >
-      <QuickActionCard />
+      <QuickActionCard id={id} isEditMode={isEditMode} onRemove={onRemove} />
     </WidgetWrapper>
   );
 });

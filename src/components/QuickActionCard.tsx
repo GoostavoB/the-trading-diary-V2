@@ -1,15 +1,16 @@
-import { memo } from 'react';
+import { memo, ComponentType } from 'react';
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { Plus, Upload, BarChart3 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "@/hooks/useTranslation";
+import { WidgetProps } from '@/types/widget';
 
-interface QuickActionCardProps {
+interface QuickActionCardProps extends WidgetProps {
   className?: string;
 }
 
-export const QuickActionCard = memo(({ className }: QuickActionCardProps) => {
+const QuickActionCardComponent = ({ className, id, isEditMode, onRemove }: QuickActionCardProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -60,6 +61,8 @@ export const QuickActionCard = memo(({ className }: QuickActionCardProps) => {
       </div>
     </GlassCard>
   );
-});
+};
+
+export const QuickActionCard = memo(QuickActionCardComponent) as ComponentType<WidgetProps>;
 
 QuickActionCard.displayName = 'QuickActionCard';
