@@ -10,6 +10,7 @@ import { QuickThemesGrid } from './QuickThemesGrid';
 import { CustomThemeManager } from './CustomThemeManager';
 import { SeasonalThemeBanner } from './SeasonalThemeBanner';
 import { AIThemeSuggestion } from './AIThemeSuggestion';
+import { BackgroundLightnessSlider } from './BackgroundLightnessSlider';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const ThemeStudio = () => {
@@ -33,6 +34,9 @@ export const ThemeStudio = () => {
         <div className="space-y-0">
           {/* Header with Dark Mode Toggle */}
           <ThemeStudioHeader />
+
+          {/* Background Lightness Slider */}
+          <BackgroundLightnessSlider />
 
           <ScrollArea className="h-[500px]">
             <div className="space-y-6 py-4">
