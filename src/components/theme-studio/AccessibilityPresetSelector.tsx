@@ -20,13 +20,25 @@ export const AccessibilityPresetSelector = () => {
     setLinkUnderlines,
   } = useAccessibilityMode();
 
+  const recommendations: Record<string, string> = {
+    deuteranopia: 'Tip: neutral background lightness ~50% improves blue–orange contrast.',
+    protanopia: 'Tip: neutral background ~50% keeps purple–orange separation clear.',
+    tritanopia: 'Tip: slightly darker background ~45% improves rose/cyan legibility.',
+    'high-contrast': 'Tip: very dark background ~12–16% maximizes contrast.',
+  };
+
   const handlePresetClick = (presetId: string) => {
     if (settings.preset === presetId) {
       clearPreset();
-      toast.success('Accessibility preset cleared');
+      toast.success('Accessibility preset cleared', {
+        description: 'Default theme colors restored.',
+      });
     } else {
       setPreset(presetId as any);
-      toast.success(`${presets.find(p => p.id === presetId)?.name} preset activated`);
+      const name = presets.find(p => p.id === presetId)?.name ?? 'Preset';
+      toast.success(`${name} activated`, {
+        description: recommendations[presetId] || 'Preset applied.',
+      });
     }
   };
 

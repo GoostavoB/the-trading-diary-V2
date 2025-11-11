@@ -96,6 +96,14 @@ export function useThemeMode() {
     applyMode(modeToApply);
   }, [customModes]);
 
+  // Re-apply current theme when accessibility preset changes
+  useEffect(() => {
+    // Re-apply with current mode so accessibility overrides take effect immediately
+    if (currentMode) {
+      applyMode(currentMode);
+    }
+  }, [activePresetTheme]);
+
   // Merge theme with DEFAULT_THEME as fallback
   const mergeWithDefault = (theme: Partial<ColorMode>): ColorMode => {
     return {
