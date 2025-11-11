@@ -20,34 +20,38 @@ export function RiskMetricsCard({ title, value, maxValue, status, description, u
   
   const getStatusColor = () => {
     switch (status) {
-      case "safe": return "text-green-600";
-      case "warning": return "text-yellow-600";
-      case "danger": return "text-red-600";
+      case "safe": return "text-state-success";
+      case "warning": return "text-state-warning";
+      case "danger": return "text-state-error";
     }
   };
 
   const getStatusIcon = () => {
     switch (status) {
-      case "safe": return <Shield className="h-5 w-5 text-green-600" />;
-      case "warning": return <AlertCircle className="h-5 w-5 text-yellow-600" />;
-      case "danger": return <AlertTriangle className="h-5 w-5 text-red-600" />;
+      case "safe": return <Shield className="h-5 w-5 text-state-success" />;
+      case "warning": return <AlertCircle className="h-5 w-5 text-state-warning" />;
+      case "danger": return <AlertTriangle className="h-5 w-5 text-state-error" />;
     }
   };
 
   const getStatusBg = () => {
     switch (status) {
-      case "safe": return "bg-green-50 dark:bg-green-950/20";
-      case "warning": return "bg-yellow-50 dark:bg-yellow-950/20";
-      case "danger": return "bg-red-50 dark:bg-red-950/20";
+      case "safe": return "bg-state-success/10";
+      case "warning": return "bg-state-warning/10";
+      case "danger": return "bg-state-error/10";
+    }
+  };
+
+  const getBorderColor = () => {
+    switch (status) {
+      case "safe": return "border-l-state-success";
+      case "warning": return "border-l-state-warning";
+      case "danger": return "border-l-state-error";
     }
   };
 
   return (
-    <Card className={`p-4 border-l-4 ${
-      status === 'safe' ? 'border-l-green-500' : 
-      status === 'warning' ? 'border-l-yellow-500' : 
-      'border-l-red-500'
-    }`}>
+    <Card className={`p-4 border-l-4 ${getBorderColor()}`}>
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="font-semibold text-sm text-muted-foreground mb-1">{title}</h3>

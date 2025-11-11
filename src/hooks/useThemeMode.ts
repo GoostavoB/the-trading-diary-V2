@@ -16,6 +16,12 @@ export interface ColorMode {
   accent: string;
   profit: string;
   loss: string;
+  // Semantic state tokens for accessibility
+  success?: string;
+  warning?: string;
+  error?: string;
+  info?: string;
+  focus?: string;
 }
 
 // DEFAULT_THEME: Always used as fallback for missing tokens
@@ -27,6 +33,12 @@ const DEFAULT_THEME: ColorMode = {
   accent: '221 83% 53%',
   profit: '142 71% 45%',       // Green
   loss: '0 84% 60%',           // Red
+  // Semantic state tokens (WCAG AA compliant)
+  success: '142 71% 45%',      // Green - same as profit
+  warning: '38 92% 50%',       // Orange
+  error: '0 84% 60%',          // Red - same as loss
+  info: '221 83% 53%',         // Blue - same as primary
+  focus: '221 83% 53%',        // Blue - high contrast for focus rings
 };
 
 const PRESET_THEMES = PRESET_THEME_COLORS;
@@ -92,6 +104,11 @@ export function useThemeMode() {
       accent: theme.accent || DEFAULT_THEME.accent,
       profit: theme.profit || DEFAULT_THEME.profit,
       loss: theme.loss || DEFAULT_THEME.loss,
+      success: theme.success || DEFAULT_THEME.success,
+      warning: theme.warning || DEFAULT_THEME.warning,
+      error: theme.error || DEFAULT_THEME.error,
+      info: theme.info || DEFAULT_THEME.info,
+      focus: theme.focus || DEFAULT_THEME.focus,
     };
   };
 
@@ -145,6 +162,13 @@ export function useThemeMode() {
         
         root.style.setProperty('--neon-green', mode.profit);
         root.style.setProperty('--neon-red', mode.loss);
+        
+        // Apply semantic state tokens
+        root.style.setProperty('--state-success', mode.success!);
+        root.style.setProperty('--state-warning', mode.warning!);
+        root.style.setProperty('--state-error', mode.error!);
+        root.style.setProperty('--state-info', mode.info!);
+        root.style.setProperty('--state-focus', mode.focus!);
         
         if (isManualSwitch) {
           setTimeout(() => {

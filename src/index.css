@@ -46,6 +46,13 @@
     --success: var(--neon-green);
     --error: var(--neon-red);
 
+    /* Semantic state tokens (updated by theme system) */
+    --state-success: 142 71% 45%;
+    --state-warning: 38 92% 50%;
+    --state-error: 0 84% 60%;
+    --state-info: 221 83% 53%;
+    --state-focus: 221 83% 53%;
+
     /* Profit/Loss colors - controlled by color modes */
     --profit: 210 90% 58%;
     --loss: 215 16% 47%;

@@ -58,6 +58,13 @@ export default {
         purple: {
           accent: "hsl(var(--purple-accent))",
         },
+        state: {
+          success: "hsl(var(--state-success))",
+          warning: "hsl(var(--state-warning))",
+          error: "hsl(var(--state-error))",
+          info: "hsl(var(--state-info))",
+          focus: "hsl(var(--state-focus))",
+        },
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
