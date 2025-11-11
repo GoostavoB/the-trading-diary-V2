@@ -70,7 +70,7 @@ export const CustomThemeManager = () => {
   const [editSecondary, setEditSecondary] = useState('');
   const [editAccent, setEditAccent] = useState('');
 
-  const handleCreateMode = () => {
+  const handleCreateMode = async () => {
     // Validate theme name
     const nameValidation = themeNameSchema.safeParse(newModeName);
     if (!nameValidation.success) {
@@ -104,7 +104,7 @@ export const CustomThemeManager = () => {
         return;
       }
 
-      const mode = addCustomMode({
+      const mode = await addCustomMode({
         name: newModeName,
         primary: primaryHsl,
         secondary: secondaryHsl,
@@ -132,7 +132,7 @@ export const CustomThemeManager = () => {
     setEditAccent(hslToHex(mode.accent));
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editingMode) return;
     
     // Validate theme name
@@ -161,7 +161,7 @@ export const CustomThemeManager = () => {
         return;
       }
 
-      updateCustomMode(editingMode, {
+      await updateCustomMode(editingMode, {
         name: editName,
         primary: primaryHsl,
         secondary: secondaryHsl,
@@ -186,10 +186,14 @@ export const CustomThemeManager = () => {
     setEditAccent('');
   };
 
-  const handleDelete = (modeId: string) => {
+  const handleDelete = async (modeId: string) => {
     if (confirm('Delete this custom theme?')) {
-      deleteCustomMode(modeId);
-      toast.success('Theme deleted');
+      try {
+        await deleteCustomMode(modeId);
+        toast.success('Theme deleted');
+      } catch (error: any) {
+        toast.error(error.message || 'Failed to delete theme');
+      }
     }
   };
 
