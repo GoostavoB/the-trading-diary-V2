@@ -11,6 +11,7 @@ export interface WidgetPosition {
 export interface LayoutData {
   positions: WidgetPosition[];
   columnCount?: number;
+  version?: number;
 }
 
 const DEFAULT_POSITIONS: WidgetPosition[] = [
@@ -24,6 +25,8 @@ const DEFAULT_POSITIONS: WidgetPosition[] = [
   { id: 'topMovers', column: 1, row: 1 },
   { id: 'combinedPnLROI', column: 2, row: 1 },
 ];
+
+const CURRENT_OVERVIEW_LAYOUT_VERSION = 2;
 
 export const useGridLayout = (userId: string | undefined, availableWidgets: string[]) => {
   const [positions, setPositions] = useState<WidgetPosition[]>(DEFAULT_POSITIONS);
@@ -50,33 +53,40 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
           return;
         }
 
-        if (data?.layout_json) {
-          const layoutData = data.layout_json as any;
-          
-          // Handle new format with positions and columnCount
-          if (layoutData?.positions && Array.isArray(layoutData.positions)) {
-            console.log('Loading layout with column count:', layoutData);
-            setPositions(layoutData.positions);
-            if (layoutData.columnCount && layoutData.columnCount >= 1 && layoutData.columnCount <= 4) {
-              setColumnCount(layoutData.columnCount);
-            }
-          }
-          // Handle position-based format (backwards compatibility)
-          else if (Array.isArray(layoutData) && layoutData.length > 0 && layoutData[0]?.column !== undefined) {
-            console.log('Loading position-based layout:', layoutData);
-            setPositions(layoutData);
-          }
-          // Handle old order-based format - convert to positions
-          else if (Array.isArray(layoutData) && layoutData.length > 0 && typeof layoutData[0] === 'string') {
-            console.log('Converting old layout format:', layoutData);
-            const newPositions = layoutData.map((id: string, idx: number) => ({
-              id,
-              column: idx % 3,
-              row: Math.floor(idx / 3),
-            }));
-            setPositions(newPositions);
-          }
-        }
+if (data?.layout_json) {
+  const layoutData = data.layout_json as any;
+
+  // New object format with positions/columnCount
+  if (layoutData?.positions && Array.isArray(layoutData.positions)) {
+    const isOutdated = !layoutData.version || layoutData.version < CURRENT_OVERVIEW_LAYOUT_VERSION;
+    if (isOutdated) {
+      console.warn('Outdated overview layout detected; applying defaults');
+      setPositions(DEFAULT_POSITIONS);
+      setColumnCount(3);
+      await saveLayout(DEFAULT_POSITIONS, 3);
+    } else {
+      console.log('Loading layout with column count:', layoutData);
+      setPositions(layoutData.positions);
+      if (layoutData.columnCount && layoutData.columnCount >= 1 && layoutData.columnCount <= 4) {
+        setColumnCount(layoutData.columnCount);
+      }
+    }
+  }
+  // Position-based array (legacy) -> treat as outdated and reset
+  else if (Array.isArray(layoutData) && layoutData.length > 0 && layoutData[0]?.column !== undefined) {
+    console.warn('Legacy position-based layout detected; applying defaults');
+    setPositions(DEFAULT_POSITIONS);
+    setColumnCount(3);
+    await saveLayout(DEFAULT_POSITIONS, 3);
+  }
+  // Order-based array (legacy strings) -> treat as outdated and reset
+  else if (Array.isArray(layoutData) && layoutData.length > 0 && typeof layoutData[0] === 'string') {
+    console.warn('Legacy order-based layout detected; applying defaults');
+    setPositions(DEFAULT_POSITIONS);
+    setColumnCount(3);
+    await saveLayout(DEFAULT_POSITIONS, 3);
+  }
+}
       } catch (error) {
         console.error('Failed to load layout:', error);
       } finally {
@@ -109,10 +119,11 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
         setColumnCount(newColumnCount);
       }
       
-      // Save in new format with both positions and columnCount
+// Save in new format with both positions and columnCount
       const layoutData: LayoutData = {
         positions: newPositions,
         columnCount: countToSave,
+        version: CURRENT_OVERVIEW_LAYOUT_VERSION,
       };
       
       // Then save to database

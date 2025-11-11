@@ -11,6 +11,7 @@ export interface TradeStationWidgetPosition {
 interface TradeStationLayoutData {
   positions: TradeStationWidgetPosition[];
   columnCount: number;
+  version?: number;
 }
 
 // Default widgets for Trade Station
@@ -22,6 +23,8 @@ const DEFAULT_TRADE_STATION_POSITIONS: TradeStationWidgetPosition[] = [
   // Row 2: Rolling Target (spans all columns)
   { id: 'rollingTarget', column: 0, row: 1 },
 ];
+
+const CURRENT_TRADE_STATION_LAYOUT_VERSION = 2;
 
 export const useTradeStationLayout = (userId: string | undefined) => {
   const [positions, setPositions] = useState<TradeStationWidgetPosition[]>(DEFAULT_TRADE_STATION_POSITIONS);
@@ -49,17 +52,23 @@ export const useTradeStationLayout = (userId: string | undefined) => {
           return;
         }
 
-        if (data?.trade_station_layout_json) {
-          const layoutData = data.trade_station_layout_json as any;
-          
-          // Handle layout data
-          if (layoutData.positions && Array.isArray(layoutData.positions)) {
-            setPositions(layoutData.positions);
-          }
-          if (layoutData.columnCount) {
-            setColumnCount(layoutData.columnCount);
-          }
-        }
+if (data?.trade_station_layout_json) {
+  const layoutData = data.trade_station_layout_json as any;
+  
+  const isOutdated = !layoutData.version || layoutData.version < CURRENT_TRADE_STATION_LAYOUT_VERSION;
+  
+  if (layoutData.positions && Array.isArray(layoutData.positions) && !isOutdated) {
+    setPositions(layoutData.positions);
+    if (layoutData.columnCount) {
+      setColumnCount(layoutData.columnCount);
+    }
+  } else {
+    // Saved layout is missing or outdated - enforce latest defaults
+    setPositions(DEFAULT_TRADE_STATION_POSITIONS);
+    setColumnCount(3);
+    await saveLayout(DEFAULT_TRADE_STATION_POSITIONS, 3);
+  }
+}
       } catch (error) {
         console.error('Failed to load Trade Station layout:', error);
       } finally {
@@ -76,9 +85,10 @@ export const useTradeStationLayout = (userId: string | undefined) => {
 
     setIsSaving(true);
     try {
-      const layoutData: TradeStationLayoutData = {
+const layoutData: TradeStationLayoutData = {
         positions: newPositions,
         columnCount: newColumnCount ?? columnCount,
+        version: CURRENT_TRADE_STATION_LAYOUT_VERSION,
       };
 
       const { error } = await supabase
