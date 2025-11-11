@@ -35,8 +35,6 @@ const ALL_ADVANCED_THEMES = ADVANCED_THEME_COLORS;
 export function useThemeMode() {
   const [currentMode, setCurrentMode] = useState<string>('default');
   const [customModes, setCustomModes] = useState<ColorMode[]>([]);
-  const [previewMode, setPreviewMode] = useState<{ themeId: string; themeName: string } | null>(null);
-  const [savedMode, setSavedMode] = useState<string>('default');
   const { activeSeasonalTheme } = useSeasonalThemes();
   const { user } = useAuth();
 
@@ -78,10 +76,10 @@ export function useThemeMode() {
 
   // Load and apply saved theme on mount
   useEffect(() => {
-    const saved = localStorage.getItem('theme:mode') || 'default';
-    setSavedMode(saved);
-    setCurrentMode(saved);
-    applyMode(saved);
+    const savedMode = localStorage.getItem('theme:mode');
+    const modeToApply = savedMode || 'default';
+    setCurrentMode(modeToApply);
+    applyMode(modeToApply);
   }, [customModes]);
 
   // Merge theme with DEFAULT_THEME as fallback
@@ -163,36 +161,7 @@ export function useThemeMode() {
 
   const setThemeMode = (modeId: string) => {
     applyMode(modeId);
-    setSavedMode(modeId);
     localStorage.setItem('theme:mode', modeId);
-  };
-
-  // Preview mode functions
-  const startPreview = (themeId: string, themeName: string) => {
-    if (!previewMode) {
-      setSavedMode(currentMode);
-    }
-    setPreviewMode({ themeId, themeName });
-    applyMode(themeId);
-  };
-
-  const applyPreview = () => {
-    if (!previewMode) return;
-    
-    const { themeId } = previewMode;
-    setThemeMode(themeId);
-    setPreviewMode(null);
-    toast.success('Theme Applied', {
-      description: 'Your theme has been saved.',
-    });
-  };
-
-  const cancelPreview = () => {
-    if (!previewMode) return;
-    
-    applyMode(savedMode);
-    setCurrentMode(savedMode);
-    setPreviewMode(null);
   };
 
   const addCustomMode = async (mode: Omit<ColorMode, 'id'>) => {
@@ -339,11 +308,6 @@ export function useThemeMode() {
       positiveBg: 'hsl(var(--profit) / 0.1)',
       negativeBg: 'hsl(var(--loss) / 0.1)',
     },
-    // Preview mode
-    previewMode,
-    startPreview,
-    applyPreview,
-    cancelPreview,
   };
 }
 

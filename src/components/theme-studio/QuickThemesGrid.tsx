@@ -5,16 +5,9 @@ import { UNIFIED_THEMES } from '@/utils/unifiedThemes';
 import { useThemeUnlocks } from '@/hooks/useThemeUnlocks';
 import { useThemeGating } from '@/hooks/useThemeGating';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Eye } from 'lucide-react';
 
 export const QuickThemesGrid = () => {
-  const { 
-    themeMode, 
-    setThemeMode, 
-    startPreview, 
-    previewMode 
-  } = useThemeMode();
+  const { themeMode, setThemeMode } = useThemeMode();
   const { themes, activateTheme } = useThemeUnlocks();
   const { canAccessTheme, handleLockedTheme } = useThemeGating();
   const [previewingTheme, setPreviewingTheme] = useState<string | null>(null);
@@ -29,19 +22,13 @@ export const QuickThemesGrid = () => {
     };
   }, [previewTimer]);
 
-  const handleThemeClick = async (themeId: string, isPreview: boolean = false) => {
+  const handleThemeClick = async (themeId: string) => {
     const theme = UNIFIED_THEMES.find(t => t.id === themeId);
     if (!theme) return;
 
-    // Preview mode (all themes)
-    if (isPreview) {
-      startPreview(themeId, theme.name);
-      return;
-    }
-
-    // Check if theme is accessible for direct apply
+    // Check if theme is accessible
     if (!canAccessTheme(themeId)) {
-      // Start 5-second locked preview
+      // Start 5-second preview
       previousThemeRef.current = themeMode;
       setPreviewingTheme(themeId);
       setThemeMode(themeId);
@@ -52,8 +39,11 @@ export const QuickThemesGrid = () => {
       });
 
       const timer = setTimeout(() => {
+        // Revert to previous theme
         setThemeMode(previousThemeRef.current);
         setPreviewingTheme(null);
+        
+        // Open upgrade modal
         handleLockedTheme(themeId);
       }, 5000);
 
@@ -84,7 +74,7 @@ export const QuickThemesGrid = () => {
     return {
       ...theme,
       isLocked: !unlockStatus?.isUnlocked,
-      isPreviewing: previewingTheme === theme.id || previewMode?.themeId === theme.id,
+      isPreviewing: previewingTheme === theme.id,
     };
   });
 
@@ -94,25 +84,15 @@ export const QuickThemesGrid = () => {
         <h3 className="text-sm font-semibold px-4">Available Themes</h3>
         <div className="grid grid-cols-2 gap-3 px-4">
           {themesWithStatus.map((theme) => (
-            <div key={theme.id} className="space-y-2">
-              <ThemePreviewCard
-                theme={theme}
-                isActive={themeMode === theme.id && !theme.isPreviewing}
-                isLocked={theme.isLocked}
-                isPreviewing={theme.isPreviewing}
-                requiredTier={theme.requiredTier}
-                onClick={() => handleThemeClick(theme.id, false)}
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full h-7 gap-1.5 text-xs"
-                onClick={() => handleThemeClick(theme.id, true)}
-              >
-                <Eye className="h-3 w-3" />
-                Preview
-              </Button>
-            </div>
+            <ThemePreviewCard
+              key={theme.id}
+              theme={theme}
+              isActive={themeMode === theme.id && !theme.isPreviewing}
+              isLocked={theme.isLocked}
+              isPreviewing={theme.isPreviewing}
+              requiredTier={theme.requiredTier}
+              onClick={() => handleThemeClick(theme.id)}
+            />
           ))}
         </div>
       </div>
