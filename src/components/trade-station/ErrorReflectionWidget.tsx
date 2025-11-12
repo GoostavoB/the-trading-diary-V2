@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AlertCircle, Plus, Clock, Archive, Trash2, Edit, AlertTriangle } from 'lucide-react';
@@ -26,6 +27,7 @@ export const ErrorReflectionWidget = ({
     loading,
     dailyReminderShown,
     todaysPnL,
+    recentTradeErrors,
     addError,
     extendError,
     archiveError,
@@ -126,6 +128,31 @@ export const ErrorReflectionWidget = ({
         }
       >
         <div className="space-y-4">
+          {/* Recent Trade Error Tags */}
+          {recentTradeErrors.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-muted-foreground">Recent from trades (last 7 days)</Label>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {recentTradeErrors.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="outline"
+                    className="text-xs cursor-pointer hover:bg-accent"
+                    onClick={() => {
+                      setNewErrorText(tag);
+                      setShowAddDialog(true);
+                    }}
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">Click a tag to add it as a tracked error</p>
+            </div>
+          )}
+
           {loading ? <p className="text-muted-foreground text-sm">Loading...</p> : errors.length === 0 ? <div className="text-center py-8 px-4">
               <div className="rounded-full bg-muted w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <AlertCircle className="h-8 w-8 text-muted-foreground" />

@@ -17,11 +17,13 @@ export const useErrorReflection = () => {
   const [loading, setLoading] = useState(true);
   const [dailyReminderShown, setDailyReminderShown] = useState(false);
   const [todaysPnL, setTodaysPnL] = useState(0);
+  const [recentTradeErrors, setRecentTradeErrors] = useState<string[]>([]);
 
   useEffect(() => {
     if (user) {
       loadErrors();
       loadTodaysPnL();
+      loadRecentTradeErrors();
       checkDailyReminderStatus();
     }
   }, [user]);
@@ -77,6 +79,34 @@ export const useErrorReflection = () => {
       }
     } catch (error) {
       console.error('Error loading today PnL:', error);
+    }
+  };
+
+  const loadRecentTradeErrors = async () => {
+    if (!user) return;
+
+    try {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const dateStr = sevenDaysAgo.toISOString().split('T')[0];
+
+      const { data } = await supabase
+        .from('trades')
+        .select('error_tags, trade_date')
+        .eq('user_id', user.id)
+        .gte('trade_date', dateStr)
+        .not('error_tags', 'is', null)
+        .is('deleted_at', null)
+        .order('trade_date', { ascending: false })
+        .limit(50);
+
+      if (data) {
+        const allErrors = data.flatMap(t => t.error_tags || []);
+        const uniqueErrors = [...new Set(allErrors)].filter(Boolean) as string[];
+        setRecentTradeErrors(uniqueErrors.slice(0, 10));
+      }
+    } catch (error) {
+      console.error('Error loading recent trade errors:', error);
     }
   };
 
@@ -234,6 +264,7 @@ export const useErrorReflection = () => {
     loading,
     todaysPnL,
     dailyReminderShown,
+    recentTradeErrors,
     addError,
     extendError,
     archiveError,
@@ -241,5 +272,6 @@ export const useErrorReflection = () => {
     markDailyReminderShown,
     checkCleanSheet,
     reload: loadErrors,
+    reloadTradeErrors: loadRecentTradeErrors,
   };
 };
