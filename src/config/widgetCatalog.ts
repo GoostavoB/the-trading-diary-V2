@@ -39,6 +39,7 @@ import { TradingQualityMetrics } from '@/components/insights/TradingQualityMetri
 import { TradingHeatmap } from '@/components/TradingHeatmap';
 import { GoalWidget } from '@/components/goals/GoalWidget';
 import { RollingTargetWidget } from '@/components/widgets/RollingTargetWidget';
+import { EmotionMistakeCorrelationWidget } from '@/components/widgets/EmotionMistakeCorrelationWidget';
 
 /**
  * Widget Catalog - Registry of all available dashboard widgets
@@ -284,6 +285,17 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     defaultSize: 'small',
     component: CombinedPnLROIWidget,
     requiresData: ['stats'],
+  },
+
+  emotionMistakeCorrelation: {
+    id: 'emotionMistakeCorrelation',
+    title: 'Emotion & Mistake Patterns',
+    description: 'Correlations between emotions/mistakes and trading performance',
+    category: 'insights',
+    icon: Brain,
+    defaultSize: 'large',
+    component: EmotionMistakeCorrelationWidget,
+    requiresData: ['trades'],
   },
 };
 
