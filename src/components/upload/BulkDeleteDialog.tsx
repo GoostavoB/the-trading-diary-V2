@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import * as SliderPrimitive from "@radix-ui/react-slider";
 import {
   Dialog,
   DialogContent,
@@ -85,7 +86,7 @@ export function BulkDeleteDialog({
 
             {/* Bidirectional Range Slider */}
             <div className="space-y-2">
-              <div className="relative">
+              <div className="relative pnl-bidir-slider">
                 <Slider
                   min={-100}
                   max={100}
@@ -96,15 +97,23 @@ export function BulkDeleteDialog({
                     setNegativePnl(Math.min(0, neg));
                     setPositivePnl(Math.max(0, pos));
                   }}
-                  className="w-full [&_[role=slider]:first-of-type]:border-red-500 [&_[role=slider]:first-of-type]:bg-red-500 [&_[role=slider]:last-of-type]:border-green-500 [&_[role=slider]:last-of-type]:bg-green-500"
-                  style={{
-                    // @ts-ignore - Custom CSS variable for gradient track
-                    '--slider-track-bg': 'linear-gradient(to right, #ef4444 0%, #fca5a5 50%, #86efac 50%, #22c55e 100%)'
-                  }}
-                />
+                  className="w-full"
+                >
+                  <SliderPrimitive.Thumb
+                    aria-label="Negative P&L"
+                    className="block h-5 w-5 rounded-full border-2 border-red-500 bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                  />
+                  <SliderPrimitive.Thumb
+                    aria-label="Positive P&L"
+                    className="block h-5 w-5 rounded-full border-2 border-green-500 bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                  />
+                </Slider>
                 <style>{`
-                  [data-radix-slider-track] {
+                  .pnl-bidir-slider [data-radix-slider-track] {
                     background: linear-gradient(to right, #ef4444 0%, #fca5a5 50%, #86efac 50%, #22c55e 100%) !important;
+                  }
+                  .pnl-bidir-slider [data-radix-slider-range] {
+                    background: transparent !important;
                   }
                 `}</style>
               </div>
