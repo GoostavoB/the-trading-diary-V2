@@ -899,19 +899,19 @@ const Upload = () => {
                       <div className="space-y-3">
                         <div className="flex gap-3">
                           <div className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary">1</div>
-                          <p className="text-xs text-muted-foreground leading-relaxed">We scan screenshots and find trades</p>
+                          <p className="text-xs text-muted-foreground leading-relaxed">Upload screenshots</p>
                         </div>
                         <div className="flex gap-3">
                           <div className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary">2</div>
-                          <p className="text-xs text-muted-foreground leading-relaxed">You review and edit</p>
+                          <p className="text-xs text-muted-foreground leading-relaxed">AI pulls every trade</p>
                         </div>
                         <div className="flex gap-3">
                           <div className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary">3</div>
-                          <p className="text-xs text-muted-foreground leading-relaxed">You save and export</p>
+                          <p className="text-xs text-muted-foreground leading-relaxed">Review and save</p>
                         </div>
                       </div>
                       <div className="mt-4 pt-4 border-t border-border/50">
-                        <p className="text-xs text-muted-foreground">Each trade uses 2 credits</p>
+                        <p className="text-xs text-muted-foreground">1 scan = 1 credit = Up to 10 trades</p>
                       </div>
                     </Card>
 
