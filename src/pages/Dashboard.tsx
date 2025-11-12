@@ -631,41 +631,40 @@ const Dashboard = () => {
   }, [capitalLog]);
 
   const portfolioChartData = useMemo(() => {
-    // Start with initial investment as the first data point
+    // Start from the same base used by the widget to avoid mismatches
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - 6); // Show last 6 months
-    
-    // Combine trades and capital additions
-    const combined = [...trades, ...capitalLog.map(c => ({
-      trade_date: c.log_date,
-      pnl: c.amount_added
-    }))].sort((a, b) => 
-      new Date(a.trade_date).getTime() - new Date(b.trade_date).getTime()
+
+    const baseCapital = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
+
+    // Use trades only for the growth line when base already includes capital additions
+    const sortedTrades = [...trades].sort((a, b) =>
+      new Date(a.trade_date as any).getTime() - new Date(b.trade_date as any).getTime()
     );
 
-    // Always start with initial investment
-    const chartData = [];
-    let cumulative = initialInvestment;
-    
+    const chartData: { date: string; value: number }[] = [];
+    let cumulative = baseCapital;
+
     // Add initial point if we have no data or if the first data point is after our start date
-    if (combined.length === 0 || new Date(combined[0].trade_date) > startDate) {
+    if (sortedTrades.length === 0 || new Date(sortedTrades[0].trade_date as any) > startDate) {
       chartData.push({
         date: startDate.toLocaleDateString(),
-        value: initialInvestment
+        value: baseCapital,
       });
     }
-    
-    // Add all trades and capital additions
-    combined.forEach(item => {
-      cumulative += item.pnl || 0;
+
+    // Add P&L over time
+    sortedTrades.forEach((item) => {
+      const pnl = Number((item as any).pnl ?? (item as any).profit_loss ?? 0);
+      cumulative += pnl;
       chartData.push({
-        date: new Date(item.trade_date).toLocaleDateString(),
-        value: cumulative
+        date: new Date((item as any).trade_date).toLocaleDateString(),
+        value: cumulative,
       });
     });
-    
+
     return chartData;
-  }, [trades, capitalLog, initialInvestment]);
+  }, [trades, initialInvestment, totalCapitalAdditions]);
 
   // Dynamic widget renderer
   const renderWidget = useCallback((widgetId: string) => {
