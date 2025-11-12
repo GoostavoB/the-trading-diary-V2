@@ -253,27 +253,64 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
           ));
         } catch (error) {
           console.error(`Error analyzing image ${i}:`, error);
+          
+          // Create user-friendly error message
+          let friendlyError = 'Analysis failed';
+          if (error instanceof Error) {
+            const errorMsg = error.message.toLowerCase();
+            
+            if (errorMsg.includes('rate limit')) {
+              friendlyError = 'Too many requests. Please wait a moment and try again.';
+            } else if (errorMsg.includes('credits') || errorMsg.includes('budget')) {
+              friendlyError = 'AI credits exhausted. Please upgrade or wait for next month.';
+            } else if (errorMsg.includes('timeout') || errorMsg.includes('ocr timeout')) {
+              friendlyError = 'Image processing took too long. Try a clearer screenshot.';
+            } else if (errorMsg.includes('too large') || errorMsg.includes('10mb')) {
+              friendlyError = 'Image is too large (max 10MB). Please compress it.';
+            } else if (errorMsg.includes('parse') || errorMsg.includes('invalid json')) {
+              friendlyError = 'Could not extract trade data. Try a clearer screenshot.';
+            } else if (errorMsg.includes('no trade') || errorMsg.includes('not found')) {
+              friendlyError = 'No trades found in this image. Make sure it shows trade data.';
+            } else if (error.message.length < 100) {
+              friendlyError = error.message;
+            }
+          }
+          
           setImages(prev => prev.map((img, idx) => 
             idx === i ? { 
               ...img, 
               status: 'error', 
-              error: error instanceof Error ? error.message : 'Analysis failed' 
+              error: friendlyError
             } : img
           ));
         }
       }
 
-      const successCount = images.filter(img => img.status !== 'error').length;
+      const successCount = images.filter(img => img.status === 'success').length;
+      const errorCount = images.filter(img => img.status === 'error').length;
       const creditsNeeded = successCount;
       const maxTrades = creditsNeeded * 10;
 
-setTotalTradesDetected(totalTrades);
-setCreditsRequired(creditsNeeded);
-setMaxSelectableTrades(maxTrades);
-setExtractedTrades(allTrades);
+      setTotalTradesDetected(totalTrades);
+      setCreditsRequired(creditsNeeded);
+      setMaxSelectableTrades(maxTrades);
+      setExtractedTrades(allTrades);
 
-setShowConfirmation(true);
-onReviewStart?.();
+      // Show helpful message about failed extractions
+      if (errorCount > 0 && successCount > 0) {
+        toast.info(`${successCount} image${successCount > 1 ? 's' : ''} extracted successfully`, {
+          description: `${errorCount} failed extraction${errorCount > 1 ? 's' : ''} (no credits charged)`
+        });
+      } else if (errorCount > 0 && successCount === 0) {
+        toast.error('All extractions failed', {
+          description: 'No credits were charged. Please try with clearer screenshots.'
+        });
+        setIsAnalyzing(false);
+        return;
+      }
+
+      setShowConfirmation(true);
+      onReviewStart?.();
     } catch (error) {
       toast.error('Failed to analyze images');
     } finally {
@@ -368,10 +405,25 @@ setExtractedTrades([]);
                 </div>
               )}
               {image.status === 'error' && (
-                <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2">
-                  <AlertCircle className="h-8 w-8 text-destructive" />
-                  <p className="text-xs font-medium text-white">Failed</p>
-                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="absolute inset-0 bg-destructive/20 border-2 border-destructive/50 flex flex-col items-center justify-center gap-2 cursor-help">
+                        <AlertCircle className="h-8 w-8 text-destructive animate-pulse" />
+                        <div className="px-3 py-1.5 bg-black/80 rounded-md max-w-[90%]">
+                          <p className="text-xs font-medium text-white text-center">{image.error || 'Failed'}</p>
+                        </div>
+                        <div className="px-2 py-1 bg-green-500/20 border border-green-500/50 rounded-md mt-1">
+                          <p className="text-[10px] text-green-400 font-medium">No credit charged</p>
+                        </div>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p className="text-sm">{image.error || 'Analysis failed'}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Failed extractions don't cost credits. You can try again with a different image.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
               
               {/* Compact bottom status */}
@@ -469,6 +521,32 @@ setExtractedTrades([]);
           </Card>
         )}
       </div>
+
+      {/* Tips for successful extraction */}
+      {images.length === 0 && (
+        <Card className="p-4 bg-muted/30 border-dashed">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5">
+              <Info className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1 space-y-2">
+              <h4 className="text-sm font-semibold">Tips for Best Results</h4>
+              <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                <li>Use clear, high-resolution screenshots of your trading history</li>
+                <li>Make sure all columns are visible (symbol, entry/exit price, P&L, dates)</li>
+                <li>Crop out unnecessary UI elements - focus on the trade table</li>
+                <li>If extraction fails, try a different screenshot angle or format</li>
+              </ul>
+              <div className="flex items-center gap-2 mt-3 pt-2 border-t border-border/50">
+                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-medium text-foreground">Failed extractions don't cost credits</span> – feel free to try again!
+                </p>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {images.length > 0 && (
         <>
