@@ -25,8 +25,8 @@ export const AIInsightCard = memo(({ trades, capitalLog, stats }: AIInsightCardP
       };
     }
 
-    const totalPnl = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
-    const winningTrades = trades.filter(t => (t.pnl || 0) > 0);
+    const totalPnl = trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+    const winningTrades = trades.filter(t => (t.profit_loss || 0) > 0);
     const winRate = (winningTrades.length / trades.length) * 100;
     
     // Use stats if available for more accurate calculations
@@ -34,18 +34,18 @@ export const AIInsightCard = memo(({ trades, capitalLog, stats }: AIInsightCardP
     const hasCapitalTracking = capitalLog && capitalLog.length > 0;
     
     const avgWin = winningTrades.length > 0
-      ? winningTrades.reduce((sum, t) => sum + (t.pnl || 0), 0) / winningTrades.length
+      ? winningTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / winningTrades.length
       : 0;
     
-    const losingTrades = trades.filter(t => (t.pnl || 0) <= 0);
+    const losingTrades = trades.filter(t => (t.profit_loss || 0) <= 0);
     const avgLoss = losingTrades.length > 0
-      ? Math.abs(losingTrades.reduce((sum, t) => sum + (t.pnl || 0), 0) / losingTrades.length)
+      ? Math.abs(losingTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / losingTrades.length)
       : 0;
 
     // Recent trades (last 10)
     const recentTrades = trades.slice(-10);
-    const recentPnl = recentTrades.reduce((sum, t) => sum + (t.pnl || 0), 0);
-    const recentWins = recentTrades.filter(t => (t.pnl || 0) > 0).length;
+    const recentPnl = recentTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+    const recentWins = recentTrades.filter(t => (t.profit_loss || 0) > 0).length;
 
     // Generate dynamic insight
     if (hasCapitalTracking && effectiveROI > 20) {

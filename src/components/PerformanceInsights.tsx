@@ -19,28 +19,28 @@ export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) =
   if (!trades.length) return null;
 
   // Calculate insights
-  const totalPnl = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
-  const winningTrades = trades.filter(t => (t.pnl || 0) > 0);
-  const losingTrades = trades.filter(t => (t.pnl || 0) < 0);
+  const totalPnl = trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+  const winningTrades = trades.filter(t => (t.profit_loss || 0) > 0);
+  const losingTrades = trades.filter(t => (t.profit_loss || 0) < 0);
   const winRate = (winningTrades.length / trades.length) * 100;
   
   const avgWin = winningTrades.length > 0
-    ? winningTrades.reduce((sum, t) => sum + (t.pnl || 0), 0) / winningTrades.length
+    ? winningTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / winningTrades.length
     : 0;
   
   const avgLoss = losingTrades.length > 0
-    ? Math.abs(losingTrades.reduce((sum, t) => sum + (t.pnl || 0), 0) / losingTrades.length)
+    ? Math.abs(losingTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / losingTrades.length)
     : 0;
   
   const profitFactor = avgLoss > 0 ? avgWin / avgLoss : 0;
   
   // Best and worst trades
   const bestTrade = trades.reduce((best, t) => 
-    (t.pnl || 0) > (best.pnl || 0) ? t : best
+    (t.profit_loss || 0) > (best.profit_loss || 0) ? t : best
   , trades[0]);
   
   const worstTrade = trades.reduce((worst, t) => 
-    (t.pnl || 0) < (worst.pnl || 0) ? t : worst
+    (t.profit_loss || 0) < (worst.profit_loss || 0) ? t : worst
   , trades[0]);
 
   // Generate insights
@@ -205,7 +205,7 @@ export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) =
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">P&L</span>
               <span className="text-sm font-bold text-neon-green">
-                <BlurredCurrency amount={bestTrade.pnl || 0} />
+                <BlurredCurrency amount={bestTrade.profit_loss || 0} />
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -238,7 +238,7 @@ export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) =
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">P&L</span>
               <span className="text-sm font-bold text-neon-red">
-                <BlurredCurrency amount={worstTrade.pnl || 0} />
+                <BlurredCurrency amount={worstTrade.profit_loss || 0} />
               </span>
             </div>
             <div className="flex items-center justify-between">

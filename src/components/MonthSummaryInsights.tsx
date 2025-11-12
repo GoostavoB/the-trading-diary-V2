@@ -21,17 +21,17 @@ export const MonthSummaryInsights = ({ trades }: MonthSummaryInsightsProps) => {
 
   if (monthTrades.length === 0) return null;
 
-  const totalPnl = monthTrades.reduce((sum, t) => sum + (t.pnl || 0), 0);
-  const winningTrades = monthTrades.filter(t => (t.pnl || 0) > 0);
-  const losingTrades = monthTrades.filter(t => (t.pnl || 0) < 0);
+  const totalPnl = monthTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+  const winningTrades = monthTrades.filter(t => (t.profit_loss || 0) > 0);
+  const losingTrades = monthTrades.filter(t => (t.profit_loss || 0) < 0);
   const winRate = monthTrades.length > 0 ? (winningTrades.length / monthTrades.length) * 100 : 0;
 
   const avgWin = winningTrades.length > 0
-    ? winningTrades.reduce((sum, t) => sum + (t.pnl || 0), 0) / winningTrades.length
+    ? winningTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / winningTrades.length
     : 0;
   
   const avgLoss = losingTrades.length > 0
-    ? Math.abs(losingTrades.reduce((sum, t) => sum + (t.pnl || 0), 0) / losingTrades.length)
+    ? Math.abs(losingTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / losingTrades.length)
     : 0;
 
   const profitFactor = avgLoss > 0 ? avgWin / avgLoss : 0;

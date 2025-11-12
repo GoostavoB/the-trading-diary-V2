@@ -1011,8 +1011,8 @@ const Dashboard = () => {
                       avgLoss={dashboardStats.avgLoss}
                       winCount={dashboardStats.winningTrades.length}
                       lossCount={dashboardStats.losingTrades.length}
-                      maxDrawdownPercent={Math.abs((Math.min(...processedTrades.map(t => t.pnl || 0)) / initialInvestment) * 100)}
-                      maxDrawdownAmount={Math.min(...processedTrades.map(t => t.pnl || 0))}
+                      maxDrawdownPercent={Math.abs((Math.min(...processedTrades.map(t => t.profit_loss || 0)) / initialInvestment) * 100)}
+                      maxDrawdownAmount={Math.min(...processedTrades.map(t => t.profit_loss || 0))}
                       profitFactor={dashboardStats.profitFactor}
                     />
                   </div>

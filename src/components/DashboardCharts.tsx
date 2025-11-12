@@ -11,6 +11,7 @@ import { Eye, EyeOff } from 'lucide-react';
 interface Trade {
   id: string;
   trade_date: string;
+  profit_loss: number;
   pnl: number;
   roi: number;
 }
@@ -30,7 +31,7 @@ export const DashboardCharts = memo(({ trades, chartType }: DashboardChartsProps
     trades
       .sort((a, b) => new Date(a.trade_date).getTime() - new Date(b.trade_date).getTime())
       .map((trade, index, arr) => {
-        const cumulative = arr.slice(0, index + 1).reduce((sum, t) => sum + t.pnl, 0);
+        const cumulative = arr.slice(0, index + 1).reduce((sum, t) => sum + (t.profit_loss || 0), 0);
         return {
           date: format(new Date(trade.trade_date), 'MMM dd'),
           pnl: cumulative,
@@ -52,7 +53,7 @@ export const DashboardCharts = memo(({ trades, chartType }: DashboardChartsProps
       if (!acc[date]) {
         acc[date] = { date, wins: 0, losses: 0 };
       }
-      if (trade.pnl > 0) {
+      if (trade.profit_loss > 0) {
         acc[date].wins += 1;
       } else {
         acc[date].losses += 1;

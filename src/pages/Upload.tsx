@@ -661,7 +661,7 @@ const Upload = () => {
       const hashes = tradesData.map(t => t.trade_hash);
       const {
         data: existingTrades
-      } = await supabase.from('trades').select('trade_hash, symbol, trade_date, pnl').eq('user_id', user.id).in('trade_hash', hashes);
+      } = await supabase.from('trades').select('trade_hash, symbol, trade_date, pnl, profit_loss').eq('user_id', user.id).is('deleted_at', null).in('trade_hash', hashes);
       if (existingTrades && existingTrades.length > 0) {
         // Found duplicates - collect all of them
         const duplicateMatches = existingTrades.map(existing => {
@@ -672,7 +672,7 @@ const Upload = () => {
             existing: {
               symbol: existing.symbol,
               trade_date: existing.trade_date,
-              pnl: existing.pnl || 0
+              pnl: existing.profit_loss || 0
             }
           };
         }).filter(d => d.tradeIndex >= 0);

@@ -65,14 +65,14 @@ const Forecast = () => {
 
     const { data: trades } = await supabase
       .from('trades')
-      .select('pnl, trade_date, trading_fee, funding_fee')
+      .select('profit_loss, trade_date, trading_fee, funding_fee')
       .eq('user_id', user.id)
       .is('deleted_at', null);
 
     if (trades && trades.length > 0) {
       // Calculate P&L after fees
       const totalPnl = trades.reduce((sum, t) => {
-        const pnl = t.pnl || 0;
+        const pnl = t.profit_loss || 0;
         const tradingFee = t.trading_fee || 0;
         const fundingFee = t.funding_fee || 0;
         return sum + (pnl - tradingFee - fundingFee);
@@ -88,10 +88,10 @@ const Forecast = () => {
   const fetchAdvancedStats = async () => {
     if (!user) return;
 
-    // Fetch trades with ROI and margin data
+    // Fetch trades with ROI and margin data - select both pnl and profit_loss for type compatibility
     const { data: trades } = await supabase
       .from('trades')
-      .select('roi, margin, pnl')
+      .select('roi, margin, profit_loss, pnl')
       .eq('user_id', user.id)
       .is('deleted_at', null);
 

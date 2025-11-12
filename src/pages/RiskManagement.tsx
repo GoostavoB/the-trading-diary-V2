@@ -40,7 +40,7 @@ export default function RiskManagement() {
       const data = [];
 
       for (const trade of trades) {
-        equity += trade.pnl;
+        equity += trade.profit_loss;
         if (equity > peak) peak = equity;
         const drawdown = ((equity - peak) / peak) * 100;
         
@@ -70,9 +70,9 @@ export default function RiskManagement() {
       };
     }
 
-    const totalPnL = trades.reduce((sum, t) => sum + t.pnl, 0);
-    const losses = trades.filter(t => t.pnl < 0);
-    const avgLoss = losses.length > 0 ? Math.abs(losses.reduce((sum, t) => sum + t.pnl, 0) / losses.length) : 0;
+    const totalPnL = trades.reduce((sum, t) => sum + t.profit_loss, 0);
+    const losses = trades.filter(t => t.profit_loss < 0);
+    const avgLoss = losses.length > 0 ? Math.abs(losses.reduce((sum, t) => sum + t.profit_loss, 0) / losses.length) : 0;
     
     // Simulated calculations (in production, these would be more sophisticated)
     const dailyRisk = avgLoss * 0.5; // Estimated daily risk
@@ -87,7 +87,7 @@ export default function RiskManagement() {
     let currentDrawdown = 0;
 
     trades.forEach(trade => {
-      equity += trade.pnl;
+      equity += trade.profit_loss;
       if (equity > peak) {
         peak = equity;
       }
@@ -98,7 +98,7 @@ export default function RiskManagement() {
     currentDrawdown = ((equity - peak) / peak) * 100;
 
     // Value at Risk (95% confidence)
-    const sortedLosses = losses.map(t => t.pnl).sort((a, b) => a - b);
+    const sortedLosses = losses.map(t => t.profit_loss).sort((a, b) => a - b);
     const varIndex = Math.floor(sortedLosses.length * 0.05);
     const varValue = sortedLosses[varIndex] || 0;
 

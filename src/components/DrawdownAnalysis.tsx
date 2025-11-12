@@ -39,7 +39,7 @@ const DrawdownAnalysisComponent = ({ trades, initialInvestment }: DrawdownAnalys
 
   // Memoize current balance and return
   const { currentBalance, totalReturn } = useMemo(() => {
-    const balance = initialInvestment + trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+    const balance = initialInvestment + trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
     const returns = ((balance - initialInvestment) / initialInvestment) * 100;
     return { currentBalance: balance, totalReturn: returns };
   }, [initialInvestment, trades]);
@@ -60,7 +60,7 @@ const DrawdownAnalysisComponent = ({ trades, initialInvestment }: DrawdownAnalys
     let currentDD: Partial<DrawdownPeriod> | null = null;
 
     sortedTrades.forEach((trade, index) => {
-      const tradePnl = trade.pnl || 0;
+      const tradePnl = trade.profit_loss || 0;
       runningBalance += tradePnl;
 
       // Check if we hit a new peak

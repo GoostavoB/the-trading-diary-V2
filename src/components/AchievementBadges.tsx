@@ -22,9 +22,9 @@ interface Achievement {
 const AchievementBadgesComponent = ({ trades }: AchievementBadgesProps) => {
   const stats = useMemo(() => {
     const totalTrades = trades.length;
-    const winningTrades = trades.filter(t => (t.pnl || 0) > 0);
+    const winningTrades = trades.filter(t => (t.profit_loss || 0) > 0);
     const winRate = totalTrades > 0 ? (winningTrades.length / totalTrades) * 100 : 0;
-    const totalPnl = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+    const totalPnl = trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
     
     // Calculate streaks
     const sortedTrades = [...trades].sort((a, b) => 
@@ -35,7 +35,7 @@ const AchievementBadgesComponent = ({ trades }: AchievementBadgesProps) => {
     let currentWinStreak = 0;
     
     sortedTrades.forEach(trade => {
-      if ((trade.pnl || 0) > 0) {
+      if ((trade.profit_loss || 0) > 0) {
         currentWinStreak++;
         maxWinStreak = Math.max(maxWinStreak, currentWinStreak);
       } else {
@@ -52,7 +52,7 @@ const AchievementBadgesComponent = ({ trades }: AchievementBadgesProps) => {
     }, {} as Record<string, Trade[]>);
 
     const beastModeDays = Object.values(tradesByDate).filter(dayTrades => {
-      const wins = dayTrades.filter(t => (t.pnl || 0) > 0).length;
+      const wins = dayTrades.filter(t => (t.profit_loss || 0) > 0).length;
       const dayWinRate = (wins / dayTrades.length) * 100;
       return dayWinRate > 70;
     }).length;

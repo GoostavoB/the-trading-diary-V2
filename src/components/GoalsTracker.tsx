@@ -74,14 +74,14 @@ export const GoalsTracker = ({ trades }: GoalsTrackerProps) => {
   const calculateCurrentValue = (goal: Goal, relevantTrades: Trade[]) => {
     switch (goal.goal_type) {
       case 'pnl':
-        return relevantTrades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+        return relevantTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
       case 'win_rate':
-        const wins = relevantTrades.filter(t => (t.pnl || 0) > 0).length;
+        const wins = relevantTrades.filter(t => (t.profit_loss || 0) > 0).length;
         return relevantTrades.length > 0 ? (wins / relevantTrades.length) * 100 : 0;
       case 'trades':
         return relevantTrades.length;
       case 'roi':
-        const totalPnl = relevantTrades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+        const totalPnl = relevantTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
         const totalMargin = relevantTrades.reduce((sum, t) => sum + (t.margin || 0), 0);
         return totalMargin > 0 ? (totalPnl / totalMargin) * 100 : 0;
       default:

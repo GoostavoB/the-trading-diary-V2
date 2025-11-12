@@ -58,7 +58,7 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
     }
   };
   // Total ROI calculation
-  const totalPnl = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+  const totalPnl = trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
   const totalROI = initialInvestment > 0 ? ((totalPnl / initialInvestment) * 100) : 0;
 
   // Average ROI per trade
@@ -70,7 +70,7 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
   const tradesByDate = trades.reduce((acc, trade) => {
     const date = new Date(trade.trade_date).toDateString();
     if (!acc[date]) acc[date] = 0;
-    acc[date] += trade.pnl || 0;
+    acc[date] += trade.profit_loss || 0;
     return acc;
   }, {} as Record<string, number>);
   const avgRevenuePerDay = Object.keys(tradesByDate).length > 0
@@ -92,7 +92,7 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
 
   // Asset with more wins
   const assetWins = trades.reduce((acc, trade) => {
-    if (trade.pnl > 0) {
+    if (trade.profit_loss > 0) {
       if (!acc[trade.symbol]) acc[trade.symbol] = 0;
       acc[trade.symbol] += 1;
     }
@@ -100,10 +100,10 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
   }, {} as Record<string, number>);
   const assetWithMoreWins = Object.entries(assetWins)
     .sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
-  const totalWins = trades.filter(t => t.pnl > 0).length;
+  const totalWins = trades.filter(t => t.profit_loss > 0).length;
   const mostWinsCount = assetWithMoreWins !== 'N/A' ? assetWins[assetWithMoreWins] : 0;
   const mostWinsPercentage = totalWins > 0 ? (mostWinsCount / totalWins) * 100 : 0;
-  const mostWinsTrades = assetWithMoreWins !== 'N/A' ? trades.filter(t => t.symbol === assetWithMoreWins && t.pnl > 0) : [];
+  const mostWinsTrades = assetWithMoreWins !== 'N/A' ? trades.filter(t => t.symbol === assetWithMoreWins && t.profit_loss > 0) : [];
   const mostWinsROI = mostWinsTrades.length > 0
     ? mostWinsTrades.reduce((sum, t) => sum + (t.roi || 0), 0) / mostWinsTrades.length
     : 0;
@@ -111,14 +111,14 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
   // Asset with biggest losses
   const assetLosses = trades.reduce((acc, trade) => {
     if (!acc[trade.symbol]) acc[trade.symbol] = 0;
-    acc[trade.symbol] += trade.pnl || 0;
+    acc[trade.symbol] += trade.profit_loss || 0;
     return acc;
   }, {} as Record<string, number>);
   const assetWithBiggestLosses = Object.entries(assetLosses)
     .sort((a, b) => a[1] - b[1])[0]?.[0] || 'N/A';
-  const totalLosses = trades.filter(t => t.pnl < 0).length;
+  const totalLosses = trades.filter(t => t.profit_loss < 0).length;
   const biggestLossesTrades = assetWithBiggestLosses !== 'N/A' 
-    ? trades.filter(t => t.symbol === assetWithBiggestLosses && t.pnl < 0)
+    ? trades.filter(t => t.symbol === assetWithBiggestLosses && t.profit_loss < 0)
     : [];
   const biggestLossesCount = biggestLossesTrades.length;
   const biggestLossesPercentage = totalLosses > 0 ? (biggestLossesCount / totalLosses) * 100 : 0;
@@ -128,7 +128,7 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
 
   // Top setup by wins
   const setupWins = trades.reduce((acc, trade) => {
-    if (trade.pnl > 0 && trade.setup) {
+    if (trade.profit_loss > 0 && trade.setup) {
       if (!acc[trade.setup]) acc[trade.setup] = 0;
       acc[trade.setup] += 1;
     }
@@ -138,7 +138,7 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
     .sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
   const topSetupByWinsCount = topSetupByWins !== 'N/A' ? setupWins[topSetupByWins] : 0;
   const topSetupByWinsROI = topSetupByWins !== 'N/A'
-    ? trades.filter(t => t.setup === topSetupByWins && t.pnl > 0)
+    ? trades.filter(t => t.setup === topSetupByWins && t.profit_loss > 0)
         .reduce((sum, t) => sum + (t.roi || 0), 0) / topSetupByWinsCount
     : 0;
 
@@ -182,7 +182,7 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
   const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const dayStats = daysOfWeek.map((dayName, dayIndex) => {
     const dayTrades = trades.filter(t => new Date(t.trade_date).getDay() === dayIndex);
-    const wins = dayTrades.filter(t => t.pnl > 0).length;
+    const wins = dayTrades.filter(t => t.profit_loss > 0).length;
     const winRate = dayTrades.length > 0 ? (wins / dayTrades.length) * 100 : 0;
     const avgROI = dayTrades.length > 0 
       ? dayTrades.reduce((sum, t) => sum + (t.roi || 0), 0) / dayTrades.length 

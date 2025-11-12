@@ -25,17 +25,17 @@ export const useDashboardStats = (trades: Trade[], capitalLog?: CapitalLogEntry[
       };
     }
 
-    const winningTrades = trades.filter(t => (t.pnl || 0) > 0);
-    const losingTrades = trades.filter(t => (t.pnl || 0) <= 0);
+    const winningTrades = trades.filter(t => (t.profit_loss || 0) > 0);
+    const losingTrades = trades.filter(t => (t.profit_loss || 0) <= 0);
     
-    const totalPnL = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+    const totalPnL = trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
     
     const avgWin = winningTrades.length > 0
-      ? winningTrades.reduce((sum, t) => sum + (t.pnl || 0), 0) / winningTrades.length
+      ? winningTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / winningTrades.length
       : 0;
     
     const avgLoss = losingTrades.length > 0
-      ? Math.abs(losingTrades.reduce((sum, t) => sum + (t.pnl || 0), 0) / losingTrades.length)
+      ? Math.abs(losingTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / losingTrades.length)
       : 0;
     
     const profitFactor = avgLoss > 0 ? avgWin / avgLoss : 0;
@@ -57,11 +57,11 @@ export const useDashboardStats = (trades: Trade[], capitalLog?: CapitalLogEntry[
     }
     
     const bestTrade = trades.reduce((best, t) => 
-      (t.pnl || 0) > (best.pnl || 0) ? t : best
+      (t.profit_loss || 0) > (best.profit_loss || 0) ? t : best
     , trades[0]);
     
     const worstTrade = trades.reduce((worst, t) => 
-      (t.pnl || 0) < (worst.pnl || 0) ? t : worst
+      (t.profit_loss || 0) < (worst.profit_loss || 0) ? t : worst
     , trades[0]);
 
     return {
