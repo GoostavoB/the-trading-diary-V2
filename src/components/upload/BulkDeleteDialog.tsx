@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Trash2 } from "lucide-react";
+import { Trash2, RotateCcw } from "lucide-react";
 
 interface Trade {
   profit_loss?: number;
@@ -64,8 +64,18 @@ export function BulkDeleteDialog({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-sm text-[#EAEFF4]">P&L Range</Label>
-              <div className="text-sm font-medium text-[#EAEFF4]">
-                ${pnlRange[0].toFixed(2)} to ${pnlRange[1].toFixed(2)}
+              <div className="flex items-center gap-2">
+                <div className="text-sm font-medium text-[#EAEFF4]">
+                  ${pnlRange[0].toFixed(2)} to ${pnlRange[1].toFixed(2)}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPnlRange([0, 0])}
+                  className="h-7 px-2 text-[#A6B1BB] hover:text-[#EAEFF4]"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                </Button>
               </div>
             </div>
             
