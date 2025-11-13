@@ -31,8 +31,19 @@ export const TradingQualityMetrics = memo(({
   const { openWithPrompt } = useAIAssistant();
   const { t } = useTranslation();
 
-  const riskReward = getRiskRewardRatio(avgWin, avgLoss);
+  // Add defensive check
   const totalTrades = winCount + lossCount;
+  if (totalTrades === 0) {
+    return (
+      <Card className="p-6 bg-card border-border">
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">{t('insights.noDataAvailable') || 'No data available'}</p>
+        </div>
+      </Card>
+    );
+  }
+
+  const riskReward = getRiskRewardRatio(avgWin, avgLoss);
   const winRatePercent = totalTrades > 0 ? (winCount / totalTrades) * 100 : 0;
 
   const getScoreColor = (score: number, thresholds: { good: number; ok: number }) => {

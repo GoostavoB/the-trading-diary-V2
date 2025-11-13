@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { DEFAULT_DASHBOARD_LAYOUT, WIDGET_CATALOG } from '@/config/widgetCatalog';
 import { toast } from 'sonner';
 
-export const useWidgetLayout = (userId: string | undefined) => {
+export const useWidgetLayout = (userId: string | undefined, layoutKey: string = 'command-center') => {
   const [widgetOrder, setWidgetOrder] = useState<string[]>(DEFAULT_DASHBOARD_LAYOUT);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -17,9 +17,12 @@ export const useWidgetLayout = (userId: string | undefined) => {
 
     const loadLayout = async () => {
       try {
+        // Load layout based on layoutKey (e.g., 'command-center' or 'trade-station')
+        const columnName = layoutKey === 'command-center' ? 'layout_json' : `layout_json_${layoutKey.replace(/-/g, '_')}`;
+        
         const { data, error } = await supabase
           .from('user_settings')
-          .select('layout_json')
+          .select(columnName)
           .eq('user_id', userId)
           .single();
 
@@ -28,8 +31,8 @@ export const useWidgetLayout = (userId: string | undefined) => {
           return;
         }
 
-        if (data?.layout_json) {
-          const layoutData = data.layout_json as any;
+        const layoutData = data?.[columnName] as any;
+        if (layoutData) {
           
           // Handle new format (array of widget IDs)
           if (Array.isArray(layoutData) && layoutData.length > 0 && typeof layoutData[0] === 'string') {
@@ -68,10 +71,13 @@ export const useWidgetLayout = (userId: string | undefined) => {
 
     setIsSaving(true);
     try {
+      // Save layout to the correct column based on layoutKey
+      const columnName = layoutKey === 'command-center' ? 'layout_json' : `layout_json_${layoutKey.replace(/-/g, '_')}`;
+      
       const { error } = await supabase
         .from('user_settings')
         .update({
-          layout_json: newOrder as any,
+          [columnName]: newOrder as any,
           updated_at: new Date().toISOString(),
         })
         .eq('user_id', userId);

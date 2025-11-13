@@ -25,7 +25,8 @@ const TradingHeatmapComponent = ({ trades }: TradingHeatmapProps) => {
   const heatmapData = useMemo(() => {
     const data: Record<string, { wins: number; total: number; pnl: number; roi: number }> = {};
 
-    trades.forEach((trade) => {
+    // Add defensive check
+    (trades || []).forEach((trade) => {
       const date = new Date(trade.trade_date);
       const day = date.getDay();
       const hour = date.getHours();

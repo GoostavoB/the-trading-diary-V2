@@ -10,10 +10,14 @@ import { SortableWidget } from '@/components/widgets/SortableWidget';
 import { DropZone } from '@/components/widgets/DropZone';
 import { CustomizeDashboardControls } from '@/components/CustomizeDashboardControls';
 import { Button } from '@/components/ui/button';
-
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useSpotWallet } from '@/hooks/useSpotWallet';
+import { useTokenPrices } from '@/hooks/useTokenPrices';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
+import type { Trade } from '@/types/trade';
 
 interface TradeStationViewProps {
   onControlsReady?: (controls: {
@@ -39,10 +43,17 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isCustomizing, setIsCustomizing] = useState(false);
-  // Widget library is now handled by parent Dashboard component
   const [activeId, setActiveId] = useState<string | null>(null);
   const [originalPositions, setOriginalPositions] = useState<TradeStationWidgetPosition[]>([]);
   const [showResetDialog, setShowResetDialog] = useState(false);
+  
+  // Data state for widgets
+  const [stats, setStats] = useState<any>(null);
+  const [trades, setTrades] = useState<Trade[]>([]);
+  const [initialInvestment, setInitialInvestment] = useState(0);
+  const [capitalLog, setCapitalLog] = useState<any[]>([]);
+  const [includeFeesInPnL, setIncludeFeesInPnL] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
   
   const {
     positions,
@@ -56,6 +67,24 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
     undoReset,
     canUndo,
   } = useTradeStationLayout(user?.id);
+
+  // Spot wallet and prices
+  const { holdings, isLoading: isSpotWalletLoading } = useSpotWallet();
+  const { prices } = useTokenPrices(holdings.map(h => h.token_symbol));
+
+  // Process trades with fees
+  const processedTrades = useMemo(() => 
+    trades.map(trade => ({
+      ...trade,
+      profit_loss: includeFeesInPnL 
+        ? (trade.profit_loss || 0) - Math.abs(trade.funding_fee || 0) - Math.abs(trade.trading_fee || 0)
+        : (trade.profit_loss || 0)
+    })),
+    [trades, includeFeesInPnL]
+  );
+
+  // Calculate dashboard stats
+  const dashboardStats = useDashboardStats(processedTrades, capitalLog);
 
   // Sensors for drag and drop
   const sensors = useSensors(
@@ -155,6 +184,166 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
     setActiveId(null);
   }, []);
   
+  // Helper function to calculate current streak
+  const calculateCurrentStreak = useCallback((trades: Trade[]): { type: 'win' | 'loss'; count: number } => {
+    if (trades.length === 0) return { type: 'win', count: 0 };
+    
+    const sorted = [...trades].sort((a, b) => 
+      new Date(b.trade_date).getTime() - new Date(a.trade_date).getTime()
+    );
+    
+    const latestTrade = sorted[0];
+    const streakType: 'win' | 'loss' = (latestTrade.profit_loss || 0) > 0 ? 'win' : 'loss';
+    let count = 0;
+    
+    for (const trade of sorted) {
+      const isWin = (trade.profit_loss || 0) > 0;
+      if ((streakType === 'win' && isWin) || (streakType === 'loss' && !isWin)) {
+        count++;
+      } else {
+        break;
+      }
+    }
+    
+    return { type: streakType, count };
+  }, []);
+
+  // Data fetching functions
+  const fetchCapitalLog = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from('capital_log')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('date', { ascending: true });
+    
+    if (data) {
+      setCapitalLog(data);
+    }
+  };
+
+  const fetchInitialInvestment = async () => {
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('user_settings')
+      .select('initial_investment')
+      .eq('user_id', user.id)
+      .single();
+
+    if (data) {
+      setInitialInvestment(data.initial_investment || 0);
+    }
+  };
+
+  const fetchStats = async () => {
+    if (!user) return;
+    setDataLoading(true);
+
+    const { data: trades } = await supabase
+      .from('trades')
+      .select('*')
+      .eq('user_id', user.id)
+      .is('deleted_at', null);
+
+    if (trades) {
+      setTrades(trades.map(trade => ({
+        ...trade,
+        side: trade.side as 'long' | 'short' | null
+      })));
+      
+      // Calculate P&L with and without fees
+      const totalPnlWithoutFees = trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+      const totalPnlWithFees = trades.reduce((sum, t) => {
+        const pnl = t.profit_loss || 0;
+        const fundingFee = t.funding_fee || 0;
+        const tradingFee = t.trading_fee || 0;
+        return sum + (pnl - Math.abs(fundingFee) - Math.abs(tradingFee));
+      }, 0);
+      
+      const winningTrades = trades.filter(t => (t.profit_loss || 0) > 0).length;
+      const avgDuration = trades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (trades.length || 1);
+
+      // Calculate unique trading days
+      const uniqueDays = new Set(trades.map(t => new Date(t.trade_date).toDateString())).size;
+      
+      // Calculate average P&L per trade
+      const avgPnLPerTrade = trades.length > 0 
+        ? (includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees) / trades.length 
+        : 0;
+      
+      // Calculate average P&L per day
+      const avgPnLPerDay = uniqueDays > 0 
+        ? (includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees) / uniqueDays 
+        : 0;
+      
+      // Calculate total added capital from capital_log
+      const totalAddedCapital = capitalLog.reduce((sum, entry) => sum + (entry.amount_added || 0), 0);
+      const baseCapital = totalAddedCapital > 0 ? totalAddedCapital : initialInvestment;
+      
+      // Calculate current balance
+      const currentBalance = baseCapital + (includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees);
+      
+      // Calculate current ROI
+      let currentROI = 0;
+      if (baseCapital > 0) {
+        currentROI = ((currentBalance - baseCapital) / baseCapital) * 100;
+      }
+      
+      // Calculate average ROI per trade - FIXED CALCULATION
+      const avgROIPerTrade = baseCapital > 0 && trades.length > 0
+        ? (avgPnLPerTrade / baseCapital) * 100
+        : 0;
+
+      setStats({
+        total_pnl: includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees,
+        win_rate: trades.length > 0 ? (winningTrades / trades.length) * 100 : 0,
+        total_trades: trades.length,
+        avg_duration: avgDuration,
+        avg_pnl_per_trade: avgPnLPerTrade,
+        avg_pnl_per_day: avgPnLPerDay,
+        trading_days: uniqueDays,
+        current_roi: currentROI,
+        avg_roi_per_trade: avgROIPerTrade,
+      });
+    }
+    setDataLoading(false);
+  };
+
+  // Load data on mount
+  useEffect(() => {
+    if (user) {
+      fetchCapitalLog();
+      fetchInitialInvestment();
+      fetchStats();
+    }
+    
+    // Set up realtime subscriptions
+    const tradesChannel = supabase
+      .channel('trades-changes-tradestation')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'trades', filter: `user_id=eq.${user?.id}` },
+        () => fetchStats()
+      )
+      .subscribe();
+    
+    const capitalChannel = supabase
+      .channel('capital-changes-tradestation')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'capital_log', filter: `user_id=eq.${user?.id}` },
+        () => {
+          fetchCapitalLog().then(() => fetchStats());
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      tradesChannel.unsubscribe();
+      capitalChannel.unsubscribe();
+    };
+  }, [user]);
+  
   // Widget renderer for regular widgets
   const renderWidget = useCallback((widgetId: string) => {
     const widgetConfig = TRADE_STATION_WIDGET_CATALOG[widgetId];
@@ -162,20 +351,133 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
     
     const WidgetComponent = widgetConfig.component;
     
+    // Build widget props based on widget requirements
+    const widgetProps: any = {
+      id: widgetId,
+      isEditMode: isCustomizing,
+      onRemove: () => removeWidget(widgetId),
+    };
+    
+    // Calculate common values
+    const totalCapitalAdditions = capitalLog.reduce((sum, entry) => 
+      sum + (entry.amount_added || 0), 0);
+    const totalInvestedCapital = totalCapitalAdditions > 0 
+      ? totalCapitalAdditions : initialInvestment;
+    const spotWalletTotal = holdings.reduce((sum, h) => {
+      const price = Number(prices[h.token_symbol]) || 0;
+      return sum + (h.quantity * price);
+    }, 0);
+    const currentStreak = calculateCurrentStreak(processedTrades);
+    
+    // Add data based on widget type
+    switch (widgetId) {
+      case 'totalBalance':
+        widgetProps.totalBalance = totalInvestedCapital + (stats?.total_pnl || 0);
+        widgetProps.change24h = stats?.total_pnl || 0;
+        widgetProps.changePercent24h = totalInvestedCapital > 0 
+          ? ((stats?.total_pnl || 0) / totalInvestedCapital) * 100 
+          : 0;
+        break;
+      case 'winRate':
+        const winningTrades = processedTrades.filter(t => (t.profit_loss || 0) > 0).length;
+        const losingTrades = processedTrades.filter(t => (t.profit_loss || 0) <= 0).length;
+        widgetProps.winRate = stats?.win_rate || 0;
+        widgetProps.wins = winningTrades;
+        widgetProps.losses = losingTrades;
+        widgetProps.totalTrades = stats?.total_trades || 0;
+        break;
+      case 'totalTrades':
+        widgetProps.totalTrades = stats?.total_trades || 0;
+        break;
+      case 'spotWallet':
+        widgetProps.totalValue = spotWalletTotal;
+        widgetProps.change24h = 0;
+        widgetProps.changePercent24h = 0;
+        widgetProps.tokenCount = holdings?.length || 0;
+        break;
+      case 'avgPnLPerTrade':
+        widgetProps.avgPnLPerTrade = stats?.avg_pnl_per_trade || 0;
+        widgetProps.totalTrades = stats?.total_trades || 0;
+        break;
+      case 'avgPnLPerDay':
+        widgetProps.avgPnLPerDay = stats?.avg_pnl_per_day || 0;
+        widgetProps.tradingDays = stats?.trading_days || 0;
+        break;
+      case 'currentROI':
+        widgetProps.currentROI = stats?.current_roi || 0;
+        widgetProps.initialInvestment = totalInvestedCapital;
+        widgetProps.currentBalance = totalInvestedCapital + (stats?.total_pnl || 0);
+        break;
+      case 'avgROIPerTrade':
+        widgetProps.avgROIPerTrade = stats?.avg_roi_per_trade || 0;
+        widgetProps.totalTrades = stats?.total_trades || 0;
+        break;
+      case 'capitalGrowth':
+        widgetProps.chartData = [];
+        widgetProps.initialInvestment = totalInvestedCapital;
+        widgetProps.totalCapitalAdditions = 0;
+        widgetProps.currentBalance = totalInvestedCapital + (stats?.total_pnl || 0);
+        break;
+      case 'topMovers':
+      case 'aiInsights':
+      case 'recentTransactions':
+      case 'behaviorAnalytics':
+      case 'costEfficiency':
+      case 'heatmap':
+        widgetProps.trades = processedTrades;
+        break;
+      case 'performanceHighlights':
+        widgetProps.trades = processedTrades;
+        widgetProps.bestTrade = dashboardStats.bestTrade;
+        widgetProps.worstTrade = dashboardStats.worstTrade;
+        widgetProps.currentStreak = currentStreak;
+        break;
+      case 'tradingQuality':
+        const minPnl = processedTrades.length > 0 
+          ? Math.min(...processedTrades.map(t => t.profit_loss || 0))
+          : 0;
+        widgetProps.avgWin = dashboardStats.avgWin;
+        widgetProps.avgLoss = dashboardStats.avgLoss;
+        widgetProps.winCount = dashboardStats.winningTrades.length;
+        widgetProps.lossCount = dashboardStats.losingTrades.length;
+        widgetProps.maxDrawdownAmount = Math.min(0, minPnl);
+        widgetProps.maxDrawdownPercent = initialInvestment > 0 
+          ? Math.abs((minPnl / initialInvestment) * 100) 
+          : 0;
+        widgetProps.profitFactor = dashboardStats.profitFactor;
+        break;
+      case 'rollingTarget':
+        widgetProps.trades = processedTrades;
+        widgetProps.initialInvestment = totalInvestedCapital;
+        break;
+      case 'combinedPnLROI':
+        widgetProps.avgPnLPerTrade = stats?.avg_pnl_per_trade || 0;
+        widgetProps.avgROIPerTrade = stats?.avg_roi_per_trade || 0;
+        break;
+      case 'activeGoals':
+        widgetProps.compact = false;
+        break;
+      case 'emotionMistakeCorrelation':
+        // This widget fetches its own data
+        break;
+      // Trade Station specific widgets - manage their own data
+      case 'errorReflection':
+      case 'riskCalculator':
+      case 'dailyLossLock':
+      case 'simpleLeverage':
+        break;
+    }
+    
     return (
       <SortableWidget
         id={widgetId}
         isEditMode={isCustomizing}
         onRemove={() => removeWidget(widgetId)}
       >
-        <WidgetComponent 
-          id={widgetId}
-          isEditMode={isCustomizing} 
-          onRemove={() => removeWidget(widgetId)} 
-        />
+        <WidgetComponent {...widgetProps} />
       </SortableWidget>
     );
-  }, [isCustomizing, removeWidget]);
+  }, [isCustomizing, removeWidget, processedTrades, stats, holdings, prices, capitalLog, initialInvestment, dashboardStats, calculateCurrentStreak]);
   
   // Render spanning widget (full width) - no extra wrapper
   const renderSpanningWidget = useCallback((widgetId: string) => {
@@ -184,20 +486,36 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
     
     const WidgetComponent = widgetConfig.component;
     
+    // Build widget props similar to renderWidget
+    const widgetProps: any = {
+      id: widgetId,
+      isEditMode: isCustomizing,
+      onRemove: () => removeWidget(widgetId),
+    };
+    
+    // Add data for spanning widgets
+    const totalCapitalAdditions = capitalLog.reduce((sum, entry) => 
+      sum + (entry.amount_added || 0), 0);
+    const totalInvestedCapital = totalCapitalAdditions > 0 
+      ? totalCapitalAdditions : initialInvestment;
+    
+    switch (widgetId) {
+      case 'rollingTarget':
+        widgetProps.trades = processedTrades;
+        widgetProps.initialInvestment = totalInvestedCapital;
+        break;
+    }
+    
     return (
       <SortableWidget
         id={widgetId}
         isEditMode={isCustomizing}
         onRemove={() => removeWidget(widgetId)}
       >
-        <WidgetComponent 
-          id={widgetId}
-          isEditMode={isCustomizing} 
-          onRemove={() => removeWidget(widgetId)} 
-        />
+        <WidgetComponent {...widgetProps} />
       </SortableWidget>
     );
-  }, [isCustomizing, removeWidget]);
+  }, [isCustomizing, removeWidget, processedTrades, capitalLog, initialInvestment]);
 
   // Handle customize actions
   const handleStartCustomize = useCallback(() => {
@@ -248,7 +566,7 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
     }
   }, [controls, onControlsReady]);
 
-  if (isLoading) {
+  if (isLoading || dataLoading) {
     return (
       <div className="container mx-auto p-6">
         <div className="flex items-center justify-center py-12">

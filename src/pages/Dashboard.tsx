@@ -452,9 +452,10 @@ const Dashboard = () => {
         currentROI = ((currentBalance - baseCapital) / baseCapital) * 100;
       }
       
-      // Calculate average ROI per trade
-      const avgROIPerTrade = trades.length > 0 
-        ? trades.reduce((sum, t) => sum + (t.roi || 0), 0) / trades.length 
+      // Calculate average ROI per trade - based on avgPnLPerTrade and baseCapital
+      // This properly calculates ROI as (avg P&L / capital) * 100
+      const avgROIPerTrade = baseCapital > 0 && trades.length > 0
+        ? (avgPnLPerTrade / baseCapital) * 100
         : 0;
 
       setStats({
@@ -957,7 +958,7 @@ const Dashboard = () => {
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6 animate-fade-in" style={{animationDelay: '0.5s'}}>
               <TabsList className="glass rounded-2xl grid w-full grid-cols-4 h-auto p-1.5">
                 <TabsTrigger value="tradestation" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Trade Station</TabsTrigger>
-                <TabsTrigger value="overview" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('dashboard.overview')}</TabsTrigger>
+                <TabsTrigger value="overview" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Command Center</TabsTrigger>
                 <TabsTrigger value="insights" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('analytics.insights')}</TabsTrigger>
                 <TabsTrigger value="history" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('trades.tradeHistory')}</TabsTrigger>
               </TabsList>

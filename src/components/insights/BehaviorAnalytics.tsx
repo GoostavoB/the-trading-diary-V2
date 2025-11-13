@@ -20,6 +20,17 @@ interface BehaviorAnalyticsProps {
 export const BehaviorAnalytics = memo(({ trades }: BehaviorAnalyticsProps) => {
   const { t } = useTranslation();
   
+  // Add defensive check for trades
+  if (!trades || trades.length === 0) {
+    return (
+      <Card className="p-6 bg-card border-border">
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">{t('insights.noDataAvailable') || 'No data available'}</p>
+        </div>
+      </Card>
+    );
+  }
+  
   const avgHoldingTime = useMemo(() => calculateAvgHoldingTime(trades), [trades]);
   const avgPositionSize = useMemo(() => calculateAvgPositionSize(trades), [trades]);
   const avgLeverage = useMemo(() => calculateAvgLeverage(trades), [trades]);

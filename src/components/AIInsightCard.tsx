@@ -15,7 +15,8 @@ interface AIInsightCardProps {
 export const AIInsightCard = memo(({ trades, capitalLog, stats }: AIInsightCardProps) => {
   const { convertAmount, formatAmount } = useCurrency();
   const insight = useMemo(() => {
-    if (!trades.length) {
+    // Add defensive check for trades
+    if (!trades || trades.length === 0) {
       return {
         title: "Start Trading",
         message: "Upload your first trade to receive personalized AI insights about your trading performance.",

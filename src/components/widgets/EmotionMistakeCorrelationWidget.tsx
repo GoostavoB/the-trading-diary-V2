@@ -43,7 +43,8 @@ export function EmotionMistakeCorrelationWidget({ id, isEditMode, onRemove }: Wi
     const emotionMap = new Map<string, { wins: number; losses: number; pnls: number[] }>();
     const mistakeMap = new Map<string, { wins: number; losses: number; pnls: number[] }>();
 
-    trades.forEach(trade => {
+    // Add defensive check
+    (trades || []).forEach(trade => {
       const pnl = trade.pnl || trade.profit_loss || 0;
       const isWin = pnl > 0;
 

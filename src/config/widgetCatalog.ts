@@ -339,17 +339,25 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
 };
 
 /**
- * Default dashboard layout for new users - simplified to just widget IDs in order
- * Row 1 (3 columns): Current ROI | Win Rate (with total trades) | Avg P&L per day
- * Row 2 (3 columns): Capital Growth | Top Movers | Combined Avg P&L/ROI per trade
+ * Default Command Center layout for new users - comprehensive performance overview
+ * Includes: ROI, Capital Growth, Avg P&L/Day, Win Rate, Top Movers, Combined P&L/ROI,
+ * Active Goals, AI Insights, Emotion/Mistake Patterns, Behavior, Cost Efficiency,
+ * Performance Highlights, and Trading Quality
  */
 export const DEFAULT_DASHBOARD_LAYOUT = [
   'currentROI',
-  'winRate',
-  'avgPnLPerDay',
   'capitalGrowth',
+  'avgPnLPerDay',
+  'winRate',
   'topMovers',
   'combinedPnLROI',
+  'activeGoals',
+  'aiInsights',
+  'emotionMistakeCorrelation',
+  'behaviorAnalytics',
+  'costEfficiency',
+  'performanceHighlights',
+  'tradingQuality',
 ];
 
 /**

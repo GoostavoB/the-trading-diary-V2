@@ -26,6 +26,9 @@ const TopMoversCardComponent = ({ trades, className }: TopMoversCardProps) => {
   const { convertAmount, formatAmount } = useCurrency();
   
   const topMovers = useMemo(() => {
+    // Add defensive check for trades
+    if (!trades || trades.length === 0) return [];
+    
     // Calculate top movers by total P&L
     const assetData: Record<string, AssetMover> = {};
     

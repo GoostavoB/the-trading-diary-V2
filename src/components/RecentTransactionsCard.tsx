@@ -19,7 +19,9 @@ export const RecentTransactionsCard = memo(({ trades, className }: RecentTransac
   const { t } = useTranslation();
   const { openWithPrompt } = useAIAssistant();
   const { convertAmount, formatAmount } = useCurrency();
-  const recentTrades = trades
+  
+  // Add defensive check for trades
+  const recentTrades = (trades || [])
     .sort((a, b) => new Date(b.trade_date).getTime() - new Date(a.trade_date).getTime())
     .slice(0, 5);
 

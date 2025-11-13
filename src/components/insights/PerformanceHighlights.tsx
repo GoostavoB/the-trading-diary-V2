@@ -27,6 +27,9 @@ export const PerformanceHighlights = memo(({
   const { openWithPrompt } = useAIAssistant();
   const { t } = useTranslation();
 
+  // Add defensive check
+  if (!trades || trades.length === 0 || !bestTrade || !worstTrade) return null;
+
   const { best: bestDay, worst: worstDay } = findBestWorstDays(trades);
   const topAssets = getTopAssets(trades, 3);
   const bottomAssets = getTopAssets(trades, trades.length).slice(-3).reverse();
