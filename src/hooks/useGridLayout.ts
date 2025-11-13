@@ -98,35 +98,36 @@ if (data?.layout_json) {
   }, [userId]);
 
   const saveLayout = useCallback(async (newPositions: WidgetPosition[], newColumnCount?: number) => {
-    if (!userId) return;
+    if (!userId) {
+      console.warn('[useGridLayout] Cannot save: no userId');
+      return;
+    }
 
     const countToSave = newColumnCount ?? columnCount;
-    console.log('Saving layout with positions and column count:', newPositions, countToSave);
+    console.log('[useGridLayout] Saving layout:', { 
+      positionCount: newPositions.length, 
+      columnCount: countToSave,
+      widgetIds: newPositions.map(p => p.id)
+    });
     
     // Validate before saving
     const uniqueIds = new Set(newPositions.map(p => p.id));
     if (uniqueIds.size !== newPositions.length) {
-      console.error('Duplicate widget IDs detected!', newPositions);
+      console.error('[useGridLayout] Duplicate widget IDs detected!', newPositions);
       toast.error('Cannot save: duplicate widgets detected');
       return;
     }
 
     setIsSaving(true);
     try {
-      // Update local state first
-      setPositions(newPositions);
-      if (newColumnCount !== undefined) {
-        setColumnCount(newColumnCount);
-      }
-      
-// Save in new format with both positions and columnCount
+      // Save in new format with both positions and columnCount
       const layoutData: LayoutData = {
         positions: newPositions,
         columnCount: countToSave,
         version: CURRENT_OVERVIEW_LAYOUT_VERSION,
       };
       
-      // Then save to database
+      // Save to database first
       const { error } = await supabase
         .from('user_settings')
         .update({
@@ -135,11 +136,39 @@ if (data?.layout_json) {
         })
         .eq('user_id', userId);
 
-      if (error) throw error;
-      console.log('Layout saved successfully');
+      if (error) {
+        console.error('[useGridLayout] Save error:', error);
+        throw error;
+      }
+      
+      // Update local state only after successful save
+      setPositions(newPositions);
+      if (newColumnCount !== undefined) {
+        setColumnCount(newColumnCount);
+      }
+      
+      console.log('[useGridLayout] ✅ Layout saved successfully');
+      toast.success('Layout saved');
     } catch (error) {
-      console.error('Failed to save layout:', error);
-      toast.error('Failed to save layout');
+      console.error('[useGridLayout] Failed to save layout:', error);
+      toast.error('Failed to save layout. Please try again.');
+      
+      // Revert local state on error by reloading from DB
+      const { data } = await supabase
+        .from('user_settings')
+        .select('layout_json')
+        .eq('user_id', userId)
+        .single();
+        
+      if (data?.layout_json) {
+        const layoutData = data.layout_json as any;
+        if (layoutData?.positions) {
+          setPositions(layoutData.positions);
+          if (layoutData.columnCount) {
+            setColumnCount(layoutData.columnCount);
+          }
+        }
+      }
     } finally {
       setIsSaving(false);
     }
@@ -154,7 +183,10 @@ if (data?.layout_json) {
 
   // Add widget to layout - place in first free position (bottom row, left to right)
   const addWidget = useCallback((widgetId: string, shouldSave: boolean = true) => {
+    console.log('[useGridLayout] addWidget called:', { widgetId, shouldSave, currentPositions: positions.length });
+    
     if (positions.find(p => p.id === widgetId)) {
+      console.warn('[useGridLayout] Widget already exists:', widgetId);
       toast.info('Widget already added');
       return;
     }
@@ -190,15 +222,26 @@ if (data?.layout_json) {
     }
 
     const newPositions = [...positions, { id: widgetId, column: targetCol, row: targetRow }];
-    console.log('[Overview] Adding widget:', widgetId, 'at position:', { column: targetCol, row: targetRow });
+    console.log('[useGridLayout] Widget placement:', { 
+      widgetId, 
+      position: { column: targetCol, row: targetRow },
+      totalWidgets: newPositions.length 
+    });
+    
+    // Update local state immediately for responsive UI
     setPositions(newPositions);
     
-    // Only save if explicitly requested (not during customize mode)
+    // Save to backend if requested
     if (shouldSave) {
-      saveLayout(newPositions);
+      console.log('[useGridLayout] Saving widget addition to backend...');
+      saveLayout(newPositions).then(() => {
+        console.log('[useGridLayout] ✅ Widget saved to backend');
+      }).catch((err) => {
+        console.error('[useGridLayout] ❌ Failed to save widget:', err);
+      });
+    } else {
+      console.log('[useGridLayout] Skipping save (shouldSave=false)');
     }
-    
-    toast.success('Widget added');
   }, [positions, columnCount, saveLayout]);
 
   const removeWidget = useCallback(async (widgetId: string, shouldSave: boolean = true) => {

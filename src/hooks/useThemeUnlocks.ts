@@ -59,15 +59,29 @@ export const useThemeUnlocks = () => {
     if (!user) return;
 
     try {
-      // Fetch user preferences
+      // Fetch user preferences from database
       const { data: preferences } = await supabase
         .from('user_customization_preferences')
         .select('active_theme')
         .eq('user_id', user.id)
         .single();
 
-      const activeThemeId = preferences?.active_theme || 'default';
+      // Try database first, fallback to localStorage, then default
+      const dbTheme = preferences?.active_theme;
+      const localTheme = localStorage.getItem('active_theme');
+      const activeThemeId = dbTheme || localTheme || 'default';
+      
+      console.log('[ThemeUnlocks] Loading theme:', { dbTheme, localTheme, activeThemeId });
+      
       setActiveTheme(activeThemeId);
+      
+      // Apply theme to document immediately
+      document.documentElement.setAttribute('data-theme', activeThemeId);
+      
+      // Sync localStorage with database value if they differ
+      if (dbTheme && dbTheme !== localTheme) {
+        localStorage.setItem('active_theme', dbTheme);
+      }
 
       // Map themes with unlock status based on tier
       const themeTier = tier as ThemeTier;
@@ -95,7 +109,16 @@ export const useThemeUnlocks = () => {
       setThemes(themesWithUnlockStatus);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching theme unlocks:', error);
+      console.error('[ThemeUnlocks] Error fetching theme unlocks:', error);
+      
+      // On error, try to load from localStorage
+      const localTheme = localStorage.getItem('active_theme');
+      if (localTheme) {
+        console.log('[ThemeUnlocks] Using localStorage theme:', localTheme);
+        setActiveTheme(localTheme);
+        document.documentElement.setAttribute('data-theme', localTheme);
+      }
+      
       setLoading(false);
     }
   };
@@ -105,12 +128,18 @@ export const useThemeUnlocks = () => {
 
     const theme = getThemeById(themeId);
     if (!theme) {
-      console.error('Theme not found:', themeId);
+      console.error('[ThemeUnlocks] Theme not found:', themeId);
       return;
     }
 
     try {
-      // Update user preferences
+      console.log('[ThemeUnlocks] Activating theme:', themeId);
+      
+      // Apply theme to document immediately for instant feedback
+      document.documentElement.setAttribute('data-theme', themeId);
+      setActiveTheme(themeId);
+      
+      // Then persist to database
       const { error } = await supabase
         .from('user_customization_preferences')
         .upsert({
@@ -121,15 +150,17 @@ export const useThemeUnlocks = () => {
           onConflict: 'user_id'
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[ThemeUnlocks] Database error:', error);
+        throw error;
+      }
 
-      setActiveTheme(themeId);
-
-      // Apply theme to document
-      document.documentElement.setAttribute('data-theme', themeId);
-      console.log('✅ Theme activated:', themeId);
+      // Also store in localStorage as backup
+      localStorage.setItem('active_theme', themeId);
+      
+      console.log('[ThemeUnlocks] ✅ Theme activated and saved:', themeId);
     } catch (error) {
-      console.error('Error activating theme:', error);
+      console.error('[ThemeUnlocks] Error activating theme:', error);
       throw error;
     }
   };
