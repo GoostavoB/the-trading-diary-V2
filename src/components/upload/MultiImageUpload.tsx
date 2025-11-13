@@ -10,6 +10,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { runOCR } from '@/utils/ocrPipeline';
 import { TradeReviewEditor } from './TradeReviewEditor';
+import { checkForDuplicates } from '@/utils/duplicateDetection';
+import type { DuplicateCheckResult } from '@/utils/duplicateDetection';
 
 interface UploadedImage {
   file: File;
@@ -43,6 +45,7 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState(0);
+  const [duplicateMap, setDuplicateMap] = useState<Map<number, DuplicateCheckResult>>(new Map());
   const dragCounter = useRef(0);
   const imageProcessStartTime = useRef<number>(0);
   const imageProcessTimes = useRef<number[]>([]);
@@ -319,10 +322,26 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
       const creditsNeeded = successCount;
       const maxTrades = creditsNeeded * 10;
 
+      // Check for duplicates
+      const duplicates = await checkForDuplicates(allTrades, user?.id || '');
+      setDuplicateMap(duplicates);
+      
+      // Count valid (non-duplicate) trades for billing
+      const duplicateCount = duplicates.size;
+      const validTradeCount = totalTrades - duplicateCount;
+      const validCreditsNeeded = Math.ceil(validTradeCount / 10); // Only charge for valid trades
+      
       setTotalTradesDetected(totalTrades);
-      setCreditsRequired(creditsNeeded);
+      setCreditsRequired(validCreditsNeeded);
       setMaxSelectableTrades(maxTrades);
       setExtractedTrades(allTrades);
+
+      // Show helpful message about duplicates if any found
+      if (duplicateCount > 0) {
+        toast.info(`Found ${duplicateCount} duplicate trade${duplicateCount > 1 ? 's' : ''}`, {
+          description: 'Duplicate trades won\'t be charged to your account'
+        });
+      }
 
       // Show helpful message about failed extractions
       if (retryMode) {
@@ -577,11 +596,19 @@ setExtractedTrades([]);
                 <li>Crop out unnecessary UI elements - focus on the trade table</li>
                 <li>If extraction fails, try a different screenshot angle or format</li>
               </ul>
-              <div className="flex items-center gap-2 mt-3 pt-2 border-t border-border/50">
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                <p className="text-xs text-muted-foreground">
-                  <span className="font-medium text-foreground">Failed extractions don't cost credits</span> – feel free to try again!
-                </p>
+              <div className="space-y-1.5 mt-3 pt-2 border-t border-border/50">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  <p className="text-xs text-muted-foreground">
+                    <span className="font-medium text-foreground">Failed extractions don't cost credits</span> – feel free to try again!
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-blue-500" />
+                  <p className="text-xs text-muted-foreground">
+                    <span className="font-medium text-foreground">AI duplicate protection</span> – you're never charged for duplicate trades
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -695,6 +722,7 @@ setExtractedTrades([]);
   maxSelectableTrades={maxSelectableTrades}
   creditsRequired={creditsRequired}
   imagesProcessed={images.filter(img => img.status === 'success').length}
+  duplicateMap={duplicateMap}
   onSave={handleSaveTrades}
   onCancel={() => { setShowConfirmation(false); onReviewEnd?.(); }}
 />

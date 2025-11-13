@@ -35,11 +35,19 @@ interface Trade {
   [key: string]: any;
 }
 
+interface DuplicateInfo {
+  isDuplicate: boolean;
+  matchedTrade?: any;
+  matchScore?: number;
+}
+
 interface TradeCardProps {
   trade: Trade;
   index: number;
   isApproved: boolean;
   isDeleted?: boolean;
+  isDuplicate?: boolean;
+  duplicateInfo?: DuplicateInfo;
   onTradeChange: (field: string, value: any) => void;
   onApprove: () => void;
   onDelete: () => void;
@@ -56,6 +64,8 @@ export function TradeCard({
   index,
   isApproved,
   isDeleted = false,
+  isDuplicate = false,
+  duplicateInfo,
   onTradeChange,
   onApprove,
   onDelete,
@@ -86,23 +96,33 @@ export function TradeCard({
   const hasRequiredFields = symbol && symbol !== 'UNKNOWN' && trade.side && 
     trade.entry_price && trade.exit_price && trade.opened_at && trade.closed_at;
   
-  const status = isApproved ? 'approved' : hasRequiredFields ? 'ready' : 'needs_fields';
+  const status = isDuplicate ? 'duplicate' : isApproved ? 'approved' : hasRequiredFields ? 'ready' : 'needs_fields';
 
   const formatDateTime = (date?: string) => {
     if (!date) return '';
     return new Date(date).toISOString().slice(0, 16);
   };
 
-  // If deleted, show only minimized header
-  if (isDeleted) {
+  // If deleted or duplicate, show only minimized header
+  if (isDeleted || isDuplicate) {
+    const isDuplicateStyle = isDuplicate && !isDeleted;
     return (
       <Card 
-        className="border-[#1E242C] bg-[#12161C]/50 overflow-hidden transition-all opacity-60"
+        className={cn(
+          "border-[#1E242C] bg-[#12161C]/50 overflow-hidden transition-all",
+          isDuplicateStyle ? "border-amber-500/30 opacity-70" : "opacity-60"
+        )}
         style={{ backgroundColor: '#12161C' }}
       >
         <div className="px-6 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <span className="text-sm font-semibold text-[#A6B1BB] shrink-0">#{index + 1}</span>
+            
+            {isDuplicate && (
+              <Badge variant="outline" className="border-amber-500/50 bg-amber-500/10 text-amber-400 shrink-0">
+                Duplicate
+              </Badge>
+            )}
             
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-xs text-[#A6B1BB] shrink-0">
@@ -115,56 +135,28 @@ export function TradeCard({
               )}
             </div>
 
-            <span className="text-base font-bold text-[#EAEFF4] truncate">{symbol}</span>
+            <span className="text-sm font-medium text-[#A6B1BB] truncate">
+              {symbol}
+            </span>
             
-            <Badge 
-              className={cn(
-                "rounded-full px-2.5 py-0.5 text-xs font-medium shrink-0",
-                trade.side === 'long' 
-                  ? "bg-green-500/20 text-green-400 hover:bg-green-500/30" 
-                  : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
-              )}
-            >
-              {trade.side || 'N/A'}
-            </Badge>
-
-            <div className="flex items-center gap-4 ml-auto shrink-0">
-              <div className="text-right">
-                <div className="text-xs text-[#A6B1BB]">P&L</div>
-                <div className={cn(
-                  "text-sm font-bold",
-                  (trade.profit_loss || 0) >= 0 ? "text-green-400" : "text-red-400"
-                )}>
-                  ${trade.profit_loss?.toFixed(2) || '0.00'}
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-xs text-[#A6B1BB]">ROI</div>
-                <div className={cn(
-                  "text-sm font-bold",
-                  (trade.roi_percent || 0) >= 0 ? "text-green-400" : "text-red-400"
-                )}>
-                  {trade.roi_percent?.toFixed(2) || '0.00'}%
-                </div>
-              </div>
-              <Badge className="rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-500/20 text-red-400">
-                Deleted
-              </Badge>
-              {onRestore && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={onRestore}
-                  className="rounded-xl border-[#2A3038] text-green-400 hover:bg-green-500/10 hover:border-green-500/50"
-                >
-                  Restore
-                </Button>
-              )}
-            </div>
+            {isDuplicate && duplicateInfo?.matchedTrade && (
+              <span className="text-xs text-amber-400/70">
+                · Already recorded on {new Date(duplicateInfo.matchedTrade.opened_at || duplicateInfo.matchedTrade.created_at).toLocaleDateString()}
+              </span>
+            )}
           </div>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onRestore}
+            className="text-xs text-[#A6B1BB] hover:text-white shrink-0"
+          >
+            {isDuplicate ? 'Keep Anyway' : 'Restore'}
+          </Button>
         </div>
       </Card>
-    );
+     );
   }
 
   return (

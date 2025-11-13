@@ -28,11 +28,18 @@ interface Trade {
   [key: string]: any;
 }
 
+interface DuplicateCheckResult {
+  isDuplicate: boolean;
+  matchedTrade?: any;
+  matchScore?: number;
+}
+
 interface TradeReviewEditorProps {
   trades: Trade[];
   maxSelectableTrades: number;
   creditsRequired: number;
   imagesProcessed: number;
+  duplicateMap?: Map<number, DuplicateCheckResult>;
   onSave: (trades: Trade[]) => void;
   onCancel: () => void;
 }
@@ -42,6 +49,7 @@ export function TradeReviewEditor({
   maxSelectableTrades,
   creditsRequired,
   imagesProcessed,
+  duplicateMap,
   onSave,
   onCancel,
 }: TradeReviewEditorProps) {
@@ -115,6 +123,13 @@ export function TradeReviewEditor({
     newTrades[index] = { ...newTrades[index], [field]: value };
     setEditedTrades(newTrades);
   };
+
+  // Count approved vs total trades
+  const duplicateCount = duplicateMap?.size || 0;
+  const approvedCount = approvedTrades.size;
+  const totalTrades = trades.length;
+  const deletedCount = deletedTrades.size;
+  const validTradeCount = totalTrades - duplicateCount;
 
   const handleApprove = (index: number) => {
     setApprovedTrades(prev => {
@@ -345,12 +360,14 @@ export function TradeReviewEditor({
       {filteredTrades.length > 0 ? (
         <div className="space-y-6">
           {filteredTrades.map(({ trade, originalIndex }) => (
-            <TradeCard
+             <TradeCard
               key={originalIndex}
               trade={trade}
               index={originalIndex}
               isApproved={approvedTrades.has(originalIndex)}
               isDeleted={deletedTrades.has(originalIndex)}
+              isDuplicate={duplicateMap?.has(originalIndex)}
+              duplicateInfo={duplicateMap?.get(originalIndex)}
               onTradeChange={(field, value) => handleTradeChange(originalIndex, field, value)}
               onApprove={() => handleApprove(originalIndex)}
               onDelete={() => handleDelete(originalIndex)}
