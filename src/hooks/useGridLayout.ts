@@ -15,18 +15,35 @@ export interface LayoutData {
 }
 
 const DEFAULT_POSITIONS: WidgetPosition[] = [
-  // Row 1
+  // Row 0
   { id: 'currentROI', column: 0, row: 0 },
-  { id: 'winRate', column: 1, row: 0 },
-  { id: 'avgPnLPerDay', column: 2, row: 0 },
+  { id: 'avgPnLPerDay', column: 1, row: 0 },
+  { id: 'winRate', column: 2, row: 0 },
+  
+  // Row 1
+  { id: 'topMovers', column: 0, row: 1 },
+  { id: 'capitalGrowth', column: 1, row: 1 },
+  { id: 'combinedPnLROI', column: 2, row: 1 },
   
   // Row 2
-  { id: 'capitalGrowth', column: 0, row: 1 },
-  { id: 'topMovers', column: 1, row: 1 },
-  { id: 'combinedPnLROI', column: 2, row: 1 },
+  { id: 'aiInsights', column: 0, row: 2 },
+  
+  // Row 3
+  { id: 'goals', column: 0, row: 3 },
+  
+  // Row 4
+  { id: 'emotionMistakeCorrelation', column: 0, row: 4 },
+  
+  // Row 5
+  { id: 'behaviorAnalytics', column: 0, row: 5 },
+  { id: 'costEfficiency', column: 1, row: 5 },
+  
+  // Row 6
+  { id: 'performanceHighlights', column: 0, row: 6 },
+  { id: 'tradingQuality', column: 1, row: 6 },
 ];
 
-const CURRENT_OVERVIEW_LAYOUT_VERSION = 2;
+const CURRENT_OVERVIEW_LAYOUT_VERSION = 3;
 
 export const useGridLayout = (userId: string | undefined, availableWidgets: string[]) => {
   const [positions, setPositions] = useState<WidgetPosition[]>(DEFAULT_POSITIONS);
