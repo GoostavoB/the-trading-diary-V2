@@ -521,15 +521,17 @@ const Dashboard = () => {
     setIsCustomizing(true);
   }, [positions, canCustomizeDashboard]);
 
-  const handleSaveLayout = useCallback(() => {
-    // Positions are already managed by the hook
+  const handleSaveLayout = useCallback(async () => {
     setIsCustomizing(false);
     setOriginalPositions([]);
-    toast.success('Layout saved');
+    
+    // Actually save the layout to database
+    await saveGridLayout(positions, selectedColumnCount);
+    
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
     }, 100);
-  }, []);
+  }, [positions, selectedColumnCount, saveGridLayout]);
 
   // Handle drag
   const handleDragStart = useCallback((event: DragStartEvent) => {
@@ -1072,14 +1074,14 @@ const Dashboard = () => {
             if (activeTab === 'tradestation' && tradeStationControls) {
               tradeStationControls.handleAddWidgetDirect(widgetId);
             } else {
-              addWidget(widgetId, !isCustomizing);
+              addWidget(widgetId);
             }
           }}
           onRemoveWidget={(widgetId) => {
             if (activeTab === 'tradestation' && tradeStationControls) {
               tradeStationControls.handleRemoveWidgetDirect(widgetId);
             } else {
-              removeWidget(widgetId, !isCustomizing);
+              removeWidget(widgetId);
             }
           }}
           activeWidgets={activeTab === 'tradestation' && tradeStationControls ? tradeStationControls.activeWidgets : activeWidgets}

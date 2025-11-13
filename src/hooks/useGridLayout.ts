@@ -127,7 +127,6 @@ if (data?.layout_json) {
         version: CURRENT_OVERVIEW_LAYOUT_VERSION,
       };
       
-      // Save to database first
       const { error } = await supabase
         .from('user_settings')
         .update({
@@ -141,8 +140,8 @@ if (data?.layout_json) {
         throw error;
       }
       
-      // Update local state only after successful save
-      setPositions(newPositions);
+      // Do NOT update positions here - caller already did
+      // Only update columnCount if it was provided
       if (newColumnCount !== undefined) {
         setColumnCount(newColumnCount);
       }
@@ -152,23 +151,7 @@ if (data?.layout_json) {
     } catch (error) {
       console.error('[useGridLayout] Failed to save layout:', error);
       toast.error('Failed to save layout. Please try again.');
-      
-      // Revert local state on error by reloading from DB
-      const { data } = await supabase
-        .from('user_settings')
-        .select('layout_json')
-        .eq('user_id', userId)
-        .single();
-        
-      if (data?.layout_json) {
-        const layoutData = data.layout_json as any;
-        if (layoutData?.positions) {
-          setPositions(layoutData.positions);
-          if (layoutData.columnCount) {
-            setColumnCount(layoutData.columnCount);
-          }
-        }
-      }
+      throw error; // Let caller handle the error
     } finally {
       setIsSaving(false);
     }
@@ -182,8 +165,8 @@ if (data?.layout_json) {
   }, []);
 
   // Add widget to layout - place in first free position (bottom row, left to right)
-  const addWidget = useCallback((widgetId: string, shouldSave: boolean = true) => {
-    console.log('[useGridLayout] addWidget called:', { widgetId, shouldSave, currentPositions: positions.length });
+  const addWidget = useCallback(async (widgetId: string) => {
+    console.log('[useGridLayout] addWidget called:', { widgetId, currentPositions: positions.length });
     
     if (positions.find(p => p.id === widgetId)) {
       console.warn('[useGridLayout] Widget already exists:', widgetId);
@@ -231,34 +214,37 @@ if (data?.layout_json) {
     // Update local state immediately for responsive UI
     setPositions(newPositions);
     
-    // Save to backend if requested
-    if (shouldSave) {
-      console.log('[useGridLayout] Saving widget addition to backend...');
-      saveLayout(newPositions).then(() => {
-        console.log('[useGridLayout] ✅ Widget saved to backend');
-      }).catch((err) => {
-        console.error('[useGridLayout] ❌ Failed to save widget:', err);
-      });
-    } else {
-      console.log('[useGridLayout] Skipping save (shouldSave=false)');
+    // Save to database immediately
+    try {
+      await saveLayout(newPositions);
+      console.log('[useGridLayout] ✅ Widget added and saved');
+    } catch (error) {
+      // Revert on error
+      console.error('[useGridLayout] ❌ Failed to save widget, reverting:', error);
+      setPositions(positions);
+      toast.error('Failed to add widget');
     }
   }, [positions, columnCount, saveLayout]);
 
-  const removeWidget = useCallback(async (widgetId: string, shouldSave: boolean = true) => {
-    console.log('Removing widget:', widgetId);
+  const removeWidget = useCallback(async (widgetId: string) => {
+    console.log('[useGridLayout] Removing widget:', widgetId);
     
-    // Optimistically update UI immediately
     const newPositions = positions.filter(p => p.id !== widgetId);
     
-    // Update state first for immediate UI feedback
+    // Update UI immediately
     setPositions(newPositions);
     
-    // Save to backend only if requested
-    if (shouldSave) {
+    // Save to database
+    try {
       await saveLayout(newPositions);
+      console.log('[useGridLayout] ✅ Widget removed and saved');
+      toast.success('Widget removed');
+    } catch (error) {
+      // Revert on error
+      console.error('[useGridLayout] ❌ Failed to remove widget, reverting:', error);
+      setPositions(positions);
+      toast.error('Failed to remove widget');
     }
-    
-    toast.success('Widget removed');
   }, [positions, saveLayout]);
 
   const resetLayout = useCallback(() => {
