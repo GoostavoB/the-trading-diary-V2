@@ -346,13 +346,13 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
  */
 export const DEFAULT_DASHBOARD_LAYOUT = [
   'currentROI',
-  'capitalGrowth',
   'avgPnLPerDay',
   'winRate',
   'topMovers',
+  'capitalGrowth',
   'combinedPnLROI',
-  'activeGoals',
   'aiInsights',
+  'goals',
   'emotionMistakeCorrelation',
   'behaviorAnalytics',
   'costEfficiency',
