@@ -299,8 +299,32 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
       }
       
       // Calculate weighted average ROI: total P&L divided by total capital invested
-      // This gives the true return on investment weighted by position size
-      const totalCapitalInvested = trades.reduce((sum, t) => sum + (t.margin || 0), 0);
+      // Calculate capital invested per trade using available data
+      const totalCapitalInvested = trades.reduce((sum, t) => {
+        // Priority 1: Use margin if available
+        if (t.margin && t.margin > 0) return sum + t.margin;
+        
+        // Priority 2: Calculate from position_size and entry_price
+        if (t.position_size && t.entry_price && t.position_size > 0 && t.entry_price > 0) {
+          const notionalValue = t.position_size * t.entry_price;
+          const leverage = t.leverage && t.leverage > 0 ? t.leverage : 1;
+          return sum + (notionalValue / leverage);
+        }
+        
+        // Priority 3: Reverse calculate from ROI if available
+        if (t.roi && t.roi !== 0 && t.profit_loss) {
+          return sum + Math.abs(t.profit_loss / (t.roi / 100));
+        }
+        
+        // Priority 4: Use position_size as approximation
+        if (t.position_size && t.position_size > 0) {
+          const leverage = t.leverage && t.leverage > 0 ? t.leverage : 1;
+          return sum + (t.position_size / leverage);
+        }
+        
+        return sum;
+      }, 0);
+      
       const avgROIPerTrade = totalCapitalInvested > 0
         ? ((includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees) / totalCapitalInvested) * 100
         : 0;
