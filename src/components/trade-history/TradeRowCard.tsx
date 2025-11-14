@@ -75,10 +75,10 @@ export const TradeRowCard = memo(({
             "font-semibold text-foreground",
             density === 'compact' ? 'text-xs' : 'text-sm'
           )}>
-            {format(new Date(trade.trade_date), 'MMM dd')}
+            {format(new Date(trade.opened_at || trade.trade_date), 'MMM dd')}
           </div>
           <div className="text-[10px] text-muted-foreground">
-            {format(new Date(trade.trade_date), 'yyyy')}
+            {format(new Date(trade.opened_at || trade.trade_date), 'yyyy')}
           </div>
         </div>
 

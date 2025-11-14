@@ -52,7 +52,7 @@ export const TradeTableRow = memo(({
         />
       </TableCell>
       {columns.find(c => c.key === 'date')?.visible && (
-        <TableCell>{format(new Date(trade.trade_date), 'MMM dd, yyyy')}</TableCell>
+        <TableCell>{format(new Date(trade.opened_at || trade.trade_date), 'MMM dd, yyyy')}</TableCell>
       )}
       {columns.find(c => c.key === 'symbol')?.visible && (
         <TableCell>

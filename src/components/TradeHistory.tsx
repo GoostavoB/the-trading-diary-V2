@@ -648,7 +648,7 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
           <DialogHeader>
             <DialogTitle>Trade Details</DialogTitle>
             <DialogDescription>
-              {selectedTrade && format(new Date(selectedTrade.trade_date), 'MMMM dd, yyyy')}
+              {selectedTrade && format(new Date(selectedTrade.opened_at || selectedTrade.trade_date), 'MMMM dd, yyyy')}
             </DialogDescription>
           </DialogHeader>
           {selectedTrade && (

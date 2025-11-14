@@ -22,7 +22,7 @@ export const RecentTransactionsCard = memo(({ trades, className }: RecentTransac
   
   // Add defensive check for trades
   const recentTrades = (trades || [])
-    .sort((a, b) => new Date(b.trade_date).getTime() - new Date(a.trade_date).getTime())
+    .sort((a, b) => new Date(b.opened_at || b.trade_date).getTime() - new Date(a.opened_at || a.trade_date).getTime())
     .slice(0, 5);
 
   return (
@@ -66,7 +66,7 @@ export const RecentTransactionsCard = memo(({ trades, className }: RecentTransac
                     <div className="min-w-0">
                       <p className="font-medium text-sm truncate">{trade.symbol || 'Unknown'}</p>
                       <p className="text-xs text-muted-foreground truncate">
-                        {format(new Date(trade.trade_date), 'MMM dd, HH:mm')}
+                        {format(new Date(trade.opened_at || trade.trade_date), 'MMM dd, HH:mm')}
                       </p>
                     </div>
                   </div>
