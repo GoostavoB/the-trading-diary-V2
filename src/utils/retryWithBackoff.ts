@@ -59,9 +59,14 @@ export async function retryWithBackoff<T>(
 }
 
 /**
- * Check if an error is retryable (network errors, timeouts, 5xx errors)
+ * Check if an error is retryable (network errors, timeouts, 5xx errors, truncation)
  */
 export function isRetryableError(error: any): boolean {
+  // Check for explicit isRetryable flag
+  if (error.isRetryable === true) {
+    return true;
+  }
+  
   // Network errors
   if (error instanceof TypeError && error.message.includes('fetch')) {
     return true;
@@ -84,6 +89,11 @@ export function isRetryableError(error: any): boolean {
   
   // Parsing errors from the edge function (AI might have issues)
   if (error.message?.includes('Failed to parse AI response')) {
+    return true;
+  }
+  
+  // JSON truncation errors
+  if (error.message?.includes('truncated') || error.details?.includes('truncated')) {
     return true;
   }
   

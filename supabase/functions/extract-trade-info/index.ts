@@ -44,9 +44,22 @@ function extractJSON(text: string): any {
   cleaned = cleaned.replace(/\n?```\s*$/gm, '');
   cleaned = cleaned.trim();
   
-  // Strategy 2: Find JSON array or object boundaries
+  // Strategy 2: Strip trailing text after JSON (remove "END" markers, etc.)
+  const arrayEndMatch = cleaned.match(/\][\s\S]*$/);
+  if (arrayEndMatch) {
+    const endIndex = cleaned.indexOf(']') + 1;
+    cleaned = cleaned.substring(0, endIndex);
+  }
+  
+  // Strategy 3: Find JSON array or object boundaries
   const arrayMatch = cleaned.match(/\[[\s\S]*\]/);
   const objectMatch = cleaned.match(/\{[\s\S]*\}/);
+  
+  // Check for truncation before parsing
+  if (!isCompleteJSON(cleaned)) {
+    console.error('⚠️ JSON appears truncated:', cleaned.substring(0, 100), '...', cleaned.substring(cleaned.length - 100));
+    throw new Error('JSON_TRUNCATED');
+  }
   
   // Try array first (most trade extractions return arrays)
   if (arrayMatch) {
@@ -66,12 +79,13 @@ function extractJSON(text: string): any {
     }
   }
   
-  // Strategy 3: Direct parse (already cleaned)
+  // Strategy 4: Direct parse (already cleaned)
   try {
     return JSON.parse(cleaned);
   } catch (e) {
+    const errorMsg = e instanceof Error ? e.message : String(e);
     console.error('All parsing strategies failed. Cleaned text:', cleaned.substring(0, 200));
-    throw new Error(`Failed to parse JSON: ${e.message}`);
+    throw new Error(`Failed to parse JSON: ${errorMsg}`);
   }
 }
 
@@ -98,12 +112,30 @@ function estimateTradeCount(ocrText: string): number {
   return Math.max(1, Math.min(estimate, 10)); // Cap at 10 trades
 }
 
-function calculateMaxTokens(estimatedTrades: number, route: 'lite' | 'deep'): number {
-  const baseTokens = route === 'lite' ? 300 : 500;
-  const tokensPerTrade = route === 'lite' ? 200 : 250;
+function isCompleteJSON(text: string): boolean {
+  const trimmed = text.trim();
+  if (trimmed.startsWith('[')) return trimmed.endsWith(']');
+  if (trimmed.startsWith('{')) return trimmed.endsWith('}');
+  return false;
+}
+
+function calculateMaxTokens(estimatedTrades: number, route: 'lite' | 'deep', retryMultiplier: number = 1): number {
+  if (route === 'lite') {
+    const baseTokens = 300;
+    const tokensPerTrade = 200;
+    const result = estimatedTrades <= 1 ? baseTokens : baseTokens + (tokensPerTrade * (estimatedTrades - 1));
+    return Math.floor(result * retryMultiplier);
+  }
   
-  if (estimatedTrades <= 1) return baseTokens;
-  return baseTokens + (tokensPerTrade * (estimatedTrades - 1));
+  // Deep model: more generous allocation with safety buffer
+  const baseTokens = 600;
+  const tokensPerTrade = 400;
+  const safetyBuffer = 500;
+  const result = estimatedTrades <= 1 
+    ? baseTokens + safetyBuffer
+    : baseTokens + (tokensPerTrade * (estimatedTrades - 1)) + safetyBuffer;
+  
+  return Math.floor(result * retryMultiplier);
 }
 
 serve(async (req) => {
@@ -153,7 +185,8 @@ serve(async (req) => {
       perceptualHash,
       broker, 
       annotations,
-      forceDeepModel // New parameter to force using deep vision model (for retries)
+      forceDeepModel, // New parameter to force using deep vision model (for retries)
+      retryAttempt = 0 // Track retry attempts
     } = await req.json();
 
     if (!imageBase64) {
@@ -239,8 +272,10 @@ serve(async (req) => {
       route = 'deep';
       modelUsed = 'google/gemini-2.5-flash';
       
-      const maxTokens = calculateMaxTokens(estimatedTradeCount, 'deep');
-      console.log(`🎯 Allocating ${maxTokens} tokens for ${estimatedTradeCount} estimated trade(s)`);
+      // Dynamic token allocation with retry multiplier
+      const retryMultiplier = retryAttempt > 0 ? 2 : 1;
+      const maxTokens = calculateMaxTokens(estimatedTradeCount, 'deep', retryMultiplier);
+      console.log(`🎯 Allocating ${maxTokens} tokens for ${estimatedTradeCount} estimated trade(s) (retry: ${retryAttempt}, multiplier: ${retryMultiplier}x)`);
 
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
@@ -348,15 +383,14 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
           messages: [
             {
               role: "system",
-              content: `Extract ALL trades from OCR text. **Extract EVERY trade visible** - if there's a table, extract EVERY ROW. **IGNORE columns** like TP/SL, Trailing Stop, Close Type, Open Type. Map flexibly: "Futures"→symbol, "PnL"→profit_loss, "Open Time"→opened_at, "Margin(Leverage)"→leverage (50x→50). Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${estimatedTradeCount} trade(s). Return ONLY JSON array. End with "\\n\\nEND".`
+              content: `Extract ALL trades from OCR text. **Extract EVERY trade visible** - if there's a table, extract EVERY ROW. **IGNORE columns** like TP/SL, Trailing Stop, Close Type, Open Type. Map flexibly: "Futures"→symbol, "PnL"→profit_loss, "Open Time"→opened_at, "Margin(Leverage)"→leverage (50x→50). Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${estimatedTradeCount} trade(s). Return ONLY JSON array with complete closing bracket.`
             },
             {
               role: "user",
               content: `OCR Text:\n${ocrText}${brokerContext}${annotationContext}\n\nExtract ALL trades as JSON array.`
             }
           ],
-          max_tokens: maxTokens,
-          stop: ["\\n\\nEND"]
+          max_tokens: maxTokens
         }),
       });
 
@@ -370,6 +404,11 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
       const aiResponse = result.choices?.[0]?.message?.content || '';
       tokensIn = result.usage?.prompt_tokens || 0;
       tokensOut = result.usage?.completion_tokens || 0;
+      
+      console.log(`📊 Token usage: ${tokensOut}/${maxTokens} (${((tokensOut/maxTokens)*100).toFixed(1)}%)`);
+      if (tokensOut >= maxTokens * 0.95) {
+        console.warn('⚠️ Token limit nearly reached - possible truncation');
+      }
 
       // Parse JSON with robust extraction
       try {
@@ -408,7 +447,7 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
             messages: [
               {
                 role: "system",
-                content: `Extract ALL trades from screenshot. **Extract EVERY trade in table/list** - EVERY ROW is a trade. **IGNORE irrelevant columns**: TP/SL, Trailing Stop, Close Type, Open Type. Map flexibly to schema. Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${estimatedTradeCount} trade(s). Return ONLY JSON array. End with "\\n\\nEND".${brokerContext}${annotationContext}`
+                content: `Extract ALL trades from screenshot. **Extract EVERY trade in table/list** - EVERY ROW is a trade. **IGNORE irrelevant columns**: TP/SL, Trailing Stop, Close Type, Open Type. Map flexibly to schema. Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${estimatedTradeCount} trade(s). Return ONLY JSON array with complete closing bracket.${brokerContext}${annotationContext}`
               },
               {
                 role: "user",
@@ -418,8 +457,7 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
                 ]
               }
             ],
-            max_tokens: maxTokens,
-            stop: ["\\n\\nEND"]
+            max_tokens: maxTokens
           }),
         });
 
@@ -445,11 +483,16 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
         const deepAiResponse = deepResult.choices?.[0]?.message?.content || '';
         tokensIn = deepResult.usage?.prompt_tokens || 0;
         tokensOut = deepResult.usage?.completion_tokens || 0;
+        
+        console.log(`📊 Token usage: ${tokensOut}/${maxTokens} (${((tokensOut/maxTokens)*100).toFixed(1)}%)`);
+        if (tokensOut >= maxTokens * 0.95) {
+          console.warn('⚠️ Token limit nearly reached - possible truncation');
+        }
 
         try {
           trades = extractJSON(deepAiResponse);
         } catch (parseError) {
-          console.error('JSON parse error:', parseError, 'Raw response:', deepAiResponse);
+          console.error('JSON parse error:', parseError, 'Raw response:', deepAiResponse.substring(0, 500));
           throw new Error('Failed to parse AI response. The model returned invalid JSON.');
         }
       }
@@ -474,7 +517,7 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
           messages: [
             {
               role: "system",
-              content: `Extract ALL trades from screenshot. **Extract EVERY trade in table/list** - EVERY ROW is a trade. **IGNORE irrelevant columns**: TP/SL, Trailing Stop, Close Type, Open Type. Map flexibly to schema. Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${estimatedTradeCount} trade(s). Return ONLY JSON array. End with "\\n\\nEND".${brokerContext}${annotationContext}`
+              content: `Extract ALL trades from screenshot. **Extract EVERY trade in table/list** - EVERY ROW is a trade. **IGNORE irrelevant columns**: TP/SL, Trailing Stop, Close Type, Open Type. Map flexibly to schema. Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${estimatedTradeCount} trade(s). Return ONLY JSON array with complete closing bracket.${brokerContext}${annotationContext}`
             },
             {
               role: "user",
@@ -484,8 +527,7 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
               ]
             }
           ],
-          max_tokens: maxTokens,
-          stop: ["\\n\\nEND"]
+          max_tokens: maxTokens
         }),
       });
 
@@ -511,12 +553,17 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
       const aiResponse = result.choices?.[0]?.message?.content || '';
       tokensIn = result.usage?.prompt_tokens || 0;
       tokensOut = result.usage?.completion_tokens || 0;
+      
+      console.log(`📊 Token usage: ${tokensOut}/${maxTokens} (${((tokensOut/maxTokens)*100).toFixed(1)}%)`);
+      if (tokensOut >= maxTokens * 0.95) {
+        console.warn('⚠️ Token limit nearly reached - possible truncation');
+      }
 
       // Parse JSON with robust extraction
       try {
         trades = extractJSON(aiResponse);
       } catch (parseError) {
-        console.error('JSON parse error:', parseError, 'Raw response:', aiResponse);
+        console.error('JSON parse error:', parseError, 'Raw response:', aiResponse.substring(0, 500));
         throw new Error('Failed to parse AI response. The model returned invalid JSON.');
       }
     }
@@ -649,7 +696,10 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
     let errorDetails = "Please try again or enter manually";
     
     if (error instanceof Error) {
-      if (error.message.includes('parse')) {
+      if (error.message === 'JSON_TRUNCATED_RETRY') {
+        errorMessage = "Response truncated - automatic retry needed";
+        errorDetails = "The AI response was incomplete. The system will automatically retry with higher token allocation.";
+      } else if (error.message.includes('parse') || error.message.includes('JSON')) {
         errorMessage = "AI response parsing failed";
         errorDetails = "The AI returned invalid data. Please try again with a clearer screenshot.";
       } else if (error.message.includes('Unauthorized')) {

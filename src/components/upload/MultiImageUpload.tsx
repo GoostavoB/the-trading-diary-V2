@@ -236,7 +236,8 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
             reader.readAsDataURL(image.file);
           });
 
-          // Extract trades from image with retry and exponential backoff
+          // Extract trades from image with smart retry logic
+          let retryAttempt = 0;
           const result = await retryWithBackoff(
             async () => {
               const response = await fetch(
@@ -254,7 +255,8 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
                     imageHash: ocrResult?.imageHash,
                     perceptualHash: ocrResult?.perceptualHash,
                     broker: skipBrokerSelection ? null : preSelectedBroker,
-                    forceDeepModel: retryMode // Tell backend to use deep model regardless of OCR quality
+                    forceDeepModel: retryMode, // Tell backend to use deep model regardless of OCR quality
+                    retryAttempt // Pass retry attempt to backend for token allocation
                   }),
                 }
               );
@@ -263,6 +265,15 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
                 const errorData = await response.json().catch(() => ({}));
                 const error = new Error(errorData.error || 'Failed to analyze image') as any;
                 error.status = response.status;
+                error.details = errorData.details;
+                
+                // Check for truncation error - trigger automatic retry with higher tokens
+                if (errorData.error?.includes('truncated') || errorData.details?.includes('truncated')) {
+                  retryAttempt++;
+                  console.log(`🔄 JSON truncated detected, retrying with 2x tokens (attempt ${retryAttempt})`);
+                  error.isRetryable = true;
+                  throw error;
+                }
                 
                 // Only retry if error is retryable
                 if (!isRetryableError(error)) {
