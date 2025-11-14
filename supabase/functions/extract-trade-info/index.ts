@@ -37,21 +37,42 @@ const TRADE_SCHEMA = {
 };
 
 function extractJSON(text: string): any {
-  // Remove markdown code blocks if present
   let cleaned = text.trim();
   
-  // Strip ```json or ``` wrappers
-  cleaned = cleaned.replace(/^```(?:json)?\s*/i, '');
-  cleaned = cleaned.replace(/\s*```\s*$/i, '');
+  // Strategy 1: Remove markdown code blocks (all variations)
+  cleaned = cleaned.replace(/^```(?:json|JSON)?\s*\n?/gm, '');
+  cleaned = cleaned.replace(/\n?```\s*$/gm, '');
+  cleaned = cleaned.trim();
   
-  // Extract JSON array or object
-  const jsonMatch = cleaned.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
-  if (jsonMatch) {
-    return JSON.parse(jsonMatch[0]);
+  // Strategy 2: Find JSON array or object boundaries
+  const arrayMatch = cleaned.match(/\[[\s\S]*\]/);
+  const objectMatch = cleaned.match(/\{[\s\S]*\}/);
+  
+  // Try array first (most trade extractions return arrays)
+  if (arrayMatch) {
+    try {
+      return JSON.parse(arrayMatch[0]);
+    } catch (e) {
+      console.warn('Array match failed to parse, trying object match');
+    }
   }
   
-  // Fallback: try parsing directly
-  return JSON.parse(cleaned);
+  // Try object
+  if (objectMatch) {
+    try {
+      return JSON.parse(objectMatch[0]);
+    } catch (e) {
+      console.warn('Object match failed to parse, trying direct parse');
+    }
+  }
+  
+  // Strategy 3: Direct parse (already cleaned)
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    console.error('All parsing strategies failed. Cleaned text:', cleaned.substring(0, 200));
+    throw new Error(`Failed to parse JSON: ${e.message}`);
+  }
 }
 
 function estimateTradeCount(ocrText: string): number {
