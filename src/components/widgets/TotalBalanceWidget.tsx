@@ -57,7 +57,7 @@ export const TotalBalanceWidget = memo(({
               }`}>
                 {isPositive ? '+' : ''}<BlurredCurrency amount={change24h} className="inline" /> ({formatPercent(changePercent24h)})
               </span>
-              <span className="text-xs text-muted-foreground">24h</span>
+              <span className="text-xs text-muted-foreground">All Time</span>
             </div>
           )}
         </div>
