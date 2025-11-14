@@ -50,6 +50,16 @@ export const useRiskCalculator = () => {
         setBase((settings.risk_base || 'equity') as 'initial' | 'equity' | 'profit');
       }
 
+      // Fetch capital log for total invested capital
+      const { data: capitalLog } = await supabase
+        .from('capital_log')
+        .select('amount_added')
+        .eq('user_id', user.id)
+        .order('log_date', { ascending: true });
+
+      const totalCapitalAdditions = capitalLog?.reduce((sum, entry) => sum + (entry.amount_added || 0), 0) || 0;
+      const baseCapital = totalCapitalAdditions > 0 ? totalCapitalAdditions : (settings?.initial_investment || 0);
+
       // Fetch all trades for equity calculation
       const { data: trades } = await supabase
         .from('trades')
@@ -65,7 +75,8 @@ export const useRiskCalculator = () => {
           return sum + (pnl - Math.abs(fundingFee) - Math.abs(tradingFee));
         }, 0);
 
-        setCurrentEquity((settings?.initial_investment || 0) + totalPnL);
+        setInitialCapital(baseCapital);
+        setCurrentEquity(baseCapital + totalPnL);
         setProfitOnly(Math.max(0, totalPnL));
       }
     } catch (error) {
