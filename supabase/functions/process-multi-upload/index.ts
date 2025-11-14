@@ -6,6 +6,66 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+/**
+ * Normalizes a symbol for consistent hashing
+ */
+function normalizeSymbol(symbol?: string): string {
+  if (!symbol) return 'UNKNOWN';
+  
+  const mappings: Record<string, string> = {
+    'DAX INDEX': 'DAXINDEX',
+    'DAX 40': 'DAX40',
+    'NQ': 'NQ100',
+    'ES': 'ES500',
+    'YM': 'YM30',
+  };
+  
+  let normalized = symbol.toUpperCase().trim();
+  
+  if (mappings[normalized]) {
+    return mappings[normalized];
+  }
+  
+  return normalized
+    .replace(/[\s\-_\/\\]/g, '')
+    .replace(/[^A-Z0-9]/g, '');
+}
+
+/**
+ * Computes a trade hash for duplicate detection using Web Crypto API
+ */
+async function computeTradeHash(trade: any): Promise<string> {
+  const symbol = normalizeSymbol(trade.symbol ?? trade.symbol_temp ?? trade.ticker);
+  const side = (trade.side || 'unknown').toLowerCase();
+  
+  // Get timestamp - prefer opened_at, fallback to trade_date or created_at
+  let timestamp = trade.opened_at || trade.trade_date || trade.created_at;
+  if (timestamp) {
+    // Truncate to minute precision
+    const date = new Date(timestamp);
+    timestamp = date.toISOString().substring(0, 16); // YYYY-MM-DDTHH:MM
+  } else {
+    timestamp = 'no-date';
+  }
+  
+  // Round numeric values to 2 decimals for consistent hashing
+  const entryPrice = trade.entry_price ? Math.round(trade.entry_price * 100) / 100 : 0;
+  const exitPrice = trade.exit_price ? Math.round(trade.exit_price * 100) / 100 : 0;
+  const positionSize = trade.position_size ? Math.round(trade.position_size * 100) / 100 : 0;
+  
+  // Create hash input string
+  const hashInput = `${symbol}|${side}|${timestamp}|${entryPrice}|${exitPrice}|${positionSize}`;
+  
+  // Use Web Crypto API to compute SHA-256 hash
+  const encoder = new TextEncoder();
+  const data = encoder.encode(hashInput);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  
+  return hashHex;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -44,33 +104,47 @@ serve(async (req) => {
 
     console.log(`Processing ${trades.length} trades for user ${user.id}`);
 
-    // TODO: Implement credit system when database schema is ready
-    // Credit deduction will be added after database migration
+    // Prepare trades with trade_hash
+    const tradesWithHash = await Promise.all(
+      trades.map(async (t: any) => {
+        const symbolCandidate = t.symbol ?? t.symbol_temp ?? t.ticker ?? t.symbolPair ?? t.pair ?? t.market ?? t.symbol_name ?? t.asset ?? null;
+        const tradeHash = await computeTradeHash(t);
+        
+        return {
+          ...t,
+          user_id: user.id,
+          symbol_temp: symbolCandidate ?? 'UNKNOWN',
+          trade_hash: tradeHash,
+        };
+      })
+    );
 
-    // Insert all trades with proper field mapping
-const { data: insertedTrades, error } = await supabaseClient
+    // Use upsert with onConflict to skip duplicates
+    const { data: insertedTrades, error } = await supabaseClient
       .from('trades')
-      .insert(
-        trades.map((t: any) => {
-          const symbolCandidate = t.symbol ?? t.symbol_temp ?? t.ticker ?? t.symbolPair ?? t.pair ?? t.market ?? t.symbol_name ?? t.asset ?? null;
-          return {
-            ...t,
-            user_id: user.id,
-            symbol_temp: symbolCandidate ?? 'UNKNOWN',
-          };
-        })
-      )
+      .upsert(tradesWithHash, {
+        onConflict: 'user_id,trade_hash',
+        ignoreDuplicates: true
+      })
       .select();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Insert error:', error);
+      throw error;
+    }
 
-    console.log(`Successfully inserted ${insertedTrades?.length || 0} trades`);
+    const insertedCount = insertedTrades?.length || 0;
+    const skippedCount = trades.length - insertedCount;
+
+    console.log(`Successfully inserted ${insertedCount} trades, skipped ${skippedCount} duplicates`);
 
     return new Response(
       JSON.stringify({ 
         success: true,
         trades: insertedTrades,
-        tradesInserted: insertedTrades?.length || 0
+        tradesInserted: insertedCount,
+        tradesSkipped: skippedCount,
+        tradesSubmitted: trades.length
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

@@ -33,6 +33,11 @@ export interface TradeStationSettings {
   rolling_target_rollover_weekends: boolean;
   rolling_target_last_suggestion_date: string | null;
   rolling_target_dismissed_suggestion: boolean;
+  
+  // Duplicate Detection
+  duplicate_review_enabled: boolean;
+  duplicate_review_last_shown: string | null;
+  duplicate_review_seen: boolean;
 }
 
 export const useUserSettings = () => {
@@ -59,6 +64,9 @@ export const useUserSettings = () => {
     rolling_target_rollover_weekends: true,
     rolling_target_last_suggestion_date: null,
     rolling_target_dismissed_suggestion: false,
+    duplicate_review_enabled: true,
+    duplicate_review_last_shown: null,
+    duplicate_review_seen: false,
   });
   const [loading, setLoading] = useState(true);
 
@@ -103,6 +111,9 @@ export const useUserSettings = () => {
           rolling_target_rollover_weekends: data.rolling_target_rollover_weekends ?? true,
           rolling_target_last_suggestion_date: data.rolling_target_last_suggestion_date,
           rolling_target_dismissed_suggestion: data.rolling_target_dismissed_suggestion || false,
+          duplicate_review_enabled: data.duplicate_review_enabled ?? true,
+          duplicate_review_last_shown: data.duplicate_review_last_shown,
+          duplicate_review_seen: data.duplicate_review_seen || false,
         });
       }
     } catch (error) {

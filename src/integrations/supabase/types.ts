@@ -4387,6 +4387,9 @@ export type Database = {
           daily_loss_lock_last_override: string | null
           daily_loss_percent: number | null
           display_currency: string | null
+          duplicate_review_enabled: boolean | null
+          duplicate_review_last_shown: string | null
+          duplicate_review_seen: boolean | null
           email_notifications: boolean | null
           error_clean_sheet: boolean | null
           error_clean_sheet_enabled: boolean | null
@@ -4454,6 +4457,9 @@ export type Database = {
           daily_loss_lock_last_override?: string | null
           daily_loss_percent?: number | null
           display_currency?: string | null
+          duplicate_review_enabled?: boolean | null
+          duplicate_review_last_shown?: string | null
+          duplicate_review_seen?: boolean | null
           email_notifications?: boolean | null
           error_clean_sheet?: boolean | null
           error_clean_sheet_enabled?: boolean | null
@@ -4521,6 +4527,9 @@ export type Database = {
           daily_loss_lock_last_override?: string | null
           daily_loss_percent?: number | null
           display_currency?: string | null
+          duplicate_review_enabled?: boolean | null
+          duplicate_review_last_shown?: string | null
+          duplicate_review_seen?: boolean | null
           email_notifications?: boolean | null
           error_clean_sheet?: boolean | null
           error_clean_sheet_enabled?: boolean | null

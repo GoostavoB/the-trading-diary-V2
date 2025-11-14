@@ -7,6 +7,7 @@ import { Upload, X, Image as ImageIcon, Loader2, CheckCircle2, AlertCircle, Info
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserSettings } from '@/hooks/useUserSettings';
 import { cn } from '@/lib/utils';
 import { runOCR } from '@/utils/ocrPipeline';
 import { TradeReviewEditor } from './TradeReviewEditor';
@@ -36,6 +37,7 @@ interface MultiImageUploadProps {
 
 export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelectedBroker = '', skipBrokerSelection = false, onBrokerError, onReviewStart, onReviewEnd }: MultiImageUploadProps) {
   const { user } = useAuth();
+  const { settings, updateSetting } = useUserSettings();
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -398,8 +400,24 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
       
       console.log('📊 Processing complete:', { successCount, errorCount, totalTrades, maxTrades });
 
-      // Check for duplicates
-      const duplicates = await checkForDuplicates(allTrades, user?.id || '');
+      // Auth guard: Ensure we have authenticated user before duplicate check
+      let currentUserId = user?.id;
+      if (!currentUserId) {
+        console.log('User not in context, fetching from session...');
+        const { data: { user: sessionUser } } = await supabase.auth.getUser();
+        currentUserId = sessionUser?.id;
+      }
+      
+      if (!currentUserId) {
+        toast.error('Authentication required to check for duplicates');
+        setIsAnalyzing(false);
+        return;
+      }
+      
+      console.log(`Running duplicate check for user ${currentUserId} with ${allTrades.length} trades`);
+      
+      // Check for duplicates with authenticated user
+      const duplicates = await checkForDuplicates(allTrades, currentUserId);
       setDuplicateMap(duplicates);
       
       // Count valid (non-duplicate) trades for billing
@@ -444,9 +462,22 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
         }
       }
 
-      // Show duplicate review dialog if duplicates found, otherwise go straight to confirmation
-      if (duplicateCount > 0) {
+      // Show duplicate review dialog if duplicates found AND enabled in settings
+      if (duplicateCount > 0 && settings.duplicate_review_enabled) {
+        console.log(`Showing duplicate dialog for ${duplicateCount} duplicates`);
         setShowDuplicateDialog(true);
+        // Mark as shown
+        await updateSetting('duplicate_review_last_shown', new Date().toISOString());
+      } else if (duplicateCount > 0) {
+        // Auto-remove duplicates if dialog is disabled
+        console.log(`Auto-removing ${duplicateCount} duplicates (dialog disabled)`);
+        const duplicateIndices = Array.from(duplicates.keys());
+        const filteredTrades = allTrades.filter((_, idx) => !duplicateIndices.includes(idx));
+        setExtractedTrades(filteredTrades);
+        setTotalTradesDetected(filteredTrades.length);
+        toast.info(`${duplicateCount} duplicate${duplicateCount > 1 ? 's' : ''} auto-removed (duplicates won't be saved)`);
+        setShowConfirmation(true);
+        onReviewStart?.();
       } else {
         setShowConfirmation(true);
         onReviewStart?.();
@@ -491,21 +522,57 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
         throw new Error(error.error || 'Failed to process trades');
       }
 
-const result = await response.json();
+      const result = await response.json();
       
-toast.success(`Successfully imported ${tradesToSave.length} trades!`);
-onTradesExtracted(result.trades);
+      // Show appropriate message based on duplicates skipped
+      if (result.tradesSkipped > 0) {
+        toast.success(`Imported ${result.tradesInserted} trades (${result.tradesSkipped} duplicates skipped)`);
+      } else {
+        toast.success(`Successfully imported ${result.tradesInserted} trades!`);
+      }
       
-// Reset state
-images.forEach(img => URL.revokeObjectURL(img.preview));
-setImages([]);
-setShowConfirmation(false);
-onReviewEnd?.();
-setExtractedTrades([]);
+      onTradesExtracted(result.trades);
+      
+      // Reset state
+      images.forEach(img => URL.revokeObjectURL(img.preview));
+      setImages([]);
+      setShowConfirmation(false);
+      onReviewEnd?.();
+      setExtractedTrades([]);
     } catch (error) {
       console.error('Import error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to import trades');
     }
+  };
+
+  const handleDuplicateReview = async (keepIndices: Set<number>, removeIndices: Set<number>, dontShowAgain: boolean) => {
+    // Update settings if user chose "don't show again"
+    if (dontShowAgain) {
+      await updateSetting('duplicate_review_enabled', false);
+      await updateSetting('duplicate_review_seen', true);
+      toast.info('Duplicate dialog disabled. You can re-enable it in Settings.');
+    }
+    
+    // Filter trades based on user selection
+    const filteredTrades = extractedTrades.filter((_, idx) => !removeIndices.has(idx));
+    const removedCount = removeIndices.size;
+    
+    // Recalculate credits
+    const validCount = filteredTrades.length;
+    const newCreditsNeeded = Math.ceil(validCount / 10);
+    
+    setExtractedTrades(filteredTrades);
+    setTotalTradesDetected(validCount);
+    setCreditsRequired(newCreditsNeeded);
+    setShowDuplicateDialog(false);
+    
+    // Show confirmation
+    if (removedCount > 0) {
+      toast.success(`Removed ${removedCount} duplicate${removedCount > 1 ? 's' : ''}`);
+    }
+    
+    setShowConfirmation(true);
+    onReviewStart?.();
   };
 
   return (

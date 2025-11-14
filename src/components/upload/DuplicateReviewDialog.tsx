@@ -28,7 +28,7 @@ interface DuplicateReviewDialogProps {
   open: boolean;
   duplicates: Map<number, DuplicateCheckResult>;
   trades: Trade[];
-  onConfirm: (keepIndices: Set<number>, removeIndices: Set<number>) => void;
+  onConfirm: (keepIndices: Set<number>, removeIndices: Set<number>, dontShowAgain: boolean) => void;
   onCancel: () => void;
 }
 
@@ -41,6 +41,7 @@ export const DuplicateReviewDialog = ({
 }: DuplicateReviewDialogProps) => {
   const duplicateIndices = Array.from(duplicates.keys());
   const [selectedToKeep, setSelectedToKeep] = useState<Set<number>>(new Set());
+  const [dontShowAgain, setDontShowAgain] = useState(false);
 
   const toggleKeep = (index: number) => {
     setSelectedToKeep(prev => {
@@ -58,15 +59,15 @@ export const DuplicateReviewDialog = ({
     const removeIndices = new Set(
       duplicateIndices.filter(idx => !selectedToKeep.has(idx))
     );
-    onConfirm(selectedToKeep, removeIndices);
+    onConfirm(selectedToKeep, removeIndices, dontShowAgain);
   };
 
   const handleKeepAll = () => {
-    onConfirm(new Set(duplicateIndices), new Set());
+    onConfirm(new Set(duplicateIndices), new Set(), dontShowAgain);
   };
 
   const handleRemoveAll = () => {
-    onConfirm(new Set(), new Set(duplicateIndices));
+    onConfirm(new Set(), new Set(duplicateIndices), dontShowAgain);
   };
 
   const removeCount = duplicateIndices.length - selectedToKeep.size;
