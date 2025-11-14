@@ -22,6 +22,7 @@ interface Trade {
   entry_price?: number;
   exit_price?: number;
   trade_date?: string;
+  opened_at?: string | null;
   broker?: string;
 }
 
@@ -201,7 +202,7 @@ export function ShareTradeCard({ open, onOpenChange, trade }: ShareTradeCardProp
                     </div>
                   </div>
                   <div className="text-foreground/60">
-                    {trade.trade_date && format(new Date(trade.trade_date), 'MMM dd, yyyy')} • {trade.broker || 'Trading'}
+                    {trade.opened_at && format(new Date(trade.opened_at), 'MMM dd, yyyy')} • {trade.broker || 'Trading'}
                   </div>
                 </div>
                 <div className="text-right">

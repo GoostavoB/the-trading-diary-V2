@@ -20,6 +20,7 @@ interface DuplicateMatch {
   existing: {
     symbol: string;
     trade_date: string;
+    opened_at?: string | null;
     pnl: number;
   };
 }
@@ -159,7 +160,7 @@ export function BatchDuplicateDialog({
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Date:</span>
                             <span className="font-medium">
-                              {format(new Date(duplicate.existing.trade_date), "MMM dd, yyyy HH:mm")}
+                              {format(new Date(duplicate.existing.opened_at || duplicate.existing.trade_date), "MMM dd, yyyy HH:mm")}
                             </span>
                           </div>
                           <div className="flex justify-between">

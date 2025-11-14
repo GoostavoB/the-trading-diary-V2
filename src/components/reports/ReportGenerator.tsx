@@ -160,7 +160,7 @@ export function ReportGenerator() {
       // Monthly breakdown
       const monthlyData = new Map<string, { pnl: number; trades: number }>();
       filteredTrades.forEach(t => {
-        const month = format(new Date(t.trade_date), 'MMM yyyy');
+        const month = format(new Date(t.opened_at || t.trade_date), 'MMM yyyy');
         const current = monthlyData.get(month) || { pnl: 0, trades: 0 };
         monthlyData.set(month, {
           pnl: current.pnl + (t.pnl || 0),

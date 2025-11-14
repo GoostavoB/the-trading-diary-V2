@@ -92,7 +92,7 @@ export function TradeComparator() {
             <SelectContent>
               {trades?.map((trade) => (
                 <SelectItem key={trade.id} value={trade.id}>
-                  {trade.symbol} - {format(new Date(trade.trade_date), 'MMM dd, yyyy')} - {trade.pnl >= 0 ? '+' : ''}{trade.pnl.toFixed(2)}
+                  {trade.symbol} - {format(new Date(trade.opened_at || trade.trade_date), 'MMM dd, yyyy')} - {trade.pnl >= 0 ? '+' : ''}{trade.pnl.toFixed(2)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -108,7 +108,7 @@ export function TradeComparator() {
             <SelectContent>
               {trades?.map((trade) => (
                 <SelectItem key={trade.id} value={trade.id}>
-                  {trade.symbol} - {format(new Date(trade.trade_date), 'MMM dd, yyyy')} - {trade.pnl >= 0 ? '+' : ''}{trade.pnl.toFixed(2)}
+                  {trade.symbol} - {format(new Date(trade.opened_at || trade.trade_date), 'MMM dd, yyyy')} - {trade.pnl >= 0 ? '+' : ''}{trade.pnl.toFixed(2)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -196,7 +196,7 @@ export function TradeComparator() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Date:</span>
-                    <span className="font-medium">{format(new Date(trade1.trade_date), 'MMM dd, yyyy HH:mm')}</span>
+                    <span className="font-medium">{format(new Date(trade1.opened_at || trade1.trade_date), 'MMM dd, yyyy HH:mm')}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Entry:</span>
@@ -238,7 +238,7 @@ export function TradeComparator() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Date:</span>
-                    <span className="font-medium">{format(new Date(trade2.trade_date), 'MMM dd, yyyy HH:mm')}</span>
+                    <span className="font-medium">{format(new Date(trade2.opened_at || trade2.trade_date), 'MMM dd, yyyy HH:mm')}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Entry:</span>
