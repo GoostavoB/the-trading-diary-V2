@@ -298,9 +298,11 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
         currentROI = ((currentBalance - baseCapital) / baseCapital) * 100;
       }
       
-      // Calculate average ROI per trade by averaging individual trade ROIs
-      const avgROIPerTrade = trades.length > 0
-        ? trades.reduce((sum, t) => sum + (t.roi || 0), 0) / trades.length
+      // Calculate weighted average ROI: total P&L divided by total capital invested
+      // This gives the true return on investment weighted by position size
+      const totalCapitalInvested = trades.reduce((sum, t) => sum + (t.margin || 0), 0);
+      const avgROIPerTrade = totalCapitalInvested > 0
+        ? ((includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees) / totalCapitalInvested) * 100
         : 0;
 
       setStats({
