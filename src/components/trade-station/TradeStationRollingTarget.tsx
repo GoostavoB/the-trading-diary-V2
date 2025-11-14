@@ -129,6 +129,9 @@ export const TradeStationRollingTarget = () => {
                 <p className="text-xs text-muted-foreground mt-2 italic">
                   Formula: (1 + daily%)^365 = annual growth multiple
                 </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  <strong>Note:</strong> In per-day mode, the "Required" amount compounds daily—it's calculated as your target % of each day's starting capital, which includes previous gains. This is how small percentages create exponential growth.
+                </p>
               </div>
 
               <div>

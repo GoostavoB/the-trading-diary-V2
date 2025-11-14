@@ -113,15 +113,15 @@ export const RollingTargetWidget = memo(({
     
     const p = (settings?.targetPercent || 1) / 100;
 
-    // Group trades by day
+    // Group trades by day (just accumulate PnL first)
     sortedTrades.forEach(trade => {
       const dateStr = format(parseISO(trade.closed_at!), 'yyyy-MM-dd');
       if (!dailyMap.has(dateStr)) {
         dailyMap.set(dateStr, {
           date: dateStr,
-          startCapital: currentCapital,
+          startCapital: 0, // Will be set in next loop
           pnl: 0,
-          endCapital: currentCapital,
+          endCapital: 0,
           plannedCapital: 0,
           deviation: 0,
           requiredToday: 0,
@@ -138,6 +138,8 @@ export const RollingTargetWidget = memo(({
     let dayIndex = 0;
 
     dailyMap.forEach((day, dateStr) => {
+      // Set start capital based on previous day's end capital (or initial investment for first day)
+      day.startCapital = currentCapital;
       day.endCapital = day.startCapital + day.pnl;
       day.returnPercent = day.startCapital > 0 ? (day.pnl / day.startCapital) * 100 : 0;
       
@@ -154,7 +156,7 @@ export const RollingTargetWidget = memo(({
         const capAmount = ((settings?.carryOverCap || 2) / 100) * day.startCapital;
         day.requiredToday = Math.min(day.requiredToday, capAmount);
       } else {
-        // Per-day mode: fixed percent of current capital
+        // Per-day mode: fixed percent of START capital for that day (compounding daily)
         day.requiredToday = p * day.startCapital;
         day.headroom = Math.max(0, day.pnl - day.requiredToday);
       }
@@ -162,7 +164,7 @@ export const RollingTargetWidget = memo(({
       day.deviation = day.endCapital - day.plannedCapital;
       
       daysArray.push(day);
-      currentCapital = day.endCapital;
+      currentCapital = day.endCapital; // Update for next day
       dayIndex++;
     });
 
@@ -295,11 +297,8 @@ export const RollingTargetWidget = memo(({
       .reduce((sum, d) => sum + d.requiredToday, 0) / Math.max(1, daysBehind);
     
     const lastDay = dailyData[dailyData.length - 1];
-    // Check if today's PnL meets or exceeds the required amount
-    const metTodaysTarget = settings?.mode === 'rolling' 
-      ? lastDay.pnl >= (lastDay.plannedCapital - lastDay.startCapital)
-      : lastDay.pnl >= lastDay.requiredToday;
-    const currentStatus = metTodaysTarget ? 'ahead' : 'behind';
+    // Current status based on cumulative deviation (not just today's performance)
+    const currentStatus = lastDay.deviation >= 0 ? 'ahead' : 'behind';
     const driftPercent = lastDay.plannedCapital > 0 
       ? (lastDay.deviation / lastDay.plannedCapital) * 100 
       : 0;
@@ -696,40 +695,82 @@ export const RollingTargetWidget = memo(({
 
         {/* Summary Metrics */}
         {summaryMetrics && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Current Status</p>
-              <div className="flex items-center gap-2">
-                {summaryMetrics.currentStatus === 'ahead' ? (
-                  <>
-                    <ArrowUpCircle className="h-4 w-4 text-profit" />
-                    <p className="text-lg font-bold text-profit">Ahead</p>
-                  </>
-                ) : (
-                  <>
-                    <ArrowDownCircle className="h-4 w-4 text-loss" />
-                    <p className="text-lg font-bold text-loss">Behind</p>
-                  </>
-                )}
+          <TooltipProvider>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="space-y-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1 cursor-help">
+                      <p className="text-xs text-muted-foreground">Current Status</p>
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">Whether your total capital is currently above (ahead) or below (behind) your planned compound growth target</p>
+                  </TooltipContent>
+                </Tooltip>
+                <div className="flex items-center gap-2">
+                  {summaryMetrics.currentStatus === 'ahead' ? (
+                    <>
+                      <ArrowUpCircle className="h-4 w-4 text-profit" />
+                      <p className="text-lg font-bold text-profit">Ahead</p>
+                    </>
+                  ) : (
+                    <>
+                      <ArrowDownCircle className="h-4 w-4 text-loss" />
+                      <p className="text-lg font-bold text-loss">Behind</p>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1 cursor-help">
+                      <p className="text-xs text-muted-foreground">Drift from Plan</p>
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">Percentage difference between your actual capital and where you should be on your planned compound growth curve</p>
+                  </TooltipContent>
+                </Tooltip>
+                <p className={`text-lg font-bold ${summaryMetrics.driftPercent >= 0 ? 'text-profit' : 'text-loss'}`}>
+                  {summaryMetrics.driftPercent >= 0 ? '+' : ''}{summaryMetrics.driftPercent.toFixed(1)}%
+                </p>
+              </div>
+              <div className="space-y-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1 cursor-help">
+                      <p className="text-xs text-muted-foreground">Success Rate</p>
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">Percentage of trading days where you were ahead of your planned growth curve</p>
+                  </TooltipContent>
+                </Tooltip>
+                <p className={`text-lg font-bold ${summaryMetrics.successRate >= 50 ? 'text-profit' : 'text-loss'}`}>
+                  {summaryMetrics.successRate.toFixed(0)}%
+                </p>
+              </div>
+              <div className="space-y-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1 cursor-help">
+                      <p className="text-xs text-muted-foreground">Avg Catch-Up</p>
+                      <Info className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">Average amount needed per day to get back on track when you're behind your plan</p>
+                  </TooltipContent>
+                </Tooltip>
+                <p className="text-lg font-bold">{formatCurrency(summaryMetrics.avgRequiredWhenBehind)}</p>
               </div>
             </div>
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Drift from Plan</p>
-              <p className={`text-lg font-bold ${summaryMetrics.driftPercent >= 0 ? 'text-profit' : 'text-loss'}`}>
-                {summaryMetrics.driftPercent >= 0 ? '+' : ''}{summaryMetrics.driftPercent.toFixed(1)}%
-              </p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Success Rate</p>
-              <p className={`text-lg font-bold ${summaryMetrics.successRate >= 50 ? 'text-profit' : 'text-loss'}`}>
-                {summaryMetrics.successRate.toFixed(0)}%
-              </p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Avg Catch-Up</p>
-              <p className="text-lg font-bold">{formatCurrency(summaryMetrics.avgRequiredWhenBehind)}</p>
-            </div>
-          </div>
+          </TooltipProvider>
         )}
 
         {/* Daily Log Table */}
@@ -746,9 +787,51 @@ export const RollingTargetWidget = memo(({
                   <tr>
                     <th className="text-left p-2">Date</th>
                     <th className="text-right p-2">PnL</th>
-                    <th className="text-right p-2">Actual</th>
-                    <th className="text-right p-2">Planned</th>
-                    <th className="text-right p-2">Required</th>
+                    <th className="text-right p-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center justify-end gap-1 cursor-help">
+                              <span>Actual</span>
+                              <Info className="h-3 w-3 text-muted-foreground" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">Your actual total capital at end of this day</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </th>
+                    <th className="text-right p-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center justify-end gap-1 cursor-help">
+                              <span>Planned</span>
+                              <Info className="h-3 w-3 text-muted-foreground" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">Target capital based on {settings?.targetPercent || 1}% daily compound growth from initial investment</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </th>
+                    <th className="text-right p-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center justify-end gap-1 cursor-help">
+                              <span>Required</span>
+                              <Info className="h-3 w-3 text-muted-foreground" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">Minimum PnL needed this day ({settings?.targetPercent || 1}% of day's starting capital)</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -777,9 +860,51 @@ export const RollingTargetWidget = memo(({
                   <tr>
                     <th className="text-left p-2">Date</th>
                     <th className="text-right p-2">PnL</th>
-                    <th className="text-right p-2">Actual</th>
-                    <th className="text-right p-2">Planned</th>
-                    <th className="text-right p-2">Deviation</th>
+                    <th className="text-right p-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center justify-end gap-1 cursor-help">
+                              <span>Actual</span>
+                              <Info className="h-3 w-3 text-muted-foreground" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">Your actual total capital at end of this day</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </th>
+                    <th className="text-right p-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center justify-end gap-1 cursor-help">
+                              <span>Planned</span>
+                              <Info className="h-3 w-3 text-muted-foreground" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">Target capital based on {settings?.targetPercent || 1}% daily compound growth from initial investment</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </th>
+                    <th className="text-right p-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center justify-end gap-1 cursor-help">
+                              <span>Deviation</span>
+                              <Info className="h-3 w-3 text-muted-foreground" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">Difference between actual and planned capital (positive = ahead, negative = behind)</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
