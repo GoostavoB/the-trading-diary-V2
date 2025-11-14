@@ -265,8 +265,15 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
       const winningTrades = trades.filter(t => (t.profit_loss || 0) > 0).length;
       const avgDuration = trades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (trades.length || 1);
 
-      // Calculate unique trading days
-      const uniqueDays = new Set(trades.map(t => new Date(t.trade_date).toDateString())).size;
+      // Calculate total calendar days from first to last trade
+      let tradingDaySpan = 0;
+      if (trades.length > 0) {
+        const tradeDates = trades.map(t => new Date(t.trade_date).getTime());
+        const firstTradeDate = Math.min(...tradeDates);
+        const lastTradeDate = Math.max(...tradeDates);
+        const daysDifference = Math.ceil((lastTradeDate - firstTradeDate) / (1000 * 60 * 60 * 24));
+        tradingDaySpan = daysDifference + 1; // +1 to include both first and last day
+      }
       
       // Calculate average P&L per trade
       const avgPnLPerTrade = trades.length > 0 
@@ -274,8 +281,8 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
         : 0;
       
       // Calculate average P&L per day
-      const avgPnLPerDay = uniqueDays > 0 
-        ? (includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees) / uniqueDays 
+      const avgPnLPerDay = tradingDaySpan > 0 
+        ? (includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees) / tradingDaySpan 
         : 0;
       
       // Calculate total added capital from capital_log
@@ -303,7 +310,7 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
         avg_duration: avgDuration,
         avg_pnl_per_trade: avgPnLPerTrade,
         avg_pnl_per_day: avgPnLPerDay,
-        trading_days: uniqueDays,
+        trading_days: tradingDaySpan,
         current_roi: currentROI,
         avg_roi_per_trade: avgROIPerTrade,
       });
