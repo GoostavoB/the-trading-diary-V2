@@ -157,8 +157,8 @@ if (data?.layout_json) {
         throw error;
       }
       
-      // Do NOT update positions here - caller already did
-      // Only update columnCount if it was provided
+      // Update local state to match what was saved
+      setPositions(newPositions);
       if (newColumnCount !== undefined) {
         setColumnCount(newColumnCount);
       }
