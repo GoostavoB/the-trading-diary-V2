@@ -295,7 +295,11 @@ export const RollingTargetWidget = memo(({
       .reduce((sum, d) => sum + d.requiredToday, 0) / Math.max(1, daysBehind);
     
     const lastDay = dailyData[dailyData.length - 1];
-    const currentStatus = lastDay.deviation >= 0 ? 'ahead' : 'behind';
+    // Check if today's PnL meets or exceeds the required amount
+    const metTodaysTarget = settings?.mode === 'rolling' 
+      ? lastDay.pnl >= (lastDay.plannedCapital - lastDay.startCapital)
+      : lastDay.pnl >= lastDay.requiredToday;
+    const currentStatus = metTodaysTarget ? 'ahead' : 'behind';
     const driftPercent = lastDay.plannedCapital > 0 
       ? (lastDay.deviation / lastDay.plannedCapital) * 100 
       : 0;
