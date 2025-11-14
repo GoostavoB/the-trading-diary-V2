@@ -486,7 +486,6 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
         break;
       case 'combinedPnLROI':
         widgetProps.avgPnLPerTrade = stats?.avg_pnl_per_trade || 0;
-        widgetProps.avgROIPerTrade = stats?.avg_roi_per_trade || 0;
         break;
       case 'activeGoals':
         widgetProps.compact = false;

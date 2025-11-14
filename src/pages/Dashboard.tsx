@@ -852,7 +852,6 @@ const Dashboard = () => {
         break;
       case 'combinedPnLROI':
         widgetProps.avgPnLPerTrade = stats?.avg_pnl_per_trade || 0;
-        widgetProps.avgROIPerTrade = stats?.avg_roi_per_trade || 0;
         break;
       // Trade Station widgets - pass required props
       case 'errorReflection':
