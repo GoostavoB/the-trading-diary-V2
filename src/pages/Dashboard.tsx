@@ -423,14 +423,13 @@ const Dashboard = () => {
       const winningTrades = trades.filter(t => (t.profit_loss || 0) > 0).length;
       const avgDuration = trades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (trades.length || 1);
 
-      // Calculate total calendar days from first to last trade (based on when trades were opened)
+      // Calculate unique trading days (actual days with trades)
       let tradingDaySpan = 0;
       if (trades.length > 0) {
-        const tradeDates = trades.map(t => new Date(t.opened_at || t.trade_date).getTime());
-        const firstTradeDate = Math.min(...tradeDates);
-        const lastTradeDate = Math.max(...tradeDates);
-        const daysDifference = Math.ceil((lastTradeDate - firstTradeDate) / (1000 * 60 * 60 * 24));
-        tradingDaySpan = daysDifference + 1; // +1 to include both first and last day
+        const uniqueTradingDays = new Set(
+          trades.map(t => new Date(t.opened_at || t.trade_date).toDateString())
+        );
+        tradingDaySpan = uniqueTradingDays.size;
       }
       
       // Calculate average P&L per trade
