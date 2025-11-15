@@ -77,66 +77,79 @@ When users ask about their trading, provide actionable insights based on their a
       .eq('user_id', user.id)
       .single();
 
+    // Helper to safely format numbers
+    const safeNumber = (val: any, decimals = 2) => {
+      const num = parseFloat(val);
+      return isNaN(num) ? 0 : num.toFixed(decimals);
+    };
+
     // Calculate KPIs from trades
     let userContext = '';
-    if (trades && trades.length > 0) {
-      const totalTrades = trades.length;
-      const winningTrades = trades.filter(t => (t.pnl || 0) > 0).length;
-      const losingTrades = totalTrades - winningTrades;
-      const totalPnL = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
-      const totalFees = trades.reduce((sum, t) => sum + (t.trading_fee || 0) + (t.funding_fee || 0), 0);
-      const netPnL = totalPnL - totalFees;
-      const winRate = (winningTrades / totalTrades) * 100;
-      const avgWin = trades.filter(t => (t.pnl || 0) > 0).reduce((sum, t) => sum + (t.pnl || 0), 0) / (winningTrades || 1);
-      const avgLoss = Math.abs(trades.filter(t => (t.pnl || 0) < 0).reduce((sum, t) => sum + (t.pnl || 0), 0)) / (losingTrades || 1);
-      const profitFactor = avgWin / (avgLoss || 1);
-      const avgROI = trades.reduce((sum, t) => sum + (t.roi || 0), 0) / totalTrades;
-      const initialCapital = stats?.initial_investment || 10000;
-      const currentROI = ((totalPnL) / initialCapital) * 100;
-      
-      // Get recent streak
-      let currentStreak = 0;
-      let streakType: 'win' | 'loss' = 'win';
-      if (trades.length > 0) {
-        const firstTradePnL = trades[0].pnl || 0;
-        streakType = firstTradePnL > 0 ? 'win' : 'loss';
-        for (const trade of trades) {
-          const pnl = trade.pnl || 0;
-          if ((streakType === 'win' && pnl > 0) || (streakType === 'loss' && pnl <= 0)) {
-            currentStreak++;
-          } else {
-            break;
+    try {
+      if (trades && trades.length > 0) {
+        const totalTrades = trades.length;
+        const winningTrades = trades.filter(t => (t.pnl || 0) > 0).length;
+        const losingTrades = totalTrades - winningTrades;
+        const totalPnL = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+        const totalFees = trades.reduce((sum, t) => sum + (t.trading_fee || 0) + (t.funding_fee || 0), 0);
+        const netPnL = totalPnL - totalFees;
+        const winRate = (winningTrades / totalTrades) * 100;
+        const avgWin = trades.filter(t => (t.pnl || 0) > 0).reduce((sum, t) => sum + (t.pnl || 0), 0) / (winningTrades || 1);
+        const avgLoss = Math.abs(trades.filter(t => (t.pnl || 0) < 0).reduce((sum, t) => sum + (t.pnl || 0), 0)) / (losingTrades || 1);
+        const profitFactor = avgWin / (avgLoss || 1);
+        const avgROI = trades.reduce((sum, t) => sum + (t.roi || 0), 0) / totalTrades;
+        const initialCapital = stats?.initial_investment || 10000;
+        const currentROI = ((totalPnL) / initialCapital) * 100;
+        
+        // Get recent streak
+        let currentStreak = 0;
+        let streakType: 'win' | 'loss' = 'win';
+        if (trades.length > 0) {
+          const firstTradePnL = trades[0].pnl || 0;
+          streakType = firstTradePnL > 0 ? 'win' : 'loss';
+          for (const trade of trades) {
+            const pnl = trade.pnl || 0;
+            if ((streakType === 'win' && pnl > 0) || (streakType === 'loss' && pnl <= 0)) {
+              currentStreak++;
+            } else {
+              break;
+            }
           }
         }
-      }
+  
+        // Get top assets
+        const assetPnL = new Map<string, number>();
+        trades.forEach(t => {
+          if (!t.symbol) return; // Skip trades with no symbol
+          const current = assetPnL.get(t.symbol) || 0;
+          const tradePnl = t.pnl || 0;
+          assetPnL.set(t.symbol, current + tradePnl);
+        });
+        const topAssets = Array.from(assetPnL.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 3)
+          .map(([symbol, pnl]) => `${symbol} ($${safeNumber(pnl, 2)})`);
 
-      // Get top assets
-      const assetPnL = new Map<string, number>();
-      trades.forEach(t => {
-        const current = assetPnL.get(t.symbol) || 0;
-        assetPnL.set(t.symbol, current + (t.pnl || 0));
-      });
-      const topAssets = Array.from(assetPnL.entries())
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([symbol, pnl]) => `${symbol} ($${pnl.toFixed(2)})`);
-
-      userContext = `\n\nUSER'S CURRENT TRADING DATA:
+        userContext = `\n\nUSER'S CURRENT TRADING DATA:
 - Total Trades: ${totalTrades}
-- Win Rate: ${winRate.toFixed(1)}% (${winningTrades}W / ${losingTrades}L)
-- Total P&L: $${totalPnL.toFixed(2)} (Net after fees: $${netPnL.toFixed(2)})
-- Total Fees Paid: $${totalFees.toFixed(2)}
-- Current ROI: ${currentROI.toFixed(2)}%
-- Avg Win: $${avgWin.toFixed(2)} | Avg Loss: $${avgLoss.toFixed(2)}
-- Profit Factor: ${profitFactor.toFixed(2)}
-- Avg ROI per Trade: ${avgROI.toFixed(2)}%
+- Win Rate: ${safeNumber(winRate, 1)}% (${winningTrades}W / ${losingTrades}L)
+- Total P&L: $${safeNumber(totalPnL)} (Net after fees: $${safeNumber(netPnL)})
+- Total Fees Paid: $${safeNumber(totalFees)}
+- Current ROI: ${safeNumber(currentROI)}%
+- Avg Win: $${safeNumber(avgWin)} | Avg Loss: $${safeNumber(avgLoss)}
+- Profit Factor: ${safeNumber(profitFactor)}
+- Avg ROI per Trade: ${safeNumber(avgROI)}%
 - Current Streak: ${Math.abs(currentStreak)} ${streakType === 'win' ? 'winning' : 'losing'} trades
 - Top Performing Assets: ${topAssets.join(', ')}
-- Most Recent Trades: ${trades.slice(0, 5).map(t => `${t.symbol} (${t.side}): ${t.pnl > 0 ? '+' : ''}$${t.pnl.toFixed(2)}`).join(', ')}
+- Most Recent Trades: ${trades.slice(0, 5).map(t => `${t.symbol} (${t.side}): ${(t.pnl || 0) > 0 ? '+' : ''}$${safeNumber(t.pnl || 0)}`).join(', ')}
 
 Use this data to provide personalized insights and analysis. Always reference these actual numbers when discussing the user's performance.`;
-    } else {
-      userContext = '\n\nThe user has not logged any trades yet. Provide general guidance about getting started with trade journaling.';
+      } else {
+        userContext = '\n\nThe user has not logged any trades yet. Provide general guidance about getting started with trade journaling.';
+      }
+    } catch (error) {
+      console.error('Error calculating user stats:', error);
+      userContext = '\n\nNote: Could not load complete trading stats due to data issues. Some user data may be incomplete.';
     }
 
     const { messages } = await req.json();

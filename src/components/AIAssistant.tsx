@@ -110,9 +110,13 @@ export const AIAssistant = () => {
       setIsLoading(false);
     } catch (error) {
       console.error('AI Assistant error:', error);
+      const errorMessage = error instanceof Error 
+        ? `Sorry, I encountered an error: ${error.message}. Please try again.`
+        : t('aiAssistant.error');
+      
       setMessages((prev) => [...prev, {
         role: 'assistant',
-        content: t('aiAssistant.error')
+        content: errorMessage,
       }]);
       setIsLoading(false);
     }
