@@ -34,9 +34,10 @@ interface GoalProjectionProps {
   trades: Trade[];
   onDelete?: (goalId: string) => void;
   onEdit?: (goal: Goal) => void;
+  includeFeesInPnL?: boolean;
 }
 
-export const GoalProjection = ({ goals, trades, onDelete, onEdit }: GoalProjectionProps) => {
+export const GoalProjection = ({ goals, trades, onDelete, onEdit, includeFeesInPnL = true }: GoalProjectionProps) => {
   const { settings } = useUserSettings();
   const tradingDaysMode = settings.trading_days_calculation_mode;
   const activeGoals = goals.filter(g => (g.current_value / g.target_value) < 1);
@@ -73,7 +74,7 @@ export const GoalProjection = ({ goals, trades, onDelete, onEdit }: GoalProjecti
     });
     
     // Calculate total PnL with consistent fee handling
-    const totalPnLNet = calculateTotalPnL(trades, { includeFees: true });
+    const totalPnLNet = calculateTotalPnL(trades, { includeFees: includeFeesInPnL });
     
     console.log('💰 PnL Calculation:', {
       totalPnLNet,
@@ -93,7 +94,7 @@ export const GoalProjection = ({ goals, trades, onDelete, onEdit }: GoalProjecti
         dailyRate = trades.length / daysPassed;
         break;
       case 'win_rate':
-        const winningTrades = trades.filter(t => calculateTradePnL(t, { includeFees: true }) > 0).length;
+        const winningTrades = trades.filter(t => calculateTradePnL(t, { includeFees: includeFeesInPnL }) > 0).length;
         dailyRate = ((winningTrades / trades.length) * 100) / daysPassed;
         break;
       case 'roi':

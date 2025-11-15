@@ -869,6 +869,9 @@ const Dashboard = () => {
       case 'combinedPnLROI':
         widgetProps.avgPnLPerTrade = stats?.avg_pnl_per_trade || 0;
         break;
+      case 'goals':
+        widgetProps.includeFeesInPnL = includeFeesInPnL;
+        break;
       // Trade Station widgets - pass required props
       case 'errorReflection':
       case 'riskCalculator':

@@ -33,7 +33,11 @@ interface GoalProjection {
   probability: number;
 }
 
-export function GoalWidget() {
+interface GoalWidgetProps {
+  includeFeesInPnL?: boolean;
+}
+
+export function GoalWidget({ includeFeesInPnL = true }: GoalWidgetProps) {
   const { user } = useAuth();
   const { dateRange } = useDateRange();
   const [editingGoal, setEditingGoal] = useState<any>(null);
@@ -87,7 +91,7 @@ export function GoalWidget() {
 
   // Compute current values for all goal types based on calculation mode and timeframe
   const { data: currentValues } = useQuery({
-    queryKey: ['goal-current-values', goals.map(g => ({ id: g.id, type: g.goal_type, calc: g.calculation_mode, period: g.period_type, start: g.period_start, end: g.period_end, deadline: g.deadline, baseline: g.baseline_value }))],
+    queryKey: ['goal-current-values', goals.map(g => ({ id: g.id, type: g.goal_type, calc: g.calculation_mode, period: g.period_type, start: g.period_start, end: g.period_end, deadline: g.deadline, baseline: g.baseline_value })), includeFeesInPnL],
     queryFn: async () => {
       const results = await Promise.all(
         goals.map(async (goal) => {
@@ -126,9 +130,37 @@ export function GoalWidget() {
           }
 
           const analytics = data as any;
-          const totalPnl = analytics?.total_pnl ?? 0;
-          const totalTrades = analytics?.total_trades ?? 0;
-          const winRate = analytics?.win_rate ?? 0;
+          
+          // Filter trades for this goal's timeframe
+          const goaltimeframeTrades = allTrades.filter(trade => {
+            const tradeDate = new Date(trade.trade_date || trade.opened_at);
+            if (startDate && tradeDate < new Date(startDate)) return false;
+            if (endDate && tradeDate > new Date(endDate)) return false;
+            return true;
+          });
+          
+          // Calculate PnL respecting includeFeesInPnL setting
+          const totalPnl = goaltimeframeTrades.reduce((sum, t) => {
+            const pnl = t.profit_loss || t.pnl || 0;
+            if (includeFeesInPnL) {
+              const fundingFee = (t as any).funding_fee || 0;
+              const tradingFee = (t as any).trading_fee || 0;
+              return sum + (pnl - Math.abs(fundingFee) - Math.abs(tradingFee));
+            }
+            return sum + pnl;
+          }, 0);
+          
+          const totalTrades = goaltimeframeTrades.length;
+          const winningTrades = goaltimeframeTrades.filter(t => {
+            const pnl = t.profit_loss || t.pnl || 0;
+            if (includeFeesInPnL) {
+              const fundingFee = (t as any).funding_fee || 0;
+              const tradingFee = (t as any).trading_fee || 0;
+              return (pnl - Math.abs(fundingFee) - Math.abs(tradingFee)) > 0;
+            }
+            return pnl > 0;
+          }).length;
+          const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
 
           // Calculate current value based on goal type
           switch (goal.goal_type) {
@@ -303,6 +335,7 @@ export function GoalWidget() {
               trades={trades}
               onDelete={(goalId) => setDeletingGoalId(goalId)}
               onEdit={(goal) => setEditingGoal(goal)}
+              includeFeesInPnL={includeFeesInPnL}
             />
           </>
         )}
