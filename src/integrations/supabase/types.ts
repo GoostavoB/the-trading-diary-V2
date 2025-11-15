@@ -4462,6 +4462,7 @@ export type Database = {
           tour_version_completed: number | null
           trade_reminders: boolean | null
           trade_station_layout_json: Json | null
+          trading_days_calculation_mode: string | null
           unlimited_uploads: boolean | null
           updated_at: string | null
           user_id: string
@@ -4532,6 +4533,7 @@ export type Database = {
           tour_version_completed?: number | null
           trade_reminders?: boolean | null
           trade_station_layout_json?: Json | null
+          trading_days_calculation_mode?: string | null
           unlimited_uploads?: boolean | null
           updated_at?: string | null
           user_id: string
@@ -4602,6 +4604,7 @@ export type Database = {
           tour_version_completed?: number | null
           trade_reminders?: boolean | null
           trade_station_layout_json?: Json | null
+          trading_days_calculation_mode?: string | null
           unlimited_uploads?: boolean | null
           updated_at?: string | null
           user_id?: string

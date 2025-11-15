@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown, AlertTriangle, Target, Trash2 } from "lucide-
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { format, addDays, addWeeks, addMonths, differenceInDays } from 'date-fns';
 import { calculateTradingDays } from '@/utils/tradingDays';
+import { useUserSettings } from '@/hooks/useUserSettings';
 
 interface Goal {
   id: string;
@@ -35,6 +36,8 @@ interface GoalProjectionProps {
 }
 
 export const GoalProjection = ({ goals, trades, onDelete, onEdit }: GoalProjectionProps) => {
+  const { settings } = useUserSettings();
+  const tradingDaysMode = settings.trading_days_calculation_mode;
   const activeGoals = goals.filter(g => (g.current_value / g.target_value) < 1);
   
   if (activeGoals.length === 0) {
@@ -52,8 +55,8 @@ export const GoalProjection = ({ goals, trades, onDelete, onEdit }: GoalProjecti
   }
 
   const calculateProjection = (goal: Goal) => {
-    // Use consistent trading days calculation: first opened to last closed
-    const { tradingDays: daysPassed, firstTradeDate, lastTradeDate } = calculateTradingDays(trades);
+    // Use consistent trading days calculation with user-selected mode
+    const { tradingDays: daysPassed, firstTradeDate, lastTradeDate } = calculateTradingDays(trades, tradingDaysMode);
     
     if (daysPassed === 0 || !firstTradeDate || !lastTradeDate) {
       return null;

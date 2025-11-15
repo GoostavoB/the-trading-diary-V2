@@ -57,6 +57,7 @@ import {
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { toast } from 'sonner';
 import { calculateTradingDays } from '@/utils/tradingDays';
+import { useUserSettings } from '@/hooks/useUserSettings';
 
 interface RollingTargetWidgetProps {
   id: string;
@@ -92,6 +93,9 @@ export const RollingTargetWidget = memo(({
     applySuggestion: applySettingsSuggestion,
     dismissSuggestion: dismissSettingsSuggestion 
   } = useRollingTargetSettings();
+  
+  const { settings: userSettings } = useUserSettings();
+  const tradingDaysMode = userSettings.trading_days_calculation_mode;
 
   const [showSettings, setShowSettings] = useState(false);
 
@@ -99,8 +103,8 @@ export const RollingTargetWidget = memo(({
   const dailyData = useMemo<DailyData[]>(() => {
     if (!trades.length || !initialInvestment) return [];
 
-    // Use consistent trading days calculation: first opened to last closed
-    const { firstTradeDate, lastTradeDate, tradingDays } = calculateTradingDays(trades);
+    // Use consistent trading days calculation with user-selected mode
+    const { firstTradeDate, lastTradeDate, tradingDays } = calculateTradingDays(trades, tradingDaysMode);
     if (!firstTradeDate || !lastTradeDate || tradingDays === 0) return [];
 
     // Sort trades by closed date for daily processing

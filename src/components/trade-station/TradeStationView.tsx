@@ -19,6 +19,7 @@ import { useTokenPrices } from '@/hooks/useTokenPrices';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import type { Trade } from '@/types/trade';
 import { calculateTradingDays, calculateAvgPnLPerDay } from '@/utils/tradingDays';
+import { useUserSettings } from '@/hooks/useUserSettings';
 
 interface TradeStationViewProps {
   onControlsReady?: (controls: {
@@ -43,6 +44,8 @@ interface TradeStationViewProps {
 export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { settings } = useUserSettings();
+  const tradingDaysMode = settings.trading_days_calculation_mode;
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [originalPositions, setOriginalPositions] = useState<TradeStationWidgetPosition[]>([]);
@@ -266,8 +269,8 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
       const winningTrades = trades.filter(t => (t.profit_loss || 0) > 0).length;
       const avgDuration = trades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (trades.length || 1);
 
-      // Use consistent trading days calculation: first opened to last closed
-      const { tradingDays: tradingDaySpan } = calculateTradingDays(trades);
+      // Use consistent trading days calculation with user-selected mode
+      const { tradingDays: tradingDaySpan } = calculateTradingDays(trades, tradingDaysMode);
       
       // Calculate average P&L per trade
       const avgPnLPerTrade = trades.length > 0 
