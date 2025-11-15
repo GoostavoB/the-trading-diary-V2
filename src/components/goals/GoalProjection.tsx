@@ -56,7 +56,8 @@ export const GoalProjection = ({ goals, trades, onDelete, onEdit }: GoalProjecti
     
     const firstTradeDate = new Date(sortedTrades[0]?.trade_date);
     const lastTradeDate = new Date(sortedTrades[sortedTrades.length - 1]?.trade_date);
-    const daysPassed = differenceInDays(lastTradeDate, firstTradeDate) || 1;
+    // Add 1 to include both first and last day (inclusive count)
+    const daysPassed = differenceInDays(lastTradeDate, firstTradeDate) + 1;
     
     console.log('🎯 Goal Projection Debug:', {
       goalTitle: goal.title,
