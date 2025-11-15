@@ -143,17 +143,11 @@ export const DuplicateReviewDialog = ({
                     className="mt-0.5 pointer-events-none"
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2 mb-1">
+                    <div className="flex items-center justify-between gap-2 mb-2">
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="font-semibold truncate">{trade.symbol || 'Unknown'}</span>
                         <Badge variant="outline" className="text-xs shrink-0">
                           {trade.side?.toUpperCase() || 'N/A'}
-                        </Badge>
-                        <Badge 
-                          variant="secondary"
-                          className="bg-amber-500/10 text-amber-700 dark:text-amber-400 text-xs shrink-0"
-                        >
-                          {match?.matchScore} match
                         </Badge>
                       </div>
                       {isChecked && (
@@ -161,21 +155,37 @@ export const DuplicateReviewDialog = ({
                       )}
                     </div>
                     
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span>${trade.entry_price?.toFixed(2)} → ${trade.exit_price?.toFixed(2)}</span>
-                      <span className="text-xs">•</span>
-                      <span className="text-xs">
-                        {entryDate ? new Date(entryDate).toLocaleDateString() : 'N/A'}
-                      </span>
+                    {/* New Trade Being Uploaded */}
+                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-2 mb-2">
+                      <div className="text-xs font-medium text-blue-700 dark:text-blue-400 mb-1">
+                        ⬆️ Trade to Upload
+                      </div>
+                      <div className="text-sm">
+                        <span className="font-medium">${trade.entry_price?.toFixed(2)}</span>
+                        <span className="mx-1 text-muted-foreground">→</span>
+                        <span className="font-medium">${trade.exit_price?.toFixed(2)}</span>
+                        <span className="mx-2 text-muted-foreground">•</span>
+                        <span className="text-muted-foreground">
+                          {entryDate ? new Date(entryDate).toLocaleDateString() : 'N/A'}
+                        </span>
+                      </div>
                     </div>
                     
+                    {/* Existing Trade in Journal */}
                     {match?.matchedTrade && (
-                      <div className="text-xs text-muted-foreground mt-2 pl-2 border-l-2 border-muted">
-                        Existing: {match.matchedTrade.symbol} • 
-                        ${match.matchedTrade.entry_price?.toFixed(2)} → ${match.matchedTrade.exit_price?.toFixed(2)}
-                        {match.matchedTrade.opened_at && (
-                          <> • {new Date(match.matchedTrade.opened_at).toLocaleDateString()}</>
-                        )}
+                      <div className="bg-muted/50 border border-border rounded-md p-2">
+                        <div className="text-xs font-medium text-muted-foreground mb-1">
+                          📋 Existing in Journal
+                        </div>
+                        <div className="text-sm">
+                          <span className="font-medium">${match.matchedTrade.entry_price?.toFixed(2)}</span>
+                          <span className="mx-1 text-muted-foreground">→</span>
+                          <span className="font-medium">${match.matchedTrade.exit_price?.toFixed(2)}</span>
+                          <span className="mx-2 text-muted-foreground">•</span>
+                          <span className="text-muted-foreground">
+                            {match.matchedTrade.opened_at ? new Date(match.matchedTrade.opened_at).toLocaleDateString() : 'N/A'}
+                          </span>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -193,10 +203,6 @@ export const DuplicateReviewDialog = ({
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">To keep:</span>
             <span className="font-semibold tabular-nums">{selectedToKeep.size}</span>
-          </div>
-          <div className="flex items-center justify-between text-sm pt-1.5 border-t border-border/50">
-            <span className="text-muted-foreground">Credits saved:</span>
-            <span className="font-semibold text-primary tabular-nums">{creditsSaved}</span>
           </div>
         </div>
 
