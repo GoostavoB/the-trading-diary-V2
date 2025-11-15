@@ -10,14 +10,17 @@ interface Goal {
   title: string;
   target_value: number;
   current_value: number;
-  goal_type: 'pnl' | 'win_rate' | 'trades' | 'roi';
+  goal_type: 'profit' | 'capital' | 'win_rate' | 'trades' | 'roi';
   period: 'daily' | 'weekly' | 'monthly' | 'yearly' | 'all_time';
   deadline?: string;
+  baseline_value?: number;
+  capital_target_type?: 'absolute' | 'relative';
 }
 
 interface Trade {
   trade_date: string;
   pnl?: number;
+  profit_loss?: number;
   roi?: number;
 }
 
@@ -25,13 +28,24 @@ interface GoalProjectionProps {
   goals: Goal[];
   trades: Trade[];
   onDelete?: (goalId: string) => void;
+  onEdit?: (goal: Goal) => void;
 }
 
-export const GoalProjection = ({ goals, trades, onDelete }: GoalProjectionProps) => {
+export const GoalProjection = ({ goals, trades, onDelete, onEdit }: GoalProjectionProps) => {
   const activeGoals = goals.filter(g => (g.current_value / g.target_value) < 1);
   
-  if (activeGoals.length === 0 || trades.length === 0) {
+  if (activeGoals.length === 0) {
     return null;
+  }
+
+  if (trades.length === 0) {
+    return (
+      <div className="text-center py-6 text-muted-foreground text-sm bg-muted/30 rounded-lg border border-dashed">
+        <TrendingUp className="h-8 w-8 mx-auto mb-2 opacity-50" />
+        <p className="font-medium">Need more trade history</p>
+        <p className="text-xs mt-1">Complete at least 5 trades to see projections</p>
+      </div>
+    );
   }
 
   const calculateProjection = (goal: Goal) => {
@@ -46,14 +60,17 @@ export const GoalProjection = ({ goals, trades, onDelete }: GoalProjectionProps)
     
     let dailyRate = 0;
     switch (goal.goal_type) {
-      case 'pnl':
+      case 'profit':
+        dailyRate = goal.current_value / daysPassed;
+        break;
+      case 'capital':
         dailyRate = goal.current_value / daysPassed;
         break;
       case 'trades':
         dailyRate = trades.length / daysPassed;
         break;
       case 'win_rate':
-        const winningTrades = trades.filter(t => (t.pnl || 0) > 0).length;
+        const winningTrades = trades.filter(t => ((t.pnl ?? t.profit_loss) || 0) > 0).length;
         dailyRate = ((winningTrades / trades.length) * 100) / daysPassed;
         break;
       case 'roi':
@@ -101,7 +118,8 @@ export const GoalProjection = ({ goals, trades, onDelete }: GoalProjectionProps)
 
   const formatValue = (value: number, type: Goal['goal_type']) => {
     switch (type) {
-      case 'pnl':
+      case 'profit':
+      case 'capital':
         return `$${value.toFixed(2)}`;
       case 'win_rate':
         return `${value.toFixed(1)}%`;
@@ -116,46 +134,37 @@ export const GoalProjection = ({ goals, trades, onDelete }: GoalProjectionProps)
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 mb-4">
-        <Target className="h-5 w-5 text-accent" />
-        <h3 className="text-lg font-semibold">Goal Projections</h3>
-      </div>
-      
       {activeGoals.map(goal => {
         const projection = calculateProjection(goal);
         
         return (
-          <Card key={goal.id} className="p-6 glass-strong">
-            <div className="space-y-4">
-              {/* Header */}
+          <Card key={goal.id} className="overflow-hidden">
+            <div className="p-6 space-y-4">
               <div className="flex items-start justify-between">
-                <div>
-                  <h4 className="font-semibold text-lg">{goal.title}</h4>
-                  <p className="text-sm text-muted-foreground capitalize">{goal.period} goal</p>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-lg mb-1">{goal.title}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {goal.deadline && `Due ${format(new Date(goal.deadline), 'MMM dd, yyyy')} • ${projection.daysRemaining} days left`}
+                  </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge 
-                    variant={projection.isOnTrack ? "default" : "destructive"}
-                    className="gap-1"
-                  >
-                    {projection.isOnTrack ? (
-                      <>
-                        <TrendingUp className="h-3 w-3" />
-                        On Track
-                      </>
-                    ) : (
-                      <>
-                        <AlertTriangle className="h-3 w-3" />
-                        Behind
-                      </>
-                    )}
-                  </Badge>
+                
+                <div className="flex gap-1">
+                  {onEdit && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onEdit(goal)}
+                      className="text-muted-foreground hover:text-foreground h-8 w-8"
+                    >
+                      <Target className="h-4 w-4" />
+                    </Button>
+                  )}
                   {onDelete && (
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => onDelete(goal.id)}
-                      className="h-8 w-8"
+                      className="text-muted-foreground hover:text-destructive h-8 w-8"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -163,19 +172,32 @@ export const GoalProjection = ({ goals, trades, onDelete }: GoalProjectionProps)
                 </div>
               </div>
 
-              {/* Current Status */}
-              <div className="grid grid-cols-2 gap-4 p-4 rounded-lg bg-muted/50">
+              <div className="flex items-center gap-2">
+                {projection.isOnTrack ? (
+                  <Badge variant="default" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 px-3 py-1">
+                    <TrendingUp className="h-3 w-3 mr-1" />
+                    On Track - {Math.min(95, Math.round(projection.projectedProgress))}% likely to succeed
+                  </Badge>
+                ) : (
+                  <Badge variant="destructive" className="bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20 px-3 py-1">
+                    <TrendingDown className="h-3 w-3 mr-1" />
+                    Behind - {Math.max(20, Math.round(projection.projectedProgress * 0.6))}% likely
+                  </Badge>
+                )}
+              </div>
+
+              <div className="grid grid-cols-3 gap-3 text-sm">
                 <div>
-                  <p className="text-xs text-muted-foreground">Current</p>
-                  <p className="text-lg font-semibold">
-                    {formatValue(goal.current_value, goal.goal_type)}
-                  </p>
+                  <p className="text-muted-foreground text-xs">Current</p>
+                  <p className="text-xl font-bold">{formatValue(goal.current_value, goal.goal_type)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Target</p>
-                  <p className="text-lg font-semibold">
-                    {formatValue(goal.target_value, goal.goal_type)}
-                  </p>
+                  <p className="text-muted-foreground text-xs">Target</p>
+                  <p className="text-xl font-bold">{formatValue(goal.target_value, goal.goal_type)}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">Progress</p>
+                  <p className="text-xl font-bold">{Math.round((goal.current_value / goal.target_value) * 100)}%</p>
                 </div>
               </div>
 
@@ -203,14 +225,14 @@ export const GoalProjection = ({ goals, trades, onDelete }: GoalProjectionProps)
                     />
                     <ReferenceLine 
                       y={goal.target_value} 
-                      stroke="hsl(var(--accent))" 
+                      stroke="hsl(var(--primary))" 
                       strokeDasharray="5 5"
                       label={{ value: 'Target', position: 'right', fontSize: 10 }}
                     />
                     <Line 
                       type="monotone" 
                       dataKey="value" 
-                      stroke={projection.isOnTrack ? "hsl(var(--accent))" : "hsl(var(--destructive))"} 
+                      stroke={projection.isOnTrack ? "hsl(var(--primary))" : "hsl(var(--destructive))"} 
                       strokeWidth={2}
                       dot={false}
                     />
@@ -218,48 +240,55 @@ export const GoalProjection = ({ goals, trades, onDelete }: GoalProjectionProps)
                 </ResponsiveContainer>
               </div>
 
-              {/* Projection Details */}
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Daily Rate</p>
-                  <p className="font-medium">
-                    {formatValue(projection.dailyRate, goal.goal_type)}/day
-                  </p>
+              <div className="space-y-2 p-4 bg-muted/30 rounded-lg border">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3" />
+                    Current Pace:
+                  </span>
+                  <span className="font-semibold">{formatValue(projection.dailyRate, goal.goal_type)}/day</span>
                 </div>
-                <div>
-                  <p className="text-muted-foreground">Required Rate</p>
-                  <p className="font-medium">
-                    {formatValue(projection.requiredDailyRate, goal.goal_type)}/day
-                  </p>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground flex items-center gap-1">
+                    <Target className="h-4 w-4" />
+                    Need:
+                  </span>
+                  <span className="font-semibold">{formatValue(projection.requiredDailyRate, goal.goal_type)}/day</span>
                 </div>
-                <div>
-                  <p className="text-muted-foreground">Projected Final</p>
-                  <p className={`font-medium ${projection.projectedProgress >= 100 ? 'text-accent' : 'text-destructive'}`}>
+                <div className="flex items-center justify-between text-sm pt-2 border-t">
+                  <span className="text-muted-foreground">Projected by deadline:</span>
+                  <span className="font-bold text-base">
                     {formatValue(projection.projectedFinalValue, goal.goal_type)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Expected Progress</p>
-                  <p className={`font-medium ${projection.projectedProgress >= 100 ? 'text-accent' : 'text-destructive'}`}>
-                    {projection.projectedProgress.toFixed(0)}%
-                  </p>
+                    <span className="text-xs text-muted-foreground ml-1">
+                      ({projection.projectedProgress.toFixed(0)}%)
+                    </span>
+                  </span>
                 </div>
               </div>
 
-              {/* Warning if behind */}
               {!projection.isOnTrack && (
-                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-start gap-2">
-                  <AlertTriangle className="h-4 w-4 text-destructive mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-medium text-destructive">Action Required</p>
-                    <p className="text-muted-foreground">
-                      You need to increase your daily rate by{' '}
+                <div className="flex items-start gap-2 p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg">
+                  <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-1 flex-1">
+                    <p className="text-xs font-medium text-orange-900 dark:text-orange-100">
+                      ⚠️ To reach your goal, increase your daily rate by{' '}
                       <span className="font-semibold">
-                        {formatValue(projection.requiredDailyRate - projection.dailyRate, goal.goal_type)}
+                        {formatValue(Math.abs(projection.requiredDailyRate - projection.dailyRate), goal.goal_type)}
                       </span>
-                      {' '}to reach this goal{goal.deadline ? ' by the deadline' : ''}.
+                    </p>
+                    <p className="text-xs text-orange-800 dark:text-orange-200">
+                      💡 At current pace: {formatValue(projection.projectedFinalValue, goal.goal_type)} by deadline ({projection.projectedProgress.toFixed(0)}% of goal)
                     </p>
                   </div>
+                </div>
+              )}
+              
+              {projection.isOnTrack && (
+                <div className="flex items-start gap-2 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                  <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-green-800 dark:text-green-200">
+                    🎯 Great pace! You're projected to reach {formatValue(projection.projectedFinalValue, goal.goal_type)} by deadline
+                  </p>
                 </div>
               )}
             </div>

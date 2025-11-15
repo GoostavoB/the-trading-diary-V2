@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
 import { BlurredCurrency, BlurredPercent } from '@/components/ui/BlurredValue';
 import { CreateGoalDialog } from './CreateGoalDialog';
+import { GoalProjection } from './GoalProjection';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -53,27 +54,21 @@ export function GoalWidget() {
     enabled: !!user,
   });
 
-  const { data: projections } = useQuery({
-    queryKey: ['goal-projections', goals.map(g => g.id)],
+  // Fetch trades for projection calculations
+  const { data: trades = [] } = useQuery({
+    queryKey: ['trades-for-projection', user?.id],
     queryFn: async () => {
-      const results = await Promise.all(
-        goals.map(async (goal) => {
-          const { data, error } = await supabase.rpc('calculate_goal_projection' as any, {
-            p_goal_id: goal.id,
-            p_user_id: user!.id
-          });
-          
-          if (error) {
-            console.error('Projection error:', error);
-            return { goalId: goal.id, projection: null };
-          }
-          
-          return { goalId: goal.id, projection: data as GoalProjection };
-        })
-      );
-      return results;
+      const { data, error } = await supabase
+        .from('trades')
+        .select('trade_date, pnl, profit_loss, roi')
+        .eq('user_id', user!.id)
+        .not('trade_date', 'is', null)
+        .order('trade_date', { ascending: true });
+      
+      if (error) throw error;
+      return data || [];
     },
-    enabled: goals.length > 0,
+    enabled: !!user,
   });
 
   // Compute current values for all goal types based on calculation mode and timeframe
@@ -199,6 +194,22 @@ export function GoalWidget() {
     return value.toString();
   };
 
+  // Transform goals for GoalProjection component
+  const transformedGoals = goals.map(goal => {
+    const currentValue = currentValues?.find(v => v.goalId === goal.id)?.current ?? goal.current_value ?? 0;
+    return {
+      id: goal.id,
+      title: goal.title,
+      target_value: goal.target_value,
+      current_value: currentValue,
+      goal_type: goal.goal_type as 'profit' | 'capital' | 'win_rate' | 'trades' | 'roi',
+      period: 'all_time' as const,
+      deadline: goal.deadline,
+      baseline_value: goal.baseline_value,
+      capital_target_type: goal.capital_target_type as 'absolute' | 'relative' | undefined,
+    };
+  });
+
   if (isLoading) {
     return (
       <Card className="col-span-full">
@@ -266,79 +277,14 @@ export function GoalWidget() {
             <CreateGoalDialog onGoalCreated={refetch} />
           </div>
         ) : (
-          goals.map((goal) => {
-          const currentRec = currentValues?.find(v => v.goalId === goal.id);
-          const currentVal = currentRec?.current ?? (goal.current_value ?? 0);
-          const progress = Math.min(100, (currentVal / goal.target_value) * 100);
-          const projection = projections?.find(p => p.goalId === goal.id)?.projection;
-          const isOnTrack = projection?.on_track ?? true;
-
-          return (
-            <div key={goal.id} className="space-y-2 p-4 rounded-lg border bg-card/50">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h4 className="font-semibold">{goal.title}</h4>
-                  <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
-                    <Calendar className="h-3 w-3" />
-                    {format(new Date(goal.deadline), 'MMM dd, yyyy')}
-                    {projection && (
-                      <span className={isOnTrack ? 'text-green-600' : 'text-destructive'}>
-                        • {Math.round(projection.probability)}% likely
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  {!isOnTrack && (
-                    <AlertTriangle className="h-5 w-5 text-destructive mr-2" />
-                  )}
-                  <Button 
-                    size="icon" 
-                    variant="ghost" 
-                    className="h-8 w-8"
-                    onClick={() => setEditingGoal(goal)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    size="icon" 
-                    variant="ghost" 
-                    className="h-8 w-8 text-destructive hover:text-destructive"
-                    onClick={() => setDeletingGoalId(goal.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              
-              <Progress value={progress} className="h-2" />
-              
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">
-                  {formatValue(currentVal, goal.goal_type, goal.capital_target_type)} / {formatValue(goal.target_value, goal.goal_type, goal.capital_target_type)}
-                </span>
-                <span className="font-medium">{progress.toFixed(1)}%</span>
-              </div>
-
-              {projection && (
-                <div className="flex gap-4 text-xs text-muted-foreground pt-2 border-t">
-                  <div>
-                    <TrendingUp className="h-3 w-3 inline mr-1" />
-                    Daily: {formatValue(projection.daily_progress, goal.goal_type)}
-                  </div>
-                  <div>
-                    Required: {formatValue(projection.required_daily_rate, goal.goal_type)}/day
-                  </div>
-                  {projection.projected_completion && (
-                    <div>
-                      ETA: {format(new Date(projection.projected_completion), 'MMM dd')}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })
+          <>
+            <GoalProjection 
+              goals={transformedGoals}
+              trades={trades}
+              onDelete={(goalId) => setDeletingGoalId(goalId)}
+              onEdit={(goal) => setEditingGoal(goal)}
+            />
+          </>
         )}
       </CardContent>
 
