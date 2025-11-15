@@ -18,6 +18,7 @@ import { useSpotWallet } from '@/hooks/useSpotWallet';
 import { useTokenPrices } from '@/hooks/useTokenPrices';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import type { Trade } from '@/types/trade';
+import { calculateTradingDays, calculateAvgPnLPerDay } from '@/utils/tradingDays';
 
 interface TradeStationViewProps {
   onControlsReady?: (controls: {
@@ -265,21 +266,15 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
       const winningTrades = trades.filter(t => (t.profit_loss || 0) > 0).length;
       const avgDuration = trades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (trades.length || 1);
 
-      // Calculate unique trading days (actual days with trades)
-      let tradingDaySpan = 0;
-      if (trades.length > 0) {
-        const uniqueTradingDays = new Set(
-          trades.map(t => new Date(t.opened_at || t.trade_date).toDateString())
-        );
-        tradingDaySpan = uniqueTradingDays.size;
-      }
+      // Use consistent trading days calculation: first opened to last closed
+      const { tradingDays: tradingDaySpan } = calculateTradingDays(trades);
       
       // Calculate average P&L per trade
       const avgPnLPerTrade = trades.length > 0 
         ? (includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees) / trades.length 
         : 0;
       
-      // Calculate average P&L per day
+      // Calculate average P&L per day using consistent method
       const avgPnLPerDay = tradingDaySpan > 0 
         ? (includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees) / tradingDaySpan 
         : 0;

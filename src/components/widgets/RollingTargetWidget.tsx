@@ -56,6 +56,7 @@ import {
 } from 'recharts';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { toast } from 'sonner';
+import { calculateTradingDays } from '@/utils/tradingDays';
 
 interface RollingTargetWidgetProps {
   id: string;
@@ -98,7 +99,11 @@ export const RollingTargetWidget = memo(({
   const dailyData = useMemo<DailyData[]>(() => {
     if (!trades.length || !initialInvestment) return [];
 
-    // Sort trades by date
+    // Use consistent trading days calculation: first opened to last closed
+    const { firstTradeDate, lastTradeDate, tradingDays } = calculateTradingDays(trades);
+    if (!firstTradeDate || !lastTradeDate || tradingDays === 0) return [];
+
+    // Sort trades by closed date for daily processing
     const sortedTrades = [...trades]
       .filter(t => t.closed_at)
       .sort((a, b) => new Date(a.closed_at!).getTime() - new Date(b.closed_at!).getTime());
@@ -107,9 +112,9 @@ export const RollingTargetWidget = memo(({
 
     const dailyMap = new Map<string, DailyData>();
     let currentCapital = initialInvestment;
-    const startDate = parseISO(sortedTrades[0].closed_at!);
-    const endDate = parseISO(sortedTrades[sortedTrades.length - 1].closed_at!);
-    const totalDays = differenceInDays(endDate, startDate) + 1;
+    const startDate = firstTradeDate;
+    const endDate = lastTradeDate;
+    const totalDays = tradingDays;
     
     const p = (settings?.targetPercent || 1) / 100;
 
@@ -136,14 +141,13 @@ export const RollingTargetWidget = memo(({
     // Calculate cumulative values and planned path
     const daysArray: DailyData[] = [];
     
-    // Get first date for calendar day calculation
-    const sortedDates = Array.from(dailyMap.keys()).sort();
-    const firstDate = parseISO(sortedDates[0]);
+    // Use the consistent first trading date (first opened) for calendar calculations
+    const firstTradingDate = firstTradeDate;
 
     dailyMap.forEach((day, dateStr) => {
-      // Calculate calendar days from start (not just trading days)
+      // Calculate calendar days from start (based on first opened date, not first closed)
       const currentDate = parseISO(dateStr);
-      const calendarDaysFromStart = differenceInDays(currentDate, firstDate);
+      const calendarDaysFromStart = differenceInDays(currentDate, firstTradingDate);
       
       // Set start capital based on previous day's end capital (or initial investment for first day)
       day.startCapital = currentCapital;

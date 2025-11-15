@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { TrendingUp, TrendingDown, AlertTriangle, Target, Trash2 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { format, addDays, addWeeks, addMonths, differenceInDays } from 'date-fns';
+import { calculateTradingDays } from '@/utils/tradingDays';
 
 interface Goal {
   id: string;
@@ -51,31 +52,20 @@ export const GoalProjection = ({ goals, trades, onDelete, onEdit }: GoalProjecti
   }
 
   const calculateProjection = (goal: Goal) => {
-    // Calculate historical period from uploaded trades only
-    const sortedTrades = [...trades].sort((a, b) => 
-      new Date(a.opened_at || a.trade_date).getTime() - new Date(b.opened_at || b.trade_date).getTime()
-    );
+    // Use consistent trading days calculation: first opened to last closed
+    const { tradingDays: daysPassed, firstTradeDate, lastTradeDate } = calculateTradingDays(trades);
     
-    const firstTradeDate = new Date(sortedTrades[0]?.opened_at || sortedTrades[0]?.trade_date);
-    const lastTradeDate = new Date(sortedTrades[sortedTrades.length - 1]?.opened_at || sortedTrades[sortedTrades.length - 1]?.trade_date);
-    
-    // Calculate unique trading days
-    const uniqueTradingDays = new Set(
-      trades.map(t => new Date(t.trade_date).toISOString().split('T')[0])
-    ).size;
-    
-    // Add 1 to include both first and last day (inclusive count)
-    const daysPassed = differenceInDays(lastTradeDate, firstTradeDate) + 1;
+    if (daysPassed === 0 || !firstTradeDate || !lastTradeDate) {
+      return null;
+    }
     
     console.log('🎯 Goal Projection Debug:', {
       goalTitle: goal.title,
       totalTrades: trades.length,
       firstTradeDate: firstTradeDate.toISOString().split('T')[0],
       lastTradeDate: lastTradeDate.toISOString().split('T')[0],
-      daysPassed,
-      uniqueTradingDays,
-      tradingDaysWithTrades: uniqueTradingDays,
-      daysInPeriod: daysPassed,
+      tradingDays: daysPassed,
+      method: 'first opened_at to last closed_at'
     });
     
     // Calculate total PnL for growth-based goals
