@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
-
+import { calculateTotalPnL } from "@/utils/pnl";
 interface CreateGoalDialogProps {
   onGoalCreated: () => void;
   editingGoal?: any;
@@ -49,17 +49,27 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
         .eq('user_id', user.id)
         .order('log_date', { ascending: true });
       
+      // Fetch all trades to compute total PnL (net of fees)
+      const { data: allTrades } = await supabase
+        .from('trades')
+        .select('profit_loss, pnl, funding_fee, trading_fee')
+        .eq('user_id', user.id)
+        .is('deleted_at', null);
+      
       if (!allEntries || allEntries.length === 0) return null;
       
       // Initial Capital = SUM of all capital additions
       const totalCapitalAdded = allEntries.reduce((sum, entry) => sum + (entry.amount_added || 0), 0);
       
-      // Current Capital = last entry's total_after
-      const lastEntry = allEntries[allEntries.length - 1];
+      // Total PnL (net) using standard util
+      const totalPnLNet = calculateTotalPnL((allTrades || []) as any, { includeFees: true });
+      
+      // Current Capital = Total added capital + Total PnL (net)
+      const currentCapital = totalCapitalAdded + totalPnLNet;
       
       return {
         initialCapital: totalCapitalAdded,
-        currentCapital: lastEntry.total_after,
+        currentCapital,
       };
     },
     enabled: !!user && open && (formData.goal_type === 'capital' || formData.goal_type === 'roi')
