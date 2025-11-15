@@ -1,17 +1,18 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Target, TrendingUp, Calendar, AlertTriangle, Edit, Trash2 } from 'lucide-react';
+import { Target, TrendingUp, Calendar, AlertTriangle, Edit, Trash2, Filter } from 'lucide-react';
 import { format } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
 import { BlurredCurrency, BlurredPercent } from '@/components/ui/BlurredValue';
 import { CreateGoalDialog } from './CreateGoalDialog';
 import { GoalProjection } from './GoalProjection';
 import { toast } from 'sonner';
+import { useDateRange } from '@/contexts/DateRangeContext';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +35,7 @@ interface GoalProjection {
 
 export function GoalWidget() {
   const { user } = useAuth();
+  const { dateRange } = useDateRange();
   const [editingGoal, setEditingGoal] = useState<any>(null);
   const [deletingGoalId, setDeletingGoalId] = useState<string | null>(null);
 
@@ -55,7 +57,7 @@ export function GoalWidget() {
   });
 
   // Fetch trades for projection calculations
-  const { data: trades = [] } = useQuery({
+  const { data: allTrades = [] } = useQuery({
     queryKey: ['trades-for-projection', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -70,6 +72,18 @@ export function GoalWidget() {
     },
     enabled: !!user,
   });
+
+  // Apply date range filter to trades
+  const trades = useMemo(() => {
+    if (!dateRange?.from || !allTrades.length) return allTrades;
+    
+    return allTrades.filter(trade => {
+      const tradeDate = new Date(trade.trade_date || trade.opened_at);
+      const from = dateRange.from!;
+      const to = dateRange.to || new Date();
+      return tradeDate >= from && tradeDate <= to;
+    });
+  }, [allTrades, dateRange]);
 
   // Compute current values for all goal types based on calculation mode and timeframe
   const { data: currentValues } = useQuery({
@@ -258,6 +272,12 @@ export function GoalWidget() {
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5" />
             Active Goals
+            {dateRange?.from && (
+              <Badge variant="secondary" className="ml-2 text-xs">
+                <Filter className="h-3 w-3 mr-1" />
+                Filtered
+              </Badge>
+            )}
           </CardTitle>
           <CreateGoalDialog 
             onGoalCreated={refetch}
