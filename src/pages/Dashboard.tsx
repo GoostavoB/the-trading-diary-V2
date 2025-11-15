@@ -36,6 +36,8 @@ import { useSpotWallet } from '@/hooks/useSpotWallet';
 import { useTokenPrices } from '@/hooks/useTokenPrices';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { formatCurrency } from '@/utils/formatNumber';
+import { calculateTradingDays } from '@/utils/tradingDays';
+import { useUserSettings } from '@/hooks/useUserSettings';
 import type { Trade } from '@/types/trade';
 import { WIDGET_CATALOG } from '@/config/widgetCatalog';
 import { WidgetLibrary } from '@/components/widgets/WidgetLibrary';
@@ -104,6 +106,8 @@ const Dashboard = () => {
   usePageMeta(pageMeta.dashboard);
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { settings: userSettings } = useUserSettings();
+  const tradingDaysMode = userSettings.trading_days_calculation_mode;
   const [stats, setStats] = useState<TradeStats | null>(null);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
@@ -423,14 +427,8 @@ const Dashboard = () => {
       const winningTrades = trades.filter(t => (t.profit_loss || 0) > 0).length;
       const avgDuration = trades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (trades.length || 1);
 
-      // Calculate unique trading days (actual days with trades)
-      let tradingDaySpan = 0;
-      if (trades.length > 0) {
-        const uniqueTradingDays = new Set(
-          trades.map(t => new Date(t.opened_at || t.trade_date).toDateString())
-        );
-        tradingDaySpan = uniqueTradingDays.size;
-      }
+      // Use consistent trading days calculation with user-selected mode
+      const { tradingDays: tradingDaySpan } = calculateTradingDays(trades, tradingDaysMode);
       
       // Calculate average P&L per trade
       const avgPnLPerTrade = trades.length > 0 

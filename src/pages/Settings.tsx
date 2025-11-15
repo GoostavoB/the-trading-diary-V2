@@ -30,7 +30,11 @@ const Settings = () => {
   const { calmModeEnabled, soundEnabled, toggleCalmMode, toggleSound } = useCalmMode();
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState({ full_name: '', email: '' });
-  const [settings, setSettings] = useState({ blur_enabled: false, sidebar_style: 'matte' });
+  const [settings, setSettings] = useState({ 
+    blur_enabled: false, 
+    sidebar_style: 'matte',
+    trading_days_calculation_mode: 'calendar' as 'calendar' | 'unique'
+  });
   const [setups, setSetups] = useState<{ id: string; name: string; color?: string }[]>([]);
   const [newSetupName, setNewSetupName] = useState('');
   const [newSetupColor, setNewSetupColor] = useState('#A18CFF');
@@ -78,7 +82,8 @@ const Settings = () => {
     if (data) {
       setSettings({ 
         blur_enabled: data.blur_enabled, 
-        sidebar_style: data.sidebar_style
+        sidebar_style: data.sidebar_style,
+        trading_days_calculation_mode: (data.trading_days_calculation_mode || 'calendar') as 'calendar' | 'unique'
       });
     }
   };
@@ -195,6 +200,23 @@ const Settings = () => {
     const { error } = await supabase
       .from('user_settings')
       .update({ blur_enabled: checked })
+      .eq('user_id', user.id);
+
+    if (error) {
+      toast.error('Failed to update setting');
+    } else {
+      toast.success('Setting updated!');
+    }
+  };
+
+  const handleSettingChange = async (key: string, value: any) => {
+    if (!user) return;
+
+    setSettings({ ...settings, [key]: value });
+    
+    const { error } = await supabase
+      .from('user_settings')
+      .update({ [key]: value })
       .eq('user_id', user.id);
 
     if (error) {
@@ -396,6 +418,43 @@ const Settings = () => {
           </TabsContent>
 
           <TabsContent value="trading" className="space-y-6">
+            <Card className="p-6 glass">
+              <h2 className="text-xl font-semibold mb-4">Trading Days Calculation</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Choose how trading days are calculated across all widgets and statistics.
+              </p>
+              
+              <div className="space-y-4">
+                <div className="flex items-start justify-between p-4 rounded-lg border">
+                  <div className="flex-1">
+                    <div className="font-medium">Calendar Days</div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      Count all calendar days from your first trade opening to your last trade closing.
+                      <div className="mt-1 text-xs">Example: If you opened your first trade on Jan 1st and closed your last trade on Jan 5th, that's 5 days (even if you didn't trade on some days).</div>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={settings.trading_days_calculation_mode === 'calendar'}
+                    onCheckedChange={(checked) => handleSettingChange('trading_days_calculation_mode', checked ? 'calendar' : 'unique')}
+                  />
+                </div>
+                
+                <div className="flex items-start justify-between p-4 rounded-lg border">
+                  <div className="flex-1">
+                    <div className="font-medium">Trading Days Only</div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      Count only the unique days when you actually opened trades.
+                      <div className="mt-1 text-xs">Example: If you traded on Jan 1st, 3rd, and 5th, that's 3 trading days.</div>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={settings.trading_days_calculation_mode === 'unique'}
+                    onCheckedChange={(checked) => handleSettingChange('trading_days_calculation_mode', checked ? 'unique' : 'calendar')}
+                  />
+                </div>
+              </div>
+            </Card>
+            
             <Card className="p-6 glass">
               <div className="flex items-center justify-between mb-4">
                 <div>

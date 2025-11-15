@@ -38,6 +38,9 @@ export interface TradeStationSettings {
   duplicate_review_enabled: boolean;
   duplicate_review_last_shown: string | null;
   duplicate_review_seen: boolean;
+  
+  // Trading Days Calculation
+  trading_days_calculation_mode: 'calendar' | 'unique';
 }
 
 export const useUserSettings = () => {
@@ -67,6 +70,7 @@ export const useUserSettings = () => {
     duplicate_review_enabled: true,
     duplicate_review_last_shown: null,
     duplicate_review_seen: false,
+    trading_days_calculation_mode: 'calendar',
   });
   const [loading, setLoading] = useState(true);
 
@@ -114,6 +118,7 @@ export const useUserSettings = () => {
           duplicate_review_enabled: data.duplicate_review_enabled ?? true,
           duplicate_review_last_shown: data.duplicate_review_last_shown,
           duplicate_review_seen: data.duplicate_review_seen || false,
+          trading_days_calculation_mode: (data.trading_days_calculation_mode || 'calendar') as 'calendar' | 'unique',
         });
       }
     } catch (error) {
