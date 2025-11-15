@@ -1,4 +1,5 @@
 import { Trade } from '@/types/trade';
+import { calculateTradePnL, calculateTotalPnL } from './pnl';
 
 export type MarketRegime = 'bull' | 'bear' | 'sideways' | 'high-volatility' | 'low-volatility';
 
@@ -33,7 +34,7 @@ export const calculateRegimeMetrics = (trades: Trade[]): RegimeMetrics => {
   );
 
   // Calculate cumulative returns for trend
-  const returns = sortedTrades.map(t => (t.profit_loss || 0) / (t.margin || 1));
+  const returns = sortedTrades.map(t => calculateTradePnL(t, { includeFees: true }) / (t.margin || 1));
   const cumReturns = returns.reduce((acc: number[], r, i) => {
     acc.push((acc[i - 1] || 0) + r);
     return acc;
@@ -152,13 +153,13 @@ const calculateHistoricalRegimePerformance = (trades: Trade[]) => {
   // For now, return placeholder data
   return regimes.map(regime => {
     const regimeTrades = trades.filter(() => Math.random() > 0.5); // Placeholder
-    const winningTrades = regimeTrades.filter(t => (t.profit_loss || 0) > 0);
+    const winningTrades = regimeTrades.filter(t => calculateTradePnL(t, { includeFees: true }) > 0);
     
     return {
       regime,
       winRate: regimeTrades.length > 0 ? (winningTrades.length / regimeTrades.length) * 100 : 0,
       avgPnL: regimeTrades.length > 0 
-        ? regimeTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / regimeTrades.length 
+        ? calculateTotalPnL(regimeTrades, { includeFees: true }) / regimeTrades.length 
         : 0,
       tradeCount: regimeTrades.length,
     };

@@ -1,4 +1,5 @@
 import type { Trade } from '@/types/trade';
+import { calculateTradePnL } from './pnl';
 
 export interface TimeBasedPerformance {
   hour: number;
@@ -58,9 +59,10 @@ export const analyzeHourlyPerformance = (trades: Trade[]): TimeBasedPerformance[
       hourlyData[hour] = { wins: 0, losses: 0, pnl: 0 };
     }
     
-    if ((t.profit_loss || 0) > 0) hourlyData[hour].wins++;
+    const tradePnL = calculateTradePnL(t, { includeFees: true });
+    if (tradePnL > 0) hourlyData[hour].wins++;
     else hourlyData[hour].losses++;
-    hourlyData[hour].pnl += t.profit_loss || 0;
+    hourlyData[hour].pnl += tradePnL;
   });
   
   return Object.entries(hourlyData).map(([hour, data]) => ({
@@ -85,9 +87,10 @@ export const analyzeDayPerformance = (trades: Trade[]): DayPerformance[] => {
       dayData[day] = { wins: 0, losses: 0, pnl: 0 };
     }
     
-    if ((t.profit_loss || 0) > 0) dayData[day].wins++;
+    const tradePnL = calculateTradePnL(t, { includeFees: true });
+    if (tradePnL > 0) dayData[day].wins++;
     else dayData[day].losses++;
-    dayData[day].pnl += t.profit_loss || 0;
+    dayData[day].pnl += tradePnL;
   });
   
   return Object.entries(dayData).map(([day, data]) => ({
@@ -113,9 +116,10 @@ export const findBestWorstDays = (trades: Trade[]): { best: BestWorstDay | null;
       dailyData[date] = { pnl: 0, trades: 0, wins: 0 };
     }
     
-    dailyData[date].pnl += t.profit_loss || 0;
+    const tradePnL = calculateTradePnL(t, { includeFees: true });
+    dailyData[date].pnl += tradePnL;
     dailyData[date].trades++;
-    if ((t.profit_loss || 0) > 0) dailyData[date].wins++;
+    if (tradePnL > 0) dailyData[date].wins++;
   });
   
   const days = Object.entries(dailyData).map(([date, data]) => ({
@@ -144,9 +148,10 @@ export const getTopAssets = (trades: Trade[], limit: number = 3): Array<{ symbol
       assetData[symbol] = { wins: 0, losses: 0, totalPnL: 0 };
     }
     
-    if ((t.profit_loss || 0) > 0) assetData[symbol].wins++;
+    const tradePnL = calculateTradePnL(t, { includeFees: true });
+    if (tradePnL > 0) assetData[symbol].wins++;
     else assetData[symbol].losses++;
-    assetData[symbol].totalPnL += t.profit_loss || 0;
+    assetData[symbol].totalPnL += tradePnL;
   });
   
   const assets = Object.entries(assetData).map(([symbol, data]) => ({

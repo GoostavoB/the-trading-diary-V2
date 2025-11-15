@@ -3,6 +3,7 @@ import { useCurrency } from '@/contexts/CurrencyContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { tradeStationEvents } from '@/utils/tradeStationEvents';
+import { calculateTradePnL } from '@/utils/pnl';
 
 export interface RiskCalculation {
   riskPerTrade: number;
@@ -69,10 +70,7 @@ export const useRiskCalculator = () => {
 
       if (trades) {
         const totalPnL = trades.reduce((sum, t) => {
-          const pnl = t.profit_loss || 0;
-          const fundingFee = t.funding_fee || 0;
-          const tradingFee = t.trading_fee || 0;
-          return sum + (pnl - Math.abs(fundingFee) - Math.abs(tradingFee));
+          return sum + calculateTradePnL(t, { includeFees: true });
         }, 0);
 
         setInitialCapital(baseCapital);

@@ -140,9 +140,9 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
 
     // Filter by type
     if (filterType === 'wins') {
-      filtered = filtered.filter((t) => (t.profit_loss || 0) > 0);
+      filtered = filtered.filter((t) => calculateTradePnL(t, { includeFees: true }) > 0);
     } else if (filterType === 'losses') {
-      filtered = filtered.filter((t) => (t.profit_loss || 0) <= 0);
+      filtered = filtered.filter((t) => calculateTradePnL(t, { includeFees: true }) <= 0);
     }
 
     // Sort
@@ -154,7 +154,7 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
         comparison = new Date(a.opened_at || a.trade_date || 0).getTime() - 
                      new Date(b.opened_at || b.trade_date || 0).getTime();
       } else if (sortBy === 'pnl') {
-        comparison = (b.profit_loss || 0) - (a.profit_loss || 0);
+        comparison = calculateTradePnL(b, { includeFees: true }) - calculateTradePnL(a, { includeFees: true });
       } else if (sortBy === 'roi') {
         comparison = (b.roi || 0) - (a.roi || 0);
       }

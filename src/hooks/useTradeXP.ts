@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useXPSystem } from './useXPSystem';
 import { useDailyChallenges } from './useDailyChallenges';
 import type { Trade } from '@/types/trade';
+import { calculateTradePnL, calculateTotalPnL } from '@/utils/pnl';
 
 export const useTradeXP = (trades: Trade[]) => {
   const { addXP } = useXPSystem();
@@ -27,9 +28,10 @@ export const useTradeXP = (trades: Trade[]) => {
         addXP(10, 'trade_completed', `Trade on ${trade.symbol}`);
 
         // Bonus XP for winning trades
-        if ((trade.profit_loss || 0) > 0) {
-          const winXP = Math.min(Math.floor((trade.profit_loss || 0) / 10), 50); // Max 50 XP per win
-          addXP(winXP, 'winning_trade', `Profit: $${trade.profit_loss?.toFixed(2)}`);
+        const tradePnL = calculateTradePnL(trade, { includeFees: true });
+        if (tradePnL > 0) {
+          const winXP = Math.min(Math.floor(tradePnL / 10), 50); // Max 50 XP per win
+          addXP(winXP, 'winning_trade', `Profit: $${tradePnL.toFixed(2)}`);
         }
 
         // Bonus XP for good risk management (ROI > 3%)
@@ -59,7 +61,7 @@ export const useTradeXP = (trades: Trade[]) => {
     );
     let winStreak = 0;
     for (const trade of sortedTodayTrades) {
-      if ((trade.profit_loss || 0) > 0) {
+      if (calculateTradePnL(trade, { includeFees: true }) > 0) {
         winStreak++;
       } else {
         break;
@@ -68,7 +70,7 @@ export const useTradeXP = (trades: Trade[]) => {
     updateChallengeProgress('win_rate', winStreak);
 
     // Profit target challenge
-    const todayProfit = todayTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+    const todayProfit = calculateTotalPnL(todayTrades, { includeFees: true });
     updateChallengeProgress('profit_target', Math.floor(todayProfit));
 
   }, [trades, addXP, updateChallengeProgress]);

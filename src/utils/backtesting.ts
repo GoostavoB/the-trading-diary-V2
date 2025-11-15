@@ -1,4 +1,5 @@
 import { Trade } from '@/types/trade';
+import { calculateTradePnL, calculateTotalPnL } from './pnl';
 
 export interface BacktestStrategy {
   name: string;
@@ -51,15 +52,15 @@ export const runBacktest = (
     trade => strategy.entryCondition(trade) && strategy.exitCondition(trade)
   );
 
-  const winningTrades = strategyTrades.filter(t => (t.profit_loss || 0) > 0);
-  const losingTrades = strategyTrades.filter(t => (t.profit_loss || 0) <= 0);
+  const winningTrades = strategyTrades.filter(t => calculateTradePnL(t, { includeFees: true }) > 0);
+  const losingTrades = strategyTrades.filter(t => calculateTradePnL(t, { includeFees: true }) <= 0);
 
-  const totalPnL = strategyTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+  const totalPnL = calculateTotalPnL(strategyTrades, { includeFees: true });
   const avgWin = winningTrades.length > 0
-    ? winningTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / winningTrades.length
+    ? calculateTotalPnL(winningTrades, { includeFees: true }) / winningTrades.length
     : 0;
   const avgLoss = losingTrades.length > 0
-    ? Math.abs(losingTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / losingTrades.length)
+    ? Math.abs(calculateTotalPnL(losingTrades, { includeFees: true }) / losingTrades.length)
     : 0;
 
   const profitFactor = avgLoss > 0 ? (avgWin * winningTrades.length) / (avgLoss * losingTrades.length) : 0;
@@ -77,7 +78,7 @@ export const runBacktest = (
   let peak = 0;
   let cumPnL = 0;
   strategyTrades.forEach(trade => {
-    cumPnL += trade.profit_loss || 0;
+    cumPnL += calculateTradePnL(trade, { includeFees: true });
     if (cumPnL > peak) peak = cumPnL;
     const drawdown = peak - cumPnL;
     if (drawdown > maxDrawdown) maxDrawdown = drawdown;

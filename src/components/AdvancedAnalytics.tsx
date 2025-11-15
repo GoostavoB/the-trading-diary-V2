@@ -193,7 +193,7 @@ export const AdvancedAnalytics = ({ trades, initialInvestment, userId, onInitial
   const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const dayStats = daysOfWeek.map((dayName, dayIndex) => {
     const dayTrades = trades.filter(t => new Date(t.trade_date).getDay() === dayIndex);
-    const wins = dayTrades.filter(t => t.profit_loss > 0).length;
+    const wins = dayTrades.filter(t => calculateTradePnL(t, { includeFees: true }) > 0).length;
     const winRate = dayTrades.length > 0 ? (wins / dayTrades.length) * 100 : 0;
     const avgROI = dayTrades.length > 0 
       ? dayTrades.reduce((sum, t) => sum + (t.roi || 0), 0) / dayTrades.length 
