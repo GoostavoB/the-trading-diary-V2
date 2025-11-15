@@ -60,7 +60,7 @@ export function GoalWidget() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('trades')
-        .select('trade_date, pnl, profit_loss, roi')
+        .select('trade_date, opened_at, pnl, profit_loss, roi')
         .eq('user_id', user!.id)
         .not('trade_date', 'is', null)
         .order('trade_date', { ascending: true });

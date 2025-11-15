@@ -17,11 +17,13 @@ interface Goal {
   capital_target_type?: 'absolute' | 'relative';
 }
 
+// Lightweight trade interface for projection calculations
 interface Trade {
-  trade_date: string;
-  pnl?: number;
-  profit_loss?: number;
-  roi?: number;
+  trade_date: string | null;
+  opened_at?: string | null;
+  pnl?: number | null;
+  profit_loss?: number | null;
+  roi?: number | null;
 }
 
 interface GoalProjectionProps {
@@ -51,11 +53,11 @@ export const GoalProjection = ({ goals, trades, onDelete, onEdit }: GoalProjecti
   const calculateProjection = (goal: Goal) => {
     // Calculate historical period from uploaded trades only
     const sortedTrades = [...trades].sort((a, b) => 
-      new Date(a.trade_date).getTime() - new Date(b.trade_date).getTime()
+      new Date(a.opened_at || a.trade_date).getTime() - new Date(b.opened_at || b.trade_date).getTime()
     );
     
-    const firstTradeDate = new Date(sortedTrades[0]?.trade_date);
-    const lastTradeDate = new Date(sortedTrades[sortedTrades.length - 1]?.trade_date);
+    const firstTradeDate = new Date(sortedTrades[0]?.opened_at || sortedTrades[0]?.trade_date);
+    const lastTradeDate = new Date(sortedTrades[sortedTrades.length - 1]?.opened_at || sortedTrades[sortedTrades.length - 1]?.trade_date);
     
     // Calculate unique trading days
     const uniqueTradingDays = new Set(
