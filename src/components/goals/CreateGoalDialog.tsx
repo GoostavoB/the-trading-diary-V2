@@ -42,27 +42,24 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
     queryFn: async () => {
       if (!user) return null;
       
-      // Get first capital log entry (initial capital)
-      const { data: firstEntry } = await supabase
+      // Get all capital log entries to sum total additions
+      const { data: allEntries } = await supabase
         .from('capital_log')
-        .select('amount_added, total_after')
+        .select('amount_added, total_after, log_date')
         .eq('user_id', user.id)
-        .order('log_date', { ascending: true })
-        .limit(1)
-        .maybeSingle();
+        .order('log_date', { ascending: true });
       
-      // Get last capital log entry (current capital)
-      const { data: lastEntry } = await supabase
-        .from('capital_log')
-        .select('total_after')
-        .eq('user_id', user.id)
-        .order('log_date', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      if (!allEntries || allEntries.length === 0) return null;
+      
+      // Initial Capital = SUM of all capital additions
+      const totalCapitalAdded = allEntries.reduce((sum, entry) => sum + (entry.amount_added || 0), 0);
+      
+      // Current Capital = last entry's total_after
+      const lastEntry = allEntries[allEntries.length - 1];
       
       return {
-        initialCapital: firstEntry?.amount_added || firstEntry?.total_after || null,
-        currentCapital: lastEntry?.total_after || null,
+        initialCapital: totalCapitalAdded,
+        currentCapital: lastEntry.total_after,
       };
     },
     enabled: !!user && open && (formData.goal_type === 'capital' || formData.goal_type === 'roi')
