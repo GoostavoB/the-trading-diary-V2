@@ -1,4 +1,5 @@
 import { Trade } from '@/types/trade';
+import { calculateTradePnL, calculateTotalPnL } from './pnl';
 
 export interface AttributionBreakdown {
   category: string;
@@ -34,11 +35,11 @@ const calculateBreakdown = (
     groups[key].push(trade);
   });
 
-  const totalPnL = trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+  const totalPnL = calculateTotalPnL(trades, { includeFees: true });
 
   return Object.entries(groups).map(([subcategory, groupTrades]) => {
-    const winningTrades = groupTrades.filter(t => (t.profit_loss || 0) > 0);
-    const groupPnL = groupTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+    const winningTrades = groupTrades.filter(t => calculateTradePnL(t, { includeFees: true }) > 0);
+    const groupPnL = calculateTotalPnL(groupTrades, { includeFees: true });
     const avgPnL = groupPnL / groupTrades.length;
 
     return {

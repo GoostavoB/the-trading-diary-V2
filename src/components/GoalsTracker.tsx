@@ -138,7 +138,7 @@ export const GoalsTracker = ({ trades }: GoalsTrackerProps) => {
           new Date(b.trade_date).getTime() - new Date(a.trade_date).getTime()
         );
         for (const trade of sortedTrades) {
-          if ((trade.profit_loss || 0) > 0) {
+          if (calculateTradePnL(trade, { includeFees: true }) > 0) {
             currentStreak++;
           } else {
             break;
