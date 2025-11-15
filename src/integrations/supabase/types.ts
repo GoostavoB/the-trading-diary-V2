@@ -5198,7 +5198,15 @@ export type Database = {
       get_subscription_tier: { Args: { p_user_id: string }; Returns: string }
       get_trading_analytics: {
         Args: { end_date?: string; start_date?: string; user_uuid: string }
-        Returns: Json
+        Returns: {
+          avg_loss: number
+          avg_win: number
+          losing_trades: number
+          total_pnl: number
+          total_trades: number
+          win_rate: number
+          winning_trades: number
+        }[]
       }
       get_user_dashboard_stats: { Args: { user_uuid: string }; Returns: Json }
       get_week_start: { Args: { date_input?: string }; Returns: string }

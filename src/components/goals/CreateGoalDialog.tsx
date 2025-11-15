@@ -27,6 +27,7 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
     goal_type: editingGoal?.goal_type || 'profit',
     capital_target_type: editingGoal?.capital_target_type || 'absolute',
     target_value: editingGoal?.target_value || '',
+    baseline_value: editingGoal?.baseline_value || '',
     period_type: editingGoal?.period_type || 'all_time',
     period_start: editingGoal?.period_start || '',
     period_end: editingGoal?.period_end || '',
@@ -42,6 +43,7 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
         goal_type: editingGoal.goal_type || 'profit',
         capital_target_type: editingGoal.capital_target_type || 'absolute',
         target_value: editingGoal.target_value || '',
+        baseline_value: editingGoal.baseline_value || '',
         period_type: editingGoal.period_type || 'all_time',
         period_start: editingGoal.period_start ? format(new Date(editingGoal.period_start), 'yyyy-MM-dd') : '',
         period_end: editingGoal.period_end ? format(new Date(editingGoal.period_end), 'yyyy-MM-dd') : '',
@@ -88,7 +90,13 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
       // Set baseline_date for start_from_scratch mode
       if (formData.calculation_mode === 'start_from_scratch' && !editingGoal) {
         goalData.baseline_date = new Date().toISOString();
-        goalData.baseline_value = 0;
+      }
+
+      // Set baseline_value for capital and ROI goals
+      if ((formData.goal_type === 'capital' || formData.goal_type === 'roi') && formData.baseline_value) {
+        goalData.baseline_value = parseFloat(formData.baseline_value);
+      } else if (!editingGoal) {
+        goalData.baseline_value = null;
       }
 
       if (editingGoal) {
@@ -119,6 +127,7 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
         goal_type: 'profit',
         capital_target_type: 'absolute',
         target_value: '',
+        baseline_value: '',
         period_type: 'all_time',
         period_start: '',
         period_end: '',

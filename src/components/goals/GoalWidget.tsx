@@ -76,35 +76,76 @@ export function GoalWidget() {
     enabled: goals.length > 0,
   });
 
-  // Compute current values based on calculation mode and timeframe
+  // Compute current values for all goal types based on calculation mode and timeframe
   const { data: currentValues } = useQuery({
-    queryKey: ['goal-current-values', goals.map(g => ({ id: g.id, type: g.goal_type, calc: g.calculation_mode, period: g.period_type, start: g.period_start, end: g.period_end, deadline: g.deadline }))],
+    queryKey: ['goal-current-values', goals.map(g => ({ id: g.id, type: g.goal_type, calc: g.calculation_mode, period: g.period_type, start: g.period_start, end: g.period_end, deadline: g.deadline, baseline: g.baseline_value }))],
     queryFn: async () => {
       const results = await Promise.all(
         goals.map(async (goal) => {
-          // Default: use stored current_value
-          let current = goal.current_value ?? 0;
+          let current = 0;
 
-          // For Profit goals with "Use current performance", compute from trades within timeframe
-          if (goal.goal_type === 'profit' && goal.calculation_mode === 'current_performance') {
-            const startDate = goal.period_type === 'custom_range' && goal.period_start
-              ? new Date(goal.period_start).toISOString()
-              : null;
-            const endDate = goal.period_type === 'custom_range' && goal.period_end
+          // Determine date range based on calculation mode and period type
+          let startDate: string | null = null;
+          let endDate: string | null = null;
+
+          if (goal.calculation_mode === 'start_from_scratch' && goal.baseline_date) {
+            startDate = new Date(goal.baseline_date).toISOString();
+            endDate = goal.period_type === 'custom_range' && goal.period_end
               ? new Date(goal.period_end).toISOString()
               : new Date(goal.deadline).toISOString();
-
-            const { data, error } = await supabase.rpc('get_trading_analytics' as any, {
-              user_uuid: user!.id,
-              start_date: startDate,
-              end_date: endDate,
-            });
-
-            if (error) {
-              console.error('Current value calc error:', error);
-            } else if (data) {
-              current = (data as any).total_pnl ?? 0;
+          } else if (goal.calculation_mode === 'current_performance') {
+            if (goal.period_type === 'custom_range') {
+              startDate = goal.period_start ? new Date(goal.period_start).toISOString() : null;
+              endDate = goal.period_end ? new Date(goal.period_end).toISOString() : null;
+            } else {
+              // all_time: no start, end at deadline
+              startDate = null;
+              endDate = new Date(goal.deadline).toISOString();
             }
+          }
+
+          // Fetch analytics for the timeframe
+          const { data, error } = await supabase.rpc('get_trading_analytics' as any, {
+            user_uuid: user!.id,
+            start_date: startDate,
+            end_date: endDate,
+          });
+
+          if (error) {
+            console.error('Analytics error for goal', goal.id, error);
+            return { goalId: goal.id, current: 0 };
+          }
+
+          const analytics = data as any;
+          const totalPnl = analytics?.total_pnl ?? 0;
+          const totalTrades = analytics?.total_trades ?? 0;
+          const winRate = analytics?.win_rate ?? 0;
+
+          // Calculate current value based on goal type
+          switch (goal.goal_type) {
+            case 'profit':
+              current = totalPnl;
+              break;
+            case 'trades':
+              current = totalTrades;
+              break;
+            case 'win_rate':
+              current = winRate;
+              break;
+            case 'roi':
+              const baseline = goal.baseline_value ?? 1;
+              current = baseline > 0 ? (totalPnl / baseline) * 100 : 0;
+              break;
+            case 'capital':
+              if (goal.capital_target_type === 'absolute') {
+                current = (goal.baseline_value ?? 0) + totalPnl;
+              } else {
+                const baseCapital = goal.baseline_value ?? 1;
+                current = baseCapital > 0 ? (totalPnl / baseCapital) * 100 : 0;
+              }
+              break;
+            default:
+              current = goal.current_value ?? 0;
           }
 
           return { goalId: goal.id, current };
@@ -135,21 +176,27 @@ export function GoalWidget() {
     }
   };
 
-  const formatValue = (value: number, type: string) => {
-    switch (type) {
-      case 'profit':
-      case 'pnl':
-        return <BlurredCurrency amount={value} className="inline" />;
-      case 'win_rate':
-      case 'roi':
-        return <BlurredPercent value={value} className="inline" />;
-      case 'trades':
-        return `${Math.floor(value)}`;
-      case 'streak':
-        return `${Math.floor(value)} days`;
-      default:
-        return value.toString();
+  const formatValue = (value: number, type: string, capitalType?: string) => {
+    if (type === 'profit' || type === 'pnl') {
+      return <BlurredCurrency amount={value} className="inline" />;
     }
+    if (type === 'capital') {
+      if (capitalType === 'absolute') {
+        return <BlurredCurrency amount={value} className="inline" />;
+      } else {
+        return <BlurredPercent value={value} className="inline" />;
+      }
+    }
+    if (type === 'win_rate' || type === 'roi') {
+      return <BlurredPercent value={value} className="inline" />;
+    }
+    if (type === 'trades') {
+      return `${Math.floor(value)}`;
+    }
+    if (type === 'streak') {
+      return `${Math.floor(value)} days`;
+    }
+    return value.toString();
   };
 
   if (isLoading) {
@@ -268,7 +315,7 @@ export function GoalWidget() {
               
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">
-                  {formatValue(currentVal, goal.goal_type)} / {formatValue(goal.target_value, goal.goal_type)}
+                  {formatValue(currentVal, goal.goal_type, goal.capital_target_type)} / {formatValue(goal.target_value, goal.goal_type, goal.capital_target_type)}
                 </span>
                 <span className="font-medium">{progress.toFixed(1)}%</span>
               </div>
