@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,9 +25,32 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
     title: editingGoal?.title || '',
     description: editingGoal?.description || '',
     goal_type: editingGoal?.goal_type || 'profit',
+    capital_target_type: editingGoal?.capital_target_type || 'absolute',
     target_value: editingGoal?.target_value || '',
+    period_type: editingGoal?.period_type || 'all_time',
+    period_start: editingGoal?.period_start || '',
+    period_end: editingGoal?.period_end || '',
+    calculation_mode: editingGoal?.calculation_mode || 'current_performance',
     target_date: editingGoal?.deadline ? format(new Date(editingGoal.deadline), 'yyyy-MM-dd') : '',
   });
+
+  useEffect(() => {
+    if (editingGoal) {
+      setFormData({
+        title: editingGoal.title || '',
+        description: editingGoal.description || '',
+        goal_type: editingGoal.goal_type || 'profit',
+        capital_target_type: editingGoal.capital_target_type || 'absolute',
+        target_value: editingGoal.target_value || '',
+        period_type: editingGoal.period_type || 'all_time',
+        period_start: editingGoal.period_start ? format(new Date(editingGoal.period_start), 'yyyy-MM-dd') : '',
+        period_end: editingGoal.period_end ? format(new Date(editingGoal.period_end), 'yyyy-MM-dd') : '',
+        calculation_mode: editingGoal.calculation_mode || 'current_performance',
+        target_date: editingGoal.deadline ? format(new Date(editingGoal.deadline), 'yyyy-MM-dd') : '',
+      });
+      setOpen(true);
+    }
+  }, [editingGoal]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +95,12 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
         title: '',
         description: '',
         goal_type: 'profit',
+        capital_target_type: 'absolute',
         target_value: '',
+        period_type: 'all_time',
+        period_start: '',
+        period_end: '',
+        calculation_mode: 'current_performance',
         target_date: '',
       });
     } catch (error) {
@@ -84,12 +112,238 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
   };
 
   const goalTypes = [
-    { value: 'profit', label: 'Profit Target', unit: '$' },
-    { value: 'win_rate', label: 'Win Rate', unit: '%' },
-    { value: 'trades', label: 'Number of Trades', unit: 'trades' },
-    { value: 'streak', label: 'Winning Streak', unit: 'days' },
-    { value: 'roi', label: 'ROI Percentage', unit: '%' },
+    { value: 'capital', label: 'Capital' },
+    { value: 'profit', label: 'Profit' },
+    { value: 'win_rate', label: 'Win Rate' },
+    { value: 'trades', label: 'Trades' },
+    { value: 'roi', label: 'ROI' },
+    { value: 'streak', label: 'Winning Streak' },
   ];
+
+  const renderGoalTypeSection = () => {
+    switch (formData.goal_type) {
+      case 'capital':
+        return (
+          <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
+            <h3 className="font-medium">Capital goal</h3>
+            
+            <div className="space-y-3">
+              <Label>Target type</Label>
+              <RadioGroup
+                value={formData.capital_target_type}
+                onValueChange={(value) => setFormData({ ...formData, capital_target_type: value })}
+              >
+                <div className="flex items-start space-x-2">
+                  <RadioGroupItem value="absolute" id="absolute" />
+                  <div className="grid gap-1.5 leading-none">
+                    <label htmlFor="absolute" className="font-medium cursor-pointer">
+                      Amount
+                    </label>
+                    <p className="text-sm text-muted-foreground">
+                      Set a fixed capital value to reach.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <RadioGroupItem value="relative" id="relative" />
+                  <div className="grid gap-1.5 leading-none">
+                    <label htmlFor="relative" className="font-medium cursor-pointer">
+                      Percentage
+                    </label>
+                    <p className="text-sm text-muted-foreground">
+                      Set how much you want your capital to grow.
+                    </p>
+                  </div>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div>
+              <Label htmlFor="target_value">
+                {formData.capital_target_type === 'absolute' ? 'Target capital' : 'Capital growth target'}
+              </Label>
+              <div className="relative mt-1.5">
+                <Input
+                  id="target_value"
+                  type="number"
+                  step="any"
+                  value={formData.target_value}
+                  onChange={(e) => setFormData({ ...formData, target_value: e.target.value })}
+                  placeholder={formData.capital_target_type === 'absolute' ? '5,000' : '20'}
+                  required
+                  className="pr-16"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  {formData.capital_target_type === 'absolute' ? 'USDT' : '%'}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1.5">
+                {formData.capital_target_type === 'absolute'
+                  ? 'Account value you want to reach by this goal\'s deadline.'
+                  : 'Percentage growth you want from your starting capital in this goal.'}
+              </p>
+            </div>
+
+            <p className="text-xs text-muted-foreground pt-2 border-t">
+              We use your account equity to calculate capital and progress toward this goal.
+            </p>
+          </div>
+        );
+      
+      case 'profit':
+        return (
+          <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
+            <h3 className="font-medium">Profit goal</h3>
+            <div>
+              <Label htmlFor="target_value">Target profit</Label>
+              <div className="relative mt-1.5">
+                <Input
+                  id="target_value"
+                  type="number"
+                  step="any"
+                  value={formData.target_value}
+                  onChange={(e) => setFormData({ ...formData, target_value: e.target.value })}
+                  placeholder="1,000"
+                  required
+                  className="pr-16"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  USDT
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Profit you want to earn within this goal's timeframe.
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground pt-2 border-t">
+              We use your realized PnL from trades to calculate progress toward this goal.
+            </p>
+          </div>
+        );
+
+      case 'win_rate':
+        return (
+          <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
+            <h3 className="font-medium">Win rate goal</h3>
+            <div>
+              <Label htmlFor="target_value">Target win rate</Label>
+              <div className="relative mt-1.5">
+                <Input
+                  id="target_value"
+                  type="number"
+                  step="any"
+                  value={formData.target_value}
+                  onChange={(e) => setFormData({ ...formData, target_value: e.target.value })}
+                  placeholder="60"
+                  required
+                  className="pr-16"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  %
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Percentage of winning trades you want to achieve in this goal.
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground pt-2 border-t">
+              We calculate win rate using the trades inside your goal timeframe.
+            </p>
+          </div>
+        );
+
+      case 'trades':
+        return (
+          <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
+            <h3 className="font-medium">Trades goal</h3>
+            <div>
+              <Label htmlFor="target_value">Target number of trades</Label>
+              <Input
+                id="target_value"
+                type="number"
+                step="1"
+                value={formData.target_value}
+                onChange={(e) => setFormData({ ...formData, target_value: e.target.value })}
+                placeholder="50"
+                required
+                className="mt-1.5"
+              />
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Total number of trades you want to take inside this goal timeframe.
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground pt-2 border-t">
+              We count all trades in the selected timeframe to track this goal.
+            </p>
+          </div>
+        );
+
+      case 'roi':
+        return (
+          <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
+            <h3 className="font-medium">ROI goal</h3>
+            <div>
+              <Label htmlFor="target_value">Target ROI</Label>
+              <div className="relative mt-1.5">
+                <Input
+                  id="target_value"
+                  type="number"
+                  step="any"
+                  value={formData.target_value}
+                  onChange={(e) => setFormData({ ...formData, target_value: e.target.value })}
+                  placeholder="10"
+                  required
+                  className="pr-16"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  %
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Return on investment percentage you want to reach in this goal.
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground pt-2 border-t">
+              We calculate ROI using your realized PnL and margin inside the timeframe.
+            </p>
+          </div>
+        );
+
+      case 'streak':
+        return (
+          <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
+            <h3 className="font-medium">Winning streak goal</h3>
+            <div>
+              <Label htmlFor="target_value">Target streak</Label>
+              <div className="relative mt-1.5">
+                <Input
+                  id="target_value"
+                  type="number"
+                  step="1"
+                  value={formData.target_value}
+                  onChange={(e) => setFormData({ ...formData, target_value: e.target.value })}
+                  placeholder="5"
+                  required
+                  className="pr-16"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  wins
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Number of consecutive winning trades you want to reach.
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground pt-2 border-t">
+              We track your active streak using trades inside your goal timeframe.
+            </p>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -101,81 +355,184 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{editingGoal ? 'Edit Goal' : 'Create New Goal'}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Title */}
           <div>
-            <Label htmlFor="title">Goal Title *</Label>
+            <Label htmlFor="title">Goal title *</Label>
             <Input
               id="title"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="e.g., Reach $10,000 profit"
               required
+              className="mt-1.5"
             />
           </div>
 
-          <div>
-            <Label htmlFor="description">Description</Label>
+          {/* Description */}
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Add more details about your goal..."
-              rows={3}
+              placeholder="Optional notes about this goal..."
+              className="mt-1.5 min-h-[80px]"
             />
           </div>
 
+          {/* Goal Type */}
           <div>
-            <Label htmlFor="goal_type">Goal Type *</Label>
-            <Select value={formData.goal_type} onValueChange={(value) => setFormData({ ...formData, goal_type: value })}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {goalTypes.map(type => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>Goal type *</Label>
+            <div className="grid grid-cols-3 gap-2 mt-1.5">
+              {goalTypes.map((type) => (
+                <button
+                  key={type.value}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, goal_type: type.value })}
+                  className={`p-3 text-sm font-medium rounded-lg border-2 transition-all ${
+                    formData.goal_type === type.value
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  {type.label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="target_value">
-              Target Value * 
-              ({goalTypes.find(t => t.value === formData.goal_type)?.unit})
-            </Label>
-            <Input
-              id="target_value"
-              type="number"
-              step="any"
-              value={formData.target_value}
-              onChange={(e) => setFormData({ ...formData, target_value: e.target.value })}
-              placeholder="Enter target value"
-              required
-            />
+          {/* Type-Specific Section */}
+          {renderGoalTypeSection()}
+
+          {/* Goal Timeframe */}
+          <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
+            <div>
+              <h3 className="font-medium">Goal timeframe</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Choose which trades and results count for this goal.
+              </p>
+            </div>
+
+            <RadioGroup
+              value={formData.period_type}
+              onValueChange={(value) => setFormData({ ...formData, period_type: value })}
+            >
+              <div className="flex items-start space-x-2">
+                <RadioGroupItem value="all_time" id="all_time" />
+                <div className="grid gap-1.5 leading-none">
+                  <label htmlFor="all_time" className="font-medium cursor-pointer">
+                    All data until deadline
+                  </label>
+                  <p className="text-sm text-muted-foreground">
+                    Use all your trading history up to this goal's deadline.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-2">
+                <RadioGroupItem value="custom_range" id="custom_range" />
+                <div className="grid gap-1.5 leading-none">
+                  <label htmlFor="custom_range" className="font-medium cursor-pointer">
+                    Custom date range
+                  </label>
+                  <p className="text-sm text-muted-foreground">
+                    Use only trades inside a specific start and end date.
+                  </p>
+                </div>
+              </div>
+            </RadioGroup>
+
+            {formData.period_type === 'custom_range' && (
+              <>
+                <div className="grid grid-cols-2 gap-4 pt-2">
+                  <div>
+                    <Label htmlFor="period_start">From</Label>
+                    <Input
+                      id="period_start"
+                      type="date"
+                      value={formData.period_start}
+                      onChange={(e) => setFormData({ ...formData, period_start: e.target.value })}
+                      required
+                      className="mt-1.5"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="period_end">To</Label>
+                    <Input
+                      id="period_end"
+                      type="date"
+                      value={formData.period_end}
+                      onChange={(e) => setFormData({ ...formData, period_end: e.target.value })}
+                      required
+                      className="mt-1.5"
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground pt-2 border-t">
+                  We only use trades inside this date range for this goal.
+                </p>
+              </>
+            )}
           </div>
 
+          {/* Goal Calculation Mode */}
+          <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
+            <div>
+              <h3 className="font-medium">Goal calculation mode</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Choose how progress is calculated.
+              </p>
+            </div>
+
+            <RadioGroup
+              value={formData.calculation_mode}
+              onValueChange={(value) => setFormData({ ...formData, calculation_mode: value })}
+            >
+              <div className="flex items-start space-x-2">
+                <RadioGroupItem value="current_performance" id="current_performance" />
+                <div className="grid gap-1.5 leading-none">
+                  <label htmlFor="current_performance" className="font-medium cursor-pointer">
+                    Use current performance
+                  </label>
+                  <p className="text-sm text-muted-foreground">
+                    Use all data inside the timeframe. Your progress starts from your existing results.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-2">
+                <RadioGroupItem value="start_from_scratch" id="start_from_scratch" />
+                <div className="grid gap-1.5 leading-none">
+                  <label htmlFor="start_from_scratch" className="font-medium cursor-pointer">
+                    Start from scratch today
+                  </label>
+                  <p className="text-sm text-muted-foreground">
+                    Ignore past data. Your progress starts at zero from today.
+                  </p>
+                </div>
+              </div>
+            </RadioGroup>
+          </div>
+
+          {/* Deadline */}
           <div>
-            <Label htmlFor="target_date">Target Date *</Label>
+            <Label htmlFor="target_date">Deadline *</Label>
             <Input
               id="target_date"
               type="date"
               value={formData.target_date}
               onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
               required
+              className="mt-1.5"
             />
           </div>
 
-          <div className="flex gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)} className="flex-1">
+          <div className="flex gap-2 justify-end pt-4">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading} className="flex-1">
+            <Button type="submit" disabled={loading}>
               {loading ? 'Saving...' : editingGoal ? 'Update Goal' : 'Create Goal'}
             </Button>
           </div>

@@ -71,54 +71,83 @@ export const GoalsTracker = ({ trades }: GoalsTrackerProps) => {
     setGoals((data || []) as Goal[]);
   };
 
-  const calculateCurrentValue = (goal: Goal, relevantTrades: Trade[]) => {
+  const getTradesInScope = (goal: any) => {
+    // Step 1: Filter by period window
+    let periodFilteredTrades = trades;
+    
+    if (goal.period_type === 'custom_range') {
+      const periodStart = new Date(goal.period_start);
+      const periodEnd = new Date(goal.period_end);
+      periodFilteredTrades = trades.filter(t => {
+        const tradeDate = new Date(t.trade_date);
+        return tradeDate >= periodStart && tradeDate <= periodEnd;
+      });
+    } else if (goal.period_type === 'all_time' && goal.deadline) {
+      const periodEnd = new Date(goal.deadline);
+      periodFilteredTrades = trades.filter(t => new Date(t.trade_date) <= periodEnd);
+    }
+
+    // Step 2: Apply baseline_date filter only for start_from_scratch mode
+    if (goal.calculation_mode === 'start_from_scratch' && goal.baseline_date) {
+      const baselineDate = new Date(goal.baseline_date);
+      return periodFilteredTrades.filter(t => new Date(t.trade_date) >= baselineDate);
+    }
+
+    return periodFilteredTrades;
+  };
+
+  const calculateCurrentValue = (goal: any, relevantTrades: Trade[]) => {
     switch (goal.goal_type) {
+      case 'capital':
+        // For capital goals, we need account equity
+        // For now, use cumulative PnL as a proxy (would need actual account data in production)
+        const totalPnl = relevantTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+        if (goal.capital_target_type === 'relative') {
+          // For relative, calculate percentage growth from baseline
+          const baseline = goal.baseline_value || 0;
+          return baseline > 0 ? ((totalPnl / baseline) * 100) : 0;
+        }
+        return totalPnl; // For absolute, return total capital (would be starting capital + PnL)
+      
+      case 'profit':
       case 'pnl':
         return relevantTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+      
       case 'win_rate':
         const wins = relevantTrades.filter(t => (t.profit_loss || 0) > 0).length;
         return relevantTrades.length > 0 ? (wins / relevantTrades.length) * 100 : 0;
+      
       case 'trades':
         return relevantTrades.length;
+      
       case 'roi':
-        const totalPnl = relevantTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+        const totalRoiPnl = relevantTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
         const totalMargin = relevantTrades.reduce((sum, t) => sum + (t.margin || 0), 0);
-        return totalMargin > 0 ? (totalPnl / totalMargin) * 100 : 0;
+        return totalMargin > 0 ? (totalRoiPnl / totalMargin) * 100 : 0;
+      
+      case 'streak':
+        // Calculate current winning streak
+        let currentStreak = 0;
+        const sortedTrades = [...relevantTrades].sort((a, b) => 
+          new Date(b.trade_date).getTime() - new Date(a.trade_date).getTime()
+        );
+        for (const trade of sortedTrades) {
+          if ((trade.profit_loss || 0) > 0) {
+            currentStreak++;
+          } else {
+            break;
+          }
+        }
+        return currentStreak;
+      
       default:
         return 0;
     }
   };
 
-  const getRelevantTrades = (period: Goal['period']) => {
-    const now = new Date();
-    const startOfPeriod = new Date();
-
-    switch (period) {
-      case 'daily':
-        startOfPeriod.setHours(0, 0, 0, 0);
-        break;
-      case 'weekly':
-        startOfPeriod.setDate(now.getDate() - now.getDay());
-        startOfPeriod.setHours(0, 0, 0, 0);
-        break;
-      case 'monthly':
-        startOfPeriod.setDate(1);
-        startOfPeriod.setHours(0, 0, 0, 0);
-        break;
-      case 'yearly':
-        startOfPeriod.setMonth(0, 1);
-        startOfPeriod.setHours(0, 0, 0, 0);
-        break;
-      case 'all_time':
-        return trades;
-    }
-
-    return trades.filter(t => new Date(t.trade_date) >= startOfPeriod);
-  };
-
   const updateGoalsProgress = async () => {
     const updates = goals.map(goal => {
-      const relevantTrades = getRelevantTrades(goal.period);
+      const relevantTrades = getTradesInScope(goal);
       const currentValue = calculateCurrentValue(goal, relevantTrades);
       return { id: goal.id, current_value: currentValue };
     });

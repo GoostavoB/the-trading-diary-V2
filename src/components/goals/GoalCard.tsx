@@ -15,8 +15,13 @@ interface GoalCardProps {
     target_value: number;
     current_value: number;
     deadline: string;
-    period: string;
+    period?: string;
     created_at: string;
+    calculation_mode?: string;
+    capital_target_type?: string;
+    period_type?: string;
+    period_start?: string;
+    period_end?: string;
   };
   onEdit: (goal: any) => void;
   onDelete: (id: string) => void;
@@ -37,16 +42,24 @@ export function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
 
   const getGoalTypeIcon = () => {
     switch (goal.goal_type) {
+      case 'capital': return <TrendingUp className="h-4 w-4" />;
       case 'profit': return <TrendingUp className="h-4 w-4" />;
+      case 'pnl': return <TrendingUp className="h-4 w-4" />;
       case 'win_rate': return <Target className="h-4 w-4" />;
       case 'streak': return <Award className="h-4 w-4" />;
       default: return <Target className="h-4 w-4" />;
     }
   };
 
-  const formatValue = (value: number, type: string) => {
+  const formatValue = (value: number, type: string, capitalTargetType?: string) => {
     switch (type) {
+      case 'capital':
+        if (capitalTargetType === 'relative') {
+          return <BlurredPercent value={value} className="inline" />;
+        }
+        return <BlurredCurrency amount={value} className="inline" />;
       case 'profit':
+      case 'pnl':
         return <BlurredCurrency amount={value} className="inline" />;
       case 'win_rate':
         return <BlurredPercent value={value} className="inline" />;
@@ -55,7 +68,7 @@ export function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
       case 'trades':
         return `${Math.floor(value)} trades`;
       case 'streak':
-        return `${Math.floor(value)} days`;
+        return `${Math.floor(value)} wins`;
       default:
         return value.toString();
     }
@@ -81,6 +94,16 @@ export function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
                 <Calendar className="h-3 w-3" />
                 {format(new Date(goal.deadline), 'MMM dd, yyyy')}
               </Badge>
+              {goal.calculation_mode === 'start_from_scratch' && (
+                <Badge variant="outline" className="text-xs">
+                  Fresh Start
+                </Badge>
+              )}
+              {goal.period_type === 'custom_range' && (
+                <Badge variant="outline" className="text-xs">
+                  Custom Range
+                </Badge>
+              )}
             </div>
           </div>
         </div>
@@ -102,10 +125,10 @@ export function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
         <Progress value={progress} className="h-2" />
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">
-            Current: {formatValue(goal.current_value, goal.goal_type)}
+            Current: {formatValue(goal.current_value, goal.goal_type, goal.capital_target_type)}
           </span>
-          <span className="font-medium">
-            Target: {formatValue(goal.target_value, goal.goal_type)}
+          <span className="text-muted-foreground">
+            Target: {formatValue(goal.target_value, goal.goal_type, goal.capital_target_type)}
           </span>
         </div>
       </div>

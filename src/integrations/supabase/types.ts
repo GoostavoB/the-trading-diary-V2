@@ -3497,6 +3497,10 @@ export type Database = {
       }
       trading_goals: {
         Row: {
+          baseline_date: string | null
+          baseline_value: number | null
+          calculation_mode: string
+          capital_target_type: string | null
           created_at: string
           current_value: number
           deadline: string | null
@@ -3504,12 +3508,19 @@ export type Database = {
           goal_type: string
           id: string
           period: string
+          period_end: string | null
+          period_start: string | null
+          period_type: string
           target_value: number
           title: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          baseline_date?: string | null
+          baseline_value?: number | null
+          calculation_mode?: string
+          capital_target_type?: string | null
           created_at?: string
           current_value?: number
           deadline?: string | null
@@ -3517,12 +3528,19 @@ export type Database = {
           goal_type: string
           id?: string
           period: string
+          period_end?: string | null
+          period_start?: string | null
+          period_type?: string
           target_value: number
           title: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          baseline_date?: string | null
+          baseline_value?: number | null
+          calculation_mode?: string
+          capital_target_type?: string | null
           created_at?: string
           current_value?: number
           deadline?: string | null
@@ -3530,6 +3548,9 @@ export type Database = {
           goal_type?: string
           id?: string
           period?: string
+          period_end?: string | null
+          period_start?: string | null
+          period_type?: string
           target_value?: number
           title?: string
           updated_at?: string
