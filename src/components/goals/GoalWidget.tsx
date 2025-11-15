@@ -76,6 +76,45 @@ export function GoalWidget() {
     enabled: goals.length > 0,
   });
 
+  // Compute current values based on calculation mode and timeframe
+  const { data: currentValues } = useQuery({
+    queryKey: ['goal-current-values', goals.map(g => ({ id: g.id, type: g.goal_type, calc: g.calculation_mode, period: g.period_type, start: g.period_start, end: g.period_end, deadline: g.deadline }))],
+    queryFn: async () => {
+      const results = await Promise.all(
+        goals.map(async (goal) => {
+          // Default: use stored current_value
+          let current = goal.current_value ?? 0;
+
+          // For Profit goals with "Use current performance", compute from trades within timeframe
+          if (goal.goal_type === 'profit' && goal.calculation_mode === 'current_performance') {
+            const startDate = goal.period_type === 'custom_range' && goal.period_start
+              ? new Date(goal.period_start).toISOString()
+              : null;
+            const endDate = goal.period_type === 'custom_range' && goal.period_end
+              ? new Date(goal.period_end).toISOString()
+              : new Date(goal.deadline).toISOString();
+
+            const { data, error } = await supabase.rpc('get_trading_analytics' as any, {
+              user_uuid: user!.id,
+              start_date: startDate,
+              end_date: endDate,
+            });
+
+            if (error) {
+              console.error('Current value calc error:', error);
+            } else if (data) {
+              current = (data as any).total_pnl ?? 0;
+            }
+          }
+
+          return { goalId: goal.id, current };
+        })
+      );
+      return results as Array<{ goalId: string; current: number }>;
+    },
+    enabled: goals.length > 0 && !!user,
+  });
+
   const handleDelete = async () => {
     if (!deletingGoalId) return;
 
@@ -181,7 +220,9 @@ export function GoalWidget() {
           </div>
         ) : (
           goals.map((goal) => {
-          const progress = Math.min(100, (goal.current_value / goal.target_value) * 100);
+          const currentRec = currentValues?.find(v => v.goalId === goal.id);
+          const currentVal = currentRec?.current ?? (goal.current_value ?? 0);
+          const progress = Math.min(100, (currentVal / goal.target_value) * 100);
           const projection = projections?.find(p => p.goalId === goal.id)?.projection;
           const isOnTrack = projection?.on_track ?? true;
 
@@ -227,7 +268,7 @@ export function GoalWidget() {
               
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">
-                  {formatValue(goal.current_value, goal.goal_type)} / {formatValue(goal.target_value, goal.goal_type)}
+                  {formatValue(currentVal, goal.goal_type)} / {formatValue(goal.target_value, goal.goal_type)}
                 </span>
                 <span className="font-medium">{progress.toFixed(1)}%</span>
               </div>
