@@ -810,8 +810,27 @@ const Dashboard = () => {
         widgetProps.avgPnLPerTrade = stats?.avg_pnl_per_trade || 0;
         break;
       case 'avgPnLPerDay':
-        widgetProps.avgPnLPerDay = stats?.avg_pnl_per_day || 0;
-        widgetProps.tradingDays = stats?.trading_days || 0;
+        // Calculate from filtered trades to respect date range
+        const { tradingDays: filteredTradingDays } = calculateTradingDays(
+          processedTrades, 
+          tradingDaysMode
+        );
+        
+        // Calculate PnL with/without fees based on user setting
+        const filteredTotalPnL = processedTrades.reduce((sum, t) => {
+          const pnl = t.profit_loss || 0;
+          if (includeFeesInPnL) {
+            const fundingFee = t.funding_fee || 0;
+            const tradingFee = t.trading_fee || 0;
+            return sum + (pnl - Math.abs(fundingFee) - Math.abs(tradingFee));
+          }
+          return sum + pnl;
+        }, 0);
+        
+        widgetProps.avgPnLPerDay = filteredTradingDays > 0 
+          ? filteredTotalPnL / filteredTradingDays 
+          : 0;
+        widgetProps.tradingDays = filteredTradingDays;
         break;
       case 'currentROI':
         widgetProps.currentROI = stats?.current_roi || 0;
