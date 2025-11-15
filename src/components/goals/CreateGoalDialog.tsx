@@ -374,6 +374,8 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
           </div>
 
           {/* Description */}
+          <div>
+            <Label htmlFor="description">Goal description</Label>
             <Textarea
               id="description"
               value={formData.description}
