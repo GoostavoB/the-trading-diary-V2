@@ -85,7 +85,7 @@ export const useThemeUnlocks = () => {
 
       // Map themes with unlock status based on tier
       const themeTier = tier as ThemeTier;
-      const tierHierarchy: ThemeTier[] = ['free', 'basic', 'pro', 'elite'];
+      const tierHierarchy: ThemeTier[] = ['free', 'starter', 'pro', 'elite'];
       const userTierIndex = tierHierarchy.indexOf(themeTier);
 
       const themesWithUnlockStatus: UnlockableTheme[] = UNIFIED_THEMES.map(theme => {

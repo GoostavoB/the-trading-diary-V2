@@ -12,7 +12,7 @@ interface PricingPlan {
   monthlyPrice: number | null;
   annualPrice: number | null;
   annualTotal: number | null;
-  featuresKeys: string[];
+  features: string[];
   ctaKey: string;
   popular: boolean;
   comingSoon?: boolean;
@@ -145,7 +145,7 @@ export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPric
         </MagneticButton>
 
         <ul className="space-y-4 flex-1">
-          {plan.featuresKeys.map((featureKey, i) => (
+          {plan.features.map((feature, i) => (
             <motion.li
               key={i}
               initial={{ opacity: 0, x: -10 }}
@@ -161,7 +161,7 @@ export const PremiumPricingCard = ({ plan, billingCycle, index, t }: PremiumPric
                 <Check size={14} className="text-accent" />
               </div>
               <span className="text-sm text-muted-foreground dark:text-muted-foreground/70 leading-relaxed group-hover:text-foreground transition-colors duration-280 ease-premium">
-                {plan.comingSoon ? featureKey : t(featureKey)}
+                {plan.comingSoon ? feature : feature}
               </span>
             </motion.li>
           ))}

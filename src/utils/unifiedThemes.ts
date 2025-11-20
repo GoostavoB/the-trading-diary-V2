@@ -5,7 +5,7 @@ import { ColorMode } from '@/hooks/useThemeMode';
  * 6 prebuilt themes gated by subscription tier
  */
 
-export type ThemeTier = 'free' | 'basic' | 'pro' | 'elite';
+export type ThemeTier = 'free' | 'starter' | 'pro' | 'elite';
 
 export interface ThemeDefinition extends ColorMode {
   description: string;
@@ -102,7 +102,7 @@ export const isThemeUnlocked = (
   theme: ThemeDefinition,
   userTier: ThemeTier
 ): boolean => {
-  const tierHierarchy: ThemeTier[] = ['free', 'basic', 'pro', 'elite'];
+  const tierHierarchy: ThemeTier[] = ['free', 'starter', 'pro', 'elite'];
   const userTierIndex = tierHierarchy.indexOf(userTier);
   const requiredTierIndex = tierHierarchy.indexOf(theme.requiredTier);
   
