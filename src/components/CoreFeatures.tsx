@@ -5,7 +5,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 export const CoreFeatures = () => {
   const { t } = useTranslation();
 
-  const features = t('landing.coreFeatures.features', [
+  const features = [
     'AI Extracts for fast trade logging',
     'Unlimited manual uploads',
     'Anti duplicate trade detection',
@@ -19,7 +19,7 @@ export const CoreFeatures = () => {
     'Smart performance insights',
     'Trade history',
     'Tax report export'
-  ]) as string[];
+  ];
 
   return (
     <section className="py-20 md:py-28 px-6" aria-labelledby="core-features-heading">

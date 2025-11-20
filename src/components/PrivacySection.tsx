@@ -5,12 +5,12 @@ import { useTranslation } from "@/hooks/useTranslation";
 export const PrivacySection = () => {
   const { t } = useTranslation();
 
-  const privacyPoints = t('landing.privacy.points', [
+  const privacyPoints = [
     'No APIs',
     'No exchange connections',
     'Works with every platform',
     'Your data stays in your control'
-  ]) as string[];
+  ];
 
   const icons = [Shield, Lock, Database, Globe];
 
