@@ -92,10 +92,10 @@ export const ThemeSelector = () => {
                     
                     {/* Tier Badge */}
                     <Badge variant={theme.isUnlocked ? "default" : "secondary"} className="text-xs">
-                      {theme.requiredTier === 'free' || theme.requiredTier === 'basic' 
-                        ? 'Starter' 
-                        : theme.requiredTier.charAt(0).toUpperCase() + theme.requiredTier.slice(1)
-                      }
+                    {theme.requiredTier === 'free' || theme.requiredTier === 'starter' 
+                      ? 'Starter' 
+                      : theme.requiredTier.charAt(0).toUpperCase() + theme.requiredTier.slice(1)
+                    }
                     </Badge>
                   </div>
                 </div>

@@ -20,21 +20,23 @@ const Pricing = () => {
 
   const plans = [
     {
-      id: 'basic',
-      nameKey: "pricing.plans.basic.name",
-      descriptionKey: "pricing.plans.basic.description",
-      monthlyPrice: 15,
-      annualPrice: 12,
-      annualTotal: 144,
-      featuresKeys: [
-        "pricing.plans.basic.features.uploads",
-        "pricing.plans.basic.features.manualUploads",
-        "pricing.plans.basic.features.dashboard",
-        "pricing.plans.basic.features.charts",
-        "pricing.plans.basic.features.basicJournal",
-        "pricing.plans.basic.features.feeAnalytics",
-        "pricing.plans.basic.features.csv",
-        "pricing.plans.basic.features.social",
+      id: 'starter',
+      nameKey: "pricing.plans.starter.name",
+      descriptionKey: "pricing.plans.starter.description",
+      monthlyPrice: 0,
+      annualPrice: 0,
+      annualTotal: 0,
+      features: [
+        "AI Extracts for fast trade logging",
+        "Unlimited manual uploads",
+        "Anti duplicate trade detection",
+        "Capital tracking",
+        "Simple dashboard",
+        "Basic charts",
+        "Basic journal",
+        "Fee analytics",
+        "CSV export",
+        "Social features",
       ],
       ctaKey: "pricing.plans.cta",
       popular: false,
@@ -44,18 +46,18 @@ const Pricing = () => {
       id: 'pro',
       nameKey: "pricing.plans.pro.name",
       descriptionKey: "pricing.plans.pro.description",
-      monthlyPrice: 35,
-      annualPrice: 28,
-      annualTotal: 336,
-      featuresKeys: [
-        "pricing.plans.pro.features.uploads",
-        "pricing.plans.pro.features.aiAnalysis",
-        "pricing.plans.pro.features.tradingPlan",
-        "pricing.plans.pro.features.goals",
-        "pricing.plans.pro.features.richJournal",
-        "pricing.plans.pro.features.customWidgets",
-        "pricing.plans.pro.features.fullSocial",
-        "pricing.plans.pro.features.everythingBasic",
+      monthlyPrice: 18,
+      annualPrice: 14.4,
+      annualTotal: 172.8,
+      features: [
+        "200 AI uploads/month",
+        "AI-powered trade analysis",
+        "Trading plan builder",
+        "Goals & targets tracking",
+        "Rich journal with attachments",
+        "Custom dashboard widgets",
+        "Full social features",
+        "Everything in Starter",
       ],
       ctaKey: "pricing.plans.cta",
       popular: true,
@@ -65,17 +67,17 @@ const Pricing = () => {
       id: 'elite',
       nameKey: "pricing.plans.elite.name",
       descriptionKey: "pricing.plans.elite.description",
-      monthlyPrice: 79,
-      annualPrice: 63,
-      annualTotal: 756,
-      featuresKeys: [
-        "pricing.plans.elite.features.uploads",
-        "pricing.plans.elite.features.aiAnalysis",
-        "pricing.plans.elite.features.tradeReplay",
-        "pricing.plans.elite.features.positionCalculator",
-        "pricing.plans.elite.features.riskDashboard",
-        "pricing.plans.elite.features.advancedAlerts",
-        "pricing.plans.elite.features.everythingPro",
+      monthlyPrice: 30,
+      annualPrice: 24,
+      annualTotal: 288,
+      features: [
+        "Unlimited AI uploads",
+        "Advanced AI analysis",
+        "Trade replay & visualization",
+        "Position size calculator",
+        "Risk management dashboard",
+        "Advanced performance alerts",
+        "Everything in Pro",
       ],
       ctaKey: "pricing.plans.cta",
       popular: false,
@@ -214,7 +216,7 @@ const Pricing = () => {
                 </p>
 
                 <ul className="space-y-2.5">
-                  {plan.featuresKeys.map((featureKey, i) => (
+                  {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-start gap-2.5">
                       <Check
                         size={18}
@@ -222,7 +224,7 @@ const Pricing = () => {
                           plan.popular ? "text-primary" : "text-foreground"
                         }`}
                       />
-                      <span className="text-xs md:text-sm text-muted-foreground leading-relaxed">{t(featureKey)}</span>
+                      <span className="text-xs md:text-sm text-muted-foreground leading-relaxed">{feature}</span>
                     </li>
                   ))}
                 </ul>
