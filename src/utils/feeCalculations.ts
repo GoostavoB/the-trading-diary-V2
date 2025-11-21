@@ -43,7 +43,8 @@ export interface ExchangeFeeStats {
 export const calculateEnhancedMetrics = (trade: Trade): EnhancedTradeMetrics => {
   const margin = trade.margin || 0;
   const leverage = trade.leverage || 1;
-  const positionSize = margin * leverage;
+  // Use position_size from trade if available, otherwise calculate from margin × leverage
+  const positionSize = trade.position_size || (margin * leverage);
   
   const tradingFee = Math.abs(trade.trading_fee || 0);
   const fundingFee = trade.funding_fee || 0;
