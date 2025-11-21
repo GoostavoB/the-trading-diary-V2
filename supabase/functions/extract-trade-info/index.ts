@@ -119,7 +119,47 @@ function isCompleteJSON(text: string): boolean {
   return false;
 }
 
-function calculateMaxTokens(estimatedTrades: number, route: 'lite' | 'deep', retryMultiplier: number = 1): number {
+// Quick vision-based trade count for better token allocation
+async function quickCountTrades(imageBase64: string, apiKey: string): Promise<number> {
+  try {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        messages: [{
+          role: "user",
+          content: [
+            { type: "text", text: "Count how many trades/rows are visible in this trading screenshot. Count only closed trades. Reply with ONLY a number, nothing else." },
+            { type: "image_url", image_url: { url: imageBase64 } }
+          ]
+        }],
+        max_tokens: 20
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn('Quick count failed, using fallback estimate');
+      return 3; // Safe fallback
+    }
+
+    const result = await response.json();
+    const content = result.choices?.[0]?.message?.content?.trim() || '3';
+    const count = parseInt(content);
+    
+    // Validate and cap the count
+    if (isNaN(count) || count < 1) return 3;
+    return Math.min(count, 15); // Cap at 15 to prevent over-allocation
+  } catch (error) {
+    console.warn('Quick count error:', error);
+    return 3; // Safe fallback
+  }
+}
+
+function calculateMaxTokens(estimatedTrades: number, route: 'lite' | 'deep', retryMultiplier: number = 1, hasOCR: boolean = true): number {
   if (route === 'lite') {
     const baseTokens = 300;
     const tokensPerTrade = 200;
@@ -127,13 +167,17 @@ function calculateMaxTokens(estimatedTrades: number, route: 'lite' | 'deep', ret
     return Math.floor(result * retryMultiplier);
   }
   
-  // Deep model: more generous allocation with safety buffer
-  const baseTokens = 600;
-  const tokensPerTrade = 400;
-  const safetyBuffer = 500;
-  const result = estimatedTrades <= 1 
+  // Deep model: MUCH more generous allocation, especially without OCR
+  const baseTokens = hasOCR ? 800 : 1800;  // 3x base without OCR
+  const tokensPerTrade = 500;              // Increased from 400
+  const safetyBuffer = hasOCR ? 700 : 2000; // 3x buffer without OCR
+  
+  // For vision-only (no OCR), assume at least 3 trades if estimate is 1
+  const tradesEstimate = !hasOCR && estimatedTrades === 1 ? 3 : estimatedTrades;
+  
+  const result = tradesEstimate <= 1 
     ? baseTokens + safetyBuffer
-    : baseTokens + (tokensPerTrade * (estimatedTrades - 1)) + safetyBuffer;
+    : baseTokens + (tokensPerTrade * (tradesEstimate - 1)) + safetyBuffer;
   
   return Math.floor(result * retryMultiplier);
 }
@@ -186,7 +230,8 @@ serve(async (req) => {
       broker, 
       annotations,
       forceDeepModel, // New parameter to force using deep vision model (for retries)
-      retryAttempt = 0 // Track retry attempts
+      retryAttempt = 0, // Track retry attempts
+      ocrFailed = false // Flag from client if OCR failed
     } = await req.json();
 
     if (!imageBase64) {
@@ -204,7 +249,20 @@ serve(async (req) => {
     }
 
     // Pre-estimate trade count from OCR for cache validation
-    const estimatedTradeCount = estimateTradeCount(ocrText || '');
+    let estimatedTradeCount = estimateTradeCount(ocrText || '');
+    
+    // If no OCR or OCR failed, do a quick vision-based count for better token allocation
+    if ((!ocrText || ocrFailed || estimatedTradeCount === 1) && !forceDeepModel) {
+      console.log('🔢 No reliable OCR - performing quick vision-based trade count...');
+      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      if (LOVABLE_API_KEY) {
+        const visionCount = await quickCountTrades(imageBase64, LOVABLE_API_KEY);
+        if (visionCount > estimatedTradeCount) {
+          console.log(`👁️ Vision counted ${visionCount} trades (OCR estimated ${estimatedTradeCount})`);
+          estimatedTradeCount = visionCount;
+        }
+      }
+    }
 
     // Check cache first using image hash
     if (imageHash) {
@@ -273,8 +331,8 @@ serve(async (req) => {
       modelUsed = 'google/gemini-2.5-flash';
       
       // Dynamic token allocation with retry multiplier
-      const retryMultiplier = retryAttempt > 0 ? 2 : 1;
-      const maxTokens = calculateMaxTokens(estimatedTradeCount, 'deep', retryMultiplier);
+      const retryMultiplier = retryAttempt === 0 ? 1 : retryAttempt === 1 ? 2.5 : 5;
+      const maxTokens = calculateMaxTokens(estimatedTradeCount, 'deep', retryMultiplier, false);
       console.log(`🎯 Allocating ${maxTokens} tokens for ${estimatedTradeCount} estimated trade(s) (retry: ${retryAttempt}, multiplier: ${retryMultiplier}x)`);
 
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -355,10 +413,23 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
       tokensIn = result.usage?.prompt_tokens || 0;
       tokensOut = result.usage?.completion_tokens || 0;
 
+      console.log(`📊 Token usage: ${tokensOut}/${maxTokens} (${((tokensOut/maxTokens)*100).toFixed(1)}%)`);
+      
+      // Check for truncation and retry if needed
+      if (tokensOut >= maxTokens * 0.95 && retryAttempt < 2) {
+        console.warn(`⚠️ Token limit nearly reached (${tokensOut}/${maxTokens}) - AUTOMATIC RETRY with 2.5x tokens`);
+        throw new Error('JSON_TRUNCATED_RETRY');
+      }
+
       try {
         trades = extractJSON(aiResponse);
       } catch (parseError) {
-        console.error('JSON parse error on retry:', parseError, 'Raw response:', aiResponse);
+        const errorMsg = parseError instanceof Error ? parseError.message : String(parseError);
+        if (errorMsg === 'JSON_TRUNCATED' && retryAttempt < 2) {
+          console.error(`⚠️ JSON truncated, automatic retry ${retryAttempt + 1}/2`);
+          throw new Error('JSON_TRUNCATED_RETRY');
+        }
+        console.error('JSON parse error on retry:', parseError, 'Raw response:', aiResponse.substring(0, 500));
         throw new Error('Failed to parse AI response on retry. The model returned invalid JSON.');
       }
       
@@ -368,7 +439,7 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
       modelUsed = 'google/gemini-2.5-flash-lite';
 
       // Dynamic token allocation
-      const maxTokens = calculateMaxTokens(estimatedTradeCount, 'lite');
+      const maxTokens = calculateMaxTokens(estimatedTradeCount, 'lite', 1, true);
       console.log(`🎯 Allocating ${maxTokens} tokens for ${estimatedTradeCount} estimated trade(s)`);
 
       // Call lite model with OCR text
@@ -439,7 +510,8 @@ Map flexibly: "Futures"→symbol, "PnL"→profit_loss, "Open Time"→opened_at, 
         route = 'deep';
         modelUsed = 'google/gemini-2.5-flash';
         
-        const maxTokens = calculateMaxTokens(estimatedTradeCount, 'deep');
+        const hasOCR = ocrText && !ocrFailed;
+        const maxTokens = calculateMaxTokens(estimatedTradeCount, 'deep', 1, hasOCR);
         console.log(`🎯 Allocating ${maxTokens} tokens for ${estimatedTradeCount} estimated trade(s)`);
 
         const deepResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -525,7 +597,8 @@ Map flexibly to schema. Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${est
       route = 'deep';
       modelUsed = 'google/gemini-2.5-flash';
 
-      const maxTokens = calculateMaxTokens(estimatedTradeCount, 'deep');
+      const hasOCR = ocrText && !ocrFailed;
+      const maxTokens = calculateMaxTokens(estimatedTradeCount, 'deep', 1, hasOCR);
       console.log(`🎯 Allocating ${maxTokens} tokens for ${estimatedTradeCount} estimated trade(s)`);
 
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -587,14 +660,22 @@ Map flexibly to schema. Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${est
       tokensOut = result.usage?.completion_tokens || 0;
       
       console.log(`📊 Token usage: ${tokensOut}/${maxTokens} (${((tokensOut/maxTokens)*100).toFixed(1)}%)`);
-      if (tokensOut >= maxTokens * 0.95) {
-        console.warn('⚠️ Token limit nearly reached - possible truncation');
+      
+      // Check for truncation and retry if needed
+      if (tokensOut >= maxTokens * 0.95 && retryAttempt < 2) {
+        console.warn(`⚠️ Token limit nearly reached (${tokensOut}/${maxTokens}) - AUTOMATIC RETRY with 2.5x tokens`);
+        throw new Error('JSON_TRUNCATED_RETRY');
       }
 
       // Parse JSON with robust extraction
       try {
         trades = extractJSON(aiResponse);
       } catch (parseError) {
+        const errorMsg = parseError instanceof Error ? parseError.message : String(parseError);
+        if (errorMsg === 'JSON_TRUNCATED' && retryAttempt < 2) {
+          console.error(`⚠️ JSON truncated, automatic retry ${retryAttempt + 1}/2`);
+          throw new Error('JSON_TRUNCATED_RETRY');
+        }
         console.error('JSON parse error:', parseError, 'Raw response:', aiResponse.substring(0, 500));
         throw new Error('Failed to parse AI response. The model returned invalid JSON.');
       }
