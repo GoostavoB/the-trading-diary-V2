@@ -25,7 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { User, LogOut, KeyRound, Settings, Target, Crown, HelpCircle, Palette, Plus, Trash2, Check } from 'lucide-react';
+import { User, LogOut, KeyRound, Settings, Target, Crown, HelpCircle, Palette, Plus, Trash2, Check, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -67,7 +67,9 @@ export const UserAccountMenu = () => {
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null);
   const [subAccounts, setSubAccounts] = useState<SubAccount[]>([]);
   const [createSubAccountOpen, setCreateSubAccountOpen] = useState(false);
+  const [editSubAccountOpen, setEditSubAccountOpen] = useState(false);
   const [deleteSubAccountId, setDeleteSubAccountId] = useState<string | null>(null);
+  const [editingSubAccount, setEditingSubAccount] = useState<SubAccount | null>(null);
   const [newSubAccountName, setNewSubAccountName] = useState('');
   const [newSubAccountDesc, setNewSubAccountDesc] = useState('');
 
@@ -135,6 +137,32 @@ export const UserAccountMenu = () => {
       toast.error('Erro ao criar sub-conta');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEditSubAccount = async () => {
+    if (!editingSubAccount || !newSubAccountName.trim()) return;
+
+    try {
+      const { error } = await supabase
+        .from('sub_accounts')
+        .update({
+          name: newSubAccountName.trim(),
+          description: newSubAccountDesc.trim() || null,
+        })
+        .eq('id', editingSubAccount.id);
+
+      if (error) throw error;
+
+      toast.success('Sub-account updated');
+      setEditSubAccountOpen(false);
+      setEditingSubAccount(null);
+      setNewSubAccountName('');
+      setNewSubAccountDesc('');
+      fetchSubAccounts();
+    } catch (error) {
+      console.error('Error updating sub-account:', error);
+      toast.error('Failed to update sub-account');
     }
   };
 
@@ -379,17 +407,33 @@ export const UserAccountMenu = () => {
                         )}
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive flex-shrink-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDeleteSubAccountId(account.id);
-                      }}
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 w-7 p-0 hover:bg-muted"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingSubAccount(account);
+                          setNewSubAccountName(account.name);
+                          setNewSubAccountDesc(account.description || '');
+                          setEditSubAccountOpen(true);
+                        }}
+                      >
+                        <Pencil className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteSubAccountId(account.id);
+                        }}
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -555,6 +599,60 @@ export const UserAccountMenu = () => {
                 disabled={loading || !newSubAccountName.trim()}
               >
                 {loading ? 'Creating...' : 'Create Sub Account'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Sub Account Dialog */}
+      <Dialog open={editSubAccountOpen} onOpenChange={setEditSubAccountOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Sub Account</DialogTitle>
+            <DialogDescription>
+              Update the name and description of this sub-account.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Account Name *</label>
+              <Input
+                value={newSubAccountName}
+                onChange={(e) => setNewSubAccountName(e.target.value)}
+                placeholder="e.g., Scalping Account"
+                className="mt-1"
+                maxLength={50}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Description (Optional)</label>
+              <Input
+                value={newSubAccountDesc}
+                onChange={(e) => setNewSubAccountDesc(e.target.value)}
+                placeholder="e.g., Short-term trades only"
+                className="mt-1"
+                maxLength={100}
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEditSubAccountOpen(false);
+                  setEditingSubAccount(null);
+                  setNewSubAccountName('');
+                  setNewSubAccountDesc('');
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleEditSubAccount}
+                disabled={loading || !newSubAccountName.trim()}
+              >
+                {loading ? 'Updating...' : 'Update Sub Account'}
               </Button>
             </div>
           </div>

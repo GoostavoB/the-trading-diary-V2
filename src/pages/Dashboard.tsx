@@ -51,6 +51,8 @@ import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useUserTier } from '@/hooks/useUserTier';
 import { UpgradePrompt } from '@/components/UpgradePrompt';
+import { useSubAccount } from '@/contexts/SubAccountContext';
+import { Badge } from '@/components/ui/badge';
 
 // Lazy load heavy components
 const TradeHistory = lazy(() => import('@/components/TradeHistory').then(m => ({ default: m.TradeHistory })));
@@ -109,6 +111,8 @@ const Dashboard = () => {
   usePageMeta(pageMeta.dashboard);
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { activeSubAccount } = useSubAccount();
+  const activeSubAccountId = activeSubAccount?.id || null;
   const { settings: userSettings } = useUserSettings();
   const tradingDaysMode = userSettings.trading_days_calculation_mode;
   const [stats, setStats] = useState<TradeStats | null>(null);
@@ -278,11 +282,17 @@ const Dashboard = () => {
   const fetchCapitalLog = async () => {
     if (!user) return;
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('capital_log')
       .select('*')
-      .eq('user_id', user.id)
-      .order('log_date', { ascending: true });
+      .eq('user_id', user.id);
+    
+    // Filter by active sub-account if one exists
+    if (activeSubAccountId) {
+      query = query.eq('sub_account_id', activeSubAccountId);
+    }
+    
+    const { data, error } = await query.order('log_date', { ascending: true });
 
     if (error) {
       console.error('Error fetching capital log:', error);
@@ -294,10 +304,17 @@ const Dashboard = () => {
   const fetchCustomWidgets = async () => {
     if (!user) return;
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('custom_dashboard_widgets')
       .select('*')
       .eq('user_id', user.id);
+    
+    // Filter by active sub-account if one exists
+    if (activeSubAccountId) {
+      query = query.eq('sub_account_id', activeSubAccountId);
+    }
+    
+    const { data, error } = await query;
 
     if (error) {
       console.error('Error fetching custom widgets:', error);
@@ -346,7 +363,7 @@ const Dashboard = () => {
     if (user && capitalLog.length >= 0) {
       fetchStats();
     }
-  }, [capitalLog]);
+  }, [capitalLog, activeSubAccountId]);
 
   // Filter trades based on date range
   useEffect(() => {
@@ -404,11 +421,18 @@ const Dashboard = () => {
   const fetchStats = async () => {
     if (!user) return;
 
-    const { data: trades } = await supabase
+    let query = supabase
       .from('trades')
       .select('*')
       .eq('user_id', user.id)
       .is('deleted_at', null);
+    
+    // Filter by active sub-account if one exists
+    if (activeSubAccountId) {
+      query = query.eq('sub_account_id', activeSubAccountId);
+    }
+    
+    const { data: trades } = await query;
 
     if (trades) {
       setTrades(trades.map(trade => ({
@@ -967,7 +991,16 @@ const Dashboard = () => {
       <div id="main-dashboard-content" className="space-y-6 mobile-safe animate-fade-in">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-1 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">{t('dashboard.title')}</h1>
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                {t('dashboard.title')}
+              </h1>
+              {activeSubAccount && (
+                <Badge variant="secondary" className="text-sm px-3 py-1">
+                  {activeSubAccount.name}
+                </Badge>
+              )}
+            </div>
             <p className="text-sm text-muted-foreground/80">{t('dashboard.overview')}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">

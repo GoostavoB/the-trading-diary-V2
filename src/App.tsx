@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
+import { SubAccountProvider } from "@/contexts/SubAccountContext";
 import { AIAssistantProvider } from "@/contexts/AIAssistantContext";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { BlurProvider } from "@/contexts/BlurContext";
@@ -253,24 +254,26 @@ const App = () => (
               <ThemeInitializer />
               <AuthProvider>
                 <SubscriptionProvider>
-                  <UpgradeModalProvider>
-                    <CalmModeProvider>
-                      <CurrencyProvider>
-                        <BlurProvider>
-                          <AIAssistantProvider>
-                            <DateRangeProvider>
-                              <AppRoutes />
-                              <ConversionTracking />
-                              <PerformanceMonitor />
-                              <GlobalSearch />
-                              <OfflineIndicator />
-                              <InstallPrompt />
-                            </DateRangeProvider>
-                          </AIAssistantProvider>
-                        </BlurProvider>
-                      </CurrencyProvider>
-                    </CalmModeProvider>
-                  </UpgradeModalProvider>
+                  <SubAccountProvider>
+                    <UpgradeModalProvider>
+                      <CalmModeProvider>
+                        <CurrencyProvider>
+                          <BlurProvider>
+                            <AIAssistantProvider>
+                              <DateRangeProvider>
+                                <AppRoutes />
+                                <ConversionTracking />
+                                <PerformanceMonitor />
+                                <GlobalSearch />
+                                <OfflineIndicator />
+                                <InstallPrompt />
+                              </DateRangeProvider>
+                            </AIAssistantProvider>
+                          </BlurProvider>
+                        </CurrencyProvider>
+                      </CalmModeProvider>
+                    </UpgradeModalProvider>
+                  </SubAccountProvider>
                 </SubscriptionProvider>
               </AuthProvider>
             </LanguageProvider>
