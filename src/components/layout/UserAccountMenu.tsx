@@ -10,12 +10,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { User, LogOut, KeyRound, Settings, Target, Crown, HelpCircle, Palette } from 'lucide-react';
+import { User, LogOut, KeyRound, Settings, Target, Crown, HelpCircle, Palette, Plus, Trash2, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -36,6 +46,16 @@ interface SubscriptionData {
   created_at: string;
 }
 
+interface SubAccount {
+  id: string;
+  name: string;
+  description: string | null;
+  icon: string;
+  color: string;
+  is_active: boolean;
+  created_at: string;
+}
+
 export const UserAccountMenu = () => {
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
@@ -45,10 +65,16 @@ export const UserAccountMenu = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null);
+  const [subAccounts, setSubAccounts] = useState<SubAccount[]>([]);
+  const [createSubAccountOpen, setCreateSubAccountOpen] = useState(false);
+  const [deleteSubAccountId, setDeleteSubAccountId] = useState<string | null>(null);
+  const [newSubAccountName, setNewSubAccountName] = useState('');
+  const [newSubAccountDesc, setNewSubAccountDesc] = useState('');
 
   useEffect(() => {
     if (user) {
       fetchSubscriptionData();
+      fetchSubAccounts();
     }
   }, [user]);
 
@@ -63,6 +89,95 @@ export const UserAccountMenu = () => {
 
     if (!error && data) {
       setSubscriptionData(data);
+    }
+  };
+
+  const fetchSubAccounts = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('sub_accounts')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      setSubAccounts(data);
+    }
+  };
+
+  const handleCreateSubAccount = async () => {
+    if (!user || !newSubAccountName.trim()) {
+      toast.error('Nome da sub-conta é obrigatório');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('sub_accounts')
+        .insert({
+          user_id: user.id,
+          name: newSubAccountName,
+          description: newSubAccountDesc || null,
+          is_active: false,
+        });
+
+      if (error) throw error;
+
+      toast.success('Sub-conta criada com sucesso!');
+      setCreateSubAccountOpen(false);
+      setNewSubAccountName('');
+      setNewSubAccountDesc('');
+      await fetchSubAccounts();
+    } catch (error) {
+      console.error('Error creating sub account:', error);
+      toast.error('Erro ao criar sub-conta');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteSubAccount = async (id: string) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('sub_accounts')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success('Sub-conta deletada com sucesso!');
+      setDeleteSubAccountId(null);
+      await fetchSubAccounts();
+    } catch (error) {
+      console.error('Error deleting sub account:', error);
+      toast.error('Erro ao deletar sub-conta');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleActivateSubAccount = async (id: string) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('sub_accounts')
+        .update({ is_active: true })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success('Sub-conta ativada!');
+      await fetchSubAccounts();
+      // Recarregar a página para aplicar os dados da sub-conta
+      window.location.reload();
+    } catch (error) {
+      console.error('Error activating sub account:', error);
+      toast.error('Erro ao ativar sub-conta');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -221,6 +336,72 @@ export const UserAccountMenu = () => {
 
           <DropdownMenuSeparator />
 
+          {/* Sub Accounts Section */}
+          <div className="py-3 px-0">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium">Sub Accounts</span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  if (subscriptionData?.plan_type === 'free') {
+                    toast.info('Upgrade to Pro or Elite to create sub-accounts');
+                    return;
+                  }
+                  setCreateSubAccountOpen(true);
+                }}
+                disabled={subscriptionData?.plan_type === 'free'}
+                className={subscriptionData?.plan_type === 'free' ? 'opacity-50 cursor-not-allowed' : ''}
+              >
+                <Plus className="w-3 h-3 mr-1" />
+                Create
+              </Button>
+            </div>
+
+            {subAccounts.length > 0 ? (
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {subAccounts.map((account) => (
+                  <div
+                    key={account.id}
+                    className={`flex items-center justify-between p-2 rounded-md border cursor-pointer transition-colors ${
+                      account.is_active 
+                        ? 'border-primary bg-primary/10' 
+                        : 'border-border hover:bg-muted/50'
+                    }`}
+                    onClick={() => !account.is_active && handleActivateSubAccount(account.id)}
+                  >
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      {account.is_active && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium truncate">{account.name}</p>
+                        {account.description && (
+                          <p className="text-xs text-muted-foreground truncate">{account.description}</p>
+                        )}
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive flex-shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteSubAccountId(account.id);
+                      }}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground text-center py-2">
+                No sub-accounts yet
+              </p>
+            )}
+          </div>
+
+          <DropdownMenuSeparator />
+
           {/* Menu Items */}
           <div className="space-y-1">
             <DropdownMenuItem onClick={() => navigate('/settings')} className="cursor-pointer">
@@ -326,6 +507,80 @@ export const UserAccountMenu = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Create Sub Account Dialog */}
+      <Dialog open={createSubAccountOpen} onOpenChange={setCreateSubAccountOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Sub Account</DialogTitle>
+            <DialogDescription>
+              Create a new sub-account with isolated data and metrics. Perfect for separating scalp trades, swing trades, or different strategies.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Account Name *</label>
+              <Input
+                value={newSubAccountName}
+                onChange={(e) => setNewSubAccountName(e.target.value)}
+                placeholder="e.g., Scalping Account"
+                className="mt-1"
+                maxLength={50}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Description (Optional)</label>
+              <Input
+                value={newSubAccountDesc}
+                onChange={(e) => setNewSubAccountDesc(e.target.value)}
+                placeholder="e.g., Short-term trades only"
+                className="mt-1"
+                maxLength={100}
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setCreateSubAccountOpen(false);
+                  setNewSubAccountName('');
+                  setNewSubAccountDesc('');
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleCreateSubAccount}
+                disabled={loading || !newSubAccountName.trim()}
+              >
+                {loading ? 'Creating...' : 'Create Sub Account'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Sub Account Confirmation */}
+      <AlertDialog open={!!deleteSubAccountId} onOpenChange={() => setDeleteSubAccountId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Sub Account?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. All data associated with this sub-account will be permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteSubAccountId && handleDeleteSubAccount(deleteSubAccountId)}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
