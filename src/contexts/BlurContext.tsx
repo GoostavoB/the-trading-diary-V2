@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
+import { useSubAccount } from './SubAccountContext';
 import { supabase } from '@/integrations/supabase/client';
 
 interface BlurContextType {
@@ -12,20 +13,23 @@ const BlurContext = createContext<BlurContextType | undefined>(undefined);
 
 export const BlurProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
+  const { activeSubAccount } = useSubAccount();
   const [isBlurred, setIsBlurred] = useState(false);
 
   useEffect(() => {
-    if (user) {
+    if (user && activeSubAccount) {
       loadBlurSetting();
     }
-  }, [user]);
+  }, [user, activeSubAccount]);
 
   const loadBlurSetting = async () => {
+    if (!activeSubAccount) return;
+    
     try {
       const { data, error } = await supabase
         .from('user_settings')
         .select('blur_enabled')
-        .eq('user_id', user?.id)
+        .eq('sub_account_id', activeSubAccount.id)
         .maybeSingle();
 
       if (error) {
@@ -44,12 +48,12 @@ export const BlurProvider = ({ children }: { children: ReactNode }) => {
   const setBlurred = async (value: boolean) => {
     setIsBlurred(value);
 
-    if (user) {
+    if (user && activeSubAccount) {
       try {
         const { error } = await supabase
           .from('user_settings')
           .update({ blur_enabled: value })
-          .eq('user_id', user.id);
+          .eq('sub_account_id', activeSubAccount.id);
 
         if (error) {
           console.error('Error saving blur setting:', error);

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
+import { useSubAccount } from './SubAccountContext';
 import { useExchangeRates } from '@/hooks/useExchangeRates';
 
 interface Currency {
@@ -60,6 +61,7 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 
 export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
+  const { activeSubAccount } = useSubAccount();
   const [currency, setCurrencyState] = useState<Currency>(SUPPORTED_CURRENCIES[0]); // Default to USD
   const { data: exchangeRates, isLoading } = useExchangeRates();
 
@@ -95,18 +97,20 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
   }, [exchangeRates]);
 
   useEffect(() => {
-    if (user) {
+    if (user && activeSubAccount) {
       loadUserCurrency();
     }
-  }, [user]);
+  }, [user, activeSubAccount]);
 
   const loadUserCurrency = async () => {
+    if (!activeSubAccount) return;
+    
     try {
       const { data } = await supabase
         .from('user_settings')
         .select('display_currency')
-        .eq('user_id', user!.id)
-        .single();
+        .eq('sub_account_id', activeSubAccount.id)
+        .maybeSingle();
 
       if (data?.display_currency) {
         const savedCurrency = SUPPORTED_CURRENCIES.find(c => c.code === data.display_currency);
@@ -122,12 +126,12 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
   const setCurrency = async (newCurrency: Currency) => {
     setCurrencyState(newCurrency);
     
-    if (user) {
+    if (user && activeSubAccount) {
       try {
         await supabase
           .from('user_settings')
           .update({ display_currency: newCurrency.code })
-          .eq('user_id', user.id);
+          .eq('sub_account_id', activeSubAccount.id);
       } catch (error) {
         console.error('Error saving currency preference:', error);
       }

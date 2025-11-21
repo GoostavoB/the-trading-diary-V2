@@ -48,14 +48,14 @@ const DEFAULT_POSITIONS: WidgetPosition[] = [
 
 const CURRENT_OVERVIEW_LAYOUT_VERSION = 4;
 
-export const useGridLayout = (userId: string | undefined, availableWidgets: string[]) => {
+export const useGridLayout = (subAccountId: string | undefined, availableWidgets: string[]) => {
   const [positions, setPositions] = useState<WidgetPosition[]>(DEFAULT_POSITIONS);
   const [columnCount, setColumnCount] = useState<number>(3);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (!userId) {
+    if (!subAccountId) {
       setIsLoading(false);
       return;
     }
@@ -65,8 +65,8 @@ export const useGridLayout = (userId: string | undefined, availableWidgets: stri
         const { data, error } = await supabase
           .from('user_settings')
           .select('layout_json')
-          .eq('user_id', userId)
-          .single();
+          .eq('sub_account_id', subAccountId)
+          .maybeSingle();
 
         if (error) {
           console.error('Error loading layout:', error);
@@ -115,11 +115,11 @@ if (data?.layout_json) {
     };
 
     loadLayout();
-  }, [userId]);
+  }, [subAccountId]);
 
   const saveLayout = useCallback(async (newPositions: WidgetPosition[], newColumnCount?: number) => {
-    if (!userId) {
-      console.warn('[useGridLayout] Cannot save: no userId');
+    if (!subAccountId) {
+      console.warn('[useGridLayout] Cannot save: no subAccountId');
       return;
     }
 
@@ -153,7 +153,7 @@ if (data?.layout_json) {
           layout_json: layoutData as any,
           updated_at: new Date().toISOString(),
         })
-        .eq('user_id', userId);
+        .eq('sub_account_id', subAccountId);
 
       if (error) {
         console.error('[useGridLayout] Save error:', error);
@@ -175,7 +175,7 @@ if (data?.layout_json) {
     } finally {
       setIsSaving(false);
     }
-  }, [userId, columnCount]);
+  }, [subAccountId, columnCount]);
 
   const updatePosition = useCallback((widgetId: string, column: number, row: number) => {
     setPositions(prev => {

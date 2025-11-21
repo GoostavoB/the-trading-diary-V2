@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import i18n from '@/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthContext } from '@/contexts/AuthContext';
+import { useSubAccount } from '@/contexts/SubAccountContext';
 import { 
   SUPPORTED_LANGUAGES, 
   SupportedLanguage, 
@@ -22,6 +23,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const authContext = useContext(AuthContext);
   const user = authContext?.user ?? null;
+  const { activeSubAccount } = useSubAccount();
   const navigate = useNavigate();
   const location = useLocation();
   const [language, setLanguage] = useState<SupportedLanguage>(() => {
@@ -46,7 +48,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   // Load language from database for authenticated users
   useEffect(() => {
     const loadUserLanguage = async () => {
-      if (!user || isInitialized) {
+      if (!user || !activeSubAccount || isInitialized) {
         setIsLoading(false);
         return;
       }
@@ -55,8 +57,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         const { data, error } = await supabase
           .from('user_settings')
           .select('language')
-          .eq('user_id', user.id)
-          .single();
+          .eq('sub_account_id', activeSubAccount.id)
+          .maybeSingle();
 
         if (!error && data?.language) {
           const dbLang = data.language as SupportedLanguage;
@@ -73,7 +75,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     };
 
     loadUserLanguage();
-  }, [user]);
+  }, [user, activeSubAccount]);
 
   // Sync with URL path changes
   useEffect(() => {
@@ -99,12 +101,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('app-language', newLang);
 
     // Update database for authenticated users
-    if (user) {
+    if (user && activeSubAccount) {
       try {
         await supabase
           .from('user_settings')
           .update({ language: newLang })
-          .eq('user_id', user.id);
+          .eq('sub_account_id', activeSubAccount.id);
       } catch (error) {
         console.error('Error saving language to database:', error);
       }
@@ -120,7 +122,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         navigate(newPath, { replace: true });
       }
     }
-  }, [user, location.pathname, navigate]);
+  }, [user, activeSubAccount, location.pathname, navigate]);
 
   return (
     <LanguageContext.Provider value={{ language, changeLanguage, isLoading }}>

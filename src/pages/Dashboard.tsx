@@ -172,7 +172,7 @@ const Dashboard = () => {
     addWidget,
     removeWidget,
     resetLayout,
-  } = useGridLayout(user?.id, Object.keys(WIDGET_CATALOG));
+  } = useGridLayout(activeSubAccount?.id, Object.keys(WIDGET_CATALOG));
 
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [showWidgetLibrary, setShowWidgetLibrary] = useState(false);

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubAccount } from '@/contexts/SubAccountContext';
 
 export interface TradeStationSettings {
   // Risk Calculator
@@ -45,6 +46,7 @@ export interface TradeStationSettings {
 
 export const useUserSettings = () => {
   const { user } = useAuth();
+  const { activeSubAccount } = useSubAccount();
   const [settings, setSettings] = useState<TradeStationSettings>({
     risk_strategy: 'day',
     risk_base: 'equity',
@@ -75,20 +77,20 @@ export const useUserSettings = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
+    if (user && activeSubAccount) {
       loadSettings();
     }
-  }, [user]);
+  }, [user, activeSubAccount]);
 
   const loadSettings = async () => {
-    if (!user) return;
+    if (!user || !activeSubAccount) return;
     
     try {
       const { data, error } = await supabase
         .from('user_settings')
         .select('*')
-        .eq('user_id', user.id)
-        .single();
+        .eq('sub_account_id', activeSubAccount.id)
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -132,13 +134,13 @@ export const useUserSettings = () => {
     key: K,
     value: TradeStationSettings[K]
   ) => {
-    if (!user) return;
+    if (!user || !activeSubAccount) return;
 
     try {
       const { error } = await supabase
         .from('user_settings')
         .update({ [key]: value })
-        .eq('user_id', user.id);
+        .eq('sub_account_id', activeSubAccount.id);
 
       if (error) throw error;
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubAccount } from '@/contexts/SubAccountContext';
 import { toast } from 'sonner';
 
 export interface WidgetConfig {
@@ -49,6 +50,7 @@ const DEFAULT_LAYOUT: LayoutItem[] = [
 
 export function useDashboardLayout() {
   const { user } = useAuth();
+  const { activeSubAccount } = useSubAccount();
   const [widgets, setWidgets] = useState<WidgetConfig[]>(DEFAULT_WIDGETS);
   const [layout, setLayout] = useState<LayoutItem[]>(DEFAULT_LAYOUT);
   const [loading, setLoading] = useState(true);
@@ -58,20 +60,20 @@ export function useDashboardLayout() {
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (user) {
+    if (user && activeSubAccount) {
       loadLayout();
     }
-  }, [user]);
+  }, [user, activeSubAccount]);
 
   const loadLayout = async () => {
-    if (!user) return;
+    if (!user || !activeSubAccount) return;
 
     try {
       const { data, error } = await supabase
         .from('user_settings')
         .select('layout_json')
-        .eq('user_id', user.id)
-        .single();
+        .eq('sub_account_id', activeSubAccount.id)
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -116,7 +118,7 @@ export function useDashboardLayout() {
         await supabase
           .from('user_settings')
           .update({ layout_json: { widgets: filteredWidgets, layout: filteredLayout } as any })
-          .eq('user_id', user.id);
+          .eq('sub_account_id', activeSubAccount.id);
       } else {
         // Initialize with defaults and save to database
         console.log('No valid layout found, initializing defaults...');
@@ -132,7 +134,7 @@ export function useDashboardLayout() {
         await supabase
           .from('user_settings')
           .update({ layout_json: layoutData as any })
-          .eq('user_id', user.id);
+          .eq('sub_account_id', activeSubAccount.id);
       }
     } catch (error) {
       console.error('Error loading layout:', error);
@@ -145,7 +147,7 @@ export function useDashboardLayout() {
   };
 
   const saveLayout = async () => {
-    if (!user) return;
+    if (!user || !activeSubAccount) return;
 
     setIsSaving(true);
     try {
@@ -157,7 +159,7 @@ export function useDashboardLayout() {
       const { error } = await supabase
         .from('user_settings')
         .update({ layout_json: layoutData as any })
-        .eq('user_id', user.id);
+        .eq('sub_account_id', activeSubAccount.id);
 
       if (error) throw error;
 
@@ -182,10 +184,10 @@ export function useDashboardLayout() {
     autoSaveTimerRef.current = setTimeout(async () => {
       await saveLayout();
     }, 2000);
-  }, [widgets, layout, user]);
+  }, [widgets, layout, user, activeSubAccount]);
 
   const resetLayout = async () => {
-    if (!user) return;
+    if (!user || !activeSubAccount) return;
 
     setLoading(true);
     try {
@@ -197,7 +199,7 @@ export function useDashboardLayout() {
       const { error } = await supabase
         .from('user_settings')
         .update({ layout_json: layoutData as any })
-        .eq('user_id', user.id);
+        .eq('sub_account_id', activeSubAccount.id);
 
       if (error) throw error;
 
