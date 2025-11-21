@@ -594,29 +594,42 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
     }
 
     // Normalize trades to match database schema
-    const normalizedTrades = trades.map((t: any) => ({
-      symbol: t.symbol ?? t.asset ?? '',
-      side: (t.side ?? t.position_type ?? 'long').toLowerCase(),
-      broker: broker || t.broker || '',
-      setup: t.setup ?? '',
-      emotional_tag: t.emotional_tag ?? '',
-      entry_price: Number(t.entry_price) || 0,
-      exit_price: Number(t.exit_price) || 0,
-      position_size: Number(t.position_size) || 0,
-      leverage: Number(t.leverage) || 1,
-      profit_loss: Number(t.profit_loss) || 0,
-      funding_fee: Number(t.funding_fee) || 0,
-      trading_fee: Number(t.trading_fee) || 0,
-      roi: Number(t.roi) || 0,
-      margin: t.margin ? Number(t.margin) : null,
-      opened_at: t.opened_at ?? '',
-      closed_at: t.closed_at ?? '',
-      period_of_day: t.period_of_day ?? 'morning',
-      duration_days: Number(t.duration_days) || 0,
-      duration_hours: Number(t.duration_hours) || 0,
-      duration_minutes: Number(t.duration_minutes) || 0,
-      notes: t.notes ?? ''
-    }));
+    const normalizedTrades = trades.map((t: any) => {
+      const profitLoss = Number(t.profit_loss) || 0;
+      const positionSize = Number(t.position_size) || 0;
+      const leverage = Number(t.leverage) || 1;
+      const margin = t.margin ? Number(t.margin) : (positionSize / leverage);
+      
+      // Calculate ROI: (profit_loss / margin) * 100
+      let roi = 0;
+      if (margin > 0) {
+        roi = (profitLoss / margin) * 100;
+      }
+      
+      return {
+        symbol: t.symbol ?? t.asset ?? '',
+        side: (t.side ?? t.position_type ?? 'long').toLowerCase(),
+        broker: broker || t.broker || '',
+        setup: t.setup ?? '',
+        emotional_tag: t.emotional_tag ?? '',
+        entry_price: Number(t.entry_price) || 0,
+        exit_price: Number(t.exit_price) || 0,
+        position_size: positionSize,
+        leverage: leverage,
+        profit_loss: profitLoss,
+        funding_fee: Number(t.funding_fee) || 0,
+        trading_fee: Number(t.trading_fee) || 0,
+        roi: roi,
+        margin: margin,
+        opened_at: t.opened_at ?? '',
+        closed_at: t.closed_at ?? '',
+        period_of_day: t.period_of_day ?? 'morning',
+        duration_days: Number(t.duration_days) || 0,
+        duration_hours: Number(t.duration_hours) || 0,
+        duration_minutes: Number(t.duration_minutes) || 0,
+        notes: t.notes ?? ''
+      };
+    });
 
     // Enforce max 10 trades per image
     if (normalizedTrades.length > 10) {

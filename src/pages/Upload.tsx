@@ -738,8 +738,19 @@ const Upload = () => {
     const entry = parseFloat(formData.entry_price);
     const exit = parseFloat(formData.exit_price);
     const size = parseFloat(formData.position_size);
-    const pnl = (exit - entry) * size;
-    const roi = (exit - entry) / entry * 100;
+    const leverage = parseFloat(formData.leverage) || 1;
+    const margin = parseFloat(formData.margin) || (size / leverage);
+    
+    // Calculate P&L correctly based on side
+    let pnl = 0;
+    if (formData.side === 'long') {
+      pnl = (exit - entry) * size;
+    } else if (formData.side === 'short') {
+      pnl = (entry - exit) * size;
+    }
+    
+    // Calculate ROI: (profit_loss / margin) * 100
+    const roi = margin > 0 ? (pnl / margin) * 100 : 0;
     const tradeData = {
       user_id: user.id,
       symbol: formData.symbol,
@@ -751,10 +762,10 @@ const Upload = () => {
       position_size: size,
       side: formData.side,
       side_temp: formData.side,
-      leverage: parseFloat(formData.leverage) || 1,
+      leverage: leverage,
       funding_fee: parseFloat(formData.funding_fee) || 0,
       trading_fee: parseFloat(formData.trading_fee) || 0,
-      margin: parseFloat(formData.margin) || null,
+      margin: margin,
       opened_at: formData.opened_at || null,
       closed_at: formData.closed_at || null,
       period_of_day: formData.period_of_day && ['morning', 'afternoon', 'night'].includes(formData.period_of_day) 
