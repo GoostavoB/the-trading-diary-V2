@@ -750,7 +750,13 @@ const Upload = () => {
     }
     
     // Calculate ROI: (profit_loss / margin) * 100
-    const roi = margin > 0 ? (pnl / margin) * 100 : 0;
+    // This correctly handles both positive profits and negative losses
+    let roi = 0;
+    if (margin > 0 && !isNaN(pnl) && isFinite(pnl)) {
+      roi = (pnl / margin) * 100;
+      // Round to 2 decimal places for realistic display
+      roi = Math.round(roi * 100) / 100;
+    }
     const tradeData = {
       user_id: user.id,
       symbol: formData.symbol,
