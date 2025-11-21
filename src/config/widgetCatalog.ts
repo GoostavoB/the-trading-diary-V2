@@ -33,6 +33,8 @@ import { AvgPnLPerTradeWidget } from '@/components/widgets/AvgPnLPerTradeWidget'
 import { AvgPnLPerDayWidget } from '@/components/widgets/AvgPnLPerDayWidget';
 import { CurrentROIWidget } from '@/components/widgets/CurrentROIWidget';
 import { AvgROIPerTradeWidget } from '@/components/widgets/AvgROIPerTradeWidget';
+import { SimpleAvgROIWidget } from '@/components/widgets/SimpleAvgROIWidget';
+import { WeightedAvgROIWidget } from '@/components/widgets/WeightedAvgROIWidget';
 import { CapitalGrowthWidget } from '@/components/widgets/CapitalGrowthWidget';
 import { CombinedPnLROIWidget } from '@/components/widgets/CombinedPnLROIWidget';
 import { BehaviorAnalytics } from '@/components/insights/BehaviorAnalytics';
@@ -197,6 +199,28 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     requiresData: ['stats'],
   },
 
+  simpleAvgROI: {
+    id: 'simpleAvgROI',
+    title: 'Simple Average ROI',
+    description: 'Average return per trade (treats all trades equally)',
+    category: 'performance',
+    icon: Percent,
+    defaultSize: 'small',
+    component: SimpleAvgROIWidget,
+    requiresData: ['stats'],
+  },
+
+  weightedAvgROI: {
+    id: 'weightedAvgROI',
+    title: 'Weighted Average ROI',
+    description: 'Capital-weighted average return (larger positions weighted more)',
+    category: 'performance',
+    icon: TrendingUp,
+    defaultSize: 'small',
+    component: WeightedAvgROIWidget,
+    requiresData: ['stats'],
+  },
+
   capitalGrowth: {
     id: 'capitalGrowth',
     title: 'Capital Growth',
@@ -347,6 +371,7 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
 export const DEFAULT_DASHBOARD_LAYOUT = [
   'totalBalance',
   'currentROI',
+  'weightedAvgROI',
   'avgPnLPerDay',
   'winRate',
   'topMovers',

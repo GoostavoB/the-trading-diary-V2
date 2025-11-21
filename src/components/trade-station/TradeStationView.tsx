@@ -326,6 +326,30 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
         ? ((includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees) / totalCapitalInvested) * 100
         : 0;
 
+      // Calculate Simple Average ROI: Sum of ROIs / number of trades
+      const simpleAvgROI = trades.length > 0
+        ? trades.reduce((sum, t) => sum + (t.roi || 0), 0) / trades.length
+        : 0;
+
+      // Calculate Weighted Average ROI: Sum of (ROI × position_size) / total capital allocated
+      let weightedAvgROI = 0;
+      if (totalCapitalInvested > 0) {
+        const weightedSum = trades.reduce((sum, t) => {
+          const tradeROI = t.roi || 0;
+          // Get capital invested for this trade
+          let tradeCapital = 0;
+          if (t.margin && t.margin > 0) {
+            tradeCapital = t.margin;
+          } else if (t.position_size && t.entry_price) {
+            const notionalValue = t.position_size * t.entry_price;
+            const leverage = t.leverage && t.leverage > 0 ? t.leverage : 1;
+            tradeCapital = notionalValue / leverage;
+          }
+          return sum + (tradeROI * tradeCapital);
+        }, 0);
+        weightedAvgROI = weightedSum / totalCapitalInvested;
+      }
+
       setStats({
         total_pnl: includeFeesInPnL ? totalPnlWithFees : totalPnlWithoutFees,
         win_rate: trades.length > 0 ? (winningTrades / trades.length) * 100 : 0,
@@ -336,6 +360,9 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
         trading_days: tradingDaySpan,
         current_roi: currentROI,
         avg_roi_per_trade: avgROIPerTrade,
+        simple_avg_roi: simpleAvgROI,
+        weighted_avg_roi: weightedAvgROI,
+        total_capital_invested: totalCapitalInvested,
       });
     }
     setDataLoading(false);
@@ -442,6 +469,15 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
       case 'avgROIPerTrade':
         widgetProps.avgROIPerTrade = stats?.avg_roi_per_trade || 0;
         widgetProps.totalTrades = stats?.total_trades || 0;
+        break;
+      case 'simpleAvgROI':
+        widgetProps.simpleAvgROI = stats?.simple_avg_roi || 0;
+        widgetProps.totalTrades = stats?.total_trades || 0;
+        break;
+      case 'weightedAvgROI':
+        widgetProps.weightedAvgROI = stats?.weighted_avg_roi || 0;
+        widgetProps.totalTrades = stats?.total_trades || 0;
+        widgetProps.totalCapitalInvested = stats?.total_capital_invested || 0;
         break;
       case 'capitalGrowth':
         widgetProps.chartData = [];

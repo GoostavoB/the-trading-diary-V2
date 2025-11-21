@@ -131,6 +131,22 @@ export const metricDefinitions: Record<string, MetricDefinition> = {
     example: 'If avg win is $300 and avg loss is $150, your risk/reward is 2:1.',
     interpretation: 'Aim for 2:1 or higher. Allows for profitability even with 50% win rate.',
   },
+  
+  simpleAvgROI: {
+    title: 'Simple Average ROI',
+    description: 'This metric shows the average return per trade. It treats every trade with the same weight.',
+    calculation: 'Sum of ROI percentages of all trades, divided by the number of trades.',
+    example: 'Trade ROIs: 5%, 10%, 20%. Simple Average ROI: 11.67%',
+    interpretation: 'You see how your trading decisions perform on average. A higher value means your typical trade produces a positive return. Use it to track the quality and consistency of your entries and exits.',
+  },
+  
+  weightedAvgROI: {
+    title: 'Weighted Average ROI',
+    description: 'This metric shows the return relative to how much capital you use in each trade. Larger positions influence the number more than smaller ones.',
+    calculation: 'Sum of (ROI percentage × position size) divided by the total capital allocated across the trades.',
+    example: 'Trades: 5% ROI with €1000, 10% ROI with €5000, 20% ROI with €500. Weighted Average ROI: 9.4%',
+    interpretation: 'You see the real impact of your trading on your account. A higher value means your capital allocation supports profitable trades. Use it to evaluate risk sizing and exposure quality.',
+  },
 };
 
 /**
