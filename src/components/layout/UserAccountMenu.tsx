@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubAccount } from '@/contexts/SubAccountContext';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -59,13 +60,13 @@ interface SubAccount {
 export const UserAccountMenu = () => {
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
+  const { subAccounts, activeSubAccount, refreshSubAccounts } = useSubAccount();
   const navigate = useNavigate();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null);
-  const [subAccounts, setSubAccounts] = useState<SubAccount[]>([]);
   const [createSubAccountOpen, setCreateSubAccountOpen] = useState(false);
   const [editSubAccountOpen, setEditSubAccountOpen] = useState(false);
   const [deleteSubAccountId, setDeleteSubAccountId] = useState<string | null>(null);
@@ -76,7 +77,6 @@ export const UserAccountMenu = () => {
   useEffect(() => {
     if (user) {
       fetchSubscriptionData();
-      fetchSubAccounts();
     }
   }, [user]);
 
@@ -91,20 +91,6 @@ export const UserAccountMenu = () => {
 
     if (!error && data) {
       setSubscriptionData(data);
-    }
-  };
-
-  const fetchSubAccounts = async () => {
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from('sub_accounts')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (!error && data) {
-      setSubAccounts(data);
     }
   };
 
@@ -131,7 +117,7 @@ export const UserAccountMenu = () => {
       setCreateSubAccountOpen(false);
       setNewSubAccountName('');
       setNewSubAccountDesc('');
-      await fetchSubAccounts();
+      await refreshSubAccounts();
     } catch (error) {
       console.error('Error creating sub account:', error);
       toast.error('Erro ao criar sub-conta');
@@ -159,7 +145,7 @@ export const UserAccountMenu = () => {
       setEditingSubAccount(null);
       setNewSubAccountName('');
       setNewSubAccountDesc('');
-      fetchSubAccounts();
+      await refreshSubAccounts();
     } catch (error) {
       console.error('Error updating sub-account:', error);
       toast.error('Failed to update sub-account');
@@ -178,7 +164,7 @@ export const UserAccountMenu = () => {
 
       toast.success('Sub-conta deletada com sucesso!');
       setDeleteSubAccountId(null);
-      await fetchSubAccounts();
+      await refreshSubAccounts();
     } catch (error) {
       console.error('Error deleting sub account:', error);
       toast.error('Erro ao deletar sub-conta');
@@ -198,7 +184,6 @@ export const UserAccountMenu = () => {
       if (error) throw error;
 
       toast.success('Sub-conta ativada!');
-      await fetchSubAccounts();
       // Recarregar a página para aplicar os dados da sub-conta
       window.location.reload();
     } catch (error) {
@@ -388,18 +373,20 @@ export const UserAccountMenu = () => {
 
             {subAccounts.length > 0 ? (
               <div className="space-y-2 max-h-40 overflow-y-auto">
-                {subAccounts.map((account) => (
-                  <div
-                    key={account.id}
-                    className={`flex items-center justify-between p-2 rounded-md border cursor-pointer transition-colors ${
-                      account.is_active 
-                        ? 'border-primary bg-primary/10' 
-                        : 'border-border hover:bg-muted/50'
-                    }`}
-                    onClick={() => !account.is_active && handleActivateSubAccount(account.id)}
-                  >
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      {account.is_active && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
+                {subAccounts.map((account) => {
+                  const isActive = account.id === activeSubAccount?.id;
+                  return (
+                    <div
+                      key={account.id}
+                      className={`flex items-center justify-between p-2 rounded-md border cursor-pointer transition-colors ${
+                        isActive 
+                          ? 'border-primary bg-primary/10' 
+                          : 'border-border hover:bg-muted/50'
+                      }`}
+                      onClick={() => !isActive && handleActivateSubAccount(account.id)}
+                    >
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        {isActive && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium truncate">{account.name}</p>
                         {account.description && (
@@ -435,7 +422,8 @@ export const UserAccountMenu = () => {
                       </Button>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <p className="text-xs text-muted-foreground text-center py-2">
