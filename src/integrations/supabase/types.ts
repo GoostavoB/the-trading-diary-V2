@@ -518,6 +518,7 @@ export type Database = {
           id: string
           log_date: string
           notes: string | null
+          sub_account_id: string | null
           total_after: number
           updated_at: string
           user_id: string
@@ -528,6 +529,7 @@ export type Database = {
           id?: string
           log_date?: string
           notes?: string | null
+          sub_account_id?: string | null
           total_after: number
           updated_at?: string
           user_id: string
@@ -538,11 +540,20 @@ export type Database = {
           id?: string
           log_date?: string
           notes?: string | null
+          sub_account_id?: string | null
           total_after?: number
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "capital_log_sub_account_id_fkey"
+            columns: ["sub_account_id"]
+            isOneToOne: false
+            referencedRelation: "sub_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       categories: {
         Row: {
@@ -686,6 +697,7 @@ export type Database = {
           position_x: number
           position_y: number
           query_config: Json
+          sub_account_id: string | null
           tier_required: number | null
           title: string
           updated_at: string
@@ -708,6 +720,7 @@ export type Database = {
           position_x?: number
           position_y?: number
           query_config?: Json
+          sub_account_id?: string | null
           tier_required?: number | null
           title: string
           updated_at?: string
@@ -730,6 +743,7 @@ export type Database = {
           position_x?: number
           position_y?: number
           query_config?: Json
+          sub_account_id?: string | null
           tier_required?: number | null
           title?: string
           updated_at?: string
@@ -743,6 +757,13 @@ export type Database = {
             columns: ["menu_item_id"]
             isOneToOne: false
             referencedRelation: "custom_menu_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_dashboard_widgets_sub_account_id_fkey"
+            columns: ["sub_account_id"]
+            isOneToOne: false
+            referencedRelation: "sub_accounts"
             referencedColumns: ["id"]
           },
         ]
@@ -1531,6 +1552,7 @@ export type Database = {
           id: string
           lessons_learned: string | null
           mood: string
+          sub_account_id: string | null
           tags: string[] | null
           title: string
           trade_id: string | null
@@ -1544,6 +1566,7 @@ export type Database = {
           id?: string
           lessons_learned?: string | null
           mood: string
+          sub_account_id?: string | null
           tags?: string[] | null
           title: string
           trade_id?: string | null
@@ -1557,6 +1580,7 @@ export type Database = {
           id?: string
           lessons_learned?: string | null
           mood?: string
+          sub_account_id?: string | null
           tags?: string[] | null
           title?: string
           trade_id?: string | null
@@ -1564,6 +1588,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "journal_entries_sub_account_id_fkey"
+            columns: ["sub_account_id"]
+            isOneToOne: false
+            referencedRelation: "sub_accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "journal_entries_trade_id_fkey"
             columns: ["trade_id"]
@@ -2319,6 +2350,7 @@ export type Database = {
           intensity: number
           logged_at: string
           notes: string | null
+          sub_account_id: string | null
           user_id: string
           xp_awarded: boolean | null
         }
@@ -2330,6 +2362,7 @@ export type Database = {
           intensity: number
           logged_at?: string
           notes?: string | null
+          sub_account_id?: string | null
           user_id: string
           xp_awarded?: boolean | null
         }
@@ -2341,10 +2374,19 @@ export type Database = {
           intensity?: number
           logged_at?: string
           notes?: string | null
+          sub_account_id?: string | null
           user_id?: string
           xp_awarded?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "psychology_logs_sub_account_id_fkey"
+            columns: ["sub_account_id"]
+            isOneToOne: false
+            referencedRelation: "sub_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reactions_log: {
         Row: {
@@ -3334,6 +3376,7 @@ export type Database = {
           side_temp: string | null
           slippage_cost: number | null
           spread_cost: number | null
+          sub_account_id: string | null
           symbol: string | null
           symbol_temp: string
           trade_date: string | null
@@ -3380,6 +3423,7 @@ export type Database = {
           side_temp?: string | null
           slippage_cost?: number | null
           spread_cost?: number | null
+          sub_account_id?: string | null
           symbol?: string | null
           symbol_temp: string
           trade_date?: string | null
@@ -3426,6 +3470,7 @@ export type Database = {
           side_temp?: string | null
           slippage_cost?: number | null
           spread_cost?: number | null
+          sub_account_id?: string | null
           symbol?: string | null
           symbol_temp?: string
           trade_date?: string | null
@@ -3443,6 +3488,13 @@ export type Database = {
             columns: ["account_id"]
             isOneToOne: false
             referencedRelation: "trading_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trades_sub_account_id_fkey"
+            columns: ["sub_account_id"]
+            isOneToOne: false
+            referencedRelation: "sub_accounts"
             referencedColumns: ["id"]
           },
         ]
