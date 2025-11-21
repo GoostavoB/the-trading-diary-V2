@@ -601,9 +601,12 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
       const margin = t.margin ? Number(t.margin) : (positionSize / leverage);
       
       // Calculate ROI: (profit_loss / margin) * 100
+      // This works for both positive (profit) and negative (loss) P&L
       let roi = 0;
-      if (margin > 0) {
+      if (margin > 0 && !isNaN(profitLoss) && isFinite(profitLoss)) {
         roi = (profitLoss / margin) * 100;
+        // Round to 2 decimal places for realistic display
+        roi = Math.round(roi * 100) / 100;
       }
       
       return {
