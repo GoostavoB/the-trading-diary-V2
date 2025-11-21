@@ -556,13 +556,67 @@ const Upload = () => {
     return data.signedUrl;
   };
   const updateTradeField = (index: number, field: keyof ExtractedTrade, value: string | number) => {
-    setTradeEdits(prev => ({
-      ...prev,
-      [index]: {
-        ...prev[index],
-        [field]: value
+    setTradeEdits(prev => {
+      const currentEdits = prev[index] || {};
+      const currentTrade = extractedTrades[index];
+      const updatedTrade = { ...currentTrade, ...currentEdits, [field]: value };
+      
+      // Fields that affect P&L, margin, or ROI calculations
+      const fieldsAffectingROI = ['profit_loss', 'margin', 'entry_price', 'exit_price', 
+                                   'position_size', 'leverage', 'side'];
+      
+      if (fieldsAffectingROI.includes(field)) {
+        // Recalculate P&L if price/size/side changed
+        let pnl = parseFloat(String(updatedTrade.profit_loss)) || 0;
+        if (['entry_price', 'exit_price', 'position_size', 'side'].includes(field)) {
+          const entry = parseFloat(String(updatedTrade.entry_price)) || 0;
+          const exit = parseFloat(String(updatedTrade.exit_price)) || 0;
+          const size = parseFloat(String(updatedTrade.position_size)) || 0;
+          if (entry > 0 && exit > 0 && size > 0) {
+            pnl = updatedTrade.side === 'long' 
+              ? (exit - entry) * size 
+              : (entry - exit) * size;
+          }
+        }
+        
+        // Recalculate margin if needed
+        let margin = parseFloat(String(updatedTrade.margin)) || 0;
+        if (['position_size', 'leverage', 'entry_price'].includes(field) || margin === 0) {
+          const size = parseFloat(String(updatedTrade.position_size)) || 0;
+          const leverage = parseFloat(String(updatedTrade.leverage)) || 1;
+          const entry = parseFloat(String(updatedTrade.entry_price)) || 0;
+          if (size > 0 && entry > 0) {
+            margin = (size * entry) / leverage;
+          }
+        }
+        
+        // Calculate ROI
+        let roi = 0;
+        if (margin > 0 && !isNaN(pnl) && isFinite(pnl)) {
+          roi = (pnl / margin) * 100;
+          roi = Math.round(roi * 100) / 100;
+        }
+        
+        return {
+          ...prev,
+          [index]: {
+            ...currentEdits,
+            [field]: value,
+            profit_loss: pnl,
+            margin: margin,
+            roi: roi
+          }
+        };
       }
-    }));
+      
+      return {
+        ...prev,
+        [index]: {
+          ...currentEdits,
+          [field]: value
+        }
+      };
+    });
   };
   const removeExtractedTrade = (index: number) => {
     setExtractedTrades(prev => prev.filter((_, i) => i !== index));

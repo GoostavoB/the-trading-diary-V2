@@ -597,8 +597,15 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
     const normalizedTrades = trades.map((t: any) => {
       const profitLoss = Number(t.profit_loss) || 0;
       const positionSize = Number(t.position_size) || 0;
+      const entryPrice = Number(t.entry_price) || 0;
       const leverage = Number(t.leverage) || 1;
-      const margin = t.margin ? Number(t.margin) : (positionSize / leverage);
+      
+      // Calculate margin: (position_size * entry_price) / leverage
+      // If margin is provided, use it; otherwise calculate it
+      let margin = t.margin ? Number(t.margin) : 0;
+      if (!margin && positionSize > 0 && entryPrice > 0) {
+        margin = (positionSize * entryPrice) / leverage;
+      }
       
       // Calculate ROI: (profit_loss / margin) * 100
       // This works for both positive (profit) and negative (loss) P&L
@@ -615,7 +622,7 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
         broker: broker || t.broker || '',
         setup: t.setup ?? '',
         emotional_tag: t.emotional_tag ?? '',
-        entry_price: Number(t.entry_price) || 0,
+        entry_price: entryPrice,
         exit_price: Number(t.exit_price) || 0,
         position_size: positionSize,
         leverage: leverage,
