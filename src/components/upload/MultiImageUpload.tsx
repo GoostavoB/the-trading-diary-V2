@@ -225,16 +225,31 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
 
           // RETRY STRATEGY: Skip OCR and force deep vision model for failed images
           let ocrResult = null;
+          let ocrFailed = false;
+          
           if (!retryMode) {
-            // First attempt: Try OCR
+            // First attempt: Try OCR with fallback retry
             try {
               ocrResult = await runOCR(image.file);
+              
+              // If OCR returned no text, retry once
+              if (!ocrResult?.text || ocrResult.text.trim().length < 10) {
+                console.warn('⚠️ OCR returned minimal text, retrying OCR...');
+                try {
+                  ocrResult = await runOCR(image.file);
+                } catch (retryError) {
+                  console.warn('OCR retry failed:', retryError);
+                  ocrFailed = true;
+                }
+              }
             } catch (ocrError) {
               console.warn('OCR failed, will use vision-only:', ocrError);
+              ocrFailed = true;
               ocrResult = null;
             }
           } else {
             console.log('🔄 Retry mode: Skipping OCR, forcing deep vision model');
+            ocrFailed = true;
           }
 
           // Convert image to base64
@@ -264,7 +279,8 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
                     perceptualHash: ocrResult?.perceptualHash,
                     broker: skipBrokerSelection ? null : preSelectedBroker,
                     forceDeepModel: retryMode, // Tell backend to use deep model regardless of OCR quality
-                    retryAttempt // Pass retry attempt to backend for token allocation
+                    retryAttempt, // Pass retry attempt to backend for token allocation
+                    ocrFailed // Flag that OCR failed so backend can allocate more tokens
                   }),
                 }
               );
