@@ -21,7 +21,7 @@ interface Trade {
   exit_price?: number;
   position_size?: number;
   profit_loss?: number;
-  roi_percent?: number;
+  roi?: number;
   opened_at?: string;
   closed_at?: string;
   setup?: string;
@@ -209,9 +209,9 @@ export function TradeCard({
               <div className="text-xs text-[#A6B1BB]">ROI</div>
               <div className={cn(
                 "text-sm font-bold",
-                (trade.roi_percent || 0) >= 0 ? "text-green-400" : "text-red-400"
+                (trade.roi || 0) >= 0 ? "text-green-400" : "text-red-400"
               )}>
-                {trade.roi_percent?.toFixed(2) || '0.00'}%
+                {trade.roi?.toFixed(2) || '0.00'}%
               </div>
             </div>
             <Badge 
