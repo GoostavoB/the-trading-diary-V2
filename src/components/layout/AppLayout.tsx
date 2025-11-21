@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
-import { UserMenu } from './UserMenu';
+import { UserAccountMenu } from './UserAccountMenu';
 import { useReminderNotifications } from '@/hooks/useReminderNotifications';
 import { useSidebarState } from '@/hooks/useSidebarState';
 import { ThemeStudio } from '@/components/theme-studio/ThemeStudio';
@@ -53,7 +53,7 @@ const AppLayout = ({
               <CurrencySelector />
               <BlurToggle />
               <ThemeStudio />
-              <UserMenu />
+              <UserAccountMenu />
             </div>
           </header>
 
@@ -66,7 +66,7 @@ const AppLayout = ({
               <CurrencySelector />
               <BlurToggle />
               <ThemeStudio />
-              <UserMenu />
+              <UserAccountMenu />
             </div>
           </header>
 
