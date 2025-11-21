@@ -26,7 +26,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { User, LogOut, KeyRound, Settings, Target, Crown, HelpCircle, Palette, Plus, Trash2, Check, Pencil } from 'lucide-react';
+import { User, LogOut, KeyRound, Settings, Target, Crown, HelpCircle, Palette, Plus, Trash2, Check, Pencil, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -56,6 +56,7 @@ interface SubAccount {
   icon: string;
   color: string;
   is_active: boolean;
+  is_default: boolean;
   created_at: string;
 }
 
@@ -201,6 +202,26 @@ export const UserAccountMenu = () => {
     } catch (error) {
       console.error('Error activating sub account:', error);
       toast.error('Erro ao ativar sub-conta');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetDefaultSubAccount = async (id: string) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('sub_accounts')
+        .update({ is_default: true })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success('Default account updated!');
+      await refreshSubAccounts();
+    } catch (error) {
+      console.error('Error setting default account:', error);
+      toast.error('Failed to set default account');
     } finally {
       setLoading(false);
     }
@@ -387,6 +408,8 @@ export const UserAccountMenu = () => {
               <div className="space-y-2 max-h-40 overflow-y-auto">
                 {subAccounts.map((account) => {
                   const isActive = account.id === activeSubAccount?.id;
+                  const isMainAccount = account.name === 'Main';
+                  
                   return (
                     <div
                       key={account.id}
@@ -413,43 +436,81 @@ export const UserAccountMenu = () => {
                             </div>
                           );
                         })()}
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate">{account.name}</p>
-                        {account.description && (
-                          <p className="text-xs text-muted-foreground truncate">{account.description}</p>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium truncate">{account.name}</p>
+                            
+                            {isMainAccount && (
+                              <Badge variant="main" className="text-[10px] px-1.5 py-0">
+                                Main
+                              </Badge>
+                            )}
+                            
+                            {account.is_default && (
+                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 flex items-center gap-0.5">
+                                <Star className="w-2.5 h-2.5" />
+                                Default
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          {account.description && (
+                            <p className="text-xs text-muted-foreground truncate">{account.description}</p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        {!account.is_default && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 w-7 p-0 hover:bg-muted"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSetDefaultSubAccount(account.id);
+                            }}
+                            title="Set as default"
+                          >
+                            <Star className="w-3 h-3" />
+                          </Button>
                         )}
+                        
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 w-7 p-0 hover:bg-muted"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingSubAccount(account);
+                            setNewSubAccountName(account.name);
+                            setNewSubAccountDesc(account.description || '');
+                            setNewSubAccountIcon(account.icon || 'Circle');
+                            setNewSubAccountColor(account.color || 'hsl(221, 83%, 53%)');
+                            setEditSubAccountOpen(true);
+                          }}
+                        >
+                          <Pencil className="w-3 h-3" />
+                        </Button>
+                        
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (isMainAccount) {
+                              toast.error("Cannot delete Main account");
+                              return;
+                            }
+                            setDeleteSubAccountId(account.id);
+                          }}
+                          disabled={isMainAccount}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 w-7 p-0 hover:bg-muted"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditingSubAccount(account);
-                          setNewSubAccountName(account.name);
-                          setNewSubAccountDesc(account.description || '');
-                          setNewSubAccountIcon(account.icon || 'Circle');
-                          setNewSubAccountColor(account.color || 'hsl(221, 83%, 53%)');
-                          setEditSubAccountOpen(true);
-                        }}
-                      >
-                        <Pencil className="w-3 h-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeleteSubAccountId(account.id);
-                        }}
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </div>
                   );
                 })}
               </div>

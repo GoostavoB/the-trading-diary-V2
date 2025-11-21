@@ -10,6 +10,7 @@ interface SubAccount {
   icon: string | null;
   color: string | null;
   is_active: boolean;
+  is_default: boolean;
   created_at: string;
 }
 
