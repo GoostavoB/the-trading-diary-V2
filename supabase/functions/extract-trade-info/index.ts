@@ -303,15 +303,15 @@ serve(async (req) => {
 Map from whatever column names you see to our schema:
 - symbol: "Futures", "Symbol", "Pair", "Asset" → extract just symbol (e.g., BTCUSDT)
 - side: "Side", "Type", "Direction" → must be "long" or "short"
-- entry_price: "Open Price", "Avg. Open Price", "Entry Price", "Entry", "Avg Open", "Open" → CRITICAL FIELD, extract as numeric. If not visible, we will calculate from exit price and P&L
-- exit_price: "Close Price", "Exit Price" → numeric
-- opened_at: "Open Time", "Entry Time" → ISO timestamp
-- closed_at: "Close Time", "Exit Time" → ISO timestamp
-- leverage: "Margin(Leverage)", "Leverage" → extract number (50x → 50)
-- profit_loss: "PnL", "P&L", "Profit/Loss" → numeric (can be negative)
-- trading_fee: "Trading Fee", "Fee"
-- funding_fee: "Funding Fee"
-- position_size: "Position Size", "Amount", "Qty"
+- **position_size: "Position Size", "Size", "Amount", "Qty", "Quantity", "Contracts", "Vol", "Volume", "Amt", "Position", "Pos Size" → CRITICAL for ROI, extract as numeric**
+- **entry_price: "Open Price", "Avg. Open Price", "Avg Open", "Entry Price", "Entry", "Open", "Avg. Entry", "Entry Avg", "Avg Entry Price" → CRITICAL for ROI, extract as numeric. Look for ANY price near trade opening time**
+- exit_price: "Close Price", "Exit Price", "Close", "Avg. Close Price" → numeric
+- opened_at: "Open Time", "Entry Time", "Open Date" → ISO timestamp
+- closed_at: "Close Time", "Exit Time", "Close Date" → ISO timestamp
+- leverage: "Margin(Leverage)", "Leverage", "Lev" → extract number (50x → 50)
+- profit_loss: "PnL", "P&L", "Profit/Loss", "Realized PnL", "Net P&L" → numeric (can be negative)
+- trading_fee: "Trading Fee", "Fee", "Commission"
+- funding_fee: "Funding Fee", "Funding"
 
 Schema: ${JSON.stringify(TRADE_SCHEMA)}
 Expected approximately ${estimatedTradeCount} trade(s)
@@ -383,7 +383,13 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
           messages: [
             {
               role: "system",
-              content: `Extract ALL trades from OCR text. **Extract EVERY trade visible** - if there's a table, extract EVERY ROW. **IGNORE columns** like TP/SL, Trailing Stop, Close Type, Open Type. Map flexibly: "Futures"→symbol, "PnL"→profit_loss, "Open Time"→opened_at, "Margin(Leverage)"→leverage (50x→50). Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${estimatedTradeCount} trade(s). Return ONLY JSON array with complete closing bracket.`
+              content: `Extract ALL trades from OCR text. **Extract EVERY trade visible** - if there's a table, extract EVERY ROW. **IGNORE columns** like TP/SL, Trailing Stop, Close Type, Open Type. 
+
+**CRITICAL FIELDS - Extract with maximum accuracy:**
+- position_size: "Position Size", "Size", "Amount", "Qty", "Quantity", "Contracts", "Vol", "Volume", "Amt" → REQUIRED for ROI calculation
+- entry_price: "Open Price", "Avg. Open Price", "Avg Open", "Entry Price", "Entry", "Open", "Avg. Entry", "Entry Avg" → REQUIRED for ROI calculation
+
+Map flexibly: "Futures"→symbol, "PnL"→profit_loss, "Open Time"→opened_at, "Margin(Leverage)"→leverage (50x→50). Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${estimatedTradeCount} trade(s). Return ONLY JSON array with complete closing bracket.`
             },
             {
               role: "user",
@@ -447,7 +453,13 @@ RETRY MODE: This image failed extraction before. Be extra thorough - extract ALL
             messages: [
               {
                 role: "system",
-                content: `Extract ALL trades from screenshot. **Extract EVERY trade in table/list** - EVERY ROW is a trade. **IGNORE irrelevant columns**: TP/SL, Trailing Stop, Close Type, Open Type. Map flexibly to schema. Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${estimatedTradeCount} trade(s). Return ONLY JSON array with complete closing bracket.${brokerContext}${annotationContext}`
+                content: `Extract ALL trades from screenshot. **Extract EVERY trade in table/list** - EVERY ROW is a trade. **IGNORE irrelevant columns**: TP/SL, Trailing Stop, Close Type, Open Type. 
+
+**CRITICAL FIELDS - Extract with maximum accuracy:**
+- position_size: "Position Size", "Size", "Amount", "Qty", "Quantity", "Contracts", "Vol", "Volume", "Amt" → REQUIRED for ROI calculation
+- entry_price: "Open Price", "Avg. Open Price", "Avg Open", "Entry Price", "Entry", "Open", "Avg. Entry", "Entry Avg" → REQUIRED for ROI calculation
+
+Map flexibly to schema. Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${estimatedTradeCount} trade(s). Return ONLY JSON array with complete closing bracket.${brokerContext}${annotationContext}`
               },
               {
                 role: "user",
