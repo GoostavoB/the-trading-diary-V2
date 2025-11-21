@@ -29,7 +29,7 @@ interface Trade {
   exit_price?: number;
   position_size?: number;
   profit_loss?: number;
-  roi_percent?: number;
+  roi?: number;
   opened_at?: string;
   closed_at?: string;
   strategy?: string;
