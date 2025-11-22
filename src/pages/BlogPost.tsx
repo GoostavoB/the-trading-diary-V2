@@ -170,6 +170,8 @@ const BlogPost = () => {
     );
   }
 
+  const relatedArticles = getRelatedArticles(slug || '', 3);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black">
       <SEO
@@ -184,11 +186,89 @@ const BlogPost = () => {
       <MobileHeader />
 
       <main id="main-content" className="pt-20 pb-16 px-4">
-        <div className="max-w-4xl mx-auto text-center py-12">
-          <h1 className="text-3xl font-bold mb-4">Article Not Found</h1>
-          <p className="text-muted-foreground mb-6">
-            The article you're looking for doesn't exist.
-          </p>
+        <article className="max-w-4xl mx-auto">
+          {article.heroImage && (
+            <img
+              src={article.heroImage}
+              alt={article.heroImageAlt || article.title}
+              className="w-full h-64 object-cover rounded-lg mb-8"
+            />
+          )}
+
+          <header className="mb-8">
+            <Badge className="mb-4">{article.category}</Badge>
+            <h1 className="text-4xl font-bold mb-4">{article.title}</h1>
+            <div className="flex items-center gap-4 text-muted-foreground text-sm">
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4" />
+                <span>{article.author}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                <span>{new Date(article.date).toLocaleDateString()}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span>{article.readTime}</span>
+              </div>
+            </div>
+          </header>
+
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_250px] gap-8">
+            <div className="prose prose-invert max-w-none">
+              <ReactMarkdown>{article.content}</ReactMarkdown>
+            </div>
+
+            <aside className="hidden lg:block">
+              <TableOfContents content={article.content} />
+            </aside>
+          </div>
+
+          <div className="mt-8 flex items-center gap-4">
+            <Button onClick={handleShare} variant="outline" className="gap-2">
+              <Share2 className="w-4 h-4" />
+              Share Article
+            </Button>
+          </div>
+
+          {article.tags && article.tags.length > 0 && (
+            <div className="mt-8 flex flex-wrap gap-2">
+              {article.tags.map(tag => (
+                <Badge key={tag} variant="secondary">{tag}</Badge>
+              ))}
+            </div>
+          )}
+        </article>
+
+        {relatedArticles.length > 0 && (
+          <section className="max-w-4xl mx-auto mt-16">
+            <h2 className="text-2xl font-bold mb-6">Related Articles</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relatedArticles.map(related => (
+                <Link key={related.slug} to={`/blog/${related.slug}`}>
+                  <Card className="h-full hover:border-primary transition-colors">
+                    {related.heroImage && (
+                      <img
+                        src={related.heroImage}
+                        alt={related.heroImageAlt || related.title}
+                        className="w-full h-32 object-cover rounded-t-lg"
+                      />
+                    )}
+                    <div className="p-4">
+                      <Badge className="mb-2">{related.category}</Badge>
+                      <h3 className="font-semibold mb-2">{related.title}</h3>
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {related.description}
+                      </p>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <div className="max-w-4xl mx-auto mt-8">
           <Link to="/blog">
             <Button variant="outline" className="gap-2">
               <ArrowLeft className="w-4 h-4" />
@@ -201,9 +281,6 @@ const BlogPost = () => {
       <Footer />
     </div>
   );
-}
-
-
 };
 
 export default BlogPost;

@@ -12,7 +12,6 @@ import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { preloadImages } from '@/utils/preloadStrategies';
-import { useHreflang } from '@/hooks/useHreflang';
 import { SUPPORTED_LANGUAGES, getLocalizedPath, getLanguageFromPath, type SupportedLanguage } from '@/utils/languageRouting';
 import { useLocation } from 'react-router-dom';
 
@@ -27,12 +26,6 @@ const Blog = () => {
   const currentLang: SupportedLanguage = (lang && SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage))
     ? (lang as SupportedLanguage)
     : getLanguageFromPath(location.pathname);
-
-  // Add hreflang tags for SEO
-  useHreflang({
-    languages: [...SUPPORTED_LANGUAGES],
-    defaultLanguage: 'en'
-  });
 
   // Update language if needed
   useEffect(() => {

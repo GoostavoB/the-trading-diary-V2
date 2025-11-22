@@ -6,22 +6,13 @@ import { useNavigate } from "react-router-dom";
 
 import { Logo } from "@/components/Logo";
 import Footer from "@/components/Footer";
-import { updatePageMeta, addStructuredData } from "@/utils/seoHelpers";
+import { addStructuredData } from "@/utils/seoHelpers";
 import { ArrowRight } from "lucide-react";
 
 const CryptoTradingFAQ = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // SEO Meta Tags
-    updatePageMeta({
-      title: 'Crypto Trading FAQ 2025: Long Short Ratio, ROI, Fees, Dashboards, and Pro Metrics',
-      description: 'Learn how to trade crypto effectively. Understand long-short ratio, ROI, trading fees, funding rates, and the best dashboards to track your performance and reduce losses.',
-      keywords: 'crypto trading, long short ratio, ROI, trading fees, funding rate, trading dashboard, crypto metrics, crypto performance tracking, bitcoin trading, crypto diary',
-      canonical: 'https://www.thetradingdiary.com/crypto-trading-faq',
-      ogType: 'article'
-    });
-
     // Structured Data for FAQ
     const faqSchema = {
       "@context": "https://schema.org",

@@ -5,8 +5,8 @@ import { X } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 
 interface DashboardHeaderProps {
-    dateRange: DateRange | undefined;
-    setDateRange: (range: DateRange | undefined) => void;
+    dateRange: { from: Date | undefined; to: Date | undefined; } | undefined;
+    setDateRange: (range: { from: Date | undefined; to: Date | undefined; } | undefined) => void;
     clearDateRange: () => void;
     isCustomizing: boolean;
     onStartCustomize: () => void;

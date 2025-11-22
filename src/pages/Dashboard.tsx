@@ -1018,6 +1018,8 @@ const Dashboard = () => {
                     open={isCustomizing}
                     onClose={() => setIsCustomizing(false)}
                     onAddWidget={addWidget}
+                    onRemoveWidget={removeWidget}
+                    activeWidgets={activeWidgets}
                   />
 
                   <UpgradePrompt
