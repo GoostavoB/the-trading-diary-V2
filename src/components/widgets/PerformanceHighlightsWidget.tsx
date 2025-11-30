@@ -1,5 +1,4 @@
 import { memo, useState } from 'react';
-import { WidgetWrapper } from './WidgetWrapper';
 import { WidgetProps } from '@/types/widget';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -31,15 +30,9 @@ export const PerformanceHighlightsWidget = memo(({
     const [period, setPeriod] = useState('30d');
 
     return (
-        <WidgetWrapper
-            id={id}
-            title="Performance Highlights"
-            isEditMode={isEditMode}
-            onRemove={onRemove}
-            className="p-4 flex flex-col h-full"
-        >
+        <div className="flex flex-col h-full">
             {/* Line 1: Title + Filter */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between p-4 border-b border-white/5">
                 <h3 className="text-base font-semibold">Performance Highlights</h3>
                 <Select value={period} onValueChange={setPeriod}>
                     <SelectTrigger className="w-[100px] h-8 text-xs">
@@ -53,46 +46,48 @@ export const PerformanceHighlightsWidget = memo(({
                 </Select>
             </div>
 
-            {/* Line 2: Two columns */}
-            <div className="grid grid-cols-2 gap-4 flex-1">
-                {/* Left: What's Working */}
-                <div>
-                    <h4 className="text-sm font-medium mb-2 text-profit">What's Working</h4>
-                    <ul className="space-y-1.5">
-                        {workingItems.slice(0, 3).map((item, idx) => (
-                            <li key={idx} className="text-sm">
-                                {item.label} · <span className="text-profit font-medium">{item.value}</span>
-                            </li>
-                        ))}
-                    </ul>
-                    {workingItems.length === 0 && (
-                        <p className="text-xs text-muted-foreground">Not enough data yet</p>
-                    )}
+            <div className="p-4 flex flex-col flex-1">
+                {/* Line 2: Two columns */}
+                <div className="grid grid-cols-2 gap-4 flex-1">
+                    {/* Left: What's Working */}
+                    <div>
+                        <h4 className="text-sm font-medium mb-2 text-profit">What's Working</h4>
+                        <ul className="space-y-1.5">
+                            {workingItems.slice(0, 3).map((item, idx) => (
+                                <li key={idx} className="text-sm">
+                                    {item.label} · <span className="text-profit font-medium">{item.value}</span>
+                                </li>
+                            ))}
+                        </ul>
+                        {workingItems.length === 0 && (
+                            <p className="text-xs text-muted-foreground">Not enough data yet</p>
+                        )}
+                    </div>
+
+                    {/* Right: Areas to Improve */}
+                    <div>
+                        <h4 className="text-sm font-medium mb-2 text-amber-600">Areas to Improve</h4>
+                        <ul className="space-y-1.5">
+                            {improvementItems.slice(0, 3).map((item, idx) => (
+                                <li key={idx} className="text-sm">
+                                    {item.label} · <span className="text-loss font-medium">{item.value}</span>
+                                </li>
+                            ))}
+                        </ul>
+                        {improvementItems.length === 0 && (
+                            <p className="text-xs text-muted-foreground">Not enough data yet</p>
+                        )}
+                    </div>
                 </div>
 
-                {/* Right: Areas to Improve */}
-                <div>
-                    <h4 className="text-sm font-medium mb-2 text-amber-600">Areas to Improve</h4>
-                    <ul className="space-y-1.5">
-                        {improvementItems.slice(0, 3).map((item, idx) => (
-                            <li key={idx} className="text-sm">
-                                {item.label} · <span className="text-loss font-medium">{item.value}</span>
-                            </li>
-                        ))}
-                    </ul>
-                    {improvementItems.length === 0 && (
-                        <p className="text-xs text-muted-foreground">Not enough data yet</p>
-                    )}
-                </div>
+                {/* Line 3: Insight (optional) */}
+                {insight && (
+                    <div className="text-xs text-muted-foreground mt-3 pt-3 border-t">
+                        {insight}
+                    </div>
+                )}
             </div>
-
-            {/* Line 3: Insight (optional) */}
-            {insight && (
-                <div className="text-xs text-muted-foreground mt-3 pt-3 border-t">
-                    {insight}
-                </div>
-            )}
-        </WidgetWrapper>
+        </div>
     );
 });
 

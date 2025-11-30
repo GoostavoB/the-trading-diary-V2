@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 interface PremiumCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
     children: ReactNode;
     className?: string;
+    contentClassName?: string;
     title?: ReactNode;
     subtitle?: string;
     action?: ReactNode;
@@ -13,6 +14,7 @@ interface PremiumCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 't
 export function PremiumCard({
     children,
     className,
+    contentClassName,
     title,
     subtitle,
     action,
@@ -57,7 +59,7 @@ export function PremiumCard({
             )}
 
             {/* Content */}
-            <div className="relative p-4">
+            <div className={cn("relative p-4", contentClassName)}>
                 {children}
             </div>
         </div>

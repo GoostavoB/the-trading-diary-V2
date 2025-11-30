@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { formatCurrency, formatPercent } from '@/utils/formatNumber';
 import { WidgetProps } from '@/types/widget';
-import { WidgetWrapper } from './WidgetWrapper';
 import { useTranslation } from '@/hooks/useTranslation';
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
 
@@ -30,14 +29,10 @@ export const SpotWalletWidget = memo(({
   const isPositive = change24h >= 0;
 
   return (
-    <WidgetWrapper
-      id={id}
-      title={t('widgets.spotWallet.title')}
-      isEditMode={isEditMode}
-      onRemove={onRemove}
-      onExpand={onExpand}
-      headerActions={
-        !isEditMode && (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between p-4 border-b border-white/5">
+        <h3 className="font-semibold text-sm">{t('widgets.spotWallet.title')}</h3>
+        {!isEditMode && (
           <Button
             variant="ghost"
             size="sm"
@@ -46,10 +41,9 @@ export const SpotWalletWidget = memo(({
           >
             {t('widgets.viewAll')} <ArrowRight className="ml-1 h-3 w-3" />
           </Button>
-        )
-      }
-    >
-      <div className="space-y-4">
+        )}
+      </div>
+      <div className="p-4 space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-2xl font-bold">
@@ -66,15 +60,14 @@ export const SpotWalletWidget = memo(({
           ) : (
             <TrendingDown className="h-4 w-4 text-neon-red" />
           )}
-          <span className={`text-sm font-semibold ${
-            isPositive ? 'text-neon-green' : 'text-neon-red'
-          }`}>
+          <span className={`text-sm font-semibold ${isPositive ? 'text-neon-green' : 'text-neon-red'
+            }`}>
             {isPositive ? '+' : ''}<BlurredCurrency amount={change24h} className="inline" /> ({formatPercent(changePercent24h)})
           </span>
           <span className="text-xs text-muted-foreground">24h</span>
         </div>
       </div>
-    </WidgetWrapper>
+    </div>
   );
 });
 

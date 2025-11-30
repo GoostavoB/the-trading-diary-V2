@@ -1,12 +1,11 @@
 import { memo, useState, useMemo } from 'react';
-import { WidgetWrapper } from './WidgetWrapper';
 import { Trade } from '@/types/trade';
 import { formatCurrency, formatPercent, formatCurrencyFull } from '@/utils/formatNumber';
 import { useRollingTargetSettings, type SuggestionMethod } from '@/hooks/useRollingTargetSettings';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Settings, 
+import {
+  TrendingUp,
+  TrendingDown,
+  Settings,
   Info,
   Target,
   Calendar,
@@ -17,13 +16,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -42,13 +41,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip as RechartsTooltip, 
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
   ResponsiveContainer,
   ReferenceLine,
   Area,
@@ -87,14 +86,14 @@ export const RollingTargetWidget = memo(({
   trades = [],  // Add default empty array to prevent crashes
   initialInvestment = 0,  // Add default value to prevent crashes
 }: RollingTargetWidgetProps) => {
-  const { 
-    settings, 
+  const {
+    settings,
     loading: settingsLoading,
-    updateSetting, 
+    updateSetting,
     applySuggestion: applySettingsSuggestion,
-    dismissSuggestion: dismissSettingsSuggestion 
+    dismissSuggestion: dismissSettingsSuggestion
   } = useRollingTargetSettings();
-  
+
   const { settings: userSettings } = useUserSettings();
   const tradingDaysMode = userSettings.trading_days_calculation_mode;
 
@@ -120,7 +119,7 @@ export const RollingTargetWidget = memo(({
     const startDate = firstTradeDate;
     const endDate = lastTradeDate;
     const totalDays = tradingDays;
-    
+
     const p = (settings?.targetPercent || 1) / 100;
 
     // Group trades by day (accumulate net PnL)
@@ -146,7 +145,7 @@ export const RollingTargetWidget = memo(({
 
     // Calculate cumulative values and planned path
     const daysArray: DailyData[] = [];
-    
+
     // Use the consistent first trading date (first opened) for calendar calculations
     const firstTradingDate = firstTradeDate;
 
@@ -154,21 +153,21 @@ export const RollingTargetWidget = memo(({
       // Calculate calendar days from start (based on first opened date, not first closed)
       const currentDate = parseISO(dateStr);
       const calendarDaysFromStart = differenceInDays(currentDate, firstTradingDate);
-      
+
       // Set start capital based on previous day's end capital (or initial investment for first day)
       day.startCapital = currentCapital;
       day.endCapital = day.startCapital + day.pnl;
       day.returnPercent = day.startCapital > 0 ? (day.pnl / day.startCapital) * 100 : 0;
-      
+
       // Planned = what you SHOULD end the day with (start capital + target growth)
       day.plannedCapital = day.startCapital * (1 + p);
-      
+
       // Calculate required today for rolling mode
       if (settings?.mode === 'rolling') {
         const plannedForToday = initialInvestment * Math.pow(1 + p, calendarDaysFromStart + 1);
         day.requiredToday = Math.max(0, plannedForToday - day.endCapital);
         day.headroom = Math.max(0, day.endCapital - plannedForToday);
-        
+
         // Apply carry-over cap
         const capAmount = ((settings?.carryOverCap || 2) / 100) * day.startCapital;
         day.requiredToday = Math.min(day.requiredToday, capAmount);
@@ -177,10 +176,10 @@ export const RollingTargetWidget = memo(({
         day.requiredToday = p * day.startCapital;
         day.headroom = Math.max(0, day.pnl - day.requiredToday);
       }
-      
+
       // Deviation = did you hit today's target?
       day.deviation = day.endCapital - day.plannedCapital;
-      
+
       daysArray.push(day);
       currentCapital = day.endCapital; // Update for next day
     });
@@ -191,22 +190,22 @@ export const RollingTargetWidget = memo(({
   // Calculate today's required PnL
   const todayData = useMemo(() => {
     if (dailyData.length === 0) return null;
-    
+
     const lastDay = dailyData[dailyData.length - 1];
     const p = (settings?.targetPercent || 1) / 100;
     const daysSinceStart = dailyData.length;
-    
+
     const plannedCapital = initialInvestment * Math.pow(1 + p, daysSinceStart);
     const actualCapital = lastDay.endCapital;
-    
+
     let requiredToday = 0;
     let headroom = 0;
     let isAhead = false;
-    
+
     if (settings?.mode === 'rolling') {
       const nextPlanned = initialInvestment * Math.pow(1 + p, daysSinceStart + 1);
       const needed = nextPlanned - actualCapital;
-      
+
       if (needed <= 0) {
         isAhead = true;
         headroom = actualCapital - nextPlanned;
@@ -220,10 +219,10 @@ export const RollingTargetWidget = memo(({
       requiredToday = p * actualCapital;
       isAhead = false;
     }
-    
+
     // Calculate forecasts based on current progress
     const forecast30Days = actualCapital * Math.pow(1 + p, 30);
-    
+
     return {
       requiredToday,
       headroom,
@@ -239,17 +238,17 @@ export const RollingTargetWidget = memo(({
   // Use the consistent tradingDays value based on user mode
   const avgDailyGrowth = useMemo(() => {
     if (dailyData.length === 0 || initialInvestment === 0) return 0;
-    
+
     // Get the trading days count using user's selected mode
     const { tradingDays: N } = calculateTradingDays(trades, tradingDaysMode);
-    
+
     const firstDay = dailyData[0];
     const lastDay = dailyData[dailyData.length - 1];
     const C_initial = firstDay.startCapital;
     const C_final = lastDay.endCapital;
-    
+
     if (C_initial === 0 || N === 0) return 0;
-    
+
     // Formula: (C_final / C_initial)^(1 / N) - 1
     const growthRate = Math.pow(C_final / C_initial, 1 / N) - 1;
     return growthRate * 100; // Convert to percentage
@@ -258,12 +257,12 @@ export const RollingTargetWidget = memo(({
   // Adaptive suggestion logic
   const suggestedPercent = useMemo(() => {
     if (!settings?.suggestionsEnabled || dailyData.length < 20) return null;
-    
+
     const last20Days = dailyData.slice(-20);
     const returns = last20Days.map(d => d.returnPercent / 100);
-    
+
     let suggestion = 0;
-    
+
     if (settings?.suggestionMethod === 'median') {
       const sorted = [...returns].sort((a, b) => a - b);
       const mid = Math.floor(sorted.length * 0.6); // 60th percentile
@@ -275,25 +274,25 @@ export const RollingTargetWidget = memo(({
       const stdev = Math.sqrt(variance);
       suggestion = (mean - 0.5 * stdev) * 100;
     }
-    
+
     // Clamp between 0.1% and 20%
     suggestion = Math.max(0.1, Math.min(20, suggestion));
-    
+
     // Check trigger conditions
     const wins = last20Days.filter(d => d.pnl > 0).length;
     const hitRate = wins / last20Days.length;
-    
+
     const last5 = dailyData.slice(-5);
     const consistentlyBehind = last5.every(d => d.deviation < -0.05 * d.plannedCapital);
-    
+
     const shouldSuggest = hitRate < 0.5 || consistentlyBehind;
-    
+
     // Check cooldown (7 days)
     if (settings?.lastSuggestionDate) {
       const daysSince = differenceInDays(new Date(), parseISO(settings.lastSuggestionDate));
       if (daysSince < 7) return null;
     }
-    
+
     return shouldSuggest && !settings?.dismissedSuggestion ? suggestion : null;
   }, [dailyData, settings?.suggestionMethod, settings?.suggestionsEnabled, settings?.dismissedSuggestion, settings?.lastSuggestionDate]);
 
@@ -320,26 +319,26 @@ export const RollingTargetWidget = memo(({
   // Summary metrics
   const summaryMetrics = useMemo(() => {
     if (dailyData.length === 0) return null;
-    
+
     const daysAhead = dailyData.filter(d => d.deviation >= 0).length;
     const daysBehind = dailyData.filter(d => d.deviation < 0).length;
     const successRate = (daysAhead / dailyData.length) * 100;
-    
+
     const avgRequiredWhenBehind = dailyData
       .filter(d => d.requiredToday > 0 && d.deviation < 0)
       .reduce((sum, d) => sum + d.requiredToday, 0) / Math.max(1, daysBehind);
-    
+
     const lastDay = dailyData[dailyData.length - 1];
     // Current status based on most recent day's performance
     const currentStatus = lastDay.deviation >= 0 ? 'ahead' : 'behind';
-    
+
     // Cumulative drift = sum of all daily deviations
     const totalDrift = dailyData.reduce((sum, d) => sum + d.deviation, 0);
-    const driftPercent = lastDay.startCapital > 0 
-      ? (totalDrift / (lastDay.startCapital * dailyData.length)) * 100 
+    const driftPercent = lastDay.startCapital > 0
+      ? (totalDrift / (lastDay.startCapital * dailyData.length)) * 100
       : 0;
     const driftAmount = Math.abs(totalDrift);
-    
+
     return {
       currentStatus,
       driftPercent,
@@ -352,29 +351,24 @@ export const RollingTargetWidget = memo(({
 
   if (!trades.length || !initialInvestment) {
     return (
-      <WidgetWrapper
-        id={id}
-        title="Rolling Target Tracker"
-        isEditMode={isEditMode}
-        onRemove={onRemove}
-      >
-        <div className="flex flex-col items-center justify-center py-12 text-center">
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between p-4 border-b border-white/5">
+          <h3 className="font-semibold text-sm">Rolling Target Tracker</h3>
+        </div>
+        <div className="flex flex-col items-center justify-center py-12 text-center flex-1">
           <Target className="h-12 w-12 text-muted-foreground mb-4" />
           <p className="text-sm text-muted-foreground">
             Add trades and set initial investment to start tracking
           </p>
         </div>
-      </WidgetWrapper>
+      </div>
     );
   }
 
   return (
-    <WidgetWrapper
-      id={id}
-      title="Rolling Target Tracker"
-      isEditMode={isEditMode}
-      onRemove={onRemove}
-      headerActions={
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between p-4 border-b border-white/5">
+        <h3 className="font-semibold text-sm">Rolling Target Tracker</h3>
         <Dialog open={showSettings} onOpenChange={setShowSettings}>
           <DialogTrigger asChild>
             <Button variant="ghost" size="sm">
@@ -388,7 +382,7 @@ export const RollingTargetWidget = memo(({
                 Configure your daily target tracking preferences
               </DialogDescription>
             </DialogHeader>
-            
+
             <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -563,9 +557,8 @@ export const RollingTargetWidget = memo(({
             </div>
           </DialogContent>
         </Dialog>
-      }
-    >
-      <div className="space-y-6">
+      </div>
+      <div className="p-4 space-y-6">
         {/* Top Bar - Mode and Today's Target */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -607,7 +600,7 @@ export const RollingTargetWidget = memo(({
                     <Target className="h-5 w-5 text-primary" />
                     <p className="text-sm font-medium">Today to stay on track</p>
                   </div>
-                   <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Required PnL</span>
                     <span className="text-2xl font-bold text-primary">
                       {formatCurrencyFull(todayData.requiredToday)}
@@ -674,13 +667,13 @@ export const RollingTargetWidget = memo(({
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 stroke="hsl(var(--muted-foreground))"
                 fontSize={11}
                 tickLine={false}
               />
-              <YAxis 
+              <YAxis
                 stroke="hsl(var(--muted-foreground))"
                 fontSize={11}
                 tickLine={false}
@@ -805,7 +798,7 @@ export const RollingTargetWidget = memo(({
             <TabsTrigger value="recent">Recent (10 days)</TabsTrigger>
             <TabsTrigger value="all">All Days</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="recent" className="space-y-2">
             <div className="max-h-[300px] overflow-auto">
               <table className="w-full text-xs">
@@ -896,7 +889,7 @@ export const RollingTargetWidget = memo(({
               </table>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="all" className="space-y-2">
             <div className="max-h-[300px] overflow-auto">
               <table className="w-full text-xs">
@@ -989,7 +982,7 @@ export const RollingTargetWidget = memo(({
           </TabsContent>
         </Tabs>
       </div>
-    </WidgetWrapper>
+    </div>
   );
 });
 

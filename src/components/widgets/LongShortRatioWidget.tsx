@@ -2,7 +2,6 @@ import { memo, useState, useEffect, useCallback } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { RefreshCw, TrendingUp, TrendingDown, Activity } from 'lucide-react';
 import { WidgetProps } from '@/types/widget';
-import { WidgetWrapper } from './WidgetWrapper';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -116,15 +115,14 @@ export const LongShortRatioWidget = memo(({
     };
 
     return (
-        <WidgetWrapper
-            id={id}
-            isEditMode={isEditMode}
-            onRemove={onRemove}
-            onExpand={onExpand}
-            title="Long/Short Ratio"
-            icon={Activity}
-            className="flex flex-col h-full"
-        >
+
+        <div className="flex flex-col h-full">
+            <div className="flex items-center justify-between p-4 border-b border-white/5">
+                <div className="flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-primary" />
+                    <h3 className="font-semibold text-sm">Long/Short Ratio</h3>
+                </div>
+            </div>
             <div className="flex flex-col h-full p-4 space-y-4">
                 {/* Controls */}
                 <div className="flex items-center justify-between gap-2">
@@ -229,7 +227,7 @@ export const LongShortRatioWidget = memo(({
                     </ScrollArea>
                 </div>
             </div>
-        </WidgetWrapper>
+        </div>
     );
 });
 

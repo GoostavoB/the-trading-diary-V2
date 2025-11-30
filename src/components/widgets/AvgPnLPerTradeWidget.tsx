@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { WidgetWrapper } from './WidgetWrapper';
 import { formatCurrency } from '@/utils/formatNumber';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -26,13 +25,8 @@ export const AvgPnLPerTradeWidget = memo(({
   const isPositive = avgPnLPerTrade >= 0;
 
   return (
-    <WidgetWrapper
-      id={id}
-      title={t('widgets.avgPnLPerTrade.title')}
-      isEditMode={isEditMode}
-      onRemove={onRemove}
-      className="p-2" // Compact padding per spec
-    >
+
+    <div className="p-2 h-full flex flex-col justify-center">
       {/* Top: Label (10-11px) */}
       <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
         {t('widgets.avgPnLPerTrade.title')}
@@ -53,7 +47,7 @@ export const AvgPnLPerTradeWidget = memo(({
       <div className="text-[10px] text-muted-foreground mt-0.5">
         Per trade average
       </div>
-    </WidgetWrapper>
+    </div>
   );
 });
 

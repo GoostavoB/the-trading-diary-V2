@@ -2,7 +2,6 @@ import { memo, useState } from 'react';
 import { ArrowUpRight, ArrowDownRight, TrendingUp } from 'lucide-react';
 import { PremiumTable, PremiumTableRow } from '@/components/ui/PremiumTable';
 import { TopMoversCard } from '@/components/TopMoversCard';
-import { WidgetWrapper } from './WidgetWrapper';
 import { WidgetProps } from '@/types/widget';
 import { Trade } from '@/types/trade';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -29,12 +28,7 @@ export const TopMoversWidget = memo(({
     .slice(0, 3);
 
   return (
-    <WidgetWrapper
-      id={id}
-      isEditMode={isEditMode}
-      onRemove={onRemove}
-      className="p-0"
-    >
+    <div className="flex flex-col h-full">
       <div className="p-4 border-b border-border/50 flex items-center justify-between">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Top Movers</h3>
         <Select value={period} onValueChange={setPeriod}>
@@ -85,7 +79,7 @@ export const TopMoversWidget = memo(({
           </div>
         )}
       </PremiumTable>
-    </WidgetWrapper>
+    </div>
   );
 });
 

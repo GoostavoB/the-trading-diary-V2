@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { WidgetWrapper } from './WidgetWrapper';
 import { AnimatedCounter } from '@/components/AnimatedCounter';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -23,13 +22,12 @@ export const SimpleAvgROIWidget = memo(({
   const isPositive = simpleAvgROI >= 0;
 
   return (
-    <WidgetWrapper
-      id={id}
-      title="Simple Average ROI"
-      isEditMode={isEditMode}
-      onRemove={onRemove}
-    >
-      <div className="space-y-3">
+
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between p-4 border-b border-white/5">
+        <h3 className="font-semibold text-sm">Simple Average ROI</h3>
+      </div>
+      <div className="p-4 space-y-3">
         <div className="flex items-baseline gap-2">
           <AnimatedCounter
             value={Math.abs(simpleAvgROI)}
@@ -47,7 +45,7 @@ export const SimpleAvgROIWidget = memo(({
           Average return across {totalTrades} {totalTrades === 1 ? 'trade' : 'trades'}
         </p>
       </div>
-    </WidgetWrapper>
+    </div>
   );
 });
 

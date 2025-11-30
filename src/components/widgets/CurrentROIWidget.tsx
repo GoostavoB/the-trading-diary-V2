@@ -1,5 +1,4 @@
 import { memo, useState } from 'react';
-import { WidgetWrapper } from './WidgetWrapper';
 import { AnimatedCounter } from '@/components/AnimatedCounter';
 import { formatCurrency, formatPercent } from '@/utils/formatNumber';
 import { TrendingUp, TrendingDown, Edit2 } from 'lucide-react';
@@ -41,7 +40,7 @@ export const CurrentROIWidget = memo(({
 
   const handleSave = async () => {
     const newValue = parseFloat(capitalValue);
-    
+
     if (isNaN(newValue) || newValue < 0) {
       toast.error(t('errors.validationError'));
       return;
@@ -88,7 +87,7 @@ export const CurrentROIWidget = memo(({
       if (onInitialInvestmentUpdate) {
         onInitialInvestmentUpdate(newValue);
       }
-      
+
       toast.success(t('success.updated'));
       setIsDialogOpen(false);
     } catch (error) {
@@ -100,13 +99,12 @@ export const CurrentROIWidget = memo(({
   };
 
   return (
-    <WidgetWrapper
-      id={id}
-      title={t('widgets.currentROI.title')}
-      isEditMode={isEditMode}
-      onRemove={onRemove}
-    >
-      <div className="space-y-3">
+
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between p-4 border-b border-white/5">
+        <h3 className="font-semibold text-sm">{t('widgets.currentROI.title')}</h3>
+      </div>
+      <div className="p-4 space-y-3">
         <div className="flex items-baseline gap-2">
           <AnimatedCounter
             value={Math.abs(currentROI)}
@@ -200,7 +198,7 @@ export const CurrentROIWidget = memo(({
           </p>
         </div>
       </div>
-    </WidgetWrapper>
+    </div>
   );
 });
 

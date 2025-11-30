@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { WidgetWrapper } from './WidgetWrapper';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
@@ -21,13 +20,11 @@ export const CombinedPnLROIWidget = memo(({
   const isPnLPositive = avgPnLPerTrade >= 0;
 
   return (
-    <WidgetWrapper
-      id={id}
-      title={t('widgets.avgPnLPerTrade.title')}
-      isEditMode={isEditMode}
-      onRemove={onRemove}
-    >
-      <div className="space-y-3">
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between p-4 border-b border-white/5">
+        <h3 className="font-semibold text-sm">{t('widgets.avgPnLPerTrade.title')}</h3>
+      </div>
+      <div className="p-4 space-y-3">
         <div className="flex items-baseline gap-2">
           <div className={`text-3xl font-bold ${isPnLPositive ? 'text-profit' : 'text-loss'}`}>
             {isPnLPositive ? '' : '-'}
@@ -43,7 +40,7 @@ export const CombinedPnLROIWidget = memo(({
           {t('widgets.avgPnLDescription')}
         </p>
       </div>
-    </WidgetWrapper>
+    </div>
   );
 });
 

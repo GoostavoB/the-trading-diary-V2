@@ -1,5 +1,4 @@
 import { PremiumCard } from "@/components/ui/PremiumCard";
-import { WidgetWrapper } from "@/components/widgets/WidgetWrapper";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Trade } from "@/types/trade";
@@ -159,16 +158,17 @@ export function EmotionMistakeCorrelationWidget({ id, isEditMode, onRemove }: Wi
   const worstMistake = mistakes[0]; // Lowest win rate
 
   return (
-    <WidgetWrapper
-      id={id}
-      title="Emotion & Mistake Patterns"
-      isEditMode={isEditMode}
-      onRemove={onRemove}
-      className="overflow-hidden h-full"
-    >
-      <ScrollArea className="h-full"
-      >
-        <div className="space-y-6 pr-4">
+    <div className="overflow-hidden h-full flex flex-col">
+      {/* Title Header */}
+      <div className="flex items-center justify-between p-4 border-b border-white/5">
+        <div className="flex items-center gap-2">
+          <Brain className="h-4 w-4 text-primary" />
+          <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Emotion & Mistake Patterns</p>
+        </div>
+      </div>
+
+      <ScrollArea className="h-full">
+        <div className="space-y-6 p-4">
           {/* Key Insights */}
           <div className="grid grid-cols-2 gap-3">
             {bestEmotion && (
@@ -329,6 +329,6 @@ export function EmotionMistakeCorrelationWidget({ id, isEditMode, onRemove }: Wi
           </div>
         </div>
       </ScrollArea>
-    </WidgetWrapper>
+    </div>
   );
 }

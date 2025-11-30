@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { WidgetWrapper } from './WidgetWrapper';
 import { AnimatedCounter } from '@/components/AnimatedCounter';
 import { formatPercent } from '@/utils/formatNumber';
 import { TrendingUp, TrendingDown, Percent } from 'lucide-react';
@@ -24,13 +23,12 @@ export const AvgROIPerTradeWidget = memo(({
   const isPositive = avgROIPerTrade >= 0;
 
   return (
-    <WidgetWrapper
-      id={id}
-      title={t('widgets.avgROIPerTrade.title')}
-      isEditMode={isEditMode}
-      onRemove={onRemove}
-    >
-      <div className="space-y-3">
+
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between p-4 border-b border-white/5">
+        <h3 className="font-semibold text-sm">{t('widgets.avgROIPerTrade.title')}</h3>
+      </div>
+      <div className="p-4 space-y-3">
         <div className="flex items-baseline gap-2">
           <AnimatedCounter
             value={Math.abs(avgROIPerTrade)}
@@ -48,7 +46,7 @@ export const AvgROIPerTradeWidget = memo(({
           {t('widgets.avgROIAcross', { count: totalTrades })}
         </p>
       </div>
-    </WidgetWrapper>
+    </div>
   );
 });
 

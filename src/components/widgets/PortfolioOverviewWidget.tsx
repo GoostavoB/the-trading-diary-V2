@@ -3,7 +3,6 @@ import { memo } from 'react';
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 import { formatCurrency } from '@/utils/formatNumber';
 import { WidgetProps } from '@/types/widget';
-import { WidgetWrapper } from './WidgetWrapper';
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
 
 interface PortfolioOverviewWidgetProps extends WidgetProps {
@@ -20,14 +19,12 @@ export const PortfolioOverviewWidget = memo(({
   totalValue,
 }: PortfolioOverviewWidgetProps) => {
   return (
-    <WidgetWrapper
-      id={id}
-      title="Portfolio Overview"
-      isEditMode={isEditMode}
-      onRemove={onRemove}
-      onExpand={onExpand}
-    >
-      <div className="space-y-4">
+
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between p-4 border-b border-white/5">
+        <h3 className="font-semibold text-sm">Portfolio Overview</h3>
+      </div>
+      <div className="p-4 space-y-4 flex-1 flex flex-col">
         <div>
           <p className="text-3xl font-bold">
             <BlurredCurrency amount={totalValue} className="inline" />
@@ -68,7 +65,7 @@ export const PortfolioOverviewWidget = memo(({
           </div>
         )}
       </div>
-    </WidgetWrapper>
+    </div>
   );
 });
 

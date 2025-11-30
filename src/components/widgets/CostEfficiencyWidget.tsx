@@ -1,5 +1,4 @@
 import { memo, useState } from 'react';
-import { WidgetWrapper } from './WidgetWrapper';
 import { WidgetProps } from '@/types/widget';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -31,13 +30,11 @@ export const CostEfficiencyWidget = memo(({
     const { t } = useTranslation();
 
     return (
-        <WidgetWrapper
-            id={id}
-            title="Cost Efficiency"
-            isEditMode={isEditMode}
-            onRemove={onRemove}
-            className="p-0"
-        >
+
+        <div className="flex flex-col h-full">
+            <div className="flex items-center justify-between p-4 border-b border-white/5">
+                <h3 className="font-semibold text-sm">Cost Efficiency</h3>
+            </div>
             <div className="p-4 space-y-4">
                 {/* Header with Badge */}
                 <div className="flex items-center justify-between">
@@ -92,7 +89,7 @@ export const CostEfficiencyWidget = memo(({
                     </div>
                 </div>
             </div>
-        </WidgetWrapper>
+        </div>
     );
 });
 

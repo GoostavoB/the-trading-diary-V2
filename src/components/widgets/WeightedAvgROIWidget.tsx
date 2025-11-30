@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { WidgetWrapper } from './WidgetWrapper';
 import { formatPercent } from '@/utils/formatNumber';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -25,13 +24,7 @@ export const WeightedAvgROIWidget = memo(({
   const isPositive = weightedAvgROI >= 0;
 
   return (
-    <WidgetWrapper
-      id={id}
-      title="Weighted Avg ROI"
-      isEditMode={isEditMode}
-      onRemove={onRemove}
-      className="p-2"
-    >
+    <div className="p-2 h-full flex flex-col justify-center">
       {/* Top: Label (10-11px) */}
       <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
         Weighted Avg ROI
@@ -51,7 +44,7 @@ export const WeightedAvgROIWidget = memo(({
       <div className="text-[10px] text-muted-foreground mt-0.5">
         Volume-weighted
       </div>
-    </WidgetWrapper>
+    </div>
   );
 });
 

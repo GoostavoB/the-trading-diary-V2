@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { WidgetWrapper } from './WidgetWrapper';
 import { formatCurrency } from '@/utils/formatNumber';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -26,13 +25,8 @@ export const AvgPnLPerDayWidget = memo(({
   const isPositive = avgPnLPerDay >= 0;
 
   return (
-    <WidgetWrapper
-      id={id}
-      title={t('widgets.avgPnLPerDay.title')}
-      isEditMode={isEditMode}
-      onRemove={onRemove}
-      className="p-2"
-    >
+
+    <div className="p-2 h-full flex flex-col justify-center">
       {/* Top: Label (10-11px) */}
       <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
         Avg P&L / Day
@@ -53,7 +47,7 @@ export const AvgPnLPerDayWidget = memo(({
       <div className="text-[10px] text-muted-foreground mt-0.5">
         Daily average
       </div>
-    </WidgetWrapper>
+    </div>
   );
 });
 
