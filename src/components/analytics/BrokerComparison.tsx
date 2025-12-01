@@ -67,23 +67,21 @@ export const BrokerComparison = ({ trades }: BrokerComparisonProps) => {
   return (
     <div className="space-y-6">
       {bestBroker && (
-        { bestBroker && (
-          <PremiumCard className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="text-sm font-medium text-muted-foreground mb-1">Recommended Broker</div>
-                <div className="text-2xl font-bold mb-2">{bestBroker.broker}</div>
-                <div className="text-sm text-muted-foreground">
-                  Best overall performance based on fees and win rate
-                </div>
+        <PremiumCard className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="text-sm font-medium text-muted-foreground mb-1">Recommended Broker</div>
+              <div className="text-2xl font-bold mb-2">{bestBroker.broker}</div>
+              <div className="text-sm text-muted-foreground">
+                Best overall performance based on fees and win rate
               </div>
-              <Badge variant="default" className="gap-2">
-                <TrendingUp className="h-4 w-4" />
-                Top Choice
-              </Badge>
             </div>
-          </PremiumCard>
-        )}
+            <Badge variant="default" className="gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Top Choice
+            </Badge>
+          </div>
+        </PremiumCard>
       )}
 
       <PremiumCard className="p-6">
