@@ -14,6 +14,7 @@ export interface CapitalLogEntry {
     user_id: string;
     sub_account_id: string | null;
     amount_added: number;
+    total_after: number;
     log_date: string;
     notes?: string;
     created_at: string;
@@ -29,6 +30,10 @@ export interface CustomWidget {
     position?: number;
     created_at: string;
     updated_at?: string;
+    title: string;
+    description: string;
+    query_config: Record<string, unknown>;
+    display_config: Record<string, unknown>;
 }
 
 export interface WidgetConfig {

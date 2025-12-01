@@ -8,6 +8,7 @@ interface AdaptiveGridProps {
   isCustomizing: boolean;
   renderWidget: (widgetId: string) => ReactNode;
   onOpenWidgetLibrary?: () => void;
+  mode?: 'adaptive' | 'fixed';
 }
 
 export const AdaptiveGrid = ({
@@ -17,6 +18,7 @@ export const AdaptiveGrid = ({
   isCustomizing,
   renderWidget,
   onOpenWidgetLibrary,
+  mode = 'adaptive',
 }: AdaptiveGridProps) => {
   const [responsiveColumns, setResponsiveColumns] = useState(columnCount);
 

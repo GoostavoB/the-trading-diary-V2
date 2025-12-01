@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface PremiumCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -11,7 +11,7 @@ interface PremiumCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 't
     glow?: boolean;
 }
 
-export function PremiumCard({
+export const PremiumCard = forwardRef<HTMLDivElement, PremiumCardProps>(({
     children,
     className,
     contentClassName,
@@ -20,9 +20,10 @@ export function PremiumCard({
     action,
     glow = false,
     ...props
-}: PremiumCardProps) {
+}, ref) => {
     return (
         <div
+            ref={ref}
             className={cn(
                 "relative rounded-xl overflow-hidden transition-all duration-300",
                 "bg-card/40 backdrop-blur-xl border border-white/5",
@@ -64,4 +65,6 @@ export function PremiumCard({
             </div>
         </div>
     );
-}
+});
+
+PremiumCard.displayName = 'PremiumCard';

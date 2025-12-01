@@ -28,8 +28,9 @@ interface CustomizeDashboardControlsProps {
   widgetCount?: number;
   canUndo?: boolean;
   onUndoReset?: () => void;
-
   onForceReset?: () => void;
+  layoutMode?: 'adaptive' | 'fixed';
+  onLayoutModeChange?: (mode: 'adaptive' | 'fixed') => void;
 }
 
 export function CustomizeDashboardControls({
@@ -47,8 +48,9 @@ export function CustomizeDashboardControls({
   widgetCount = 0,
   canUndo = false,
   onUndoReset,
-
   onForceReset,
+  layoutMode,
+  onLayoutModeChange,
 }: CustomizeDashboardControlsProps) {
   const { t } = useTranslation();
   const { canCustomizeDashboard } = useUserTier();

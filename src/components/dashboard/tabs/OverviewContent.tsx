@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useDashboard } from '@/providers/dashboard/DashboardProvider';
 import { SimplifiedDashboardGrid } from '@/components/dashboard/SimplifiedDashboardGrid';
 import { useGridLayout } from '@/hooks/useGridLayout';
@@ -7,6 +7,7 @@ import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { resolveLayoutCollisions, toGridWidgets } from '@/utils/gridValidator';
+import { WIDGET_CATALOG } from '@/config/widgetCatalog';
 
 interface OverviewContentProps {
     renderWidget: (widget: any) => React.ReactNode;
@@ -17,6 +18,8 @@ export function OverviewContent({ renderWidget }: OverviewContentProps) {
     const { activeSubAccount } = useSubAccount();
     const activeSubAccountId = activeSubAccount?.id || null;
 
+    const availableWidgets = useMemo(() => Object.keys(WIDGET_CATALOG), []);
+
     const {
         positions,
         order,
@@ -24,7 +27,7 @@ export function OverviewContent({ renderWidget }: OverviewContentProps) {
         saveLayout,
         isLoading: isLayoutLoading,
         columnCount
-    } = useGridLayout(activeSubAccountId);
+    } = useGridLayout(activeSubAccountId, availableWidgets);
 
     const handleDragStart = useCallback((event: DragStartEvent) => {
         // Optional: Add any specific start logic here
