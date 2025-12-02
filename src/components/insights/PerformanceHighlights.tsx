@@ -45,15 +45,15 @@ export const PerformanceHighlights = memo(({
   const isSameDay = bestDay && worstDay && bestDay.date === worstDay.date;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <h3 className="text-lg font-semibold flex items-center gap-2">
         <Trophy className="w-5 h-5 text-profit" />
         {t('insights.performanceHighlights')}
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {/* LEFT COLUMN - Success */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <h4 className="font-semibold flex items-center gap-2 text-sm">
             <TrendingUp className="w-4 h-4 text-profit" />
             {t('insights.whatWorking')}
@@ -61,8 +61,8 @@ export const PerformanceHighlights = memo(({
 
           {/* Best Trade */}
           <PremiumCard className="bg-gradient-to-br from-profit/10 to-transparent border-profit/30 transition-all duration-300 hover:scale-[1.02]">
-            <div className="p-4">
-              <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="p-3">
+              <div className="flex items-center justify-between gap-2 mb-1.5">
                 <div className="flex items-center gap-2">
                   <Trophy className="w-4 h-4 text-profit" aria-hidden="true" />
                   <h5 className="font-semibold text-sm">{t('insights.bestTrade')}</h5>
@@ -98,8 +98,8 @@ export const PerformanceHighlights = memo(({
           {/* Best Day */}
           {bestDay && (
             <PremiumCard className="bg-profit/10 border-profit/30 transition-all duration-300 hover:scale-[1.02]">
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
+              <div className="p-3">
+                <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-profit" />
                     <span className="text-xs font-semibold text-profit">{t('insights.bestDay')}</span>
@@ -118,9 +118,9 @@ export const PerformanceHighlights = memo(({
           {/* Top Assets */}
           {topAssets.length > 0 && (
             <PremiumCard className="bg-profit/10 border-profit/30">
-              <div className="p-4">
-                <p className="text-xs font-semibold text-profit mb-3">{t('insights.topAssets')}</p>
-                <div className="space-y-2">
+              <div className="p-3">
+                <p className="text-xs font-semibold text-profit mb-2">{t('insights.topAssets')}</p>
+                <div className="space-y-1.5">
                   {topAssets.map((asset, idx) => (
                     <div key={idx} className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -146,7 +146,7 @@ export const PerformanceHighlights = memo(({
                 ? "bg-profit/10 border-profit/30"
                 : "bg-yellow-500/10 border-yellow-500/30"
             )}>
-              <div className="p-4">
+              <div className="p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs font-semibold text-muted-foreground mb-1">
@@ -167,7 +167,7 @@ export const PerformanceHighlights = memo(({
         </div>
 
         {/* RIGHT COLUMN - Areas to Improve */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <h4 className="font-semibold flex items-center gap-2 text-sm">
             <AlertCircle className="w-4 h-4 text-yellow-500" />
             {t('insights.areasToImprove')}
@@ -175,8 +175,8 @@ export const PerformanceHighlights = memo(({
 
           {/* Worst Trade */}
           <PremiumCard className="bg-gradient-to-br from-loss/10 to-transparent border-loss/30 transition-all duration-300 hover:scale-[1.02]">
-            <div className="p-4">
-              <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="p-3">
+              <div className="flex items-center justify-between gap-2 mb-1.5">
                 <div className="flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 text-loss" aria-hidden="true" />
                   <h5 className="font-semibold text-sm">{t('insights.worstTrade')}</h5>
@@ -212,8 +212,8 @@ export const PerformanceHighlights = memo(({
           {/* Worst Day - only show if different from best day */}
           {worstDay && !isSameDay && (
             <PremiumCard className="bg-loss/10 border-loss/30 transition-all duration-300 hover:scale-[1.02]">
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
+              <div className="p-3">
+                <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-loss" />
                     <span className="text-xs font-semibold text-loss">{t('insights.worstDay')}</span>
@@ -232,9 +232,9 @@ export const PerformanceHighlights = memo(({
           {/* Bottom Assets */}
           {bottomAssets.length > 0 && (
             <PremiumCard className="bg-yellow-500/10 border-yellow-500/30">
-              <div className="p-4">
-                <p className="text-xs font-semibold text-yellow-500 mb-3">{t('insights.underperforming')}</p>
-                <div className="space-y-2">
+              <div className="p-3">
+                <p className="text-xs font-semibold text-yellow-500 mb-2">{t('insights.underperforming')}</p>
+                <div className="space-y-1.5">
                   {bottomAssets.map((asset, idx) => (
                     <div key={idx} className="flex items-center justify-between">
                       <div className="flex items-center gap-2">

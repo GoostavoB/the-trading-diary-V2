@@ -480,6 +480,36 @@ function DashboardContent() {
       case 'combinedPnLROI':
         widgetProps.avgPnLPerTrade = stats?.avg_pnl_per_trade || 0;
         break;
+      case 'compactPerformance':
+        // ROI data
+        widgetProps.currentROI = stats?.current_roi || 0;
+        widgetProps.initialInvestment = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
+        widgetProps.currentBalance = totalCapitalAdditions > 0
+          ? totalCapitalAdditions + (stats?.total_pnl || 0)
+          : initialInvestment + (stats?.total_pnl || 0);
+        // Win Rate data
+        const winningTradesComp = processedTrades.filter(t => (t.profit_loss || 0) > 0).length;
+        const losingTradesComp = processedTrades.filter(t => (t.profit_loss || 0) <= 0).length;
+        widgetProps.winRate = stats?.win_rate || 0;
+        widgetProps.wins = winningTradesComp;
+        widgetProps.losses = losingTradesComp;
+        widgetProps.totalTrades = stats?.total_trades || 0;
+        // Avg PnL per Day data
+        const { tradingDays: compTradingDays } = calculateTradingDays(processedTrades, tradingDaysMode);
+        const compTotalPnL = processedTrades.reduce((sum, t) => {
+          const pnl = t.profit_loss || 0;
+          if (includeFeesInPnL) {
+            const fundingFee = t.funding_fee || 0;
+            const tradingFee = t.trading_fee || 0;
+            return sum + (pnl - Math.abs(fundingFee) - Math.abs(tradingFee));
+          }
+          return sum + pnl;
+        }, 0);
+        widgetProps.avgPnLPerDay = compTradingDays > 0 ? compTotalPnL / compTradingDays : 0;
+        widgetProps.tradingDays = compTradingDays;
+        // Mini chart data (last 7 days PnL)
+        widgetProps.pnlTrendData = [] as any; // Will implement later if needed
+        break;
       case 'goals':
         widgetProps.includeFeesInPnL = includeFeesInPnL;
         widgetProps.tradesOverride = processedTrades;
@@ -509,7 +539,8 @@ function DashboardContent() {
       'avgPnLPerDay',
       'spotWallet',
       'totalTrades',
-      'performanceHighlights'
+      'performanceHighlights',
+      'compactPerformance', // NEW: Handles own padding
     ];
 
     const widgetsHandlingOwnHeader = widgetsWithCustomPadding;

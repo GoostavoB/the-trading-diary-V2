@@ -27,7 +27,7 @@ export const TopMoversWidget = memo(({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-3 border-b border-border/50 flex items-center justify-between">
+      <div className="p-2 border-b border-border/50 flex items-center justify-between">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Top Movers</h3>
         <Select value={period} onValueChange={setPeriod}>
           <SelectTrigger className="w-[80px] h-7 text-xs bg-muted/30 border-transparent hover:bg-muted/50">
@@ -41,7 +41,7 @@ export const TopMoversWidget = memo(({
         </Select>
       </div>
 
-      <div className="p-3 flex items-center gap-3 overflow-x-auto">
+      <div className="p-2 flex items-center gap-2 overflow-x-auto">
         {topMovers.length > 0 ? (
           topMovers.map((trade, idx) => {
             const isProfit = trade.pnl >= 0;
@@ -50,9 +50,9 @@ export const TopMoversWidget = memo(({
             return (
               <div
                 key={`${trade.symbol}-${idx}`}
-                className="flex-1 min-w-[120px] p-3 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors border border-border/30"
+                className="flex-1 min-w-[110px] p-2 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors border border- border/30"
               >
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-1.5">
                   <span className="font-medium text-sm">{trade.symbol}</span>
                   <div className={`p-1 rounded ${isProfit ? 'bg-neon-green/10 text-neon-green' : 'bg-neon-red/10 text-neon-red'}`}>
                     {isProfit ? (

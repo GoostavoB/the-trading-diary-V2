@@ -52,6 +52,7 @@ import { TradeStationRollingTarget } from '@/components/trade-station/TradeStati
 import { DailyLossLockStatus } from '@/components/trade-station/DailyLossLockStatus';
 import { SimpleLeverageWidget } from '@/components/trade-station/SimpleLeverageWidget';
 import { LongShortRatioWidget } from '@/components/widgets/LongShortRatioWidget';
+import { CompactPerformanceWidget } from '@/components/widgets/CompactPerformanceWidget';
 
 /**
  * Widget Catalog - Registry of all available dashboard widgets
@@ -313,6 +314,17 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
     requiresData: ['stats'],
   },
 
+  compactPerformance: {
+    id: 'compactPerformance',
+    title: '🆕 Compact Performance',
+    description: 'Combines ROI, Win Rate, and Avg P&L/Day in one horizontal block',
+    category: 'performance',
+    icon: Activity,
+    defaultSize: 'large',
+    component: CompactPerformanceWidget,
+    requiresData: ['stats', 'trades'],
+  },
+
   emotionMistakeCorrelation: {
     id: 'emotionMistakeCorrelation',
     title: 'Emotion & Mistake Patterns',
@@ -373,28 +385,22 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
 };
 
 /**
- * Default Command Center layout for new users - comprehensive performance overview
- * Includes: Total Balance, ROI, Capital Growth, Avg P&L/Day, Win Rate, Top Movers, Combined P&L/ROI,
- * Active Goals, AI Insights, Emotion/Mistake Patterns, Behavior, Cost Efficiency,
- * Performance Highlights, and Trading Quality
+ * Default Command Center layout for new users - compact performance-focused design
+ * Features the new compactPerformance widget and compressed layouts for maximum information density
  */
 export const DEFAULT_DASHBOARD_LAYOUT = [
   'totalBalance',
-  'currentROI',
-  'weightedAvgROI',
-  'avgPnLPerDay',
-  'winRate',
-  'topMovers',
+  'longShortRatio',
+  'compactPerformance', // NEW: Combines ROI, Win Rate, Avg P&L/Day
   'capitalGrowth',
-  'combinedPnLROI',
-  'aiInsights',
+  'performanceHighlights',
+  'topMovers',
   'goals',
   'emotionMistakeCorrelation',
   'behaviorAnalytics',
   'costEfficiency',
-  'performanceHighlights',
   'tradingQuality',
-  'longShortRatio',
+  'aiInsights',
 ];
 
 /**

@@ -112,7 +112,7 @@ export function SimplifiedDashboardGrid({
             <SortableContext items={order} strategy={rectSortingStrategy}>
                 <div
                     className={cn(
-                        "grid gap-4 auto-rows-[minmax(180px,auto)] transition-all duration-300",
+                        "grid gap-3 auto-rows-[minmax(180px,auto)] transition-all duration-300",
                         getGridCols(),
                         className
                     )}
