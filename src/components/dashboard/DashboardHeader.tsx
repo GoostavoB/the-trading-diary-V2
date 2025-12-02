@@ -22,6 +22,7 @@ interface DashboardHeaderProps {
     canUndo?: boolean;
     onUndoReset?: () => void;
     onForceReset?: () => void;
+    onAddWidget?: () => void;
 }
 
 export const DashboardHeader = ({
@@ -42,6 +43,7 @@ export const DashboardHeader = ({
     canUndo,
     onUndoReset,
     onForceReset,
+    onAddWidget,
 }: DashboardHeaderProps) => {
     return (
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
@@ -80,6 +82,7 @@ export const DashboardHeader = ({
                     canUndo={canUndo}
                     onUndoReset={onUndoReset}
                     onForceReset={onForceReset}
+                    onAddWidget={onAddWidget}
                     widgets={[]}
                 />
             </div>

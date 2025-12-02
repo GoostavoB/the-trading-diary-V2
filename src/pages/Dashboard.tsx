@@ -627,11 +627,12 @@ function DashboardContent() {
                     canUndo={canUndo}
                     onUndoReset={undoReset}
                     onForceReset={handleForceResetLayout}
+                    onAddWidget={() => setShowWidgetLibrary(true)}
                   />
 
                   <WidgetLibrary
-                    open={isCustomizing}
-                    onClose={() => setIsCustomizing(false)}
+                    open={showWidgetLibrary}
+                    onClose={() => setShowWidgetLibrary(false)}
                     onAddWidget={addWidget}
                     onRemoveWidget={removeWidget}
                     activeWidgets={activeWidgets}

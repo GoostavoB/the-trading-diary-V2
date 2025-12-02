@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { WIDGET_SIZE_MAP } from '@/types/widget';
 import { toGridWidgets, resolveLayoutCollisions, GridWidget } from '@/utils/gridValidator';
+import { DEFAULT_DASHBOARD_LAYOUT, WIDGET_CATALOG } from '@/config/widgetCatalog';
 
 export interface WidgetPosition {
   id: string;
@@ -20,37 +21,48 @@ export interface LayoutData {
   version?: number;
 }
 
-// Default positions using the new 6-subcolumn system
-// Columns: 0-1 (first column), 2-3 (second column), 4-5 (third column)
-const DEFAULT_POSITIONS: WidgetPosition[] = [
-  // Row 0 - Two size-1 widgets in first column, two size-2 widgets
-  { id: 'totalBalance', column: 0, row: 0, size: 1, height: 2 },
-  { id: 'winRate', column: 1, row: 0, size: 1, height: 2 },
-  { id: 'capitalGrowth', column: 2, row: 0, size: 2, height: 2 },
-  { id: 'topMovers', column: 4, row: 0, size: 2, height: 2 },
+/**
+ * Generate default positions dynamically from DEFAULT_DASHBOARD_LAYOUT
+ * This ensures Force Reset always uses the latest widget configuration
+ */
+const generateDefaultPositions = (): WidgetPosition[] => {
+  return DEFAULT_DASHBOARD_LAYOUT.map((widgetId, index) => {
+    const widget = WIDGET_CATALOG[widgetId];
 
-  // Row 1 - Two size-1 widgets in first column, two size-2 widgets
-  { id: 'currentROI', column: 0, row: 1, size: 1, height: 2 },
-  { id: 'avgPnLPerDay', column: 1, row: 1, size: 1, height: 2 },
-  { id: 'goals', column: 2, row: 1, size: 2, height: 2 },
-  { id: 'behaviorAnalytics', column: 4, row: 1, size: 2, height: 2 },
+    if (!widget) {
+      console.warn(`[useGridLayout] Widget not found in catalog: ${widgetId}`);
+      return {
+        id: widgetId,
+        column: 0,
+        row: index,
+        size: 4 as 1 | 2 | 4 | 6,
+        height: 2 as 2 | 4 | 6,
+      };
+    }
 
-  // Row 2 - Size 4 widget + size 2 widget
-  { id: 'combinedPnLROI', column: 0, row: 2, size: 4, height: 2 },
-  { id: 'costEfficiency', column: 4, row: 2, size: 2, height: 2 },
+    const defaultSize = widget.defaultSize || 'medium';
 
-  // Row 3 - Size 4 widget + size 2 widget
-  { id: 'aiInsights', column: 0, row: 3, size: 4, height: 2 },
-  { id: 'tradingQuality', column: 4, row: 3, size: 2, height: 2 },
+    // Convert size string to number (using 6-column grid)
+    const sizeMap: Record<string, 1 | 2 | 4 | 6> = {
+      tiny: 1,
+      small: 2,
+      medium: 4,
+      large: 6,
+      xlarge: 6,
+    };
 
-  // Row 4 - Full width size 6 widget
-  { id: 'emotionMistakeCorrelation', column: 0, row: 4, size: 6, height: 2 },
+    return {
+      id: widgetId,
+      column: 0, // Adaptive grid will auto-layout
+      row: index,
+      size: sizeMap[defaultSize] || 4,
+      height: 2 as 2 | 4 | 6,
+    };
+  });
+};
 
-  // Row 5 - Three size-2 widgets
-  { id: 'performanceHighlights', column: 0, row: 5, size: 2, height: 2 },
-  { id: 'avgPnLPerTrade', column: 2, row: 5, size: 1, height: 2 },
-  { id: 'totalTrades', column: 3, row: 5, size: 1, height: 2 },
-];
+// Generate default positions from catalog - single source of truth
+const DEFAULT_POSITIONS: WidgetPosition[] = generateDefaultPositions();
 
 const CURRENT_OVERVIEW_LAYOUT_VERSION = 4;
 

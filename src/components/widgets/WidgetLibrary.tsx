@@ -14,6 +14,7 @@ import { Plus, Search, Crown, Trash2 } from 'lucide-react';
 import { WIDGET_CATALOG, WIDGET_CATEGORIES } from '@/config/widgetCatalog';
 import { WidgetConfig } from '@/types/widget';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface WidgetLibraryProps {
   open: boolean;
@@ -41,9 +42,9 @@ export const WidgetLibrary = memo(({
 
   const filteredWidgets = useMemo(() => {
     const allWidgets = Object.values(WIDGET_CATALOG);
-    
+
     return allWidgets.filter(widget => {
-      const matchesSearch = !searchQuery || 
+      const matchesSearch = !searchQuery ||
         widget.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         widget.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedCategory === 'all' || widget.category === selectedCategory;
@@ -59,16 +60,58 @@ export const WidgetLibrary = memo(({
         next.delete(widgetId);
         return next;
       });
-      
+
       // Then remove from backend
       await onRemoveWidget(widgetId);
     } else {
       // Add to local state first
       setLocalActive(prev => new Set(prev).add(widgetId));
-      
+
       // Then add to backend
       await onAddWidget(widgetId);
     }
+  };
+
+  const handleAddAllInCategory = async () => {
+    const widgetsToAdd = filteredWidgets.filter(w => !localActive.has(w.id));
+
+    if (widgetsToAdd.length === 0) {
+      toast.info('All widgets already added');
+      return;
+    }
+
+    // Update local state first for immediate feedback
+    setLocalActive(prev => {
+      const next = new Set(prev);
+      widgetsToAdd.forEach(w => next.add(w.id));
+      return next;
+    });
+
+    // Then add all to backend
+    for (const widget of widgetsToAdd) {
+      await onAddWidget(widget.id);
+    }
+
+    toast.success(`Added ${widgetsToAdd.length} widget${widgetsToAdd.length === 1 ? '' : 's'}`);
+  };
+
+  const handleRemoveAll = async () => {
+    const widgetsToRemove = Array.from(localActive);
+
+    if (widgetsToRemove.length === 0) {
+      toast.info('No widgets to remove');
+      return;
+    }
+
+    // Clear local state first
+    setLocalActive(new Set());
+
+    // Then remove all from backend
+    for (const widgetId of widgetsToRemove) {
+      await onRemoveWidget(widgetId);
+    }
+
+    toast.success(`Removed ${widgetsToRemove.length} widget${widgetsToRemove.length === 1 ? '' : 's'}`);
   };
 
   const isWidgetActive = (widgetId: string) => localActive.has(widgetId);
@@ -105,18 +148,40 @@ export const WidgetLibrary = memo(({
           </TabsList>
 
           {WIDGET_CATEGORIES.map((category) => {
-            const categoryWidgets = category.id === 'all' 
-              ? filteredWidgets 
+            const categoryWidgets = category.id === 'all'
+              ? filteredWidgets
               : filteredWidgets.filter(w => w.category === category.id);
-            
+
             return (
-              <TabsContent 
-                key={category.id} 
+              <TabsContent
+                key={category.id}
                 value={category.id}
                 className="flex-1 overflow-auto mt-4"
               >
-                <div className="mb-4">
+                <div className="flex justify-between items-center mb-4">
                   <p className="text-sm text-muted-foreground">{category.description}</p>
+                  <div className="flex gap-2">
+                    {category.id !== 'all' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleAddAllInCategory}
+                        className="gap-1.5"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                        Add All
+                      </Button>
+                    )}
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={handleRemoveAll}
+                      className="gap-1.5"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Remove All
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -176,7 +241,7 @@ const WidgetCard = memo(({ widget, isActive, onToggle, showCategory }: WidgetCar
         <div className="p-2 rounded-lg bg-primary/10">
           <Icon className="h-5 w-5 text-primary" />
         </div>
-        
+
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <h4 className="font-semibold text-sm">{widget.title}</h4>
@@ -197,7 +262,7 @@ const WidgetCard = memo(({ widget, isActive, onToggle, showCategory }: WidgetCar
               </Badge>
             )}
           </div>
-          
+
           <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
             {widget.description}
           </p>
