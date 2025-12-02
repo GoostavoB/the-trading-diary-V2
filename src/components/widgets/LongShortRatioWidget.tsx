@@ -117,13 +117,13 @@ export const LongShortRatioWidget = memo(({
     return (
 
         <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between p-4 border-b border-white/5">
+            <div className="flex items-center justify-between p-2 border-b border-white/5">
                 <div className="flex items-center gap-2">
                     <Activity className="h-4 w-4 text-primary" />
                     <h3 className="font-semibold text-sm">Long/Short Ratio</h3>
                 </div>
             </div>
-            <div className="flex flex-col h-full p-4 space-y-4">
+            <div className="flex flex-col h-full p-2 space-y-2">
                 {/* Controls */}
                 <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
@@ -166,7 +166,7 @@ export const LongShortRatioWidget = memo(({
                 </div>
 
                 {/* Chart */}
-                <div className="flex-1 min-h-[150px] w-full">
+                <div className="flex-1 min-h-[120px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={chartData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
@@ -185,7 +185,7 @@ export const LongShortRatioWidget = memo(({
                                 fontSize={10}
                                 tickLine={false}
                                 axisLine={false}
-                                width={30}
+                                width={25}
                             />
                             <Tooltip content={<CustomTooltip />} />
                             <Line
@@ -201,9 +201,9 @@ export const LongShortRatioWidget = memo(({
                 </div>
 
                 {/* Percentage Changes List */}
-                <div className="border-t border-border pt-3">
+                <div className="border-t border-border pt-2">
                     <p className="text-xs font-medium text-muted-foreground mb-2">Changes by Timeframe</p>
-                    <ScrollArea className="h-[80px] w-full pr-2">
+                    <ScrollArea className="h-[60px] w-full pr-2">
                         <div className="grid grid-cols-3 gap-2">
                             {changes.map((item) => (
                                 <div key={item.timeframe} className="flex items-center justify-between bg-muted/30 rounded p-1.5">
