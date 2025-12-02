@@ -54,7 +54,7 @@ export const AdaptiveGrid = ({
   // Adaptive mode: responsive flowing grid with dense packing
   return (
     <div
-      className="grid gap-6 auto-rows-auto transition-all duration-500 ease-out"
+      className="grid gap-4 auto-rows-auto transition-all duration-500 ease-out"
       style={{
         gridTemplateColumns: `repeat(${responsiveColumns}, minmax(0, 1fr))`,
         gridAutoFlow: 'dense',

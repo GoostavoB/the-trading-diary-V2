@@ -56,7 +56,7 @@ export function InsightsContent() {
                 totalTrades={stats.totalTrades}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <PerformanceHighlights
                     trades={processedTrades}
                     bestTrade={bestTrade}
