@@ -502,28 +502,21 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
 
-      // Process trades
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/process-multi-upload`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            trades: tradesToSave,
-            creditsToDeduct: creditsRequired
-          }),
+      // Process trades using supabase.functions.invoke
+      const { data: result, error: invokeError } = await supabase.functions.invoke('process-multi-upload', {
+        body: {
+          trades: tradesToSave,
+          creditsToDeduct: creditsRequired
         }
-      );
+      });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to process trades');
+      if (invokeError) {
+        throw new Error(invokeError.message || 'Failed to process trades');
       }
 
-      const result = await response.json();
+      if (!result) {
+        throw new Error('No response from server');
+      }
 
       // Show appropriate message based on duplicates skipped
       if (result.tradesSkipped > 0) {
