@@ -689,11 +689,35 @@ Map flexibly to schema. Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${est
     // Normalize trades to match database schema
     const normalizedTrades = trades.map((t: any) => {
       const profitLoss = Number(t.profit_loss) || 0;
-      const positionSize = Number(t.position_size) || 0;
+      let positionSize = Number(t.position_size) || 0;
       let entryPrice = Number(t.entry_price) || 0;
       const exitPrice = Number(t.exit_price) || 0;
       const leverage = Number(t.leverage) || 1;
       const side = (t.side ?? t.position_type ?? 'long').toLowerCase();
+      
+      // Get AI-provided ROI if available (from screenshot)
+      const aiProvidedROI = Number(t.roi) || 0;
+      
+      // DETECT BingX/other exchanges where "Margin(Leverage)" column actually provides MARGIN, not position_size
+      // Clue: If position_size looks like margin (small compared to price * leverage)
+      // In these cases, position_size is actually the margin, and we need to recalculate
+      let margin = Number(t.margin) || 0;
+      
+      // If we have a tiny margin but large position_size relative to price, 
+      // OR if position_size looks like margin value (small number, not full position)
+      // Use heuristic: for crypto, if position_size is less than 10000 and there's no separate margin field,
+      // it's likely the margin, not the full position
+      const isBingXOrSimilar = !margin && positionSize > 0 && positionSize < 50000 && leverage > 1;
+      
+      if (isBingXOrSimilar && exitPrice > 0) {
+        // position_size from AI is actually the margin amount
+        margin = positionSize;
+        // Calculate real position_size: margin * leverage (in quote currency like USDT)
+        // But we need it in base currency units for calculations
+        // Actually for USDT-margined futures, position_size in USDT = margin * leverage
+        positionSize = margin * leverage;
+        console.log(`✅ Detected margin-as-position format: margin=${margin}, calculated position_size=${positionSize}`);
+      }
 
       // FALLBACK: Calculate entry_price from P&L if missing
       if (!entryPrice && exitPrice > 0 && positionSize > 0 && profitLoss !== 0) {
@@ -708,20 +732,33 @@ Map flexibly to schema. Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${est
         console.log(`✅ Calculated missing entry_price: ${entryPrice.toFixed(2)} from P&L for ${t.symbol || 'trade'}`);
       }
       
-      // Calculate margin: (position_size * entry_price) / leverage
-      // If margin is provided, use it; otherwise calculate it
-      let margin = t.margin ? Number(t.margin) : 0;
+      // Calculate margin if not already set
       if (!margin && positionSize > 0 && entryPrice > 0) {
         margin = (positionSize * entryPrice) / leverage;
       }
       
-      // Calculate ROI: (profit_loss / margin) * 100
-      // This works for both positive (profit) and negative (loss) P&L
+      // ROI Calculation - USE AI-provided ROI if available and looks reasonable
+      // Otherwise calculate: ROI = (P&L / margin) * 100
       let roi = 0;
-      if (margin > 0 && !isNaN(profitLoss) && isFinite(profitLoss)) {
+      if (aiProvidedROI !== 0 && Math.abs(aiProvidedROI) < 1000) {
+        // Use AI-extracted ROI from screenshot if it looks reasonable (under 1000%)
+        roi = aiProvidedROI;
+        console.log(`✅ Using AI-provided ROI: ${roi}% for ${t.symbol || 'trade'}`);
+      } else if (margin > 0 && !isNaN(profitLoss) && isFinite(profitLoss)) {
+        // Calculate ROI based on margin
         roi = (profitLoss / margin) * 100;
-        // Round to 2 decimal places for realistic display
         roi = Math.round(roi * 100) / 100;
+      }
+      
+      // Handle opened_at - if not available, use closed_at as fallback (better than empty)
+      let openedAt = t.opened_at || t.open_time || t.entry_time || '';
+      const closedAt = t.closed_at || t.close_time || t.exit_time || '';
+      
+      // If opened_at is still empty but we have closed_at, use closed_at as a reasonable fallback
+      // Many exchanges only show close time in history
+      if (!openedAt && closedAt) {
+        openedAt = closedAt;
+        console.log(`⚠️ No opened_at found, using closed_at as fallback for ${t.symbol || 'trade'}`);
       }
       
       return {
@@ -739,8 +776,8 @@ Map flexibly to schema. Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${est
         trading_fee: Number(t.trading_fee) || 0,
         roi: roi,
         margin: margin,
-        opened_at: t.opened_at ?? '',
-        closed_at: t.closed_at ?? '',
+        opened_at: openedAt,
+        closed_at: closedAt,
         period_of_day: t.period_of_day ?? 'morning',
         duration_days: Number(t.duration_days) || 0,
         duration_hours: Number(t.duration_hours) || 0,
