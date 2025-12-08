@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { WidgetSize, WidgetHeight, migrateLegacySize } from '@/types/widget';
 
 export interface TradeStationWidgetPosition {
   id: string;
   column: number;
   row: number;
-  size: 1 | 2 | 4 | 6;
-  height: 2 | 4 | 6;
+  size: WidgetSize;
+  height: WidgetHeight;
 }
 
 interface TradeStationLayoutData {
@@ -18,12 +19,12 @@ interface TradeStationLayoutData {
   version?: number;
 }
 
-// Default widgets for Trade Station with varied sizes for visual impact
+// Default widgets for Trade Station with semantic sizes
 const DEFAULT_TRADE_STATION_POSITIONS: TradeStationWidgetPosition[] = [
-  { id: 'riskCalculator', column: 0, row: 0, size: 4, height: 4 },      // LARGE & TALL
-  { id: 'simpleLeverage', column: 4, row: 0, size: 2, height: 2 },     // MEDIUM
-  { id: 'errorReflection', column: 4, row: 1, size: 2, height: 2 },    // MEDIUM
-  { id: 'rollingTarget', column: 0, row: 2, size: 6, height: 4 },      // FULL WIDTH
+  { id: 'riskCalculator', column: 0, row: 0, size: 'medium', height: 4 },
+  { id: 'simpleLeverage', column: 2, row: 0, size: 'small', height: 2 },
+  { id: 'errorReflection', column: 2, row: 1, size: 'small', height: 2 },
+  { id: 'rollingTarget', column: 0, row: 2, size: 'large', height: 4 },
 ];
 
 const CURRENT_TRADE_STATION_LAYOUT_VERSION = 3;
@@ -268,8 +269,8 @@ if (data?.trade_station_layout_json) {
         const col = index % columnCount;
         const row = Math.floor(index / columnCount);
         const defaultWidget = DEFAULT_TRADE_STATION_POSITIONS.find(p => p.id === widgetId);
-        const size: 1 | 2 | 4 | 6 = (defaultWidget?.size || 2) as 1 | 2 | 4 | 6;
-        const height: 2 | 4 | 6 = (defaultWidget?.height || 2) as 2 | 4 | 6;
+        const size: WidgetSize = defaultWidget?.size || 'small';
+        const height: WidgetHeight = defaultWidget?.height || 2;
         newPositions.push({ id: widgetId, column: col, row, size, height });
       });
       console.log('[TradeStation] 📐 New positions:', { count: newPositions.length });
@@ -329,7 +330,7 @@ if (data?.trade_station_layout_json) {
         }
       }
 
-      const newPositions = [...positions, { id: widgetId, column: targetCol, row: targetRow, size: 2 as 1 | 2 | 4 | 6, height: 2 as 2 | 4 | 6 }];
+      const newPositions = [...positions, { id: widgetId, column: targetCol, row: targetRow, size: 'small' as WidgetSize, height: 2 as WidgetHeight }];
       saveLayout(newPositions, newOrder, mode, columnCount);
     } else {
       // Adaptive mode: just add to order
@@ -399,7 +400,7 @@ if (data?.trade_station_layout_json) {
   }, [mode, positions, order, saveLayout]);
 
   // Resize widget
-  const resizeWidget = useCallback(async (widgetId: string, newSize?: 1 | 2 | 4 | 6, newHeight?: 2 | 4 | 6) => {
+  const resizeWidget = useCallback(async (widgetId: string, newSize?: WidgetSize, newHeight?: WidgetHeight) => {
     const widget = positions.find(p => p.id === widgetId);
     console.log('[TradeStation] 📐 Resize Widget:', { 
       widgetId, 
@@ -413,12 +414,12 @@ if (data?.trade_station_layout_json) {
       if (p.id === widgetId) {
         const updates: Partial<TradeStationWidgetPosition> = {};
         
-        if (newSize !== undefined && p.size !== 1) {
+        if (newSize !== undefined && p.size !== 'small') {
           updates.size = newSize;
         }
         
         if (newHeight !== undefined) {
-          if (p.size === 1) {
+          if (p.size === 'small') {
             updates.height = 2;
           } else {
             updates.height = newHeight;

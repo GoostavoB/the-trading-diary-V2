@@ -4,6 +4,7 @@ import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useTradeStationLayout, TradeStationWidgetPosition } from '@/hooks/useTradeStationLayout';
+import { WidgetSize, WidgetHeight } from '@/types/widget';
 // Use unified widget catalog that includes all widgets
 import { TRADE_STATION_WIDGET_CATALOG } from '@/config/tradeStationWidgetCatalog';
 import { AdaptiveGrid } from '@/components/dashboard/AdaptiveGrid';
@@ -419,7 +420,7 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
       id: widgetId,
       isEditMode: isCustomizing,
       onRemove: () => removeWidget(widgetId),
-      onResize: (newSize?: 1 | 2 | 4 | 6, newHeight?: 2 | 4 | 6) => {
+      onResize: (newSize?: WidgetSize, newHeight?: WidgetHeight) => {
         if (resizeWidget) {
           resizeWidget(widgetId, newSize, newHeight);
         }
@@ -701,8 +702,6 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
         onReset={() => setShowResetDialog(true)}
         layoutMode={mode}
         onLayoutModeChange={toggleLayoutMode}
-        columnCount={columnCount}
-        onColumnCountChange={updateColumnCount}
         canUndo={canUndo}
         onUndoReset={undoReset}
         onForceReset={handleForceResetLayout}
