@@ -695,64 +695,80 @@ Map flexibly to schema. Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${est
       const leverage = Number(t.leverage) || 1;
       const side = (t.side ?? t.position_type ?? 'long').toLowerCase();
       
-      // Get AI-provided ROI if available (from screenshot)
+      // Get AI-provided ROI if available (from screenshot) - THIS IS THE SOURCE OF TRUTH
       const aiProvidedROI = Number(t.roi) || 0;
       
-      // DETECT BingX/other exchanges where "Margin(Leverage)" column actually provides MARGIN, not position_size
-      // Clue: If position_size looks like margin (small compared to price * leverage)
-      // In these cases, position_size is actually the margin, and we need to recalculate
+      // BingX format: "Margin(Leverage)" column provides MARGIN, not position_size
+      // The AI extracts this as position_size, but it's actually the margin
+      // We need to:
+      // 1. Keep the extracted value as margin
+      // 2. Calculate position_size = margin * leverage
+      // 3. Use AI-provided ROI directly (it's correct from the screenshot)
+      
       let margin = Number(t.margin) || 0;
+      let marginWasExtractedAsPositionSize = false;
       
-      // If we have a tiny margin but large position_size relative to price, 
-      // OR if position_size looks like margin value (small number, not full position)
-      // Use heuristic: for crypto, if position_size is less than 10000 and there's no separate margin field,
-      // it's likely the margin, not the full position
-      const isBingXOrSimilar = !margin && positionSize > 0 && positionSize < 50000 && leverage > 1;
-      
-      if (isBingXOrSimilar && exitPrice > 0) {
-        // position_size from AI is actually the margin amount
+      // If no separate margin field but we have position_size, the AI likely extracted margin as position_size
+      // This is common for BingX/Bybit where column is labeled "Margin(Leverage)"
+      if (!margin && positionSize > 0 && leverage > 1) {
+        // The extracted "position_size" is actually the margin
         margin = positionSize;
-        // Calculate real position_size: margin * leverage (in quote currency like USDT)
-        // But we need it in base currency units for calculations
-        // Actually for USDT-margined futures, position_size in USDT = margin * leverage
+        marginWasExtractedAsPositionSize = true;
+        // Real position_size = margin * leverage
         positionSize = margin * leverage;
-        console.log(`✅ Detected margin-as-position format: margin=${margin}, calculated position_size=${positionSize}`);
+        console.log(`✅ BingX format detected: margin=${margin.toFixed(2)}, position_size=${positionSize.toFixed(2)}`);
       }
 
       // FALLBACK: Calculate entry_price from P&L if missing
-      if (!entryPrice && exitPrice > 0 && positionSize > 0 && profitLoss !== 0) {
-        if (side === 'long') {
-          // For long: PnL = (exit - entry) * size => entry = exit - (PnL / size)
-          entryPrice = exitPrice - (profitLoss / positionSize);
-        } else {
-          // For short: PnL = (entry - exit) * size => entry = exit + (PnL / size)
-          entryPrice = exitPrice + (profitLoss / positionSize);
+      if (!entryPrice && exitPrice > 0 && margin > 0 && profitLoss !== 0) {
+        // For BingX format, calculate entry from exit price and ROI
+        // P&L = margin * (ROI / 100), so this is consistent
+        if (marginWasExtractedAsPositionSize && positionSize > 0) {
+          // Calculate entry based on exit, PnL and position size in quote currency
+          if (side === 'long') {
+            // Long: PnL = (exit - entry) * (position_size / exit) = position_size * (1 - entry/exit)
+            // Simplified: entry = exit * (1 - PnL/position_size)
+            entryPrice = exitPrice * (1 - profitLoss / positionSize);
+          } else {
+            // Short: PnL = (entry - exit) * (position_size / entry)
+            entryPrice = exitPrice * (1 + profitLoss / positionSize);
+          }
+        } else if (positionSize > 0) {
+          if (side === 'long') {
+            entryPrice = exitPrice - (profitLoss / positionSize);
+          } else {
+            entryPrice = exitPrice + (profitLoss / positionSize);
+          }
         }
         entryPrice = Math.abs(entryPrice);
-        console.log(`✅ Calculated missing entry_price: ${entryPrice.toFixed(2)} from P&L for ${t.symbol || 'trade'}`);
+        console.log(`✅ Calculated entry_price: ${entryPrice.toFixed(4)} for ${t.symbol || 'trade'}`);
       }
       
-      // Calculate margin if not already set
-      if (!margin && positionSize > 0 && entryPrice > 0) {
-        margin = (positionSize * entryPrice) / leverage;
-      }
+      // CRITICAL: DO NOT recalculate margin if we already have it from the extraction
+      // The margin extracted from BingX is correct - don't overwrite it!
       
-      // ROI Calculation - USE AI-provided ROI if available and looks reasonable
-      // Otherwise calculate: ROI = (P&L / margin) * 100
+      // ROI: ALWAYS use AI-provided ROI if available - it comes directly from the screenshot
+      // This is the most accurate value since BingX shows it in the PnL column as "(X.XX%)"
       let roi = 0;
-      if (aiProvidedROI !== 0 && Math.abs(aiProvidedROI) < 1000) {
-        // Use AI-extracted ROI from screenshot if it looks reasonable (under 1000%)
+      if (aiProvidedROI !== 0) {
+        // AI extracted ROI directly from screenshot - use it as-is
         roi = aiProvidedROI;
         console.log(`✅ Using AI-provided ROI: ${roi}% for ${t.symbol || 'trade'}`);
       } else if (margin > 0 && !isNaN(profitLoss) && isFinite(profitLoss)) {
-        // Calculate ROI based on margin
+        // Fallback: Calculate ROI = (P&L / margin) * 100
         roi = (profitLoss / margin) * 100;
         roi = Math.round(roi * 100) / 100;
+        console.log(`📊 Calculated ROI: ${roi}% for ${t.symbol || 'trade'}`);
       }
       
-      // Handle opened_at - if not available, use closed_at as fallback (better than empty)
+      // Handle dates - BingX only shows "Close Time", not open time
       let openedAt = t.opened_at || t.open_time || t.entry_time || '';
       const closedAt = t.closed_at || t.close_time || t.exit_time || '';
+      
+      // Use closed_at as fallback for opened_at (BingX history only shows close time)
+      if (!openedAt && closedAt) {
+        openedAt = closedAt;
+      }
       
       // If opened_at is still empty but we have closed_at, use closed_at as a reasonable fallback
       // Many exchanges only show close time in history
