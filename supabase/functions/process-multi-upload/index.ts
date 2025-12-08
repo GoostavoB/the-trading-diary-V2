@@ -85,7 +85,7 @@ serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    const { trades, creditsToDeduct } = await req.json();
+    const { trades, creditsToDeduct, sub_account_id } = await req.json();
 
     if (!Array.isArray(trades) || trades.length === 0) {
       throw new Error('No trades provided');
@@ -118,6 +118,7 @@ serve(async (req) => {
         return {
           ...t,
           user_id: user.id,
+          sub_account_id: sub_account_id || null,
           symbol_temp: symbolCandidate ?? 'UNKNOWN',
           trade_hash: tradeHash,
           // Sanitize timestamp fields - convert empty strings to null
