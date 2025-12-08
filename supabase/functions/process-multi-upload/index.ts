@@ -91,12 +91,11 @@ serve(async (req) => {
       throw new Error('No trades provided');
     }
 
-    // Validate trade count (max 10 trades per image)
-    const maxAllowedTrades = creditsToDeduct * 10;
-    if (trades.length > maxAllowedTrades) {
+    // Maximum 100 trades per batch for safety
+    if (trades.length > 100) {
       return new Response(
         JSON.stringify({ 
-          error: `Cannot save ${trades.length} trades with ${creditsToDeduct} images. Maximum allowed: ${maxAllowedTrades} trades.` 
+          error: `Cannot save ${trades.length} trades in one batch. Maximum allowed: 100 trades per upload.` 
         }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
