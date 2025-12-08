@@ -263,50 +263,35 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
           let retryAttempt = 0;
           const result = await retryWithBackoff(
             async () => {
-              const response = await fetch(
-                `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-trade-info`,
-                {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${session.access_token}`,
-                  },
-                  body: JSON.stringify({
-                    imageBase64,
-                    ocrText: ocrResult?.text,
-                    ocrConfidence: ocrResult?.confidence,
-                    imageHash: ocrResult?.imageHash,
-                    perceptualHash: ocrResult?.perceptualHash,
-                    broker: skipBrokerSelection ? null : preSelectedBroker,
-                    forceDeepModel: retryMode, // Tell backend to use deep model regardless of OCR quality
-                    retryAttempt, // Pass retry attempt to backend for token allocation
-                    ocrFailed // Flag that OCR failed so backend can allocate more tokens
-                  }),
+              const { data, error: invokeError } = await supabase.functions.invoke('extract-trade-info', {
+                body: {
+                  imageBase64,
+                  ocrText: ocrResult?.text,
+                  ocrConfidence: ocrResult?.confidence,
+                  imageHash: ocrResult?.imageHash,
+                  perceptualHash: ocrResult?.perceptualHash,
+                  broker: skipBrokerSelection ? null : preSelectedBroker,
+                  forceDeepModel: retryMode,
+                  retryAttempt,
+                  ocrFailed
                 }
-              );
+              });
 
-              if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                const error = new Error(errorData.error || 'Failed to analyze image') as any;
-                error.status = response.status;
-                error.details = errorData.details;
+              if (invokeError) {
+                const error = new Error(invokeError.message || 'Failed to analyze image') as any;
+                error.status = 500;
+                error.details = invokeError.message;
 
                 // Check for truncation error - trigger automatic retry with higher tokens
-                if (errorData.error?.includes('truncated') || errorData.details?.includes('truncated')) {
+                if (invokeError.message?.includes('truncated')) {
                   retryAttempt++;
                   console.log(`🔄 JSON truncated detected, retrying with 2x tokens (attempt ${retryAttempt})`);
                   error.isRetryable = true;
-                  throw error;
-                }
-
-                // Only retry if error is retryable
-                if (!isRetryableError(error)) {
-                  throw error;
                 }
                 throw error;
               }
 
-              return await response.json();
+              return data;
             },
             {
               maxRetries: 3,
