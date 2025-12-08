@@ -43,3 +43,21 @@ verify_jwt = true
 
 [functions.process-multi-upload]
 verify_jwt = true
+
+[functions.extract-trade-info]
+verify_jwt = true
+
+[functions.ai-chat]
+verify_jwt = true
+
+[functions.ai-trade-analysis]
+verify_jwt = true
+
+[functions.ai-pattern-recognition]
+verify_jwt = true
+
+[functions.ai-widget-clarify]
+verify_jwt = true
+
+[functions.ai-generate-widget]
+verify_jwt = true
