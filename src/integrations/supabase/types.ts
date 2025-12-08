@@ -116,9 +116,11 @@ export type Database = {
           endpoint: string
           error_message: string | null
           id: number
+          idempotency_key: string | null
           latency_ms: number
           model_id: string
           ocr_quality_score: number | null
+          request_id: string | null
           route: string
           tokens_in: number
           tokens_out: number
@@ -133,9 +135,11 @@ export type Database = {
           endpoint: string
           error_message?: string | null
           id?: number
+          idempotency_key?: string | null
           latency_ms?: number
           model_id: string
           ocr_quality_score?: number | null
+          request_id?: string | null
           route: string
           tokens_in?: number
           tokens_out?: number
@@ -150,9 +154,11 @@ export type Database = {
           endpoint?: string
           error_message?: string | null
           id?: number
+          idempotency_key?: string | null
           latency_ms?: number
           model_id?: string
           ocr_quality_score?: number | null
+          request_id?: string | null
           route?: string
           tokens_in?: number
           tokens_out?: number
