@@ -104,6 +104,12 @@ serve(async (req) => {
     console.log(`Processing ${trades.length} trades for user ${user.id}`);
 
     // Prepare trades with trade_hash
+    // Helper to convert empty strings to null for timestamp fields
+    const sanitizeTimestamp = (val: any): string | null => {
+      if (val === '' || val === null || val === undefined) return null;
+      return val;
+    };
+
     const tradesWithHash = await Promise.all(
       trades.map(async (t: any) => {
         const symbolCandidate = t.symbol ?? t.symbol_temp ?? t.ticker ?? t.symbolPair ?? t.pair ?? t.market ?? t.symbol_name ?? t.asset ?? null;
@@ -114,6 +120,11 @@ serve(async (req) => {
           user_id: user.id,
           symbol_temp: symbolCandidate ?? 'UNKNOWN',
           trade_hash: tradeHash,
+          // Sanitize timestamp fields - convert empty strings to null
+          opened_at: sanitizeTimestamp(t.opened_at),
+          closed_at: sanitizeTimestamp(t.closed_at),
+          trade_date: sanitizeTimestamp(t.trade_date),
+          created_at: sanitizeTimestamp(t.created_at),
         };
       })
     );
