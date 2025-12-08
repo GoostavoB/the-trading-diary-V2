@@ -54,174 +54,148 @@ export const CompactPerformanceWidget = memo(({
     const isPnLPositive = avgPnLPerDay >= 0;
 
     return (
-        <div className="flex flex-col h-full min-h-[220px]">
+        <div className="flex flex-col h-full p-4 gap-4 overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3 border-b border-border/30">
-                <h3 className="font-bold text-base tracking-tight">Performance Overview</h3>
-            </div>
+            <h3 className="font-bold text-sm tracking-tight text-foreground shrink-0">
+                Performance Overview
+            </h3>
 
-            {/* Three-column layout */}
-            <div className="grid grid-cols-1 md:grid-cols-3 flex-1 divide-y md:divide-y-0 md:divide-x divide-border/20">
-
-                {/* Column 1: Current ROI */}
-                <div className="flex flex-col p-5 gap-3">
-                    <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-primary/30 shadow-sm">
-                            <TrendingUp className="h-4 w-4 text-primary" />
+            {/* Top Row: Three main metrics in equal columns */}
+            <div className="grid grid-cols-3 gap-4 shrink-0">
+                {/* ROI Card */}
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5">
+                        <div className="p-1.5 rounded-lg bg-primary/10">
+                            <TrendingUp className="h-3 w-3 text-primary" />
                         </div>
-                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                            Current ROI
+                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+                            ROI
                         </span>
                     </div>
-
-                    <div className="flex-1 flex items-center">
-                        <div className="flex items-baseline gap-2">
-                            <AnimatedCounter
-                                value={Math.abs(currentROI)}
-                                className={cn(
-                                    "text-3xl font-black tracking-tight",
-                                    isROIPositive ? 'text-neon-green' : 'text-neon-red'
-                                )}
-                                suffix="%"
-                                prefix={isROIPositive ? '' : '-'}
-                            />
-                            {isROIPositive ? (
-                                <TrendingUp className="h-5 w-5 text-neon-green" />
-                            ) : (
-                                <TrendingDown className="h-5 w-5 text-neon-red" />
+                    <div className="flex items-center gap-1">
+                        <AnimatedCounter
+                            value={Math.abs(currentROI)}
+                            className={cn(
+                                "text-xl font-bold tabular-nums",
+                                isROIPositive ? 'text-neon-green' : 'text-neon-red'
                             )}
-                        </div>
-                    </div>
-
-                    <div className="space-y-1.5 pt-2 border-t border-border/20">
-                        <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Initial</span>
-                            <span className="font-semibold">
-                                <BlurredCurrency amount={initialInvestment} className="font-semibold" />
-                            </span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Current</span>
-                            <span className="font-semibold text-foreground">
-                                <BlurredCurrency amount={currentBalance} className="font-semibold" />
-                            </span>
-                        </div>
+                            suffix="%"
+                            prefix={isROIPositive ? '+' : '-'}
+                        />
                     </div>
                 </div>
 
-                {/* Column 2: Win Rate */}
-                <div className="flex flex-col p-5 gap-3">
-                    <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-primary/30 shadow-sm">
-                            <Target className="h-4 w-4 text-primary" />
+                {/* Win Rate Card */}
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5">
+                        <div className="p-1.5 rounded-lg bg-primary/10">
+                            <Target className="h-3 w-3 text-primary" />
                         </div>
-                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
                             Win Rate
                         </span>
                     </div>
-
-                    <div className="flex-1 flex items-center justify-between gap-4">
-                        <div className="text-3xl font-black tracking-tight">
+                    <div className="flex items-center gap-2">
+                        <span className="text-xl font-bold tabular-nums text-foreground">
                             {formatPercent(winRate)}
-                        </div>
-
-                        {/* Mini circular progress */}
-                        <div className="relative h-14 w-14 flex-shrink-0">
+                        </span>
+                        <div className="relative h-8 w-8 shrink-0">
                             <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
-                                <path
-                                    className="text-muted/10"
-                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                <circle
+                                    className="text-muted/20"
+                                    cx="18"
+                                    cy="18"
+                                    r="14"
                                     fill="none"
                                     stroke="currentColor"
-                                    strokeWidth="3"
+                                    strokeWidth="4"
                                 />
-                                <path
+                                <circle
                                     className={winRate >= 50 ? "text-neon-green" : "text-neon-red"}
-                                    strokeDasharray={`${winRate}, 100`}
-                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    cx="18"
+                                    cy="18"
+                                    r="14"
                                     fill="none"
                                     stroke="currentColor"
-                                    strokeWidth="3"
+                                    strokeWidth="4"
                                     strokeLinecap="round"
+                                    strokeDasharray={`${winRate * 0.88} 88`}
                                 />
                             </svg>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-[10px] font-bold text-muted-foreground">
-                                    {Math.round(winRate)}%
-                                </span>
-                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div className="flex items-center gap-3 pt-2 border-t border-border/20">
-                        <span className="text-sm font-bold px-2.5 py-1 rounded-lg bg-neon-green/15 text-neon-green ring-1 ring-neon-green/30">
+                {/* Avg P&L Card */}
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5">
+                        <div className="p-1.5 rounded-lg bg-primary/10">
+                            <Calendar className="h-3 w-3 text-primary" />
+                        </div>
+                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+                            Avg P&L/Day
+                        </span>
+                    </div>
+                    <div className={cn(
+                        "text-xl font-bold tabular-nums",
+                        isPnLPositive ? 'text-neon-green' : 'text-neon-red'
+                    )}>
+                        {isPnLPositive ? '+' : ''}
+                        <BlurredCurrency amount={avgPnLPerDay} className="text-xl font-bold inline" />
+                    </div>
+                </div>
+            </div>
+
+            {/* Divider */}
+            <div className="h-px bg-border/30 shrink-0" />
+
+            {/* Bottom Row: Supporting stats */}
+            <div className="grid grid-cols-2 gap-4 shrink-0">
+                {/* Capital Section */}
+                <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Initial</span>
+                        <BlurredCurrency amount={initialInvestment} className="text-sm font-medium" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Current</span>
+                        <BlurredCurrency amount={currentBalance} className="text-sm font-semibold text-foreground" />
+                    </div>
+                </div>
+
+                {/* Trades Section */}
+                <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-neon-green/15 text-neon-green">
                             {wins}W
                         </span>
-                        <span className="text-sm font-bold px-2.5 py-1 rounded-lg bg-neon-red/15 text-neon-red ring-1 ring-neon-red/30">
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-neon-red/15 text-neon-red">
                             {losses}L
                         </span>
-                        <span className="text-sm text-muted-foreground ml-auto font-medium">
-                            {totalTrades} trades
-                        </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{totalTrades} trades</span>
+                        <span>{tradingDays || 0} days</span>
                     </div>
                 </div>
-
-                {/* Column 3: Avg PnL per Day with mini chart */}
-                <div className="flex flex-col p-5 gap-3">
-                    <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-primary/30 shadow-sm">
-                            <Calendar className="h-4 w-4 text-primary" />
-                        </div>
-                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                            Avg P&L / Day
-                        </span>
-                    </div>
-
-                    <div className="flex-1 flex items-center">
-                        <div className="flex items-baseline gap-2">
-                            <span className={cn(
-                                "text-3xl font-black tracking-tight",
-                                isPnLPositive ? 'text-neon-green' : 'text-neon-red'
-                            )}>
-                                {isPnLPositive ? '+' : '-'}
-                                <BlurredCurrency amount={Math.abs(avgPnLPerDay)} className="text-3xl font-black inline" />
-                            </span>
-                            {isPnLPositive ? (
-                                <TrendingUp className="h-5 w-5 text-neon-green" />
-                            ) : (
-                                <TrendingDown className="h-5 w-5 text-neon-red" />
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Mini trend chart or stats */}
-                    <div className="pt-2 border-t border-border/20">
-                        {pnlTrendData.length > 0 ? (
-                            <div className="h-12 w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <LineChart data={pnlTrendData}>
-                                        <Line
-                                            type="monotone"
-                                            dataKey="value"
-                                            stroke={isPnLPositive ? 'hsl(var(--neon-green))' : 'hsl(var(--neon-red))'}
-                                            strokeWidth={2}
-                                            dot={false}
-                                        />
-                                    </LineChart>
-                                </ResponsiveContainer>
-                            </div>
-                        ) : (
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">Period</span>
-                                <span className="font-semibold">
-                                    {tradingDays ? `${tradingDays} trading days` : 'All time'}
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
             </div>
+
+            {/* Optional Trend Chart */}
+            {pnlTrendData.length > 0 && (
+                <div className="h-10 w-full shrink-0 mt-auto">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={pnlTrendData}>
+                            <Line
+                                type="monotone"
+                                dataKey="value"
+                                stroke={isPnLPositive ? 'hsl(var(--neon-green))' : 'hsl(var(--neon-red))'}
+                                strokeWidth={1.5}
+                                dot={false}
+                            />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
+            )}
         </div>
     );
 });
