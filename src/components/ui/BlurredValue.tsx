@@ -26,10 +26,10 @@ export const BlurredValue = ({
   const shouldBlur = isBlurred && !localOverride;
 
   return (
-    <div className="inline-flex items-center gap-2">
+    <div className="inline-flex items-center justify-center gap-2 w-full">
       <span
         className={cn(
-          "transition-all duration-200",
+          "transition-all duration-200 text-2xl font-bold",
           shouldBlur && "blur-md select-none",
           className
         )}
