@@ -51,7 +51,7 @@ export function OverviewContent({ renderWidget }: OverviewContentProps) {
                     id,
                     column: pos?.column || 0,
                     row: pos?.row || 0,
-                    size: pos?.size || 2,
+                    size: pos?.size || 'medium',
                     height: pos?.height || 2
                 };
             });
@@ -61,7 +61,7 @@ export function OverviewContent({ renderWidget }: OverviewContentProps) {
                 columnCount
             );
 
-            saveLayout(newPositions, newOrder, columnCount);
+            saveLayout(newPositions, newOrder);
         }
     }, [order, positions, columnCount, saveLayout]);
 

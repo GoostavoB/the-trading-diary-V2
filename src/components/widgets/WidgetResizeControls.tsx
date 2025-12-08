@@ -21,10 +21,10 @@ export const WidgetResizeControls = ({
   currentHeight,
   onResize,
 }: WidgetResizeControlsProps) => {
-  // Size 1 widgets cannot be resized
-  if (currentSize === 1) return null;
+  // Small widgets cannot be resized
+  if (currentSize === 'small') return null;
 
-  const widthOptions: WidgetSize[] = [2, 4, 6];
+  const widthOptions: WidgetSize[] = ['small', 'medium', 'large'];
   const heightOptions: WidgetHeight[] = [2, 4, 6];
 
   return (
@@ -46,15 +46,15 @@ export const WidgetResizeControls = ({
             onClick={() => onResize(size, undefined)}
             className={currentSize === size ? 'bg-accent' : ''}
           >
-            {size === 2 && <Minimize2 className="h-4 w-4 mr-2" />}
-            {size === 4 && <Maximize2 className="h-4 w-4 mr-2" />}
-            {size === 6 && <Maximize2 className="h-4 w-4 mr-2" />}
-            {size === 2 ? '1 coluna' : size === 4 ? '2 colunas' : '3 colunas'}
+            {size === 'small' && <Minimize2 className="h-4 w-4 mr-2" />}
+            {size === 'medium' && <Maximize2 className="h-4 w-4 mr-2" />}
+            {size === 'large' && <Maximize2 className="h-4 w-4 mr-2" />}
+            {size === 'small' ? 'Pequeno (1/3)' : size === 'medium' ? 'Médio (2/3)' : 'Grande (Full)'}
           </DropdownMenuItem>
         ))}
-        
+
         <DropdownMenuSeparator />
-        
+
         <DropdownMenuLabel>Altura</DropdownMenuLabel>
         {heightOptions.map((height) => (
           <DropdownMenuItem

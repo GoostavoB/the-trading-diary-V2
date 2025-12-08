@@ -161,3 +161,6 @@ export function getDefaultHeightForWidget(widgetId: string, size?: WidgetSize): 
   // Default height for medium widgets
   return 2;
 }
+
+// Backward compatibility: export available widget sizes
+export const WIDGET_SIZES: WidgetSize[] = ['small', 'medium', 'large'];

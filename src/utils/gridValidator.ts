@@ -1,4 +1,6 @@
 import { WidgetPosition } from '@/hooks/useGridLayout';
+import type { WidgetSize } from '@/types/widget';
+import { WIDGET_SIZE_TO_COLUMNS } from '@/types/widget';
 
 export interface GridCell {
   column: number;
@@ -9,7 +11,7 @@ export interface GridWidget {
   id: string;
   column: number;
   row: number;
-  size: 1 | 2 | 4 | 6;
+  size: WidgetSize;  // 'small' | 'medium' | 'large'
   height: 2 | 4 | 6;
 }
 
@@ -22,7 +24,8 @@ export function isWithinBounds(
   widget: GridWidget,
   totalColumns: number = TOTAL_SUBCOLUMNS
 ): boolean {
-  const endColumn = widget.column + widget.size;
+  const widgetColumns = WIDGET_SIZE_TO_COLUMNS[widget.size];
+  const endColumn = widget.column + widgetColumns;
   return widget.column >= 0 && endColumn <= totalColumns && widget.row >= 0;
 }
 
@@ -33,9 +36,12 @@ export function doWidgetsOverlap(
   widget1: GridWidget,
   widget2: GridWidget
 ): boolean {
-  const w1EndCol = widget1.column + widget1.size;
+  const w1Columns = WIDGET_SIZE_TO_COLUMNS[widget1.size];
+  const w2Columns = WIDGET_SIZE_TO_COLUMNS[widget2.size];
+
+  const w1EndCol = widget1.column + w1Columns;
   const w1EndRow = widget1.row + Math.ceil(widget1.height / 2);
-  const w2EndCol = widget2.column + widget2.size;
+  const w2EndCol = widget2.column + w2Columns;
   const w2EndRow = widget2.row + Math.ceil(widget2.height / 2);
 
   // Check if they don't overlap

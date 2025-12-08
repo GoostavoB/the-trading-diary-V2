@@ -18,6 +18,7 @@ import {
 } from '@dnd-kit/sortable';
 import { useState } from 'react';
 import { WidgetPosition } from '@/hooks/useGridLayout';
+import { WIDGET_SIZE_TO_COLUMNS } from '@/types/widget';
 import { cn } from '@/lib/utils';
 import { createPortal } from 'react-dom';
 import { SortableWidget } from './SortableWidget';
@@ -119,7 +120,9 @@ export function SimplifiedDashboardGrid({
                 >
                     {order.map((id) => {
                         const position = positions.find(p => p.id === id);
-                        const colSpan = position?.size ? `col-span-${Math.min(position.size, columnCount)}` : 'col-span-1';
+                        // Use WIDGET_SIZE_TO_COLUMNS to convert semantic size to column count
+                        const sizeInColumns = position?.size ? WIDGET_SIZE_TO_COLUMNS[position.size] : 1;
+                        const colSpan = `col-span-${Math.min(sizeInColumns, columnCount)}`;
                         const rowSpan = position?.height ? `row-span-${position.height / 2}` : 'row-span-1';
 
                         return (
