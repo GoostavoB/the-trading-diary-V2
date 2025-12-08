@@ -7,6 +7,7 @@ import { Upload, X, Image as ImageIcon, Loader2, CheckCircle2, AlertCircle, Info
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubAccount } from '@/contexts/SubAccountContext';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import { cn } from '@/lib/utils';
 import { runOCR } from '@/utils/ocrPipeline';
@@ -37,6 +38,7 @@ interface MultiImageUploadProps {
 
 export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelectedBroker = '', skipBrokerSelection = false, onBrokerError, onReviewStart, onReviewEnd }: MultiImageUploadProps) {
   const { user } = useAuth();
+  const { activeSubAccount } = useSubAccount();
   const { settings, updateSetting } = useUserSettings();
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -506,7 +508,8 @@ export function MultiImageUpload({ onTradesExtracted, maxImages = 10, preSelecte
       const { data: result, error: invokeError } = await supabase.functions.invoke('process-multi-upload', {
         body: {
           trades: tradesToSave,
-          creditsToDeduct: creditsRequired
+          creditsToDeduct: creditsRequired,
+          sub_account_id: activeSubAccount?.id
         }
       });
 
