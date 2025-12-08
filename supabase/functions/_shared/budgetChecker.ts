@@ -330,12 +330,28 @@ export async function logCost(
 
 /**
  * Check rate limits for specific endpoint
+ * Admins are exempt from rate limits
  */
 export async function checkRateLimit(
   supabase: SupabaseClient,
   userId: string,
   endpoint: string
-): Promise<{ allowed: boolean; message?: string }> {
+): Promise<{ allowed: boolean; message?: string; isAdmin?: boolean }> {
+  // Check if user is admin FIRST (admin bypass)
+  const { data: roleData } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .eq('role', 'admin')
+    .single();
+
+  const isAdmin = roleData?.role === 'admin';
+
+  if (isAdmin) {
+    console.log('🔓 Admin bypass - rate limit check skipped');
+    return { allowed: true, isAdmin: true };
+  }
+
   const now = new Date();
   const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
   const oneMinuteAgo = new Date(now.getTime() - 60 * 1000);
