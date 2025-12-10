@@ -19,6 +19,7 @@ import { BlurredCurrency } from '@/components/ui/BlurredValue';
 import AppLayout from '@/components/layout/AppLayout';
 import { useNavigate } from 'react-router-dom';
 import { SEO } from '@/components/SEO';
+import { useSubAccount } from '@/contexts/SubAccountContext';
 
 interface CapitalLogEntry {
   id: string;
@@ -27,26 +28,34 @@ interface CapitalLogEntry {
   total_after: number;
   notes?: string;
   created_at: string;
+  sub_account_id?: string | null;
 }
 
 const CapitalManagementPage = () => {
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { activeSubAccount } = useSubAccount();
+  const activeSubAccountId = activeSubAccount?.id || null;
   const [isOpen, setIsOpen] = useState(false);
   const [date, setDate] = useState<Date>(new Date());
   const [amountAdded, setAmountAdded] = useState('');
   const [notes, setNotes] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  // Fetch capital log
+  // Fetch capital log - include entries for this sub-account or entries with no sub-account
   const { data: capitalLog = [], isLoading } = useQuery({
-    queryKey: ['capital-log'],
+    queryKey: ['capital-log', activeSubAccountId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('capital_log')
-        .select('*')
-        .order('log_date', { ascending: true });
+        .select('*');
+
+      if (activeSubAccountId) {
+        query = query.or(`sub_account_id.eq.${activeSubAccountId},sub_account_id.is.null`);
+      }
+
+      const { data, error } = await query.order('log_date', { ascending: true });
 
       if (error) throw error;
       return data as CapitalLogEntry[];
@@ -96,13 +105,14 @@ const CapitalManagementPage = () => {
             amount_added: parseFloat(amountAdded),
             total_after: totalAfter,
             notes: notes || null,
+            sub_account_id: activeSubAccountId,
           });
 
         if (error) throw error;
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['capital-log'] });
+      queryClient.invalidateQueries({ queryKey: ['capital-log', activeSubAccountId] });
       toast.success(editingId ? 'Capital entry updated' : 'Capital entry added');
       handleClose();
     },
@@ -122,7 +132,7 @@ const CapitalManagementPage = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['capital-log'] });
+      queryClient.invalidateQueries({ queryKey: ['capital-log', activeSubAccountId] });
       toast.success('Capital entry deleted');
     },
     onError: (error) => {

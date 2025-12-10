@@ -7,6 +7,7 @@ import { BlurredCurrency } from '@/components/ui/BlurredValue';
 import { WidgetProps } from '@/types/widget';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
 
 interface CompactPerformanceWidgetProps extends WidgetProps {
     // ROI data
@@ -154,7 +155,12 @@ export const CompactPerformanceWidget = memo(({
                 {/* Capital Section */}
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">Initial</span>
+                        <Link 
+                            to="/capital-management" 
+                            className="text-xs text-muted-foreground hover:text-primary transition-colors underline-offset-2 hover:underline"
+                        >
+                            Initial
+                        </Link>
                         <BlurredCurrency amount={initialInvestment} className="text-sm font-medium" />
                     </div>
                     <div className="flex items-center justify-between">

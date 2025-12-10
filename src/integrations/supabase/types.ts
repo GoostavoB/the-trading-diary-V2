@@ -5390,6 +5390,7 @@ export type Database = {
         Returns: undefined
       }
       record_social_share:
+        | { Args: { p_platform: string }; Returns: Json }
         | {
             Args: {
               p_content_id?: string
@@ -5398,7 +5399,6 @@ export type Database = {
             }
             Returns: Json
           }
-        | { Args: { p_platform: string }; Returns: Json }
       reset_daily_xp: { Args: never; Returns: undefined }
       reset_daily_xp_caps: { Args: never; Returns: undefined }
       reset_monthly_credits: { Args: never; Returns: undefined }
