@@ -59,13 +59,15 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     const fetchCapitalLog = useCallback(async () => {
         if (!user) return;
 
+        // First try to get entries for the active sub-account
         let query = supabase
             .from('capital_log')
             .select('*')
             .eq('user_id', user.id);
 
         if (activeSubAccountId) {
-            query = query.eq('sub_account_id', activeSubAccountId);
+            // Get entries for this sub-account OR entries with no sub-account (legacy/global entries)
+            query = query.or(`sub_account_id.eq.${activeSubAccountId},sub_account_id.is.null`);
         }
 
         const { data, error } = await query.order('log_date', { ascending: true });
