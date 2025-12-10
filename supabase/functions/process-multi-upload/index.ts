@@ -130,30 +130,70 @@ serve(async (req) => {
       })
     );
 
-    // Use upsert with onConflict to skip duplicates
-    const { data: insertedTrades, error } = await supabaseClient
+    // First, check for soft-deleted trades with matching hashes and restore them
+    const tradeHashes = tradesWithHash.map((t: any) => t.trade_hash);
+    
+    const { data: existingDeletedTrades } = await supabaseClient
       .from('trades')
-      .upsert(tradesWithHash, {
-        onConflict: 'user_id,trade_hash',
-        ignoreDuplicates: true
-      })
-      .select();
+      .select('id, trade_hash')
+      .eq('user_id', user.id)
+      .in('trade_hash', tradeHashes)
+      .not('deleted_at', 'is', null);
+    
+    const deletedHashSet = new Set((existingDeletedTrades || []).map((t: any) => t.trade_hash));
+    
+    // Restore soft-deleted trades
+    let restoredCount = 0;
+    if (existingDeletedTrades && existingDeletedTrades.length > 0) {
+      const { error: restoreError } = await supabaseClient
+        .from('trades')
+        .update({ deleted_at: null })
+        .eq('user_id', user.id)
+        .in('trade_hash', Array.from(deletedHashSet));
+      
+      if (restoreError) {
+        console.error('Restore error:', restoreError);
+      } else {
+        restoredCount = existingDeletedTrades.length;
+        console.log(`Restored ${restoredCount} previously deleted trades`);
+      }
+    }
+    
+    // Filter out trades that were just restored (they already exist)
+    const tradesToInsert = tradesWithHash.filter((t: any) => !deletedHashSet.has(t.trade_hash));
+    
+    let insertedCount = 0;
+    let insertedTrades: any[] = [];
+    
+    if (tradesToInsert.length > 0) {
+      // Use upsert with onConflict to skip duplicates for remaining trades
+      const { data, error } = await supabaseClient
+        .from('trades')
+        .upsert(tradesToInsert, {
+          onConflict: 'user_id,trade_hash',
+          ignoreDuplicates: true
+        })
+        .select();
 
-    if (error) {
-      console.error('Insert error:', error);
-      throw error;
+      if (error) {
+        console.error('Insert error:', error);
+        throw error;
+      }
+      
+      insertedTrades = data || [];
+      insertedCount = insertedTrades.length;
     }
 
-    const insertedCount = insertedTrades?.length || 0;
-    const skippedCount = trades.length - insertedCount;
+    const skippedCount = trades.length - insertedCount - restoredCount;
 
-    console.log(`Successfully inserted ${insertedCount} trades, skipped ${skippedCount} duplicates`);
+    console.log(`Successfully inserted ${insertedCount} trades, restored ${restoredCount}, skipped ${skippedCount} duplicates`);
 
     return new Response(
       JSON.stringify({ 
         success: true,
         trades: insertedTrades,
         tradesInserted: insertedCount,
+        tradesRestored: restoredCount,
         tradesSkipped: skippedCount,
         tradesSubmitted: trades.length
       }),
