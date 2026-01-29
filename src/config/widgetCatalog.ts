@@ -385,21 +385,32 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
 };
 
 /**
- * Default Command Center layout for new users - compact performance-focused design
- * Features the new compactPerformance widget and compressed layouts for maximum information density
+ * Default Command Center layout for new users - priority-ordered for above-the-fold visibility
+ * Widgets are ordered by importance: primary KPIs first, then charts, then detailed analytics
  */
 export const DEFAULT_DASHBOARD_LAYOUT = [
+  // Row 1: Primary KPIs (most important, always visible)
   'totalBalance',
-  'longShortRatio',
-  'compactPerformance', // NEW: Combines ROI, Win Rate, Avg P&L/Day
+  'compactPerformance', // Combines ROI, Win Rate, Avg P&L/Day
+  
+  // Row 2: Visual data + market context
   'capitalGrowth',
+  'longShortRatio',
+  
+  // Row 3: Performance details
   'performanceHighlights',
   'topMovers',
+  
+  // Row 4: Goals and insights
   'goals',
   'emotionMistakeCorrelation',
+  
+  // Row 5: Deep analytics (may be below fold on smaller screens)
   'behaviorAnalytics',
   'costEfficiency',
   'tradingQuality',
+  
+  // Optional: AI insights at bottom
   'aiInsights',
 ];
 

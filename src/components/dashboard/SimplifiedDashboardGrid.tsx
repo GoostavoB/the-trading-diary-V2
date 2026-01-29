@@ -16,12 +16,13 @@ import {
     sortableKeyboardCoordinates,
     rectSortingStrategy
 } from '@dnd-kit/sortable';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { WidgetPosition } from '@/hooks/useGridLayout';
-import { WIDGET_SIZE_TO_COLUMNS } from '@/types/widget';
+import { WIDGET_SIZE_TO_COLUMNS, WidgetSize } from '@/types/widget';
 import { cn } from '@/lib/utils';
 import { createPortal } from 'react-dom';
 import { SortableWidget } from './SortableWidget';
+import { calculateDensity } from '@/hooks/useAdaptiveWidgetSize';
 
 interface SimplifiedDashboardGridProps {
     positions: WidgetPosition[];
@@ -33,6 +34,20 @@ interface SimplifiedDashboardGridProps {
     onDragCancel?: () => void;
     renderWidget: (widgetId: string) => React.ReactNode;
     className?: string;
+}
+
+// Get minimum height class based on widget size and density
+function getMinHeightClass(size: WidgetSize, widgetCount: number): string {
+    const density = calculateDensity(widgetCount);
+    
+    const heights: Record<string, Record<WidgetSize, string>> = {
+        spacious: { small: 'min-h-[140px]', medium: 'min-h-[180px]', large: 'min-h-[160px]' },
+        comfortable: { small: 'min-h-[120px]', medium: 'min-h-[150px]', large: 'min-h-[130px]' },
+        compact: { small: 'min-h-[100px]', medium: 'min-h-[130px]', large: 'min-h-[110px]' },
+        dense: { small: 'min-h-[80px]', medium: 'min-h-[110px]', large: 'min-h-[90px]' },
+    };
+    
+    return heights[density]?.[size] || 'min-h-[100px]';
 }
 
 export function SimplifiedDashboardGrid({
@@ -47,11 +62,12 @@ export function SimplifiedDashboardGrid({
     className
 }: SimplifiedDashboardGridProps) {
     const [activeId, setActiveId] = useState<string | null>(null);
+    const widgetCount = order.length;
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
-                distance: 8, // Require 8px movement before drag starts to prevent accidental drags
+                distance: 8,
             },
         }),
         useSensor(KeyboardSensor, {
@@ -84,19 +100,24 @@ export function SimplifiedDashboardGrid({
         }),
     };
 
-    // Calculate grid template columns based on column count
-    // We use a 6-column grid system internally for flexibility
-    // 1 column mode = 1 fr
-    // 2 column mode = repeat(2, 1fr)
-    // 3 column mode = repeat(3, 1fr)
-    // 6 column mode = repeat(6, 1fr)
+    // Calculate gap based on density
+    const gapClass = useMemo(() => {
+        const density = calculateDensity(widgetCount);
+        switch (density) {
+            case 'spacious': return 'gap-4';
+            case 'comfortable': return 'gap-3';
+            case 'compact': return 'gap-2';
+            case 'dense': return 'gap-1.5';
+            default: return 'gap-3';
+        }
+    }, [widgetCount]);
 
     const getGridCols = () => {
         switch (columnCount) {
             case 1: return 'grid-cols-1';
             case 2: return 'grid-cols-2';
             case 3: return 'grid-cols-3';
-            case 4: return 'grid-cols-4'; // Legacy support
+            case 4: return 'grid-cols-4';
             case 6: return 'grid-cols-6';
             default: return 'grid-cols-3';
         }
@@ -113,23 +134,28 @@ export function SimplifiedDashboardGrid({
             <SortableContext items={order} strategy={rectSortingStrategy}>
                 <div
                     className={cn(
-                        "grid gap-3 auto-rows-[minmax(180px,auto)] transition-all duration-300",
+                        "grid transition-all duration-300",
                         getGridCols(),
+                        gapClass,
                         className
                     )}
+                    style={{
+                        gridAutoRows: 'minmax(0, auto)',
+                        gridAutoFlow: 'dense',
+                    }}
                 >
                     {order.map((id) => {
                         const position = positions.find(p => p.id === id);
-                        // Use WIDGET_SIZE_TO_COLUMNS to convert semantic size to column count
-                        const sizeInColumns = position?.size ? WIDGET_SIZE_TO_COLUMNS[position.size] : 1;
+                        const widgetSize = position?.size || 'medium';
+                        const sizeInColumns = WIDGET_SIZE_TO_COLUMNS[widgetSize] || 1;
                         const colSpan = `col-span-${Math.min(sizeInColumns, columnCount)}`;
-                        const rowSpan = position?.height ? `row-span-${position.height / 2}` : 'row-span-1';
+                        const minHeightClass = getMinHeightClass(widgetSize, widgetCount);
 
                         return (
                             <SortableWidget
                                 key={id}
                                 id={id}
-                                className={cn(colSpan, rowSpan)}
+                                className={cn(colSpan, minHeightClass)}
                             >
                                 {renderWidget(id)}
                             </SortableWidget>
@@ -142,8 +168,6 @@ export function SimplifiedDashboardGrid({
                 <DragOverlay dropAnimation={dropAnimation}>
                     {activeId ? (
                         <div className="opacity-80 scale-105 cursor-grabbing">
-                            {/* We might need a simplified preview here or clone the widget */}
-                            {/* For now, just render the widget content */}
                             {renderWidget(activeId)}
                         </div>
                     ) : null}

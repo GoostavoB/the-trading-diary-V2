@@ -1,8 +1,8 @@
 import { memo } from 'react';
+import { Percent, TrendingUp, TrendingDown } from 'lucide-react';
 import { AnimatedCounter } from '@/components/AnimatedCounter';
-import { formatPercent } from '@/utils/formatNumber';
-import { TrendingUp, TrendingDown, Percent } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { cn } from '@/lib/utils';
 
 interface AvgROIPerTradeWidgetProps {
   id: string;
@@ -12,6 +12,9 @@ interface AvgROIPerTradeWidgetProps {
   totalTrades: number;
 }
 
+/**
+ * Avg ROI Per Trade Widget - Compact responsive design
+ */
 export const AvgROIPerTradeWidget = memo(({
   id,
   isEditMode,
@@ -23,29 +26,39 @@ export const AvgROIPerTradeWidget = memo(({
   const isPositive = avgROIPerTrade >= 0;
 
   return (
-
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between p-4 border-b border-white/5">
-        <h3 className="font-semibold text-sm">{t('widgets.avgROIPerTrade.title')}</h3>
-      </div>
-      <div className="p-4 space-y-3">
-        <div className="flex items-baseline gap-2">
-          <AnimatedCounter
-            value={Math.abs(avgROIPerTrade)}
-            className={`text-3xl font-bold ${isPositive ? 'text-profit' : 'text-loss'}`}
-            suffix="%"
-            prefix={isPositive ? '' : '-'}
-          />
-          {isPositive ? (
-            <TrendingUp className="h-5 w-5 text-profit" />
-          ) : (
-            <TrendingDown className="h-5 w-5 text-loss" />
-          )}
+    <div className="flex flex-col h-full p-3 gap-2 justify-center">
+      {/* Header */}
+      <div className="flex items-center gap-2 shrink-0">
+        <div className="p-1.5 rounded-lg bg-primary/10">
+          <Percent className="h-3.5 w-3.5 text-primary" />
         </div>
-        <p className="text-sm text-muted-foreground">
-          {t('widgets.avgROIAcross', { count: totalTrades })}
-        </p>
+        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+          {t('widgets.avgROIPerTrade.title')}
+        </span>
       </div>
+
+      {/* Main Value */}
+      <div className="flex-1 flex items-center gap-2 min-h-0">
+        <AnimatedCounter
+          value={Math.abs(avgROIPerTrade)}
+          className={cn(
+            "text-2xl font-bold tracking-tight tabular-nums",
+            isPositive ? 'text-neon-green' : 'text-neon-red'
+          )}
+          suffix="%"
+          prefix={isPositive ? '+' : '-'}
+        />
+        {isPositive ? (
+          <TrendingUp className="h-4 w-4 text-neon-green shrink-0" />
+        ) : (
+          <TrendingDown className="h-4 w-4 text-neon-red shrink-0" />
+        )}
+      </div>
+
+      {/* Subtitle */}
+      <span className="text-[10px] text-muted-foreground shrink-0">
+        {t('widgets.avgROIAcross', { count: totalTrades })}
+      </span>
     </div>
   );
 });
