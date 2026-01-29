@@ -66,7 +66,7 @@ export const PerformanceHighlightsWidget = memo(({
 
                     {/* Column 2: Areas to Improve */}
                     <div className="border-r border-border/50 pr-3">
-                        <h4 className="text-sm font-medium mb-2 text-amber-600">Areas to Improve</h4>
+                        <h4 className="text-sm font-medium mb-2 text-loss">Areas to Improve</h4>
                         <ul className="space-y-1.5">
                             {improvementItems.slice(0, 3).map((item, idx) => (
                                 <li key={idx} className="text-sm">

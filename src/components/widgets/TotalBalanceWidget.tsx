@@ -25,10 +25,9 @@ export const TotalBalanceWidget = memo(({
 }: TotalBalanceWidgetProps) => {
   const { t } = useTranslation();
   const isPositive = change24h >= 0;
-
-  return (
-    <div className="flex flex-col h-full min-h-[180px]">
       {/* Header */}
+  return (
+    <div className="flex flex-col h-full p-4">
       <div className="flex items-center justify-between mb-auto">
         <div className="flex items-center gap-2">
           <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-primary/20 shadow-lg shadow-primary/10">
