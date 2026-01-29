@@ -258,13 +258,6 @@
     "socialSharer": "Mariposa Social",
     "socialSharerDesc": "Comparte en todas las plataformas sociales"
   },
-  "dashboard": {
-    "marketSentiment": "Sentimiento del Mercado",
-    "totalPnL": "P&L Total",
-    "winRate": "Tasa de Éxito",
-    "totalTrades": "Total de Operaciones",
-    "avgProfit": "Beneficio Promedio"
-  },
   "journal": {
     "title": "Diario de Trading",
     "newEntry": "Nueva Entrada",
@@ -483,6 +476,13 @@
     "resetDescription": "Ingresa tu dirección de correo y te enviaremos un enlace para restablecer tu contraseña."
   },
   "dashboard": {
+    "marketSentiment": "Sentimiento del Mercado",
+    "totalPnL": "P&L Total",
+    "winRate": "Tasa de Éxito",
+    "totalTrades": "Total de Operaciones",
+    "avgProfit": "Beneficio Promedio",
+    "profitFactor": "Factor de Beneficio",
+    "avgROI": "ROI Promedio",
     "title": "Panel",
     "welcome": "Bienvenido",
     "overview": "Resumen",
@@ -490,8 +490,6 @@
     "history": "Historial",
     "stats": "Estadísticas",
     "totalBalance": "Balance Total",
-    "winRate": "Tasa de Éxito",
-    "totalTrades": "Total de Operaciones",
     "avgPnL": "P&L Promedio",
     "currentROI": "ROI Actual",
     "maxDrawdown": "Drawdown Máximo",

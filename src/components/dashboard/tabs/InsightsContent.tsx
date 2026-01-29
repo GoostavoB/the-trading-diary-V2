@@ -4,8 +4,6 @@ import { PerformanceHighlights } from '@/components/insights/PerformanceHighligh
 import { TradingQualityMetrics } from '@/components/insights/TradingQualityMetrics';
 import { CostEfficiencyPanel } from '@/components/insights/CostEfficiencyPanel';
 import { BehaviorAnalytics } from '@/components/insights/BehaviorAnalytics';
-import { RollingTargetWidget } from '@/components/widgets/RollingTargetWidget';
-import { SmartWidgetWrapper } from '@/components/widgets/SmartWidgetWrapper';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useMemo } from 'react';
 import type { Trade } from '@/types/trade';
@@ -33,7 +31,7 @@ function calculateCurrentStreak(trades: Trade[]) {
 }
 
 export function InsightsContent() {
-    const { processedTrades, capitalLog, initialInvestment } = useDashboard();
+    const { processedTrades, capitalLog } = useDashboard();
     const stats = useDashboardStats(processedTrades, capitalLog);
     const isMobile = useIsMobile();
 
@@ -72,22 +70,13 @@ export function InsightsContent() {
                     maxDrawdownAmount={0}
                     profitFactor={stats.profitFactor}
                 />
-                <SmartWidgetWrapper id="rollingTarget" hasPadding={false}>
-                    <RollingTargetWidget 
-                        id="rollingTarget" 
-                        trades={processedTrades}
-                        initialInvestment={initialInvestment}
-                    />
-                </SmartWidgetWrapper>
                 <CostEfficiencyPanel trades={processedTrades} />
                 <BehaviorAnalytics trades={processedTrades} />
             </div>
         );
     }
 
-    // Desktop: Simple 2-row layout that NEVER cuts off content
-    // Row 1: KPI strip (auto height)
-    // Row 2: 3-column grid (flex to fill)
+    // Desktop: Simple 2-column layout
     return (
         <div 
             className="flex flex-col gap-3 animate-in fade-in-50 duration-500"
@@ -106,8 +95,8 @@ export function InsightsContent() {
                 />
             </div>
 
-            {/* Row 2: 3-column grid filling remaining space */}
-            <div className="flex-1 grid grid-cols-3 gap-3 min-h-0">
+            {/* Row 2: 2-column grid filling remaining space */}
+            <div className="flex-1 grid grid-cols-2 gap-3 min-h-0">
                 {/* Column 1: Performance Highlights (full height) */}
                 <div className="col-span-1 h-full overflow-hidden">
                     <PerformanceHighlights
@@ -118,18 +107,7 @@ export function InsightsContent() {
                     />
                 </div>
 
-                {/* Column 2: Rolling Target (full height) */}
-                <div className="col-span-1 h-full overflow-hidden">
-                    <SmartWidgetWrapper id="rollingTarget" hasPadding={false} className="h-full">
-                        <RollingTargetWidget 
-                            id="rollingTarget" 
-                            trades={processedTrades}
-                            initialInvestment={initialInvestment}
-                        />
-                    </SmartWidgetWrapper>
-                </div>
-
-                {/* Column 3: Trading Quality + Behavior stacked */}
+                {/* Column 2: Trading Quality + Behavior stacked */}
                 <div className="col-span-1 flex flex-col gap-3 h-full overflow-hidden">
                     <div className="flex-1 min-h-0 overflow-hidden">
                         <TradingQualityMetrics

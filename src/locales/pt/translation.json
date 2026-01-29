@@ -258,13 +258,6 @@
     "socialSharer": "Borboleta Social",
     "socialSharerDesc": "Compartilhe em todas as plataformas sociais"
   },
-  "dashboard": {
-    "marketSentiment": "Sentimento do Mercado",
-    "totalPnL": "P&L Total",
-    "winRate": "Taxa de Vitória",
-    "totalTrades": "Total de Negociações",
-    "avgProfit": "Lucro Médio"
-  },
   "journal": {
     "title": "Diário de Negociação",
     "newEntry": "Nova Entrada",
@@ -483,6 +476,13 @@
     "resetDescription": "Digite seu endereço de e-mail e enviaremos um link para redefinir sua senha."
   },
   "dashboard": {
+    "marketSentiment": "Sentimento do Mercado",
+    "totalPnL": "P&L Total",
+    "winRate": "Taxa de Vitória",
+    "totalTrades": "Total de Negociações",
+    "avgProfit": "Lucro Médio",
+    "profitFactor": "Fator de Lucro",
+    "avgROI": "ROI Médio",
     "title": "Painel",
     "welcome": "Bem-vindo",
     "overview": "Resumo",
@@ -490,8 +490,6 @@
     "history": "Histórico",
     "stats": "Estatísticas",
     "totalBalance": "Saldo Total",
-    "winRate": "Taxa de Vitórias",
-    "totalTrades": "Total de Operações",
     "avgPnL": "P&L Médio",
     "currentROI": "ROI Atual",
     "maxDrawdown": "Drawdown Máximo",
