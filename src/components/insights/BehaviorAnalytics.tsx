@@ -1,13 +1,11 @@
 import { memo, useMemo } from 'react';
 import { PremiumCard } from '@/components/ui/PremiumCard';
-import { Badge } from '@/components/ui/badge';
-import { Clock, TrendingUp, Calendar, DollarSign, Activity } from 'lucide-react';
+import { Clock, DollarSign, Activity, Calendar, TrendingUp, TrendingDown } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatNumber';
 import {
   calculateAvgHoldingTime,
   calculateAvgPositionSize,
   calculateAvgLeverage,
-  analyzeHourlyPerformance,
   analyzeDayPerformance
 } from '@/utils/insightCalculations';
 import type { Trade } from '@/types/trade';
@@ -20,12 +18,11 @@ interface BehaviorAnalyticsProps {
 export const BehaviorAnalytics = memo(({ trades }: BehaviorAnalyticsProps) => {
   const { t } = useTranslation();
 
-  // Add defensive check for trades
   if (!trades || trades.length === 0) {
     return (
-      <PremiumCard className="p-6 bg-card border-border">
-        <div className="text-center py-8">
-          <p className="text-muted-foreground">{t('insights.noDataAvailable') || 'No data available'}</p>
+      <PremiumCard className="h-full bg-card border-border">
+        <div className="p-3 text-center py-4">
+          <p className="text-xs text-muted-foreground">{t('insights.noDataAvailable') || 'No data available'}</p>
         </div>
       </PremiumCard>
     );
@@ -51,60 +48,47 @@ export const BehaviorAnalytics = memo(({ trades }: BehaviorAnalyticsProps) => {
   }, [dayPerf]);
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Average Holding Time */}
-        <PremiumCard className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Clock className="h-4 w-4 text-primary" />
-            <p className="text-xs font-medium text-muted-foreground">{t('insights.avgHoldingTime') || 'Avg Holding Time'}</p>
+    <PremiumCard className="h-full bg-card border-border flex flex-col">
+      <div className="p-3 flex flex-col h-full">
+        {/* Single row with 5 stat chips */}
+        <div className="flex gap-2 flex-1 items-stretch">
+          {/* Avg Holding Time */}
+          <div className="flex-1 p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center justify-center text-center">
+            <Clock className="w-4 h-4 text-primary mb-1" />
+            <span className="text-sm font-bold">{avgHoldingTime}</span>
+            <span className="text-[9px] text-muted-foreground uppercase">{t('insights.avgHoldingTime') || 'Hold Time'}</span>
           </div>
-          <p className="text-lg font-bold">{avgHoldingTime}</p>
-        </PremiumCard>
 
-        {/* Average Position Size */}
-        <PremiumCard className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <DollarSign className="h-4 w-4 text-primary" />
-            <p className="text-xs font-medium text-muted-foreground">{t('insights.avgPositionSize') || 'Avg Position Size'}</p>
+          {/* Avg Position Size */}
+          <div className="flex-1 p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center justify-center text-center">
+            <DollarSign className="w-4 h-4 text-primary mb-1" />
+            <span className="text-sm font-bold">{formatCurrency(avgPositionSize)}</span>
+            <span className="text-[9px] text-muted-foreground uppercase">{t('insights.avgPositionSize') || 'Avg Size'}</span>
           </div>
-          <p className="text-lg font-bold">{formatCurrency(avgPositionSize)}</p>
-        </PremiumCard>
 
-        {/* Average Leverage */}
-        <PremiumCard className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Activity className="h-4 w-4 text-primary" />
-            <p className="text-xs font-medium text-muted-foreground">{t('insights.avgLeverage') || 'Avg Leverage'}</p>
+          {/* Avg Leverage */}
+          <div className="flex-1 p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center justify-center text-center">
+            <Activity className="w-4 h-4 text-primary mb-1" />
+            <span className="text-sm font-bold">{avgLeverage.toFixed(1)}x</span>
+            <span className="text-[9px] text-muted-foreground uppercase">{t('insights.avgLeverage') || 'Avg Lever'}</span>
           </div>
-          <p className="text-lg font-bold">{avgLeverage.toFixed(1)}x</p>
-        </PremiumCard>
+
+          {/* Best Day of Week */}
+          <div className="flex-1 p-2 rounded-lg bg-profit/10 border border-profit/30 flex flex-col items-center justify-center text-center">
+            <TrendingUp className="w-4 h-4 text-profit mb-1" />
+            <span className="text-sm font-bold text-profit">{bestDay.day}</span>
+            <span className="text-[9px] text-muted-foreground uppercase">{t('insights.bestDayOfWeek') || 'Best Day'}</span>
+          </div>
+
+          {/* Worst Day of Week */}
+          <div className="flex-1 p-2 rounded-lg bg-loss/10 border border-loss/30 flex flex-col items-center justify-center text-center">
+            <TrendingDown className="w-4 h-4 text-loss mb-1" />
+            <span className="text-sm font-bold text-loss">{worstDay.day}</span>
+            <span className="text-[9px] text-muted-foreground uppercase">{t('insights.worstDayOfWeek') || 'Worst Day'}</span>
+          </div>
+        </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <PremiumCard className="p-4 bg-green-500/5 border-green-500/20">
-          <div className="flex items-center gap-2 mb-2">
-            <Calendar className="h-4 w-4 text-green-500" />
-            <p className="text-xs font-medium text-green-500">{t('insights.bestDayOfWeek') || 'Best Day'}</p>
-          </div>
-          <p className="text-lg font-bold">{bestDay.day}</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            {formatCurrency(bestDay.totalPnL)} • {bestDay.tradeCount} {t('insights.trades') || 'trades'}
-          </p>
-        </PremiumCard>
-
-        <PremiumCard className="p-4 bg-red-500/5 border-red-500/20">
-          <div className="flex items-center gap-2 mb-2">
-            <Calendar className="h-4 w-4 text-red-500" />
-            <p className="text-xs font-medium text-red-500">{t('insights.worstDayOfWeek') || 'Worst Day'}</p>
-          </div>
-          <p className="text-lg font-bold">{worstDay.day}</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            {formatCurrency(worstDay.totalPnL)} • {worstDay.tradeCount} {t('insights.trades') || 'trades'}
-          </p>
-        </PremiumCard>
-      </div>
-    </div>
+    </PremiumCard>
   );
 });
 

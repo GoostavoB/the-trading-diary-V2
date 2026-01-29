@@ -48,7 +48,7 @@ const KPIChip = memo(({
 
   return (
     <div className={cn(
-      "flex items-center gap-2 px-3 py-2 rounded-lg border backdrop-blur-sm transition-all duration-200 hover:scale-[1.02]",
+      "flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border backdrop-blur-sm transition-all duration-200 hover:scale-[1.02]",
       bgColor
     )}>
       <div className={cn("p-1.5 rounded-md bg-background/50", trendColor)}>

@@ -2,10 +2,9 @@ import { memo } from 'react';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Receipt, TrendingDown, ExternalLink } from 'lucide-react';
+import { Receipt, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ExchangeBadge } from '@/components/exchanges/ExchangeBadge';
-import { EfficiencyBadge } from '@/components/fee-analysis/EfficiencyBadge';
 import { formatCurrency } from '@/utils/formatNumber';
 import { aggregateExchangeStats } from '@/utils/feeCalculations';
 import { calculateFeeImpactMetrics } from '@/utils/insightCalculations';
@@ -17,115 +16,67 @@ interface CostEfficiencyPanelProps {
 }
 
 export const CostEfficiencyPanel = memo(({ trades }: CostEfficiencyPanelProps) => {
+  const { t } = useTranslation();
+
   if (!trades || trades.length === 0) return null;
 
-  const { t } = useTranslation();
   const exchangeStats = aggregateExchangeStats(trades);
   const topExchanges = exchangeStats.slice(0, 3);
   const feeMetrics = calculateFeeImpactMetrics(trades);
 
   if (topExchanges.length === 0) return null;
 
-  const mostEfficient = topExchanges[0];
-  const leastEfficient = topExchanges[topExchanges.length - 1];
-  const savingsVsWorst = leastEfficient.avgFeePercent - mostEfficient.avgFeePercent;
+  const medals = ['🥇', '🥈', '🥉'];
 
   return (
-    <PremiumCard className="bg-card border-border">
-      <div className="p-6">
-        <div className="mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Receipt className="w-5 h-5" />
-                {t('insights.exchangeCostEfficiency')}
-              </h3>
-              <p className="text-sm text-muted-foreground mt-1">
-                {t('insights.compareTradingCosts')}
-              </p>
-            </div>
-            <Link to="/fee-analysis">
-              <Button variant="ghost" size="sm" className="gap-2">
-                {t('insights.viewFullAnalysis')}
-                <ExternalLink className="h-3 w-3" />
-              </Button>
-            </Link>
+    <PremiumCard className="h-full bg-card border-border flex flex-col">
+      <div className="p-3 flex flex-col h-full">
+        {/* Compact header with link */}
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <Receipt className="w-4 h-4 text-primary" />
+            <h3 className="text-sm font-semibold">{t('insights.exchangeCostEfficiency')}</h3>
           </div>
+          <Link to="/fee-analysis">
+            <Button variant="ghost" size="sm" className="h-6 px-2 text-xs gap-1">
+              {t('insights.viewFullAnalysis')}
+              <ExternalLink className="h-3 w-3" />
+            </Button>
+          </Link>
         </div>
 
-        {/* Exchange Rankings */}
-        <div className="space-y-3 mb-6">
+        {/* Horizontal exchange row */}
+        <div className="grid grid-cols-3 gap-2 mb-2">
           {topExchanges.map((exchange, idx) => (
             <div
               key={exchange.broker}
-              className="p-4 rounded-lg bg-muted/20 border border-border transition-all duration-300 hover:scale-[1.02] hover:bg-muted/30"
+              className="p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center text-center"
             >
-              <div className="space-y-3">
-                {/* Top row: Medal + Exchange + Fee % */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Badge variant={idx === 0 ? 'default' : 'secondary'} className="font-mono text-base w-9 h-9 flex items-center justify-center flex-shrink-0 p-0">
-                      {idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉'}
-                    </Badge>
-                    <div className="flex-shrink-0">
-                      <ExchangeBadge source={exchange.broker} />
-                    </div>
-                  </div>
-                  <p className="text-base font-mono font-bold">
-                    {exchange.avgFeePercent.toFixed(3)}%
-                  </p>
-                </div>
-
-                {/* Bottom row: Broker name + trades | Efficiency badge */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-sm">{exchange.broker}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {exchange.tradeCount} {t('insights.trades')}
-                    </p>
-                  </div>
-                  <EfficiencyBadge score={exchange.avgEfficiencyScore} />
-                </div>
+              <span className="text-lg mb-1">{medals[idx]}</span>
+              <div className="mb-1">
+                <ExchangeBadge source={exchange.broker} />
               </div>
+              <span className="text-sm font-bold font-mono">{exchange.avgFeePercent.toFixed(3)}%</span>
+              <span className="text-[10px] text-muted-foreground">({exchange.tradeCount})</span>
             </div>
           ))}
         </div>
 
-        {/* Summary Metrics */}
-        <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-          <div className="space-y-3 text-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">{t('insights.totalFeesPaid')}:</span>
-              <span className="font-bold text-loss">
-                {formatCurrency(feeMetrics.totalFees)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">{t('insights.feeImpactOnPnL')}:</span>
-              <span className="font-bold text-yellow-500">
-                {feeMetrics.feeImpactOnPnL.toFixed(2)}%
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">{t('insights.effectiveFeeRate')}:</span>
-              <span className="font-bold font-mono">
-                {feeMetrics.effectiveFeeRate.toFixed(3)}%
-              </span>
-            </div>
+        {/* Summary metrics in single row */}
+        <div className="grid grid-cols-3 gap-2 p-2 rounded-lg bg-primary/5 border border-primary/20 mt-auto">
+          <div className="text-center">
+            <span className="text-[10px] text-muted-foreground block">{t('insights.totalFeesPaid')}</span>
+            <span className="text-xs font-bold text-loss">{formatCurrency(feeMetrics.totalFees)}</span>
+          </div>
+          <div className="text-center border-x border-border/50">
+            <span className="text-[10px] text-muted-foreground block">{t('insights.feeImpactOnPnL')}</span>
+            <span className="text-xs font-bold text-yellow-500">{feeMetrics.feeImpactOnPnL.toFixed(2)}%</span>
+          </div>
+          <div className="text-center">
+            <span className="text-[10px] text-muted-foreground block">{t('insights.effectiveFeeRate')}</span>
+            <span className="text-xs font-bold font-mono">{feeMetrics.effectiveFeeRate.toFixed(3)}%</span>
           </div>
         </div>
-
-        {/* Tip */}
-        {savingsVsWorst > 0.01 && (
-          <div className="mt-4 p-3 rounded-lg bg-profit/10 border border-profit/30">
-            <div className="flex items-start gap-2">
-              <TrendingDown className="h-4 w-4 text-profit mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <span className="font-semibold text-profit">{t('insights.tip')}:</span> Trading on {mostEfficient.broker} saves you ~{savingsVsWorst.toFixed(3)}% vs {leastEfficient.broker}
-              </p>
-            </div>
-          </div>
-        )}
       </div>
     </PremiumCard>
   );
