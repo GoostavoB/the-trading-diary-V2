@@ -1,8 +1,6 @@
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { PremiumCard } from "@/components/ui/PremiumCard";
 import { useMobileOptimization } from "@/hooks/useMobileOptimization";
-import { ExplainMetricButton } from "@/components/ExplainMetricButton";
-import { useAIAssistant } from "@/contexts/AIAssistantContext";
 
 interface AssetPerformanceRadarProps {
   data: Array<{
@@ -16,7 +14,6 @@ interface AssetPerformanceRadarProps {
 
 export const AssetPerformanceRadar = ({ data }: AssetPerformanceRadarProps) => {
   const { isMobile } = useMobileOptimization();
-  const { openWithPrompt } = useAIAssistant();
 
   // Limit to top 3 assets on mobile, 5 on desktop
   const topAssets = data
@@ -33,19 +30,10 @@ export const AssetPerformanceRadar = ({ data }: AssetPerformanceRadarProps) => {
     'Consistency': Math.min((item.tradeCount * item.winRate) / 100, 100), // Calculated metric
   }));
 
-  const topAssetNames = topAssets.map(a => a.asset).join(', ');
-  const chartSummary = `Performance comparison of top ${topAssets.length} assets: ${topAssetNames}`;
-
   return (
     <PremiumCard className="p-4 lg:p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-base lg:text-lg font-semibold">Asset Performance Radar</h3>
-        <ExplainMetricButton
-          metricName="Asset Performance Radar"
-          metricValue={`${topAssets.length} top assets`}
-          context={chartSummary}
-          onExplain={openWithPrompt}
-        />
       </div>
       <ResponsiveContainer width="100%" height={isMobile ? 280 : 400}>
         <RadarChart data={normalizedData}>

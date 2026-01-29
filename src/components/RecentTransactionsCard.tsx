@@ -5,11 +5,8 @@ import { PremiumTable, PremiumTableRow } from "@/components/ui/PremiumTable";
 import { Trade } from "@/types/trade";
 import { format } from "date-fns";
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { ExplainMetricButton } from "@/components/ExplainMetricButton";
 import { useTranslation } from '@/hooks/useTranslation';
-import { useAIAssistant } from '@/contexts/AIAssistantContext';
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
-import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface RecentTransactionsCardProps {
   trades: Trade[];
@@ -18,8 +15,6 @@ interface RecentTransactionsCardProps {
 
 export const RecentTransactionsCard = memo(({ trades, className }: RecentTransactionsCardProps) => {
   const { t } = useTranslation();
-  const { openWithPrompt } = useAIAssistant();
-  const { convertAmount, formatAmount } = useCurrency();
 
   // Add defensive check for trades
   const recentTrades = (trades || [])
@@ -31,17 +26,9 @@ export const RecentTransactionsCard = memo(({ trades, className }: RecentTransac
       <div className="space-y-4 p-6 md:p-8">
         <div className="flex items-center justify-between">
           <h3 id="recent-transactions-title" className="text-lg font-semibold">{t('widgets.recentTransactions.title')}</h3>
-          <div className="flex items-center gap-2">
-            <ExplainMetricButton
-              metricName="Recent Transactions"
-              metricValue={`${recentTrades.length} trades`}
-              context={recentTrades.length > 0 ? `Latest: ${recentTrades[0].symbol} (${formatAmount(recentTrades[0].pnl || 0)})` : ''}
-              onExplain={openWithPrompt}
-            />
-            <a href="/journal" className="text-xs text-primary hover:underline">
-              {t('widgets.recentTransactions.viewAll')}
-            </a>
-          </div>
+          <a href="/journal" className="text-xs text-primary hover:underline">
+            {t('widgets.recentTransactions.viewAll')}
+          </a>
         </div>
 
         <PremiumTable density="compact">

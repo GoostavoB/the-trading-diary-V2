@@ -37,13 +37,6 @@ export const KeyboardShortcutsHelp = () => {
       ],
     },
     {
-      category: t('keyboardShortcuts.categories.aiAssistant'),
-      items: [
-        { keys: ['Alt', 'I'], description: t('keyboardShortcuts.shortcuts.openAIAssistant') },
-        { keys: ['Ctrl', 'Enter'], description: t('keyboardShortcuts.shortcuts.sendMessage') },
-      ],
-    },
-    {
       category: t('keyboardShortcuts.categories.general'),
       items: [
         { keys: ['Shift', '?'], description: t('keyboardShortcuts.shortcuts.showShortcuts') },

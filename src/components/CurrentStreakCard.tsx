@@ -2,8 +2,6 @@ import { memo } from 'react';
 import { GlassCard } from "@/components/ui/glass-card";
 import { Flame, TrendingDown } from "lucide-react";
 import { useThemeMode } from "@/hooks/useThemeMode";
-import { ExplainMetricButton } from "@/components/ExplainMetricButton";
-import { useAIAssistant } from '@/contexts/AIAssistantContext';
 
 interface CurrentStreakCardProps {
   streak: number;
@@ -13,7 +11,6 @@ interface CurrentStreakCardProps {
 
 const CurrentStreakCardComponent = ({ streak, type, className }: CurrentStreakCardProps) => {
   const { colors } = useThemeMode();
-  const { openWithPrompt } = useAIAssistant();
   const isWinning = type === 'winning';
   
   return (
@@ -29,20 +26,12 @@ const CurrentStreakCardComponent = ({ streak, type, className }: CurrentStreakCa
           <h3 id="current-streak-title" className="text-sm font-medium text-muted-foreground">
             Current Streak
           </h3>
-          <div className="flex items-center gap-2">
-            <ExplainMetricButton 
-              metricName="Current Streak"
-              metricValue={`${streak} ${isWinning ? 'winning' : 'losing'} trades`}
-              context={`Type: ${type}`}
-              onExplain={openWithPrompt}
-            />
-            <div className={`p-2 rounded-xl ${isWinning ? 'bg-primary/10' : 'bg-secondary/10'}`} aria-hidden="true">
-              {isWinning ? (
-                <Flame className="h-4 w-4 text-primary" />
-              ) : (
-                <TrendingDown className="h-4 w-4 text-secondary" />
-              )}
-            </div>
+          <div className={`p-2 rounded-xl ${isWinning ? 'bg-primary/10' : 'bg-secondary/10'}`} aria-hidden="true">
+            {isWinning ? (
+              <Flame className="h-4 w-4 text-primary" />
+            ) : (
+              <TrendingDown className="h-4 w-4 text-secondary" />
+            )}
           </div>
         </div>
         

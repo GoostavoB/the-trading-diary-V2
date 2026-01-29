@@ -1,14 +1,12 @@
 import { memo, useMemo, useState } from "react";
 import { PremiumCard } from "@/components/ui/PremiumCard";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useThemeMode } from "@/hooks/useThemeMode";
 import { useMobileOptimization } from "@/hooks/useMobileOptimization";
-import { ExplainMetricButton } from "@/components/ExplainMetricButton";
-import { useAIAssistant } from "@/contexts/AIAssistantContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, TrendingUp, TrendingDown, BarChart3, Grid3x3 } from "lucide-react";
+import { TrendingUp, TrendingDown, BarChart3, Grid3x3 } from "lucide-react";
 import { Trade } from "@/types/trade";
 import { formatNumber, formatPercent } from "@/utils/formatNumber";
 import { calculateTradePnL } from '@/utils/pnl';
@@ -20,7 +18,6 @@ interface WinsByHourChartProps {
 const WinsByHourChartComponent = ({ trades }: WinsByHourChartProps) => {
   const { colors } = useThemeMode();
   const { isMobile } = useMobileOptimization();
-  const { openWithPrompt } = useAIAssistant();
 
   const [viewMode, setViewMode] = useState<'bar' | 'heatmap'>('bar');
   const [timeType, setTimeType] = useState<'open' | 'close'>('close');
@@ -155,10 +152,8 @@ const WinsByHourChartComponent = ({ trades }: WinsByHourChartProps) => {
     const intensity = Math.abs(pnl) / maxPnL;
 
     if (pnl > 0) {
-      // Use positive color from theme with intensity variation
       return colors.positive.replace(')', ` / ${0.5 + intensity * 0.5})`);
     } else {
-      // Use negative color from theme with intensity variation
       return colors.negative.replace(')', ` / ${0.5 + intensity * 0.5})`);
     }
   };
@@ -171,12 +166,6 @@ const WinsByHourChartComponent = ({ trades }: WinsByHourChartProps) => {
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-semibold">Trading Performance by Hour</h3>
-            <ExplainMetricButton
-              metricName="Hour-by-Hour Performance"
-              metricValue={`${filteredTrades.length} trades analyzed`}
-              context={aiInsight}
-              onExplain={openWithPrompt}
-            />
           </div>
 
           {/* Summary Stats */}
@@ -361,7 +350,7 @@ const WinsByHourChartComponent = ({ trades }: WinsByHourChartProps) => {
                 <TrendingUp className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1">
-                <h4 className="font-semibold text-sm mb-1 text-foreground">AI Insights</h4>
+                <h4 className="font-semibold text-sm mb-1 text-foreground">Insights</h4>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   {aiInsight}
                 </p>

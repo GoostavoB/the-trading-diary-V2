@@ -3,11 +3,8 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { formatPercent } from "@/utils/formatNumber";
 import { Trade } from "@/types/trade";
-import { ExplainMetricButton } from "@/components/ExplainMetricButton";
-import { useAIAssistant } from '@/contexts/AIAssistantContext';
 import { TokenIcon } from "@/components/TokenIcon";
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
-import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface AssetMover {
   symbol: string;
@@ -22,9 +19,6 @@ interface TopMoversCardProps {
 }
 
 const TopMoversCardComponent = ({ trades, className }: TopMoversCardProps) => {
-  const { openWithPrompt } = useAIAssistant();
-  const { convertAmount, formatAmount } = useCurrency();
-  
   const topMovers = useMemo(() => {
     // Add defensive check for trades
     if (!trades || trades.length === 0) return [];
@@ -56,12 +50,6 @@ const TopMoversCardComponent = ({ trades, className }: TopMoversCardProps) => {
       <div className="space-y-4 p-6 md:p-8">
         <div className="flex items-center justify-between">
           <h3 id="top-movers-title" className="text-lg font-semibold">Top Movers</h3>
-          <ExplainMetricButton 
-            metricName="Top Movers"
-            metricValue={`${topMovers.length} assets`}
-            context={topMovers.length > 0 ? `Biggest mover: ${topMovers[0].symbol} at ${formatAmount(topMovers[0].pnl)}` : ''}
-            onExplain={openWithPrompt}
-          />
         </div>
         
         <ul className="space-y-2" role="list">
@@ -73,7 +61,7 @@ const TopMoversCardComponent = ({ trades, className }: TopMoversCardProps) => {
                   key={asset.symbol} 
                   className="flex items-center justify-between gap-3 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
                   role="listitem"
-                  aria-label={`${asset.symbol}: ${formatAmount(asset.pnl)}, ${isPositive ? 'up' : 'down'} ${formatPercent(Math.abs(asset.change))}`}
+                  aria-label={`${asset.symbol}: ${isPositive ? 'up' : 'down'} ${formatPercent(Math.abs(asset.change))}`}
                 >
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <div 

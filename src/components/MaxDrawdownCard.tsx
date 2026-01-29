@@ -2,8 +2,6 @@ import { memo } from 'react';
 import { GlassCard } from "@/components/ui/glass-card";
 import { TrendingDown } from "lucide-react";
 import { formatPercent } from "@/utils/formatNumber";
-import { ExplainMetricButton } from "@/components/ExplainMetricButton";
-import { useAIAssistant } from '@/contexts/AIAssistantContext';
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
 import { useCurrency } from '@/contexts/CurrencyContext';
 
@@ -14,8 +12,7 @@ interface MaxDrawdownCardProps {
 }
 
 const MaxDrawdownCardComponent = ({ value, percentage, className }: MaxDrawdownCardProps) => {
-  const { openWithPrompt } = useAIAssistant();
-  const { convertAmount, formatAmount } = useCurrency();
+  const { formatAmount } = useCurrency();
   
   return (
     <GlassCard 
@@ -29,16 +26,8 @@ const MaxDrawdownCardComponent = ({ value, percentage, className }: MaxDrawdownC
           <h3 id="max-drawdown-title" className="text-sm font-medium text-muted-foreground">
             Max Drawdown
           </h3>
-          <div className="flex items-center gap-2">
-            <ExplainMetricButton 
-              metricName="Max Drawdown"
-              metricValue={formatAmount(value)}
-              context={`Percentage of peak: ${formatPercent(percentage)}`}
-              onExplain={openWithPrompt}
-            />
-            <div className="p-2 rounded-xl bg-secondary/10" aria-hidden="true">
-              <TrendingDown className="h-4 w-4 text-secondary" />
-            </div>
+          <div className="p-2 rounded-xl bg-secondary/10" aria-hidden="true">
+            <TrendingDown className="h-4 w-4 text-secondary" />
           </div>
         </div>
         
