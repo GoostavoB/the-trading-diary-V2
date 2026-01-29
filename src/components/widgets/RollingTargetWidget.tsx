@@ -159,8 +159,9 @@ export const RollingTargetWidget = memo(({
       day.endCapital = day.startCapital + day.pnl;
       day.returnPercent = day.startCapital > 0 ? (day.pnl / day.startCapital) * 100 : 0;
 
-      // Planned = what you SHOULD end the day with (start capital + target growth)
-      day.plannedCapital = day.startCapital * (1 + p);
+      // Planned = absolute compound growth target from initial investment
+      // Formula: Initial × (1 + target%)^days — where I SHOULD BE at end of this day
+      day.plannedCapital = initialInvestment * Math.pow(1 + p, calendarDaysFromStart + 1);
 
       // Calculate required today for rolling mode
       if (settings?.mode === 'rolling') {
@@ -332,12 +333,11 @@ export const RollingTargetWidget = memo(({
     // Current status based on most recent day's performance
     const currentStatus = lastDay.deviation >= 0 ? 'ahead' : 'behind';
 
-    // Cumulative drift = sum of all daily deviations
-    const totalDrift = dailyData.reduce((sum, d) => sum + d.deviation, 0);
-    const driftPercent = lastDay.startCapital > 0
-      ? (totalDrift / (lastDay.startCapital * dailyData.length)) * 100
+    // Drift from plan = (Actual Capital - Planned Capital) / Planned Capital × 100
+    const driftPercent = lastDay.plannedCapital > 0
+      ? ((lastDay.endCapital - lastDay.plannedCapital) / lastDay.plannedCapital) * 100
       : 0;
-    const driftAmount = Math.abs(totalDrift);
+    const driftAmount = Math.abs(lastDay.endCapital - lastDay.plannedCapital);
 
     return {
       currentStatus,
