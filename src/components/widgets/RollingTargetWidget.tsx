@@ -352,13 +352,13 @@ export const RollingTargetWidget = memo(({
   if (!trades.length || !initialInvestment) {
     return (
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-4 border-b border-white/5">
-          <h3 className="font-semibold text-sm">Rolling Target Tracker</h3>
+        <div className="flex items-center justify-between px-3 py-2 border-b border-white/5">
+          <h3 className="font-semibold text-sm">Rolling Target</h3>
         </div>
-        <div className="flex flex-col items-center justify-center py-12 text-center flex-1">
-          <Target className="h-12 w-12 text-muted-foreground mb-4" />
-          <p className="text-sm text-muted-foreground">
-            Add trades and set initial investment to start tracking
+        <div className="flex flex-col items-center justify-center py-6 text-center flex-1">
+          <Target className="h-8 w-8 text-muted-foreground mb-2" />
+          <p className="text-xs text-muted-foreground">
+            Add trades to start tracking
           </p>
         </div>
       </div>
@@ -367,12 +367,12 @@ export const RollingTargetWidget = memo(({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between p-4 border-b border-white/5">
-        <h3 className="font-semibold text-sm">Rolling Target Tracker</h3>
+      <div className="flex items-center justify-between px-3 py-2 border-b border-white/5">
+        <h3 className="font-semibold text-sm">Rolling Target</h3>
         <Dialog open={showSettings} onOpenChange={setShowSettings}>
           <DialogTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <Settings className="h-4 w-4" />
+            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+              <Settings className="h-3.5 w-3.5" />
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
@@ -558,74 +558,54 @@ export const RollingTargetWidget = memo(({
           </DialogContent>
         </Dialog>
       </div>
-      <div className="p-4 space-y-6">
+      <div className="px-3 py-2 space-y-3 flex-1 overflow-y-auto">
         {/* Top Bar - Mode and Today's Target */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Badge variant="outline" className="capitalize">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <Badge variant="outline" className="capitalize text-xs">
               {settings.mode === 'rolling' ? 'Rolling' : 'Per-Day'}
             </Badge>
-            <Badge variant="secondary">
+            <Badge variant="secondary" className="text-xs">
               Target: {settings.targetPercent}%
             </Badge>
           </div>
 
           {todayData && (
-            <div className="p-4 rounded-lg bg-muted/50 border">
+            <div className="p-2.5 rounded-lg bg-muted/50 border">
               {todayData.isAhead ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <ArrowUpCircle className="h-5 w-5 text-profit" />
-                    <p className="text-sm font-medium text-profit">You are ahead!</p>
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <ArrowUpCircle className="h-4 w-4 text-profit" />
+                    <p className="text-xs font-medium text-profit">You are ahead!</p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Headroom</span>
-                    <span className="text-lg font-bold text-profit">
+                    <span className="text-xs text-muted-foreground">Headroom</span>
+                    <span className="text-base font-bold text-profit">
                       {formatCurrencyFull(todayData.headroom)}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Today's minimum to stay on track: $0
-                  </p>
-                  <div className="flex items-center gap-2 mt-3 flex-wrap">
-                    <span className="text-xs text-muted-foreground">Forecasts:</span>
-                    <Badge variant="secondary" className="text-xs">
-                      30d: {formatCurrencyFull(todayData.forecast30Days)}
-                    </Badge>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Today's min: $0</span>
+                    <span>30d: {formatCurrencyFull(todayData.forecast30Days)}</span>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Target className="h-5 w-5 text-primary" />
-                    <p className="text-sm font-medium">Today to stay on track</p>
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <Target className="h-4 w-4 text-primary" />
+                    <p className="text-xs font-medium">Today to stay on track</p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Required PnL</span>
-                    <span className="text-2xl font-bold text-primary">
+                    <span className="text-xs text-muted-foreground">Required</span>
+                    <span className="text-lg font-bold text-primary">
                       {formatCurrencyFull(todayData.requiredToday)}
                     </span>
                   </div>
-                  {settings.mode === 'rolling' && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Info className="h-3 w-3" />
-                            <span>Capped at {settings.carryOverCap}% of capital</span>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Prevents wild swings from accumulated carry-over</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-                  <div className="flex items-center gap-2 mt-3 flex-wrap">
-                    <span className="text-xs text-muted-foreground">Forecasts:</span>
-                    <Badge variant="secondary" className="text-xs">
-                      30d: {formatCurrencyFull(todayData.forecast30Days)}
-                    </Badge>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    {settings.mode === 'rolling' && (
+                      <span>Cap: {settings.carryOverCap}%</span>
+                    )}
+                    <span>30d: {formatCurrencyFull(todayData.forecast30Days)}</span>
                   </div>
                 </div>
               )}
@@ -633,21 +613,18 @@ export const RollingTargetWidget = memo(({
           )}
         </div>
 
-        {/* Adaptive Suggestion Card */}
+        {/* Adaptive Suggestion Card - Compact */}
         {suggestedPercent && (
-          <div className="p-4 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
-            <div className="flex items-start gap-3">
-              <Lightbulb className="h-5 w-5 text-primary mt-0.5" />
-              <div className="flex-1 space-y-2">
-                <p className="text-sm font-medium">Suggested Target Adjustment</p>
-                <p className="text-xs text-muted-foreground">
-                  Based on your last 20 days, try {suggestedPercent.toFixed(2)}% for a more realistic target
-                </p>
-                <div className="flex gap-2">
-                  <Button size="sm" onClick={applySuggestion}>
-                    Apply {suggestedPercent.toFixed(2)}%
+          <div className="p-2.5 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
+            <div className="flex items-start gap-2">
+              <Lightbulb className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+              <div className="flex-1 space-y-1.5">
+                <p className="text-xs font-medium">Try {suggestedPercent.toFixed(2)}% for realistic targets</p>
+                <div className="flex gap-1.5">
+                  <Button size="sm" className="h-6 text-xs px-2" onClick={applySuggestion}>
+                    Apply
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={dismissSuggestion}>
+                  <Button size="sm" variant="ghost" className="h-6 text-xs px-2" onClick={dismissSuggestion}>
                     Dismiss
                   </Button>
                 </div>
@@ -656,8 +633,8 @@ export const RollingTargetWidget = memo(({
           </div>
         )}
 
-        {/* Chart */}
-        <div className="h-[300px] w-full">
+        {/* Chart - Compact */}
+        <div className="h-32 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData}>
               <defs>

@@ -79,14 +79,14 @@ export const SimpleLeverageWidget = ({
       onRemove={onRemove}
       onExpand={onExpand}
     >
-      <div className="flex flex-col h-full overflow-y-auto">
-        {/* Side selector - compact */}
-        <div className="flex gap-1 mb-2">
+      <div className="flex flex-col h-full overflow-y-auto space-y-3">
+        {/* Side selector */}
+        <div className="flex gap-1.5">
           <Button
             variant={side === 'long' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSide('long')}
-            className={`h-7 text-xs ${side === 'long' ? 'bg-state-success hover:bg-state-success/90' : ''}`}
+            className={`flex-1 h-8 text-xs ${side === 'long' ? 'bg-state-success hover:bg-state-success/90' : ''}`}
           >
             Long
           </Button>
@@ -94,16 +94,16 @@ export const SimpleLeverageWidget = ({
             variant={side === 'short' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSide('short')}
-            className={`h-7 text-xs ${side === 'short' ? 'bg-state-error hover:bg-state-error/90' : ''}`}
+            className={`flex-1 h-8 text-xs ${side === 'short' ? 'bg-state-error hover:bg-state-error/90' : ''}`}
           >
             Short
           </Button>
         </div>
 
-        {/* Input fields - compact */}
-        <div className="space-y-2 mb-2">
+        {/* Input fields */}
+        <div className="space-y-2">
           <div>
-            <Label htmlFor="entry-price" className="text-[10px] text-muted-foreground uppercase">
+            <Label htmlFor="entry-price" className="text-xs text-muted-foreground">
               Entry Price
             </Label>
             <Input
@@ -112,13 +112,13 @@ export const SimpleLeverageWidget = ({
               value={entryPrice}
               onChange={(e) => setEntryPrice(e.target.value)}
               placeholder="50000"
-              className="h-8 mt-0.5"
+              className="h-8 mt-1"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label htmlFor="stop-percent" className="text-[10px] text-muted-foreground uppercase">
+              <Label htmlFor="stop-percent" className="text-xs text-muted-foreground">
                 Stop %
               </Label>
               <Input
@@ -128,12 +128,12 @@ export const SimpleLeverageWidget = ({
                 value={stopPercent}
                 onChange={(e) => handleStopPercentChange(e.target.value)}
                 placeholder="1.0"
-                className="h-8 mt-0.5"
+                className="h-8 mt-1"
               />
             </div>
 
             <div>
-              <Label htmlFor="stop-price" className="text-[10px] text-muted-foreground uppercase">
+              <Label htmlFor="stop-price" className="text-xs text-muted-foreground">
                 Stop Price
               </Label>
               <Input
@@ -142,53 +142,53 @@ export const SimpleLeverageWidget = ({
                 value={stopPrice}
                 onChange={(e) => handleStopPriceChange(e.target.value)}
                 placeholder="49500"
-                className="h-8 mt-0.5"
+                className="h-8 mt-1"
               />
             </div>
           </div>
         </div>
 
-        {/* Results - compact */}
+        {/* Results */}
         {result && result.isValid && (
-          <div className="border-t border-border/40 pt-2 space-y-1.5 mt-auto">
+          <div className="border-t border-border/40 pt-3 space-y-2 mt-auto">
             <div className="flex justify-between items-center">
               <span className="text-xs text-muted-foreground">Max Safe Leverage</span>
-              <span className="text-base font-bold text-foreground">{result.Lmax}x</span>
+              <span className="text-lg md:text-xl font-bold text-foreground">{result.Lmax}x</span>
             </div>
             
             <div className="flex justify-between items-center">
               <span className="text-xs text-muted-foreground">Liquidation Price</span>
-              <span className="text-xs font-medium text-foreground">
+              <span className="text-sm font-medium text-foreground">
                 ${result.pliq.toFixed(2)}
               </span>
             </div>
             
             <div className="flex justify-between items-center">
               <span className="text-xs text-muted-foreground">Risk Level</span>
-              <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${getRiskLevelColor(result.riskLevel)}`}>
+              <Badge variant="outline" className={`text-xs px-2 py-0.5 ${getRiskLevelColor(result.riskLevel)}`}>
                 {result.riskLevel}
               </Badge>
             </div>
             
             <div className="flex justify-between items-center">
               <span className="text-xs text-muted-foreground">Safety Margin</span>
-              <span className="text-xs font-medium text-foreground">
+              <span className="text-sm font-medium text-foreground">
                 {result.marginPct.toFixed(2)}%
               </span>
             </div>
 
             {result.warnings.length > 0 && (
-              <div className="p-1.5 rounded-md bg-state-warning/10 border border-state-warning/20">
-                <p className="text-[10px] text-state-warning">{result.warnings[0]}</p>
+              <div className="p-2 rounded-md bg-state-warning/10 border border-state-warning/20">
+                <p className="text-xs text-state-warning">{result.warnings[0]}</p>
               </div>
             )}
           </div>
         )}
 
         {result && !result.isValid && (
-          <div className="p-1.5 rounded-md bg-state-error/10 border border-state-error/20 mt-auto">
-            <p className="text-[10px] text-state-error font-medium">Error</p>
-            <p className="text-[10px] text-state-error mt-0.5">{result.warnings[0]}</p>
+          <div className="p-2 rounded-md bg-state-error/10 border border-state-error/20 mt-auto">
+            <p className="text-xs text-state-error font-medium">Error</p>
+            <p className="text-xs text-state-error mt-0.5">{result.warnings[0]}</p>
           </div>
         )}
       </div>

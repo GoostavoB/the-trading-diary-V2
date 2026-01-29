@@ -3,16 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { RollingTargetWidget } from '@/components/widgets/RollingTargetWidget';
 import { PremiumCard } from '@/components/ui/PremiumCard';
-import { Target, HelpCircle } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Trade } from '@/types/trade';
 
 export const TradeStationRollingTarget = () => {
@@ -73,87 +63,8 @@ export const TradeStationRollingTarget = () => {
   }
 
   return (
-    <div className="space-y-2">
-      {/* Help Section */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Target className="h-5 w-5" />
-          Rolling Target Tracker
-        </h3>
-
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="sm" className="gap-2">
-              <HelpCircle className="h-4 w-4" />
-              What is this?
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5" />
-                Rolling Target Tracker - Your Growth Companion
-              </DialogTitle>
-            </DialogHeader>
-
-            <div className="space-y-4 py-4">
-              <div>
-                <h4 className="font-semibold mb-2 text-primary">🎯 What It Does</h4>
-                <p className="text-sm text-muted-foreground">
-                  Tracks your daily trading progress toward a consistent, compound growth target.
-                  It shows you exactly what you need to earn each day to stay on track with your goals.
-                </p>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-2 text-primary">💡 Why It's Powerful</h4>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>• <strong>Prevents FOMO:</strong> Removes pressure to "make up for losses" with risky trades</li>
-                  <li>• <strong>Realistic Goals:</strong> Keeps your expectations grounded in achievable targets</li>
-                  <li>• <strong>Compound Mindset:</strong> Shows how small, consistent gains create massive returns</li>
-                  <li>• <strong>Visual Progress:</strong> See exactly where you stand vs. your planned path</li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-2 text-primary">🏆 Pro Recommendation</h4>
-                <p className="text-sm text-muted-foreground mb-2">
-                  <strong>Professional traders recommend 1% daily growth</strong> (default setting).
-                  This may sound small, but the math is powerful:
-                </p>
-                <div className="bg-muted/50 rounded-lg p-3 text-sm space-y-1">
-                  <p>• <strong>1% daily = 37.8x your capital in 1 year</strong></p>
-                  <p>• <strong>0.5% daily = 6.1x your capital in 1 year</strong></p>
-                  <p>• <strong>2% daily = 1,377x your capital in 1 year</strong></p>
-                </div>
-                <p className="text-xs text-muted-foreground mt-2 italic">
-                  Formula: (1 + daily%)^365 = annual growth multiple
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  <strong>Note:</strong> In per-day mode, the "Required" amount compounds daily—it's calculated as your target % of each day's starting capital, which includes previous gains. This is how small percentages create exponential growth.
-                </p>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-2 text-primary">⚙️ Flexibility</h4>
-                <p className="text-sm text-muted-foreground">
-                  You can customize the target percentage in settings to match your trading style,
-                  risk tolerance, and experience level. Start conservative, then adjust as you improve.
-                </p>
-              </div>
-
-              <div className="pt-2 border-t">
-                <p className="text-xs text-muted-foreground">
-                  <strong>Remember:</strong> Sustainable, consistent growth beats volatile home runs every time.
-                  This tool helps you stay disciplined and focused on the long game.
-                </p>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Widget */}
+    <div className="h-full flex flex-col">
+      {/* Widget takes full space - header is inside RollingTargetWidget */}
       <RollingTargetWidget
         id="tradestation-rolling-target"
         trades={trades}

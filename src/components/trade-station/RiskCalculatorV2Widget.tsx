@@ -86,13 +86,13 @@ export const RiskCalculatorV2Widget = ({
       onRemove={onRemove}
       onExpand={onExpand}
     >
-      <div className="space-y-6">
-        {/* Strategy & Base */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label>Strategy</Label>
+      <div className="space-y-3">
+        {/* Strategy & Base - Compact */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">Strategy</Label>
             <Select value={settings.risk_strategy} onValueChange={handleStrategyChange}>
-              <SelectTrigger>
+              <SelectTrigger className="h-8">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -104,118 +104,114 @@ export const RiskCalculatorV2Widget = ({
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label>Base</Label>
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">Base</Label>
             <Select value={base} onValueChange={(v) => updateBase(v as any)}>
-              <SelectTrigger>
+              <SelectTrigger className="h-8">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="initial">Initial Capital</SelectItem>
-                <SelectItem value="equity">Current Equity</SelectItem>
+                <SelectItem value="initial">Initial</SelectItem>
+                <SelectItem value="equity">Equity</SelectItem>
                 <SelectItem value="profit">Profit Only</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
 
-        {/* Risk per Trade */}
-        <div className="space-y-4">
+        {/* Risk per Trade - Compact */}
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label>Risk per Trade</Label>
-            <div className={`flex items-center gap-2 font-mono text-sm ${colorClass}`}>
-              <span className={`h-2 w-2 rounded-full ${colorBg}`} />
+            <Label className="text-xs text-muted-foreground">Risk per Trade</Label>
+            <div className={`flex items-center gap-1.5 text-xs font-medium ${colorClass}`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${colorBg}`} />
               {calculation.colorState.toUpperCase()}
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Slider
-              value={[riskPercent]}
-              onValueChange={([v]) => updateRiskPercent(v)}
-              min={0}
-              max={20}
-              step={0.1}
-              disabled={isLocked && !overrideUntil}
-              className="w-full"
-            />
-            <div className="flex items-center justify-between">
-              <div className="relative">
-                <Input
-                  type="number"
-                  value={riskPercent}
-                  onChange={(e) => updateRiskPercent(parseFloat(e.target.value) || 0)}
-                  min={0}
-                  max={20}
-                  step={0.1}
-                  disabled={isLocked && !overrideUntil}
-                  className="w-24 text-center pr-8"
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
-                  %
-                </span>
-              </div>
-              <span className="text-2xl font-bold">{formatAmount(calculation.riskPerTrade)}</span>
+          <Slider
+            value={[riskPercent]}
+            onValueChange={([v]) => updateRiskPercent(v)}
+            min={0}
+            max={20}
+            step={0.1}
+            disabled={isLocked && !overrideUntil}
+            className="w-full"
+          />
+          <div className="flex items-center justify-between">
+            <div className="relative">
+              <Input
+                type="number"
+                value={riskPercent}
+                onChange={(e) => updateRiskPercent(parseFloat(e.target.value) || 0)}
+                min={0}
+                max={20}
+                step={0.1}
+                disabled={isLocked && !overrideUntil}
+                className="w-20 h-8 text-center pr-6 text-sm"
+              />
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
+                %
+              </span>
             </div>
+            <span className="text-lg md:text-xl font-bold">{formatAmount(calculation.riskPerTrade)}</span>
           </div>
         </div>
 
-        {/* Daily Loss Limit */}
-        <div className="space-y-4">
-          <Label>Daily Loss Limit</Label>
-          <div className="space-y-2">
-            <Slider
-              value={[dailyLossPercent]}
-              onValueChange={([v]) => updateDailyLossPercent(v)}
-              min={0}
-              max={10}
-              step={0.1}
-              disabled={isLocked && !overrideUntil}
-              className="w-full"
-            />
-            <div className="flex items-center justify-between">
-              <div className="relative">
-                <Input
-                  type="number"
-                  value={dailyLossPercent}
-                  onChange={(e) => updateDailyLossPercent(parseFloat(e.target.value) || 0)}
-                  min={0}
-                  max={10}
-                  step={0.1}
-                  disabled={isLocked && !overrideUntil}
-                  className="w-24 text-center pr-8"
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
-                  %
-                </span>
-              </div>
-              <span className="text-2xl font-bold">{formatAmount(calculation.dailyLossLimit)}</span>
+        {/* Daily Loss Limit - Compact */}
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">Daily Loss Limit</Label>
+          <Slider
+            value={[dailyLossPercent]}
+            onValueChange={([v]) => updateDailyLossPercent(v)}
+            min={0}
+            max={10}
+            step={0.1}
+            disabled={isLocked && !overrideUntil}
+            className="w-full"
+          />
+          <div className="flex items-center justify-between">
+            <div className="relative">
+              <Input
+                type="number"
+                value={dailyLossPercent}
+                onChange={(e) => updateDailyLossPercent(parseFloat(e.target.value) || 0)}
+                min={0}
+                max={10}
+                step={0.1}
+                disabled={isLocked && !overrideUntil}
+                className="w-20 h-8 text-center pr-6 text-sm"
+              />
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
+                %
+              </span>
             </div>
+            <span className="text-lg md:text-xl font-bold">{formatAmount(calculation.dailyLossLimit)}</span>
           </div>
         </div>
 
-        {/* Lock Toggle */}
+        {/* Lock Toggle - Compact */}
         {isLocked && !overrideUntil && (
-          <div className="rounded-md border border-red-500 bg-red-50 p-4 dark:bg-red-950/20">
-            <div className="flex items-center gap-2 mb-2">
-              <Lock className="h-5 w-5 text-red-600" />
-              <span className="font-semibold text-red-600">Daily Loss Limit Hit</span>
+          <div className="rounded-md border border-red-500 bg-red-50 p-3 dark:bg-red-950/20">
+            <div className="flex items-center gap-2 mb-1">
+              <Lock className="h-4 w-4 text-red-600" />
+              <span className="text-sm font-semibold text-red-600">Daily Limit Hit</span>
             </div>
-            <p className="text-sm text-muted-foreground mb-3">
-              You've reached your daily loss limit. Trading is paused.
+            <p className="text-xs text-muted-foreground mb-2">
+              Trading paused until reset.
             </p>
-            <Button variant="outline" size="sm" onClick={override}>
-              Override for 60 minutes
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={override}>
+              Override 60min
             </Button>
           </div>
         )}
 
         {overrideUntil && (
-          <div className="rounded-md border border-amber-500 bg-amber-50 p-3 dark:bg-amber-950/20">
+          <div className="rounded-md border border-amber-500 bg-amber-50 p-2 dark:bg-amber-950/20">
             <div className="flex items-center gap-2">
-              <Unlock className="h-4 w-4 text-amber-600" />
-              <span className="text-sm text-amber-600">
-                Override active until {overrideUntil.toLocaleTimeString()}
+              <Unlock className="h-3.5 w-3.5 text-amber-600" />
+              <span className="text-xs text-amber-600">
+                Override until {overrideUntil.toLocaleTimeString()}
               </span>
             </div>
           </div>
