@@ -144,10 +144,13 @@ const LongShortRatio = () => {
 
     return (
       <>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <PremiumCard title="Symbol" className="glass">
+        {/* Compact controls + KPIs in one row */}
+        <div className="glass rounded-xl p-3 flex flex-wrap items-center gap-4">
+          {/* Symbol */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground font-medium">Symbol:</span>
             <Select value={symbol} onValueChange={setSymbol}>
-              <SelectTrigger>
+              <SelectTrigger className="h-8 w-[120px] text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="glass-strong">
@@ -157,14 +160,19 @@ const LongShortRatio = () => {
                 <SelectItem value="SOLUSDT">SOL/USDT</SelectItem>
               </SelectContent>
             </Select>
-          </PremiumCard>
+          </div>
 
-          <PremiumCard title="Time Period" subtitle="Synced across both sources" className="glass">
+          {/* Separator */}
+          <div className="h-6 w-px bg-border/50 hidden sm:block" />
+
+          {/* Period */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground font-medium">Period:</span>
             <Select value={period} onValueChange={(value) => {
               setPeriod(value);
               setBybitPeriod(value === "1h" ? "1h" : value === "4h" ? "4h" : value === "1d" ? "1d" : "1h");
             }}>
-              <SelectTrigger>
+              <SelectTrigger className="h-8 w-[100px] text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="glass-strong">
@@ -173,7 +181,30 @@ const LongShortRatio = () => {
                 <SelectItem value="1d">1 Day</SelectItem>
               </SelectContent>
             </Select>
-          </PremiumCard>
+          </div>
+
+          {/* Separator */}
+          <div className="h-6 w-px bg-border/50 hidden md:block" />
+
+          {/* KPI Chips */}
+          {!isLoading && latestCombinedData && (
+            <>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card/50 border border-border/50">
+                <span className="text-xs text-muted-foreground">L/S Ratio:</span>
+                <span className="text-sm font-bold">{latestCombinedData.longShortRatio.toFixed(4)}</span>
+              </div>
+
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card/50 border border-border/50">
+                <span className="text-xs text-muted-foreground">Long:</span>
+                <span className="text-sm font-bold text-profit">{latestCombinedData.longAccount.toFixed(2)}%</span>
+              </div>
+
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card/50 border border-border/50">
+                <span className="text-xs text-muted-foreground">Short:</span>
+                <span className="text-sm font-bold text-loss">{latestCombinedData.shortAccount.toFixed(2)}%</span>
+              </div>
+            </>
+          )}
         </div>
 
         {isLoading ? (
@@ -191,28 +222,8 @@ const LongShortRatio = () => {
           </PremiumCard>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <PremiumCard title="Avg Long/Short Ratio" subtitle="Combined average" className="glass">
-                <p className="text-2xl font-bold">
-                  {latestCombinedData ? latestCombinedData.longShortRatio.toFixed(4) : "N/A"}
-                </p>
-              </PremiumCard>
-
-              <PremiumCard title="Avg Long Accounts" subtitle="Combined percentage" className="glass">
-                <p className="text-2xl font-bold text-neon-green">
-                  {latestCombinedData ? latestCombinedData.longAccount.toFixed(2) : "N/A"}%
-                </p>
-              </PremiumCard>
-
-              <PremiumCard title="Avg Short Accounts" subtitle="Combined percentage" className="glass">
-                <p className="text-2xl font-bold text-neon-red">
-                  {latestCombinedData ? latestCombinedData.shortAccount.toFixed(2) : "N/A"}%
-                </p>
-              </PremiumCard>
-            </div>
-
             <PremiumCard title="Combined Long/Short Ratio History" subtitle="Average of Binance and Bybit data" className="glass">
-              <ResponsiveContainer width="100%" height={350}>
+              <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={combinedChartData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-white/5" />
                   <XAxis
@@ -247,7 +258,7 @@ const LongShortRatio = () => {
             </PremiumCard>
 
             <PremiumCard title="Combined Account Distribution" subtitle="Average percentage of long vs short accounts" className="glass">
-              <ResponsiveContainer width="100%" height={350}>
+              <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={combinedChartData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-white/5" />
                   <XAxis
