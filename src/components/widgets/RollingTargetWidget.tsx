@@ -634,7 +634,7 @@ export const RollingTargetWidget = memo(({
         )}
 
         {/* Chart - Compact */}
-        <div className="h-32 w-full">
+        <div className="h-40 w-full mb-6">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData}>
               <defs>
@@ -651,6 +651,7 @@ export const RollingTargetWidget = memo(({
                 tickLine={false}
               />
               <YAxis
+                width={45}
                 stroke="hsl(var(--muted-foreground))"
                 fontSize={11}
                 tickLine={false}
@@ -690,7 +691,7 @@ export const RollingTargetWidget = memo(({
         {/* Summary Metrics */}
         {summaryMetrics && (
           <TooltipProvider>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
               <div className="space-y-1">
                 <Tooltip>
                   <TooltipTrigger asChild>
