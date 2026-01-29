@@ -47,35 +47,57 @@ export function InsightsContent() {
     }, [processedTrades, stats]);
 
     return (
-        <div className="space-y-6 animate-in fade-in-50 duration-500">
-            <InsightsQuickSummary
-                totalPnL={stats.totalPnL}
-                winRate={stats.winRate}
-                profitFactor={stats.profitFactor || 0}
-                avgROI={stats.avgRoi}
-                totalTrades={stats.totalTrades}
-            />
+        <div 
+            className="grid grid-cols-3 gap-3 animate-in fade-in-50 duration-500"
+            style={{
+                gridAutoRows: 'minmax(0, 1fr)',
+                maxHeight: 'calc(100vh - 220px)',
+                overflow: 'hidden',
+            }}
+        >
+            {/* Quick Summary - Full width top */}
+            <div className="col-span-3">
+                <InsightsQuickSummary
+                    totalPnL={stats.totalPnL}
+                    winRate={stats.winRate}
+                    profitFactor={stats.profitFactor || 0}
+                    avgROI={stats.avgRoi}
+                    totalTrades={stats.totalTrades}
+                />
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Performance Highlights - 2 columns */}
+            <div className="col-span-2">
                 <PerformanceHighlights
                     trades={processedTrades}
                     bestTrade={bestTrade}
                     worstTrade={worstTrade}
                     currentStreak={currentStreak}
                 />
+            </div>
+
+            {/* Trading Quality Metrics - 1 column */}
+            <div className="col-span-1">
                 <TradingQualityMetrics
                     avgWin={stats.avgWin}
                     avgLoss={stats.avgLoss}
                     winCount={stats.winningTrades.length}
                     lossCount={stats.losingTrades.length}
-                    maxDrawdownPercent={0} // Placeholder as it's not in stats yet
-                    maxDrawdownAmount={0} // Placeholder
+                    maxDrawdownPercent={0}
+                    maxDrawdownAmount={0}
                     profitFactor={stats.profitFactor}
                 />
             </div>
 
-            <CostEfficiencyPanel trades={processedTrades} />
-            <BehaviorAnalytics trades={processedTrades} />
+            {/* Cost Efficiency - 2 columns */}
+            <div className="col-span-2">
+                <CostEfficiencyPanel trades={processedTrades} />
+            </div>
+
+            {/* Behavior Analytics - 1 column */}
+            <div className="col-span-1">
+                <BehaviorAnalytics trades={processedTrades} />
+            </div>
         </div>
     );
 }

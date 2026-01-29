@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SmartWidgetWrapper } from '@/components/widgets/SmartWidgetWrapper';
 import { OverviewContent } from '@/components/dashboard/tabs/OverviewContent';
+import { CommandCenterContent } from '@/components/dashboard/tabs/CommandCenterContent';
 import { BehaviorContent } from '@/components/dashboard/tabs/BehaviorContent';
 import { InsightsContent } from '@/components/dashboard/tabs/InsightsContent';
 import { HistoryContent } from '@/components/dashboard/tabs/HistoryContent';
@@ -588,7 +589,7 @@ function DashboardContent() {
                   <TradeStationView onControlsReady={setTradeStationControls} />
                 </TabsContent>
 
-                <TabsContent value="overview" className="space-y-6">
+                <TabsContent value="overview" className="space-y-4">
                   <DashboardHeader
                     dateRange={dateRange}
                     setDateRange={handleDateRangeChange}
@@ -600,7 +601,6 @@ function DashboardContent() {
                     onResetLayout={resetLayout}
                     canCustomizeDashboard={canCustomizeDashboard}
                     showUpgradePrompt={setShowUpgradePrompt}
-                    // columnCount removed
                     canUndo={canUndo}
                     onUndoReset={undoReset}
                     onForceReset={handleForceResetLayout}
@@ -620,7 +620,7 @@ function DashboardContent() {
                     onClose={() => setShowUpgradePrompt(false)}
                   />
 
-                  <OverviewContent renderWidget={renderWidget} />
+                  <CommandCenterContent />
                 </TabsContent>
 
                 <TabsContent value="behavior" className="space-y-4">

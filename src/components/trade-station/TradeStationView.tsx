@@ -691,7 +691,7 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
   }
   
   return (
-    <div className="space-y-4 relative">
+    <div className="space-y-3 relative">
       {/* Customization Controls */}
       <CustomizeDashboardControls
         isCustomizing={isCustomizing}
@@ -729,15 +729,22 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Dynamic Grid with Puzzle Layout */}
-      <AdaptiveGrid
-        mode={mode}
-        positions={positions}
-        order={order}
-        columnCount={columnCount}
-        isCustomizing={isCustomizing}
-        renderWidget={renderWidget}
-      />
+      {/* Dynamic Grid with Puzzle Layout - Viewport Locked */}
+      <div 
+        style={{
+          maxHeight: 'calc(100vh - 220px)',
+          overflow: 'hidden',
+        }}
+      >
+        <AdaptiveGrid
+          mode={mode}
+          positions={positions}
+          order={order}
+          columnCount={columnCount}
+          isCustomizing={isCustomizing}
+          renderWidget={renderWidget}
+        />
+      </div>
       
       {/* Widget Library - Removed from here, handled by parent Dashboard */}
     </div>
