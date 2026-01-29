@@ -116,19 +116,17 @@ export const ErrorReflectionWidget = ({
         </Tooltip>
       }
     >
-      <div className="space-y-4">
-        {/* Recent Trade Error Tags */}
+      <div className="space-y-3 h-full flex flex-col">
+        {/* Recent Trade Error Tags - Compact */}
         {recentTradeErrors.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs text-muted-foreground">Recent from trades (last 7 days)</Label>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {recentTradeErrors.map((tag) => (
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Recent from trades</Label>
+            <div className="flex flex-wrap gap-1">
+              {recentTradeErrors.slice(0, 4).map((tag) => (
                 <Badge
                   key={tag}
                   variant="outline"
-                  className="text-xs cursor-pointer hover:bg-accent"
+                  className="text-xs cursor-pointer hover:bg-accent px-2 py-0.5"
                   onClick={() => {
                     setNewErrorText(tag);
                     setShowAddDialog(true);
@@ -138,90 +136,97 @@ export const ErrorReflectionWidget = ({
                 </Badge>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground">Click a tag to add it as a tracked error</p>
           </div>
         )}
 
-        {loading ? <p className="text-muted-foreground text-sm">Loading...</p> : errors.length === 0 ? <div className="text-center py-8 px-4">
-          <div className="rounded-full bg-muted w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-            <AlertCircle className="h-8 w-8 text-muted-foreground" />
+        {loading ? (
+          <p className="text-muted-foreground text-sm">Loading...</p>
+        ) : errors.length === 0 ? (
+          <div className="text-center py-4 flex-1 flex flex-col items-center justify-center">
+            <div className="rounded-full bg-muted w-10 h-10 mx-auto mb-2 flex items-center justify-center">
+              <AlertCircle className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <h3 className="text-sm font-semibold mb-1">No Active Errors</h3>
+            <p className="text-xs text-muted-foreground mb-3">Track mistakes to improve.</p>
+            <Button onClick={() => setShowAddDialog(true)} size="sm" className="gap-1.5 h-8">
+              <Plus className="h-3.5 w-3.5" />
+              Add First Error
+            </Button>
           </div>
-          <h3 className="font-semibold mb-2">No Active Errors</h3>
-          <p className="text-sm text-muted-foreground mb-4">Start tracking mistakes to improve your trading.</p>
-          <Button onClick={() => setShowAddDialog(true)} size="sm" className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add Your First Error
-          </Button>
-        </div> : <>
-          <div className="space-y-2">
-            {displayErrors.map(error => <div key={error.id} className="group rounded-lg border bg-card hover:bg-accent/5 transition-colors">
-              <div className="p-4">
-                <p className="text-sm leading-relaxed mb-3">{error.text}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">
-                    Expires in {Math.ceil((new Date(error.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => extendError(error.id)}>
-                          <Clock className="h-3.5 w-3.5" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Extend 7 days</TooltipContent>
-                    </Tooltip>
+        ) : (
+          <>
+            <div className="space-y-2 flex-1 overflow-y-auto">
+              {displayErrors.map(error => (
+                <div key={error.id} className="group rounded-lg border bg-card hover:bg-accent/5 transition-colors">
+                  <div className="p-2.5">
+                    <p className="text-xs leading-relaxed mb-2 line-clamp-2">{error.text}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-muted-foreground">
+                        {Math.ceil((new Date(error.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}d left
+                      </span>
+                      <div className="flex items-center gap-0.5">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => extendError(error.id)}>
+                              <Clock className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>+7 days</TooltipContent>
+                        </Tooltip>
 
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => {
-                          setEditingError(error.id);
-                          setEditText(error.text);
-                        }}>
-                          <Edit className="h-3.5 w-3.5" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Edit error</TooltipContent>
-                    </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => {
+                              setEditingError(error.id);
+                              setEditText(error.text);
+                            }}>
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Edit</TooltipContent>
+                        </Tooltip>
 
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => archiveError(error.id)}>
-                          <Archive className="h-3.5 w-3.5" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Archive</TooltipContent>
-                    </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => archiveError(error.id)}>
+                              <Archive className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Archive</TooltipContent>
+                        </Tooltip>
 
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive" onClick={() => deleteError(error.id)}>
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Delete</TooltipContent>
-                    </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-destructive hover:text-destructive" onClick={() => deleteError(error.id)}>
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Delete</TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>)}
-          </div>
+              ))}
+            </div>
 
-          <div className="flex gap-2 pt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 gap-2"
-              onClick={() => navigate('/error-analytics')}
-            >
-              <ExternalLink className="h-4 w-4" />
-              View Analytics
-            </Button>
-            <Button size="sm" className="flex-1 gap-2" onClick={() => setShowAddDialog(true)}>
-              <Plus className="h-4 w-4" />
-              Add Error
-            </Button>
-          </div>
-        </>}
+            <div className="flex gap-2 pt-1 mt-auto">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 gap-1.5 h-8 text-xs"
+                onClick={() => navigate('/error-analytics')}
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                Analytics
+              </Button>
+              <Button size="sm" className="flex-1 gap-1.5 h-8 text-xs" onClick={() => setShowAddDialog(true)}>
+                <Plus className="h-3.5 w-3.5" />
+                Add Error
+              </Button>
+            </div>
+          </>
+        )}
       </div>
     </WidgetWrapper>
 
