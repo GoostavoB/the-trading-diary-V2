@@ -1,214 +1,140 @@
 
-# Fix Google Sign-In 404 Error
+# Fix Translation Keys and Restructure Insights Tab
 
-## Problem Identified
+## Issues Identified
 
-The screenshot shows a **404 error at `/~oauth/initiate?provider=g...`** when trying to sign in with Google.
+### Issue 1: Translation Key Display ("dashboard.totalPnL")
+The label shows the raw translation key instead of translated text because multiple translation files have **duplicate `"dashboard"` keys**. When JSON is parsed, the second occurrence overwrites the first, causing keys like `totalPnL`, `profitFactor`, and `avgROI` to be lost.
 
-### Root Cause
+**Affected files:**
+| File | Problem |
+|------|---------|
+| `es/translation.json` | Two `dashboard` keys (line 261 and 485) |
+| `pt/translation.json` | Two `dashboard` keys (line 261 and 485) |
+| `ar/translation.json` | Two `dashboard` keys (line 165 and 451) |
+| `en/translation.json` | Two `dashboard` keys (line 606 and 858) - but works because second has all needed keys |
 
-The `@lovable.dev/cloud-auth-js` library has two modes:
+### Issue 2: Rolling Target in Insights Tab
+User wants Rolling Target removed from Insights and placed in its own standalone tab.
 
-1. **Iframe mode** (inside Lovable editor preview): Uses popup with `web_message` response mode
-2. **Standalone mode** (direct browser access): Redirects the full page to `/~oauth/initiate`
+### Issue 3: Potentially Incorrect Numbers
+Based on analysis of the network data, the numbers appear correct when accounting for trading fees:
+- Total P&L ($394): Sum of profit_loss minus fees = ~$395 (correct)
+- Win Rate (85.7%): 6 out of 7 trades are net profitable after fees (correct)
+- Trade 7 (ADAUSDT): profit_loss $5.64 - trading_fee $11.42 = -$5.78 (net loss)
 
-The current code passes `response_mode: 'web_message'` as `extraParams`, but the library ignores this when detecting it's NOT in an iframe and does a full-page redirect instead.
+The metrics are correctly calculated using net P&L (after fees), but the labels are not showing due to the translation issue.
 
-```typescript
-// Current code in AuthContext.tsx (line 133-138)
-const result = await (lovable.auth as any).signInWithOAuth('google', {
-  redirect_uri: `${window.location.origin}/auth`,
-  extraParams: {
-    response_mode: 'web_message',  // <-- Ignored when not in iframe
-  },
-});
-```
+---
 
-The library code (line 65-68):
-```javascript
-if (!isInIframe) {
-  window.location.href = `${oauthBrokerUrl}?${params.toString()}`;
-  return { error: null, redirected: true };
-}
-```
+## Solution Plan
 
-## Solution
+### Step 1: Merge Duplicate Translation Keys
+For each affected translation file, merge the two `dashboard` sections into one complete section containing all required keys:
 
-Force the OAuth flow to **always use popup mode** by opening the OAuth URL in a popup window ourselves, bypassing the library's iframe detection.
+**Required keys for InsightsQuickSummary:**
+- `totalPnL`
+- `winRate`
+- `profitFactor`
+- `avgROI`
+- `totalTrades`
 
-### Option A: Override the library behavior (Recommended)
+**Files to modify:**
 
-Implement a custom popup-based flow that works consistently in both preview and production:
+1. **`src/locales/es/translation.json`**
+   - Delete first `dashboard` block (lines 261-267)
+   - Add missing keys (`totalPnL`, `profitFactor`, `avgROI`, `avgProfit`) to second `dashboard` block (line 485)
 
-```typescript
-const signInWithGoogle = async () => {
-  // Always use popup flow to avoid 404 on /~oauth/* routes
-  const state = generateState();
-  const redirectUri = `${window.location.origin}/auth`;
-  
-  const params = new URLSearchParams({
-    provider: 'google',
-    redirect_uri: redirectUri,
-    state,
-    response_mode: 'web_message'
-  });
-  
-  const oauthUrl = `/~oauth/initiate?${params.toString()}`;
-  
-  // Force popup even when not in iframe
-  const popup = window.open(oauthUrl, 'oauth', 'width=500,height=600');
-  
-  // Listen for message from popup
-  // ... handle tokens and set session
-};
-```
+2. **`src/locales/pt/translation.json`**
+   - Same structure as Spanish
 
-### Option B: Use production URL for OAuth
+3. **`src/locales/ar/translation.json`**
+   - Delete first `dashboard` block (lines 165-...)
+   - Add missing keys to second `dashboard` block (line 451)
 
-Configure the library to use the published URL's OAuth endpoint which properly handles the `/~oauth/*` routes:
+4. **`src/locales/vi/translation.json`**
+   - Check for duplicates and merge if needed
+
+### Step 2: Create New Rolling Target Tab
+
+**New file:** `src/components/dashboard/tabs/RollingTargetContent.tsx`
 
 ```typescript
-const lovableAuth = createLovableAuth({
-  oauthBrokerUrl: 'https://the-trading-diary.lovable.app/~oauth/initiate'
-});
+// Structure:
+// - Uses useDashboard() to get processedTrades, initialInvestment
+// - Full-height container: calc(100vh - 220px)
+// - Renders RollingTargetWidget with proper props
 ```
 
-**Problem**: This breaks during development as it redirects to production.
+### Step 3: Update Dashboard Tabs
 
-### Option C: Detect environment and handle accordingly (Best)
+**File:** `src/pages/Dashboard.tsx`
 
-Check if on preview vs production and use the appropriate flow:
+Changes:
+- Import new `RollingTargetContent` component
+- Add 7th tab: "Target" between "Insights" and "Trade History"
+- Update grid from `grid-cols-6` to `grid-cols-7`
+- Add new `TabsTrigger` for "target"
+- Add new `TabsContent` for "target" rendering `RollingTargetContent`
 
-```typescript
-const signInWithGoogle = async () => {
-  const isPreview = window.location.hostname.includes('id-preview');
-  
-  if (isPreview) {
-    // Show message to user that Google sign-in must be tested on published URL
-    toast.error('Please test Google Sign-In on the published URL');
-    return { error: new Error('Google Sign-In not available in preview') };
-  }
-  
-  // Normal flow for production
-  const result = await lovable.auth.signInWithOAuth('google', {
-    redirect_uri: `${window.location.origin}/auth`,
-  });
-  // ...
-};
+**New tab order:**
+1. Trade Station
+2. Command Center
+3. Behavior
+4. Errors
+5. Insights
+6. **Target** (NEW)
+7. Trade History
+
+### Step 4: Simplify Insights Tab Layout
+
+**File:** `src/components/dashboard/tabs/InsightsContent.tsx`
+
+Changes:
+- Remove `RollingTargetWidget` import and usage
+- Remove `SmartWidgetWrapper` for rollingTarget
+- Desktop: Change 3-column grid to 2-column grid
+- Mobile: Remove Rolling Target section
+
+**Updated desktop layout:**
+```text
++----------------------------+----------------------------+
+|                            |                            |
+|   Performance Highlights   |   Trading Quality Metrics  |
+|       (full height)        |        (50% height)        |
+|                            |----------------------------+
+|                            |                            |
+|                            |    Behavior Analytics      |
+|                            |        (50% height)        |
++----------------------------+----------------------------+
 ```
 
-## Recommended Implementation
+---
 
-Combine approaches: Always use popup flow with proper message handling, which works in both environments.
+## Files to Create
 
-### Files to Modify
+| File | Purpose |
+|------|---------|
+| `src/components/dashboard/tabs/RollingTargetContent.tsx` | New tab content component for Rolling Target |
 
-| File | Change |
-|------|--------|
-| `src/contexts/AuthContext.tsx` | Implement robust popup-based OAuth flow |
-| `src/integrations/lovable/index.ts` | DO NOT MODIFY (auto-generated) |
+## Files to Modify
 
-### Implementation Details
+| File | Changes |
+|------|---------|
+| `src/locales/es/translation.json` | Merge duplicate dashboard keys |
+| `src/locales/pt/translation.json` | Merge duplicate dashboard keys |
+| `src/locales/ar/translation.json` | Merge duplicate dashboard keys |
+| `src/locales/vi/translation.json` | Check and merge if needed |
+| `src/pages/Dashboard.tsx` | Add 7th "Target" tab |
+| `src/components/dashboard/tabs/InsightsContent.tsx` | Remove Rolling Target, simplify to 2-column layout |
 
-1. **Create a helper to generate secure state**
-2. **Always open OAuth in popup window** (bypass iframe detection)
-3. **Listen for postMessage** from `https://oauth.lovable.app`
-4. **Handle tokens** and set session with Supabase
-5. **Fallback to redirect flow** only on published domain
+---
 
-### Code Changes in AuthContext.tsx
+## Expected Results
 
-```typescript
-// Helper function to generate state
-const generateState = () => {
-  return [...crypto.getRandomValues(new Uint8Array(16))]
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-};
-
-const signInWithGoogle = async () => {
-  // Generate state for CSRF protection
-  const state = generateState();
-  
-  // Build OAuth URL
-  const params = new URLSearchParams({
-    provider: 'google',
-    redirect_uri: `${window.location.origin}/auth`,
-    state,
-    response_mode: 'web_message'
-  });
-  
-  const oauthUrl = `/~oauth/initiate?${params.toString()}`;
-  
-  // Open popup
-  const width = 500;
-  const height = 600;
-  const left = window.screenX + (window.outerWidth - width) / 2;
-  const top = window.screenY + (window.outerHeight - height) / 2;
-  
-  const popup = window.open(
-    oauthUrl,
-    'oauth',
-    `width=${width},height=${height},left=${left},top=${top}`
-  );
-  
-  if (!popup) {
-    toast.error('Popup was blocked. Please allow popups for this site.');
-    return { error: new Error('Popup blocked') };
-  }
-  
-  // Listen for message
-  return new Promise((resolve) => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== 'https://oauth.lovable.app') return;
-      if (event.data?.type !== 'authorization_response') return;
-      
-      window.removeEventListener('message', handleMessage);
-      popup.close();
-      
-      const data = event.data.response;
-      
-      if (data.error) {
-        resolve({ error: new Error(data.error_description || 'Sign in failed') });
-        return;
-      }
-      
-      if (data.state !== state) {
-        resolve({ error: new Error('Invalid state') });
-        return;
-      }
-      
-      // Set session with Supabase
-      supabase.auth.setSession({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token
-      }).then(() => {
-        navigate('/dashboard');
-        resolve({ error: null });
-      }).catch((e) => {
-        resolve({ error: e });
-      });
-    };
-    
-    window.addEventListener('message', handleMessage);
-    
-    // Check if popup was closed without completing
-    const checkClosed = setInterval(() => {
-      if (popup.closed) {
-        clearInterval(checkClosed);
-        window.removeEventListener('message', handleMessage);
-        resolve({ error: new Error('Sign in was cancelled') });
-      }
-    }, 500);
-  });
-};
-```
-
-## Summary
-
-| Issue | Solution |
-|-------|----------|
-| Library redirects to `/~oauth/initiate` when not in iframe | Always use popup flow with `response_mode: web_message` |
-| 404 on preview URL | Force popup mode bypasses the redirect |
-| State validation | Generate and validate CSRF state token |
-| Popup blocked | Show user-friendly error message |
+After implementation:
+1. All translation keys (e.g., `dashboard.totalPnL`) will display proper translated text
+2. Rolling Target will have its own dedicated full-page tab
+3. Insights tab will have a cleaner 2-column layout
+4. No widgets will be cut off
+5. All metrics will display correctly with proper labels
