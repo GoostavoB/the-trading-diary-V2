@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   user: User | null;
@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Set up auth state listener with automatic token refresh
@@ -79,6 +80,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
+  // If the OAuth flow returns the user to /auth, finish the UX by routing to the app once session exists.
+  useEffect(() => {
+    if (session?.user && location.pathname.startsWith('/auth')) {
+      navigate('/dashboard');
+    }
+  }, [session?.user, location.pathname, navigate]);
+
   const signIn = async (email: string, password: string, rememberMe: boolean = true) => {
     // Store rememberMe preference
     if (rememberMe) {
@@ -120,8 +128,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signInWithGoogle = async () => {
-    const result = await lovable.auth.signInWithOAuth('google', {
-      redirect_uri: window.location.origin,
+    // Force the popup/web_message flow to avoid full-page redirects to /~oauth/* which can 404 on some hosts.
+    // (The Lovable auth wrapper is auto-generated; we keep changes local by passing params at call-site.)
+    const result = await (lovable.auth as any).signInWithOAuth('google', {
+      redirect_uri: `${window.location.origin}/auth`,
+      extraParams: {
+        response_mode: 'web_message',
+      },
     });
     
     if (result.error) {
