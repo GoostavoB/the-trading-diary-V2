@@ -60,6 +60,7 @@ import { DashboardProvider, useDashboard } from '@/providers/dashboard/Dashboard
 import { SEO } from '@/components/SEO';
 import { pageMeta } from '@/utils/seoHelpers';
 import { TradeStationView } from '@/components/trade-station/TradeStationView';
+import { TradeStationContent } from '@/components/dashboard/tabs/TradeStationContent';
 import { AIAssistant } from '@/components/AIAssistant';
 import { TourCTAButton } from '@/components/tour/TourCTAButton';
 
@@ -586,7 +587,7 @@ function DashboardContent() {
                 </TabsList>
 
                 <TabsContent value="tradestation" className="space-y-6">
-                  <TradeStationView onControlsReady={setTradeStationControls} />
+                  <TradeStationContent />
                 </TabsContent>
 
                 <TabsContent value="overview" className="space-y-4">
