@@ -1,32 +1,62 @@
-# Plan Completed ✅
 
-## Summary of Changes Made
+# Fix Translation Keys - Merge Duplicate Dashboard Sections
 
-### ✅ Issue 1: Fixed Translation Keys
-- Removed duplicate `dashboard` keys from Spanish, Portuguese, and Arabic translation files
-- Added missing keys (`profitFactor`, `avgROI`) to all language files
-- Vietnamese file only needed `profitFactor` and `avgROI` added (no duplicates)
+## Problem Identified
+The translation files have **duplicate `"dashboard"` keys** causing translations to fail:
 
-### ✅ Issue 2: Rolling Target Now in Standalone Tab
-- Created `src/components/dashboard/tabs/RollingTargetContent.tsx`
-- Added 7th "Target" tab to Dashboard between Insights and History
-- Updated tab grid from 6 to 7 columns
+| File | First `dashboard` | Second `dashboard` | Result |
+|------|-------------------|-------------------|--------|
+| English | Line 606 (has `totalPnL`) | Line 858 (missing `totalPnL`) | Second overwrites first, `totalPnL` lost |
+| Spanish | Similar structure | Similar structure | Same issue |
+| Portuguese | Similar structure | Similar structure | Same issue |
+| Arabic | Similar structure | Similar structure | Same issue |
+| Vietnamese | Similar structure | Similar structure | Same issue |
 
-### ✅ Issue 3: Simplified Insights Layout
-- Removed Rolling Target widget from Insights tab
-- Changed desktop layout from 3-column to 2-column:
-  - Column 1: Performance Highlights (full height)
-  - Column 2: Trading Quality + Behavior Analytics (stacked 50/50)
-- Removed Rolling Target from mobile layout as well
+This causes `t('dashboard.totalPnL')` to return the raw key instead of "Total P&L".
 
-## Files Modified
-- `src/locales/es/translation.json` - Merged duplicate dashboard keys
-- `src/locales/pt/translation.json` - Merged duplicate dashboard keys  
-- `src/locales/ar/translation.json` - Merged duplicate dashboard keys
-- `src/locales/vi/translation.json` - Added profitFactor and avgROI
-- `src/pages/Dashboard.tsx` - Added Target tab
-- `src/components/dashboard/tabs/InsightsContent.tsx` - Simplified to 2-column
+## Solution
+Merge both `dashboard` sections into ONE section containing all required keys in each translation file.
 
-## Files Created
-- `src/components/dashboard/tabs/RollingTargetContent.tsx` - New standalone tab component
+## Files to Modify
 
+### 1. `src/locales/en/translation.json`
+- Delete first `dashboard` block (lines 606-612)
+- Ensure second `dashboard` block (line 858) includes ALL required keys:
+  - `totalPnL: "Total P&L"` (missing, must add)
+  - `avgProfit: "Avg Profit"` (missing, must add)
+  - `marketSentiment: "Market Sentiment"` (missing, must add)
+
+### 2. `src/locales/es/translation.json`
+- Same merge operation - ensure single `dashboard` block with all keys
+
+### 3. `src/locales/pt/translation.json`
+- Same merge operation - ensure single `dashboard` block with all keys
+
+### 4. `src/locales/ar/translation.json`
+- Same merge operation - ensure single `dashboard` block with all keys
+
+### 5. `src/locales/vi/translation.json`
+- Same merge operation - ensure single `dashboard` block with all keys
+
+## Required Keys for InsightsQuickSummary
+The merged `dashboard` section must include:
+- `totalPnL`
+- `winRate`
+- `profitFactor`
+- `avgROI`
+- `totalTrades`
+- Plus all other existing dashboard keys
+
+## Technical Changes
+
+For each file:
+1. Identify both `dashboard` sections
+2. Remove the first `dashboard` block entirely
+3. Add missing keys to the second `dashboard` block
+4. Verify no duplicate keys within the merged section
+
+## Expected Result
+After this fix:
+- `t('dashboard.totalPnL')` will display "Total P&L" instead of the raw key
+- All metric labels in InsightsQuickSummary will show proper translated text
+- No duplicate JSON keys causing override issues
