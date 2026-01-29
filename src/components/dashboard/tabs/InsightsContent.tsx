@@ -50,7 +50,7 @@ export function InsightsContent() {
         <div 
             className="grid grid-cols-3 gap-3 animate-in fade-in-50 duration-500"
             style={{
-                gridAutoRows: 'minmax(0, 1fr)',
+                gridTemplateRows: 'auto 1fr 1fr',
                 maxHeight: 'calc(100vh - 220px)',
                 overflow: 'hidden',
             }}

@@ -1,14 +1,11 @@
 import { memo } from 'react';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, AlertCircle, Calendar, TrendingUp, TrendingDown } from 'lucide-react';
+import { Trophy, AlertCircle, Calendar, TrendingUp } from 'lucide-react';
 import type { Trade } from '@/types/trade';
 import { formatCurrency, formatPercent } from '@/utils/formatNumber';
-import { ExplainMetricButton } from '@/components/ExplainMetricButton';
-import { useAIAssistant } from '@/contexts/AIAssistantContext';
 import { useTranslation } from '@/hooks/useTranslation';
-import { findBestWorstDays, getTopAssets } from '@/utils/insightCalculations';
-import { cn } from '@/lib/utils';
+import { findBestWorstDays } from '@/utils/insightCalculations';
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
 import { calculateTradePnL } from '@/utils/pnl';
 
@@ -25,236 +22,100 @@ export const PerformanceHighlights = memo(({
   worstTrade,
   currentStreak
 }: PerformanceHighlightsProps) => {
-  const { openWithPrompt } = useAIAssistant();
   const { t } = useTranslation();
 
-  // Add defensive check
   if (!trades || trades.length === 0 || !bestTrade || !worstTrade) return null;
 
   const { best: bestDay, worst: worstDay } = findBestWorstDays(trades);
-  const topAssets = getTopAssets(trades, 3);
-  const bottomAssets = getTopAssets(trades, trades.length).slice(-3).reverse();
-
-  if (!bestTrade || !worstTrade) return null;
-
-  // Calculate P&L using the standardized function
   const bestTradePnL = calculateTradePnL(bestTrade, { includeFees: true });
   const worstTradePnL = calculateTradePnL(worstTrade, { includeFees: true });
-
-  // Check if best and worst days are the same
   const isSameDay = bestDay && worstDay && bestDay.date === worstDay.date;
 
   return (
-    <div className="space-y-3">
-      <h3 className="text-lg font-semibold flex items-center gap-2">
-        <Trophy className="w-5 h-5 text-profit" />
-        {t('insights.performanceHighlights')}
-      </h3>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {/* LEFT COLUMN - Success */}
-        <div className="space-y-2">
-          <h4 className="font-semibold flex items-center gap-2 text-sm">
-            <TrendingUp className="w-4 h-4 text-profit" />
-            {t('insights.whatWorking')}
-          </h4>
-
-          {/* Best Trade */}
-          <PremiumCard className="bg-gradient-to-br from-profit/10 to-transparent border-profit/30 transition-all duration-300 hover:scale-[1.02]">
-            <div className="p-3">
-              <div className="flex items-center justify-between gap-2 mb-1.5">
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-4 h-4 text-profit" aria-hidden="true" />
-                  <h5 className="font-semibold text-sm">{t('insights.bestTrade')}</h5>
-                </div>
-                <ExplainMetricButton
-                  metricName={t('insights.bestTrade')}
-                  metricValue={formatCurrency(bestTradePnL)}
-                  context={`${bestTrade.symbol} with ${formatPercent(bestTrade.roi || 0)} ROI`}
-                  onExplain={openWithPrompt}
-                />
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">{t('insights.symbol')}</span>
-                  <Badge variant="outline" className="text-xs">{bestTrade.symbol || bestTrade.symbol_temp}</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">{t('insights.pnl')}</span>
-                  <span className="text-sm font-bold text-profit">
-                    <BlurredCurrency amount={bestTradePnL} className="inline" />
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">ROI</span>
-                  <span className="text-sm font-bold text-profit">
-                    +{formatPercent(bestTrade.roi || 0)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </PremiumCard>
-
-          {/* Best Day */}
-          {bestDay && (
-            <PremiumCard className="bg-profit/10 border-profit/30 transition-all duration-300 hover:scale-[1.02]">
-              <div className="p-3">
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-profit" />
-                    <span className="text-xs font-semibold text-profit">{t('insights.bestDay')}</span>
-                  </div>
-                </div>
-                <p className="text-2xl font-bold text-profit">
-                  <BlurredCurrency amount={bestDay.totalPnL} className="inline" />
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {new Date(bestDay.date).toLocaleDateString()} • {bestDay.tradeCount} {t('insights.trades')}
-                </p>
-              </div>
-            </PremiumCard>
-          )}
-
-          {/* Top Assets */}
-          {topAssets.length > 0 && (
-            <PremiumCard className="bg-profit/10 border-profit/30">
-              <div className="p-3">
-                <p className="text-xs font-semibold text-profit mb-2">{t('insights.topAssets')}</p>
-                <div className="space-y-1.5">
-                  {topAssets.map((asset, idx) => (
-                    <div key={idx} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">
-                          #{idx + 1}
-                        </Badge>
-                        <span className="text-sm font-medium">{asset.symbol}</span>
-                      </div>
-                      <span className="text-sm text-profit font-bold">
-                        <BlurredCurrency amount={asset.avgPnL} className="inline" />
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </PremiumCard>
-          )}
-
-          {/* Current Streak */}
-          {currentStreak.count >= 3 && (
-            <PremiumCard className={cn(
-              currentStreak.type === 'win'
-                ? "bg-profit/10 border-profit/30"
-                : "bg-yellow-500/10 border-yellow-500/30"
-            )}>
-              <div className="p-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-semibold text-muted-foreground mb-1">
-                      {t('insights.currentStreak')}
-                    </p>
-                    <p className="text-2xl font-bold">
-                      {currentStreak.count} {currentStreak.type === 'win' ? t('dashboard.wins') : t('dashboard.losses')}
-                    </p>
-                  </div>
-                  {currentStreak.type === 'win' ?
-                    <TrendingUp className="h-8 w-8 text-profit" /> :
-                    <TrendingDown className="h-8 w-8 text-yellow-500" />
-                  }
-                </div>
-              </div>
-            </PremiumCard>
-          )}
+    <PremiumCard className="h-full bg-card border-border flex flex-col">
+      <div className="p-3 flex flex-col h-full">
+        {/* Compact header */}
+        <div className="flex items-center gap-2 mb-2">
+          <Trophy className="w-4 h-4 text-profit" />
+          <h3 className="text-sm font-semibold">{t('insights.performanceHighlights')}</h3>
         </div>
 
-        {/* RIGHT COLUMN - Areas to Improve */}
-        <div className="space-y-2">
-          <h4 className="font-semibold flex items-center gap-2 text-sm">
-            <AlertCircle className="w-4 h-4 text-yellow-500" />
-            {t('insights.areasToImprove')}
-          </h4>
+        {/* 4-column flat grid */}
+        <div className="grid grid-cols-4 gap-2 flex-1">
+          {/* Best Trade */}
+          <div className="p-2 rounded-lg bg-profit/10 border border-profit/30 flex flex-col">
+            <div className="flex items-center gap-1 mb-1">
+              <TrendingUp className="w-3 h-3 text-profit" />
+              <span className="text-[10px] font-medium text-profit uppercase">{t('insights.bestTrade')}</span>
+            </div>
+            <Badge variant="outline" className="text-[10px] w-fit mb-1 px-1.5 py-0">
+              {bestTrade.symbol || bestTrade.symbol_temp}
+            </Badge>
+            <div className="text-sm font-bold text-profit mt-auto">
+              <BlurredCurrency amount={bestTradePnL} className="inline" />
+            </div>
+            <span className="text-[10px] text-profit">+{formatPercent(bestTrade.roi || 0)}</span>
+          </div>
 
           {/* Worst Trade */}
-          <PremiumCard className="bg-gradient-to-br from-loss/10 to-transparent border-loss/30 transition-all duration-300 hover:scale-[1.02]">
-            <div className="p-3">
-              <div className="flex items-center justify-between gap-2 mb-1.5">
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-loss" aria-hidden="true" />
-                  <h5 className="font-semibold text-sm">{t('insights.worstTrade')}</h5>
-                </div>
-                <ExplainMetricButton
-                  metricName={t('insights.worstTrade')}
-                  metricValue={formatCurrency(worstTradePnL)}
-                  context={`${worstTrade.symbol} with ${formatPercent(worstTrade.roi || 0)} ROI`}
-                  onExplain={openWithPrompt}
-                />
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">{t('insights.symbol')}</span>
-                  <Badge variant="outline" className="text-xs">{worstTrade.symbol || worstTrade.symbol_temp}</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">{t('insights.pnl')}</span>
-                  <span className="text-sm font-bold text-loss">
-                    <BlurredCurrency amount={worstTradePnL} className="inline" />
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">ROI</span>
-                  <span className="text-sm font-bold text-loss">
-                    {formatPercent(worstTrade.roi || 0)}
-                  </span>
-                </div>
-              </div>
+          <div className="p-2 rounded-lg bg-loss/10 border border-loss/30 flex flex-col">
+            <div className="flex items-center gap-1 mb-1">
+              <AlertCircle className="w-3 h-3 text-loss" />
+              <span className="text-[10px] font-medium text-loss uppercase">{t('insights.worstTrade')}</span>
             </div>
-          </PremiumCard>
+            <Badge variant="outline" className="text-[10px] w-fit mb-1 px-1.5 py-0">
+              {worstTrade.symbol || worstTrade.symbol_temp}
+            </Badge>
+            <div className="text-sm font-bold text-loss mt-auto">
+              <BlurredCurrency amount={worstTradePnL} className="inline" />
+            </div>
+            <span className="text-[10px] text-loss">{formatPercent(worstTrade.roi || 0)}</span>
+          </div>
 
-          {/* Worst Day - only show if different from best day */}
-          {worstDay && !isSameDay && (
-            <PremiumCard className="bg-loss/10 border-loss/30 transition-all duration-300 hover:scale-[1.02]">
-              <div className="p-3">
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-loss" />
-                    <span className="text-xs font-semibold text-loss">{t('insights.worstDay')}</span>
-                  </div>
+          {/* Best Day */}
+          <div className="p-2 rounded-lg bg-profit/10 border border-profit/30 flex flex-col">
+            <div className="flex items-center gap-1 mb-1">
+              <Calendar className="w-3 h-3 text-profit" />
+              <span className="text-[10px] font-medium text-profit uppercase">{t('insights.bestDay')}</span>
+            </div>
+            {bestDay ? (
+              <>
+                <span className="text-[10px] text-muted-foreground mb-1">
+                  {new Date(bestDay.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </span>
+                <div className="text-sm font-bold text-profit mt-auto">
+                  <BlurredCurrency amount={bestDay.totalPnL} className="inline" />
                 </div>
-                <p className="text-2xl font-bold text-loss">
+                <span className="text-[10px] text-muted-foreground">{bestDay.tradeCount} {t('insights.trades')}</span>
+              </>
+            ) : (
+              <span className="text-xs text-muted-foreground">N/A</span>
+            )}
+          </div>
+
+          {/* Worst Day */}
+          <div className="p-2 rounded-lg bg-loss/10 border border-loss/30 flex flex-col">
+            <div className="flex items-center gap-1 mb-1">
+              <Calendar className="w-3 h-3 text-loss" />
+              <span className="text-[10px] font-medium text-loss uppercase">{t('insights.worstDay')}</span>
+            </div>
+            {worstDay && !isSameDay ? (
+              <>
+                <span className="text-[10px] text-muted-foreground mb-1">
+                  {new Date(worstDay.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </span>
+                <div className="text-sm font-bold text-loss mt-auto">
                   <BlurredCurrency amount={worstDay.totalPnL} className="inline" />
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {new Date(worstDay.date).toLocaleDateString()} • {worstDay.tradeCount} {t('insights.trades')}
-                </p>
-              </div>
-            </PremiumCard>
-          )}
-
-          {/* Bottom Assets */}
-          {bottomAssets.length > 0 && (
-            <PremiumCard className="bg-yellow-500/10 border-yellow-500/30">
-              <div className="p-3">
-                <p className="text-xs font-semibold text-yellow-500 mb-2">{t('insights.underperforming')}</p>
-                <div className="space-y-1.5">
-                  {bottomAssets.map((asset, idx) => (
-                    <div key={idx} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">
-                          #{idx + 1}
-                        </Badge>
-                        <span className="text-sm font-medium">{asset.symbol}</span>
-                      </div>
-                      <span className="text-sm text-loss font-bold">
-                        <BlurredCurrency amount={asset.avgPnL} className="inline" />
-                      </span>
-                    </div>
-                  ))}
                 </div>
-              </div>
-            </PremiumCard>
-          )}
+                <span className="text-[10px] text-muted-foreground">{worstDay.tradeCount} {t('insights.trades')}</span>
+              </>
+            ) : (
+              <span className="text-xs text-muted-foreground mt-auto">Same as best</span>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </PremiumCard>
   );
 });
 
