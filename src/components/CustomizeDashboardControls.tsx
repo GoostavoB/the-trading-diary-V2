@@ -1,17 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Settings2, Save, X, RotateCcw, Eye, EyeOff, LayoutDashboard, Columns, Plus, Crown, Undo2, LayoutGrid, Lock } from 'lucide-react';
+import { Settings2, Save, X, RotateCcw, Eye, EyeOff, Plus, Undo2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WidgetConfig } from '@/hooks/useDashboardLayout';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { TourButton } from '@/components/tour/TourButton';
-import { useUserTier } from '@/hooks/useUserTier';
-import { Label } from '@/components/ui/label';
 
 interface CustomizeDashboardControlsProps {
   isCustomizing: boolean;
@@ -51,7 +45,6 @@ export function CustomizeDashboardControls({
   onLayoutModeChange,
 }: CustomizeDashboardControlsProps) {
   const { t } = useTranslation();
-  const { canCustomizeDashboard } = useUserTier();
   const navigate = useNavigate();
   const visibleCount = widgetCount || widgets.filter(w => w.visible).length;
   const hiddenCount = widgets.filter(w => !w.visible).length;
@@ -89,18 +82,6 @@ export function CustomizeDashboardControls({
           className="flex items-center gap-2 flex-wrap"
         >
           <Button
-            onClick={onStartCustomize}
-            variant="outline"
-            className="gap-2 glass hover:glass-strong"
-          >
-            <LayoutDashboard className="w-4 h-4" />
-            {t('dashboard.customizeLayout')}
-            {!canCustomizeDashboard && (
-              <Crown className="w-3 h-3 text-amber-500 ml-1" />
-            )}
-          </Button>
-
-          <Button
             onClick={() => navigate('/upload')}
             variant="outline"
             className="gap-2 glass hover:glass-strong"
@@ -108,27 +89,6 @@ export function CustomizeDashboardControls({
             <Plus className="w-4 h-4" />
             Add Trade
           </Button>
-
-          {/* Column selector removed - grid is always 3 columns */}
-
-          {/* Force Reset Button */}
-          {onForceReset && (
-            <Button
-              onClick={() => {
-                console.log('[Controls] 🔴 Force reset clicked');
-                onForceReset();
-              }}
-              variant="ghost"
-              size="sm"
-              className="gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-            >
-              <RotateCcw className="w-4 h-4" />
-              Force Reset
-            </Button>
-          )}
-
-          {/* Tour Button */}
-          <TourButton />
         </motion.div>
       ) : (
         <motion.div
