@@ -1,47 +1,76 @@
 
-# Fix Rolling Target Widget Overlapping Layout
+# Fix Google OAuth 404 Error
 
 ## Problem
-In the Rolling Target tab, the chart Y-axis labels (`$0k`, `$1k`, `$2k`) overlap with the Summary Metrics section below (Current Status, Drift from Plan, Success Rate, Avg Daily Capital Growth).
+Google Sign-In is returning a 404 "page not found" error. The current implementation in `AuthContext.tsx` uses a manual popup-based OAuth flow that calls `https://oauth.lovable.app/~oauth/initiate`, which is causing the 404.
 
-**Root Cause**: The chart container at line 637 (`h-32`) has no bottom margin, and the Y-axis labels extend outside the chart bounds, visually colliding with the metrics grid below.
+## Root Cause
+The `signInWithGoogle` function (lines 137-218 in `AuthContext.tsx`) uses a custom implementation instead of the official Lovable Cloud Auth module that's already available at `src/integrations/lovable/index.ts`.
 
 ## Solution
+Replace the custom OAuth implementation with the official `lovable.auth.signInWithOAuth()` function from the Lovable Cloud Auth module.
 
-### File: `src/components/widgets/RollingTargetWidget.tsx`
+## File to Modify
 
-**Changes to make:**
+### `src/contexts/AuthContext.tsx`
 
-1. **Add bottom margin to chart container** (line 637)
-   - Current: `<div className="h-32 w-full">`
-   - Fix: `<div className="h-32 w-full mb-6">`
-   - Adds `mb-6` (24px) margin between chart and metrics
+**Changes:**
 
-2. **Increase chart height for better readability** (line 637)
-   - Change from `h-32` (128px) to `h-40` (160px)
-   - Gives more vertical space for Y-axis labels
+1. **Add import** for the lovable module:
+```typescript
+import { lovable } from '@/integrations/lovable';
+```
 
-3. **Add left padding to metrics grid** (line 693)
-   - Current: `<div className="grid grid-cols-2 md:grid-cols-4 gap-4">`
-   - Fix: `<div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">`
-   - Adds top padding to create visual separation
+2. **Replace the entire `signInWithGoogle` function** (lines 137-218):
 
-4. **Increase Y-axis width in chart** (line 653-658)
-   - Add `width={40}` prop to `YAxis` to ensure tick labels don't overflow
-   - This ensures `$0k`, `$1k`, `$2k` labels have adequate space
+Current (broken):
+```typescript
+const signInWithGoogle = async (): Promise<{ error: any }> => {
+  // Generate state for CSRF protection
+  const state = generateState();
+  // ... 80+ lines of manual popup logic
+};
+```
 
-## Summary of Changes
+New (using Lovable Cloud Auth):
+```typescript
+const signInWithGoogle = async (): Promise<{ error: any }> => {
+  try {
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
 
-| Line | Current | New |
-|------|---------|-----|
-| 637 | `h-32 w-full` | `h-40 w-full mb-6` |
-| 653 | `<YAxis ...` | `<YAxis width={45} ...` |
-| 693 | `grid grid-cols-2 md:grid-cols-4 gap-4` | `grid grid-cols-2 md:grid-cols-4 gap-4 pt-2` |
+    if (result.error) {
+      toast.error(result.error.message || 'Sign in failed');
+      return { error: result.error };
+    }
 
-## Files to Modify
-- `src/components/widgets/RollingTargetWidget.tsx`
+    // If redirected, the page will reload and auth state will update automatically
+    if (!result.redirected) {
+      navigate('/dashboard');
+    }
+
+    return { error: null };
+  } catch (e) {
+    const error = e instanceof Error ? e : new Error(String(e));
+    toast.error('Failed to sign in with Google');
+    return { error };
+  }
+};
+```
+
+3. **Remove unused helper function** `generateState()` (lines 8-12) since it's no longer needed.
+
+## Technical Details
+
+| Item | Before | After |
+|------|--------|-------|
+| OAuth Method | Manual popup + postMessage | Lovable Cloud Auth SDK |
+| Endpoint | `oauth.lovable.app/~oauth/initiate` | Managed by `@lovable.dev/cloud-auth-js` |
+| Session Handling | Manual `setSession()` | Automatic via SDK |
+| Lines of Code | ~80 lines | ~15 lines |
 
 ## Expected Result
-- Chart Y-axis labels no longer overlap with metrics section
-- Clear visual separation between chart and summary stats
-- "Current Status" / "Ahead" text displays cleanly without any overlap
+- Google Sign-In will work without 404 errors
+- Uses the officially supported Lovable Cloud authentication flow
+- Simpler, more maintainable code
