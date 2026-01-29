@@ -252,6 +252,7 @@ const LongShortRatio = () => {
                     stroke="hsl(var(--neon-blue))"
                     name="Avg Long/Short Ratio"
                     strokeWidth={2}
+                    isAnimationActive={false}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -288,6 +289,7 @@ const LongShortRatio = () => {
                     stroke="hsl(var(--neon-green))"
                     name="Avg Long Accounts %"
                     strokeWidth={2}
+                    isAnimationActive={false}
                   />
                   <Line
                     type="monotone"
@@ -295,6 +297,7 @@ const LongShortRatio = () => {
                     stroke="hsl(var(--neon-red))"
                     name="Avg Short Accounts %"
                     strokeWidth={2}
+                    isAnimationActive={false}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -400,6 +403,7 @@ const LongShortRatio = () => {
                     stroke="hsl(var(--neon-blue))"
                     name="Long/Short Ratio"
                     strokeWidth={2}
+                    isAnimationActive={false}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -436,6 +440,7 @@ const LongShortRatio = () => {
                     stroke="hsl(var(--neon-green))"
                     name="Long Accounts %"
                     strokeWidth={2}
+                    isAnimationActive={false}
                   />
                   <Line
                     type="monotone"
@@ -443,6 +448,7 @@ const LongShortRatio = () => {
                     stroke="hsl(var(--neon-red))"
                     name="Short Accounts %"
                     strokeWidth={2}
+                    isAnimationActive={false}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -553,6 +559,7 @@ const LongShortRatio = () => {
                     stroke="hsl(var(--neon-blue))"
                     name="Long/Short Ratio"
                     strokeWidth={2}
+                    isAnimationActive={false}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -589,6 +596,7 @@ const LongShortRatio = () => {
                     stroke="hsl(var(--neon-green))"
                     name="Long Accounts %"
                     strokeWidth={2}
+                    isAnimationActive={false}
                   />
                   <Line
                     type="monotone"
@@ -596,6 +604,7 @@ const LongShortRatio = () => {
                     stroke="hsl(var(--neon-red))"
                     name="Short Accounts %"
                     strokeWidth={2}
+                    isAnimationActive={false}
                   />
                 </LineChart>
               </ResponsiveContainer>

@@ -195,6 +195,7 @@ export const LongShortRatioWidget = memo(({
                                 strokeWidth={2}
                                 dot={false}
                                 activeDot={{ r: 4, fill: "hsl(var(--neon-blue))" }}
+                                isAnimationActive={false}
                             />
                         </LineChart>
                     </ResponsiveContainer>
