@@ -61,6 +61,7 @@ import { SEO } from '@/components/SEO';
 import { pageMeta } from '@/utils/seoHelpers';
 import { TradeStationView } from '@/components/trade-station/TradeStationView';
 import { TradeStationContent } from '@/components/dashboard/tabs/TradeStationContent';
+import { ErrorsContent } from '@/components/dashboard/tabs/ErrorsContent';
 import { AIAssistant } from '@/components/AIAssistant';
 import { TourCTAButton } from '@/components/tour/TourCTAButton';
 
@@ -578,16 +579,21 @@ function DashboardContent() {
           ) : (
             <>
               <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-                <TabsList className="glass rounded-2xl grid w-full grid-cols-5 h-auto p-1.5">
+                <TabsList className="glass rounded-2xl grid w-full grid-cols-6 h-auto p-1.5">
                   <TabsTrigger value="tradestation" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Trade Station</TabsTrigger>
                   <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Command Center</TabsTrigger>
                   <TabsTrigger value="behavior" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Behavior</TabsTrigger>
+                  <TabsTrigger value="errors" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Errors</TabsTrigger>
                   <TabsTrigger value="insights" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('analytics.insights')}</TabsTrigger>
                   <TabsTrigger value="history" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('trades.tradeHistory')}</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="tradestation" className="space-y-6">
                   <TradeStationContent />
+                </TabsContent>
+
+                <TabsContent value="errors" className="space-y-6">
+                  <ErrorsContent />
                 </TabsContent>
 
                 <TabsContent value="overview" className="space-y-4">

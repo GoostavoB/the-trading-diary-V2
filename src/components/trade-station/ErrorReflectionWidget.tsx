@@ -14,13 +14,16 @@ import { useToast } from '@/hooks/use-toast';
 import { WidgetWrapper } from '@/components/widgets/WidgetWrapper';
 import { WidgetProps } from '@/types/widget';
 
-interface ErrorReflectionWidgetProps extends WidgetProps { }
+interface ErrorReflectionWidgetProps extends WidgetProps {
+  fullPage?: boolean;
+}
 
 export const ErrorReflectionWidget = ({
   id,
   isEditMode,
   onRemove,
-  onExpand
+  onExpand,
+  fullPage = false
 }: ErrorReflectionWidgetProps) => {
   const {
     errors,
