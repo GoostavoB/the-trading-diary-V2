@@ -4,6 +4,8 @@ import { PerformanceHighlights } from '@/components/insights/PerformanceHighligh
 import { TradingQualityMetrics } from '@/components/insights/TradingQualityMetrics';
 import { CostEfficiencyPanel } from '@/components/insights/CostEfficiencyPanel';
 import { BehaviorAnalytics } from '@/components/insights/BehaviorAnalytics';
+import { RollingTargetWidget } from '@/components/widgets/RollingTargetWidget';
+import { SmartWidgetWrapper } from '@/components/widgets/SmartWidgetWrapper';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useMemo } from 'react';
 import type { Trade } from '@/types/trade';
@@ -30,7 +32,7 @@ function calculateCurrentStreak(trades: Trade[]) {
 }
 
 export function InsightsContent() {
-    const { processedTrades, capitalLog } = useDashboard();
+    const { processedTrades, capitalLog, initialInvestment } = useDashboard();
     const stats = useDashboardStats(processedTrades, capitalLog);
 
     const { bestTrade, worstTrade, currentStreak } = useMemo(() => {
@@ -89,8 +91,19 @@ export function InsightsContent() {
                 />
             </div>
 
-            {/* Cost Efficiency - 2 columns */}
-            <div className="col-span-2">
+            {/* Rolling Target - 1 column */}
+            <div className="col-span-1">
+                <SmartWidgetWrapper id="rollingTarget" hasPadding={false}>
+                    <RollingTargetWidget 
+                        id="rollingTarget" 
+                        trades={processedTrades}
+                        initialInvestment={initialInvestment}
+                    />
+                </SmartWidgetWrapper>
+            </div>
+
+            {/* Cost Efficiency - 1 column */}
+            <div className="col-span-1">
                 <CostEfficiencyPanel trades={processedTrades} />
             </div>
 
