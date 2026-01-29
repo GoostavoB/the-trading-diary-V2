@@ -48,43 +48,50 @@ export const BehaviorAnalytics = memo(({ trades }: BehaviorAnalyticsProps) => {
   }, [dayPerf]);
 
   return (
-    <PremiumCard className="h-full bg-card border-border flex flex-col">
-      <div className="p-3 flex flex-col h-full">
-        {/* Single row with 5 stat chips */}
-        <div className="flex gap-2 flex-1 items-stretch">
+    <PremiumCard className="h-full bg-card border-border flex flex-col overflow-hidden">
+      <div className="p-3 flex flex-col h-full overflow-hidden">
+        {/* Compact 2x3 grid for stacked layout */}
+        <div className="grid grid-cols-3 grid-rows-2 gap-2 flex-1 min-h-0">
           {/* Avg Holding Time */}
-          <div className="flex-1 p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center justify-center text-center">
-            <Clock className="w-4 h-4 text-primary mb-1" />
-            <span className="text-sm font-bold">{avgHoldingTime}</span>
-            <span className="text-[9px] text-muted-foreground uppercase">{t('insights.avgHoldingTime') || 'Hold Time'}</span>
+          <div className="p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center justify-center text-center min-h-0">
+            <Clock className="w-3.5 h-3.5 text-primary mb-0.5" />
+            <span className="text-xs font-bold truncate">{avgHoldingTime}</span>
+            <span className="text-[8px] text-muted-foreground uppercase">{t('insights.avgHoldingTime') || 'HOLD'}</span>
           </div>
 
           {/* Avg Position Size */}
-          <div className="flex-1 p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center justify-center text-center">
-            <DollarSign className="w-4 h-4 text-primary mb-1" />
-            <span className="text-sm font-bold">{formatCurrency(avgPositionSize)}</span>
-            <span className="text-[9px] text-muted-foreground uppercase">{t('insights.avgPositionSize') || 'Avg Size'}</span>
+          <div className="p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center justify-center text-center min-h-0">
+            <DollarSign className="w-3.5 h-3.5 text-primary mb-0.5" />
+            <span className="text-xs font-bold truncate">{formatCurrency(avgPositionSize)}</span>
+            <span className="text-[8px] text-muted-foreground uppercase">{t('insights.avgPositionSize') || 'SIZE'}</span>
           </div>
 
           {/* Avg Leverage */}
-          <div className="flex-1 p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center justify-center text-center">
-            <Activity className="w-4 h-4 text-primary mb-1" />
-            <span className="text-sm font-bold">{avgLeverage.toFixed(1)}x</span>
-            <span className="text-[9px] text-muted-foreground uppercase">{t('insights.avgLeverage') || 'Avg Lever'}</span>
+          <div className="p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center justify-center text-center min-h-0">
+            <Activity className="w-3.5 h-3.5 text-primary mb-0.5" />
+            <span className="text-xs font-bold">{avgLeverage.toFixed(1)}x</span>
+            <span className="text-[8px] text-muted-foreground uppercase">{t('insights.avgLeverage') || 'LEVER'}</span>
           </div>
 
           {/* Best Day of Week */}
-          <div className="flex-1 p-2 rounded-lg bg-profit/10 border border-profit/30 flex flex-col items-center justify-center text-center">
-            <TrendingUp className="w-4 h-4 text-profit mb-1" />
-            <span className="text-sm font-bold text-profit">{bestDay.day}</span>
-            <span className="text-[9px] text-muted-foreground uppercase">{t('insights.bestDayOfWeek') || 'Best Day'}</span>
+          <div className="p-2 rounded-lg bg-profit/10 border border-profit/30 flex flex-col items-center justify-center text-center min-h-0 col-span-1">
+            <TrendingUp className="w-3.5 h-3.5 text-profit mb-0.5" />
+            <span className="text-xs font-bold text-profit">{bestDay.day}</span>
+            <span className="text-[8px] text-muted-foreground uppercase">{t('insights.bestDayOfWeek') || 'BEST'}</span>
           </div>
 
           {/* Worst Day of Week */}
-          <div className="flex-1 p-2 rounded-lg bg-loss/10 border border-loss/30 flex flex-col items-center justify-center text-center">
-            <TrendingDown className="w-4 h-4 text-loss mb-1" />
-            <span className="text-sm font-bold text-loss">{worstDay.day}</span>
-            <span className="text-[9px] text-muted-foreground uppercase">{t('insights.worstDayOfWeek') || 'Worst Day'}</span>
+          <div className="p-2 rounded-lg bg-loss/10 border border-loss/30 flex flex-col items-center justify-center text-center min-h-0 col-span-1">
+            <TrendingDown className="w-3.5 h-3.5 text-loss mb-0.5" />
+            <span className="text-xs font-bold text-loss">{worstDay.day}</span>
+            <span className="text-[8px] text-muted-foreground uppercase">{t('insights.worstDayOfWeek') || 'WORST'}</span>
+          </div>
+
+          {/* Total days placeholder */}
+          <div className="p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center justify-center text-center min-h-0">
+            <Calendar className="w-3.5 h-3.5 text-muted-foreground mb-0.5" />
+            <span className="text-xs font-bold">{trades.length}</span>
+            <span className="text-[8px] text-muted-foreground uppercase">TRADES</span>
           </div>
         </div>
       </div>
