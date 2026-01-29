@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useState, useMemo } from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { WidgetProps } from '@/types/widget';
 import { Trade } from '@/types/trade';
@@ -20,10 +20,35 @@ export const TopMoversWidget = memo(({
 }: TopMoversWidgetProps) => {
   const [period, setPeriod] = useState('24h');
 
-  // Get top 3 movers
-  const topMovers = trades
-    .sort((a, b) => Math.abs(b.pnl) - Math.abs(a.pnl))
-    .slice(0, 3);
+  // Filter trades by selected period
+  const filteredTrades = useMemo(() => {
+    if (!trades || trades.length === 0) return [];
+    
+    const now = new Date();
+    const periodMs = period === '24h' 
+      ? 24 * 60 * 60 * 1000 
+      : period === '7d' 
+        ? 7 * 24 * 60 * 60 * 1000 
+        : 30 * 24 * 60 * 60 * 1000;
+    
+    const cutoffTime = now.getTime() - periodMs;
+    
+    return trades.filter(trade => {
+      const tradeDate = new Date(trade.trade_date || trade.created_at);
+      return tradeDate.getTime() > cutoffTime;
+    });
+  }, [trades, period]);
+
+  // Get top 3 movers with safe null handling
+  const topMovers = useMemo(() => {
+    return [...filteredTrades]
+      .sort((a, b) => {
+        const aPnl = a.profit_loss ?? a.pnl ?? 0;
+        const bPnl = b.profit_loss ?? b.pnl ?? 0;
+        return Math.abs(bPnl) - Math.abs(aPnl);
+      })
+      .slice(0, 3);
+  }, [filteredTrades]);
 
   return (
     <div className="flex flex-col h-full">
@@ -44,16 +69,18 @@ export const TopMoversWidget = memo(({
       <div className="p-2 flex items-center gap-2 overflow-x-auto">
         {topMovers.length > 0 ? (
           topMovers.map((trade, idx) => {
-            const isProfit = trade.pnl >= 0;
-            const changePercent = (trade.pnl / trade.entry_price) * 100;
+            const pnl = trade.profit_loss ?? trade.pnl ?? 0;
+            const isProfit = pnl >= 0;
+            const entryPrice = trade.entry_price || 1;
+            const changePercent = entryPrice > 0 ? (pnl / entryPrice) * 100 : 0;
 
             return (
               <div
                 key={`${trade.symbol}-${idx}`}
-                className="flex-1 min-w-[110px] p-2 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors border border- border/30"
+                className="flex-1 min-w-[110px] p-2 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors border border-border/30"
               >
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="font-medium text-sm">{trade.symbol}</span>
+                  <span className="font-medium text-sm">{trade.symbol || 'Unknown'}</span>
                   <div className={`p-1 rounded ${isProfit ? 'bg-neon-green/10 text-neon-green' : 'bg-neon-red/10 text-neon-red'}`}>
                     {isProfit ? (
                       <ArrowUpRight className="h-3 w-3" />
@@ -63,14 +90,14 @@ export const TopMoversWidget = memo(({
                   </div>
                 </div>
                 <div className={`text-lg font-bold ${isProfit ? 'text-neon-green' : 'text-neon-red'}`}>
-                  {isProfit ? '+' : ''}{changePercent.toFixed(1)}%
+                  {isProfit ? '+' : ''}{isNaN(changePercent) ? '0.0' : changePercent.toFixed(1)}%
                 </div>
               </div>
             );
           })
         ) : (
           <div className="text-sm text-muted-foreground text-center py-4 w-full">
-            No trades yet
+            No trades in {period}
           </div>
         )}
       </div>
