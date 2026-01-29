@@ -53,8 +53,23 @@ export const useDashboardStats = (trades: Trade[], capitalLog?: CapitalLogEntry[
       avgRoi = roiData.weightedROI;
       currentCapital = getCurrentCapital(capitalLog);
     } else {
-      // Fallback to simple ROI if no capital log
-      avgRoi = trades.reduce((sum, t) => sum + (t.roi || 0), 0) / trades.length;
+      // Calculate weighted average ROI by margin (capital-weighted)
+      // This prevents small trades from distorting the average
+      const totalMargin = trades.reduce((sum, t) => sum + (t.margin || 0), 0);
+      
+      if (totalMargin > 0) {
+        avgRoi = trades.reduce((sum, t) => sum + ((t.roi || 0) * (t.margin || 0)), 0) / totalMargin;
+      } else {
+        // Fallback to trimmed mean if no margin data (remove top/bottom 10% outliers)
+        const sortedROIs = trades.map(t => t.roi || 0).sort((a, b) => a - b);
+        const trimCount = Math.max(1, Math.floor(sortedROIs.length * 0.1));
+        const trimmedROIs = sortedROIs.length > 2 
+          ? sortedROIs.slice(trimCount, sortedROIs.length - trimCount)
+          : sortedROIs;
+        avgRoi = trimmedROIs.length > 0
+          ? trimmedROIs.reduce((a, b) => a + b, 0) / trimmedROIs.length
+          : 0;
+      }
     }
     
     const bestTrade = trades.reduce((best, t) => 
