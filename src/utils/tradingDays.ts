@@ -10,8 +10,11 @@ interface Trade {
  * CONSISTENT TRADING DAYS CALCULATION
  * 
  * Supports two calculation modes:
- * 1. 'calendar': Calendar days from first opened trade to last closed trade (inclusive)
- * 2. 'unique': Only count unique days where trades were actually opened
+ * 1. 'calendar': Calendar days from first CLOSED trade to last CLOSED trade (inclusive)
+ * 2. 'unique': Only count unique days where trades were actually CLOSED
+ * 
+ * IMPORTANT: Both modes now use closed_at (not opened_at) as the reference date,
+ * since P&L should be attributed to the day the trade was completed.
  * 
  * This ensures ALL widgets use the same calculation method based on user preference.
  */
@@ -27,34 +30,23 @@ export function calculateTradingDays(
     return { tradingDays: 0, firstTradeDate: null, lastTradeDate: null };
   }
 
-  // Filter trades that have opened_at (required for first date anchor)
-  const tradesWithOpen = trades.filter(t => t.opened_at || t.trade_date);
-  if (tradesWithOpen.length === 0) {
+  // Filter trades that have closed_at or trade_date (P&L is attributed to close date)
+  const tradesWithClose = trades.filter(t => t.closed_at || t.trade_date);
+  if (tradesWithClose.length === 0) {
     return { tradingDays: 0, firstTradeDate: null, lastTradeDate: null };
   }
 
-  // Sort by opened date to find first opened trade
-  const sortedByOpen = [...tradesWithOpen].sort((a, b) => {
-    const dateA = new Date(a.opened_at || a.trade_date!);
-    const dateB = new Date(b.opened_at || b.trade_date!);
-    return dateA.getTime() - dateB.getTime();
-  });
-  const firstTradeDate = new Date(sortedByOpen[0].opened_at || sortedByOpen[0].trade_date!);
-
-  // For lastTradeDate, prefer closed_at if available, fallback to opened_at, then trade_date
-  const tradesWithClose = trades.filter(t => t.closed_at || t.opened_at || t.trade_date);
-  if (tradesWithClose.length === 0) {
-    return { tradingDays: 1, firstTradeDate, lastTradeDate: firstTradeDate };
-  }
-
+  // Sort by CLOSED date to find first and last closed trade
+  // Use closed_at preferentially, fallback to trade_date
   const sortedByClose = [...tradesWithClose].sort((a, b) => {
-    const dateA = new Date(a.closed_at || a.opened_at || a.trade_date!);
-    const dateB = new Date(b.closed_at || b.opened_at || b.trade_date!);
+    const dateA = new Date(a.closed_at || a.trade_date!);
+    const dateB = new Date(b.closed_at || b.trade_date!);
     return dateA.getTime() - dateB.getTime();
   });
+  
+  const firstTradeDate = new Date(sortedByClose[0].closed_at || sortedByClose[0].trade_date!);
   const lastTradeDate = new Date(
     sortedByClose[sortedByClose.length - 1].closed_at || 
-    sortedByClose[sortedByClose.length - 1].opened_at || 
     sortedByClose[sortedByClose.length - 1].trade_date!
   );
 
@@ -68,16 +60,12 @@ export function calculateTradingDays(
       const dateToUse = t.closed_at || t.trade_date;
       if (dateToUse) {
         const dateStr = dateToUse.split('T')[0];
-        const tradeDate = new Date(dateStr);
-        // Only count days up to and including lastTradeDate
-        if (tradeDate <= lastTradeDate) {
-          uniqueDays.add(dateStr);
-        }
+        uniqueDays.add(dateStr);
       }
     });
     tradingDays = uniqueDays.size;
   } else {
-    // Calendar days from first open to last close (inclusive, so +1)
+    // Calendar days from first CLOSE to last CLOSE (inclusive, so +1)
     tradingDays = differenceInDays(lastTradeDate, firstTradeDate) + 1;
   }
 
