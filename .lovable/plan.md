@@ -1,96 +1,130 @@
 
-# Fix Long Short Ratio Chart Flickering and Missing Lines
+# Remove AI Trading Assistant - Complete Removal Plan
 
-## Problem Identified
+## Summary
 
-The Long Short Ratio charts are flickering and not displaying lines properly due to **missing animation stability settings**.
-
-### Root Cause
-
-After reviewing the code and a known memory from a previous similar fix:
-
-1. **All 10 Line components in `LongShortRatio.tsx` are missing `isAnimationActive={false}`**
-   - The Recharts library re-animates lines on every re-render
-   - When data is refreshed or the container resizes, the animation restarts causing visible "flashing"
-
-2. **ResponsiveContainer + Animation = Flickering**
-   - The charts use `ResponsiveContainer` which detects size changes
-   - Each resize triggers a re-render, which triggers a new animation
-   - This creates the visual "blinking" effect
-
-3. **Lazy Loading Compounds the Issue**
-   - The component is lazy-loaded via `Suspense` in `LSRContent.tsx`
-   - Mount/unmount cycles during tab switches can restart animations
-
-### Evidence
-
-Other charts in the app already have this fix:
-- `CapitalGrowthWidget.tsx` line 126: `isAnimationActive={false}`
-- `TotalBalanceCard.tsx` line 119: `isAnimationActive={false}`
-
-The `LongShortRatio.tsx` charts do NOT have this property set.
+Remove the AI Trading Assistant feature entirely, including:
+- The floating bot button on the dashboard
+- The AIAssistant component and its context
+- The ExplainMetricButton components that trigger AI explanations
+- The AI Tools page (/ai-tools route)
+- Related navigation links
+- Related edge functions
 
 ---
 
-## Solution
+## Files to Delete
 
-### File: `src/pages/LongShortRatio.tsx`
-
-Add `isAnimationActive={false}` to all 10 `<Line>` components across the three chart views (Combined, Binance, Bybit).
-
-**Lines to modify:**
-
-| Location | Line | Current | Add |
-|----------|------|---------|-----|
-| Combined L/S Ratio chart | ~249-255 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
-| Combined Account Distribution (Long) | ~285-291 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
-| Combined Account Distribution (Short) | ~292-298 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
-| Binance L/S Ratio chart | ~397-403 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
-| Binance Account Distribution (Long) | ~433-439 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
-| Binance Account Distribution (Short) | ~440-445 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
-| Bybit L/S Ratio chart | ~550-556 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
-| Bybit Account Distribution (Long) | ~586-592 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
-| Bybit Account Distribution (Short) | ~593-599 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
-
-**Example change:**
-
-Before:
-```tsx
-<Line
-  type="monotone"
-  dataKey="longShortRatio"
-  stroke="hsl(var(--neon-blue))"
-  name="Avg Long/Short Ratio"
-  strokeWidth={2}
-/>
-```
-
-After:
-```tsx
-<Line
-  type="monotone"
-  dataKey="longShortRatio"
-  stroke="hsl(var(--neon-blue))"
-  name="Avg Long/Short Ratio"
-  strokeWidth={2}
-  isAnimationActive={false}
-/>
-```
+| File | Description |
+|------|-------------|
+| `src/components/AIAssistant.tsx` | Main floating bot button + chat sheet |
+| `src/contexts/AIAssistantContext.tsx` | Context provider for AI assistant state |
+| `src/components/ExplainMetricButton.tsx` | "Ask AI" button on metrics |
+| `src/pages/AITools.tsx` | AI Tools page with Analysis, Patterns, Psychology, etc. |
+| `supabase/functions/ai-chat/` | Edge function for AI chat |
+| `supabase/functions/ai-dashboard-assistant/` | Edge function for dashboard AI |
+| `supabase/functions/ai-widget-clarify/` | Edge function for widget clarification |
 
 ---
 
 ## Files to Modify
 
-- `src/pages/LongShortRatio.tsx` — Add `isAnimationActive={false}` to all Line components
+### 1. `src/App.tsx`
+**Remove:**
+- Import of `AIAssistantProvider` (line 9)
+- Import of lazy `AITools` page (line 55)
+- `<AIAssistantProvider>` wrapper (lines 263, 272)
+- Route `/ai-tools` (line 195)
+
+### 2. `src/pages/Dashboard.tsx`
+**Remove:**
+- Import of `AIAssistant` (line 67)
+- `<AIAssistant />` render (lines 660-662)
+
+### 3. `src/components/SidebarQuickLinks.tsx`
+**Remove:**
+- Navigation link to `/ai-tools` (line 17)
+
+### 4. `src/components/GlobalSearch.tsx`
+**Remove:**
+- Search result entry for 'ai-tools' (lines 117-125)
+
+### 5. Components using `useAIAssistant` and `ExplainMetricButton`
+Remove AI-related imports and button usage from these files:
+- `src/components/insights/InsightsQuickSummary.tsx`
+- `src/components/TopMoversCard.tsx`
+- `src/components/TotalBalanceCard.tsx`
+- `src/components/TradingStreaks.tsx`
+- `src/components/CurrentStreakCard.tsx`
+- `src/components/MaxDrawdownCard.tsx`
+- `src/components/StatCard.tsx`
+- `src/components/PerformanceInsights.tsx`
+- `src/components/TradingHeatmap.tsx`
+- `src/components/RecentTransactionsCard.tsx`
+- `src/components/charts/AssetPerformanceRadar.tsx`
+- `src/components/charts/WinsByHourChart.tsx`
+
+### 6. `src/components/KeyboardShortcutsHelp.tsx`
+**Remove:**
+- AI Assistant category from keyboard shortcuts (lines 40-44)
 
 ---
 
-## Expected Results
+## Technical Details
 
-| Issue | Before | After |
-|-------|--------|-------|
-| Chart flickering | Visible blinking on resize/refresh | Static, stable lines |
-| Missing lines | Lines disappear during animation reset | Lines always visible |
-| Tab switching | Animations restart on each mount | Instant display |
+### Changes per component (example pattern)
 
-This is the same fix already applied to other charts in the codebase (`CapitalGrowthWidget`, `TotalBalanceCard`) and follows the established pattern for Recharts stability.
+**Before:**
+```tsx
+import { ExplainMetricButton } from '@/components/ExplainMetricButton';
+import { useAIAssistant } from '@/contexts/AIAssistantContext';
+
+const Component = () => {
+  const { openWithPrompt } = useAIAssistant();
+  return (
+    <ExplainMetricButton onExplain={openWithPrompt} ... />
+  );
+};
+```
+
+**After:**
+```tsx
+// Remove imports and ExplainMetricButton usage entirely
+const Component = () => {
+  return (
+    // Component without AI button
+  );
+};
+```
+
+---
+
+## Edge Functions to Delete
+
+These edge functions will be deleted from the deployed environment:
+1. `ai-chat`
+2. `ai-dashboard-assistant` 
+3. `ai-widget-clarify`
+
+Note: Other AI-related edge functions (`ai-generate-report`, `ai-pattern-recognition`, etc.) are used by the AITools page components, so they will also become unused and can be deleted.
+
+---
+
+## Impact
+
+| Area | Change |
+|------|--------|
+| Dashboard | Floating bot button removed |
+| Metric cards | "Ask AI" help buttons removed |
+| Navigation | /ai-tools link removed from sidebar |
+| Search | AI Tools removed from global search |
+| Keyboard shortcuts | Alt+I shortcut removed |
+| Bundle size | Reduced (fewer components/dependencies) |
+
+---
+
+## Files Count
+
+- **Delete**: 7+ files (components, context, page, edge functions)
+- **Modify**: 15+ files (remove imports and usage)
+
