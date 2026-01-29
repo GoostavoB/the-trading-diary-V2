@@ -603,13 +603,6 @@
     "socialSharer": "Social Butterfly",
     "socialSharerDesc": "Share on all social platforms"
   },
-  "dashboard": {
-    "marketSentiment": "Market Sentiment",
-    "totalPnL": "Total P&L",
-    "winRate": "Win Rate",
-    "totalTrades": "Total Trades",
-    "avgProfit": "Avg Profit"
-  },
   "journal": {
     "title": "Trade Journal",
     "newEntry": "New Entry",
@@ -863,6 +856,9 @@
     "history": "History",
     "stats": "Statistics",
     "totalBalance": "Total Balance",
+    "totalPnL": "Total P&L",
+    "avgProfit": "Avg Profit",
+    "marketSentiment": "Market Sentiment",
     "winRate": "Win Rate",
     "totalTrades": "Total Trades",
     "avgPnL": "Avg P&L",
