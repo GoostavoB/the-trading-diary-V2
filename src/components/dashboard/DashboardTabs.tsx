@@ -16,7 +16,7 @@ import {
     horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Plus, X, LayoutDashboard, LineChart, History, GripVertical } from 'lucide-react';
+import { Plus, X, LayoutDashboard, LineChart, History, GripVertical, Brain, Wrench, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -29,7 +29,7 @@ import {
 export interface DashboardTab {
     id: string;
     title: string;
-    type: 'main' | 'insights' | 'trade-history' | 'custom';
+    type: 'trade-station' | 'main' | 'behavior' | 'insights' | 'trade-history' | 'custom';
     isRemovable?: boolean;
 }
 
@@ -133,8 +133,10 @@ const SortableTab = ({ tab, isActive, onClick, onRemove }: SortableTabProps) => 
 
     const getIcon = () => {
         switch (tab.type) {
+            case 'trade-station': return <Wrench className="h-3.5 w-3.5" />;
             case 'main': return <LayoutDashboard className="h-3.5 w-3.5" />;
-            case 'insights': return <LineChart className="h-3.5 w-3.5" />;
+            case 'behavior': return <Brain className="h-3.5 w-3.5" />;
+            case 'insights': return <Lightbulb className="h-3.5 w-3.5" />;
             case 'trade-history': return <History className="h-3.5 w-3.5" />;
             default: return null;
         }
