@@ -13,6 +13,7 @@ import { OverviewContent } from '@/components/dashboard/tabs/OverviewContent';
 import { CommandCenterContent } from '@/components/dashboard/tabs/CommandCenterContent';
 import { BehaviorContent } from '@/components/dashboard/tabs/BehaviorContent';
 import { InsightsContent } from '@/components/dashboard/tabs/InsightsContent';
+import { RollingTargetContent } from '@/components/dashboard/tabs/RollingTargetContent';
 import { HistoryContent } from '@/components/dashboard/tabs/HistoryContent';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { ExportTradesDialog } from '@/components/ExportTradesDialog';
@@ -579,12 +580,13 @@ function DashboardContent() {
           ) : (
             <>
               <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-                <TabsList className="glass rounded-2xl grid w-full grid-cols-6 h-auto p-1.5">
+                <TabsList className="glass rounded-2xl grid w-full grid-cols-7 h-auto p-1.5">
                   <TabsTrigger value="tradestation" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Trade Station</TabsTrigger>
                   <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Command Center</TabsTrigger>
                   <TabsTrigger value="behavior" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Behavior</TabsTrigger>
                   <TabsTrigger value="errors" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Errors</TabsTrigger>
                   <TabsTrigger value="insights" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('analytics.insights')}</TabsTrigger>
+                  <TabsTrigger value="target" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Target</TabsTrigger>
                   <TabsTrigger value="history" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('trades.tradeHistory')}</TabsTrigger>
                 </TabsList>
 
@@ -636,6 +638,10 @@ function DashboardContent() {
 
                 <TabsContent value="insights" className="space-y-4">
                   <InsightsContent />
+                </TabsContent>
+
+                <TabsContent value="target" className="space-y-4">
+                  <RollingTargetContent />
                 </TabsContent>
 
                 <TabsContent value="history" className="relative glass rounded-2xl p-6">

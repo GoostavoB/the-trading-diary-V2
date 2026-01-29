@@ -162,13 +162,6 @@
     "socialSharer": "فراشة اجتماعية",
     "socialSharerDesc": "شارك على جميع منصات التواصل الاجتماعي"
   },
-  "dashboard": {
-    "marketSentiment": "معنويات السوق",
-    "totalPnL": "إجمالي الربح والخسارة",
-    "winRate": "معدل الفوز",
-    "totalTrades": "إجمالي الصفقات",
-    "avgProfit": "متوسط الربح"
-  },
   "journal": {
     "title": "دفتر التداول",
     "newEntry": "إدخال جديد",
@@ -449,6 +442,13 @@
     "welcomeBack": "مرحبًا بعودتك"
   },
   "dashboard": {
+    "marketSentiment": "معنويات السوق",
+    "totalPnL": "إجمالي الربح والخسارة",
+    "winRate": "معدل الفوز",
+    "totalTrades": "إجمالي الصفقات",
+    "avgProfit": "متوسط الربح",
+    "profitFactor": "عامل الربح",
+    "avgROI": "متوسط العائد",
     "welcome": "مرحبًا",
     "overview": "نظرة عامة",
     "quickActions": "إجراءات سريعة",
@@ -456,8 +456,6 @@
     "recentActivity": "النشاط الأخير",
     "performanceSummary": "ملخص الأداء",
     "totalBalance": "إجمالي الرصيد",
-    "winRate": "Win Rate",
-    "totalPnL": "إجمالي P&L",
     "maxDrawdown": "أكبر سحب",
     "totalROI": "إجمالي ROI"
   },

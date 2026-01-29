@@ -212,7 +212,9 @@
     "totalPnL": "Tổng P&L",
     "winRate": "Tỷ lệ thắng",
     "totalTrades": "Tổng giao dịch",
-    "avgProfit": "Lợi nhuận trung bình"
+    "avgProfit": "Lợi nhuận trung bình",
+    "profitFactor": "Hệ số lợi nhuận",
+    "avgROI": "ROI trung bình"
   },
   "journal": {
     "title": "Nhật ký giao dịch",
