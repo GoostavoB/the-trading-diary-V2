@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSubAccount } from "@/contexts/SubAccountContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -20,6 +21,7 @@ interface CreateGoalDialogProps {
 
 export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: CreateGoalDialogProps) {
   const { user } = useAuth();
+  const { activeSubAccount } = useSubAccount();
   const [open, setOpen] = useState(!!editingGoal);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -96,7 +98,10 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !activeSubAccount) {
+      toast.error('Please select a sub-account first');
+      return;
+    }
 
     // Validate baseline_value for capital and ROI goals
     if ((formData.goal_type === 'capital' || formData.goal_type === 'roi') && !formData.baseline_value) {
@@ -108,6 +113,7 @@ export function CreateGoalDialog({ onGoalCreated, editingGoal, onClose }: Create
     try {
       const goalData: any = {
         user_id: user.id,
+        sub_account_id: activeSubAccount.id,
         title: formData.title,
         description: formData.description || '',
         goal_type: formData.goal_type,
