@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSubAccount } from '@/contexts/SubAccountContext';
 import { UNIFIED_THEMES, getThemeById, ThemeTier } from '@/utils/unifiedThemes';
 import { useUserTier } from './useUserTier';
+import { useThemeMode } from './useThemeMode';
 
 export interface UnlockableTheme {
   id: string;
@@ -47,6 +48,7 @@ export const useThemeUnlocks = () => {
   const { user } = useAuth();
   const { activeSubAccount } = useSubAccount();
   const { tier } = useUserTier();
+  const { setThemeMode } = useThemeMode();
   const [themes, setThemes] = useState<UnlockableTheme[]>([]);
   const [activeTheme, setActiveTheme] = useState<string>('default');
   const [loading, setLoading] = useState(true);
@@ -79,6 +81,9 @@ export const useThemeUnlocks = () => {
       
       // Apply theme to document immediately
       document.documentElement.setAttribute('data-theme', activeThemeId);
+      
+      // IMPORTANT: Also apply CSS variables via useThemeMode
+      setThemeMode(activeThemeId);
       
       // Sync localStorage with database value if they differ
       if (dbTheme && dbTheme !== localTheme) {
@@ -140,6 +145,9 @@ export const useThemeUnlocks = () => {
       // Apply theme to document immediately for instant feedback
       document.documentElement.setAttribute('data-theme', themeId);
       setActiveTheme(themeId);
+      
+      // IMPORTANT: Apply CSS variables via useThemeMode for visual change
+      setThemeMode(themeId);
       
       // Then persist to database
       const { error } = await supabase
