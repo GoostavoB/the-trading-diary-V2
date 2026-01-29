@@ -385,34 +385,47 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
 };
 
 /**
+ * Tab-specific widget layouts for viewport-locked, above-the-fold display
+ * Each tab has a maximum of 6-8 widgets to prevent scrolling
+ */
+
+// Trade Station: Daily trading tools (max 5 widgets)
+export const TRADE_STATION_LAYOUT = [
+  'riskCalculator',
+  'dailyLossLock',
+  'simpleLeverage',
+  'longShortRatio',
+];
+
+// Command Center: Core KPIs & charts (max 6 widgets)
+export const COMMAND_CENTER_LAYOUT = [
+  'totalBalance',
+  'compactPerformance',
+  'capitalGrowth',
+  'topMovers',
+  'goals',
+  'performanceHighlights',
+];
+
+// Behavior Analytics: Psychology & patterns (max 4 widgets)
+export const BEHAVIOR_TAB_LAYOUT = [
+  'emotionMistakeCorrelation',
+  'heatmap',
+  'tradingQuality',
+  'behaviorAnalytics',
+];
+
+// Insights: Deep analytics (max 5 widgets)
+export const INSIGHTS_TAB_LAYOUT = [
+  'costEfficiency',
+  'aiInsights',
+];
+
+/**
  * Default Command Center layout for new users - priority-ordered for above-the-fold visibility
  * Widgets are ordered by importance: primary KPIs first, then charts, then detailed analytics
  */
-export const DEFAULT_DASHBOARD_LAYOUT = [
-  // Row 1: Primary KPIs (most important, always visible)
-  'totalBalance',
-  'compactPerformance', // Combines ROI, Win Rate, Avg P&L/Day
-  
-  // Row 2: Visual data + market context
-  'capitalGrowth',
-  'longShortRatio',
-  
-  // Row 3: Performance details
-  'performanceHighlights',
-  'topMovers',
-  
-  // Row 4: Goals and insights
-  'goals',
-  'emotionMistakeCorrelation',
-  
-  // Row 5: Deep analytics (may be below fold on smaller screens)
-  'behaviorAnalytics',
-  'costEfficiency',
-  'tradingQuality',
-  
-  // Optional: AI insights at bottom
-  'aiInsights',
-];
+export const DEFAULT_DASHBOARD_LAYOUT = COMMAND_CENTER_LAYOUT;
 
 /**
  * Get widgets by category

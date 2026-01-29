@@ -140,8 +140,10 @@ export function SimplifiedDashboardGrid({
                         className
                     )}
                     style={{
-                        gridAutoRows: 'minmax(0, auto)',
+                        gridAutoRows: 'minmax(0, 1fr)',
                         gridAutoFlow: 'dense',
+                        maxHeight: 'calc(100vh - 220px)',
+                        overflow: 'hidden',
                     }}
                 >
                     {order.map((id) => {

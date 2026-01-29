@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SmartWidgetWrapper } from '@/components/widgets/SmartWidgetWrapper';
 import { OverviewContent } from '@/components/dashboard/tabs/OverviewContent';
+import { BehaviorContent } from '@/components/dashboard/tabs/BehaviorContent';
 import { InsightsContent } from '@/components/dashboard/tabs/InsightsContent';
 import { HistoryContent } from '@/components/dashboard/tabs/HistoryContent';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
@@ -574,12 +575,13 @@ function DashboardContent() {
             </PremiumCard>
           ) : (
             <>
-              <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-                <TabsList className="glass rounded-2xl grid w-full grid-cols-4 h-auto p-1.5">
-                  <TabsTrigger value="tradestation" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Trade Station</TabsTrigger>
-                  <TabsTrigger value="overview" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Command Center</TabsTrigger>
-                  <TabsTrigger value="insights" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('analytics.insights')}</TabsTrigger>
-                  <TabsTrigger value="history" className="text-sm py-2.5 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('trades.tradeHistory')}</TabsTrigger>
+              <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+                <TabsList className="glass rounded-2xl grid w-full grid-cols-5 h-auto p-1.5">
+                  <TabsTrigger value="tradestation" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Trade Station</TabsTrigger>
+                  <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Command Center</TabsTrigger>
+                  <TabsTrigger value="behavior" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Behavior</TabsTrigger>
+                  <TabsTrigger value="insights" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('analytics.insights')}</TabsTrigger>
+                  <TabsTrigger value="history" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('trades.tradeHistory')}</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="tradestation" className="space-y-6">
@@ -621,7 +623,11 @@ function DashboardContent() {
                   <OverviewContent renderWidget={renderWidget} />
                 </TabsContent>
 
-                <TabsContent value="insights" className="space-y-6">
+                <TabsContent value="behavior" className="space-y-4">
+                  <BehaviorContent />
+                </TabsContent>
+
+                <TabsContent value="insights" className="space-y-4">
                   <InsightsContent />
                 </TabsContent>
 
