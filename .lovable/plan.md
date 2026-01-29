@@ -1,128 +1,90 @@
 
+# Fix Rolling Target Dashboard - Wrong Information
 
-# Fix Insights Dashboard - Wrong Information Issue
+## Problems Identified
 
-## Problem Identified
+After analyzing the data and code, I found **three major issues** causing wrong information in the Rolling Target dashboard:
 
-The Insights Dashboard is showing technically correct but misleading data due to two main issues:
+### Issue 1: initialInvestment Source vs. Actual Capital Log
 
-### Issue 1: avgROI Calculation Distorted by Outliers
+**Data Discrepancy:**
+- `user_settings.initial_investment` = **$1,500**
+- `capital_log` entry = **$1,000** (added 2025-12-30)
+- First trade opened: **2026-01-27** (almost 1 month after capital log entry)
 
-**Root Cause**: There's a trade with ROI of **-990.99%** (BTC trade with $10 margin that lost $100) that is severely distorting the average ROI calculation.
+The widget uses `initialInvestment` from `user_settings` ($1,500), but the actual capital added was $1,000. This creates a **$500 discrepancy** that cascades through all calculations.
 
-| Metric | Current Value | Expected Behavior |
-|--------|---------------|-------------------|
-| Avg ROI | -51.86% | Should show ~+10% without outlier |
-| Trade causing issue | -990.99% ROI | 1 trade out of 16 |
+### Issue 2: Drift from Plan Calculation is Wrong
 
-The `useDashboardStats.ts` hook (line 57) uses a simple average:
+**Current formula (lines 336-339):**
 ```typescript
-avgRoi = trades.reduce((sum, t) => sum + (t.roi || 0), 0) / trades.length;
+const totalDrift = dailyData.reduce((sum, d) => sum + d.deviation, 0);
+const driftPercent = lastDay.startCapital > 0
+  ? (totalDrift / (lastDay.startCapital * dailyData.length)) * 100
+  : 0;
 ```
 
-This is mathematically correct but doesn't represent the typical trading performance.
+**Problem:** This sums ALL daily deviations (cumulative) and divides by `lastDay.startCapital × totalDays`, which produces incorrect results. The denominator doesn't represent the proper base for calculating drift percentage.
 
-### Issue 2: Dual Stat Calculation Sources
+**Correct formula should be:**
+```typescript
+// Drift = (Actual Capital - Planned Capital) / Planned Capital × 100
+const driftPercent = lastDay.plannedCapital > 0
+  ? ((lastDay.endCapital - lastDay.plannedCapital) / lastDay.plannedCapital) * 100
+  : 0;
+```
 
-The dashboard has two separate sources calculating statistics:
-1. `DashboardProvider.tsx` - calculates `stats` internally (lines 129-238)
-2. `useDashboardStats.ts` - separate hook used by `InsightsContent.tsx`
+### Issue 3: plannedCapital Calculation Uses Day's Start Capital Instead of Compound Target
 
-Both calculate similar metrics but may produce slightly different results.
+**Current formula (line 163):**
+```typescript
+day.plannedCapital = day.startCapital * (1 + p);
+```
+
+**Problem:** This calculates "what I should earn TODAY" based on current capital, not "where I should BE according to compound growth from initial investment."
+
+**Correct formula:**
+```typescript
+// Planned capital should be: Initial × (1 + target%)^days
+day.plannedCapital = initialInvestment * Math.pow(1 + p, calendarDaysFromStart + 1);
+```
+
+The rolling mode (line 167) already uses this formula correctly for `requiredToday`, but `plannedCapital` used for chart/metrics doesn't.
+
+---
 
 ## Solution
 
-### 1. Add Outlier-Resistant ROI Calculation
+### File: `src/components/widgets/RollingTargetWidget.tsx`
 
-**File**: `src/hooks/useDashboardStats.ts`
+**Change 1: Fix plannedCapital calculation (line 163)**
 
-Add median-based or trimmed mean ROI calculation to handle outliers:
+| Before | After |
+|--------|-------|
+| `day.plannedCapital = day.startCapital * (1 + p);` | `day.plannedCapital = initialInvestment * Math.pow(1 + p, calendarDaysFromStart + 1);` |
 
-```typescript
-// Calculate median ROI instead of mean (outlier-resistant)
-const sortedROIs = trades.map(t => t.roi || 0).sort((a, b) => a - b);
-const mid = Math.floor(sortedROIs.length / 2);
-const medianRoi = sortedROIs.length % 2 !== 0
-  ? sortedROIs[mid]
-  : (sortedROIs[mid - 1] + sortedROIs[mid]) / 2;
+**Change 2: Fix driftPercent calculation (lines 336-339)**
 
-// Use trimmed mean (remove top/bottom 10% outliers)
-const trimCount = Math.floor(sortedROIs.length * 0.1);
-const trimmedROIs = sortedROIs.slice(trimCount, sortedROIs.length - trimCount);
-const trimmedAvgRoi = trimmedROIs.length > 0
-  ? trimmedROIs.reduce((a, b) => a + b, 0) / trimmedROIs.length
-  : 0;
-```
+| Before | After |
+|--------|-------|
+| `totalDrift / (lastDay.startCapital × dailyData.length)` | `(lastDay.endCapital - lastDay.plannedCapital) / lastDay.plannedCapital` |
 
-### 2. Use Weighted ROI by Position Size
+---
 
-More accurate representation: weight each trade's ROI by its capital/margin:
+## Expected Results After Fix
 
-**File**: `src/hooks/useDashboardStats.ts`
-
-```typescript
-// Weighted average ROI (capital-weighted)
-const totalMargin = trades.reduce((sum, t) => sum + (t.margin || 0), 0);
-const weightedAvgRoi = totalMargin > 0
-  ? trades.reduce((sum, t) => sum + ((t.roi || 0) * (t.margin || 0)), 0) / totalMargin
-  : 0;
-```
-
-### 3. Display Both Simple and Weighted Metrics
-
-**File**: `src/components/insights/InsightsQuickSummary.tsx`
-
-Update to show weighted ROI instead of simple average:
-
-```typescript
-// Line 57-64: Change avgROI display
-{
-  label: t('dashboard.avgROI'),
-  value: avgROI,  // Pass weighted ROI from parent
-  displayValue: `${avgROI >= 0 ? '+' : ''}${avgROI.toFixed(2)}%`,
-  // ...
-}
-```
-
-### 4. Pass Correct Stats to InsightsContent
-
-**File**: `src/components/dashboard/tabs/InsightsContent.tsx`
-
-The component already receives `processedTrades` from `DashboardProvider`. Ensure it's using the capital-weighted ROI:
-
-```typescript
-// Line 55: Change from stats.avgRoi to stats.weightedAvgRoi or calculate inline
-avgROI={stats.avgRoi}  // Ensure this is the weighted version
-```
+| Metric | Before (Wrong) | After (Correct) |
+|--------|----------------|-----------------|
+| Planned Capital | Based on daily start capital | Compound growth from initial |
+| Drift from Plan | Cumulative sum / arbitrary base | `(Actual - Planned) / Planned` |
+| Chart "Planned" line | Step-function jumps | Smooth exponential curve |
 
 ## Files to Modify
+- `src/components/widgets/RollingTargetWidget.tsx`
 
-1. **`src/hooks/useDashboardStats.ts`**
-   - Add weighted/trimmed ROI calculation
-   - Return both `simpleAvgRoi` and `weightedAvgRoi`
+## Technical Summary
 
-2. **`src/components/dashboard/tabs/InsightsContent.tsx`**
-   - Use weighted ROI for display
-
-3. **`src/components/insights/InsightsQuickSummary.tsx`** (optional)
-   - Add tooltip explaining the metric is weighted
-
-## Expected Results
-
-| Metric | Before | After |
-|--------|--------|-------|
-| Avg ROI | -51.86% (distorted) | ~+7% (weighted by capital) |
-| Profit Factor | 1.60 | 1.60 (unchanged) |
-| Win Rate | 68.75% | 68.75% (unchanged) |
-| Total P&L | $340.75 | $340.75 (unchanged) |
-
-## Technical Details
-
-The weighted ROI calculation uses each trade's margin (capital at risk) as weight:
-
-```
-Weighted ROI = Σ(ROI_i × Margin_i) / Σ(Margin_i)
-```
-
-This prevents a small $10 trade from having equal influence as a $1000 trade on the average ROI metric.
-
+The Rolling Target widget is displaying incorrect data because:
+1. `plannedCapital` is calculated relative to each day's start capital instead of absolute compound growth target
+2. `driftPercent` uses an incorrect denominator that doesn't represent true deviation from plan
+3. These compound errors produce values that don't align with actual trading performance vs target curve
