@@ -476,7 +476,9 @@ const Settings = () => {
                   <ExternalLink className="h-4 w-4" />
                 </Button>
               </div>
-              <CapitalManagement />
+              <p className="text-sm text-muted-foreground">
+                For full capital management features including adding, editing, and viewing your capital history, please use the full page.
+              </p>
             </PremiumCard>
           </TabsContent>
 
