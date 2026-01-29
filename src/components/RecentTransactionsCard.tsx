@@ -38,7 +38,7 @@ export const RecentTransactionsCard = memo(({ trades, className }: RecentTransac
               context={recentTrades.length > 0 ? `Latest: ${recentTrades[0].symbol} (${formatAmount(recentTrades[0].pnl || 0)})` : ''}
               onExplain={openWithPrompt}
             />
-            <a href="/dashboard" className="text-xs text-primary hover:underline">
+            <a href="/journal" className="text-xs text-primary hover:underline">
               {t('widgets.recentTransactions.viewAll')}
             </a>
           </div>

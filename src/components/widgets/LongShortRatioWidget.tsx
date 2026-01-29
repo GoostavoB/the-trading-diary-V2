@@ -85,7 +85,7 @@ export const LongShortRatioWidget = memo(({
             const calculatedChanges = await Promise.all(changePromises);
             setChanges(calculatedChanges);
             setLastUpdated(new Date());
-            toast.success('Long/Short Ratio updated');
+            // Removed toast to avoid notification spam on auto-refresh
         } catch (error) {
             console.error('Error updating widget:', error);
             toast.error('Failed to update data');
