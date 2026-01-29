@@ -47,40 +47,41 @@ export function BehaviorContent() {
 
   return (
     <div 
-      className="grid grid-cols-3 gap-3"
+      className="flex flex-col gap-3"
       style={{
-        gridTemplateRows: '1fr 1fr',
-        maxHeight: 'calc(100vh - 220px)',
-        overflow: 'hidden',
+        height: 'calc(100vh - 220px)',
       }}
     >
-      {/* Emotion & Mistake Correlation - Full width top */}
-      <div className="col-span-3">
-        <SmartWidgetWrapper id="emotionMistakeCorrelation" hasPadding={false}>
+      {/* Row 1: Emotion & Mistake Correlation - 55% height */}
+      <div className="shrink-0" style={{ height: '55%' }}>
+        <SmartWidgetWrapper id="emotionMistakeCorrelation" hasPadding={false} className="h-full">
           <EmotionMistakeCorrelationWidget id="emotionMistakeCorrelation" trades={processedTrades} />
         </SmartWidgetWrapper>
       </div>
 
-      {/* Trading Heatmap - 2 columns */}
-      <div className="col-span-2">
-        <SmartWidgetWrapper id="heatmap">
-          <TradingHeatmap trades={processedTrades} />
-        </SmartWidgetWrapper>
-      </div>
+      {/* Row 2: Heatmap + Quality Metrics - 45% height */}
+      <div className="flex-1 grid grid-cols-3 gap-3 min-h-0">
+        {/* Trading Heatmap - 2 columns */}
+        <div className="col-span-2 h-full overflow-hidden">
+          <SmartWidgetWrapper id="heatmap" className="h-full">
+            <TradingHeatmap trades={processedTrades} />
+          </SmartWidgetWrapper>
+        </div>
 
-      {/* Trading Quality Metrics - 1 column */}
-      <div className="col-span-1">
-        <SmartWidgetWrapper id="tradingQuality">
-          <TradingQualityMetrics
-            avgWin={qualityStats.avgWin}
-            avgLoss={qualityStats.avgLoss}
-            winCount={qualityStats.winCount}
-            lossCount={qualityStats.lossCount}
-            maxDrawdownAmount={qualityStats.maxDrawdownAmount}
-            maxDrawdownPercent={qualityStats.maxDrawdownPercent}
-            profitFactor={qualityStats.profitFactor}
-          />
-        </SmartWidgetWrapper>
+        {/* Trading Quality Metrics - 1 column */}
+        <div className="col-span-1 h-full overflow-hidden">
+          <SmartWidgetWrapper id="tradingQuality" className="h-full">
+            <TradingQualityMetrics
+              avgWin={qualityStats.avgWin}
+              avgLoss={qualityStats.avgLoss}
+              winCount={qualityStats.winCount}
+              lossCount={qualityStats.lossCount}
+              maxDrawdownAmount={qualityStats.maxDrawdownAmount}
+              maxDrawdownPercent={qualityStats.maxDrawdownPercent}
+              profitFactor={qualityStats.profitFactor}
+            />
+          </SmartWidgetWrapper>
+        </div>
       </div>
     </div>
   );
