@@ -1,15 +1,9 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-
-// Helper to generate secure state for CSRF protection
-const generateState = () => {
-  return [...crypto.getRandomValues(new Uint8Array(16))]
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-};
 
 interface AuthContextType {
   user: User | null;
@@ -135,87 +129,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signInWithGoogle = async (): Promise<{ error: any }> => {
-    // Generate state for CSRF protection
-    const state = generateState();
-    
-    // Build OAuth URL using Lovable's OAuth broker
-    const params = new URLSearchParams({
-      provider: 'google',
-      redirect_uri: `${window.location.origin}/auth`,
-      state,
-      response_mode: 'web_message'
-    });
-    
-    const oauthUrl = `https://oauth.lovable.app/~oauth/initiate?${params.toString()}`;
-    
-    // Open popup centered on screen
-    const width = 500;
-    const height = 600;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
-    
-    const popup = window.open(
-      oauthUrl,
-      'oauth',
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
-    
-    if (!popup) {
-      toast.error('Popup was blocked. Please allow popups for this site.');
-      return { error: new Error('Popup blocked') };
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+
+      if (result.error) {
+        toast.error(result.error.message || 'Sign in failed');
+        return { error: result.error };
+      }
+
+      // If redirected, the page will reload and auth state will update automatically
+      if (!result.redirected) {
+        navigate('/dashboard');
+      }
+
+      return { error: null };
+    } catch (e) {
+      const error = e instanceof Error ? e : new Error(String(e));
+      toast.error('Failed to sign in with Google');
+      return { error };
     }
-    
-    // Listen for postMessage from OAuth broker
-    return new Promise((resolve) => {
-      const handleMessage = async (event: MessageEvent) => {
-        // Only accept messages from Lovable OAuth broker
-        if (event.origin !== 'https://oauth.lovable.app') return;
-        if (event.data?.type !== 'authorization_response') return;
-        
-        window.removeEventListener('message', handleMessage);
-        clearInterval(checkClosed);
-        popup.close();
-        
-        const data = event.data.response;
-        
-        if (data.error) {
-          toast.error(data.error_description || 'Sign in failed');
-          resolve({ error: new Error(data.error_description || 'Sign in failed') });
-          return;
-        }
-        
-        // Validate state to prevent CSRF attacks
-        if (data.state !== state) {
-          toast.error('Invalid authentication state');
-          resolve({ error: new Error('Invalid state') });
-          return;
-        }
-        
-        // Set session with Supabase
-        try {
-          await supabase.auth.setSession({
-            access_token: data.access_token,
-            refresh_token: data.refresh_token
-          });
-          navigate('/dashboard');
-          resolve({ error: null });
-        } catch (e) {
-          toast.error('Failed to complete sign in');
-          resolve({ error: e });
-        }
-      };
-      
-      window.addEventListener('message', handleMessage);
-      
-      // Check if popup was closed without completing
-      const checkClosed = setInterval(() => {
-        if (popup.closed) {
-          clearInterval(checkClosed);
-          window.removeEventListener('message', handleMessage);
-          resolve({ error: new Error('Sign in was cancelled') });
-        }
-      }, 500);
-    });
   };
 
   const signOut = async () => {
