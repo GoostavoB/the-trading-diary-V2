@@ -123,7 +123,7 @@ export const CapitalGrowthWidget = memo(({
               stroke={isPositive ? "hsl(var(--neon-green))" : "hsl(var(--neon-red))"}
               strokeWidth={2}
               fill="url(#capitalGradient)"
-              animationDuration={1500}
+              isAnimationActive={false}
             />
           </AreaChart>
         </ResponsiveContainer>
