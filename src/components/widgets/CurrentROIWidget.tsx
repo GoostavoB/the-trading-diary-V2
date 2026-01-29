@@ -1,9 +1,9 @@
 import { memo, useState } from 'react';
 import { AnimatedCounter } from '@/components/AnimatedCounter';
-import { formatCurrency, formatPercent } from '@/utils/formatNumber';
-import { TrendingUp, TrendingDown, Edit2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Edit2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,10 +35,43 @@ export const CurrentROIWidget = memo(({
   const { t } = useTranslation();
   const isPositive = currentROI >= 0;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [capitalValue, setCapitalValue] = useState(initialInvestment.toString());
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = async () => {
+  // Check if there's existing capital log entries
+  const checkExistingCapitalLog = async (): Promise<boolean> => {
+    if (!user) return false;
+    const { data, error } = await supabase
+      .from('capital_log')
+      .select('id')
+      .eq('user_id', user.id)
+      .limit(1);
+    
+    return !error && data && data.length > 0;
+  };
+
+  const handleSaveClick = async () => {
+    const newValue = parseFloat(capitalValue);
+
+    if (isNaN(newValue) || newValue < 0) {
+      toast.error(t('errors.validationError'));
+      return;
+    }
+
+    // Check if there's existing capital history
+    const hasHistory = await checkExistingCapitalLog();
+    
+    if (hasHistory) {
+      // Show confirmation dialog
+      setShowConfirmDialog(true);
+    } else {
+      // Proceed directly
+      await executeCapitalUpdate();
+    }
+  };
+
+  const executeCapitalUpdate = async () => {
     const newValue = parseFloat(capitalValue);
 
     if (isNaN(newValue) || newValue < 0) {
@@ -62,7 +95,6 @@ export const CurrentROIWidget = memo(({
       if (settingsError) throw settingsError;
 
       // Clear existing capital_log entries and create a single entry with the new initial investment
-      // This ensures consistency between user_settings and capital_log
       const { error: deleteError } = await supabase
         .from('capital_log')
         .delete()
@@ -90,6 +122,7 @@ export const CurrentROIWidget = memo(({
 
       toast.success(t('success.updated'));
       setIsDialogOpen(false);
+      setShowConfirmDialog(false);
     } catch (error) {
       console.error('Error updating initial investment:', error);
       toast.error(t('errors.generic'));
@@ -99,7 +132,6 @@ export const CurrentROIWidget = memo(({
   };
 
   return (
-
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between p-4 border-b border-white/5">
         <h3 className="font-semibold text-sm">{t('widgets.currentROI.title')}</h3>
@@ -156,15 +188,12 @@ export const CurrentROIWidget = memo(({
                         onChange={(e) => setCapitalValue(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !isSaving) {
-                            handleSave();
+                            handleSaveClick();
                           }
                         }}
                       />
                       <p className="text-xs text-muted-foreground">
                         {t('widgets.currentBalance')}: <BlurredCurrency amount={currentBalance} className="inline" />
-                      </p>
-                      <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-2 font-medium">
-                        ⚠️ Note: Changing this will reset your Capital Management history and create a new starting point.
                       </p>
                       <p className="text-xs text-muted-foreground mt-2">
                         💡 Tip: Use <a href="/capital-management" className="text-primary hover:underline">Capital Management</a> to track capital additions over time for accurate ROI calculation.
@@ -178,7 +207,7 @@ export const CurrentROIWidget = memo(({
                       >
                         {t('common.cancel')}
                       </Button>
-                      <Button onClick={handleSave} disabled={isSaving}>
+                      <Button onClick={handleSaveClick} disabled={isSaving}>
                         {isSaving ? t('settings.saving') : t('common.save')}
                       </Button>
                     </div>
@@ -198,6 +227,41 @@ export const CurrentROIWidget = memo(({
           </p>
         </div>
       </div>
+
+      {/* Confirmation Dialog for Capital History Reset */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Reset Capital History?
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                <p>
+                  <strong>This action will delete your entire capital management history</strong> and create a fresh starting point with the new amount.
+                </p>
+                <p className="text-amber-600 dark:text-amber-400">
+                  All previous capital additions, removals, and tracking data will be permanently lost.
+                </p>
+                <p>
+                  If you want to add capital without losing history, use the <a href="/capital-management" className="text-primary hover:underline font-medium">Capital Management</a> page instead.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSaving}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={executeCapitalUpdate}
+              disabled={isSaving}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isSaving ? 'Resetting...' : 'Yes, Reset History'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 });

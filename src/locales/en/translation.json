@@ -1690,6 +1690,13 @@
       "title": "Trading Quality Metrics",
       "description": "Win/loss analysis and profit factor"
     },
+    "stats": "Statistics",
+    "portfolio": "Portfolio",
+    "premiumCTA": "Premium Features",
+    "insights": "Insights",
+    "streaks": "Streaks",
+    "heatmap": "Trading Heatmap",
+    "charts": "Charts",
     "categories": {
       "overview": {
         "label": "Overview",
