@@ -51,13 +51,16 @@ export const AdaptiveGrid = ({
   }, [columnCount, positions.length, order.length, isCustomizing]);
 
   console.log('[AdaptiveGrid] 🌊 Rendering Adaptive Grid:', { responsiveColumns, widgetCount: order.length });
-  // Adaptive mode: responsive flowing grid with dense packing
+  // Adaptive mode: responsive flowing grid with viewport-locked height
   return (
     <div
-      className="grid gap-3 auto-rows-auto transition-all duration-500 ease-out"
+      className="grid gap-3 transition-all duration-500 ease-out"
       style={{
         gridTemplateColumns: `repeat(${responsiveColumns}, minmax(0, 1fr))`,
+        gridAutoRows: 'minmax(0, 1fr)',
         gridAutoFlow: 'dense',
+        maxHeight: 'calc(100vh - 220px)',
+        overflow: 'hidden',
       }}
     >
       {order.map((widgetId, index) => (
