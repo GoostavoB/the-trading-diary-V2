@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable';
 import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
@@ -119,13 +120,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`,
-      }
+    const result = await lovable.auth.signInWithOAuth('google', {
+      redirect_uri: window.location.origin,
     });
-    return { error };
+    
+    if (result.error) {
+      return { error: result.error };
+    }
+    
+    // If not redirected and we have tokens, the session is already set
+    if (!result.redirected) {
+      navigate('/dashboard');
+    }
+    
+    return { error: null };
   };
 
   const signOut = async () => {
