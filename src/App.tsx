@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { SubAccountProvider } from "@/contexts/SubAccountContext";
-import { AIAssistantProvider } from "@/contexts/AIAssistantContext";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { BlurProvider } from "@/contexts/BlurContext";
 import { CalmModeProvider } from "@/contexts/CalmModeContext";
@@ -52,7 +51,6 @@ const FAQ = lazy(() => import("./pages/FAQ"));
 const CryptoTradingFAQ = lazy(() => import("./pages/CryptoTradingFAQ"));
 // Phase 2: Social features - temporarily disabled for backlog #34
 // const Social = lazy(() => import("./pages/Social"));
-const AITools = lazy(() => import("./pages/AITools"));
 const Journal = lazy(() => import("./pages/Journal"));
 // const TradeAnalysis = lazy(() => import("./pages/TradeAnalysis"));
 const Goals = lazy(() => import("./pages/Goals"));
@@ -192,7 +190,6 @@ const AppRoutes = () => {
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           {/* Phase 2: Social features - temporarily disabled for backlog #34 */}
           {/* <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} /> */}
-          <Route path="/ai-tools" element={<ProtectedRoute><AITools /></ProtectedRoute>} />
           <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
           {/* Trade Analysis temporarily disabled - incomplete module */}
           {/* <Route path="/trade-analysis" element={<ProtectedRoute><TradeAnalysis /></ProtectedRoute>} /> */}
@@ -260,16 +257,14 @@ const App = () => (
                         <CalmModeProvider>
                           <CurrencyProvider>
                             <BlurProvider>
-                              <AIAssistantProvider>
-                                <DateRangeProvider>
-                                  <AppRoutes />
-                                  <ConversionTracking />
-                                  <PerformanceMonitor />
-                                  <GlobalSearch />
-                                  <OfflineIndicator />
-                                  <InstallPrompt />
-                                </DateRangeProvider>
-                              </AIAssistantProvider>
+                              <DateRangeProvider>
+                                <AppRoutes />
+                                <ConversionTracking />
+                                <PerformanceMonitor />
+                                <GlobalSearch />
+                                <OfflineIndicator />
+                                <InstallPrompt />
+                              </DateRangeProvider>
                             </BlurProvider>
                           </CurrencyProvider>
                         </CalmModeProvider>

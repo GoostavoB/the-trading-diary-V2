@@ -3,11 +3,9 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { DollarSign, TrendingUp, TrendingDown } from "lucide-react";
 import { AnimatedCounter } from "./AnimatedCounter";
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
-import { ExplainMetricButton } from "@/components/ExplainMetricButton";
-import { useAIAssistant } from '@/contexts/AIAssistantContext';
 import { formatPercent } from "@/utils/formatNumber";
 import { Trade } from "@/types/trade";
-import { BlurredCurrency, BlurredPercent } from '@/components/ui/BlurredValue';
+import { BlurredCurrency } from '@/components/ui/BlurredValue';
 import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface TotalBalanceCardProps {
@@ -25,8 +23,7 @@ export const TotalBalanceCard = memo(({
   trades,
   className 
 }: TotalBalanceCardProps) => {
-  const { openWithPrompt } = useAIAssistant();
-  const { currency, convertAmount, formatAmount } = useCurrency();
+  const { currency, convertAmount } = useCurrency();
   
   // Generate sparkline data from last 14 trades
   const sparklineData = trades
@@ -58,36 +55,28 @@ export const TotalBalanceCard = memo(({
             </div>
             <p id="total-balance-title" className="text-sm font-medium text-muted-foreground">Total Balance</p>
           </div>
-          <div className="flex items-center gap-2">
-            <ExplainMetricButton 
-              metricName="Total Balance"
-              metricValue={formatAmount(balance)}
-              context={`Current change: ${formatAmount(change)} (${changePercent.toFixed(1)}%)`}
-              onExplain={openWithPrompt}
-            />
-            <div 
-              className={`flex items-center gap-1 px-2 py-1 rounded-lg ${
-                isPositive ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
-              }`}
-              role="status"
-              aria-label={`Balance change: ${isPositive ? 'up' : 'down'} ${formatPercent(Math.abs(changePercent))}`}
-            >
-              {isPositive ? (
-                <TrendingUp className="h-3 w-3" aria-hidden="true" />
-              ) : (
-                <TrendingDown className="h-3 w-3" aria-hidden="true" />
-              )}
-              <span className="text-xs font-semibold">
-                {isPositive ? '+' : ''}{changePercent.toFixed(1)}%
-              </span>
-            </div>
+          <div 
+            className={`flex items-center gap-1 px-2 py-1 rounded-lg ${
+              isPositive ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
+            }`}
+            role="status"
+            aria-label={`Balance change: ${isPositive ? 'up' : 'down'} ${formatPercent(Math.abs(changePercent))}`}
+          >
+            {isPositive ? (
+              <TrendingUp className="h-3 w-3" aria-hidden="true" />
+            ) : (
+              <TrendingDown className="h-3 w-3" aria-hidden="true" />
+            )}
+            <span className="text-xs font-semibold">
+              {isPositive ? '+' : ''}{changePercent.toFixed(1)}%
+            </span>
           </div>
         </div>
         
         <div className="space-y-1">
           <div 
             className="text-4xl font-bold tracking-tight"
-            aria-label={`Current balance: ${formatAmount(balance)}`}
+            aria-label={`Current balance`}
           >
             <AnimatedCounter value={convertAmount(balance)} prefix={currency.symbol} decimals={2} />
           </div>

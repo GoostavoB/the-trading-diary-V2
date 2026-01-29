@@ -1,9 +1,7 @@
 import { memo } from 'react';
 import { TrendingUp, TrendingDown, Target, DollarSign, Activity } from 'lucide-react';
-import { formatCurrency, formatPercent } from '@/utils/formatNumber';
+import { formatPercent } from '@/utils/formatNumber';
 import { cn } from '@/lib/utils';
-import { ExplainMetricButton } from '@/components/ExplainMetricButton';
-import { useAIAssistant } from '@/contexts/AIAssistantContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
 
@@ -22,7 +20,6 @@ export const InsightsQuickSummary = memo(({
   avgROI, 
   totalTrades 
 }: InsightsQuickSummaryProps) => {
-  const { openWithPrompt } = useAIAssistant();
   const { t } = useTranslation();
 
   const metrics = [
@@ -101,14 +98,6 @@ export const InsightsQuickSummary = memo(({
                   <TrendingUp className="h-3 w-3 text-profit" aria-hidden="true" /> : 
                   <TrendingDown className="h-3 w-3 text-loss" aria-hidden="true" />
               )}
-            </div>
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <ExplainMetricButton
-                metricName={metric.label}
-                metricValue={typeof metric.value === 'number' && metric.label === t('dashboard.totalPnL') ? formatCurrency(metric.value) : metric.displayValue?.toString() || metric.value.toString()}
-                onExplain={openWithPrompt}
-                className="h-6 w-6"
-              />
             </div>
           </div>
         );

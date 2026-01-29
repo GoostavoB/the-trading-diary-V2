@@ -3,9 +3,7 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
-import { ExplainMetricButton } from "@/components/ExplainMetricButton";
 import { MetricTooltip } from "@/components/MetricTooltip";
-import { useAIAssistant } from '@/contexts/AIAssistantContext';
 import { getMetricDefinition } from '@/utils/metricDefinitions';
 
 interface StatCardProps {
@@ -30,7 +28,6 @@ export const StatCard = memo(({
   className,
   valueClassName,
 }: StatCardProps) => {
-  const { openWithPrompt } = useAIAssistant();
   const chartData = sparklineData?.map((val, idx) => ({ value: val, index: idx })) || [];
   
   // Get metric definition for enhanced tooltip
@@ -54,18 +51,11 @@ export const StatCard = memo(({
               />
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <ExplainMetricButton 
-              metricName={title}
-              metricValue={value}
-              onExplain={openWithPrompt}
-            />
-            {Icon && (
-              <div className="p-2 rounded-xl bg-primary/10">
-                <Icon className="h-4 w-4 text-primary" aria-hidden="true" />
-              </div>
-            )}
-          </div>
+          {Icon && (
+            <div className="p-2 rounded-xl bg-primary/10">
+              <Icon className="h-4 w-4 text-primary" aria-hidden="true" />
+            </div>
+          )}
         </div>
         
         <div className="flex items-end justify-between">

@@ -16,8 +16,6 @@ import {
   Target,
   TrendingUp,
   Users,
-  Sparkles,
-  Calendar,
   DollarSign,
   Search,
 } from 'lucide-react';
@@ -96,16 +94,6 @@ const searchItems: SearchItem[] = [
     category: 'Community',
     keywords: ['community', 'leaderboard', 'share'],
   },
-  // Gamification page temporarily hidden - XP/Level/Challenges removed
-  // {
-  //   id: 'gamification',
-  //   title: 'Achievements',
-  //   description: 'Track your progress and unlock rewards',
-  //   icon: Sparkles,
-  //   path: '/gamification',
-  //   category: 'Rewards',
-  //   keywords: ['badges', 'xp', 'level', 'rewards'],
-  // },
   {
     id: 'fee-analysis',
     title: 'Fee Analysis',
@@ -114,15 +102,6 @@ const searchItems: SearchItem[] = [
     path: '/fee-analysis',
     category: 'Tools',
     keywords: ['costs', 'fees', 'expenses'],
-  },
-  {
-    id: 'ai-tools',
-    title: 'AI Tools',
-    description: 'AI-powered trading insights',
-    icon: Sparkles,
-    path: '/ai-tools',
-    category: 'Tools',
-    keywords: ['artificial intelligence', 'assistant', 'analysis'],
   },
 ];
 

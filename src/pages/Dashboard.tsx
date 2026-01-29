@@ -64,7 +64,6 @@ import { pageMeta } from '@/utils/seoHelpers';
 import { TradeStationView } from '@/components/trade-station/TradeStationView';
 import { TradeStationContent } from '@/components/dashboard/tabs/TradeStationContent';
 import { ErrorsContent } from '@/components/dashboard/tabs/ErrorsContent';
-import { AIAssistant } from '@/components/AIAssistant';
 import { TourCTAButton } from '@/components/tour/TourCTAButton';
 
 // Helper function
@@ -657,9 +656,6 @@ function DashboardContent() {
             </>
           )}
 
-          <Suspense fallback={null}>
-            <AIAssistant />
-          </Suspense>
 
           <WidgetLibrary
             open={showWidgetLibrary}

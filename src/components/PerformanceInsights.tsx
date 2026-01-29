@@ -4,8 +4,6 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, Trophy, Target } from 'lucide-react';
 import type { Trade } from '@/types/trade';
 import { formatPercent } from '@/utils/formatNumber';
-import { ExplainMetricButton } from '@/components/ExplainMetricButton';
-import { useAIAssistant } from '@/contexts/AIAssistantContext';
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { calculateTradePnL, calculateTotalPnL } from '@/utils/pnl';
@@ -15,8 +13,7 @@ interface PerformanceInsightsProps {
 }
 
 export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) => {
-  const { openWithPrompt } = useAIAssistant();
-  const { convertAmount, formatAmount } = useCurrency();
+  const { formatAmount } = useCurrency();
   if (!trades.length) return null;
 
   // Calculate insights
@@ -165,13 +162,6 @@ export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) =
                 <div className="flex-1">
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <h4 id={`insight-${index}-title`} className="font-semibold text-sm">{insight.title}</h4>
-                    <ExplainMetricButton
-                      metricName={insight.title}
-                      metricValue=""
-                      context={insight.message}
-                      onExplain={openWithPrompt}
-                      className="flex-shrink-0"
-                    />
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {insight.message}
@@ -191,12 +181,6 @@ export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) =
               <Trophy className="w-4 h-4 text-neon-green" aria-hidden="true" />
               <h4 className="font-semibold text-sm">Best Trade</h4>
             </div>
-            <ExplainMetricButton
-              metricName="Best Trade"
-              metricValue={formatAmount(bestTrade.pnl || 0)}
-              context={`${bestTrade.symbol} with ${formatPercent(bestTrade.roi || 0)} ROI`}
-              onExplain={openWithPrompt}
-            />
           </div>
           <div className="space-y-1">
             <div className="flex items-center justify-between">
@@ -224,12 +208,6 @@ export const PerformanceInsights = memo(({ trades }: PerformanceInsightsProps) =
               <AlertCircle className="w-4 h-4 text-neon-red" aria-hidden="true" />
               <h4 className="font-semibold text-sm">Worst Trade</h4>
             </div>
-            <ExplainMetricButton
-              metricName="Worst Trade"
-              metricValue={formatAmount(worstTrade.pnl || 0)}
-              context={`${worstTrade.symbol} with ${formatPercent(worstTrade.roi || 0)} ROI`}
-              onExplain={openWithPrompt}
-            />
           </div>
           <div className="space-y-1">
             <div className="flex items-center justify-between">

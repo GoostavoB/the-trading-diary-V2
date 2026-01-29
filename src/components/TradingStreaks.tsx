@@ -4,15 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { Trade } from '@/types/trade';
 import { calculateTradePnL } from '@/utils/pnl';
-import { ExplainMetricButton } from '@/components/ExplainMetricButton';
-import { useAIAssistant } from '@/contexts/AIAssistantContext';
 
 interface TradingStreaksProps {
   trades: Trade[];
 }
 
 export const TradingStreaks = memo(({ trades }: TradingStreaksProps) => {
-  const { openWithPrompt } = useAIAssistant();
   if (trades.length === 0) return null;
 
   // Sort trades by closed_at date (fallback to trade_date)
@@ -61,7 +58,6 @@ export const TradingStreaks = memo(({ trades }: TradingStreaksProps) => {
   });
 
   // Find consecutive trading days (use closed_at for day keys, fallback to trade_date)
-  // This intentionally uses unique day logic for streaks
   const tradingDays = new Set(sortedTrades.map(t => 
     new Date(t.closed_at || t.trade_date).toDateString()
   ));
@@ -113,13 +109,6 @@ export const TradingStreaks = memo(({ trades }: TradingStreaksProps) => {
           </span>
         </div>
         <div className="absolute top-2 right-2 flex gap-1">
-          <ExplainMetricButton
-            metricName="Current Streak"
-            metricValue={`${currentStreak} ${currentStreakType === 'win' ? 'wins' : 'losses'}`}
-            context="Number of consecutive winning or losing trades from most recent positions"
-            onExplain={openWithPrompt}
-            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-          />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -157,13 +146,6 @@ export const TradingStreaks = memo(({ trades }: TradingStreaksProps) => {
           <span className="text-xs text-muted-foreground">wins</span>
         </div>
         <div className="absolute top-2 right-2 flex gap-1">
-          <ExplainMetricButton
-            metricName="Best Win Streak"
-            metricValue={`${longestWinStreak} wins`}
-            context="Longest run of consecutive profitable trades"
-            onExplain={openWithPrompt}
-            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-          />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -196,13 +178,6 @@ export const TradingStreaks = memo(({ trades }: TradingStreaksProps) => {
           <span className="text-xs text-muted-foreground">losses</span>
         </div>
         <div className="absolute top-2 right-2 flex gap-1">
-          <ExplainMetricButton
-            metricName="Max Drawdown Streak"
-            metricValue={`${longestLossStreak} losses`}
-            context="Longest run of consecutive losing trades"
-            onExplain={openWithPrompt}
-            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-          />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -235,13 +210,6 @@ export const TradingStreaks = memo(({ trades }: TradingStreaksProps) => {
           <span className="text-xs text-muted-foreground">days</span>
         </div>
         <div className="absolute top-2 right-2 flex gap-1">
-          <ExplainMetricButton
-            metricName="Consecutive Trading Days"
-            metricValue={`${maxConsecutiveDays} days`}
-            context="Longest streak of back-to-back trading days"
-            onExplain={openWithPrompt}
-            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-          />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
