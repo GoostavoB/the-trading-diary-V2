@@ -1,4 +1,4 @@
-import { memo, ReactNode, Suspense } from 'react';
+import { memo, ReactNode, Suspense, createContext, useContext } from 'react';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Button } from '@/components/ui/button';
 import { Trash2, GripVertical, AlertCircle, RefreshCw } from 'lucide-react';
@@ -7,6 +7,14 @@ import { WidgetResizeControls } from './WidgetResizeControls';
 import { WidgetSize, WidgetHeight } from '@/types/widget';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorBoundary } from 'react-error-boundary';
+import { calculateDensity, WidgetDensity } from '@/hooks/useAdaptiveWidgetSize';
+
+// Context to pass widget count down to child widgets
+export const WidgetDensityContext = createContext<WidgetDensity>('comfortable');
+
+export function useWidgetDensity() {
+  return useContext(WidgetDensityContext);
+}
 
 interface SmartWidgetWrapperProps {
     id: string;
@@ -23,21 +31,34 @@ interface SmartWidgetWrapperProps {
     className?: string;
     headerActions?: ReactNode;
     hasPadding?: boolean;
+    widgetCount?: number; // Total widgets on dashboard for density calculation
 }
 
 function ErrorFallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
     return (
-        <div className="flex flex-col items-center justify-center h-full p-4 text-center space-y-2 min-h-[150px]">
-            <AlertCircle className="h-8 w-8 text-destructive/50" />
-            <p className="text-sm font-medium text-destructive">Widget Error</p>
-            <p className="text-xs text-muted-foreground max-w-[200px] truncate" title={error.message}>
+        <div className="flex flex-col items-center justify-center h-full p-3 text-center space-y-1.5">
+            <AlertCircle className="h-6 w-6 text-destructive/50" />
+            <p className="text-xs font-medium text-destructive">Widget Error</p>
+            <p className="text-[10px] text-muted-foreground max-w-[180px] truncate" title={error.message}>
                 {error.message}
             </p>
-            <Button variant="outline" size="sm" onClick={resetErrorBoundary} className="h-7 text-xs mt-2">
+            <Button variant="outline" size="sm" onClick={resetErrorBoundary} className="h-6 text-[10px] mt-1">
                 <RefreshCw className="h-3 w-3 mr-1" /> Retry
             </Button>
         </div>
     );
+}
+
+// Get padding class based on density
+function getPaddingClass(density: WidgetDensity, hasPadding: boolean): string {
+    if (!hasPadding) return '';
+    switch (density) {
+        case 'spacious': return 'p-5';
+        case 'comfortable': return 'p-4';
+        case 'compact': return 'p-3';
+        case 'dense': return 'p-2';
+        default: return 'p-3';
+    }
 }
 
 export const SmartWidgetWrapper = memo(({
@@ -55,14 +76,17 @@ export const SmartWidgetWrapper = memo(({
     className,
     headerActions,
     hasPadding = true,
+    widgetCount = 6, // Default to comfortable density
 }: SmartWidgetWrapperProps) => {
+    const density = calculateDensity(widgetCount);
+    const paddingClass = getPaddingClass(density, hasPadding);
 
     if (isLoading) {
         return (
-            <PremiumCard className={cn("h-full flex flex-col p-4 space-y-3", className)}>
+            <PremiumCard className={cn("h-full flex flex-col space-y-2", paddingClass, className)}>
                 <div className="flex items-center justify-between">
-                    <Skeleton className="h-5 w-1/3" />
-                    <Skeleton className="h-4 w-4 rounded-full" />
+                    <Skeleton className="h-4 w-1/3" />
+                    <Skeleton className="h-3 w-3 rounded-full" />
                 </div>
                 <Skeleton className="h-full w-full rounded-lg flex-1" />
             </PremiumCard>
@@ -70,71 +94,73 @@ export const SmartWidgetWrapper = memo(({
     }
 
     return (
-        <PremiumCard
-            className={cn(
-                "h-full flex flex-col relative group transition-all duration-200",
-                isEditMode && "ring-2 ring-primary/50 scale-[0.99] hover:ring-primary",
-                className
-            )}
-            contentClassName={!hasPadding ? "p-0" : undefined}
-            title={title}
-            action={headerActions}
-        >
-            {/* Edit Mode Controls */}
-            {isEditMode && (
-                <div className="absolute top-2 right-2 z-50 flex gap-1 opacity-100 transition-opacity">
-                    <div className="cursor-move p-1.5 rounded bg-background/80 hover:bg-background border border-primary/20 text-primary shadow-sm">
-                        <GripVertical className="h-4 w-4" />
-                    </div>
+        <WidgetDensityContext.Provider value={density}>
+            <PremiumCard
+                className={cn(
+                    "h-full flex flex-col relative group transition-all duration-200",
+                    isEditMode && "ring-2 ring-primary/50 scale-[0.99] hover:ring-primary",
+                    className
+                )}
+                contentClassName={!hasPadding ? "p-0" : paddingClass}
+                title={title}
+                action={headerActions}
+            >
+                {/* Edit Mode Controls */}
+                {isEditMode && (
+                    <div className="absolute top-1.5 right-1.5 z-50 flex gap-0.5 opacity-100 transition-opacity">
+                        <div className="cursor-move p-1 rounded bg-background/80 hover:bg-background border border-primary/20 text-primary shadow-sm">
+                            <GripVertical className="h-3.5 w-3.5" />
+                        </div>
 
-                    {onResize && currentSize && currentHeight && (
-                        <WidgetResizeControls
-                            currentSize={currentSize}
-                            currentHeight={currentHeight}
-                            onResize={onResize}
-                        />
-                    )}
-
-                    {onRemove && (
-                        <Button
-                            variant="destructive"
-                            size="icon"
-                            className="h-7 w-7 shadow-sm"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onRemove();
-                            }}
-                        >
-                            <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                    )}
-                </div>
-            )}
-
-            {/* Content with Error Boundary */}
-            <div className="flex-1 overflow-hidden mt-2">
-                <ErrorBoundary
-                    FallbackComponent={ErrorFallback}
-                    onReset={onRetry}
-                >
-                    <Suspense fallback={<Skeleton className="h-full w-full" />}>
-                        {error ? (
-                            <div className="flex flex-col items-center justify-center h-full p-4 text-center space-y-2">
-                                <AlertCircle className="h-6 w-6 text-destructive/50" />
-                                <p className="text-xs text-muted-foreground">{error.message}</p>
-                                {onRetry && (
-                                    <Button variant="ghost" size="sm" onClick={onRetry} className="h-6 text-xs">
-                                        Retry
-                                    </Button>
-                                )}
-                            </div>
-                        ) : (
-                            children
+                        {onResize && currentSize && currentHeight && (
+                            <WidgetResizeControls
+                                currentSize={currentSize}
+                                currentHeight={currentHeight}
+                                onResize={onResize}
+                            />
                         )}
-                    </Suspense>
-                </ErrorBoundary>
-            </div>
-        </PremiumCard>
+
+                        {onRemove && (
+                            <Button
+                                variant="destructive"
+                                size="icon"
+                                className="h-6 w-6 shadow-sm"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onRemove();
+                                }}
+                            >
+                                <Trash2 className="h-3 w-3" />
+                            </Button>
+                        )}
+                    </div>
+                )}
+
+                {/* Content with Error Boundary */}
+                <div className="flex-1 overflow-hidden">
+                    <ErrorBoundary
+                        FallbackComponent={ErrorFallback}
+                        onReset={onRetry}
+                    >
+                        <Suspense fallback={<Skeleton className="h-full w-full" />}>
+                            {error ? (
+                                <div className="flex flex-col items-center justify-center h-full p-3 text-center space-y-1.5">
+                                    <AlertCircle className="h-5 w-5 text-destructive/50" />
+                                    <p className="text-[10px] text-muted-foreground">{error.message}</p>
+                                    {onRetry && (
+                                        <Button variant="ghost" size="sm" onClick={onRetry} className="h-5 text-[10px]">
+                                            Retry
+                                        </Button>
+                                    )}
+                                </div>
+                            ) : (
+                                children
+                            )}
+                        </Suspense>
+                    </ErrorBoundary>
+                </div>
+            </PremiumCard>
+        </WidgetDensityContext.Provider>
     );
 });
 

@@ -55,9 +55,9 @@ export const CompactPerformanceWidget = memo(({
     const isPnLPositive = avgPnLPerDay >= 0;
 
     return (
-        <div className="flex flex-col h-full p-4 gap-4 overflow-hidden">
+        <div className="flex flex-col h-full p-3 gap-3 overflow-hidden">
             {/* Header */}
-            <h3 className="font-bold text-sm tracking-tight text-foreground shrink-0">
+            <h3 className="font-bold text-xs tracking-tight text-foreground shrink-0">
                 Performance Overview
             </h3>
 

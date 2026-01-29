@@ -1,8 +1,8 @@
 import { memo } from 'react';
 import { Target } from 'lucide-react';
-import { formatPercent } from '@/utils/formatNumber';
 import { WidgetProps } from '@/types/widget';
 import { useTranslation } from '@/hooks/useTranslation';
+import { cn } from '@/lib/utils';
 
 interface WinRateWidgetProps extends WidgetProps {
   winRate: number;
@@ -12,8 +12,7 @@ interface WinRateWidgetProps extends WidgetProps {
 }
 
 /**
- * S Widget (1×1) - Compact stat
- * Per spec: padding 8-10px, max 3 lines, typography 10-18px
+ * Win Rate Widget - Compact responsive design with circular indicator
  */
 export const WinRateWidget = memo(({
   id,
@@ -26,58 +25,79 @@ export const WinRateWidget = memo(({
   totalTrades,
 }: WinRateWidgetProps) => {
   const { t } = useTranslation();
+  const isGoodWinRate = winRate >= 50;
+  
+  // Calculate the stroke offset for the circular progress
+  const radius = 28;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (winRate / 100) * circumference;
 
   return (
-    <div className="flex items-center justify-between h-full p-4">
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-primary/10 ring-1 ring-primary/20">
-            <Target className="h-4 w-4 text-primary" />
-          </div>
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            Win Rate
-          </span>
+    <div className="flex flex-col h-full p-3 gap-2 justify-center">
+      {/* Header */}
+      <div className="flex items-center gap-2 shrink-0">
+        <div className="p-1.5 rounded-lg bg-primary/10">
+          <Target className="h-3.5 w-3.5 text-primary" />
         </div>
+        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+          {t('widgets.winRate.title')}
+        </span>
+      </div>
 
-        <div>
-          <div className="text-3xl font-bold gradient-text tracking-tight">
-            {formatPercent(winRate)}
-          </div>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-neon-green/10 text-neon-green border border-neon-green/20">
+      {/* Main Content - Circular Chart + Value */}
+      <div className="flex items-center justify-between gap-3 flex-1 min-h-0">
+        {/* Win Rate Value */}
+        <div className="flex flex-col gap-0.5">
+          <span className={cn(
+            "text-2xl font-bold tabular-nums",
+            isGoodWinRate ? "text-neon-green" : "text-neon-red"
+          )}>
+            {winRate.toFixed(1)}%
+          </span>
+          <div className="flex items-center gap-1.5 text-[10px]">
+            <span className="px-1.5 py-0.5 rounded bg-neon-green/15 text-neon-green font-semibold">
               {wins}W
             </span>
-            <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-neon-red/10 text-neon-red border border-neon-red/20">
+            <span className="px-1.5 py-0.5 rounded bg-neon-red/15 text-neon-red font-semibold">
               {losses}L
             </span>
           </div>
         </div>
-      </div>
 
-      {/* Circular Progress Premium */}
-      <div className="relative h-16 w-16 flex items-center justify-center">
-        <svg className="h-full w-full -rotate-90 drop-shadow-lg" viewBox="0 0 36 36">
-          {/* Background Circle */}
-          <path
-            className="text-muted/20"
-            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-          />
-          {/* Progress Circle */}
-          <path
-            className={winRate >= 50 ? "text-neon-green drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]" : "text-neon-red drop-shadow-[0_0_10px_rgba(239,68,68,0.4)]"}
-            strokeDasharray={`${winRate}, 100`}
-            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className={`h-12 w-12 rounded-full blur-xl opacity-20 ${winRate >= 50 ? 'bg-neon-green' : 'bg-neon-red'}`} />
+        {/* Circular Progress */}
+        <div className="relative h-14 w-14 shrink-0">
+          <svg className="h-full w-full -rotate-90" viewBox="0 0 64 64">
+            {/* Background circle */}
+            <circle
+              className="text-muted/20"
+              cx="32"
+              cy="32"
+              r={radius}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="6"
+            />
+            {/* Progress circle */}
+            <circle
+              className={isGoodWinRate ? "text-neon-green" : "text-neon-red"}
+              cx="32"
+              cy="32"
+              r={radius}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+            />
+          </svg>
+          {/* Center text */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-[10px] font-medium text-muted-foreground">
+              {totalTrades}
+            </span>
+          </div>
         </div>
       </div>
     </div>
