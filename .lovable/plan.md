@@ -1,221 +1,205 @@
 
-# Dashboard Layout Compaction & Responsiveness Fix
+
+# Dashboard Tab Reorganization: Above-the-Fold Compact Layout
 
 ## Problem Analysis
 
-After reviewing the codebase, I identified the root causes of the spacing issues:
+The current dashboard has several issues preventing a compact, above-the-fold layout:
 
-### Current Issues
+1. **Too many widgets on one tab**: The Command Center (Overview) tries to display 12+ widgets, causing inevitable scrolling
+2. **No viewport-height constraint**: The grid doesn't enforce `100vh` bounds
+3. **Current tabs structure**:
+   - Trade Station (tools)
+   - Command Center (performance widgets - overcrowded)
+   - Insights (analytics - separate page view)
+   - Trade History (journal)
 
-1. **Fixed Row Heights**: The grid uses `auto-rows-[minmax(180px,auto)]` which creates a fixed 180px minimum height for all rows, leaving empty space in widgets that don't need that much height.
+4. **Reference image analysis**: The example shows:
+   - Top row: 5 compact KPI chips (Net P&L, Trade Expectancy, Profit Factor, Win/Loss Trade, Win Rate)
+   - Second row: 3 medium widgets (Score radar chart, Cumulative P&L chart, Daily P&L bars)
+   - Third row: 2 medium widgets (Open Positions table, Calendar heatmap)
+   - Total: ~10 widgets fitting above the fold with no scroll
 
-2. **Disconnected Size System**: 
-   - Grid uses 3 columns (`grid-cols-3`) 
-   - Widget sizes map to columns (small=1, medium=2, large=3)
-   - But widget heights are fixed (2, 4, 6 rows) and don't scale with screen size
+## Solution: 5-Tab Organization with Viewport-Locked Layouts
 
-3. **No Auto-Fill Behavior**: When widgets are removed, remaining widgets don't expand to fill empty space
+### New Tab Structure
 
-4. **Viewport Height Ignored**: Widgets don't scale based on available viewport height - they use absolute pixel values
+| Tab | Purpose | Max Widgets | Focus |
+|-----|---------|-------------|-------|
+| **Trade Station** | Daily trading tools | 4-6 | Risk calc, leverage, loss lock, quick actions |
+| **Command Center** | Core KPIs & charts | 6-8 | Balance, ROI, Win Rate, Capital Growth, Top Movers |
+| **Behavior** | Psychology & patterns | 4-6 | Emotions, mistakes, heatmap, quality metrics |
+| **Insights** | Deep analytics | 4-6 | Cost efficiency, highlights, behavior analytics |
+| **Trade History** | Journal & records | 1 (full page) | Trade table |
 
-5. **Wrong Widget Priority Order**: The default layout doesn't place most important widgets first for above-the-fold visibility
+### Widget Distribution
 
-### Architecture Diagram
-
+**Trade Station (Tools Tab)**
 ```text
-CURRENT SYSTEM (BROKEN):
-┌─────────────────────────────────────────────────────────────┐
-│  Grid: 3 columns, auto-rows: minmax(180px, auto)            │
-├───────────────┬───────────────┬─────────────────────────────┤
-│   Widget A    │   Widget B    │         Widget C            │
-│   small (1)   │   small (1)   │         medium (2)          │
-│   height: 2   │   height: 2   │         height: 2           │
-│   [180px+]    │   [180px+]    │         [180px+]            │
-├───────────────┴───────────────┴─────────────────────────────┤
-│                    [EMPTY SPACE - GAP]                      │
-├─────────────────────────────────────────────────────────────┤
-│                      Widget D (large)                       │
-│                      height: 4 [360px+]                     │
-└─────────────────────────────────────────────────────────────┘
-
-PROPOSED SYSTEM (AUTO-COMPACT):
-┌─────────────────────────────────────────────────────────────┐
-│  Grid: 3 columns, auto-rows: min-content, auto-flow: dense │
-├───────────────┬───────────────┬─────────────────────────────┤
-│   Widget A    │   Widget B    │         Widget C            │
-│   (flexes)    │   (flexes)    │         (flexes)            │
-├───────────────┴───────────────┼─────────────────────────────┤
-│        Widget D (large)       │  Widgets fill remaining     │
-│        (content-driven)       │  space dynamically          │
-└───────────────────────────────┴─────────────────────────────┘
+┌─────────────┬─────────────┬─────────────┐
+│ Risk Calc   │ Loss Lock   │ Leverage    │
+│ (medium)    │ (small)     │ (small)     │
+├─────────────┴─────────────┴─────────────┤
+│     Long/Short Ratio (full width)       │
+└─────────────────────────────────────────┘
 ```
 
----
-
-## Solution Overview
-
-Create a **Masonry-like auto-compact grid** that:
-1. Eliminates gaps between widgets
-2. Scales widget content based on number of widgets and viewport
-3. Auto-fills space when widgets are removed
-4. Prioritizes important widgets at the top
-
----
-
-## Implementation Plan
-
-### Phase 1: Fix Grid Container (SimplifiedDashboardGrid)
-
-**Changes:**
-- Remove fixed `minmax(180px, auto)` row sizing
-- Add CSS Masonry-like behavior with `grid-auto-flow: dense`
-- Use percentage-based heights tied to viewport
-
-```typescript
-// NEW: Viewport-aware grid with dense packing
-<div
-  className={cn(
-    "grid gap-2 transition-all duration-300",
-    getGridCols()
-  )}
-  style={{
-    gridAutoRows: 'minmax(0, auto)',
-    gridAutoFlow: 'dense',
-    minHeight: 'calc(100vh - 200px)', // Fill viewport
-  }}
->
+**Command Center (Performance Tab)**
+```text
+┌──────┬──────┬──────┬──────┬──────┐
+│ P&L  │ ROI  │ Win% │Trades│Streak│  ← KPI Row (5 compact chips)
+├──────┴──────┴──────┴──────┴──────┤
+│ Capital Growth Chart │ Top Movers│  ← Chart Row
+├──────────────────────┴───────────┤
+│        Goals Progress            │  ← Goals Row
+└──────────────────────────────────┘
 ```
 
-### Phase 2: Create Dynamic Widget Sizing Hook
-
-New hook: `useAdaptiveWidgetSize`
-
-**Purpose:** Calculate widget sizes based on:
-- Total number of visible widgets
-- Screen size (mobile/tablet/desktop)
-- Widget priority tier
-
-**Logic:**
-- Few widgets (1-4) → Larger sizes, more padding
-- Many widgets (8+) → Compact sizes, tight padding
-- Very many widgets (12+) → Ultra-compact mode
-
-### Phase 3: Update SmartWidgetWrapper
-
-**Changes:**
-- Remove fixed internal padding
-- Add responsive scaling classes
-- Content-driven height instead of row-span based
-
-```typescript
-// NEW: Content-adaptive wrapper
-<PremiumCard
-  className={cn(
-    "h-full flex flex-col",
-    widgetCount <= 4 && "p-6",        // Spacious
-    widgetCount <= 8 && "p-4",        // Normal  
-    widgetCount <= 12 && "p-3",       // Compact
-    widgetCount > 12 && "p-2",        // Ultra-compact
-  )}
->
+**Behavior Analytics Tab**
+```text
+┌─────────────────────────────────────────┐
+│   Emotion & Mistake Correlation         │
+├─────────────────────┬───────────────────┤
+│   Trading Heatmap   │ Quality Metrics   │
+└─────────────────────┴───────────────────┘
 ```
 
-### Phase 4: Reorder Default Layout by Priority
-
-**New priority order:**
-
-| Priority | Widget | Size | Reason |
-|----------|--------|------|--------|
-| 1 | totalBalance | large | Primary KPI - most important |
-| 2 | compactPerformance | large | Key metrics combo |
-| 3 | capitalGrowth | medium | Visual growth indicator |
-| 4 | longShortRatio | small | Market sentiment |
-| 5 | performanceHighlights | small | Quick wins/losses |
-| 6 | topMovers | small | Active assets |
-| 7 | goals | medium | User-defined targets |
-| 8 | emotionMistakeCorrelation | large | Behavioral insights |
-| 9 | behaviorAnalytics | medium | Pattern analysis |
-| 10 | costEfficiency | small | Fee tracking |
-| 11 | tradingQuality | small | Quality metrics |
-| 12 | aiInsights | medium | AI recommendations |
-
-### Phase 5: Implement Flex-Based Widget Heights
-
-Replace row-span system with content-driven flex:
-
-**Widget Categories:**
-- **KPI widgets** (small): `min-h-[100px]` flexible
-- **Chart widgets** (medium): `min-h-[200px]` with flex-1
-- **Full-width widgets** (large): `min-h-[150px]` auto-expand
-
----
+**Insights Tab**
+```text
+┌─────────────────────────────────────────┐
+│        Performance Highlights           │
+├─────────────────────┬───────────────────┤
+│   Cost Efficiency   │ Behavior Patterns │
+└─────────────────────┴───────────────────┘
+```
 
 ## Technical Implementation
 
-### Files to Modify
+### 1. Update Tab Types and Structure
 
-1. **`src/components/dashboard/SimplifiedDashboardGrid.tsx`**
-   - Change grid strategy from fixed rows to dense auto-flow
-   - Add viewport height calculation
-   - Remove row-span classes in favor of content-driven heights
+**File: `src/components/dashboard/DashboardTabs.tsx`**
+- Add new tab type: `'behavior'`
+- Update icons to match new tab purposes
 
-2. **`src/hooks/useAdaptiveWidgetSize.ts`** (NEW)
-   - Widget count detection
-   - Dynamic padding/sizing calculator
-   - Responsive breakpoints
+**File: `src/pages/Dashboard.tsx`**
+- Add 5th tab for "Behavior Analytics"
+- Create dedicated content components for each tab
+- Lock grid height to viewport: `max-h-[calc(100vh-180px)] overflow-hidden`
 
-3. **`src/components/widgets/SmartWidgetWrapper.tsx`**
-   - Accept adaptive size props
-   - Apply dynamic classes based on widget count
+### 2. Create New Tab Content Components
 
-4. **`src/config/widgetCatalog.ts`**
-   - Reorder DEFAULT_DASHBOARD_LAYOUT by priority
-   - Update size mappings for better default layout
+**New File: `src/components/dashboard/tabs/CommandCenterContent.tsx`**
+- Compact KPI row with 5 small stat chips
+- Capital Growth chart (medium width)
+- Top Movers + Goals (compact)
+- Viewport-locked height
 
-5. **`src/types/widget.ts`**
-   - Simplify height system (remove fixed 2/4/6)
-   - Add priority field to widget config
+**New File: `src/components/dashboard/tabs/BehaviorContent.tsx`**
+- Emotion/Mistake correlation widget
+- Trading heatmap
+- Quality metrics
+- Viewport-locked height
 
-6. **Individual widget components** (TotalBalanceWidget, etc.)
-   - Replace fixed padding with responsive classes
-   - Use flex-1 for content areas
+### 3. Update Grid System for Fixed Height
 
----
-
-## Expected Results
-
-| Metric | Before | After |
-|--------|--------|-------|
-| Gaps between widgets | Yes (visible) | None (dense pack) |
-| Above-fold content | 3-4 widgets | 6-8 widgets |
-| Widget removal behavior | Gap left behind | Auto-fill space |
-| Responsive scaling | Fixed pixels | Viewport-aware |
-| Mobile experience | Cut-off widgets | Full compact view |
-
----
-
-## Widget Count Scaling Behavior
-
-```text
-1-4 widgets:  ████████████████████████████████ Large, spacious
-5-8 widgets:  ████████████████████ Medium, comfortable  
-9-12 widgets: ████████████████ Compact, efficient
-13+ widgets:  ████████████ Ultra-compact, dense
-
-Each widget shrinks proportionally as more are added,
-ensuring ALL widgets fit above the fold.
+**File: `src/components/dashboard/SimplifiedDashboardGrid.tsx`**
+```typescript
+// Add viewport height constraint
+style={{
+  gridAutoRows: 'minmax(0, 1fr)', // Flex rows
+  maxHeight: 'calc(100vh - 200px)', // Viewport lock
+  overflow: 'hidden',
+}}
 ```
 
----
+### 4. Create Compact KPI Row Component
 
-## Estimated Implementation Time
+**New File: `src/components/widgets/CompactKPIRow.tsx`**
+A horizontal row of 5 compact KPI chips matching the reference design:
+- Net P&L
+- ROI %
+- Win Rate
+- Total Trades
+- Current Streak
 
-| Task | Time |
-|------|------|
-| Grid container fixes | 20 min |
-| useAdaptiveWidgetSize hook | 15 min |
-| SmartWidgetWrapper updates | 15 min |
-| Widget catalog reorder | 10 min |
-| Individual widget adjustments | 25 min |
-| Testing & refinement | 15 min |
-| **Total** | **~100 min** |
+Each chip: icon + value + label, minimal padding, no card borders
+
+### 5. Widget Catalog Updates
+
+**File: `src/config/widgetCatalog.ts`**
+- Define default layouts per tab
+- Add tab assignment to widget configs
+
+### 6. Tab-Specific Default Layouts
+
+```typescript
+// Command Center defaults (8 widgets max)
+export const COMMAND_CENTER_LAYOUT = [
+  'compactKPIs', // New compact row component
+  'capitalGrowth',
+  'topMovers', 
+  'goals',
+];
+
+// Behavior Tab defaults (4 widgets)
+export const BEHAVIOR_TAB_LAYOUT = [
+  'emotionMistakeCorrelation',
+  'heatmap',
+  'tradingQuality',
+];
+
+// Trade Station defaults (5 widgets)
+export const TRADE_STATION_LAYOUT = [
+  'riskCalculator',
+  'dailyLossLock',
+  'simpleLeverage',
+  'longShortRatio',
+];
+```
+
+## Implementation Files
+
+| File | Action | Purpose |
+|------|--------|---------|
+| `src/pages/Dashboard.tsx` | Edit | Add 5th tab, update TabsList grid |
+| `src/components/dashboard/tabs/CommandCenterContent.tsx` | Create | Compact performance dashboard |
+| `src/components/dashboard/tabs/BehaviorContent.tsx` | Create | Behavior analytics tab |
+| `src/components/widgets/CompactKPIRow.tsx` | Create | Horizontal KPI strip |
+| `src/components/dashboard/SimplifiedDashboardGrid.tsx` | Edit | Viewport lock |
+| `src/config/widgetCatalog.ts` | Edit | Tab-specific layouts |
+
+## Visual Result
+
+After implementation:
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│ [Trade Station] [Command Center] [Behavior] [Insights] [History] │
+├─────────────────────────────────────────────────────────────┤
+│ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐          │
+│ │ +$248 │ │ +12%  │ │ 62%   │ │ 156   │ │ 4W    │          │ ← KPI Row
+│ │ P&L   │ │ ROI   │ │ Win   │ │Trades │ │Streak │          │
+│ └───────┘ └───────┘ └───────┘ └───────┘ └───────┘          │
+│ ┌────────────────────────┐ ┌──────────────────┐            │
+│ │                        │ │    Top Movers    │            │ ← Charts
+│ │    Capital Growth      │ ├──────────────────┤            │
+│ │        Chart           │ │   Recent Trades  │            │
+│ │                        │ │                  │            │
+│ └────────────────────────┘ └──────────────────┘            │
+│ ┌──────────────────────────────────────────────┐           │
+│ │              Goals Progress                  │           │ ← Goals
+│ └──────────────────────────────────────────────┘           │
+└─────────────────────────────────────────────────────────────┘
+                    ↑ NO SCROLL - All above the fold
+```
+
+## Summary
+
+| Change | Before | After |
+|--------|--------|-------|
+| Tabs | 4 tabs | 5 tabs |
+| Widgets per tab | 12+ | 4-8 |
+| Scroll required | Yes | No (viewport locked) |
+| KPI display | Individual cards | Compact chip row |
+| Height behavior | Auto-expand | Fixed to viewport |
+
