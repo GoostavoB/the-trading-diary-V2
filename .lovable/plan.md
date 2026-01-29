@@ -1,90 +1,96 @@
 
-# Fix Rolling Target Dashboard - Wrong Information
+# Fix Long Short Ratio Chart Flickering and Missing Lines
 
-## Problems Identified
+## Problem Identified
 
-After analyzing the data and code, I found **three major issues** causing wrong information in the Rolling Target dashboard:
+The Long Short Ratio charts are flickering and not displaying lines properly due to **missing animation stability settings**.
 
-### Issue 1: initialInvestment Source vs. Actual Capital Log
+### Root Cause
 
-**Data Discrepancy:**
-- `user_settings.initial_investment` = **$1,500**
-- `capital_log` entry = **$1,000** (added 2025-12-30)
-- First trade opened: **2026-01-27** (almost 1 month after capital log entry)
+After reviewing the code and a known memory from a previous similar fix:
 
-The widget uses `initialInvestment` from `user_settings` ($1,500), but the actual capital added was $1,000. This creates a **$500 discrepancy** that cascades through all calculations.
+1. **All 10 Line components in `LongShortRatio.tsx` are missing `isAnimationActive={false}`**
+   - The Recharts library re-animates lines on every re-render
+   - When data is refreshed or the container resizes, the animation restarts causing visible "flashing"
 
-### Issue 2: Drift from Plan Calculation is Wrong
+2. **ResponsiveContainer + Animation = Flickering**
+   - The charts use `ResponsiveContainer` which detects size changes
+   - Each resize triggers a re-render, which triggers a new animation
+   - This creates the visual "blinking" effect
 
-**Current formula (lines 336-339):**
-```typescript
-const totalDrift = dailyData.reduce((sum, d) => sum + d.deviation, 0);
-const driftPercent = lastDay.startCapital > 0
-  ? (totalDrift / (lastDay.startCapital * dailyData.length)) * 100
-  : 0;
-```
+3. **Lazy Loading Compounds the Issue**
+   - The component is lazy-loaded via `Suspense` in `LSRContent.tsx`
+   - Mount/unmount cycles during tab switches can restart animations
 
-**Problem:** This sums ALL daily deviations (cumulative) and divides by `lastDay.startCapital × totalDays`, which produces incorrect results. The denominator doesn't represent the proper base for calculating drift percentage.
+### Evidence
 
-**Correct formula should be:**
-```typescript
-// Drift = (Actual Capital - Planned Capital) / Planned Capital × 100
-const driftPercent = lastDay.plannedCapital > 0
-  ? ((lastDay.endCapital - lastDay.plannedCapital) / lastDay.plannedCapital) * 100
-  : 0;
-```
+Other charts in the app already have this fix:
+- `CapitalGrowthWidget.tsx` line 126: `isAnimationActive={false}`
+- `TotalBalanceCard.tsx` line 119: `isAnimationActive={false}`
 
-### Issue 3: plannedCapital Calculation Uses Day's Start Capital Instead of Compound Target
-
-**Current formula (line 163):**
-```typescript
-day.plannedCapital = day.startCapital * (1 + p);
-```
-
-**Problem:** This calculates "what I should earn TODAY" based on current capital, not "where I should BE according to compound growth from initial investment."
-
-**Correct formula:**
-```typescript
-// Planned capital should be: Initial × (1 + target%)^days
-day.plannedCapital = initialInvestment * Math.pow(1 + p, calendarDaysFromStart + 1);
-```
-
-The rolling mode (line 167) already uses this formula correctly for `requiredToday`, but `plannedCapital` used for chart/metrics doesn't.
+The `LongShortRatio.tsx` charts do NOT have this property set.
 
 ---
 
 ## Solution
 
-### File: `src/components/widgets/RollingTargetWidget.tsx`
+### File: `src/pages/LongShortRatio.tsx`
 
-**Change 1: Fix plannedCapital calculation (line 163)**
+Add `isAnimationActive={false}` to all 10 `<Line>` components across the three chart views (Combined, Binance, Bybit).
 
-| Before | After |
-|--------|-------|
-| `day.plannedCapital = day.startCapital * (1 + p);` | `day.plannedCapital = initialInvestment * Math.pow(1 + p, calendarDaysFromStart + 1);` |
+**Lines to modify:**
 
-**Change 2: Fix driftPercent calculation (lines 336-339)**
+| Location | Line | Current | Add |
+|----------|------|---------|-----|
+| Combined L/S Ratio chart | ~249-255 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
+| Combined Account Distribution (Long) | ~285-291 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
+| Combined Account Distribution (Short) | ~292-298 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
+| Binance L/S Ratio chart | ~397-403 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
+| Binance Account Distribution (Long) | ~433-439 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
+| Binance Account Distribution (Short) | ~440-445 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
+| Bybit L/S Ratio chart | ~550-556 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
+| Bybit Account Distribution (Long) | ~586-592 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
+| Bybit Account Distribution (Short) | ~593-599 | `<Line ... strokeWidth={2} />` | `isAnimationActive={false}` |
 
-| Before | After |
-|--------|-------|
-| `totalDrift / (lastDay.startCapital × dailyData.length)` | `(lastDay.endCapital - lastDay.plannedCapital) / lastDay.plannedCapital` |
+**Example change:**
+
+Before:
+```tsx
+<Line
+  type="monotone"
+  dataKey="longShortRatio"
+  stroke="hsl(var(--neon-blue))"
+  name="Avg Long/Short Ratio"
+  strokeWidth={2}
+/>
+```
+
+After:
+```tsx
+<Line
+  type="monotone"
+  dataKey="longShortRatio"
+  stroke="hsl(var(--neon-blue))"
+  name="Avg Long/Short Ratio"
+  strokeWidth={2}
+  isAnimationActive={false}
+/>
+```
 
 ---
 
-## Expected Results After Fix
-
-| Metric | Before (Wrong) | After (Correct) |
-|--------|----------------|-----------------|
-| Planned Capital | Based on daily start capital | Compound growth from initial |
-| Drift from Plan | Cumulative sum / arbitrary base | `(Actual - Planned) / Planned` |
-| Chart "Planned" line | Step-function jumps | Smooth exponential curve |
-
 ## Files to Modify
-- `src/components/widgets/RollingTargetWidget.tsx`
 
-## Technical Summary
+- `src/pages/LongShortRatio.tsx` — Add `isAnimationActive={false}` to all Line components
 
-The Rolling Target widget is displaying incorrect data because:
-1. `plannedCapital` is calculated relative to each day's start capital instead of absolute compound growth target
-2. `driftPercent` uses an incorrect denominator that doesn't represent true deviation from plan
-3. These compound errors produce values that don't align with actual trading performance vs target curve
+---
+
+## Expected Results
+
+| Issue | Before | After |
+|-------|--------|-------|
+| Chart flickering | Visible blinking on resize/refresh | Static, stable lines |
+| Missing lines | Lines disappear during animation reset | Lines always visible |
+| Tab switching | Animations restart on each mount | Instant display |
+
+This is the same fix already applied to other charts in the codebase (`CapitalGrowthWidget`, `TotalBalanceCard`) and follows the established pattern for Recharts stability.
