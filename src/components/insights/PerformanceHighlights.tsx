@@ -32,23 +32,23 @@ export const PerformanceHighlights = memo(({
   const isSameDay = bestDay && worstDay && bestDay.date === worstDay.date;
 
   return (
-    <PremiumCard className="h-full bg-card border-border flex flex-col">
-      <div className="p-3 flex flex-col h-full">
+    <PremiumCard className="h-full bg-card border-border flex flex-col overflow-hidden">
+      <div className="p-3 flex flex-col h-full overflow-hidden">
         {/* Compact header */}
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-2 shrink-0">
           <Trophy className="w-4 h-4 text-profit" />
           <h3 className="text-sm font-semibold">{t('insights.performanceHighlights')}</h3>
         </div>
 
-        {/* 4-column flat grid */}
-        <div className="grid grid-cols-4 gap-2 flex-1">
+        {/* 2x2 grid that adapts to available space */}
+        <div className="grid grid-cols-2 grid-rows-2 gap-2 flex-1 min-h-0 overflow-hidden">
           {/* Best Trade */}
-          <div className="p-2 rounded-lg bg-profit/10 border border-profit/30 flex flex-col">
+          <div className="p-2 rounded-lg bg-profit/10 border border-profit/30 flex flex-col min-h-0 overflow-hidden">
             <div className="flex items-center gap-1 mb-1">
-              <TrendingUp className="w-3 h-3 text-profit" />
-              <span className="text-[10px] font-medium text-profit uppercase">{t('insights.bestTrade')}</span>
+              <TrendingUp className="w-3 h-3 text-profit shrink-0" />
+              <span className="text-[10px] font-medium text-profit uppercase truncate">{t('insights.bestTrade')}</span>
             </div>
-            <Badge variant="outline" className="text-[10px] w-fit mb-1 px-1.5 py-0">
+            <Badge variant="outline" className="text-[10px] w-fit mb-1 px-1.5 py-0 shrink-0">
               {bestTrade.symbol || bestTrade.symbol_temp}
             </Badge>
             <div className="text-sm font-bold text-profit mt-auto">
@@ -58,12 +58,12 @@ export const PerformanceHighlights = memo(({
           </div>
 
           {/* Worst Trade */}
-          <div className="p-2 rounded-lg bg-loss/10 border border-loss/30 flex flex-col">
+          <div className="p-2 rounded-lg bg-loss/10 border border-loss/30 flex flex-col min-h-0 overflow-hidden">
             <div className="flex items-center gap-1 mb-1">
-              <AlertCircle className="w-3 h-3 text-loss" />
-              <span className="text-[10px] font-medium text-loss uppercase">{t('insights.worstTrade')}</span>
+              <AlertCircle className="w-3 h-3 text-loss shrink-0" />
+              <span className="text-[10px] font-medium text-loss uppercase truncate">{t('insights.worstTrade')}</span>
             </div>
-            <Badge variant="outline" className="text-[10px] w-fit mb-1 px-1.5 py-0">
+            <Badge variant="outline" className="text-[10px] w-fit mb-1 px-1.5 py-0 shrink-0">
               {worstTrade.symbol || worstTrade.symbol_temp}
             </Badge>
             <div className="text-sm font-bold text-loss mt-auto">
@@ -73,41 +73,39 @@ export const PerformanceHighlights = memo(({
           </div>
 
           {/* Best Day */}
-          <div className="p-2 rounded-lg bg-profit/10 border border-profit/30 flex flex-col">
+          <div className="p-2 rounded-lg bg-profit/10 border border-profit/30 flex flex-col min-h-0 overflow-hidden">
             <div className="flex items-center gap-1 mb-1">
-              <Calendar className="w-3 h-3 text-profit" />
-              <span className="text-[10px] font-medium text-profit uppercase">{t('insights.bestDay')}</span>
+              <Calendar className="w-3 h-3 text-profit shrink-0" />
+              <span className="text-[10px] font-medium text-profit uppercase truncate">{t('insights.bestDay')}</span>
             </div>
             {bestDay ? (
               <>
-                <span className="text-[10px] text-muted-foreground mb-1">
+                <span className="text-[10px] text-muted-foreground mb-1 truncate">
                   {new Date(bestDay.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </span>
                 <div className="text-sm font-bold text-profit mt-auto">
                   <BlurredCurrency amount={bestDay.totalPnL} className="inline" />
                 </div>
-                <span className="text-[10px] text-muted-foreground">{bestDay.tradeCount} {t('insights.trades')}</span>
               </>
             ) : (
-              <span className="text-xs text-muted-foreground">N/A</span>
+              <span className="text-xs text-muted-foreground mt-auto">N/A</span>
             )}
           </div>
 
           {/* Worst Day */}
-          <div className="p-2 rounded-lg bg-loss/10 border border-loss/30 flex flex-col">
+          <div className="p-2 rounded-lg bg-loss/10 border border-loss/30 flex flex-col min-h-0 overflow-hidden">
             <div className="flex items-center gap-1 mb-1">
-              <Calendar className="w-3 h-3 text-loss" />
-              <span className="text-[10px] font-medium text-loss uppercase">{t('insights.worstDay')}</span>
+              <Calendar className="w-3 h-3 text-loss shrink-0" />
+              <span className="text-[10px] font-medium text-loss uppercase truncate">{t('insights.worstDay')}</span>
             </div>
             {worstDay && !isSameDay ? (
               <>
-                <span className="text-[10px] text-muted-foreground mb-1">
+                <span className="text-[10px] text-muted-foreground mb-1 truncate">
                   {new Date(worstDay.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </span>
                 <div className="text-sm font-bold text-loss mt-auto">
                   <BlurredCurrency amount={worstDay.totalPnL} className="inline" />
                 </div>
-                <span className="text-[10px] text-muted-foreground">{worstDay.tradeCount} {t('insights.trades')}</span>
               </>
             ) : (
               <span className="text-xs text-muted-foreground mt-auto">Same as best</span>
