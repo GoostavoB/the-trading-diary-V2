@@ -7,6 +7,7 @@ import { CapitalGrowthWidget } from '@/components/widgets/CapitalGrowthWidget';
 import { TopMoversWidget } from '@/components/widgets/TopMoversWidget';
 import { GoalWidget } from '@/components/goals/GoalWidget';
 import { RecentTransactionsWidget } from '@/components/widgets/RecentTransactionsWidget';
+import { RollingTargetWidget } from '@/components/widgets/RollingTargetWidget';
 import type { Trade } from '@/types/trade';
 
 // Helper to calculate current streak
