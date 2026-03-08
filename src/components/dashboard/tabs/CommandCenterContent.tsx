@@ -94,7 +94,7 @@ export function CommandCenterContent() {
         <div 
             className="grid grid-cols-3 gap-3"
             style={{
-                gridTemplateRows: 'auto 1fr 1fr',
+                gridTemplateRows: 'auto 1fr 1fr 1fr',
                 maxHeight: 'calc(100vh - 220px)',
                 overflow: 'hidden',
             }}
@@ -141,6 +141,17 @@ export function CommandCenterContent() {
             <div className="col-span-1">
                 <SmartWidgetWrapper id="recentTransactions" widgetCount={widgetCount}>
                     <RecentTransactionsWidget id="recentTransactions" trades={processedTrades} />
+                </SmartWidgetWrapper>
+            </div>
+
+            {/* Rolling Target - Full width bottom */}
+            <div className="col-span-3">
+                <SmartWidgetWrapper id="rollingTarget" widgetCount={widgetCount}>
+                    <RollingTargetWidget 
+                        id="rollingTarget"
+                        trades={processedTrades}
+                        initialInvestment={initialInvestment}
+                    />
                 </SmartWidgetWrapper>
             </div>
         </div>
