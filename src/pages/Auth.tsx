@@ -189,6 +189,7 @@ const Auth = () => {
 
         <h2 className="text-2xl font-semibold mb-6 text-center" id="auth-heading">
           {isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome Back' : 'Create Account'}
+          <span className="block text-xs font-normal text-primary mt-1">v1.1 - Code Field Active</span>
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4" aria-labelledby="auth-heading">
