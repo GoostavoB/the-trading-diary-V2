@@ -189,24 +189,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signInWithGoogle = async (): Promise<{ error: any }> => {
     try {
-      const lovableAppOrigin = "https://the-trading-diary.lovable.app";
+      const lovableAppOrigin = 'https://the-trading-diary.lovable.app';
+      const redirectUri = `${window.location.origin}/auth`;
       const isCustomDomain = window.location.origin !== lovableAppOrigin && !window.location.hostname.includes('lovable.app');
 
       if (isCustomDomain) {
-        // On custom domains, the /~oauth/initiate endpoint doesn't exist.
-        // Redirect manually to the .lovable.app domain where it does exist.
-        const state = [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('');
+        const state = [...crypto.getRandomValues(new Uint8Array(16))]
+          .map((b) => b.toString(16).padStart(2, '0'))
+          .join('');
+
         const params = new URLSearchParams({
           provider: 'google',
-          redirect_uri: lovableAppOrigin,
+          redirect_uri: redirectUri,
           state,
         });
+
         window.location.href = `${lovableAppOrigin}/~oauth/initiate?${params.toString()}`;
         return { error: null };
       }
 
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: lovableAppOrigin,
+      const result = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: redirectUri,
       });
 
       if (result.error) {
