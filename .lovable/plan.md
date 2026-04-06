@@ -1,19 +1,39 @@
 
 
-## Plan: Fix Sign Up Build Error
+## Plan: Fix "Database error saving new user" on Sign Up
 
-The signup is broken due to a type mismatch. The `signUp` function interface declares 5 parameters, but the implementation and caller both use 6 (with `inviteCode`).
+### Root Cause
 
-### Changes
+The auth logs show this exact error:
+```
+record "new" has no field "user_id" (SQLSTATE 42703)
+```
 
-1. **`src/contexts/AuthContext.tsx` (line 13)** — Add `inviteCode?: string` to the `signUp` type signature in the `AuthContextType` interface:
-   ```typescript
-   signUp: (email: string, password: string, fullName: string, country: string, marketingConsent: boolean, inviteCode?: string) => Promise<{ error: any }>;
-   ```
+The `create_default_sub_account` trigger fires on the `profiles` table after insert. It references `NEW.user_id`, but the `profiles` table uses `id` (not `user_id`) as its primary key column. This crashes the entire signup transaction.
 
-2. **Also fix `@types/node` build errors** — The `tsconfig.app.json` was recently edited and may have lost the `"node"` type. Add `"node"` to the `types` array in `tsconfig.app.json` to resolve all the `Cannot find namespace 'NodeJS'` and `Cannot find name 'process'` errors.
+### Fix
 
-### Result
-- Signup flow will compile and work end-to-end (invite code, terms, marketing consent all passed correctly)
-- All `NodeJS`/`process`/`Buffer` type errors resolved
+One database migration to replace the broken trigger function:
+
+**Update `create_default_sub_account()` function** — change `NEW.user_id` to `NEW.id`:
+
+```sql
+CREATE OR REPLACE FUNCTION public.create_default_sub_account()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+BEGIN
+  INSERT INTO public.sub_accounts (user_id, name, description, is_active)
+  VALUES (NEW.id, 'Main', 'Main account', true);
+  RETURN NEW;
+END;
+$$;
+```
+
+### Impact
+- Single function replacement, no other files or code changes needed
+- Fixes signup for all new users immediately
+- No risk to existing data or functionality
 
