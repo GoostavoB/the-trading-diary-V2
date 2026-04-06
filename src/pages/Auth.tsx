@@ -152,6 +152,10 @@ const Auth = () => {
   };
 
   const handleGoogleSignIn = async () => {
+    // Store invite code before OAuth redirect so we can apply rewards after
+    if (!isLogin && inviteCode?.trim()) {
+      localStorage.setItem('pendingInviteCode', inviteCode.trim().toUpperCase());
+    }
     setLoading(true);
     const { error } = await signInWithGoogle();
     if (error) {
@@ -202,7 +206,7 @@ const Auth = () => {
                   value={inviteCode}
                   onChange={(e) => setInviteCode(e.target.value)}
                   className="mt-1 border-primary/50"
-                  placeholder="HORISTIC"
+                  placeholder="Enter invite code"
                 />
               </div>
 
