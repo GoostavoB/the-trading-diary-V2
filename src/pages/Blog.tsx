@@ -115,7 +115,7 @@ const Blog = () => {
                   size="sm"
                   onClick={() => setSelectedCategory(category)}
                 >
-                  {category === 'all' ? t('blog.allArticles') : category}
+                  {category === 'all' ? t('blog.allArticles', 'All Articles') : category}
                 </Button>
               ))}
             </div>

@@ -89,13 +89,14 @@ const WinsByHourChartComponent = ({ trades }: WinsByHourChartProps) => {
 
     // Find best and worst hours
     const hoursWithTrades = hourlyDataRaw.filter(h => h.tradeCount > 0);
-    const best = hoursWithTrades.reduce((max, h) =>
-      h.totalPnL > max.totalPnL ? h : max
-      , { hour: '--', totalPnL: -Infinity, avgROI: 0 });
+    const defaultHourStats = { hour: '--', totalPnL: 0, avgROI: 0 };
+    const best = hoursWithTrades.length > 0
+      ? hoursWithTrades.reduce((max, h) => h.totalPnL > max.totalPnL ? h : max, hoursWithTrades[0])
+      : defaultHourStats;
 
-    const worst = hoursWithTrades.reduce((min, h) =>
-      h.totalPnL < min.totalPnL ? h : min
-      , { hour: '--', totalPnL: Infinity, avgROI: 0 });
+    const worst = hoursWithTrades.length > 0
+      ? hoursWithTrades.reduce((min, h) => h.totalPnL < min.totalPnL ? h : min, hoursWithTrades[0])
+      : defaultHourStats;
 
     // Generate AI insight
     const insight = hoursWithTrades.length > 0

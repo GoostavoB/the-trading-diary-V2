@@ -59,6 +59,30 @@ interface ExtractedTrade {
 
 // Broker list and management moved to BrokerSelect component
 
+const CreditsDisplay = () => {
+  const [credits, setCredits] = useState<number | null>(null);
+  
+  useEffect(() => {
+    const fetchCredits = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from('subscriptions')
+        .select('upload_credits_balance')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+      setCredits(data?.upload_credits_balance ?? 0);
+    };
+    fetchCredits();
+  }, []);
+
+  return (
+    <Badge variant="secondary" className="cursor-default">
+      Credits: {credits !== null ? credits : '...'}
+    </Badge>
+  );
+};
 const Upload = () => {
   useKeyboardShortcuts();
   useKeyboardShortcuts();
@@ -919,9 +943,9 @@ const Upload = () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Badge variant="secondary" className="cursor-default">Credits: —</Badge>
+                    <CreditsDisplay />
                   </TooltipTrigger>
-                  <TooltipContent>2 credits per trade. Add more in Billing.</TooltipContent>
+                  <TooltipContent>1 scan = 1 credit = Up to 10 trades. Add more in Billing.</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
               <TabsList className="grid grid-cols-2">
