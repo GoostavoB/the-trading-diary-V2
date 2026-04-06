@@ -62,14 +62,6 @@ const LongShortRatio = () => {
   const fetchBybitData = async () => {
     setLoadingBybit(true);
     try {
-      const { data, error } = await supabase.functions.invoke('proxy-bybit-lsr', {
-        body: null,
-        headers: { 'Content-Type': 'application/json' },
-        method: 'GET',
-      });
-
-      // Use query params via URL construction
-      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
       
