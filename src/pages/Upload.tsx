@@ -59,6 +59,30 @@ interface ExtractedTrade {
 
 // Broker list and management moved to BrokerSelect component
 
+const CreditsDisplay = () => {
+  const [credits, setCredits] = useState<number | null>(null);
+  
+  useEffect(() => {
+    const fetchCredits = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from('subscriptions')
+        .select('upload_credits_balance')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+      setCredits(data?.upload_credits_balance ?? 0);
+    };
+    fetchCredits();
+  }, []);
+
+  return (
+    <Badge variant="secondary" className="cursor-default">
+      Credits: {credits !== null ? credits : '...'}
+    </Badge>
+  );
+};
 const Upload = () => {
   useKeyboardShortcuts();
   useKeyboardShortcuts();
