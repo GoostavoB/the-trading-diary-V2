@@ -46,10 +46,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (event === 'TOKEN_REFRESHED') {
           console.log('Token refreshed successfully');
         } else if (event === 'SIGNED_OUT') {
-          // Clear any cached data
           localStorage.removeItem('rememberMe');
         } else if (event === 'USER_UPDATED') {
           console.log('User data updated');
+        } else if (event === 'SIGNED_IN' && session?.user) {
+          // Check for pending invite code from Google OAuth signup
+          const pendingCode = localStorage.getItem('pendingInviteCode');
+          if (pendingCode && (pendingCode === 'HORISTIC' || pendingCode === 'TEO')) {
+            localStorage.removeItem('pendingInviteCode');
+            applyInviteCodeRewards(session.user.id, pendingCode);
+          }
         }
       }
     );
