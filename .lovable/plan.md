@@ -1,44 +1,34 @@
 
 
-## Fix: Invite Code Rewards Not Applying to Subscriptions
+## Fix: Google OAuth no domínio custom
 
-### Problem
-The invite code "HORISTIC" partially worked — it updated `profiles.subscription_tier` to `'pro'` successfully, but the `subscriptions` table still has `free` / 5 credits. The `setTimeout(2000)` approach is unreliable because the database trigger may not have created the subscription row yet when the update runs.
+### Problema
+Quando o usuário acessa via `thetradingdiary.com`, o SDK do Lovable constrói a URL de inicio do OAuth como `thetradingdiary.com/~oauth/initiate`, mas o endpoint `~oauth` só existe em `the-trading-diary.lovable.app`. Resultado: 404.
 
-### Root Cause
-The `setTimeout` fires once after 2 seconds. If the subscription row doesn't exist yet, the `UPDATE` matches zero rows and silently does nothing. There's no retry logic.
+### Causa
+O SDK `@lovable.dev/cloud-auth-js` usa internamente `window.location.origin` para montar a URL do `~oauth/initiate`. No domínio custom, isso quebra.
 
-### Fix — Two Parts
+### Solução
+Passar o parâmetro `redirect_uri` apontando para o domínio `.lovable.app` — que já está correto no código. Porém, o SDK também precisa saber onde iniciar o fluxo. Precisamos verificar se o SDK aceita um parâmetro de `baseUrl` ou similar.
 
-**1. Fix the code: Replace setTimeout with a retry loop**
-- In `AuthContext.tsx`, replace the fragile `setTimeout` with a polling function that:
-  - Checks if the subscription row exists (up to 5 attempts, 1.5s apart)
-  - Only runs the UPDATE once the row is found
-  - Logs a warning if it gives up after all retries
+**Opção mais provável**: O SDK do Lovable Cloud Auth já deveria lidar com isso automaticamente. Isso pode ser um bug do SDK ou uma configuração faltando.
 
-**2. Fix Gustavo's account now: One-time data correction**
-- Run a migration to update the existing subscription for user `48bfc4dd-a375-4d03-a05d-6daefb476a21`:
-  - `plan_type` → `'pro'`
-  - `upload_credits_balance` → `50`
-  - `monthly_upload_limit` → `50`
+### Passos
+1. **Investigar o SDK** — verificar como `@lovable.dev/cloud-auth-js` constrói a URL de initiate e se aceita configuração de base URL
+2. **Se o SDK aceitar config** — passar o domínio `.lovable.app` como base para o fluxo OAuth
+3. **Se não aceitar** — criar um workaround redirecionando o usuário manualmente para `https://the-trading-diary.lovable.app/~oauth/initiate?...` antes de iniciar o fluxo
 
-### Files Changed
-- `src/contexts/AuthContext.tsx` — replace setTimeout with retry loop
-- 1 new migration SQL — fix existing account data
+### Arquivo afetado
+- `src/contexts/AuthContext.tsx` — ajustar chamada do `signInWithGoogle`
 
-### Technical Detail
+### Detalhe técnico
 ```text
-Current (broken):
-  setTimeout(() => {
-    UPDATE subscriptions SET credits=50 WHERE user_id=X
-    // Row might not exist yet → 0 rows updated → silent failure
-  }, 2000)
+Atual (quebrado no domínio custom):
+  thetradingdiary.com/~oauth/initiate?provider=google&redirect_uri=...
+  → 404 (endpoint não existe no domínio custom)
 
-Fixed:
-  for (attempt 1..5) {
-    SELECT count(*) FROM subscriptions WHERE user_id=X
-    if found → UPDATE → break
-    else → wait 1.5s
-  }
+Correto:
+  the-trading-diary.lovable.app/~oauth/initiate?provider=google&redirect_uri=...
+  → Funciona (endpoint existe no .lovable.app)
 ```
 
