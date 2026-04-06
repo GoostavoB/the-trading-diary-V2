@@ -1,69 +1,108 @@
 
-The reason it feels circular is that there were multiple signup failures stacked on top of each other.
+Problema real identificado.
 
-What is actually happening:
-1. First blocker was the broken default sub-account setup
-   - It used `NEW.user_id` where the record only had `NEW.id`.
-   - That was a real bug and fixing it was necessary.
+Não é o mesmo erro de antes. Agora o signup quebra por causa desta incompatibilidade no bootstrap do usuário:
 
-2. After that, a second blocker appeared inside `handle_new_user()`
-   - It was writing to old subscription columns like `upload_credits_total`.
-   - That was also real and got exposed only after the first bug was removed.
+- `handle_new_user()` ainda tenta fazer:
+  - `INSERT INTO user_settings (user_id) ... ON CONFLICT (user_id) DO NOTHING`
+  - `INSERT INTO user_customization_preferences (user_id, ...) ... ON CONFLICT (user_id) DO NOTHING`
+- Mas essas duas tabelas mudaram para o modelo de `sub_account`.
+- Hoje elas:
+  - exigem `sub_account_id NOT NULL`
+  - não têm mais unique em `user_id`
+  - têm unique em `sub_account_id`
 
-3. The current blocker is different again
-   - The auth logs now show:
-     `new row for relation "subscriptions" violates check constraint "subscriptions_plan_type_check"`
-   - I verified why:
-     - `handle_new_user()` now inserts `plan_type = 'free'`
-     - but the `subscriptions` table still only allows:
-       `('basic', 'pro', 'elite')`
-   - So signup still fails at the database layer before the user is created successfully.
+O log confirma isso:
+- `there is no unique or exclusion constraint matching the ON CONFLICT specification (SQLSTATE 42P10)`
 
-Why we kept “fixing” but it still failed:
-- We were uncovering the next failing step each time.
-- The signup flow is one transaction.
-- If any trigger/function/constraint fails, the whole signup aborts and the UI only shows the same generic message:
-  `Database error saving new user`.
+Resumo simples:
+- o trigger cria `profile`
+- o `profile` dispara criação da sub-account principal
+- depois o `handle_new_user()` tenta criar settings/preferences no formato antigo
+- isso explode a transação
+- o frontend só mostra `Database error saving new user`
 
-The precise problem now:
-- Backend function and database schema are still out of sync.
-- Current mismatch:
-  - Function inserts `free`
-  - Constraint only accepts `basic`, `pro`, `elite`
+Plano de correção
 
-What is not the main blocker right now:
-- The frontend consent metadata issue is secondary.
-- It should be cleaned up, but it is not what causes the current 500 error.
-- The signup is failing before that matters.
+1. Reescrever `public.handle_new_user()` para o fluxo atual
+- Criar `profile`
+- Criar `subscription`
+- Não inserir mais direto em `user_settings` e `user_customization_preferences` com só `user_id`
+- Primeiro criar/obter a sub-account principal
+- Depois inserir:
+  - `user_settings (user_id, sub_account_id, ...)`
+  - `user_customization_preferences (user_id, sub_account_id, ...)`
 
-Smallest safe fix:
-1. Update the subscription plan rule so it matches the app’s real tiers
-   - allow `free` in the `subscriptions.plan_type` constraint
-   - optionally also align on whether the product uses `starter` or `basic` long-term, because the codebase currently mixes both
+2. Tornar o bootstrap idempotente
+- Usar `ON CONFLICT (user_id)` apenas onde realmente existe unique em `user_id`
+  - `subscriptions`
+  - `user_xp_levels`
+  - `user_xp_tiers`
+- Para settings/preferences:
+  - usar `ON CONFLICT (sub_account_id) DO NOTHING`
+  - ou checar existência antes do insert
 
-2. Keep `handle_new_user()` aligned with that rule
-   - if free users are intended, insert `plan_type = 'free'`
-   - keep the new credit columns already fixed
+3. Evitar dependência frágil entre triggers
+- Hoje o fluxo depende de um trigger em `profiles` para criar a sub-account
+- Vou consolidar isso para o signup não depender de ordem implícita
+- Opção mais segura:
+  - `handle_new_user()` cria o profile
+  - cria/garante a sub-account principal
+  - cria settings/preferences ligados a essa sub-account
+- Depois podemos manter ou remover o trigger de profile, mas o signup precisa ter um único caminho confiável
 
-3. Leave the auth UI mostly untouched
-   - only make follow-up frontend cleanup after signup is stable
+4. Preservar o que já foi corrigido
+- manter `plan_type = 'free'`
+- manter colunas novas de `subscriptions`
+- manter consentimentos e provider no metadata
+- manter códigos de convite `HORISTIC` e `TEO`
 
-Recommended implementation scope:
-- One database migration focused on schema alignment:
-  - drop/recreate the `subscriptions_plan_type_check` constraint to include `free`
-  - verify no other subscription checks still assume only paid plans
-- Optional follow-up cleanup:
-  - standardize plan naming across app code (`free/basic/pro/elite` vs `free/starter/pro/elite`)
+5. Limpeza mínima de dados quebrados
+- Não apagar tudo
+- Verificar e remover apenas registros órfãos/incompletos criados pelas tentativas falhas:
+  - profiles sem subscription
+  - profiles sem sub_account
+  - settings/preferences inconsistentes
+- Isso evita destruir contas válidas
 
-Expected result after that fix:
-- Signup should stop failing with the generic database error
-- New users should be created successfully
-- The current error loop should end because the remaining blocker is now clearly identified
+Arquivos/objetos a ajustar
+- `supabase/migrations/...sql`
+  - substituir `public.handle_new_user()`
+  - opcionalmente ajustar/remover duplicação com `create_default_sub_account()`
+- possível revisão do trigger `on_profile_created_create_sub_account`
+- sem mudança grande no frontend agora
 
-Files / objects involved:
-- `supabase/migrations/20251023103703_5c3d1f17-9205-452b-a46e-bd84e066380e.sql` — original restrictive check
-- `supabase/migrations/20260406105846_bd5483bb-39c3-4308-93c4-f66e7f292c80.sql` — now inserts `free`
-- `src/contexts/AuthContext.tsx` — secondary metadata cleanup, not the current root cause
+Resultado esperado
+- signup para de falhar
+- novo usuário nasce com:
+  - profile
+  - subscription free
+  - main sub-account
+  - user_settings ligados ao sub-account
+  - user_customization_preferences ligadas ao sub-account
+  - xp records
+- fim do erro atual sem mexer em partes desnecessárias
 
-So in one sentence:
-We are not looping on the same bug — signup has been failing on a chain of separate database mismatches, and the current real blocker is the `subscriptions.plan_type` constraint rejecting `'free'`.
+Detalhe técnico
+```text
+Fluxo atual quebrado:
+auth.users insert
+  -> handle_new_user()
+      -> profiles insert
+          -> profile trigger cria sub_account
+      -> subscriptions ok
+      -> user_xp_levels ok
+      -> user_xp_tiers ok
+      -> user_settings ON CONFLICT (user_id)  ❌ sem unique(user_id)
+      -> transaction abort
+
+Fluxo correto:
+auth.users insert
+  -> handle_new_user()
+      -> profiles insert
+      -> ensure main sub_account
+      -> subscriptions insert/upsert
+      -> xp insert/upsert
+      -> user_settings insert/upsert por sub_account_id
+      -> customization insert/upsert por sub_account_id
+```
