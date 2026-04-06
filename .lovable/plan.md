@@ -1,108 +1,31 @@
 
-Problema real identificado.
 
-Não é o mesmo erro de antes. Agora o signup quebra por causa desta incompatibilidade no bootstrap do usuário:
+## Plan: Clean Rebuild of Sign-Up Database Flow
 
-- `handle_new_user()` ainda tenta fazer:
-  - `INSERT INTO user_settings (user_id) ... ON CONFLICT (user_id) DO NOTHING`
-  - `INSERT INTO user_customization_preferences (user_id, ...) ... ON CONFLICT (user_id) DO NOTHING`
-- Mas essas duas tabelas mudaram para o modelo de `sub_account`.
-- Hoje elas:
-  - exigem `sub_account_id NOT NULL`
-  - não têm mais unique em `user_id`
-  - têm unique em `sub_account_id`
+### Problem
+There are 4 patched migrations on top of each other, two competing triggers (`handle_new_user` + `create_default_sub_account`), and 15 orphaned profiles with only 1 subscription. The EXCEPTION handler silently swallows errors, creating auth users with no profile data.
 
-O log confirma isso:
-- `there is no unique or exclusion constraint matching the ON CONFLICT specification (SQLSTATE 42P10)`
+### Root Issues
+1. **Two triggers compete**: `handle_new_user` creates a sub_account, but the `create_default_sub_account` trigger on profiles ALSO fires and creates another one — causing duplicates
+2. **EXCEPTION swallows failures**: errors are logged but the function returns NEW, so auth.users gets created but all public data (profile, subscription, settings) is silently rolled back
+3. **Orphaned data**: 15 profiles, only 1 subscription, 15 sub_accounts — leftover from failed attempts
 
-Resumo simples:
-- o trigger cria `profile`
-- o `profile` dispara criação da sub-account principal
-- depois o `handle_new_user()` tenta criar settings/preferences no formato antigo
-- isso explode a transação
-- o frontend só mostra `Database error saving new user`
+### Single Migration — What It Does
 
-Plano de correção
+1. **Drop the redundant trigger** `on_profile_created_create_sub_account` — handle_new_user will manage everything
+2. **Replace `handle_new_user()`** with a clean version:
+   - Profile insert (no trigger interference)
+   - Sub-account insert (with `is_default = true`)
+   - Subscription insert (`plan_type = 'free'`, 5 credits)
+   - XP initialization
+   - Settings + customization linked to sub_account_id
+   - **NO exception swallowing** — if something fails, the error surfaces clearly instead of creating ghost accounts
+3. **Clean orphaned data**: delete profiles/sub_accounts/settings that have no matching subscription (ghost records from failed signups)
 
-1. Reescrever `public.handle_new_user()` para o fluxo atual
-- Criar `profile`
-- Criar `subscription`
-- Não inserir mais direto em `user_settings` e `user_customization_preferences` com só `user_id`
-- Primeiro criar/obter a sub-account principal
-- Depois inserir:
-  - `user_settings (user_id, sub_account_id, ...)`
-  - `user_customization_preferences (user_id, sub_account_id, ...)`
+### Frontend
+- `AuthContext.tsx` — no changes needed, invite code logic (HORISTIC/TEO) is already correct
 
-2. Tornar o bootstrap idempotente
-- Usar `ON CONFLICT (user_id)` apenas onde realmente existe unique em `user_id`
-  - `subscriptions`
-  - `user_xp_levels`
-  - `user_xp_tiers`
-- Para settings/preferences:
-  - usar `ON CONFLICT (sub_account_id) DO NOTHING`
-  - ou checar existência antes do insert
+### Files Changed
+- 1 new migration SQL file (replaces all 4 previous patches)
+- No frontend changes
 
-3. Evitar dependência frágil entre triggers
-- Hoje o fluxo depende de um trigger em `profiles` para criar a sub-account
-- Vou consolidar isso para o signup não depender de ordem implícita
-- Opção mais segura:
-  - `handle_new_user()` cria o profile
-  - cria/garante a sub-account principal
-  - cria settings/preferences ligados a essa sub-account
-- Depois podemos manter ou remover o trigger de profile, mas o signup precisa ter um único caminho confiável
-
-4. Preservar o que já foi corrigido
-- manter `plan_type = 'free'`
-- manter colunas novas de `subscriptions`
-- manter consentimentos e provider no metadata
-- manter códigos de convite `HORISTIC` e `TEO`
-
-5. Limpeza mínima de dados quebrados
-- Não apagar tudo
-- Verificar e remover apenas registros órfãos/incompletos criados pelas tentativas falhas:
-  - profiles sem subscription
-  - profiles sem sub_account
-  - settings/preferences inconsistentes
-- Isso evita destruir contas válidas
-
-Arquivos/objetos a ajustar
-- `supabase/migrations/...sql`
-  - substituir `public.handle_new_user()`
-  - opcionalmente ajustar/remover duplicação com `create_default_sub_account()`
-- possível revisão do trigger `on_profile_created_create_sub_account`
-- sem mudança grande no frontend agora
-
-Resultado esperado
-- signup para de falhar
-- novo usuário nasce com:
-  - profile
-  - subscription free
-  - main sub-account
-  - user_settings ligados ao sub-account
-  - user_customization_preferences ligadas ao sub-account
-  - xp records
-- fim do erro atual sem mexer em partes desnecessárias
-
-Detalhe técnico
-```text
-Fluxo atual quebrado:
-auth.users insert
-  -> handle_new_user()
-      -> profiles insert
-          -> profile trigger cria sub_account
-      -> subscriptions ok
-      -> user_xp_levels ok
-      -> user_xp_tiers ok
-      -> user_settings ON CONFLICT (user_id)  ❌ sem unique(user_id)
-      -> transaction abort
-
-Fluxo correto:
-auth.users insert
-  -> handle_new_user()
-      -> profiles insert
-      -> ensure main sub_account
-      -> subscriptions insert/upsert
-      -> xp insert/upsert
-      -> user_settings insert/upsert por sub_account_id
-      -> customization insert/upsert por sub_account_id
-```
