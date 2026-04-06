@@ -919,9 +919,9 @@ const Upload = () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Badge variant="secondary" className="cursor-default">Credits: —</Badge>
+                    <CreditsDisplay />
                   </TooltipTrigger>
-                  <TooltipContent>2 credits per trade. Add more in Billing.</TooltipContent>
+                  <TooltipContent>1 scan = 1 credit = Up to 10 trades. Add more in Billing.</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
               <TabsList className="grid grid-cols-2">
