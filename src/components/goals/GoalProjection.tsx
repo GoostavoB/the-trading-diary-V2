@@ -24,6 +24,7 @@ interface Goal {
 interface Trade {
   trade_date: string | null;
   opened_at?: string | null;
+  closed_at?: string | null;
   pnl?: number | null;
   profit_loss?: number | null;
   roi?: number | null;

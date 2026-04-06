@@ -68,10 +68,10 @@ export function GoalWidget({ includeFeesInPnL = true, tradesOverride }: GoalWidg
     queryFn: async () => {
       const { data, error } = await supabase
         .from('trades')
-        .select('trade_date, opened_at, pnl, profit_loss, roi, funding_fee, trading_fee')
+        .select('trade_date, opened_at, closed_at, pnl, profit_loss, roi, funding_fee, trading_fee')
         .eq('user_id', user!.id)
-        .not('trade_date', 'is', null)
-        .order('trade_date', { ascending: true });
+        .is('deleted_at', null)
+        .order('closed_at', { ascending: true, nullsFirst: false });
 
       if (error) throw error;
       return data || [];
@@ -85,7 +85,7 @@ export function GoalWidget({ includeFeesInPnL = true, tradesOverride }: GoalWidg
     if (!dateRange?.from || !source.length) return source;
 
     return source.filter(trade => {
-      const tradeDate = new Date((trade as any).trade_date || (trade as any).opened_at);
+      const tradeDate = new Date((trade as any).trade_date || (trade as any).closed_at || (trade as any).opened_at);
       const from = dateRange.from!;
       const to = dateRange.to || new Date();
       return tradeDate >= from && tradeDate <= to;
@@ -136,7 +136,8 @@ export function GoalWidget({ includeFeesInPnL = true, tradesOverride }: GoalWidg
 
           // Filter trades for this goal's timeframe
           const goaltimeframeTrades = allTrades.filter(trade => {
-            const tradeDate = new Date(trade.trade_date || trade.opened_at);
+            const tradeDate = new Date(trade.trade_date || (trade as any).closed_at || trade.opened_at);
+            if (isNaN(tradeDate.getTime())) return false;
             if (startDate && tradeDate < new Date(startDate)) return false;
             if (endDate && tradeDate > new Date(endDate)) return false;
             return true;

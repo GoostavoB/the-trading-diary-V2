@@ -38,6 +38,7 @@ export function CommandCenterContent() {
 
     // Calculate KPI values
     const kpiData = useMemo(() => {
+        // Use capital_log as source of truth when available; fall back to user_settings
         const totalCapitalAdditions = capitalLog.reduce((sum, log) => sum + (log.amount_added || 0), 0);
         const baseCapital = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
         const totalPnL = stats?.total_pnl || 0;
@@ -50,6 +51,7 @@ export function CommandCenterContent() {
             winRate: stats?.win_rate || 0,
             totalTrades: stats?.total_trades || 0,
             currentStreak,
+            baseCapital,
         };
     }, [processedTrades, capitalLog, stats, initialInvestment]);
 
@@ -58,9 +60,11 @@ export function CommandCenterContent() {
         const totalCapitalAdditions = capitalLog.reduce((sum, log) => sum + (log.amount_added || 0), 0);
         const baseCapital = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
 
-        const sortedTrades = [...processedTrades].sort((a, b) =>
-            new Date(a.trade_date as any).getTime() - new Date(b.trade_date as any).getTime()
-        );
+        const sortedTrades = [...processedTrades].sort((a, b) => {
+            const dateA = a.trade_date || a.closed_at || a.opened_at || '';
+            const dateB = b.trade_date || b.closed_at || b.opened_at || '';
+            return new Date(dateA).getTime() - new Date(dateB).getTime();
+        });
 
         const data: { date: string; value: number }[] = [];
         let cumulative = baseCapital;
@@ -70,8 +74,9 @@ export function CommandCenterContent() {
         } else {
             sortedTrades.forEach((trade) => {
                 cumulative += (trade.profit_loss || 0);
+                const tradeDate = trade.trade_date || trade.closed_at || trade.opened_at;
                 data.push({
-                    date: new Date(trade.trade_date).toLocaleDateString(),
+                    date: tradeDate ? new Date(tradeDate).toLocaleDateString() : new Date().toLocaleDateString(),
                     value: cumulative,
                 });
             });
@@ -96,7 +101,8 @@ export function CommandCenterContent() {
             style={{
                 gridTemplateRows: 'auto 1fr 1fr 1fr',
                 maxHeight: 'calc(100vh - 220px)',
-                overflow: 'hidden',
+                overflowY: 'auto',
+                overflowX: 'hidden',
             }}
         >
             {/* Compact KPI Row - Full width top */}
@@ -116,7 +122,7 @@ export function CommandCenterContent() {
                     <CapitalGrowthWidget 
                         id="capitalGrowth"
                         chartData={chartData.chartData}
-                        initialInvestment={initialInvestment}
+                        initialInvestment={chartData.totalCapitalAdditions > 0 ? 0 : initialInvestment}
                         totalCapitalAdditions={chartData.totalCapitalAdditions}
                         currentBalance={chartData.currentBalance}
                     />
