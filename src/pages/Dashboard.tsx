@@ -589,9 +589,7 @@ function DashboardContent() {
                   <TabsTrigger value="behavior" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Behavior</TabsTrigger>
                   <TabsTrigger value="calendar" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Calendar</TabsTrigger>
                   <TabsTrigger value="errors" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Errors</TabsTrigger>
-                  <TabsTrigger value="insights" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">{t('analytics.insights')}</TabsTrigger>
                   <TabsTrigger value="target" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Target</TabsTrigger>
-                  <TabsTrigger value="lsr" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">L/S Ratio</TabsTrigger>
                   <TabsTrigger value="history" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">{t('trades.tradeHistory')}</TabsTrigger>
                 </TabsList>
 
@@ -649,16 +647,8 @@ function DashboardContent() {
                   <CalendarContent />
                 </TabsContent>
 
-                <TabsContent value="insights" className="space-y-4">
-                  <InsightsContent />
-                </TabsContent>
-
                 <TabsContent value="target" className="space-y-4">
                   <RollingTargetContent />
-                </TabsContent>
-
-                <TabsContent value="lsr" className="space-y-4">
-                  <LSRContent />
                 </TabsContent>
 
                 <TabsContent value="history" className="relative glass rounded-2xl p-6">
