@@ -178,46 +178,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Apply invite code rewards
     const code = inviteCode?.toUpperCase();
     if ((code === 'HORISTIC' || code === 'TEO') && signUpData.user) {
-      console.log(`Invite code ${code} detected, applying rewards...`);
-      const isUnlimited = code === 'TEO';
-      const userId = signUpData.user.id;
-      const targetPlan = isUnlimited ? 'elite' : 'pro';
-      const targetCredits = isUnlimited ? 999999 : 50;
-
-      // Update profile tier
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ subscription_tier: targetPlan })
-        .eq('id', userId);
-      if (profileError) console.error('Error updating profile tier:', profileError);
-
-      // Retry loop: wait for subscription row to exist, then update
-      (async () => {
-        for (let attempt = 1; attempt <= 5; attempt++) {
-          await new Promise(r => setTimeout(r, 1500));
-          const { data } = await supabase
-            .from('subscriptions')
-            .select('id')
-            .eq('user_id', userId)
-            .maybeSingle();
-
-          if (data) {
-            const { error: subError } = await supabase
-              .from('subscriptions')
-              .update({
-                upload_credits_balance: targetCredits,
-                monthly_upload_limit: targetCredits,
-                plan_type: targetPlan
-              })
-              .eq('user_id', userId);
-            if (subError) console.error('Error updating subscription:', subError);
-            else console.log(`Invite code ${code} rewards applied successfully`);
-            return;
-          }
-          console.log(`Waiting for subscription row (attempt ${attempt}/5)...`);
-        }
-        console.warn('Subscription row not found after 5 attempts — invite rewards not applied');
-      })();
+      applyInviteCodeRewards(signUpData.user.id, code);
     }
 
     if (!signUpError) {
