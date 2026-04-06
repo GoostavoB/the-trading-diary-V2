@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { PremiumCard } from "@/components/ui/PremiumCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea } from "recharts";
@@ -73,13 +73,13 @@ const LongShortRatio = () => {
     fetchBinanceData();
   }, [period]);
 
-  const chartData: ChartDataPoint[] = binanceData.map((item, index) => ({
+  const chartData: ChartDataPoint[] = useMemo(() => binanceData.map((item, index) => ({
     time: new Date(parseInt(item.timestamp)).toLocaleString(),
     index,
     longShortRatio: parseFloat(item.longShortRatio),
     longAccount: parseFloat(item.longAccount) * 100,
     shortAccount: parseFloat(item.shortAccount) * 100,
-  }));
+  })), [binanceData]);
 
   const latestData = binanceData[binanceData.length - 1];
 
