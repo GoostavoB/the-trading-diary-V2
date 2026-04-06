@@ -582,15 +582,17 @@ function DashboardContent() {
           ) : (
             <>
               <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-                <TabsList className="glass rounded-2xl grid w-full grid-cols-8 h-auto p-1.5">
-                  <TabsTrigger value="tradestation" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Trade Station</TabsTrigger>
-                  <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Command Center</TabsTrigger>
-                  <TabsTrigger value="behavior" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Behavior</TabsTrigger>
-                  <TabsTrigger value="errors" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Errors</TabsTrigger>
-                  <TabsTrigger value="insights" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('analytics.insights')}</TabsTrigger>
-                  <TabsTrigger value="target" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Target</TabsTrigger>
-                  <TabsTrigger value="lsr" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">L/S Ratio</TabsTrigger>
-                  <TabsTrigger value="history" className="text-xs sm:text-sm py-2 data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">{t('trades.tradeHistory')}</TabsTrigger>
+                <TabsList className="glass rounded-2xl flex w-full h-auto p-1.5 overflow-x-auto gap-1">
+                  <TabsTrigger value="tradestation" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Trade Station</TabsTrigger>
+                  <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Command Center</TabsTrigger>
+                  <TabsTrigger value="goals" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Goals</TabsTrigger>
+                  <TabsTrigger value="behavior" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Behavior</TabsTrigger>
+                  <TabsTrigger value="calendar" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Calendar</TabsTrigger>
+                  <TabsTrigger value="errors" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Errors</TabsTrigger>
+                  <TabsTrigger value="insights" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">{t('analytics.insights')}</TabsTrigger>
+                  <TabsTrigger value="target" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Target</TabsTrigger>
+                  <TabsTrigger value="lsr" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">L/S Ratio</TabsTrigger>
+                  <TabsTrigger value="history" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">{t('trades.tradeHistory')}</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="tradestation" className="space-y-6">
@@ -635,8 +637,16 @@ function DashboardContent() {
                   <CommandCenterContent />
                 </TabsContent>
 
+                <TabsContent value="goals" className="space-y-4">
+                  <GoalsContent />
+                </TabsContent>
+
                 <TabsContent value="behavior" className="space-y-4">
                   <BehaviorContent />
+                </TabsContent>
+
+                <TabsContent value="calendar" className="space-y-4">
+                  <CalendarContent />
                 </TabsContent>
 
                 <TabsContent value="insights" className="space-y-4">
