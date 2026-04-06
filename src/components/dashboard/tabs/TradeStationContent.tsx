@@ -9,10 +9,10 @@ export function TradeStationContent() {
   if (isMobile) {
     return (
       <div className="space-y-3 pb-4">
-        <PremiumCard className="p-4">
+        <PremiumCard className="p-3">
           <RiskCalculatorV2Widget id="tradestation-risk-calculator" />
         </PremiumCard>
-        <PremiumCard className="p-4">
+        <PremiumCard className="p-3">
           <SimpleLeverageWidget id="tradestation-leverage-calculator" />
         </PremiumCard>
       </div>
@@ -21,16 +21,14 @@ export function TradeStationContent() {
 
   return (
     <div 
-      className="grid grid-cols-2 gap-4"
-      style={{
-        height: 'calc(100vh - 220px)',
-      }}
+      className="grid grid-cols-2 gap-3"
+      style={{ height: 'calc(100vh - 220px)' }}
     >
-      <PremiumCard className="h-full p-5 flex flex-col overflow-y-auto">
+      <PremiumCard className="h-full p-3 flex flex-col overflow-y-auto">
         <RiskCalculatorV2Widget id="tradestation-risk-calculator" />
       </PremiumCard>
 
-      <PremiumCard className="h-full p-5 flex flex-col overflow-y-auto">
+      <PremiumCard className="h-full p-3 flex flex-col overflow-y-auto">
         <SimpleLeverageWidget id="tradestation-leverage-calculator" />
       </PremiumCard>
     </div>
