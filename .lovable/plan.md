@@ -1,51 +1,69 @@
 
-Issue confirmed:
+The reason it feels circular is that there were multiple signup failures stacked on top of each other.
 
-- The previous fix addressed `create_default_sub_account()`, but signup is still failing in a different step.
-- The current backend error is now: `column "upload_credits_total" of relation "subscriptions" does not exist`.
-- Root cause: `public.handle_new_user()` is still inserting into old subscription columns (`upload_credits_total`, `upload_credits_used`) that do not exist in the live `subscriptions` table.
-- I verified the live `subscriptions` schema now uses `upload_credits_balance`, `upload_credits_used_this_month`, `monthly_upload_limit`, `extra_credits_purchased`, `last_reset_date`, etc.
-- I also found a secondary mismatch in the frontend: the signup UI collects marketing + terms/privacy consent, but `AuthContext.signUp()` only sends `full_name` and `country`, so those values are not being persisted.
+What is actually happening:
+1. First blocker was the broken default sub-account setup
+   - It used `NEW.user_id` where the record only had `NEW.id`.
+   - That was a real bug and fixing it was necessary.
 
-Plan:
+2. After that, a second blocker appeared inside `handle_new_user()`
+   - It was writing to old subscription columns like `upload_credits_total`.
+   - That was also real and got exposed only after the first bug was removed.
 
-1. Replace `public.handle_new_user()` with a schema-aligned version
-   - Keep profile creation.
-   - Keep initialization of `user_settings` and `user_roles`.
-   - Rewrite the subscription insert to use current columns:
-     - `upload_credits_balance`
-     - `upload_credits_used_this_month`
-     - `monthly_upload_limit`
-     - `extra_credits_purchased`
-     - `current_period_start`
-     - `current_period_end`
-     - `last_reset_date`
-   - Use safe defaults for a new free user.
-   - Add `ON CONFLICT DO NOTHING` where appropriate for helper tables to avoid duplicate setup failures.
+3. The current blocker is different again
+   - The auth logs now show:
+     `new row for relation "subscriptions" violates check constraint "subscriptions_plan_type_check"`
+   - I verified why:
+     - `handle_new_user()` now inserts `plan_type = 'free'`
+     - but the `subscriptions` table still only allows:
+       `('basic', 'pro', 'elite')`
+   - So signup still fails at the database layer before the user is created successfully.
 
-2. Align the signup metadata in `src/contexts/AuthContext.tsx`
-   - Update `signUp()` so it also sends:
-     - `marketing_consent`
-     - `accepted_terms_at`
-     - `accepted_privacy_at`
-     - `provider: 'email'`
-   - This makes the client match what the backend function is already prepared to store.
+Why we kept “fixing” but it still failed:
+- We were uncovering the next failing step each time.
+- The signup flow is one transaction.
+- If any trigger/function/constraint fails, the whole signup aborts and the UI only shows the same generic message:
+  `Database error saving new user`.
 
-3. Update the signup call in `src/pages/Auth.tsx`
-   - Pass the consent timestamps from the two required checkboxes.
-   - Keep the existing UI validation and form structure unchanged.
+The precise problem now:
+- Backend function and database schema are still out of sync.
+- Current mismatch:
+  - Function inserts `free`
+  - Constraint only accepts `basic`, `pro`, `elite`
 
-4. Verify one schema compatibility point in the same migration
-   - The frontend clearly treats new users as `free`.
-   - If the database still has any old `plan_type` restriction left over from earlier migrations, widen it in the same migration so signup does not fail on the next insert.
+What is not the main blocker right now:
+- The frontend consent metadata issue is secondary.
+- It should be cleaned up, but it is not what causes the current 500 error.
+- The signup is failing before that matters.
 
-Files / objects to update:
-- `supabase/migrations/...sql` — replace `public.handle_new_user()`
-- `src/contexts/AuthContext.tsx`
-- `src/pages/Auth.tsx`
+Smallest safe fix:
+1. Update the subscription plan rule so it matches the app’s real tiers
+   - allow `free` in the `subscriptions.plan_type` constraint
+   - optionally also align on whether the product uses `starter` or `basic` long-term, because the codebase currently mixes both
 
-Expected result:
-- Signup will stop failing with “Database error saving new user”.
-- New users will get their profile, settings, role, subscription, and default sub-account correctly.
-- Consent fields already collected by the form will finally be saved too.
-- This is the smallest safe fix focused only on the broken signup path.
+2. Keep `handle_new_user()` aligned with that rule
+   - if free users are intended, insert `plan_type = 'free'`
+   - keep the new credit columns already fixed
+
+3. Leave the auth UI mostly untouched
+   - only make follow-up frontend cleanup after signup is stable
+
+Recommended implementation scope:
+- One database migration focused on schema alignment:
+  - drop/recreate the `subscriptions_plan_type_check` constraint to include `free`
+  - verify no other subscription checks still assume only paid plans
+- Optional follow-up cleanup:
+  - standardize plan naming across app code (`free/basic/pro/elite` vs `free/starter/pro/elite`)
+
+Expected result after that fix:
+- Signup should stop failing with the generic database error
+- New users should be created successfully
+- The current error loop should end because the remaining blocker is now clearly identified
+
+Files / objects involved:
+- `supabase/migrations/20251023103703_5c3d1f17-9205-452b-a46e-bd84e066380e.sql` — original restrictive check
+- `supabase/migrations/20260406105846_bd5483bb-39c3-4308-93c4-f66e7f292c80.sql` — now inserts `free`
+- `src/contexts/AuthContext.tsx` — secondary metadata cleanup, not the current root cause
+
+So in one sentence:
+We are not looping on the same bug — signup has been failing on a chain of separate database mismatches, and the current real blocker is the `subscriptions.plan_type` constraint rejecting `'free'`.
