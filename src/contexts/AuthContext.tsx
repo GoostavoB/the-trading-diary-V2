@@ -127,27 +127,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (signUpError) return { error: signUpError };
 
-    // If invite code is HORISTIC, apply rewards
-    if (inviteCode?.toUpperCase() === 'HORISTIC' && signUpData.user) {
-      console.log('Special invite code detected, applying rewards...');
+    // Apply invite code rewards
+    const code = inviteCode?.toUpperCase();
+    if ((code === 'HORISTIC' || code === 'TEO') && signUpData.user) {
+      console.log(`Invite code ${code} detected, applying rewards...`);
+
+      const isUnlimited = code === 'TEO';
 
       // Update profile tier
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ subscription_tier: 'pro' })
+        .update({ subscription_tier: isUnlimited ? 'elite' : 'pro' })
         .eq('id', signUpData.user.id);
 
       if (profileError) console.error('Error updating profile tier:', profileError);
 
-      // Check if subscription record exists (wait for trigger)
-      // Since it's a new user, we might need to wait a moment or just try updating
-      // In a real app, a trigger or edge function is better, but here we do it best-effort
       setTimeout(async () => {
         const { error: subError } = await supabase
           .from('subscriptions')
           .update({
-            upload_credits_balance: 50,
-            plan_type: 'pro'
+            upload_credits_balance: isUnlimited ? 999999 : 50,
+            monthly_upload_limit: isUnlimited ? 999999 : 50,
+            plan_type: isUnlimited ? 'elite' : 'pro'
           })
           .eq('user_id', signUpData.user!.id);
 
