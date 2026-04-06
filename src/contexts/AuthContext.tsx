@@ -117,6 +117,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         data: {
           full_name: fullName,
           country: country,
+          marketing_consent: marketingConsent,
+          accepted_terms_at: new Date().toISOString(),
+          accepted_privacy_at: new Date().toISOString(),
+          provider: 'email',
         }
       }
     });
