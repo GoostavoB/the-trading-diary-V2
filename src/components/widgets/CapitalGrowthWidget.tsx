@@ -102,8 +102,10 @@ export const CapitalGrowthWidget = memo(({
               fontSize={10}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-              width={40}
+              tickFormatter={(value) => value >= 1000 ? `$${(value / 1000).toFixed(1)}k` : `$${value.toFixed(0)}`}
+              width={45}
+              domain={['auto', 'auto']}
+              hide={false}
             />
             <Tooltip
               contentStyle={{

@@ -36,6 +36,7 @@ const signupSchema = z.object({
   confirmPassword: z.string(),
   fullName: z.string().min(2, 'Full name is required').max(100, 'Name is too long'),
   country: z.string().min(2, 'Please select your country').max(100, 'Country name is too long'),
+  inviteCode: z.string().optional(),
   termsAccepted: z.boolean().refine((val) => val === true, 'You must accept the Terms and Privacy Policy'),
   privacyAccepted: z.boolean().refine((val) => val === true, 'You must accept the Privacy Policy'),
   marketingConsent: z.boolean()
@@ -52,6 +53,7 @@ const Auth = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [country, setCountry] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
@@ -122,6 +124,7 @@ const Auth = () => {
           confirmPassword,
           fullName,
           country,
+          inviteCode,
           termsAccepted,
           privacyAccepted,
           marketingConsent
@@ -134,7 +137,7 @@ const Auth = () => {
           return;
         }
 
-        const { error } = await signUp(email, password, fullName, country, marketingConsent);
+        const { error } = await signUp(email, password, fullName, country, marketingConsent, inviteCode);
         if (error) {
           toast.error(error.message || 'Failed to sign up');
         } else {
@@ -191,6 +194,18 @@ const Auth = () => {
         <form onSubmit={handleSubmit} className="space-y-4" aria-labelledby="auth-heading">
           {!isLogin && !isForgotPassword && (
             <>
+              <div>
+                <Label htmlFor="inviteCode" className="text-sm font-medium text-foreground">Invite Code / Código de Convite (Optional)</Label>
+                <Input
+                  id="inviteCode"
+                  type="text"
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value)}
+                  className="mt-1 border-primary/50"
+                  placeholder="HORISTIC"
+                />
+              </div>
+
               <div>
                 <Label htmlFor="fullName" className="text-sm font-medium text-foreground">Full Name</Label>
                 <Input

@@ -303,7 +303,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         [filteredTrades, trades]
     );
 
-    const value: DashboardContextValue = {
+    const value = useMemo(() => ({
         stats,
         trades,
         filteredTrades,
@@ -316,7 +316,18 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         updateStats: setStats,
         processedTrades,
         setFilteredTrades
-    };
+    }), [
+        stats,
+        trades,
+        filteredTrades,
+        capitalLog,
+        customWidgets,
+        loading,
+        initialInvestment,
+        includeFeesInPnL,
+        fetchStats,
+        processedTrades
+    ]);
 
     return (
         <DashboardContext.Provider value={value}>

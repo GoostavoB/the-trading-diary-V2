@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth event:', event);
-        
+
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -100,16 +100,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email,
       password,
     });
-    
+
     if (!error) {
       navigate('/dashboard');
     }
     return { error };
   };
 
-  const signUp = async (email: string, password: string, fullName: string, country: string, marketingConsent: boolean) => {
+  const signUp = async (email: string, password: string, fullName: string, country: string, marketingConsent: boolean, inviteCode?: string) => {
     const redirectUrl = `${window.location.origin}/dashboard`;
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -118,14 +118,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           full_name: fullName,
           country: country,
           marketing_consent: marketingConsent,
-          terms_accepted_at: new Date().toISOString()
+          terms_accepted_at: new Date().toISOString(),
+          invite_code: inviteCode
         }
       }
     });
-    if (!error) {
+
+    if (signUpError) return { error: signUpError };
+
+    // If invite code is HORISTIC, apply rewards
+    if (inviteCode?.toUpperCase() === 'HORISTIC' && signUpData.user) {
+      console.log('Special invite code detected, applying rewards...');
+
+      // Update profile tier
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ subscription_tier: 'pro' })
+        .eq('id', signUpData.user.id);
+
+      if (profileError) console.error('Error updating profile tier:', profileError);
+
+      // Check if subscription record exists (wait for trigger)
+      // Since it's a new user, we might need to wait a moment or just try updating
+      // In a real app, a trigger or edge function is better, but here we do it best-effort
+      setTimeout(async () => {
+        const { error: subError } = await supabase
+          .from('subscriptions')
+          .update({
+            upload_credits_balance: 50,
+            plan_type: 'pro'
+          })
+          .eq('user_id', signUpData.user!.id);
+
+        if (subError) console.error('Error updating subscription credits:', subError);
+      }, 2000);
+    }
+
+    if (!signUpError) {
       navigate('/dashboard');
     }
-    return { error };
+    return { error: signUpError };
   };
 
   const signInWithGoogle = async (): Promise<{ error: any }> => {
