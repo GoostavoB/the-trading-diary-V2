@@ -46,10 +46,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (event === 'TOKEN_REFRESHED') {
           console.log('Token refreshed successfully');
         } else if (event === 'SIGNED_OUT') {
-          // Clear any cached data
           localStorage.removeItem('rememberMe');
         } else if (event === 'USER_UPDATED') {
           console.log('User data updated');
+        } else if (event === 'SIGNED_IN' && session?.user) {
+          // Check for pending invite code from Google OAuth signup
+          const pendingCode = localStorage.getItem('pendingInviteCode');
+          if (pendingCode && (pendingCode === 'HORISTIC' || pendingCode === 'TEO')) {
+            localStorage.removeItem('pendingInviteCode');
+            applyInviteCodeRewards(session.user.id, pendingCode);
+          }
         }
       }
     );
@@ -80,6 +86,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       clearInterval(sessionCheckInterval);
     };
   }, []);
+
+  // Apply invite code rewards (used by both email signup and Google OAuth)
+  const applyInviteCodeRewards = async (userId: string, code: string) => {
+    const isUnlimited = code === 'TEO';
+    const targetPlan = isUnlimited ? 'elite' : 'pro';
+    const targetCredits = isUnlimited ? 999999 : 50;
+
+    console.log(`Applying invite code ${code} rewards for user ${userId}...`);
+
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .update({ subscription_tier: targetPlan })
+      .eq('id', userId);
+    if (profileError) console.error('Error updating profile tier:', profileError);
+
+    // Retry loop: wait for subscription row to exist, then update
+    for (let attempt = 1; attempt <= 5; attempt++) {
+      await new Promise(r => setTimeout(r, 1500));
+      const { data } = await supabase
+        .from('subscriptions')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (data) {
+        const { error: subError } = await supabase
+          .from('subscriptions')
+          .update({
+            upload_credits_balance: targetCredits,
+            monthly_upload_limit: targetCredits,
+            plan_type: targetPlan
+          })
+          .eq('user_id', userId);
+        if (subError) console.error('Error updating subscription:', subError);
+        else console.log(`Invite code ${code} rewards applied successfully`);
+        return;
+      }
+      console.log(`Waiting for subscription row (attempt ${attempt}/5)...`);
+    }
+    console.warn('Subscription row not found after 5 attempts — invite rewards not applied');
+  };
+
 
   // If the OAuth flow returns the user to /auth, finish the UX by routing to the app once session exists.
   useEffect(() => {
@@ -130,46 +178,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Apply invite code rewards
     const code = inviteCode?.toUpperCase();
     if ((code === 'HORISTIC' || code === 'TEO') && signUpData.user) {
-      console.log(`Invite code ${code} detected, applying rewards...`);
-      const isUnlimited = code === 'TEO';
-      const userId = signUpData.user.id;
-      const targetPlan = isUnlimited ? 'elite' : 'pro';
-      const targetCredits = isUnlimited ? 999999 : 50;
-
-      // Update profile tier
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ subscription_tier: targetPlan })
-        .eq('id', userId);
-      if (profileError) console.error('Error updating profile tier:', profileError);
-
-      // Retry loop: wait for subscription row to exist, then update
-      (async () => {
-        for (let attempt = 1; attempt <= 5; attempt++) {
-          await new Promise(r => setTimeout(r, 1500));
-          const { data } = await supabase
-            .from('subscriptions')
-            .select('id')
-            .eq('user_id', userId)
-            .maybeSingle();
-
-          if (data) {
-            const { error: subError } = await supabase
-              .from('subscriptions')
-              .update({
-                upload_credits_balance: targetCredits,
-                monthly_upload_limit: targetCredits,
-                plan_type: targetPlan
-              })
-              .eq('user_id', userId);
-            if (subError) console.error('Error updating subscription:', subError);
-            else console.log(`Invite code ${code} rewards applied successfully`);
-            return;
-          }
-          console.log(`Waiting for subscription row (attempt ${attempt}/5)...`);
-        }
-        console.warn('Subscription row not found after 5 attempts — invite rewards not applied');
-      })();
+      applyInviteCodeRewards(signUpData.user.id, code);
     }
 
     if (!signUpError) {
