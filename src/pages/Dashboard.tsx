@@ -16,6 +16,8 @@ import { InsightsContent } from '@/components/dashboard/tabs/InsightsContent';
 import { RollingTargetContent } from '@/components/dashboard/tabs/RollingTargetContent';
 import { LSRContent } from '@/components/dashboard/tabs/LSRContent';
 import { HistoryContent } from '@/components/dashboard/tabs/HistoryContent';
+import { CalendarContent } from '@/components/dashboard/tabs/CalendarContent';
+import { GoalsContent } from '@/components/dashboard/tabs/GoalsContent';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { ExportTradesDialog } from '@/components/ExportTradesDialog';
 import {
