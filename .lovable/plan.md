@@ -1,31 +1,44 @@
 
 
-## Plan: Clean Rebuild of Sign-Up Database Flow
+## Fix: Invite Code Rewards Not Applying to Subscriptions
 
 ### Problem
-There are 4 patched migrations on top of each other, two competing triggers (`handle_new_user` + `create_default_sub_account`), and 15 orphaned profiles with only 1 subscription. The EXCEPTION handler silently swallows errors, creating auth users with no profile data.
+The invite code "HORISTIC" partially worked — it updated `profiles.subscription_tier` to `'pro'` successfully, but the `subscriptions` table still has `free` / 5 credits. The `setTimeout(2000)` approach is unreliable because the database trigger may not have created the subscription row yet when the update runs.
 
-### Root Issues
-1. **Two triggers compete**: `handle_new_user` creates a sub_account, but the `create_default_sub_account` trigger on profiles ALSO fires and creates another one — causing duplicates
-2. **EXCEPTION swallows failures**: errors are logged but the function returns NEW, so auth.users gets created but all public data (profile, subscription, settings) is silently rolled back
-3. **Orphaned data**: 15 profiles, only 1 subscription, 15 sub_accounts — leftover from failed attempts
+### Root Cause
+The `setTimeout` fires once after 2 seconds. If the subscription row doesn't exist yet, the `UPDATE` matches zero rows and silently does nothing. There's no retry logic.
 
-### Single Migration — What It Does
+### Fix — Two Parts
 
-1. **Drop the redundant trigger** `on_profile_created_create_sub_account` — handle_new_user will manage everything
-2. **Replace `handle_new_user()`** with a clean version:
-   - Profile insert (no trigger interference)
-   - Sub-account insert (with `is_default = true`)
-   - Subscription insert (`plan_type = 'free'`, 5 credits)
-   - XP initialization
-   - Settings + customization linked to sub_account_id
-   - **NO exception swallowing** — if something fails, the error surfaces clearly instead of creating ghost accounts
-3. **Clean orphaned data**: delete profiles/sub_accounts/settings that have no matching subscription (ghost records from failed signups)
+**1. Fix the code: Replace setTimeout with a retry loop**
+- In `AuthContext.tsx`, replace the fragile `setTimeout` with a polling function that:
+  - Checks if the subscription row exists (up to 5 attempts, 1.5s apart)
+  - Only runs the UPDATE once the row is found
+  - Logs a warning if it gives up after all retries
 
-### Frontend
-- `AuthContext.tsx` — no changes needed, invite code logic (HORISTIC/TEO) is already correct
+**2. Fix Gustavo's account now: One-time data correction**
+- Run a migration to update the existing subscription for user `48bfc4dd-a375-4d03-a05d-6daefb476a21`:
+  - `plan_type` → `'pro'`
+  - `upload_credits_balance` → `50`
+  - `monthly_upload_limit` → `50`
 
 ### Files Changed
-- 1 new migration SQL file (replaces all 4 previous patches)
-- No frontend changes
+- `src/contexts/AuthContext.tsx` — replace setTimeout with retry loop
+- 1 new migration SQL — fix existing account data
+
+### Technical Detail
+```text
+Current (broken):
+  setTimeout(() => {
+    UPDATE subscriptions SET credits=50 WHERE user_id=X
+    // Row might not exist yet → 0 rows updated → silent failure
+  }, 2000)
+
+Fixed:
+  for (attempt 1..5) {
+    SELECT count(*) FROM subscriptions WHERE user_id=X
+    if found → UPDATE → break
+    else → wait 1.5s
+  }
+```
 
