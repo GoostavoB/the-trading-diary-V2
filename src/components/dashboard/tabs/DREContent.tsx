@@ -40,11 +40,11 @@ export function DREContent() {
     }
   };
 
-  const handleBalanceSave = () => {
-    const val = parseFloat(balanceInput);
-    if (!isNaN(val) && val > 0) {
-      dre.setManualBalance(val);
-      setEditingBalance(false);
+  const handleGoalPctSave = () => {
+    const val = parseFloat(goalPctInput);
+    if (!isNaN(val) && val >= 0.5 && val <= 50) {
+      dre.updateDailyGoalPercent(val);
+      setEditingGoalPct(false);
     }
   };
 
