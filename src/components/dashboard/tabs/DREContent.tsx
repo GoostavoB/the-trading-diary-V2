@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Shield, AlertTriangle, Check, X, Zap, Target, Activity } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { useCurrency } from '@/contexts/CurrencyContext';
+import { MetricTooltip } from '@/components/MetricTooltip';
 
 const TIER_COLORS: Record<DRETier, string> = {
   protection: 'hsl(0, 72%, 51%)',
@@ -71,7 +72,16 @@ export function DREContent() {
             <p className="text-xs text-muted-foreground text-center">Status Atual do Engine</p>
             <div className="flex items-center gap-4 mt-1 text-sm">
               <div className="text-center">
-                <p className="text-muted-foreground text-[10px]">Saldo Inicial</p>
+                <div className="flex items-center gap-0.5">
+                  <p className="text-muted-foreground text-[10px]">Saldo Inicial</p>
+                  <MetricTooltip
+                    title="Saldo Inicial"
+                    description="Vem da sua configuração de Investimento Inicial (user_settings). Clique no valor para editar manualmente nesta sessão."
+                    calculation="user_settings.initial_investment ?? $500"
+                    example="Se você configurou $1.500 como investimento inicial, esse será o valor exibido."
+                    side="bottom"
+                  />
+                </div>
                 {editingBalance ? (
                   <div className="flex gap-1 items-center">
                     <Input
@@ -91,11 +101,29 @@ export function DREContent() {
                 )}
               </div>
               <div className="text-center">
-                <p className="text-muted-foreground text-[10px]">Meta Diária</p>
+                <div className="flex items-center gap-0.5">
+                  <p className="text-muted-foreground text-[10px]">Meta Diária</p>
+                  <MetricTooltip
+                    title="Meta Diária"
+                    description="Calculada automaticamente como 5% do seu Saldo Inicial."
+                    calculation="Saldo Inicial × 0.05"
+                    example="Se Saldo Inicial = $1.500, Meta Diária = $75"
+                    side="bottom"
+                  />
+                </div>
                 <p className="font-semibold">{formatAmount(dre.dailyGoal)}</p>
               </div>
               <div className="text-center">
-                <p className="text-muted-foreground text-[10px]">PnL Hoje</p>
+                <div className="flex items-center gap-0.5">
+                  <p className="text-muted-foreground text-[10px]">PnL Hoje</p>
+                  <MetricTooltip
+                    title="PnL Hoje"
+                    description="Soma de todos os lucros e prejuízos dos trades registrados hoje."
+                    calculation="SUM(trades.profit_loss) WHERE date = hoje"
+                    example="Se você fez 3 trades hoje: +$50, -$20, +$30 → PnL = $60"
+                    side="bottom"
+                  />
+                </div>
                 <p className={`font-semibold ${dre.todayPnL >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
                   {formatAmount(dre.todayPnL)}
                 </p>
@@ -110,13 +138,27 @@ export function DREContent() {
             <div className="flex items-center gap-1 text-muted-foreground text-xs">
               <Target className="h-3 w-3" />
               PRÓXIMO TRADE - STOP MÁXIMO
+              <MetricTooltip
+                title="Stop Máximo Permitido"
+                description="Risco máximo permitido no próximo trade com base no seu tier atual. Se estiver em Proteção, o risco é $0."
+                calculation="Excedente × % de Risco do Tier"
+                example="Excedente = $100, Tier Moderado (30%) → Stop Máximo = $30"
+                side="bottom"
+              />
             </div>
             <div className="text-4xl font-black" style={{ color: tierColor }}>
               {formatAmount(dre.allowedRisk)}
             </div>
-            <p className="text-[10px] text-muted-foreground">
+            <div className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
               Excedente: {formatAmount(dre.surplus)}
-            </p>
+              <MetricTooltip
+                title="Excedente"
+                description="Valor acima da sua meta diária. Determina seu tier de risco."
+                calculation="PnL Hoje − Meta Diária"
+                example="PnL = $100, Meta = $75 → Excedente = $25"
+                side="bottom"
+              />
+            </div>
             {dre.tier === 'protection' && (
               <div className="flex items-center gap-1 mt-1 text-[10px] text-red-500 bg-red-500/10 px-2 py-1 rounded-full">
                 <AlertTriangle className="h-3 w-3" />
@@ -129,7 +171,15 @@ export function DREContent() {
         {/* Risk Gauge */}
         <Card className="glass border-0">
           <CardContent className="p-4 flex flex-col items-center justify-center">
-            <p className="text-xs text-muted-foreground mb-1">Curva de Risco</p>
+            <div className="flex items-center gap-0.5 mb-1">
+              <p className="text-xs text-muted-foreground">Curva de Risco</p>
+              <MetricTooltip
+                title="Curva de Risco"
+                description="Gauge visual da sua posição de excedente nos 5 tiers de risco."
+                example="Protection (<$10) → Aggressive ($10-50) → Moderate ($50-150) → Conservative ($150-500) → Institutional ($500+)"
+                side="left"
+              />
+            </div>
             <div className="w-full h-[100px] relative">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -238,8 +288,13 @@ export function DREContent() {
           <CardHeader className="pb-2 pt-3 px-4">
             <CardTitle className="text-sm flex items-center justify-between">
               <span className="flex items-center gap-1.5">
-                <Activity className="h-4 w-4 text-blue-500" />
+                <Activity className="h-4 w-4 text-primary" />
                 Health Check - Trades de Hoje
+                <MetricTooltip
+                  title="Health Check"
+                  description="Cada trade é verificado contra o risco permitido no momento em que foi executado. Verde = respeitou os limites do DRE. Vermelho = violou."
+                  side="bottom"
+                />
               </span>
               <span className="text-xs font-normal text-muted-foreground">
                 <span className="text-emerald-500">{compliantTrades}✓</span>
