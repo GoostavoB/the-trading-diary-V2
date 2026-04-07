@@ -1,47 +1,38 @@
 
 
-## Analysis: Goals Page Numbers
+## Problem
 
-### Current State
-- **1 goal** in database: "Way to 10k" (profit target = $10,000)
-- `current_value` in database = **$0** (never updated)
-- Actual trades since goal start (Apr 6): 3 trades, gross PnL = $101.66, fees = $5.43
-- **Correct current value should be ~$96.23** (net) or $101.66 (gross)
+The two trades uploaded today (BTCUSDT +$18.05 and DAX +$14.56) have `trade_date = NULL` and `created_at = NULL` in the database. The DRE query filters by `.gte('trade_date', todayStart)`, so trades with null `trade_date` are excluded entirely. They also have `closed_at` set to today (Apr 7), which is the only reliable date field.
 
-### Problem Found
-The **Goals.tsx page** reads `current_value` directly from the `trading_goals` table, which is always **$0** because nothing updates it. The page shows:
-- Progress: **0%** (wrong — should be ~1%)
-- Current: **$0** (wrong — should be ~$96)
-- Stats cards (Active/Completed/Overdue/Progress): all based on stale DB value
+## Fix
 
-Meanwhile, the **GoalWidget** component (used inside the GoalsContent dashboard tab) correctly recalculates values dynamically using the `get_trading_analytics` RPC and trade data. This creates an inconsistency — different numbers depending on where you view goals.
+**File: `src/hooks/useDynamicRiskEngine.ts`**
 
-### Root Cause
-`Goals.tsx` uses raw `goal.current_value` from the database. The `GoalWidget` recalculates it on the fly. The database `current_value` column is never written to after goal creation.
+Change the "today's trades" query to use `closed_at` as a fallback when `trade_date` is null. Since Supabase JS client doesn't support `COALESCE` directly, use an `.or()` filter:
 
-### Fix Plan
+- Filter: trades where `trade_date >= today` OR (`trade_date` is null AND `closed_at >= today`)
+- Order by `COALESCE(trade_date, closed_at, created_at)` — use raw ordering or just `closed_at`
+- Also select `closed_at` so the compliance mapper can use it as timestamp fallback
 
-**File: `src/pages/Goals.tsx`**
-1. Add the same dynamic calculation logic that `GoalWidget` uses — query trades filtered by each goal's `baseline_date`/`period_start`/`period_end`, compute real PnL, and override `current_value` before rendering
-2. Extract the calculation into a shared hook (e.g. `useGoalCurrentValues`) to avoid duplication between `Goals.tsx` and `GoalWidget`
-3. Update the stats cards (Active Goals, Completed, Overdue, Total Progress) to use the recalculated values
+Concrete changes to the query (lines 100-108):
+```typescript
+const todayStart = startOfDay(new Date()).toISOString();
+const { data, error } = await supabase
+  .from('trades')
+  .select('id, symbol, symbol_temp, profit_loss, trade_date, closed_at, created_at')
+  .eq('user_id', user!.id)
+  .is('deleted_at', null)
+  .or(`trade_date.gte.${todayStart},and(trade_date.is.null,closed_at.gte.${todayStart})`)
+  .order('closed_at', { ascending: true });
+```
 
-**New file: `src/hooks/useGoalCurrentValues.ts`**
-- Accept an array of goals + user ID
-- For each goal, determine the date range from `calculation_mode`, `baseline_date`, `period_start`, `period_end`
-- Query trades within that range, compute PnL (respecting `includeFeesInPnL`)
-- Return a map of `goalId → currentValue`
+Also update the compliance mapper (around line 148) to use `closed_at` as fallback for `timestamp`:
+```typescript
+timestamp: t.trade_date || t.closed_at || t.created_at,
+```
 
-**File: `src/components/goals/GoalWidget.tsx`**
-- Refactor to use the shared `useGoalCurrentValues` hook instead of its inline calculation (lines 96-202)
-
-### Result
-- Goals page and GoalWidget will show identical, correct numbers
-- Stats cards will reflect real progress
-- No more stale `current_value = 0` display
+**Also fix `allTrades` query** — select `closed_at` too since those new trades also contribute to total PnL and the current query already works (no date filter), but verify it includes the new trades. It does — no change needed there.
 
 ### Files Modified
-- `src/hooks/useGoalCurrentValues.ts` — new shared hook
-- `src/pages/Goals.tsx` — use hook for real values
-- `src/components/goals/GoalWidget.tsx` — refactor to use shared hook
+- `src/hooks/useDynamicRiskEngine.ts` — fix today's trades query to handle null `trade_date`
 
