@@ -64,6 +64,7 @@ import { pageMeta } from '@/utils/seoHelpers';
 import { TradeStationView } from '@/components/trade-station/TradeStationView';
 import { TradeStationContent } from '@/components/dashboard/tabs/TradeStationContent';
 import { ErrorsContent } from '@/components/dashboard/tabs/ErrorsContent';
+import { DREContent } from '@/components/dashboard/tabs/DREContent';
 import { TourCTAButton } from '@/components/tour/TourCTAButton';
 
 // Helper function
@@ -589,6 +590,7 @@ function DashboardContent() {
                   <TabsTrigger value="errors" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Errors</TabsTrigger>
                   <TabsTrigger value="target" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Target</TabsTrigger>
                   <TabsTrigger value="history" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">{t('trades.tradeHistory')}</TabsTrigger>
+                  <TabsTrigger value="dre" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Risk Engine</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="tradestation" className="space-y-6">
