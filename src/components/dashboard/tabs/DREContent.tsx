@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Shield, AlertTriangle, Check, X, Zap, Target, Activity } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { useCurrency } from '@/contexts/CurrencyContext';
+import { MetricTooltip } from '@/components/MetricTooltip';
 
 const TIER_COLORS: Record<DRETier, string> = {
   protection: 'hsl(0, 72%, 51%)',
