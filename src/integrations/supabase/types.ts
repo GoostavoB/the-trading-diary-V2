@@ -4523,6 +4523,7 @@ export type Database = {
           crypto_display_mode: boolean | null
           currency: string | null
           current_visit_streak: number | null
+          daily_goal_percent: number | null
           daily_loss_lock_enabled: boolean | null
           daily_loss_lock_last_override: string | null
           daily_loss_percent: number | null
@@ -4597,6 +4598,7 @@ export type Database = {
           crypto_display_mode?: boolean | null
           currency?: string | null
           current_visit_streak?: number | null
+          daily_goal_percent?: number | null
           daily_loss_lock_enabled?: boolean | null
           daily_loss_lock_last_override?: string | null
           daily_loss_percent?: number | null
@@ -4671,6 +4673,7 @@ export type Database = {
           crypto_display_mode?: boolean | null
           currency?: string | null
           current_visit_streak?: number | null
+          daily_goal_percent?: number | null
           daily_loss_lock_enabled?: boolean | null
           daily_loss_lock_last_override?: string | null
           daily_loss_percent?: number | null
