@@ -1,36 +1,47 @@
 
 
-## Plan: Add Explanatory Tooltips to Every DRE Metric
+## Analysis: Goals Page Numbers
 
-### Goal
-Add tooltips to each number/metric in the DRE tab so the user understands exactly where each value comes from and how it's calculated.
+### Current State
+- **1 goal** in database: "Way to 10k" (profit target = $10,000)
+- `current_value` in database = **$0** (never updated)
+- Actual trades since goal start (Apr 6): 3 trades, gross PnL = $101.66, fees = $5.43
+- **Correct current value should be ~$96.23** (net) or $101.66 (gross)
 
-### Changes
+### Problem Found
+The **Goals.tsx page** reads `current_value` directly from the `trading_goals` table, which is always **$0** because nothing updates it. The page shows:
+- Progress: **0%** (wrong — should be ~1%)
+- Current: **$0** (wrong — should be ~$96)
+- Stats cards (Active/Completed/Overdue/Progress): all based on stale DB value
 
-**File: `src/components/dashboard/tabs/DREContent.tsx`**
+Meanwhile, the **GoalWidget** component (used inside the GoalsContent dashboard tab) correctly recalculates values dynamically using the `get_trading_analytics` RPC and trade data. This creates an inconsistency — different numbers depending on where you view goals.
 
-Import `MetricTooltip` (already exists at `src/components/MetricTooltip.tsx`) and wrap each metric label with it:
+### Root Cause
+`Goals.tsx` uses raw `goal.current_value` from the database. The `GoalWidget` recalculates it on the fly. The database `current_value` column is never written to after goal creation.
 
-1. **Saldo Inicial** — Tooltip: "Comes from your Initial Investment setting (user_settings). Click to edit manually for this session. Default: $500."
+### Fix Plan
 
-2. **Meta Diária** — Tooltip: "Calculated as 5% of your Initial Balance. Formula: Initial Balance × 0.05"
+**File: `src/pages/Goals.tsx`**
+1. Add the same dynamic calculation logic that `GoalWidget` uses — query trades filtered by each goal's `baseline_date`/`period_start`/`period_end`, compute real PnL, and override `current_value` before rendering
+2. Extract the calculation into a shared hook (e.g. `useGoalCurrentValues`) to avoid duplication between `Goals.tsx` and `GoalWidget`
+3. Update the stats cards (Active Goals, Completed, Overdue, Total Progress) to use the recalculated values
 
-3. **PnL Hoje** — Tooltip: "Sum of all profit/loss from today's trades (trades table, filtered by today's date)."
+**New file: `src/hooks/useGoalCurrentValues.ts`**
+- Accept an array of goals + user ID
+- For each goal, determine the date range from `calculation_mode`, `baseline_date`, `period_start`, `period_end`
+- Query trades within that range, compute PnL (respecting `includeFeesInPnL`)
+- Return a map of `goalId → currentValue`
 
-4. **PRÓXIMO TRADE - STOP MÁXIMO** — Tooltip: "Maximum allowed stop loss based on your current tier. Calculated as Surplus × Tier Risk %. If in Protection zone, risk = $0."
+**File: `src/components/goals/GoalWidget.tsx`**
+- Refactor to use the shared `useGoalCurrentValues` hook instead of its inline calculation (lines 96-202)
 
-5. **Excedente** — Tooltip: "Surplus above your daily goal. Formula: Today's PnL − Daily Goal ($25). Determines your risk tier."
-
-6. **Curva de Risco** — Tooltip: "Visual gauge of your surplus position across the 5 risk tiers: Protection (<$10), Aggressive ($10-50), Moderate ($50-150), Conservative ($150-500), Institutional ($500+)."
-
-7. **Health Check trades** — The "max:" label already exists per trade; add a small tooltip on the header explaining: "Each trade is checked against the allowed risk at the time it was placed. Green = respected DRE limits. Red = violated."
-
-### Implementation
-- Use the existing `MetricTooltip` component with `variant="info"` and `side` appropriate to each position
-- Wrap each `<p className="text-muted-foreground text-[10px]">` label with a MetricTooltip
-- Keep the layout compact — use the inline icon variant (small info icon next to the label)
-- No new dependencies needed
+### Result
+- Goals page and GoalWidget will show identical, correct numbers
+- Stats cards will reflect real progress
+- No more stale `current_value = 0` display
 
 ### Files Modified
-- `src/components/dashboard/tabs/DREContent.tsx` — add MetricTooltip imports and wrap 7 metric labels
+- `src/hooks/useGoalCurrentValues.ts` — new shared hook
+- `src/pages/Goals.tsx` — use hook for real values
+- `src/components/goals/GoalWidget.tsx` — refactor to use shared hook
 
