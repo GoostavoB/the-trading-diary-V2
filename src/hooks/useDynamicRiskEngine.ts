@@ -3,12 +3,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { startOfDay } from 'date-fns';
+import { calculateTradePnL } from '@/utils/pnl';
 
 export type DRETier = 'protection' | 'aggressive' | 'moderate' | 'conservative' | 'institutional';
 
 export interface DREState {
-  initialBalance: number;
+  currentBalance: number;
   dailyGoal: number;
+  dailyGoalPercent: number;
   todayPnL: number;
   surplus: number;
   tier: DRETier;
@@ -45,11 +47,10 @@ function getAllowedRisk(surplus: number): number {
   return Math.max(0, surplus * TIER_CONFIG[tier].riskPct);
 }
 
-export const useDynamicRiskEngine = (initialBalanceOverride?: number) => {
+export const useDynamicRiskEngine = () => {
   const { user } = useAuth();
-  const [manualBalance, setManualBalance] = useState<number | null>(initialBalanceOverride ?? null);
 
-  // Primary source: capital_log (sum of all capital additions)
+  // Fetch capital log total
   const { data: capitalLogTotal } = useQuery({
     queryKey: ['capital-log-dre', user?.id],
     queryFn: async () => {
@@ -64,13 +65,13 @@ export const useDynamicRiskEngine = (initialBalanceOverride?: number) => {
     enabled: !!user?.id,
   });
 
-  // Fallback: user_settings.initial_investment
+  // Fetch user settings (initial_investment + daily_goal_percent)
   const { data: userSettings } = useQuery({
     queryKey: ['user-settings-dre', user?.id],
     queryFn: async () => {
       const { data } = await supabase
         .from('user_settings')
-        .select('initial_investment')
+        .select('initial_investment, daily_goal_percent')
         .eq('user_id', user!.id)
         .single();
       return data;
@@ -78,6 +79,22 @@ export const useDynamicRiskEngine = (initialBalanceOverride?: number) => {
     enabled: !!user?.id,
   });
 
+  // Fetch ALL trades for equity calculation (same as useRiskCalculator)
+  const { data: allTrades = [] } = useQuery({
+    queryKey: ['all-trades-dre', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('trades')
+        .select('profit_loss, funding_fee, trading_fee')
+        .eq('user_id', user!.id)
+        .is('deleted_at', null);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user?.id,
+  });
+
+  // Fetch today's trades for DRE compliance
   const { data: todayTrades = [] } = useQuery({
     queryKey: ['trades-today-dre', user?.id],
     queryFn: async () => {
@@ -95,9 +112,25 @@ export const useDynamicRiskEngine = (initialBalanceOverride?: number) => {
     enabled: !!user?.id,
   });
 
-  // Priority: manualBalance > capital_log > initial_investment > 500
-  const initialBalance = manualBalance ?? capitalLogTotal ?? userSettings?.initial_investment ?? 500;
-  const dailyGoal = initialBalance * 0.05;
+  // Current balance = base capital + total PnL (current equity)
+  const baseCapital = capitalLogTotal ?? userSettings?.initial_investment ?? 500;
+  const totalPnL = allTrades.reduce((sum, t) => {
+    return sum + calculateTradePnL(t, { includeFees: true });
+  }, 0);
+  const currentBalance = baseCapital + totalPnL;
+
+  // Daily goal % from DB (default 5)
+  const dailyGoalPercent = (userSettings as any)?.daily_goal_percent ?? 5;
+  const dailyGoal = currentBalance * (dailyGoalPercent / 100);
+
+  const updateDailyGoalPercent = async (pct: number) => {
+    if (!user) return;
+    const clamped = Math.max(0.5, Math.min(50, pct));
+    await supabase
+      .from('user_settings')
+      .update({ daily_goal_percent: clamped } as any)
+      .eq('user_id', user.id);
+  };
 
   const dreState: DREState = useMemo(() => {
     const todayPnL = todayTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
@@ -105,7 +138,6 @@ export const useDynamicRiskEngine = (initialBalanceOverride?: number) => {
     const tier = getTier(surplus);
     const allowedRisk = getAllowedRisk(surplus);
 
-    // Build trade history with DRE compliance check
     let runningPnL = 0;
     const tradesWithCompliance = todayTrades.map((t) => {
       const pnlBefore = runningPnL;
@@ -127,8 +159,9 @@ export const useDynamicRiskEngine = (initialBalanceOverride?: number) => {
     });
 
     return {
-      initialBalance,
+      currentBalance,
       dailyGoal,
+      dailyGoalPercent,
       todayPnL,
       surplus,
       tier,
@@ -136,7 +169,7 @@ export const useDynamicRiskEngine = (initialBalanceOverride?: number) => {
       allowedRisk,
       todayTrades: tradesWithCompliance,
     };
-  }, [todayTrades, initialBalance, dailyGoal]);
+  }, [todayTrades, currentBalance, dailyGoal, dailyGoalPercent]);
 
   const simulate = (hypotheticalPnL: number) => {
     const newPnL = dreState.todayPnL + hypotheticalPnL;
@@ -154,7 +187,7 @@ export const useDynamicRiskEngine = (initialBalanceOverride?: number) => {
 
   return {
     ...dreState,
-    setManualBalance: setManualBalance,
+    updateDailyGoalPercent,
     simulate,
     TIER_CONFIG,
   };
