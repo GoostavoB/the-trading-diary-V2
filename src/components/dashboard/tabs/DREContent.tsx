@@ -30,8 +30,8 @@ export function DREContent() {
   const { formatAmount } = useCurrency();
   const [simValue, setSimValue] = useState('');
   const [simResult, setSimResult] = useState<ReturnType<typeof dre.simulate> | null>(null);
-  const [editingBalance, setEditingBalance] = useState(false);
-  const [balanceInput, setBalanceInput] = useState(String(dre.initialBalance));
+  const [editingGoalPct, setEditingGoalPct] = useState(false);
+  const [goalPctInput, setGoalPctInput] = useState(String(dre.dailyGoalPercent));
 
   const handleSimulate = () => {
     const val = parseFloat(simValue);
