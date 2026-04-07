@@ -49,6 +49,22 @@ export const useDynamicRiskEngine = (initialBalanceOverride?: number) => {
   const { user } = useAuth();
   const [manualBalance, setManualBalance] = useState<number | null>(initialBalanceOverride ?? null);
 
+  // Primary source: capital_log (sum of all capital additions)
+  const { data: capitalLogTotal } = useQuery({
+    queryKey: ['capital-log-dre', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('capital_log')
+        .select('amount_added')
+        .eq('user_id', user!.id);
+      if (error) throw error;
+      if (!data || data.length === 0) return null;
+      return data.reduce((sum, entry) => sum + (entry.amount_added || 0), 0);
+    },
+    enabled: !!user?.id,
+  });
+
+  // Fallback: user_settings.initial_investment
   const { data: userSettings } = useQuery({
     queryKey: ['user-settings-dre', user?.id],
     queryFn: async () => {
@@ -79,7 +95,8 @@ export const useDynamicRiskEngine = (initialBalanceOverride?: number) => {
     enabled: !!user?.id,
   });
 
-  const initialBalance = manualBalance ?? userSettings?.initial_investment ?? 500;
+  // Priority: manualBalance > capital_log > initial_investment > 500
+  const initialBalance = manualBalance ?? capitalLogTotal ?? userSettings?.initial_investment ?? 500;
   const dailyGoal = initialBalance * 0.05;
 
   const dreState: DREState = useMemo(() => {

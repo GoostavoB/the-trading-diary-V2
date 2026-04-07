@@ -76,9 +76,9 @@ export function DREContent() {
                   <p className="text-muted-foreground text-[10px]">Saldo Inicial</p>
                   <MetricTooltip
                     title="Saldo Inicial"
-                    description="Vem da sua configuração de Investimento Inicial (user_settings). Clique no valor para editar manualmente nesta sessão."
-                    calculation="user_settings.initial_investment ?? $500"
-                    example="Se você configurou $1.500 como investimento inicial, esse será o valor exibido."
+                    description="Fonte primária: soma de todos os aportes no Capital Log. Fallback: Investimento Inicial (configurações). Clique no valor para editar manualmente nesta sessão."
+                    calculation="capital_log.SUM(amount_added) ?? user_settings.initial_investment ?? $500"
+                    example="Se você adicionou $300 + $200 no Capital Log, o saldo será $500."
                     side="bottom"
                   />
                 </div>
