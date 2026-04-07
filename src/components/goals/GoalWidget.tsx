@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { computeCurrentValue } from '@/hooks/useGoalCurrentValues';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Progress } from '@/components/ui/progress';
@@ -92,114 +93,14 @@ export function GoalWidget({ includeFeesInPnL = true, tradesOverride }: GoalWidg
     });
   }, [allTrades, tradesOverride, dateRange]);
 
-  // Compute current values for all goal types based on calculation mode and timeframe
-  const { data: currentValues } = useQuery({
-    queryKey: ['goal-current-values', goals.map(g => ({ id: g.id, type: g.goal_type, calc: g.calculation_mode, period: g.period_type, start: g.period_start, end: g.period_end, deadline: g.deadline, baseline: g.baseline_value })), includeFeesInPnL],
-    queryFn: async () => {
-      const results = await Promise.all(
-        goals.map(async (goal) => {
-          let current = 0;
-
-          // Determine date range based on calculation mode and period type
-          let startDate: string | null = null;
-          let endDate: string | null = null;
-
-          if (goal.calculation_mode === 'start_from_scratch' && goal.baseline_date) {
-            startDate = new Date(goal.baseline_date).toISOString();
-            endDate = goal.period_type === 'custom_range' && goal.period_end
-              ? new Date(goal.period_end).toISOString()
-              : new Date(goal.deadline).toISOString();
-          } else if (goal.calculation_mode === 'current_performance') {
-            if (goal.period_type === 'custom_range') {
-              startDate = goal.period_start ? new Date(goal.period_start).toISOString() : null;
-              endDate = goal.period_end ? new Date(goal.period_end).toISOString() : null;
-            } else {
-              // all_time: no start, end at deadline
-              startDate = null;
-              endDate = new Date(goal.deadline).toISOString();
-            }
-          }
-
-          // Fetch analytics for the timeframe
-          const { data, error } = await supabase.rpc('get_trading_analytics' as any, {
-            user_uuid: user!.id,
-            start_date: startDate,
-            end_date: endDate,
-          });
-
-          if (error) {
-            console.error('Analytics error for goal', goal.id, error);
-            return { goalId: goal.id, current: 0 };
-          }
-
-          const analytics = data as any;
-
-          // Filter trades for this goal's timeframe
-          const goaltimeframeTrades = allTrades.filter(trade => {
-            const tradeDate = new Date(trade.trade_date || (trade as any).closed_at || trade.opened_at);
-            if (isNaN(tradeDate.getTime())) return false;
-            if (startDate && tradeDate < new Date(startDate)) return false;
-            if (endDate && tradeDate > new Date(endDate)) return false;
-            return true;
-          });
-
-          // Calculate PnL respecting includeFeesInPnL setting
-          const totalPnl = goaltimeframeTrades.reduce((sum, t) => {
-            const pnl = t.profit_loss || t.pnl || 0;
-            if (includeFeesInPnL) {
-              const fundingFee = (t as any).funding_fee || 0;
-              const tradingFee = (t as any).trading_fee || 0;
-              return sum + (pnl - Math.abs(fundingFee) - Math.abs(tradingFee));
-            }
-            return sum + pnl;
-          }, 0);
-
-          const totalTrades = goaltimeframeTrades.length;
-          const winningTrades = goaltimeframeTrades.filter(t => {
-            const pnl = t.profit_loss || t.pnl || 0;
-            if (includeFeesInPnL) {
-              const fundingFee = (t as any).funding_fee || 0;
-              const tradingFee = (t as any).trading_fee || 0;
-              return (pnl - Math.abs(fundingFee) - Math.abs(tradingFee)) > 0;
-            }
-            return pnl > 0;
-          }).length;
-          const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
-
-          // Calculate current value based on goal type
-          switch (goal.goal_type) {
-            case 'profit':
-              current = totalPnl;
-              break;
-            case 'trades':
-              current = totalTrades;
-              break;
-            case 'win_rate':
-              current = winRate;
-              break;
-            case 'roi':
-              const baseline = goal.baseline_value ?? 1;
-              current = baseline > 0 ? (totalPnl / baseline) * 100 : 0;
-              break;
-            case 'capital':
-              if (goal.capital_target_type === 'absolute') {
-                current = (goal.baseline_value ?? 0) + totalPnl;
-              } else {
-                const baseCapital = goal.baseline_value ?? 1;
-                current = baseCapital > 0 ? (totalPnl / baseCapital) * 100 : 0;
-              }
-              break;
-            default:
-              current = goal.current_value ?? 0;
-          }
-
-          return { goalId: goal.id, current };
-        })
-      );
-      return results as Array<{ goalId: string; current: number }>;
-    },
-    enabled: goals.length > 0 && !!user,
-  });
+  // Compute current values using shared logic
+  const currentValues = useMemo(() => {
+    if (!goals.length || !allTrades.length) return [] as Array<{ goalId: string; current: number }>;
+    return goals.map(goal => ({
+      goalId: goal.id,
+      current: computeCurrentValue(goal, allTrades, includeFeesInPnL),
+    }));
+  }, [goals, allTrades, includeFeesInPnL]);
 
   const handleDelete = async () => {
     if (!deletingGoalId) return;
