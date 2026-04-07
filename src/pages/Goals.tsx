@@ -15,6 +15,7 @@ import { Target, TrendingUp, Award, CheckCircle, X, Trophy, Star } from "lucide-
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useGoalCurrentValues } from "@/hooks/useGoalCurrentValues";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -86,8 +87,16 @@ export default function Goals() {
     }
   };
 
-  const activeGoals = goals?.filter(g => (g.current_value / g.target_value) < 1) || [];
-  const completedGoals = goals?.filter(g => (g.current_value / g.target_value) >= 1) || [];
+  const { valuesMap } = useGoalCurrentValues(goals || [], user?.id);
+
+  // Enrich goals with real-time current_value
+  const enrichedGoals = (goals || []).map(g => ({
+    ...g,
+    current_value: valuesMap.get(g.id) ?? g.current_value,
+  }));
+
+  const activeGoals = enrichedGoals.filter(g => (g.current_value / g.target_value) < 1);
+  const completedGoals = enrichedGoals.filter(g => (g.current_value / g.target_value) >= 1);
   const overdueGoals = activeGoals.filter(g => new Date(g.deadline) < new Date());
 
   const stats = [
@@ -177,7 +186,7 @@ export default function Goals() {
                 Completed ({completedGoals.length})
               </TabsTrigger>
               <TabsTrigger value="all">
-                All Goals ({goals?.length || 0})
+                All Goals ({enrichedGoals.length})
               </TabsTrigger>
             </TabsList>
 
@@ -230,7 +239,7 @@ export default function Goals() {
             </TabsContent>
 
             <TabsContent value="all" className="space-y-4">
-              {!goals || goals.length === 0 ? (
+              {enrichedGoals.length === 0 ? (
                 <PremiumCard className="p-12 text-center">
                   <Target className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
                   <h3 className="text-lg font-semibold mb-2">No Goals Created</h3>
@@ -241,7 +250,7 @@ export default function Goals() {
                 </PremiumCard>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {goals.map((goal) => (
+                  {enrichedGoals.map((goal) => (
                     <GoalCard
                       key={goal.id}
                       goal={goal}
