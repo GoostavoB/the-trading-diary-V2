@@ -101,11 +101,11 @@ export const useDynamicRiskEngine = () => {
       const todayStart = startOfDay(new Date()).toISOString();
       const { data, error } = await supabase
         .from('trades')
-        .select('id, symbol, symbol_temp, profit_loss, trade_date, created_at')
+        .select('id, symbol, symbol_temp, profit_loss, trade_date, closed_at, created_at')
         .eq('user_id', user!.id)
         .is('deleted_at', null)
-        .gte('trade_date', todayStart)
-        .order('trade_date', { ascending: true });
+        .or(`trade_date.gte.${todayStart},and(trade_date.is.null,closed_at.gte.${todayStart})`)
+        .order('closed_at', { ascending: true });
       if (error) throw error;
       return data || [];
     },
@@ -152,7 +152,7 @@ export const useDynamicRiskEngine = () => {
         id: t.id,
         symbol: t.symbol || t.symbol_temp || 'Unknown',
         profit_loss: t.profit_loss || 0,
-        timestamp: t.trade_date || t.created_at,
+        timestamp: t.trade_date || t.closed_at || t.created_at,
         respectedDRE,
         allowedRiskAtTime: allowedAtTime,
       };
