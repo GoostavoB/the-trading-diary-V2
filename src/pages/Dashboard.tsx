@@ -654,6 +654,10 @@ function DashboardContent() {
                 <TabsContent value="history" className="relative glass rounded-2xl p-6">
                   <HistoryContent />
                 </TabsContent>
+
+                <TabsContent value="dre" className="space-y-4">
+                  <DREContent />
+                </TabsContent>
               </Tabs>
             </>
           )}
