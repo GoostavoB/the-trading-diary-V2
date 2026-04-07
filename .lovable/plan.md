@@ -1,34 +1,36 @@
 
 
-## Fix: Google OAuth no domínio custom
+## Plan: Add Explanatory Tooltips to Every DRE Metric
 
-### Problema
-Quando o usuário acessa via `thetradingdiary.com`, o SDK do Lovable constrói a URL de inicio do OAuth como `thetradingdiary.com/~oauth/initiate`, mas o endpoint `~oauth` só existe em `the-trading-diary.lovable.app`. Resultado: 404.
+### Goal
+Add tooltips to each number/metric in the DRE tab so the user understands exactly where each value comes from and how it's calculated.
 
-### Causa
-O SDK `@lovable.dev/cloud-auth-js` usa internamente `window.location.origin` para montar a URL do `~oauth/initiate`. No domínio custom, isso quebra.
+### Changes
 
-### Solução
-Passar o parâmetro `redirect_uri` apontando para o domínio `.lovable.app` — que já está correto no código. Porém, o SDK também precisa saber onde iniciar o fluxo. Precisamos verificar se o SDK aceita um parâmetro de `baseUrl` ou similar.
+**File: `src/components/dashboard/tabs/DREContent.tsx`**
 
-**Opção mais provável**: O SDK do Lovable Cloud Auth já deveria lidar com isso automaticamente. Isso pode ser um bug do SDK ou uma configuração faltando.
+Import `MetricTooltip` (already exists at `src/components/MetricTooltip.tsx`) and wrap each metric label with it:
 
-### Passos
-1. **Investigar o SDK** — verificar como `@lovable.dev/cloud-auth-js` constrói a URL de initiate e se aceita configuração de base URL
-2. **Se o SDK aceitar config** — passar o domínio `.lovable.app` como base para o fluxo OAuth
-3. **Se não aceitar** — criar um workaround redirecionando o usuário manualmente para `https://the-trading-diary.lovable.app/~oauth/initiate?...` antes de iniciar o fluxo
+1. **Saldo Inicial** — Tooltip: "Comes from your Initial Investment setting (user_settings). Click to edit manually for this session. Default: $500."
 
-### Arquivo afetado
-- `src/contexts/AuthContext.tsx` — ajustar chamada do `signInWithGoogle`
+2. **Meta Diária** — Tooltip: "Calculated as 5% of your Initial Balance. Formula: Initial Balance × 0.05"
 
-### Detalhe técnico
-```text
-Atual (quebrado no domínio custom):
-  thetradingdiary.com/~oauth/initiate?provider=google&redirect_uri=...
-  → 404 (endpoint não existe no domínio custom)
+3. **PnL Hoje** — Tooltip: "Sum of all profit/loss from today's trades (trades table, filtered by today's date)."
 
-Correto:
-  the-trading-diary.lovable.app/~oauth/initiate?provider=google&redirect_uri=...
-  → Funciona (endpoint existe no .lovable.app)
-```
+4. **PRÓXIMO TRADE - STOP MÁXIMO** — Tooltip: "Maximum allowed stop loss based on your current tier. Calculated as Surplus × Tier Risk %. If in Protection zone, risk = $0."
+
+5. **Excedente** — Tooltip: "Surplus above your daily goal. Formula: Today's PnL − Daily Goal ($25). Determines your risk tier."
+
+6. **Curva de Risco** — Tooltip: "Visual gauge of your surplus position across the 5 risk tiers: Protection (<$10), Aggressive ($10-50), Moderate ($50-150), Conservative ($150-500), Institutional ($500+)."
+
+7. **Health Check trades** — The "max:" label already exists per trade; add a small tooltip on the header explaining: "Each trade is checked against the allowed risk at the time it was placed. Green = respected DRE limits. Red = violated."
+
+### Implementation
+- Use the existing `MetricTooltip` component with `variant="info"` and `side` appropriate to each position
+- Wrap each `<p className="text-muted-foreground text-[10px]">` label with a MetricTooltip
+- Keep the layout compact — use the inline icon variant (small info icon next to the label)
+- No new dependencies needed
+
+### Files Modified
+- `src/components/dashboard/tabs/DREContent.tsx` — add MetricTooltip imports and wrap 7 metric labels
 
