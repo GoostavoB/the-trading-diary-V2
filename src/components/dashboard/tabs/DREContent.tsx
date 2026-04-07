@@ -30,8 +30,8 @@ export function DREContent() {
   const { formatAmount } = useCurrency();
   const [simValue, setSimValue] = useState('');
   const [simResult, setSimResult] = useState<ReturnType<typeof dre.simulate> | null>(null);
-  const [editingBalance, setEditingBalance] = useState(false);
-  const [balanceInput, setBalanceInput] = useState(String(dre.initialBalance));
+  const [editingGoalPct, setEditingGoalPct] = useState(false);
+  const [goalPctInput, setGoalPctInput] = useState(String(dre.dailyGoalPercent));
 
   const handleSimulate = () => {
     const val = parseFloat(simValue);
@@ -40,11 +40,11 @@ export function DREContent() {
     }
   };
 
-  const handleBalanceSave = () => {
-    const val = parseFloat(balanceInput);
-    if (!isNaN(val) && val > 0) {
-      dre.setManualBalance(val);
-      setEditingBalance(false);
+  const handleGoalPctSave = () => {
+    const val = parseFloat(goalPctInput);
+    if (!isNaN(val) && val >= 0.5 && val <= 50) {
+      dre.updateDailyGoalPercent(val);
+      setEditingGoalPct(false);
     }
   };
 
@@ -73,45 +73,50 @@ export function DREContent() {
             <div className="flex items-center gap-4 mt-1 text-sm">
               <div className="text-center">
                 <div className="flex items-center gap-0.5">
-                  <p className="text-muted-foreground text-[10px]">Saldo Inicial</p>
+                  <p className="text-muted-foreground text-[10px]">Saldo Atual</p>
                   <MetricTooltip
-                    title="Saldo Inicial"
-                    description="Fonte primária: soma de todos os aportes no Capital Log. Fallback: Investimento Inicial (configurações). Clique no valor para editar manualmente nesta sessão."
-                    calculation="capital_log.SUM(amount_added) ?? user_settings.initial_investment ?? $500"
-                    example="Se você adicionou $300 + $200 no Capital Log, o saldo será $500."
+                    title="Saldo Atual"
+                    description="Capital base (capital_log ou initial_investment) + PnL total de todos os trades. Representa seu equity atual."
+                    calculation="Capital Base + SUM(trades.pnl)"
+                    example="Se capital = $500 e PnL total = +$96, Saldo Atual = $596"
                     side="bottom"
                   />
                 </div>
-                {editingBalance ? (
+                <p className="font-semibold">{formatAmount(dre.currentBalance)}</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center gap-0.5">
+                  <p className="text-muted-foreground text-[10px]">Meta Diária ({dre.dailyGoalPercent}%)</p>
+                  <MetricTooltip
+                    title="Meta Diária"
+                    description="Percentual configurável sobre o Saldo Atual. Clique no valor para editar."
+                    calculation={`Saldo Atual × ${dre.dailyGoalPercent}%`}
+                    example={`Se Saldo = ${formatAmount(dre.currentBalance)}, Meta = ${formatAmount(dre.dailyGoal)}`}
+                    side="bottom"
+                  />
+                </div>
+                {editingGoalPct ? (
                   <div className="flex gap-1 items-center">
                     <Input
-                      className="h-6 w-20 text-xs"
-                      value={balanceInput}
-                      onChange={(e) => setBalanceInput(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleBalanceSave()}
+                      className="h-6 w-16 text-xs text-center"
+                      value={goalPctInput}
+                      onChange={(e) => setGoalPctInput(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleGoalPctSave()}
+                      type="number"
+                      min={0.5}
+                      max={50}
+                      step={0.5}
                     />
-                    <Button size="sm" variant="ghost" className="h-6 px-1" onClick={handleBalanceSave}>
+                    <span className="text-[10px] text-muted-foreground">%</span>
+                    <Button size="sm" variant="ghost" className="h-6 px-1" onClick={handleGoalPctSave}>
                       <Check className="h-3 w-3" />
                     </Button>
                   </div>
                 ) : (
-                  <p className="font-semibold cursor-pointer hover:underline" onClick={() => setEditingBalance(true)}>
-                    {formatAmount(dre.initialBalance)}
+                  <p className="font-semibold cursor-pointer hover:underline" onClick={() => { setEditingGoalPct(true); setGoalPctInput(String(dre.dailyGoalPercent)); }}>
+                    {formatAmount(dre.dailyGoal)}
                   </p>
                 )}
-              </div>
-              <div className="text-center">
-                <div className="flex items-center gap-0.5">
-                  <p className="text-muted-foreground text-[10px]">Meta Diária</p>
-                  <MetricTooltip
-                    title="Meta Diária"
-                    description="Calculada automaticamente como 5% do seu Saldo Inicial."
-                    calculation="Saldo Inicial × 0.05"
-                    example="Se Saldo Inicial = $1.500, Meta Diária = $75"
-                    side="bottom"
-                  />
-                </div>
-                <p className="font-semibold">{formatAmount(dre.dailyGoal)}</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center gap-0.5">
