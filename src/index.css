@@ -483,7 +483,11 @@
     border: 1px solid hsl(240 3% 20%);
   }
 
-  /* ── GRADIENT TEXT (Apple style — subtle, no tricks) ── */
+  /* ──────────────────────────────────────────────────────────────────
+     GRADIENT TEXT — the signature Apple blue → cyan system
+     Use `.text-gradient-electric` on hero numbers, section titles, and
+     strong accents. Keep body copy in plain white for contrast.
+     ────────────────────────────────────────────────────────────────── */
   .text-gradient-hero {
     background: linear-gradient(180deg,
       hsl(240 5% 100%) 0%,
@@ -492,10 +496,30 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+  /* Electric: the blue → cyan signature gradient */
   .text-gradient-electric {
     background: linear-gradient(135deg,
       hsl(var(--electric-blue)) 0%,
       hsl(var(--apple-cyan)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  /* Electric vertical — for big display numbers, reads as bright→soft */
+  .text-gradient-electric-v {
+    background: linear-gradient(180deg,
+      hsl(var(--apple-cyan)) 0%,
+      hsl(var(--electric-blue)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  /* White-into-electric — premium heading */
+  .text-gradient-electric-soft {
+    background: linear-gradient(135deg,
+      hsl(240 5% 100%) 0%,
+      hsl(var(--apple-cyan)) 60%,
+      hsl(var(--electric-blue)) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -507,6 +531,118 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+  /* Semantic gradients for P&L numbers */
+  .text-gradient-profit {
+    background: linear-gradient(135deg,
+      hsl(var(--apple-green)) 0%,
+      hsl(var(--apple-cyan)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-loss {
+    background: linear-gradient(135deg,
+      hsl(var(--apple-red)) 0%,
+      hsl(var(--apple-pink)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ──────────────────────────────────────────────────────────────────
+     GRADIENT BACKGROUNDS — for buttons, progress bars, card accents.
+     ────────────────────────────────────────────────────────────────── */
+  .bg-gradient-electric {
+    background: linear-gradient(135deg,
+      hsl(var(--electric-blue)) 0%,
+      hsl(var(--apple-cyan)) 100%);
+  }
+  .bg-gradient-electric-v {
+    background: linear-gradient(180deg,
+      hsl(var(--electric-blue-bright)) 0%,
+      hsl(var(--electric-blue)) 100%);
+  }
+  .bg-gradient-profit {
+    background: linear-gradient(135deg,
+      hsl(var(--apple-green)) 0%,
+      hsl(var(--apple-cyan)) 100%);
+  }
+  .bg-gradient-loss {
+    background: linear-gradient(135deg,
+      hsl(var(--apple-red)) 0%,
+      hsl(var(--apple-pink)) 100%);
+  }
+  /* Soft ambient card wash — subtle blue glow on top of the surface */
+  .bg-gradient-card-electric {
+    background:
+      radial-gradient(ellipse 80% 50% at 0% 0%, hsl(var(--electric-blue) / 0.12) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%),
+      hsl(var(--space-gray-700));
+  }
+  .bg-gradient-card-profit {
+    background:
+      radial-gradient(ellipse 80% 50% at 0% 0%, hsl(var(--apple-green) / 0.14) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%),
+      hsl(var(--space-gray-700));
+  }
+  .bg-gradient-card-loss {
+    background:
+      radial-gradient(ellipse 80% 50% at 0% 0%, hsl(var(--apple-red) / 0.14) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%),
+      hsl(var(--space-gray-700));
+  }
+  .bg-gradient-card-purple {
+    background:
+      radial-gradient(ellipse 80% 50% at 0% 0%, hsl(var(--apple-purple) / 0.14) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%),
+      hsl(var(--space-gray-700));
+  }
+  /* Full-surface subtle blue wash for heroes/section headers */
+  .bg-gradient-surface-electric {
+    background:
+      linear-gradient(135deg, hsl(var(--electric-blue) / 0.08) 0%, hsl(var(--apple-cyan) / 0.04) 100%),
+      hsl(var(--space-gray-800));
+  }
+
+  /* ──────────────────────────────────────────────────────────────────
+     GRADIENT BORDERS — thin conic accent around cards/CTAs.
+     Usage: wrap element with `.ring-gradient-electric`.
+     ────────────────────────────────────────────────────────────────── */
+  .ring-gradient-electric {
+    position: relative;
+  }
+  .ring-gradient-electric::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg,
+      hsl(var(--electric-blue) / 0.7) 0%,
+      hsl(var(--apple-cyan) / 0.4) 50%,
+      hsl(var(--electric-blue) / 0) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Subtle underline accent for section titles */
+  .accent-underline {
+    position: relative;
+    display: inline-block;
+  }
+  .accent-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 40%;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, hsl(var(--electric-blue)), hsl(var(--apple-cyan)), transparent);
   }
 
   /* Legacy shim → map old gradient utilities to new ones */
@@ -549,28 +685,38 @@
     gap: 0.5rem;
     padding: 0.625rem 1.25rem;
     border-radius: 10px;
-    background: linear-gradient(180deg, hsl(211 100% 60%) 0%, hsl(211 100% 48%) 100%);
+    /* Blue → cyan gradient to match hero "Every edge" accent */
+    background: linear-gradient(135deg,
+      hsl(var(--electric-blue-bright)) 0%,
+      hsl(var(--electric-blue)) 50%,
+      hsl(var(--apple-cyan)) 100%);
+    background-size: 200% 200%;
+    background-position: 0% 0%;
     color: white;
     font-weight: 600;
     font-size: 0.9375rem;
     letter-spacing: -0.01em;
-    border: 1px solid hsl(211 100% 45%);
+    border: 1px solid hsl(var(--electric-blue-soft));
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.25),
       inset 0 -1px 0 rgba(0, 0, 0, 0.1),
       0 1px 2px rgba(0, 0, 0, 0.3),
-      0 4px 14px hsl(211 100% 50% / 0.35);
+      0 4px 14px hsl(var(--electric-blue) / 0.4),
+      0 0 24px hsl(var(--electric-blue) / 0.15);
     transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1),
                 box-shadow 200ms ease,
-                filter 200ms ease;
+                filter 200ms ease,
+                background-position 400ms ease;
     cursor: pointer;
   }
   .btn-primary:hover {
     filter: brightness(1.08);
+    background-position: 100% 100%;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.3),
       0 2px 4px rgba(0, 0, 0, 0.3),
-      0 6px 18px hsl(211 100% 50% / 0.5);
+      0 6px 22px hsl(var(--electric-blue) / 0.55),
+      0 0 40px hsl(var(--apple-cyan) / 0.25);
   }
   .btn-primary:active { transform: scale(0.97); filter: brightness(0.95); }
 
@@ -619,12 +765,16 @@
     transition: all 200ms cubic-bezier(0.22, 1, 0.36, 1);
   }
   .btn-term {
-    background: linear-gradient(180deg, hsl(211 100% 60%) 0%, hsl(211 100% 48%) 100%);
+    background: linear-gradient(135deg,
+      hsl(var(--electric-blue-bright)) 0%,
+      hsl(var(--electric-blue)) 50%,
+      hsl(var(--apple-cyan)) 100%);
     color: white;
-    border: 1px solid hsl(211 100% 45%);
+    border: 1px solid hsl(var(--electric-blue-soft));
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.25),
-      0 4px 14px hsl(211 100% 50% / 0.35);
+      0 4px 14px hsl(var(--electric-blue) / 0.4),
+      0 0 24px hsl(var(--apple-cyan) / 0.12);
   }
   .btn-term::before, .btn-term::after { content: ''; }
   .btn-term:hover {
@@ -668,7 +818,11 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(12px);
   }
-  .chip-electric { background: hsl(var(--electric-blue) / 0.15); color: hsl(var(--electric-blue)); border-color: hsl(var(--electric-blue) / 0.3); }
+  .chip-electric {
+    background: linear-gradient(135deg, hsl(var(--electric-blue) / 0.2) 0%, hsl(var(--apple-cyan) / 0.15) 100%);
+    color: hsl(var(--apple-cyan));
+    border-color: hsl(var(--electric-blue) / 0.35);
+  }
   .chip-green { background: hsl(var(--apple-green) / 0.15); color: hsl(var(--apple-green)); border-color: hsl(var(--apple-green) / 0.3); }
   .chip-red { background: hsl(var(--apple-red) / 0.15); color: hsl(var(--apple-red)); border-color: hsl(var(--apple-red) / 0.3); }
   .chip-orange { background: hsl(var(--apple-orange) / 0.15); color: hsl(var(--apple-orange)); border-color: hsl(var(--apple-orange) / 0.3); }

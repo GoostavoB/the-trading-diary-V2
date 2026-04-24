@@ -77,8 +77,8 @@ export const UpgradeModal = ({
   const plans = [
     {
       id: 'starter',
-      nameKey: 'pricing.plans.starter.name',
-      descriptionKey: 'pricing.plans.starter.description',
+      nameKey: 'pricing.plans.basic.name',
+      descriptionKey: 'pricing.plans.basic.description',
       monthlyPrice: 0,
       annualPrice: 0,
       annualTotal: 0,

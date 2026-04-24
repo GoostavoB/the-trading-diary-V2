@@ -241,7 +241,7 @@ export const OneYearProjectionWidget = memo(({
           </div>
           <div className={cn(
             'font-display text-4xl md:text-5xl font-bold tabular-nums tracking-tight leading-none mt-1',
-            isPositive ? 'text-space-100' : 'text-apple-red'
+            isPositive ? 'text-gradient-electric' : 'text-gradient-loss'
           )}>
             {formatCurrency(result.projectedBalance, true)}
           </div>

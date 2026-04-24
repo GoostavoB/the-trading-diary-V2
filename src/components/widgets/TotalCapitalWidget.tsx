@@ -102,7 +102,7 @@ export const TotalCapitalWidget = memo(({
       <div className="px-5 pb-1">
         <div className={cn(
           'font-display text-5xl md:text-6xl font-bold tabular-nums tracking-tight leading-none',
-          isPositive ? 'text-space-100' : 'text-apple-red'
+          isPositive ? 'text-gradient-electric' : 'text-gradient-loss'
         )}>
           {formatCurrency(currentCapital)}
         </div>

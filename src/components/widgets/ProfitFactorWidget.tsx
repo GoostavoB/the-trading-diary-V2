@@ -79,10 +79,10 @@ export const ProfitFactorWidget = memo(({
       {/* Hero number */}
       <div className="px-4 pb-3 flex items-baseline gap-3">
         <span className={cn('font-display text-5xl font-bold tabular-nums tracking-tight leading-none',
-          tier.color === 'apple-green' && 'text-apple-green',
-          tier.color === 'electric' && 'text-electric',
+          tier.color === 'apple-green' && 'text-gradient-profit',
+          tier.color === 'electric' && 'text-gradient-electric',
           tier.color === 'apple-orange' && 'text-apple-orange',
-          tier.color === 'apple-red' && 'text-apple-red',
+          tier.color === 'apple-red' && 'text-gradient-loss',
         )}>
           {isFinite(profitFactor) && profitFactor < 100 ? profitFactor.toFixed(2) : '∞'}
         </span>
