@@ -306,7 +306,7 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
   tradingQuality: {
     id: 'tradingQuality',
     title: 'Trading Quality Metrics',
-    description: 'Win/loss analysis and profit factor',
+    description: 'Win/loss analysis, risk-reward and max drawdown',
     category: 'insights',
     icon: BarChart3,
     defaultSize: 'medium',

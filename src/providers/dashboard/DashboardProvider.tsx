@@ -174,7 +174,25 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
             }, 0);
 
             const winningTrades = mappedTrades.filter(t => (t.profit_loss || 0) > 0).length;
-            const avgDuration = mappedTrades.reduce((sum, t) => sum + (t.duration_minutes || 0), 0) / (mappedTrades.length || 1);
+            // Average holding time in minutes — falls back to duration_hours then to
+            // (closed_at - opened_at) for rows where duration_minutes is null/0.
+            const durationSamples: number[] = [];
+            for (const t of mappedTrades) {
+                if (typeof t.duration_minutes === 'number' && t.duration_minutes > 0) {
+                    durationSamples.push(t.duration_minutes);
+                } else if (typeof t.duration_hours === 'number' && t.duration_hours > 0) {
+                    durationSamples.push(t.duration_hours * 60);
+                } else if (t.opened_at && t.closed_at) {
+                    const openedAt = new Date(t.opened_at).getTime();
+                    const closedAt = new Date(t.closed_at).getTime();
+                    if (!Number.isNaN(openedAt) && !Number.isNaN(closedAt) && closedAt > openedAt) {
+                        durationSamples.push((closedAt - openedAt) / 60000);
+                    }
+                }
+            }
+            const avgDuration = durationSamples.length > 0
+                ? durationSamples.reduce((a, b) => a + b, 0) / durationSamples.length
+                : 0;
 
             const { tradingDays: tradingDaySpan } = calculateTradingDays(mappedTrades, tradingDaysMode);
 

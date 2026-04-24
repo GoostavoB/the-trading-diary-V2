@@ -90,6 +90,59 @@ export const UNIFIED_THEMES: ThemeDefinition[] = [
     requiredTier: 'pro',
     isPrebuilt: true,
   },
+
+  // NEW THEMES — Synthwave, Private Banking, Creative Product
+  {
+    id: 'neon',
+    name: 'Neon',
+    description: 'Synthwave magenta and cyan on space gray',
+    primary: '278 69% 63%',      // Apple purple #BF5AF2 (electric)
+    secondary: '190 100% 66%',   // Apple cyan #64D2FF
+    accent: '348 100% 65%',      // Apple pink #FF375F
+    profit: '145 63% 51%',       // Apple green
+    loss: '348 100% 65%',        // Pink red
+    success: '145 63% 51%',
+    warning: '35 100% 52%',
+    error: '348 100% 65%',
+    info: '278 69% 63%',
+    focus: '278 69% 63%',
+    requiredTier: 'pro',
+    isPrebuilt: true,
+  },
+  {
+    id: 'midnight-gold',
+    name: 'Midnight Gold',
+    description: 'Champagne gold on warm near-black — private banking',
+    primary: '46 65% 52%',       // Champagne gold #D4AF37
+    secondary: '340 69% 32%',    // Deep burgundy #8B1A3A
+    accent: '46 65% 52%',        // Gold
+    profit: '46 65% 52%',        // Gold (positive)
+    loss: '340 69% 32%',         // Burgundy (negative)
+    success: '145 50% 48%',
+    warning: '38 95% 55%',       // Copper
+    error: '340 69% 32%',
+    info: '46 65% 52%',
+    focus: '46 65% 52%',
+    requiredTier: 'pro',
+    isPrebuilt: true,
+  },
+  {
+    id: 'sunset-wave',
+    name: 'Sunset Wave',
+    description: 'Coral and teal — creative product vibe',
+    primary: '11 100% 67%',      // Coral orange #FF7A59
+    secondary: '350 100% 81%',   // Sunset pink #FF9EB1
+    accent: '172 66% 50%',       // Teal
+    profit: '172 66% 50%',       // Teal
+    loss: '11 100% 67%',         // Coral red-orange
+    success: '145 63% 51%',
+    warning: '48 95% 60%',       // Yellow
+    error: '11 100% 67%',
+    info: '350 100% 81%',
+    focus: '11 100% 67%',
+    requiredTier: 'pro',
+    isPrebuilt: true,
+  },
 ];
 
 // Helper to get theme by ID

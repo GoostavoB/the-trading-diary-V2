@@ -4,6 +4,7 @@ import { TradingHeatmap } from '@/components/TradingHeatmap';
 import { TradingQualityMetrics } from '@/components/insights/TradingQualityMetrics';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { useMemo } from 'react';
+import { calculateMaxDrawdown } from '@/utils/insightCalculations';
 
 export function CalendarContent() {
   const { loading, processedTrades, initialInvestment } = useDashboard();
@@ -11,23 +12,26 @@ export function CalendarContent() {
   const qualityStats = useMemo(() => {
     const winningTrades = processedTrades.filter(t => (t.profit_loss || 0) > 0);
     const losingTrades = processedTrades.filter(t => (t.profit_loss || 0) <= 0);
-    
-    const avgWin = winningTrades.length > 0 
-      ? winningTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / winningTrades.length 
+
+    const avgWin = winningTrades.length > 0
+      ? winningTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / winningTrades.length
       : 0;
-    const avgLoss = losingTrades.length > 0 
+    const avgLoss = losingTrades.length > 0
       ? Math.abs(losingTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / losingTrades.length)
       : 0;
-    
-    const minPnl = processedTrades.length > 0
-      ? Math.min(...processedTrades.map(t => t.profit_loss || 0))
-      : 0;
-    
-    const totalWins = winningTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
-    const totalLosses = Math.abs(losingTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0));
-    const profitFactor = totalLosses > 0 ? totalWins / totalLosses : totalWins > 0 ? Infinity : 0;
 
-    return { avgWin, avgLoss, winCount: winningTrades.length, lossCount: losingTrades.length, maxDrawdownAmount: Math.min(0, minPnl), maxDrawdownPercent: initialInvestment > 0 ? Math.abs((minPnl / initialInvestment) * 100) : 0, profitFactor };
+    // True max drawdown: largest peak-to-trough decline in cumulative P&L.
+    const { amount: maxDrawdownAmount, percent: maxDrawdownPercent } =
+      calculateMaxDrawdown(processedTrades, initialInvestment);
+
+    return {
+      avgWin,
+      avgLoss,
+      winCount: winningTrades.length,
+      lossCount: losingTrades.length,
+      maxDrawdownAmount: -Math.abs(maxDrawdownAmount), // render as negative
+      maxDrawdownPercent,
+    };
   }, [processedTrades, initialInvestment]);
 
   if (loading) return <DashboardSkeleton />;
@@ -51,7 +55,6 @@ export function CalendarContent() {
             lossCount={qualityStats.lossCount}
             maxDrawdownAmount={qualityStats.maxDrawdownAmount}
             maxDrawdownPercent={qualityStats.maxDrawdownPercent}
-            profitFactor={qualityStats.profitFactor}
           />
         </SmartWidgetWrapper>
       </div>

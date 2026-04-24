@@ -11,7 +11,6 @@ interface TradingQualityMetricsProps {
   lossCount: number;
   maxDrawdownPercent: number;
   maxDrawdownAmount: number;
-  profitFactor: number;
 }
 
 // ── Risk/Reward Visual Scale ────────────────────────────────────
@@ -121,33 +120,34 @@ function DrawdownMeter({ pct }: { pct: number }) {
   );
 }
 
-// ── Profit Factor Badge ─────────────────────────────────────────
-function ProfitFactorBadge({ value }: { value: number }) {
-  const zones = [
-    { max: 1,   label: 'LOSING',  bg: 'bg-rose-500/10',   border: 'border-rose-500/20',   text: 'text-rose-400' },
-    { max: 1.5, label: 'BREAKEVEN', bg: 'bg-amber-400/10', border: 'border-amber-400/20',  text: 'text-amber-400' },
-    { max: 2,   label: 'SOLID',   bg: 'bg-lime-400/10',   border: 'border-lime-400/20',    text: 'text-lime-400' },
-    { max: Infinity, label: 'ELITE', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20', text: 'text-emerald-400' },
-  ];
-  const zone = zones.find(z => value < z.max) || zones[zones.length - 1];
-  const pct = Math.min(value / 3, 1) * 100;
-
+// ── Avg Win / Avg Loss Cell ─────────────────────────────────────
+function AvgWinLossCell({ avgWin, avgLoss }: { avgWin: number; avgLoss: number }) {
+  const formatUsd = (n: number) => {
+    const abs = Math.abs(n);
+    if (abs >= 1000) return `$${(n / 1000).toFixed(2)}K`;
+    return `$${n.toFixed(2)}`;
+  };
+  const hasWin = avgWin > 0;
+  const hasLoss = avgLoss > 0;
   return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <span className={cn("text-xl font-black tabular-nums", zone.text)}>{value.toFixed(2)}</span>
+    <div className="space-y-1.5">
+      <div className="flex items-baseline justify-between">
+        <span className="text-[9px] text-emerald-400/70 tracking-wider">AVG WIN</span>
         <span className={cn(
-          "text-[9px] font-bold tracking-widest px-1.5 py-0.5 rounded-md border",
-          zone.bg, zone.border, zone.text
+          "text-sm font-black tabular-nums",
+          hasWin ? "text-emerald-400" : "text-space-400"
         )}>
-          {zone.label}
+          {hasWin ? `+${formatUsd(avgWin)}` : '—'}
         </span>
       </div>
-      <div className="h-1 w-full rounded-full bg-white/5 overflow-hidden">
-        <div
-          className={cn("h-full rounded-full transition-all duration-700", zone.text.replace('text-', 'bg-').replace('-400', '-400/60').replace('-500', '-500/60'))}
-          style={{ width: `${pct}%` }}
-        />
+      <div className="flex items-baseline justify-between">
+        <span className="text-[9px] text-rose-400/70 tracking-wider">AVG LOSS</span>
+        <span className={cn(
+          "text-sm font-black tabular-nums",
+          hasLoss ? "text-rose-400" : "text-space-400"
+        )}>
+          {hasLoss ? `−${formatUsd(avgLoss)}` : '—'}
+        </span>
       </div>
     </div>
   );
@@ -173,7 +173,6 @@ export const TradingQualityMetrics = memo(({
   lossCount,
   maxDrawdownPercent,
   maxDrawdownAmount,
-  profitFactor
 }: TradingQualityMetricsProps) => {
   const { t } = useTranslation();
 
@@ -212,8 +211,8 @@ export const TradingQualityMetrics = memo(({
           <DrawdownMeter pct={maxDrawdownPercent} />
         </MetricCell>
 
-        <MetricCell label="Profit Factor">
-          <ProfitFactorBadge value={profitFactor} />
+        <MetricCell label="Avg Win / Loss">
+          <AvgWinLossCell avgWin={avgWin} avgLoss={avgLoss} />
         </MetricCell>
       </div>
     </PremiumCard>

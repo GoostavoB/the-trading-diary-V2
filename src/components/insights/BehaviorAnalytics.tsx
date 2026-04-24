@@ -4,6 +4,7 @@ import { Clock, DollarSign, Activity, Calendar, TrendingUp, TrendingDown } from 
 import { formatCurrency } from '@/utils/formatNumber';
 import {
   calculateAvgHoldingTime,
+  formatHoldingTime,
   calculateAvgPositionSize,
   calculateAvgLeverage,
   analyzeDayPerformance
@@ -28,7 +29,8 @@ export const BehaviorAnalytics = memo(({ trades }: BehaviorAnalyticsProps) => {
     );
   }
 
-  const avgHoldingTime = useMemo(() => calculateAvgHoldingTime(trades), [trades]);
+  const avgHoldingMinutes = useMemo(() => calculateAvgHoldingTime(trades), [trades]);
+  const avgHoldingTime = useMemo(() => formatHoldingTime(avgHoldingMinutes), [avgHoldingMinutes]);
   const avgPositionSize = useMemo(() => calculateAvgPositionSize(trades), [trades]);
   const avgLeverage = useMemo(() => calculateAvgLeverage(trades), [trades]);
   const dayPerf = useMemo(() => analyzeDayPerformance(trades), [trades]);
@@ -55,7 +57,7 @@ export const BehaviorAnalytics = memo(({ trades }: BehaviorAnalyticsProps) => {
           {/* Avg Holding Time */}
           <div className="p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center justify-center text-center min-h-0">
             <Clock className="w-3.5 h-3.5 text-primary mb-0.5" />
-            <span className="text-xs font-bold truncate">{avgHoldingTime}</span>
+            <span className={`text-xs font-bold truncate tabular-nums ${avgHoldingTime === '—' ? 'text-space-400' : ''}`}>{avgHoldingTime}</span>
             <span className="text-[8px] text-muted-foreground uppercase">{t('insights.avgHoldingTime') || 'HOLD'}</span>
           </div>
 

@@ -1,13 +1,28 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDynamicRiskEngine, type DRETier } from '@/hooks/useDynamicRiskEngine';
+import { useRiskCalculator } from '@/hooks/useRiskCalculator';
+import { useDailyLossLock } from '@/hooks/useDailyLossLock';
+import { useUserSettings } from '@/hooks/useUserSettings';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Shield, AlertTriangle, Check, X, Zap, Target, Activity } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import {
+  Shield,
+  AlertTriangle,
+  Check,
+  X,
+  Zap,
+  Target,
+  Activity,
+  Settings2,
+  TrendingDown,
+  CircleDollarSign,
+} from 'lucide-react';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { MetricTooltip } from '@/components/MetricTooltip';
+import { cn } from '@/lib/utils';
 
 const TIER_COLORS: Record<DRETier, string> = {
   protection: 'hsl(0, 72%, 51%)',
@@ -26,12 +41,36 @@ const TIER_BG: Record<DRETier, string> = {
 };
 
 export function DREContent() {
+  const navigate = useNavigate();
   const dre = useDynamicRiskEngine();
   const { formatAmount } = useCurrency();
+  const { settings } = useUserSettings();
+
+  // Pull the real per-trade risk / daily loss budget from the Risk Calculator
+  // so the "Próximo Trade Stop Max" number reflects the user's actual settings.
+  const { calculation, riskPercent, loading: riskLoading } = useRiskCalculator();
+  const { todaysPnL, remaining: remainingDailyBudget, isLocked } = useDailyLossLock(
+    calculation.dailyLossLimit,
+  );
+
   const [simValue, setSimValue] = useState('');
   const [simResult, setSimResult] = useState<ReturnType<typeof dre.simulate> | null>(null);
   const [editingGoalPct, setEditingGoalPct] = useState(false);
   const [goalPctInput, setGoalPctInput] = useState(String(dre.dailyGoalPercent));
+
+  // ── BUSINESS LOGIC ────────────────────────────────────────────────────
+  // nextTradeStopMax = min(per-trade risk, remaining daily budget)
+  // If daily loss lock is active → 0. If user is already over their goal,
+  // we fall back to the tier-based allowedRisk from the DRE hook.
+  const nextTradeStopMax = useMemo(() => {
+    if (isLocked) return 0;
+    const baseStop = Math.min(calculation.riskPerTrade, remainingDailyBudget);
+    return Math.max(0, baseStop);
+  }, [isLocked, calculation.riskPerTrade, remainingDailyBudget]);
+
+  // Configuration flag — if neither risk_percent nor daily_loss_percent is
+  // set in user_settings, the widget has nothing to work with.
+  const lossLockConfigured = calculation.dailyLossLimit > 0 && calculation.riskPerTrade > 0;
 
   const handleSimulate = () => {
     const val = parseFloat(simValue);
@@ -48,55 +87,75 @@ export function DREContent() {
     }
   };
 
-  // Gauge data
-  const gaugeValue = Math.max(0, Math.min(100, ((dre.surplus + 50) / 600) * 100));
-  const gaugeData = [
-    { value: gaugeValue },
-    { value: 100 - gaugeValue },
-  ];
-
   const tierColor = TIER_COLORS[dre.tier];
-  const compliantTrades = dre.todayTrades.filter(t => t.respectedDRE).length;
-  const violatedTrades = dre.todayTrades.filter(t => !t.respectedDRE).length;
+  const compliantTrades = dre.todayTrades.filter((t) => t.respectedDRE).length;
+  const violatedTrades = dre.todayTrades.filter((t) => !t.respectedDRE).length;
+
+  const budgetUsedPct =
+    calculation.dailyLossLimit > 0
+      ? Math.min(100, (Math.abs(Math.min(0, todaysPnL)) / calculation.dailyLossLimit) * 100)
+      : 0;
 
   return (
-    <div className="flex flex-col gap-3 overflow-y-auto" style={{ height: 'calc(100vh - 220px)' }}>
-      {/* Top Row: Status Badge + Next Trade Command */}
+    <div
+      className="flex flex-col gap-3 overflow-y-auto"
+      style={{ height: 'calc(100vh - 220px)' }}
+    >
+      {/* ── Config banner ─────────────────────────────────────────── */}
+      {!lossLockConfigured && !riskLoading && (
+        <Card className="glass border-0 border-l-4" style={{ borderLeftColor: tierColor }}>
+          <CardContent className="p-3 flex items-center gap-3">
+            <Settings2 className="h-5 w-5 text-amber-500 flex-shrink-0" />
+            <div className="flex-1 text-sm">
+              <p className="font-semibold">Configure your risk settings first</p>
+              <p className="text-xs text-muted-foreground">
+                Set a per-trade risk % and a daily loss limit on the Trade Station to
+                enable next-trade stop suggestions.
+              </p>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => navigate('/settings')}>
+              Open Settings
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── Top Row: Status + Next Trade + Daily Budget ─────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {/* Status Badge */}
+        {/* Status */}
         <Card className="glass border-0">
           <CardContent className="p-4 flex flex-col items-center justify-center gap-2">
             <div className={`px-4 py-2 rounded-full border font-bold text-lg ${TIER_BG[dre.tier]}`}>
               {dre.tierLabel}
             </div>
-            <p className="text-xs text-muted-foreground text-center">Status Atual do Engine</p>
+            <p className="text-xs text-muted-foreground text-center">Engine status</p>
             <div className="flex items-center gap-4 mt-1 text-sm">
               <div className="text-center">
-                <div className="flex items-center gap-0.5">
-                  <p className="text-muted-foreground text-[10px]">Saldo Atual</p>
+                <div className="flex items-center gap-0.5 justify-center">
+                  <p className="text-muted-foreground text-[10px]">Current balance</p>
                   <MetricTooltip
-                    title="Saldo Atual"
-                    description="Capital base (capital_log ou initial_investment) + PnL total de todos os trades. Representa seu equity atual."
-                    calculation="Capital Base + SUM(trades.pnl)"
-                    example="Se capital = $500 e PnL total = +$96, Saldo Atual = $596"
+                    title="Current balance"
+                    description="Base capital + total PnL across every trade."
+                    calculation="Base capital + SUM(trades.pnl)"
                     side="bottom"
                   />
                 </div>
-                <p className="font-semibold">{formatAmount(dre.currentBalance)}</p>
+                <p className="font-semibold tabular-nums">{formatAmount(dre.currentBalance)}</p>
               </div>
               <div className="text-center">
-                <div className="flex items-center gap-0.5">
-                  <p className="text-muted-foreground text-[10px]">Meta Diária ({dre.dailyGoalPercent}%)</p>
+                <div className="flex items-center gap-0.5 justify-center">
+                  <p className="text-muted-foreground text-[10px]">
+                    Daily goal ({dre.dailyGoalPercent}%)
+                  </p>
                   <MetricTooltip
-                    title="Meta Diária"
-                    description="Percentual configurável sobre o Saldo Atual. Clique no valor para editar."
-                    calculation={`Saldo Atual × ${dre.dailyGoalPercent}%`}
-                    example={`Se Saldo = ${formatAmount(dre.currentBalance)}, Meta = ${formatAmount(dre.dailyGoal)}`}
+                    title="Daily goal"
+                    description="Editable % of current balance. Click the value to change it."
+                    calculation={`Current balance × ${dre.dailyGoalPercent}%`}
                     side="bottom"
                   />
                 </div>
                 {editingGoalPct ? (
-                  <div className="flex gap-1 items-center">
+                  <div className="flex gap-1 items-center justify-center">
                     <Input
                       className="h-6 w-16 text-xs text-center"
                       value={goalPctInput}
@@ -108,28 +167,42 @@ export function DREContent() {
                       step={0.5}
                     />
                     <span className="text-[10px] text-muted-foreground">%</span>
-                    <Button size="sm" variant="ghost" className="h-6 px-1" onClick={handleGoalPctSave}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-6 px-1"
+                      onClick={handleGoalPctSave}
+                    >
                       <Check className="h-3 w-3" />
                     </Button>
                   </div>
                 ) : (
-                  <p className="font-semibold cursor-pointer hover:underline" onClick={() => { setEditingGoalPct(true); setGoalPctInput(String(dre.dailyGoalPercent)); }}>
+                  <p
+                    className="font-semibold cursor-pointer hover:underline tabular-nums"
+                    onClick={() => {
+                      setEditingGoalPct(true);
+                      setGoalPctInput(String(dre.dailyGoalPercent));
+                    }}
+                  >
                     {formatAmount(dre.dailyGoal)}
                   </p>
                 )}
               </div>
               <div className="text-center">
-                <div className="flex items-center gap-0.5">
-                  <p className="text-muted-foreground text-[10px]">PnL Hoje</p>
+                <div className="flex items-center gap-0.5 justify-center">
+                  <p className="text-muted-foreground text-[10px]">Today PnL</p>
                   <MetricTooltip
-                    title="PnL Hoje"
-                    description="Soma de todos os lucros e prejuízos dos trades registrados hoje."
-                    calculation="SUM(trades.profit_loss) WHERE date = hoje"
-                    example="Se você fez 3 trades hoje: +$50, -$20, +$30 → PnL = $60"
+                    title="Today PnL"
+                    description="Sum of realised PnL for every trade closed today."
                     side="bottom"
                   />
                 </div>
-                <p className={`font-semibold ${dre.todayPnL >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                <p
+                  className={cn(
+                    'font-semibold tabular-nums',
+                    dre.todayPnL >= 0 ? 'text-emerald-500' : 'text-red-500',
+                  )}
+                >
                   {formatAmount(dre.todayPnL)}
                 </p>
               </div>
@@ -137,117 +210,118 @@ export function DREContent() {
           </CardContent>
         </Card>
 
-        {/* Next Trade Command - Maximum Visual Highlight */}
-        <Card className="glass border-0 md:col-span-1" style={{ borderLeft: `3px solid ${tierColor}` }}>
+        {/* Next Trade - Max Stop (rebuilt calc) */}
+        <Card
+          className="glass border-0"
+          style={{ borderLeft: `3px solid ${tierColor}` }}
+        >
           <CardContent className="p-4 flex flex-col items-center justify-center gap-1">
-            <div className="flex items-center gap-1 text-muted-foreground text-xs">
+            <div className="flex items-center gap-1 text-muted-foreground text-xs uppercase tracking-wide">
               <Target className="h-3 w-3" />
-              PRÓXIMO TRADE - STOP MÁXIMO
+              Next trade · Stop max
               <MetricTooltip
-                title="Stop Máximo Permitido"
-                description="Risco máximo permitido no próximo trade com base no seu tier atual. Se estiver em Proteção, o risco é $0."
-                calculation="Excedente × % de Risco do Tier"
-                example="Excedente = $100, Tier Moderado (30%) → Stop Máximo = $30"
+                title="Next trade — Stop max"
+                description="Maximum $ risk you can lose on the next trade without busting your per-trade risk or daily loss budget."
+                calculation="min( equity × risk%, daily_loss_limit + todayPnL )"
                 side="bottom"
               />
             </div>
-            <div className="text-4xl font-black" style={{ color: tierColor }}>
-              {formatAmount(dre.allowedRisk)}
+            <div
+              className="text-4xl font-black tabular-nums"
+              style={{ color: nextTradeStopMax > 0 ? tierColor : 'hsl(var(--muted-foreground))' }}
+            >
+              {lossLockConfigured ? formatAmount(nextTradeStopMax) : '—'}
             </div>
             <div className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
-              Excedente: {formatAmount(dre.surplus)}
+              Per-trade risk: {lossLockConfigured ? formatAmount(calculation.riskPerTrade) : '—'}
               <MetricTooltip
-                title="Excedente"
-                description="Valor acima da sua meta diária. Determina seu tier de risco."
-                calculation="PnL Hoje − Meta Diária"
-                example="PnL = $100, Meta = $75 → Excedente = $25"
+                title="Per-trade risk"
+                description="Calculated from your Risk Calculator: equity × risk %."
                 side="bottom"
               />
             </div>
-            {dre.tier === 'protection' && (
+            {isLocked && (
               <div className="flex items-center gap-1 mt-1 text-[10px] text-red-500 bg-red-500/10 px-2 py-1 rounded-full">
                 <AlertTriangle className="h-3 w-3" />
-                Meta de {formatAmount(dre.dailyGoal)} protegida. Não opere.
+                Lock triggered — stop trading today
               </div>
+            )}
+            {!isLocked && !lossLockConfigured && (
+              <p className="text-[10px] text-muted-foreground text-center mt-1 max-w-[22ch]">
+                Set a daily loss lock to enable next-trade stop suggestions.
+              </p>
             )}
           </CardContent>
         </Card>
 
-        {/* Risk Gauge */}
+        {/* Daily budget remaining */}
         <Card className="glass border-0">
-          <CardContent className="p-4 flex flex-col items-center justify-center">
-            <div className="flex items-center gap-0.5 mb-1">
-              <p className="text-xs text-muted-foreground">Curva de Risco</p>
-              <MetricTooltip
-                title="Curva de Risco"
-                description="Gauge visual da sua posição de excedente nos 5 tiers de risco."
-                example="Protection (<$10) → Aggressive ($10-50) → Moderate ($50-150) → Conservative ($150-500) → Institutional ($500+)"
-                side="left"
+          <CardContent className="p-4 flex flex-col justify-center gap-2">
+            <div className="flex items-center gap-1 text-muted-foreground text-xs">
+              <CircleDollarSign className="h-3 w-3" />
+              Daily loss budget
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span
+                className={cn(
+                  'text-2xl font-black tabular-nums',
+                  isLocked ? 'text-red-500' : 'text-foreground',
+                )}
+              >
+                {lossLockConfigured ? formatAmount(remainingDailyBudget) : '—'}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                / {formatAmount(calculation.dailyLossLimit)}
+              </span>
+            </div>
+            {/* Progress */}
+            <div className="h-1.5 w-full rounded-full bg-muted/40 overflow-hidden">
+              <div
+                className={cn(
+                  'h-full rounded-full transition-all',
+                  budgetUsedPct >= 100
+                    ? 'bg-red-500'
+                    : budgetUsedPct >= 75
+                    ? 'bg-amber-500'
+                    : 'bg-emerald-500',
+                )}
+                style={{ width: `${budgetUsedPct}%` }}
               />
             </div>
-            <div className="w-full h-[100px] relative">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={gaugeData}
-                    cx="50%"
-                    cy="90%"
-                    startAngle={180}
-                    endAngle={0}
-                    innerRadius={50}
-                    outerRadius={70}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    <Cell fill={tierColor} />
-                    <Cell fill="hsl(var(--muted))" />
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex items-end justify-center pb-1">
-                <span className="text-xs font-bold" style={{ color: tierColor }}>
-                  {dre.surplus >= 0 ? '+' : ''}{formatAmount(dre.surplus)}
-                </span>
-              </div>
+            <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <TrendingDown className="h-3 w-3" />
+                Used: {budgetUsedPct.toFixed(0)}%
+              </span>
+              <span>Risk % / trade: {riskPercent.toFixed(2)}%</span>
             </div>
-            {/* Tier scale */}
-            <div className="flex gap-1 mt-1 w-full">
-              {(['protection', 'aggressive', 'moderate', 'conservative', 'institutional'] as DRETier[]).map((t) => (
-                <div
-                  key={t}
-                  className={`h-1.5 flex-1 rounded-full transition-all ${dre.tier === t ? 'opacity-100 scale-y-150' : 'opacity-30'}`}
-                  style={{ backgroundColor: TIER_COLORS[t] }}
-                />
-              ))}
-            </div>
-            <div className="flex justify-between w-full text-[8px] text-muted-foreground mt-0.5">
-              <span>$0</span>
-              <span>$10</span>
-              <span>$50</span>
-              <span>$150</span>
-              <span>$500+</span>
-            </div>
+            {isLocked && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-red-500/40 bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-500 self-start">
+                <AlertTriangle className="h-3 w-3" />
+                Lock triggered
+              </span>
+            )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Bottom Row: Simulator + Health Check */}
+      {/* ── Bottom Row: Simulator + Health Check ───────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1 min-h-0">
-        {/* Trade Simulator */}
+        {/* Simulator */}
         <Card className="glass border-0">
           <CardHeader className="pb-2 pt-3 px-4">
             <CardTitle className="text-sm flex items-center gap-1.5">
               <Zap className="h-4 w-4 text-amber-500" />
-              Simular Próximo Trade
+              Simulate next trade
             </CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-3 space-y-3">
             <div className="flex gap-2">
               <div className="flex-1">
-                <Label className="text-xs">Lucro / Prejuízo Hipotético ($)</Label>
+                <Label className="text-xs">Hypothetical P/L ($)</Label>
                 <Input
                   type="number"
-                  placeholder="Ex: 50 ou -30"
+                  placeholder="e.g. 50 or -30"
                   value={simValue}
                   onChange={(e) => setSimValue(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSimulate()}
@@ -255,31 +329,41 @@ export function DREContent() {
                 />
               </div>
               <Button onClick={handleSimulate} className="self-end">
-                Simular
+                Run
               </Button>
             </div>
 
             {simResult && (
               <div className="rounded-lg border p-3 space-y-2 bg-muted/30">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Novo PnL do dia</span>
-                  <span className={simResult.newPnL >= 0 ? 'text-emerald-500 font-semibold' : 'text-red-500 font-semibold'}>
+                  <span className="text-muted-foreground">New day PnL</span>
+                  <span
+                    className={cn(
+                      'font-semibold tabular-nums',
+                      simResult.newPnL >= 0 ? 'text-emerald-500' : 'text-red-500',
+                    )}
+                  >
                     {formatAmount(simResult.newPnL)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Novo Excedente</span>
-                  <span className="font-semibold">{formatAmount(simResult.newSurplus)}</span>
+                  <span className="text-muted-foreground">New surplus vs goal</span>
+                  <span className="font-semibold tabular-nums">{formatAmount(simResult.newSurplus)}</span>
                 </div>
                 <div className="flex justify-between text-sm items-center">
-                  <span className="text-muted-foreground">Novo Status</span>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold border ${TIER_BG[simResult.newTier]}`}>
+                  <span className="text-muted-foreground">New tier</span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-bold border ${TIER_BG[simResult.newTier]}`}
+                  >
                     {simResult.newTierLabel}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Novo Stop Permitido</span>
-                  <span className="font-bold text-base" style={{ color: TIER_COLORS[simResult.newTier] }}>
+                  <span className="text-muted-foreground">Tier-implied stop</span>
+                  <span
+                    className="font-bold text-base tabular-nums"
+                    style={{ color: TIER_COLORS[simResult.newTier] }}
+                  >
                     {formatAmount(simResult.newAllowedRisk)}
                   </span>
                 </div>
@@ -288,22 +372,19 @@ export function DREContent() {
           </CardContent>
         </Card>
 
-        {/* Health Check History */}
+        {/* Health Check */}
         <Card className="glass border-0 flex flex-col">
           <CardHeader className="pb-2 pt-3 px-4">
             <CardTitle className="text-sm flex items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <Activity className="h-4 w-4 text-primary" />
-                Health Check - Trades de Hoje
-                <MetricTooltip
-                  title="Health Check"
-                  description="Cada trade é verificado contra o risco permitido no momento em que foi executado. Verde = respeitou os limites do DRE. Vermelho = violou."
-                  side="bottom"
-                />
+                Health check — today's trades
               </span>
               <span className="text-xs font-normal text-muted-foreground">
-                <span className="text-emerald-500">{compliantTrades}✓</span>
-                {violatedTrades > 0 && <span className="text-red-500 ml-1">{violatedTrades}✗</span>}
+                <span className="text-emerald-500">{compliantTrades}</span>
+                {violatedTrades > 0 && (
+                  <span className="text-red-500 ml-1">· {violatedTrades} violated</span>
+                )}
               </span>
             </CardTitle>
           </CardHeader>
@@ -311,12 +392,15 @@ export function DREContent() {
             {dre.todayTrades.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-sm gap-2">
                 <Shield className="h-8 w-8 opacity-30" />
-                <p>Nenhum trade registrado hoje</p>
+                <p>No trades logged today</p>
               </div>
             ) : (
               <div className="space-y-1.5">
                 {dre.todayTrades.map((trade, i) => (
-                  <div key={trade.id} className="flex items-center gap-2 text-sm py-1.5 px-2 rounded-lg hover:bg-muted/30">
+                  <div
+                    key={trade.id}
+                    className="flex items-center gap-2 text-sm py-1.5 px-2 rounded-lg hover:bg-muted/30"
+                  >
                     <span className="text-muted-foreground text-xs w-4">#{i + 1}</span>
                     {trade.respectedDRE ? (
                       <div className="h-5 w-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
@@ -328,8 +412,14 @@ export function DREContent() {
                       </div>
                     )}
                     <span className="font-medium flex-1 truncate">{trade.symbol}</span>
-                    <span className={`font-semibold ${trade.profit_loss >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                      {trade.profit_loss >= 0 ? '+' : ''}{formatAmount(trade.profit_loss)}
+                    <span
+                      className={cn(
+                        'font-semibold tabular-nums',
+                        trade.profit_loss >= 0 ? 'text-emerald-500' : 'text-red-500',
+                      )}
+                    >
+                      {trade.profit_loss >= 0 ? '+' : ''}
+                      {formatAmount(trade.profit_loss)}
                     </span>
                     <span className="text-[10px] text-muted-foreground">
                       max: {formatAmount(trade.allowedRiskAtTime)}

@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SmartWidgetWrapper } from '@/components/widgets/SmartWidgetWrapper';
 import { CommandCenterContent } from '@/components/dashboard/tabs/CommandCenterContent';
-import { BehaviorContent } from '@/components/dashboard/tabs/BehaviorContent';
 import { RollingTargetContent } from '@/components/dashboard/tabs/RollingTargetContent';
 import { HistoryContent } from '@/components/dashboard/tabs/HistoryContent';
 import { CalendarContent } from '@/components/dashboard/tabs/CalendarContent';
@@ -32,6 +31,7 @@ import { useWidgetLayout } from '@/hooks/useWidgetLayout';
 import { useGridLayout, type WidgetPosition } from '@/hooks/useGridLayout';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
+import { calculateMaxDrawdown } from '@/utils/insightCalculations';
 import { LessonLearnedPopup } from '@/components/lessons/LessonLearnedPopup';
 import { useBadgeNotifications } from '@/hooks/useBadgeNotifications';
 import { useSpotWallet } from '@/hooks/useSpotWallet';
@@ -61,7 +61,6 @@ import { SEO } from '@/components/SEO';
 import { pageMeta } from '@/utils/seoHelpers';
 import { TradeStationView } from '@/components/trade-station/TradeStationView';
 import { TradeStationContent } from '@/components/dashboard/tabs/TradeStationContent';
-import { ErrorsContent } from '@/components/dashboard/tabs/ErrorsContent';
 import { DREContent } from '@/components/dashboard/tabs/DREContent';
 import { TourCTAButton } from '@/components/tour/TourCTAButton';
 
@@ -105,7 +104,15 @@ function DashboardContent() {
     setFilteredTrades // Not really needed as context handles filtering, but kept for compatibility if needed
   } = useDashboard();
 
-  const [activeTab, setActiveTab] = useState<string>('overview');
+  // Read ?tab= from URL so that deep links like /dashboard?tab=history land on the right tab
+  const initialTab = (() => {
+    if (typeof window === 'undefined') return 'overview';
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get('tab');
+    const allowed = ['overview', 'tradestation', 'history', 'planning'];
+    return t && allowed.includes(t) ? t : 'overview';
+  })();
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
 
   // Onboarding flow
@@ -387,20 +394,18 @@ function DashboardContent() {
         widgetProps.worstTrade = dashboardStats.worstTrade;
         widgetProps.currentStreak = currentStreak;
         break;
-      case 'tradingQuality':
-        const minPnl = processedTrades.length > 0
-          ? Math.min(...processedTrades.map(t => t.profit_loss || 0))
-          : 0;
+      case 'tradingQuality': {
+        // True max drawdown = largest peak-to-trough decline in cumulative equity.
+        const { amount: mddAmount, percent: mddPercent } =
+          calculateMaxDrawdown(processedTrades, initialInvestment);
         widgetProps.avgWin = dashboardStats.avgWin;
         widgetProps.avgLoss = dashboardStats.avgLoss;
         widgetProps.winCount = dashboardStats.winningTrades.length;
         widgetProps.lossCount = dashboardStats.losingTrades.length;
-        widgetProps.maxDrawdownAmount = Math.min(0, minPnl);
-        widgetProps.maxDrawdownPercent = initialInvestment > 0
-          ? Math.abs((minPnl / initialInvestment) * 100)
-          : 0;
-        widgetProps.profitFactor = dashboardStats.profitFactor;
+        widgetProps.maxDrawdownAmount = -Math.abs(mddAmount);
+        widgetProps.maxDrawdownPercent = mddPercent;
         break;
+      }
       case 'avgPnLPerTrade':
         widgetProps.avgPnLPerTrade = stats?.avg_pnl_per_trade || 0;
         break;
@@ -647,7 +652,6 @@ function DashboardContent() {
                 <TabsList className="glass rounded-2xl flex w-full h-auto p-1.5 gap-1">
                   <TabsTrigger value="overview"      className="flex-1 text-sm py-2.5 px-4 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Overview</TabsTrigger>
                   <TabsTrigger value="tradestation"  className="flex-1 text-sm py-2.5 px-4 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Trade Station</TabsTrigger>
-                  <TabsTrigger value="analytics"     className="flex-1 text-sm py-2.5 px-4 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Analytics</TabsTrigger>
                   <TabsTrigger value="history"       className="flex-1 text-sm py-2.5 px-4 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">History</TabsTrigger>
                   <TabsTrigger value="planning"      className="flex-1 text-sm py-2.5 px-4 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Planning</TabsTrigger>
                 </TabsList>
@@ -676,22 +680,6 @@ function DashboardContent() {
                 {/* ── Trade Station ── */}
                 <TabsContent value="tradestation" className="space-y-6">
                   <TradeStationContent />
-                </TabsContent>
-
-                {/* ── Analytics: Behavior + Errors in sub-tabs ── */}
-                <TabsContent value="analytics" className="space-y-4">
-                  <Tabs defaultValue="behavior" className="space-y-4">
-                    <TabsList className="h-9 rounded-lg bg-muted/40 p-1 gap-1">
-                      <TabsTrigger value="behavior" className="rounded-md px-4 text-sm">Behavior</TabsTrigger>
-                      <TabsTrigger value="errors"   className="rounded-md px-4 text-sm">Errors</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="behavior" className="space-y-4">
-                      <BehaviorContent />
-                    </TabsContent>
-                    <TabsContent value="errors" className="space-y-4">
-                      <ErrorsContent />
-                    </TabsContent>
-                  </Tabs>
                 </TabsContent>
 
                 {/* ── History: Trade History + Calendar in sub-tabs ── */}

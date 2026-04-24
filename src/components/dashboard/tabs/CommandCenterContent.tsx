@@ -9,6 +9,7 @@ import { BehaviorAnalytics } from '@/components/insights/BehaviorAnalytics';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useIsMobile } from '@/hooks/use-mobile';
 import type { Trade } from '@/types/trade';
+import { calculateMaxDrawdown } from '@/utils/insightCalculations';
 
 function calculateCurrentStreak(trades: Trade[]) {
     if (!trades || trades.length === 0) return { type: 'win' as const, count: 0 };
@@ -28,9 +29,14 @@ function calculateCurrentStreak(trades: Trade[]) {
 }
 
 export function CommandCenterContent() {
-    const { loading, processedTrades, capitalLog } = useDashboard();
+    const { loading, processedTrades, capitalLog, initialInvestment } = useDashboard();
     const stats = useDashboardStats(processedTrades, capitalLog);
     const isMobile = useIsMobile();
+
+    const maxDrawdown = useMemo(
+        () => calculateMaxDrawdown(processedTrades, initialInvestment),
+        [processedTrades, initialInvestment],
+    );
 
     const { bestTrade, worstTrade, currentStreak } = useMemo(() => {
         if (!processedTrades.length) return { bestTrade: undefined, worstTrade: undefined, currentStreak: { type: 'win' as const, count: 0 } };
@@ -64,9 +70,8 @@ export function CommandCenterContent() {
                     avgLoss={stats.avgLoss}
                     winCount={stats.winningTrades.length}
                     lossCount={stats.losingTrades.length}
-                    maxDrawdownPercent={0}
-                    maxDrawdownAmount={0}
-                    profitFactor={stats.profitFactor}
+                    maxDrawdownPercent={maxDrawdown.percent}
+                    maxDrawdownAmount={-Math.abs(maxDrawdown.amount)}
                 />
                 <CostEfficiencyPanel trades={processedTrades} />
                 <BehaviorAnalytics trades={processedTrades} />
@@ -107,9 +112,8 @@ export function CommandCenterContent() {
                             avgLoss={stats.avgLoss}
                             winCount={stats.winningTrades.length}
                             lossCount={stats.losingTrades.length}
-                            maxDrawdownPercent={0}
-                            maxDrawdownAmount={0}
-                            profitFactor={stats.profitFactor}
+                            maxDrawdownPercent={maxDrawdown.percent}
+                            maxDrawdownAmount={-Math.abs(maxDrawdown.amount)}
                         />
                     </div>
                     <div className="flex-1 min-h-0 overflow-hidden">

@@ -19,6 +19,7 @@ import { Sparkles, Settings2, TrendingDown } from 'lucide-react';
 import { PremiumFeatureLock } from '@/components/PremiumFeatureLock';
 import { usePremiumFeatures } from '@/hooks/usePremiumFeatures';
 import { SmartCapitalProjection } from '@/components/forecast/SmartCapitalProjection';
+import { CapitalHistoryChart } from '@/components/CapitalHistoryChart';
 import { SEO } from '@/components/SEO';
 import { pageMeta } from '@/utils/seoHelpers';
 
@@ -94,7 +95,7 @@ const Forecast = () => {
     // Fetch trades with ROI and margin data - select both pnl and profit_loss for type compatibility
     const { data: trades } = await supabase
       .from('trades')
-      .select('roi, margin, profit_loss, pnl')
+      .select('roi, margin, profit_loss, pnl, trade_date, closed_at, opened_at')
       .eq('user_id', user.id)
       .is('deleted_at', null);
 
@@ -103,14 +104,25 @@ const Forecast = () => {
       .from('user_settings')
       .select('initial_investment')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (settings) {
       setCurrentBalance(settings.initial_investment || 0);
     }
 
     if (trades) {
-      const stats = calculateAdvancedStats(trades);
+      // Derive number of distinct trading days so forecast compounds at the
+      // trader's actual pace (not 1 trade/day by default).
+      const distinctDays = new Set<string>();
+      for (const t of trades) {
+        const raw = (t as any).trade_date || (t as any).closed_at || (t as any).opened_at;
+        if (!raw) continue;
+        const d = new Date(raw);
+        if (isNaN(d.getTime())) continue;
+        distinctDays.add(d.toISOString().slice(0, 10));
+      }
+      const tradingDays = distinctDays.size || 1;
+      const stats = calculateAdvancedStats(trades, tradingDays);
       setAdvancedStats(stats);
     }
   };
@@ -216,6 +228,11 @@ const Forecast = () => {
                   Past performance does not guarantee future results. Markets are unpredictable, and actual results may vary significantly.
                 </p>
               </PremiumCard>
+
+              {/* Capital Evolution Chart — moved here from the removed Analytics tab */}
+              <div className="mt-8">
+                <CapitalHistoryChart />
+              </div>
 
               {/* Forecast 2.0 Section */}
               <div className="space-y-8 mt-16">
@@ -420,6 +437,7 @@ const Forecast = () => {
                       }
                       winRate={advancedStats.success_rate / 100}
                       volatility={advancedStats.roi_std_dev / 100}
+                      capped={advancedStats.capped}
                     />
 
                     {/* Understand the Calculation Button */}

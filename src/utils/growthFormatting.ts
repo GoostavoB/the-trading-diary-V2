@@ -10,13 +10,15 @@ export const formatGrowth = (value: number, useMultiplier: boolean = false): str
     return "—";
   }
 
-  // Handle extreme values
-  if (value > 100) {
-    return "∞";
+  // Handle extreme values — we never display ∞ or a true -100% wipe-out
+  // because those are almost always overflow / mathematical artifacts of
+  // compounding small-sample statistics over years.
+  if (value > 49) {
+    return "50×+";
   }
 
-  if (value < -0.99) {
-    return "-100%";
+  if (value < -0.94) {
+    return "−95%+";
   }
 
   // Convert to percentage
@@ -62,17 +64,26 @@ export const formatGrowth = (value: number, useMultiplier: boolean = false): str
 };
 
 /**
- * Calculate growth from daily rate using proper compounding
+ * Calculate growth from daily rate using proper compounding over TRADING DAYS
+ * (21/month, 252/year, 1260/5-year) with realism caps applied so the result
+ * never reads ∞ or -100%. Input is a daily growth fraction like +0.02 = +2%/day.
  */
-export const calculateGrowth = (dailyGrowthDecimal: number) => {
-  const days = 365;
-  const months = 30;
-  const years = 5;
+const GROWTH_DISPLAY_CAP = 50;      // 50× ceiling
+const GROWTH_DISPLAY_FLOOR = -0.95; // −95% floor
 
-  // Compound growth formula: (1 + r)^n - 1
-  const monthlyGrowth = Math.pow(1 + dailyGrowthDecimal, months) - 1;
-  const annualGrowth = Math.pow(1 + dailyGrowthDecimal, days) - 1;
-  const fiveYearGrowth = Math.pow(1 + dailyGrowthDecimal, days * years) - 1;
+const clampMultiple = (m: number) => {
+  if (!isFinite(m)) return GROWTH_DISPLAY_CAP;
+  return Math.max(GROWTH_DISPLAY_FLOOR, Math.min(GROWTH_DISPLAY_CAP, m));
+};
+
+export const calculateGrowth = (dailyGrowthDecimal: number) => {
+  const tradingDaysMonth = 21;
+  const tradingDaysYear = 252;
+  const tradingDaysFiveYear = 1260;
+
+  const monthlyGrowth = clampMultiple(Math.pow(1 + dailyGrowthDecimal, tradingDaysMonth) - 1);
+  const annualGrowth = clampMultiple(Math.pow(1 + dailyGrowthDecimal, tradingDaysYear) - 1);
+  const fiveYearGrowth = clampMultiple(Math.pow(1 + dailyGrowthDecimal, tradingDaysFiveYear) - 1);
 
   return {
     monthlyGrowth,

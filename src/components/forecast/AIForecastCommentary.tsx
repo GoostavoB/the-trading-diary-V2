@@ -7,27 +7,52 @@ interface AIForecastCommentaryProps {
   fiveYearGrowth: number;
   winRate: number;
   volatility: number;
+  capped?: boolean;
 }
 
+/**
+ * Human-readable forecast commentary. Never displays multipliers above 50×
+ * (numeric overflow territory) — shows "50×+" instead and flags that the
+ * projection was capped for realism.
+ */
 export const AIForecastCommentary = ({
   dailyGrowth,
   fiveYearGrowth,
   winRate,
   volatility,
+  capped,
 }: AIForecastCommentaryProps) => {
   const generateCommentary = () => {
-    const multiplier = (1 + fiveYearGrowth).toFixed(0);
+    // 5-year growth is a DECIMAL. Convert to multiple: multiplier = 1 + growth.
+    // Clamp to a realistic display range — if capped flag is set, we trust it.
+    const rawMultiplier = 1 + fiveYearGrowth;
+    const safeMultiplier = isFinite(rawMultiplier)
+      ? Math.max(0, Math.min(rawMultiplier, 50))
+      : 50;
+
     const isHighRisk = volatility > 0.15 || winRate < 0.5;
 
-    let commentary = `Based on your current daily growth of ${formatGrowth(dailyGrowth)}, maintaining this pace for 5 years would multiply your capital by approximately ${multiplier}x.`;
+    const multText = (() => {
+      if (capped || safeMultiplier >= 50) return '50×+';
+      if (safeMultiplier < 1) return `${(safeMultiplier * 100).toFixed(0)}% of your starting capital`;
+      if (safeMultiplier < 2) return `${safeMultiplier.toFixed(2)}×`;
+      if (safeMultiplier < 10) return `${safeMultiplier.toFixed(1)}×`;
+      return `${safeMultiplier.toFixed(0)}×`;
+    })();
 
-    if (isHighRisk) {
-      commentary += ` However, your win rate of ${(winRate * 100).toFixed(1)}% and volatility suggest elevated risk. Focus on consistency and risk management to achieve these projections.`;
-    } else {
-      commentary += ` Your ${(winRate * 100).toFixed(1)}% win rate shows good consistency. Maintain your discipline to achieve these results.`;
+    let commentary = `At your current daily pace of ${formatGrowth(dailyGrowth)}, maintaining this consistency for 5 years projects your capital at roughly ${multText} its starting value.`;
+
+    if (capped) {
+      commentary += ` (Projections above 50× are capped — small samples tend to overstate compounded growth. Treat these numbers as an upper envelope, not a target.)`;
     }
 
-    commentary += ` Remember that real results vary due to volatility, market conditions, and behavioral factors.`;
+    if (isHighRisk) {
+      commentary += ` With a win rate of ${(winRate * 100).toFixed(1)}% and elevated volatility, the actual path will vary substantially — focus on consistency and position sizing.`;
+    } else {
+      commentary += ` Your ${(winRate * 100).toFixed(1)}% win rate shows solid consistency — stick to your rules to realize a result in this range.`;
+    }
+
+    commentary += ` Real outcomes depend on market conditions, drawdown tolerance, and behavioral discipline.`;
 
     return commentary;
   };

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, TrendingUp, Users, Settings, BarChart3, Image } from "lucide-react";
+import { Home, TrendingUp, History as HistoryIcon, LineChart, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -7,11 +7,12 @@ export const MobileNav = () => {
   const location = useLocation();
   const { t } = useTranslation();
 
+  // Matches the simplified top-nav: Dashboard, Trades (entry), Analytics (Market Data), History, Settings
   const navItems = [
     { path: "/dashboard", icon: Home, label: t('navigation.home') },
-    { path: "/tools", icon: BarChart3, label: t('navigation.tools') },
     { path: "/upload", icon: TrendingUp, label: t('trades.trade') },
-    { path: "/logo-generator", icon: Image, label: "Logos" },
+    { path: "/market-data", icon: LineChart, label: "Market" },
+    { path: "/dashboard?tab=history", icon: HistoryIcon, label: "History" },
     { path: "/settings", icon: Settings, label: t('common.settings') },
   ];
 

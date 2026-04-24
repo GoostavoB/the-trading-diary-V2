@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
-    BarChart3, Wallet, Plus, Receipt, Shield, BookMarked,
-    LineChart, Target, Brain, AlertCircle, TrendingDown,
-    FileText, BookOpen, ChevronDown, Menu, X, Newspaper, Link2
+    BarChart3, Plus, Receipt, Shield,
+    LineChart, Target,
+    Menu, X, Link2, History as HistoryIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -38,38 +38,29 @@ export function TopNavigation() {
         {
             title: 'Trades',
             items: [
-                { title: 'Journal', url: '/journal', icon: BookMarked, description: 'Review your trading diary and notes' },
-                { title: 'Risk Management', url: '/risk-management', icon: Shield, description: 'Position sizing and risk calculators' },
                 { title: 'Fee Analysis', url: '/fee-analysis', icon: Receipt, description: 'Analyze trading costs and commissions' },
-                { title: 'Tax Reports', url: '/tax-reports', icon: FileText, description: 'Generate tax reports for your trades' },
-                { title: 'Reports', url: '/reports', icon: BarChart3, description: 'AI-generated performance reports' },
+                { title: 'Risk Management', url: '/risk-management', icon: Shield, description: 'Position sizing and risk calculators' },
                 { title: 'Exchange Connections', url: '/exchanges', icon: Link2, description: 'Connect exchanges for automatic trade sync' },
             ]
         },
         {
             title: 'Analytics',
             items: [
-                { title: 'Advanced Analytics', url: '/analytics', icon: BarChart3, description: 'Deep dive into performance metrics' },
-                { title: 'Market Data', url: '/market-data', icon: LineChart, description: 'Real-time crypto prices and movers' },
                 { title: 'Forecast', url: '/forecast', icon: Target, description: 'Project future growth scenarios' },
-                { title: 'Error Analytics', url: '/error-analytics', icon: AlertCircle, description: 'Identify and reduce costly mistakes' },
-                { title: 'Long/Short Ratio', url: '/long-short-ratio', icon: TrendingDown, description: 'Market sentiment via long/short data' },
+                { title: 'Market Data', url: '/market-data', icon: LineChart, description: 'Real-time prices, long/short ratio and open interest' },
             ]
         },
         {
             title: 'Planning',
             items: [
                 { title: 'Goals', url: '/goals', icon: Target, description: 'Set and track trading objectives' },
-                { title: 'Trading Plan', url: '/trading-plan', icon: BookOpen, description: 'Create and follow your trading strategy' },
-                { title: 'Psychology', url: '/psychology', icon: Brain, description: 'Track emotional state and discipline' },
-                { title: 'Spot Wallet', url: '/spot-wallet', icon: Wallet, description: 'Track your crypto assets and net worth' },
                 { title: 'Capital Management', url: '/capital-management', icon: Plus, description: 'Log capital additions and track growth' },
             ]
         },
         {
-            title: 'Blog',
-            url: '/blog',
-            icon: Newspaper
+            title: 'History',
+            url: '/dashboard?tab=history',
+            icon: HistoryIcon
         },
     ];
 
@@ -87,12 +78,22 @@ export function TopNavigation() {
                                 {menuItems.map((item) => (
                                     <NavigationMenuItem key={item.title}>
                                         {item.url ? (
-                                            <NavLink to={item.url} className={navigationMenuTriggerStyle()}>
+                                            <NavLink
+                                                to={item.url}
+                                                className={cn(
+                                                    // Base: transparent bg, iOS-style text, tight hit area
+                                                    "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+                                                    // Active: subtle primary tint, clearly readable (AA contrast)
+                                                    isActive(item.url.split('?')[0])
+                                                        ? "bg-primary/15 text-primary ring-1 ring-primary/25"
+                                                        : "bg-transparent text-foreground/80 hover:bg-white/5 hover:text-foreground"
+                                                )}
+                                            >
                                                 {item.title}
                                             </NavLink>
                                         ) : (
                                             <>
-                                                <NavigationMenuTrigger className="bg-transparent hover:bg-white/8 data-[state=open]:bg-white/8 transition-colors duration-150">
+                                                <NavigationMenuTrigger className="bg-transparent text-foreground/80 hover:bg-white/5 hover:text-foreground data-[state=open]:bg-white/5 data-[state=open]:text-foreground focus:bg-white/5 transition-colors duration-150">
                                                     {item.title}
                                                 </NavigationMenuTrigger>
                                                 <NavigationMenuContent>
@@ -138,9 +139,12 @@ export function TopNavigation() {
 
                 {/* Right Actions */}
                 <div className="flex items-center gap-2 md:gap-4">
-                    {/* Add Trade — primary CTA always visible */}
+                    {/* Add Trade — primary CTA, always distinct from tabs (iOS blue gradient, white text) */}
                     <NavLink to="/upload" className="hidden sm:block">
-                        <Button size="sm" className="gap-1.5 font-semibold">
+                        <Button
+                            size="sm"
+                            className="gap-1.5 font-semibold !bg-primary !text-primary-foreground hover:!bg-primary/90 shadow-[0_4px_14px_hsl(var(--primary)/0.35)] border border-primary/60"
+                        >
                             <Plus className="h-4 w-4" />
                             Add Trade
                         </Button>

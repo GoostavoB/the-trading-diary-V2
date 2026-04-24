@@ -165,9 +165,12 @@ function TradeCard({
 }
 
 // ── Day Highlight Card ──────────────────────────────────────────
-function DayCard({ type, date, pnl }: { type: 'best' | 'worst'; date: string; pnl: number }) {
+function DayCard({ type, date, pnl }: { type: 'best' | 'worst'; date: string | null; pnl: number | null }) {
   const isBest = type === 'best';
-  const dateStr = new Date(date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  const hasData = date != null && pnl != null && Number.isFinite(pnl);
+  const dateStr = hasData
+    ? new Date(date as string).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+    : '—';
 
   return (
     <div className={cn(
@@ -184,9 +187,11 @@ function DayCard({ type, date, pnl }: { type: 'best' | 'worst'; date: string; pn
       </div>
       <div className={cn(
         "text-base font-black tabular-nums",
-        isBest ? "text-teal-300" : "text-orange-300"
+        !hasData ? "text-space-400" : (isBest ? "text-teal-300" : "text-orange-300")
       )}>
-        <BlurredCurrency amount={pnl} className="inline" />
+        {hasData
+          ? <BlurredCurrency amount={pnl as number} className="inline" />
+          : '—'}
       </div>
       <div className="text-[9px] text-muted-foreground/40 mt-1 font-mono">{dateStr}</div>
 
@@ -231,21 +236,22 @@ export const PerformanceHighlights = memo(({
         </div>
 
         {/* Best / Worst Day */}
-        {bestDay && (
-          <div className="grid grid-cols-2 gap-2">
-            <DayCard type="best" date={bestDay.date} pnl={bestDay.totalPnL} />
-            {worstDay && !isSameDay
-              ? <DayCard type="worst" date={worstDay.date} pnl={worstDay.totalPnL} />
-              : (
+        <div className="grid grid-cols-2 gap-2">
+          {bestDay
+            ? <DayCard type="best" date={bestDay.date} pnl={bestDay.totalPnL} />
+            : <DayCard type="best" date={null} pnl={null} />}
+          {bestDay && worstDay && !isSameDay
+            ? <DayCard type="worst" date={worstDay.date} pnl={worstDay.totalPnL} />
+            : bestDay
+              ? (
                 <div className="rounded-xl p-3 border border-white/6 bg-white/[0.02] flex items-center justify-center">
                   <span className="text-[10px] text-muted-foreground/30 text-center">
                     Only one<br />trading day
                   </span>
                 </div>
               )
-            }
-          </div>
-        )}
+              : <DayCard type="worst" date={null} pnl={null} />}
+        </div>
       </div>
     </PremiumCard>
   );
