@@ -11,8 +11,8 @@ interface AvgROIPerTradeWidgetProps {
 }
 
 /**
- * Avg ROI Per Trade Widget — rendered as a 270° gauge ring (HUD dial).
- * Metaphor: a cockpit gauge sweeping from bottom-left to bottom-right.
+ * Avg ROI Per Trade Widget — Apple Premium gauge ring.
+ * Minimal 270° arc, electric-blue for positive / apple-red for negative.
  */
 export const AvgROIPerTradeWidget = memo(({
   avgROIPerTrade,
@@ -21,7 +21,7 @@ export const AvgROIPerTradeWidget = memo(({
   const { t } = useTranslation();
   const isPositive = avgROIPerTrade >= 0;
 
-  // Scale: cap ring at +/- 10% per-trade for "full" sweep (realistic max)
+  // Scale: cap ring at +/- 10% per-trade for full sweep
   const scaleMax = 10;
   const abs = Math.min(Math.abs(avgROIPerTrade), scaleMax);
   const pct = abs / scaleMax;
@@ -36,16 +36,19 @@ export const AvgROIPerTradeWidget = memo(({
   const filled = totalArc * pct;
   const gap = circ - totalArc;
 
-  const stroke = isPositive ? 'hsl(var(--phosphor))' : 'hsl(var(--danger))';
+  const stroke = isPositive ? 'hsl(var(--electric-blue))' : 'hsl(var(--apple-red))';
 
   return (
-    <div className="relative flex flex-col h-full scanlines overflow-hidden">
-      <div className="term-header shrink-0">
-        <span className="tracking-widest">AVG_ROI // PER_TRADE</span>
-        <span className={cn('pulse-dot ml-auto', isPositive ? '' : 'danger')} />
+    <div className="relative flex flex-col h-full overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-3 pb-2">
+        <span className="text-xs font-medium text-space-300">
+          Avg ROI per trade
+        </span>
+        <span className={cn('pulse-dot', isPositive ? '' : 'danger')} />
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-3 py-2 min-h-0 gap-3">
+      <div className="flex-1 flex items-center justify-center px-4 pb-4 min-h-0 gap-4">
         {/* Gauge */}
         <div className="relative shrink-0" style={{ width: size, height: size }}>
           <svg width={size} height={size} style={{ transform: 'rotate(135deg)' }}>
@@ -53,8 +56,9 @@ export const AvgROIPerTradeWidget = memo(({
             <circle
               cx={cx} cy={cy} r={r}
               fill="none"
-              stroke="hsl(var(--phosphor) / 0.15)"
-              strokeWidth={8}
+              stroke="hsl(var(--space-gray-600))"
+              strokeWidth={10}
+              strokeLinecap="round"
               strokeDasharray={`${totalArc} ${gap}`}
             />
             {/* fill */}
@@ -62,64 +66,45 @@ export const AvgROIPerTradeWidget = memo(({
               cx={cx} cy={cy} r={r}
               fill="none"
               stroke={stroke}
-              strokeWidth={8}
-              strokeLinecap="butt"
+              strokeWidth={10}
+              strokeLinecap="round"
               strokeDasharray={`${filled} ${circ - filled}`}
               style={{
                 transition: 'stroke-dasharray 1s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                filter: `drop-shadow(0 0 6px ${stroke})`,
               }}
             />
-            {/* tick marks */}
-            {Array.from({ length: 10 }).map((_, i) => {
-              const angle = (i / 9) * arcFraction * 2 * Math.PI;
-              const x1 = cx + Math.cos(angle) * (r - 12);
-              const y1 = cy + Math.sin(angle) * (r - 12);
-              const x2 = cx + Math.cos(angle) * (r - 16);
-              const y2 = cy + Math.sin(angle) * (r - 16);
-              return (
-                <line
-                  key={i}
-                  x1={x1} y1={y1} x2={x2} y2={y2}
-                  stroke="hsl(var(--phosphor) / 0.35)"
-                  strokeWidth={1}
-                />
-              );
-            })}
           </svg>
           {/* center readout */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className={cn(
-              'font-display text-3xl chromatic tabular-nums leading-none',
-              isPositive ? 'text-phosphor glow-text' : 'text-danger glow-text-danger'
+              'font-display font-semibold text-2xl tabular-nums leading-none font-num',
+              isPositive ? 'text-space-100' : 'text-apple-red'
             )}>
-              {isPositive ? '+' : '-'}{Math.abs(avgROIPerTrade).toFixed(2)}
+              {isPositive ? '+' : '-'}{Math.abs(avgROIPerTrade).toFixed(2)}%
             </span>
-            <span className="text-[10px] text-phosphor-dim mt-1 tracking-widest">
-              %/TRADE
-            </span>
+            <span className="text-[10px] text-space-400 mt-1">per trade</span>
           </div>
         </div>
 
         {/* Side readout */}
-        <div className="flex flex-col gap-1 flex-1 text-[10px] font-mono">
-          <div className="flex justify-between border-b border-phosphor-dim pb-0.5">
-            <span className="text-phosphor-dim tracking-widest">RANGE</span>
-            <span className="text-phosphor">±{scaleMax}%</span>
+        <div className="flex flex-col gap-2 flex-1 text-xs">
+          <div className="flex justify-between">
+            <span className="text-space-400">Range</span>
+            <span className="text-space-200 font-num tabular-nums">±{scaleMax}%</span>
           </div>
-          <div className="flex justify-between border-b border-phosphor-dim pb-0.5">
-            <span className="text-phosphor-dim tracking-widest">DUTY</span>
-            <span className={isPositive ? 'text-phosphor' : 'text-danger'}>
+          <div className="flex justify-between">
+            <span className="text-space-400">Filled</span>
+            <span className={cn('font-num tabular-nums', isPositive ? 'text-electric' : 'text-apple-red')}>
               {(pct * 100).toFixed(0)}%
             </span>
           </div>
-          <div className="flex justify-between border-b border-phosphor-dim pb-0.5">
-            <span className="text-phosphor-dim tracking-widest">N</span>
-            <span className="text-phosphor">{totalTrades}</span>
+          <div className="flex justify-between">
+            <span className="text-space-400">Trades</span>
+            <span className="text-space-200 font-num tabular-nums">{totalTrades}</span>
           </div>
-          <div className="text-phosphor-dim tracking-widest mt-1">
+          <p className="text-[11px] text-space-400 mt-2 leading-snug">
             {t('widgets.avgROIAcross', { count: totalTrades })}
-          </div>
+          </p>
         </div>
       </div>
     </div>

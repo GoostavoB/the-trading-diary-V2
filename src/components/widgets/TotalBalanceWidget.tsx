@@ -13,8 +13,8 @@ interface TotalBalanceWidgetProps extends WidgetProps {
 }
 
 /**
- * Total Balance Widget — rendered as an oscilloscope / P_L live scope.
- * Metaphor: a CRT scope showing a live waveform of account value.
+ * Total Balance Widget — Apple Premium oscilloscope.
+ * Live account-value waveform, electric-blue for positive, apple-red for negative.
  */
 export const TotalBalanceWidget = memo(({
   totalBalance,
@@ -37,7 +37,7 @@ export const TotalBalanceWidget = memo(({
       const t = (i + seed % 9) * 0.37;
       const y =
         50 -
-        bias * (i / n) * 8 * amp +  // slow drift
+        bias * (i / n) * 8 * amp +
         Math.sin(t) * 16 * amp +
         Math.sin(t * 2.4 + seed) * 7 * amp +
         Math.sin(t * 0.6) * 3;
@@ -46,68 +46,70 @@ export const TotalBalanceWidget = memo(({
     return pts.join(' ');
   }, [totalBalance, change24h, isPositive]);
 
-  const stroke = isPositive ? 'hsl(var(--phosphor))' : 'hsl(var(--danger))';
+  const stroke = isPositive ? 'hsl(var(--electric-blue))' : 'hsl(var(--apple-red))';
+  const areaFill = isPositive ? 'hsl(var(--electric-blue) / 0.18)' : 'hsl(var(--apple-red) / 0.18)';
+
+  const areaPoints = `0,100 ${points} 100,100`;
 
   return (
-    <div className="relative flex flex-col h-full scanlines overflow-hidden">
-      {/* Header bar */}
-      <div className="term-header shrink-0">
-        <span className="tracking-widest">BAL.LIVE // USD</span>
-        <span className={cn('pulse-dot ml-auto', isPositive ? '' : 'danger')} />
-        <span className="text-[10px] text-phosphor-dim tracking-widest">
-          {tradingDays > 0 ? `${tradingDays}D` : 'IDLE'}
+    <div className="relative flex flex-col h-full overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-3 pb-2">
+        <span className="text-xs font-medium text-space-300">
+          {t('widgets.totalBalance.title')}
         </span>
+        <div className="flex items-center gap-1.5">
+          <span className={cn('pulse-dot', isPositive ? '' : 'danger')} />
+          <span className="text-xs text-space-400 font-num">
+            {tradingDays > 0 ? `${tradingDays}d` : '—'}
+          </span>
+        </div>
       </div>
 
       {/* Big number */}
-      <div className="flex-1 flex items-center justify-between px-3 min-h-0 gap-2">
-        <div className="flex flex-col gap-0.5 min-w-0">
-          <span className="text-[9px] text-phosphor-dim tracking-widest uppercase">
-            {t('widgets.totalBalance.title')}
-          </span>
+      <div className="flex-1 flex items-center px-4 min-h-0">
+        <div className="flex flex-col gap-1 min-w-0 w-full">
           <BlurredCurrency
             amount={totalBalance}
             className={cn(
-              'font-display text-2xl chromatic tabular-nums truncate',
-              isPositive ? 'glow-text' : 'glow-text-danger'
+              'font-display font-semibold text-3xl tabular-nums truncate font-num',
+              isPositive ? 'text-space-100' : 'text-apple-red'
             )}
           />
           {(change24h !== 0 || changePercent24h !== 0) && (
-            <div className="flex items-center gap-2 text-[10px] font-mono tabular-nums">
-              <span className={cn('status-pill', isPositive ? '' : 'danger')} style={{ fontSize: '0.58rem', padding: '0 0.35rem' }}>
+            <div className="flex items-center gap-2 text-xs">
+              <span className={isPositive ? 'chip-green' : 'chip-red'}>
                 {isPositive ? '+' : ''}{formatPercent(changePercent24h)}
               </span>
               <BlurredCurrency
                 amount={Math.abs(change24h)}
-                className={cn('text-xs', isPositive ? 'text-phosphor' : 'text-danger')}
+                className={cn('text-xs font-num tabular-nums', isPositive ? 'text-apple-green' : 'text-apple-red')}
               />
             </div>
           )}
         </div>
       </div>
 
-      {/* Oscilloscope readout */}
-      <div className="relative mx-2 mb-2 h-14 border border-phosphor-dim bg-void overflow-hidden shrink-0">
-        {/* grid */}
+      {/* Oscilloscope */}
+      <div className="relative mx-3 mb-3 h-14 rounded-ios border border-space-500/70 bg-space-800/40 overflow-hidden shrink-0">
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full">
-          {[20, 40, 60, 80].map((y) => (
-            <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="hsl(var(--phosphor) / 0.1)" strokeWidth="0.25" strokeDasharray="1 1.5" />
+          {/* subtle grid */}
+          {[25, 50, 75].map((y) => (
+            <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="hsl(var(--space-gray-500) / 0.35)" strokeWidth="0.2" />
           ))}
-          {[25, 50, 75].map((x) => (
-            <line key={x} x1={x} y1="0" x2={x} y2="100" stroke="hsl(var(--phosphor) / 0.1)" strokeWidth="0.25" strokeDasharray="1 1.5" />
-          ))}
-          <line x1="0" y1="50" x2="100" y2="50" stroke="hsl(var(--phosphor) / 0.25)" strokeWidth="0.35" strokeDasharray="2 2" />
+          {/* area fill */}
+          <polygon points={areaPoints} fill={areaFill} />
+          {/* line */}
           <polyline
             points={points}
             fill="none"
             stroke={stroke}
-            strokeWidth="1.1"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+            strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
-            style={{ filter: `drop-shadow(0 0 3px ${stroke})` }}
           />
         </svg>
-        {/* sweeping scan line */}
-        <div className="scan-bar" />
       </div>
     </div>
   );

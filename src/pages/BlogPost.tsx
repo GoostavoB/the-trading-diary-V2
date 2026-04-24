@@ -11,6 +11,7 @@ import { addStructuredData, generateBreadcrumbSchema, generateHowToSchema } from
 import { useEffect, useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useArticleTracking } from '@/hooks/useArticleTracking';
+import { Share2, Copy, Twitter, ChevronLeft } from 'lucide-react';
 
 interface TocItem {
   id: string;
@@ -211,7 +212,7 @@ const BlogPost = () => {
         await navigator.share({ url, title: article?.title });
       } else {
         await navigator.clipboard.writeText(url);
-        toast.success('Link copied to clipboard!');
+        toast.success('Link copied to clipboard');
       }
     } catch {
       /* user cancelled */
@@ -220,33 +221,39 @@ const BlogPost = () => {
 
   const handleCopyLink = async () => {
     await navigator.clipboard.writeText(window.location.href);
-    toast.success('[COPIED] link in clipboard');
+    toast.success('Link copied to clipboard');
   };
 
-  const handlePrint = () => window.print();
+  const handleTwitterShare = () => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(article?.title || '');
+    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank', 'noopener,noreferrer');
+  };
 
-  const progressBar = (() => {
-    const total = 20;
-    const filled = Math.round((progress / 100) * total);
-    return '█'.repeat(filled) + '░'.repeat(total - filled);
-  })();
+  const formatReadableDate = (iso: string) => {
+    try {
+      const d = new Date(iso);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch {
+      return iso;
+    }
+  };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-void text-phosphor">
+      <div className="min-h-screen bg-space-900 text-space-100">
         <SkipToContent />
         <MobileHeader />
         <main id="main-content" className="pt-20 pb-16 px-4">
-          <div className="max-w-5xl mx-auto space-y-4 font-mono">
-            <div className="term-header">loading ./posts/{slug}.md ...</div>
-            <div className="term-card p-6 space-y-3">
-              <div className="h-4 w-1/3 bg-phosphor-dim animate-pulse" />
-              <div className="h-8 w-3/4 bg-phosphor-dim animate-pulse" />
-              <div className="space-y-2 mt-6">
-                {Array.from({ length: 10 }).map((_, i) => (
-                  <div key={i} className="h-3 bg-phosphor-dim opacity-40 animate-pulse" />
-                ))}
-              </div>
+          <div className="max-w-4xl mx-auto space-y-4">
+            <div className="h-4 w-40 bg-space-700 rounded animate-pulse" />
+            <div className="h-10 w-3/4 bg-space-700 rounded animate-pulse" />
+            <div className="h-5 w-1/2 bg-space-700 rounded animate-pulse opacity-60" />
+            <div className="aspect-[16/9] bg-space-700 rounded-ios-card animate-pulse mt-6" />
+            <div className="space-y-2.5 mt-6">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="h-3 bg-space-700 opacity-50 rounded animate-pulse" />
+              ))}
             </div>
           </div>
         </main>
@@ -257,7 +264,7 @@ const BlogPost = () => {
 
   if (!article) {
     return (
-      <div className="min-h-screen bg-void text-phosphor">
+      <div className="min-h-screen bg-space-900 text-space-100">
         <SEO
           title="Article Not Found"
           description="The article you are looking for does not exist."
@@ -267,25 +274,19 @@ const BlogPost = () => {
         <MobileHeader />
 
         <main id="main-content" className="pt-20 pb-16 px-4">
-          <div className="max-w-3xl mx-auto mt-10 font-mono">
-            <div className="hud-panel-danger p-8 relative">
-              <div className="hud-corners">
-                <span className="hud-c tl" />
-                <span className="hud-c tr" />
-                <span className="hud-c bl" />
-                <span className="hud-c br" />
-              </div>
-              <div className="text-danger text-xs mb-2">ERR_404 // FILE_NOT_FOUND</div>
-              <h1 className="font-display text-3xl uppercase text-danger glow-text-danger mb-3">
-                Article Not Found
+          <div className="max-w-xl mx-auto mt-10">
+            <div className="card-premium rounded-ios-card p-8 text-center">
+              <h1 className="font-display text-2xl font-semibold text-space-100 mb-2">
+                Article not found
               </h1>
-              <p className="text-phosphor-dim mb-6">
-                <span className="text-danger">$</span> cat ./posts/{slug}.md
-                <br />
-                <span className="text-danger">&gt;</span> no such file or directory
+              <p className="text-sm text-space-300 mb-6">
+                The article you are looking for does not exist or may have moved.
               </p>
               <Link to="/blog">
-                <button className="btn-term">&lt; BACK_TO_BLOG</button>
+                <button className="btn-secondary h-10 px-4 text-sm inline-flex items-center gap-1.5">
+                  <ChevronLeft className="w-4 h-4" />
+                  Back to blog
+                </button>
               </Link>
             </div>
           </div>
@@ -297,18 +298,9 @@ const BlogPost = () => {
   }
 
   const relatedArticles = getRelatedArticles(slug || '', 3);
-  const catSlug = article.category.toLowerCase().replace(/\s+/g, '-');
-  const modTime = (() => {
-    try {
-      const d = new Date(article.date);
-      return d.toISOString().replace('T', ' ').slice(0, 16);
-    } catch {
-      return article.date;
-    }
-  })();
 
   return (
-    <div className="min-h-screen bg-void text-phosphor">
+    <div className="min-h-screen bg-space-900 text-space-100">
       <SEO
         title={article.metaTitle || article.title}
         description={article.metaDescription || article.description}
@@ -322,35 +314,156 @@ const BlogPost = () => {
 
       <main id="main-content" className="pt-20 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
-          {/* Breadcrumb terminal path */}
-          <div className="term-header mb-6 flex items-center justify-between flex-wrap gap-2">
-            <span className="text-amber-term font-mono text-xs sm:text-sm">
-              ~/blog/{catSlug}/{article.slug}$
-            </span>
-            <span className="flex items-center gap-2 text-xs">
-              <span className="pulse-dot" />
-              <span className="status-pill">[READING]</span>
-            </span>
-          </div>
+          {/* Breadcrumb */}
+          <nav className="text-sm text-space-300 mb-8 flex items-center gap-1.5 flex-wrap" aria-label="Breadcrumb">
+            <Link to="/blog" className="hover:text-space-100 transition-colors">Blog</Link>
+            <span className="text-space-400">›</span>
+            <span className="text-space-300">{article.category}</span>
+            <span className="text-space-400">›</span>
+            <span className="text-space-200 truncate">{article.title}</span>
+          </nav>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
-            {/* Sidebar — file tree ToC */}
-            <aside className="hidden lg:block">
-              <div className="term-card p-0 overflow-hidden sticky top-24">
-                <div className="term-header text-xs">
-                  <span className="text-amber-term">./posts/{article.slug}.md</span>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-10">
+            {/* Main article */}
+            <article className="min-w-0 max-w-3xl">
+              {/* Title + meta */}
+              <header className="mb-8">
+                <h1 className="font-display text-4xl md:text-5xl font-semibold text-space-100 tracking-tight leading-[1.1]">
+                  {article.title}
+                </h1>
+                <p className="text-lg text-space-300 mt-4 leading-relaxed">
+                  {article.description}
+                </p>
+
+                <div className="mt-6 flex items-center gap-3 flex-wrap text-sm text-space-300">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-electric/15 border border-electric/25 flex items-center justify-center">
+                      <span className="text-xs font-medium text-electric">
+                        {article.author.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <span className="font-medium text-space-200">{article.author}</span>
+                  </div>
+                  <span className="text-space-400">·</span>
+                  <span>{formatReadableDate(article.date)}</span>
+                  <span className="text-space-400">·</span>
+                  <span className="chip-electric text-xs">{article.readTime}</span>
                 </div>
-                <div className="p-4 font-mono text-xs">
-                  <div className="text-phosphor-dim mb-3">
-                    mod: <span className="text-cyan-term">{modTime}</span>
+              </header>
+
+              {/* Hero image */}
+              {article.heroImage && (
+                <div className="mb-10 rounded-ios-card overflow-hidden shadow-premium">
+                  <img
+                    src={article.heroImage}
+                    alt={article.heroImageAlt || article.title}
+                    className="w-full h-auto max-h-[440px] object-cover"
+                  />
+                </div>
+              )}
+
+              {/* Article body */}
+              <div className="prose prose-invert prose-lg max-w-none
+                prose-headings:font-display prose-headings:font-semibold prose-headings:text-space-100 prose-headings:tracking-tight
+                prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
+                prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+                prose-p:text-base prose-p:text-space-200 prose-p:leading-relaxed
+                prose-a:text-electric prose-a:no-underline hover:prose-a:text-electric-bright
+                prose-strong:text-space-100
+                prose-blockquote:border-l-4 prose-blockquote:border-electric prose-blockquote:bg-space-700/40 prose-blockquote:rounded-ios prose-blockquote:px-5 prose-blockquote:py-1 prose-blockquote:not-italic prose-blockquote:text-space-200
+                prose-code:font-num prose-code:text-sm prose-code:text-electric prose-code:bg-space-700/60 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
+                prose-pre:bg-space-700/80 prose-pre:border prose-pre:border-space-500 prose-pre:rounded-ios prose-pre:font-num prose-pre:text-sm prose-pre:text-space-100
+                prose-img:rounded-ios-card prose-img:shadow-premium
+                prose-li:text-space-200 prose-ul:text-space-200 prose-ol:text-space-200
+                ">
+                <ReactMarkdown>{article.content}</ReactMarkdown>
+              </div>
+
+              {/* Tags */}
+              {article.tags && article.tags.length > 0 && (
+                <div className="mt-10 flex flex-wrap gap-2">
+                  {article.tags.map((tag) => (
+                    <span key={tag} className="chip text-xs text-space-300">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Share row */}
+              <div className="mt-8 pt-6 border-t border-space-500/60 flex flex-wrap gap-2">
+                <button onClick={handleShare} className="btn-secondary h-10 px-4 text-sm inline-flex items-center gap-2">
+                  <Share2 className="w-4 h-4" />
+                  Share
+                </button>
+                <button onClick={handleCopyLink} className="btn-secondary h-10 px-4 text-sm inline-flex items-center gap-2">
+                  <Copy className="w-4 h-4" />
+                  Copy link
+                </button>
+                <button onClick={handleTwitterShare} className="btn-secondary h-10 px-4 text-sm inline-flex items-center gap-2">
+                  <Twitter className="w-4 h-4" />
+                  Tweet
+                </button>
+              </div>
+
+              {/* Related posts */}
+              {relatedArticles.length > 0 && (
+                <section className="mt-16">
+                  <h2 className="font-display text-2xl font-semibold text-space-100 mb-6 tracking-tight">
+                    Related articles
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    {relatedArticles.map((related) => (
+                      <Link
+                        key={related.slug}
+                        to={`/blog/${related.slug}`}
+                        className="card-premium rounded-ios-card overflow-hidden hover:shadow-premium-lg group transition-all"
+                      >
+                        {related.heroImage && (
+                          <div className="aspect-[16/9] bg-space-700 overflow-hidden">
+                            <img
+                              src={related.heroImage}
+                              alt={related.heroImageAlt || related.title}
+                              loading="lazy"
+                              className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                            />
+                          </div>
+                        )}
+                        <div className="p-4">
+                          <span className="chip-electric text-[10px] mb-2 inline-flex">{related.category}</span>
+                          <h3 className="font-display text-sm font-semibold text-space-100 line-clamp-2 mb-1.5 group-hover:text-electric-bright transition-colors">
+                            {related.title}
+                          </h3>
+                          <p className="text-xs text-space-300 line-clamp-2 leading-relaxed">
+                            {related.description}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
                   </div>
-                  <div className="text-phosphor-dim border-t border-dashed border-phosphor-dim/40 pt-3 mb-2">
-                    <span className="text-phosphor">── TABLE OF CONTENTS ──</span>
-                  </div>
-                  {tocItems.length === 0 && (
-                    <div className="text-phosphor-dim italic">// no headings</div>
-                  )}
-                  <nav className="space-y-1 mt-2">
+                </section>
+              )}
+
+              <div className="mt-10">
+                <Link to="/blog">
+                  <button className="btn-secondary h-10 px-4 text-sm inline-flex items-center gap-1.5">
+                    <ChevronLeft className="w-4 h-4" />
+                    Back to blog
+                  </button>
+                </Link>
+              </div>
+            </article>
+
+            {/* Sidebar — TOC */}
+            <aside className="hidden lg:block">
+              <div className="panel rounded-ios-card p-5 sticky top-24">
+                <div className="text-xs font-medium text-space-400 uppercase tracking-wide mb-3">
+                  On this page
+                </div>
+                {tocItems.length === 0 ? (
+                  <div className="text-xs text-space-400">No sections</div>
+                ) : (
+                  <nav className="space-y-1.5">
                     {tocItems.map((item) => {
                       const active = activeId === item.id;
                       return (
@@ -365,163 +478,32 @@ const BlogPost = () => {
                             });
                           }}
                           className={[
-                            'block transition-colors',
-                            item.level === 3 ? 'pl-6' : 'pl-2',
-                            active
-                              ? 'text-phosphor glow-text'
-                              : 'text-phosphor-dim hover:text-phosphor',
+                            'block text-sm transition-colors leading-snug',
+                            item.level === 3 ? 'pl-4' : 'pl-0',
+                            active ? 'text-electric font-medium' : 'text-space-300 hover:text-space-100',
                           ].join(' ')}
                         >
-                          <span className={active ? 'text-amber-term' : 'opacity-60'}>
-                            {active ? '▸' : '→'}
-                          </span>{' '}
                           {item.text}
                         </a>
                       );
                     })}
                   </nav>
+                )}
 
-                  {/* Reading progress */}
-                  <div className="mt-6 pt-3 border-t border-dashed border-phosphor-dim/40">
-                    <div className="text-phosphor-dim mb-1">READ_PROGRESS</div>
-                    <div className="text-cyan-term">
-                      [{progressBar}] {Math.round(progress)}%
-                    </div>
+                {/* Reading progress */}
+                <div className="mt-6 pt-4 border-t border-space-500/60">
+                  <div className="h-1 bg-space-600 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-electric transition-all duration-150"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                  <div className="text-xs text-space-400 mt-1.5">
+                    {Math.round(progress)}% read
                   </div>
                 </div>
               </div>
             </aside>
-
-            {/* Main article */}
-            <article className="min-w-0">
-              {/* Title block */}
-              <header className="mb-8">
-                <div className="mb-4 flex flex-wrap items-center gap-2">
-                  <span className="status-pill amber">CAT: {article.category}</span>
-                  <span className="status-pill cyan">RT: {article.readTime}</span>
-                  <span className="status-pill">
-                    <span className="pulse-dot" /> by {article.author}
-                  </span>
-                </div>
-
-                <h1
-                  className="font-display uppercase text-3xl sm:text-5xl tracking-wider text-phosphor chromatic leading-tight"
-                  data-text={article.title}
-                >
-                  {article.title}
-                </h1>
-
-                <p className="text-phosphor-dim font-mono text-sm mt-4">
-                  <span className="text-amber-term">// </span>
-                  {article.description}
-                </p>
-              </header>
-
-              {/* Hero image as CRT capture */}
-              {article.heroImage && (
-                <div className="relative mb-8 hud-corners">
-                  <span className="hud-c tl" />
-                  <span className="hud-c tr" />
-                  <span className="hud-c bl" />
-                  <span className="hud-c br" />
-                  <div className="relative overflow-hidden border border-phosphor-dim shadow-phosphor">
-                    <img
-                      src={article.heroImage}
-                      alt={article.heroImageAlt || article.title}
-                      className="w-full h-64 sm:h-80 object-cover"
-                    />
-                    <div className="scanlines absolute inset-0 pointer-events-none" />
-                    <div className="scan-bar absolute inset-0 pointer-events-none" />
-                  </div>
-                </div>
-              )}
-
-              {/* Article body */}
-              <div className="term-card p-5 sm:p-8 relative">
-                <div className="prose prose-invert max-w-none font-mono blog-terminal-content">
-                  <ReactMarkdown>{article.content}</ReactMarkdown>
-                </div>
-              </div>
-
-              {/* Tags */}
-              {article.tags && article.tags.length > 0 && (
-                <div className="mt-6 font-mono text-xs flex flex-wrap gap-2">
-                  <span className="text-phosphor-dim">tags:</span>
-                  {article.tags.map((tag) => (
-                    <span key={tag} className="text-cyan-term">
-                      #{tag.replace(/\s+/g, '_').toLowerCase()}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Terminal actions */}
-              <div className="mt-8 flex flex-wrap gap-3">
-                <button onClick={handleShare} className="btn-term">SHARE</button>
-                <button onClick={handleCopyLink} className="btn-term-amber">COPY_LINK</button>
-                <button onClick={handlePrint} className="btn-term">PRINT</button>
-              </div>
-
-              {/* Related */}
-              {relatedArticles.length > 0 && (
-                <section className="mt-16">
-                  <div className="term-header mb-4 flex items-center justify-between">
-                    <span>./related --limit=3</span>
-                    <span className="text-phosphor-dim text-xs">
-                      {relatedArticles.length} match{relatedArticles.length === 1 ? '' : 'es'}
-                    </span>
-                  </div>
-
-                  <div className="term-card p-2 sm:p-4 font-mono text-sm">
-                    {relatedArticles.map((related, idx) => {
-                      const relDate = (() => {
-                        try {
-                          const d = new Date(related.date);
-                          return d.toISOString().slice(0, 10);
-                        } catch {
-                          return related.date;
-                        }
-                      })();
-                      return (
-                        <div key={related.slug}>
-                          <Link
-                            to={`/blog/${related.slug}`}
-                            className="block py-3 px-2 hover:bg-phosphor-dim transition-colors group"
-                          >
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-phosphor-dim">
-                              <span className="text-amber-term">[{relDate}]</span>
-                              <span className="text-cyan-term">
-                                CAT_{related.category.toUpperCase().replace(/\s+/g, '-')}
-                              </span>
-                            </div>
-                            <div className="mt-1 flex items-start gap-2">
-                              <span className="text-amber-term">&gt;</span>
-                              <span className="text-phosphor group-hover:text-amber-term group-hover:glow-text-amber">
-                                {related.title}
-                              </span>
-                            </div>
-                            <div className="mt-1 flex items-start gap-2 text-phosphor-dim">
-                              <span>//</span>
-                              <span className="line-clamp-2">{related.description}</span>
-                            </div>
-                          </Link>
-                          {idx < relatedArticles.length - 1 && (
-                            <div className="border-t border-dashed border-phosphor-dim/40" />
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-              )}
-
-              {/* Back link */}
-              <div className="mt-10">
-                <Link to="/blog">
-                  <button className="btn-term">&lt; CD_..</button>
-                </Link>
-              </div>
-            </article>
           </div>
         </div>
       </main>

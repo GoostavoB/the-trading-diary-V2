@@ -9,9 +9,8 @@ interface TotalTradesWidgetProps extends WidgetProps {
 }
 
 /**
- * Total Trades Widget — rendered as an ASCII dot-matrix.
- * Metaphor: each block = 1 trade. Green dots represent a deterministic
- * "winning" distribution; red dots the losing ones. Capped at 200 visible.
+ * Total Trades Widget — Apple Premium dot-matrix.
+ * Each dot = 1 trade; winners apple-green, losers apple-red (50% opacity).
  */
 export const TotalTradesWidget = memo(({
   totalTrades,
@@ -24,8 +23,7 @@ export const TotalTradesWidget = memo(({
   const cap = 200;
   const visible = Math.min(totalTrades, cap);
 
-  // Deterministic pattern — we don't have real win/loss flags here,
-  // so we generate a stable mosaic: roughly 60% "wins" feel
+  // Deterministic pattern — roughly 60% "winners"
   const pattern = useMemo(() => {
     const seed = totalTrades % 131 || 7;
     return Array.from({ length: cap }).map((_, i) => {
@@ -38,27 +36,25 @@ export const TotalTradesWidget = memo(({
   const lossesViz = visible - winsViz;
 
   return (
-    <div className="relative flex flex-col h-full scanlines overflow-hidden">
-      <div className="term-header shrink-0">
-        <span className="tracking-widest">TRADES.N // DUMP</span>
+    <div className="relative flex flex-col h-full overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-3 pb-2">
+        <span className="text-xs font-medium text-space-300">
+          {t('widgets.totalTrades.title')}
+        </span>
         {hasTrend && (
-          <span className={cn('status-pill ml-auto', isPositiveTrend ? '' : 'danger')} style={{ fontSize: '0.58rem', padding: '0 0.35rem' }}>
+          <span className={cn('text-[10px]', isPositiveTrend ? 'chip-green' : 'chip-red')}>
             {isPositiveTrend ? '+' : ''}{trend} {t('widgets.thisWeek')}
           </span>
         )}
       </div>
 
-      <div className="flex-1 flex flex-col gap-1.5 px-3 py-2 min-h-0">
-        <div className="flex items-baseline justify-between">
-          <span className="text-[10px] text-phosphor-dim tracking-widest uppercase">
-            {t('widgets.totalTrades.title')}
-          </span>
-          <div className="font-display text-3xl text-phosphor glow-text chromatic tabular-nums leading-none">
-            {totalTrades.toString().padStart(4, '0')}
-          </div>
+      <div className="flex-1 flex flex-col gap-2 px-4 pb-4 min-h-0">
+        <div className="font-display font-semibold text-3xl leading-none tabular-nums text-space-100 font-num">
+          {totalTrades}
         </div>
 
-        {/* Matrix */}
+        {/* Dot matrix */}
         <div
           className="grid gap-[2px] mt-1"
           style={{ gridTemplateColumns: 'repeat(25, minmax(0, 1fr))' }}
@@ -70,29 +66,27 @@ export const TotalTradesWidget = memo(({
               <div
                 key={i}
                 className={cn(
-                  'aspect-square animate-fade-in',
-                  !active ? 'bg-phosphor-dim opacity-20' :
-                  isWin ? 'bg-phosphor' : 'bg-danger'
+                  'aspect-square rounded-sm transition-opacity',
+                  !active ? 'bg-space-600/40' :
+                  isWin ? 'bg-apple-green/50' : 'bg-apple-red/50'
                 )}
-                style={{
-                  animationDelay: active ? `${(i % 40) * 8}ms` : '0ms',
-                  ...(active ? { boxShadow: '0 0 3px currentColor' } : {}),
-                }}
               />
             );
           })}
         </div>
 
-        {/* Stats line */}
-        <div className="flex items-center justify-between text-[10px] font-mono pt-1 mt-auto border-t border-phosphor-dim">
-          <span className="text-phosphor">
-            <span className="text-phosphor-dim">W </span>{winsViz}
+        {/* Footer stats */}
+        <div className="flex items-center justify-between text-xs pt-2 mt-auto">
+          <span className="text-space-300">
+            <span className="text-apple-green font-medium font-num tabular-nums">{winsViz}</span>
+            <span className="text-space-400"> wins</span>
           </span>
-          <span className="text-danger">
-            <span className="text-phosphor-dim">L </span>{lossesViz}
+          <span className="text-space-300">
+            <span className="text-apple-red font-medium font-num tabular-nums">{lossesViz}</span>
+            <span className="text-space-400"> losses</span>
           </span>
-          <span className="text-phosphor-dim">
-            {visible < totalTrades ? `VIZ=${visible}/${totalTrades}` : `TOTAL=${totalTrades}`}
+          <span className="text-space-400 font-num tabular-nums">
+            {visible < totalTrades ? `${visible}/${totalTrades}` : `${totalTrades} total`}
           </span>
         </div>
       </div>

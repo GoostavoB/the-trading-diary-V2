@@ -460,6 +460,24 @@ function DashboardContent() {
       case 'combinedPnLROI':
         widgetProps.avgPnLPerTrade = stats?.avg_pnl_per_trade || 0;
         break;
+      case 'profitFactor':
+        widgetProps.profitFactor = dashboardStats.profitFactor;
+        widgetProps.grossProfit = dashboardStats.grossProfit;
+        widgetProps.grossLoss = dashboardStats.grossLoss;
+        widgetProps.winCount = dashboardStats.winningTrades.length;
+        widgetProps.lossCount = dashboardStats.losingTrades.length;
+        break;
+      case 'oneYearProjection':
+        const projBase = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
+        widgetProps.currentBalance = projBase + (stats?.total_pnl || 0);
+        widgetProps.totalPnL = stats?.total_pnl || 0;
+        widgetProps.tradingDays = stats?.trading_days || 0;
+        widgetProps.totalTrades = stats?.total_trades || 0;
+        widgetProps.winRate = stats?.win_rate || 0;
+        widgetProps.profitFactor = dashboardStats.profitFactor;
+        widgetProps.avgWin = dashboardStats.avgWin;
+        widgetProps.avgLoss = dashboardStats.avgLoss;
+        break;
       case 'compactPerformance':
         // ROI data
         widgetProps.currentROI = stats?.current_roi || 0;
@@ -521,6 +539,8 @@ function DashboardContent() {
       'totalTrades',
       'performanceHighlights',
       'compactPerformance', // NEW: Handles own padding
+      'profitFactor',       // NEW: own padding + own header
+      'oneYearProjection',  // NEW: own padding + own header
     ];
 
     const widgetsHandlingOwnHeader = widgetsWithCustomPadding;

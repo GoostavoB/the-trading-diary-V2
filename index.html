@@ -13,8 +13,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="The Trading Diary" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5, user-scalable=yes" />
-    <meta name="theme-color" content="#00FF66" />
-    <meta name="msapplication-TileColor" content="#020806" />
+    <meta name="theme-color" content="#0A84FF" />
+    <meta name="msapplication-TileColor" content="#1C1C1E" />
     <meta name="msapplication-TileImage" content="/logo-192.png" />
     <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -194,37 +194,47 @@
     <link rel="dns-prefetch" href="https://www.google-analytics.com">
     <link rel="dns-prefetch" href="https://analytics.google.com">
     
-    <!-- Terminal Typography: JetBrains Mono + IBM Plex Mono -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet';document.body.classList.add('fonts-loaded')">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap"></noscript>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;600&display=swap" media="print" onload="this.media='all'">
+    <!-- Apple Premium Typography: SF Pro via Inter fallback + JetBrains Mono for numbers -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet';document.body.classList.add('fonts-loaded')">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
 
-    <!-- Phase 4: Critical above-the-fold (terminal aesthetic) -->
+    <!-- Critical above-the-fold (Apple Premium) -->
     <style>
       body {
         margin: 0;
-        font-family: 'JetBrains Mono', 'IBM Plex Mono', 'Fira Code', ui-monospace, Monaco, monospace;
-        background: #020806;
-        color: #9FFA9F;
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+        background: #111113;
+        color: #F5F5F7;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        letter-spacing: -0.005em;
       }
-      body.fonts-loaded { font-family: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace; }
+      body.fonts-loaded {
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+      }
       .hero-section { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-      .hero-title { font-size: 3rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.015em; text-transform: uppercase; }
-      .hero-subtitle { font-size: 1rem; opacity: 0.75; margin-top: 1rem; }
+      .hero-title { font-size: 3.25rem; font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; }
+      .hero-subtitle { font-size: 1.125rem; opacity: 0.7; margin-top: 1.25rem; letter-spacing: -0.005em; }
       .cta-button {
         padding: 0.75rem 1.5rem;
-        border-radius: 0;
-        background: transparent;
-        border: 1px solid #00FF66;
-        color: #00FF66;
-        font-family: 'JetBrains Mono', monospace;
+        border-radius: 10px;
+        background: linear-gradient(180deg, #3FA7FF 0%, #0A84FF 100%);
+        color: white;
         font-weight: 600;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        transition: all 0.15s linear;
+        letter-spacing: -0.01em;
+        border: 1px solid #0060D1;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 14px rgba(10,132,255,0.35);
+        transition: filter 200ms ease, transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
       }
-      .cta-button:hover { background: #00FF66; color: #020806; box-shadow: 0 0 24px rgba(0,255,102,0.5); }
-      .skeleton { background: linear-gradient(90deg, rgba(0,255,102,0.02) 25%, rgba(0,255,102,0.08) 50%, rgba(0,255,102,0.02) 75%); background-size: 200% 100%; animation: shimmer 2s infinite; }
+      .cta-button:hover { filter: brightness(1.08); }
+      .cta-button:active { transform: scale(0.97); }
+      .skeleton {
+        background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 2s infinite;
+        border-radius: 10px;
+      }
       @keyframes shimmer { 0%, 100% { background-position: 200% 0; } 50% { background-position: -200% 0; } }
     </style>
     

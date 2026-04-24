@@ -11,9 +11,8 @@ interface SimpleAvgROIWidgetProps {
 }
 
 /**
- * Simple Avg ROI Widget — rendered as a horizontal tier rail (gauge meter).
- * Metaphor: a 4-zone classifier rail with a sliding ▼ marker showing tier.
- * Zones: LOSING (<0) / WEAK (0-2) / SOLID (2-5) / ELITE (>5)
+ * Simple Avg ROI Widget — Apple Premium tier rail.
+ * 4-zone classifier rail with a sliding marker. Sentence-case labels.
  */
 export const SimpleAvgROIWidget = memo(({
   simpleAvgROI,
@@ -21,80 +20,77 @@ export const SimpleAvgROIWidget = memo(({
 }: SimpleAvgROIWidgetProps) => {
   const { t } = useTranslation();
 
-  // Clamp to rail range: -5 .. +10 for display purposes
+  // Clamp to rail range
   const RAIL_MIN = -5;
   const RAIL_MAX = 10;
   const clamped = Math.max(RAIL_MIN, Math.min(RAIL_MAX, simpleAvgROI));
   const markerPct = ((clamped - RAIL_MIN) / (RAIL_MAX - RAIL_MIN)) * 100;
 
   const zones = [
-    { label: 'LOSING', color: 'bg-danger', text: 'text-danger', glow: 'glow-text-danger', range: '< 0%', test: (v: number) => v < 0 },
-    { label: 'WEAK',   color: 'bg-amber-term', text: 'text-amber-term', glow: 'glow-text-amber', range: '0 — 2%', test: (v: number) => v >= 0 && v < 2 },
-    { label: 'SOLID',  color: 'bg-phosphor', text: 'text-phosphor', glow: 'glow-text', range: '2 — 5%', test: (v: number) => v >= 2 && v < 5 },
-    { label: 'ELITE',  color: 'bg-cyan-term', text: 'text-cyan-term', glow: 'glow-text-cyan', range: '> 5%', test: (v: number) => v >= 5 },
+    { label: 'Losing', color: 'bg-apple-red/60',    text: 'text-apple-red',    chip: 'chip-red',      range: '< 0%',  test: (v: number) => v < 0 },
+    { label: 'Weak',   color: 'bg-apple-orange/60', text: 'text-apple-orange', chip: 'chip-orange',   range: '0-2%',  test: (v: number) => v >= 0 && v < 2 },
+    { label: 'Solid',  color: 'bg-electric/60',     text: 'text-electric',     chip: 'chip-electric', range: '2-5%',  test: (v: number) => v >= 2 && v < 5 },
+    { label: 'Elite',  color: 'bg-apple-green/60',  text: 'text-apple-green',  chip: 'chip-green',    range: '> 5%',  test: (v: number) => v >= 5 },
   ];
   const activeIdx = zones.findIndex((z) => z.test(simpleAvgROI));
   const active = zones[activeIdx === -1 ? 0 : activeIdx];
 
   return (
-    <div className="relative flex flex-col h-full scanlines overflow-hidden">
-      <div className="term-header shrink-0">
-        <span className="tracking-widest">AVG_ROI.METER</span>
-        <span className={cn(
-          'status-pill ml-auto',
-          active.label === 'LOSING' ? 'danger' : active.label === 'WEAK' ? 'amber' : active.label === 'ELITE' ? 'cyan' : ''
-        )} style={{ fontSize: '0.6rem', padding: '0 0.4rem' }}>
-          [ {active.label} ]
+    <div className="relative flex flex-col h-full overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-3 pb-2">
+        <span className="text-xs font-medium text-space-300">
+          Simple Avg ROI
         </span>
+        <span className={cn(active.chip, 'text-[10px]')}>{active.label}</span>
       </div>
 
-      <div className="flex-1 flex flex-col gap-2 px-3 py-2 min-h-0 justify-center">
-        <div className="flex items-baseline justify-between">
-          <span className="text-[10px] text-phosphor-dim tracking-widest uppercase">
-            Simple Avg ROI
-          </span>
-          <div className={cn('font-display text-3xl chromatic tabular-nums leading-none', active.text, active.glow)}>
-            {simpleAvgROI >= 0 ? '+' : ''}{simpleAvgROI.toFixed(2)}<span className="text-phosphor-dim">%</span>
-          </div>
+      <div className="flex-1 flex flex-col gap-3 px-4 pb-4 min-h-0 justify-center">
+        {/* Big number */}
+        <div className={cn('font-display font-semibold text-3xl leading-none tabular-nums font-num', active.text)}>
+          {simpleAvgROI >= 0 ? '+' : ''}{simpleAvgROI.toFixed(2)}
+          <span className="text-space-400 text-2xl">%</span>
         </div>
 
         {/* Rail */}
-        <div className="relative mt-1 mb-4">
+        <div className="relative mt-3 mb-5">
           {/* Zone bar */}
-          <div className="flex gap-[2px] h-2.5">
+          <div className="flex gap-[3px] h-2 rounded-full overflow-hidden">
             {zones.map((z, i) => (
               <div
                 key={z.label}
                 className={cn(
                   'flex-1 transition-opacity',
                   z.color,
-                  i === activeIdx ? 'opacity-100' : 'opacity-25'
+                  i === activeIdx ? 'opacity-100' : 'opacity-40'
                 )}
-                style={i === activeIdx ? { boxShadow: '0 0 8px currentColor' } : undefined}
               />
             ))}
           </div>
           {/* Marker */}
           <div
-            className="absolute top-[-8px] -translate-x-1/2 transition-[left] duration-700 ease-out pointer-events-none"
+            className="absolute top-[-7px] -translate-x-1/2 transition-[left] duration-700 ease-out pointer-events-none"
             style={{ left: `${markerPct}%` }}
+            aria-hidden="true"
           >
-            <div className={cn('font-display text-xs leading-none', active.text, active.glow)}>▼</div>
+            <div className="w-3.5 h-3.5 rounded-full bg-white shadow-premium border border-space-500" />
           </div>
           {/* Tick labels */}
-          <div className="grid grid-cols-4 gap-[2px] mt-1 text-[8px] font-mono tracking-widest">
-            {zones.map((z) => (
+          <div className="grid grid-cols-4 gap-1 mt-2 text-[10px]">
+            {zones.map((z, i) => (
               <div key={z.label} className="flex flex-col items-center leading-tight">
-                <span className="text-phosphor-dim">{z.label}</span>
-                <span className="text-phosphor-dim opacity-60">{z.range}</span>
+                <span className={i === activeIdx ? active.text + ' font-medium' : 'text-space-400'}>
+                  {z.label}
+                </span>
+                <span className="text-space-400 font-num tabular-nums">{z.range}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="text-[10px] font-mono text-phosphor-dim tracking-widest mt-auto">
-          &gt; avg across {totalTrades} {totalTrades === 1 ? 'trade' : 'trades'}
+        <div className="text-xs text-space-400 mt-auto">
+          Average across <span className="text-space-200 font-num tabular-nums">{totalTrades}</span> {totalTrades === 1 ? 'trade' : 'trades'}
         </div>
       </div>
     </div>

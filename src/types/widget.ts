@@ -88,6 +88,8 @@ export const WIDGET_SIZE_MAP: Record<string, WidgetSize> = {
   // Small widgets (1/3 width) - KPIs and metrics
   'totalBalance': 'small',
   'winRate': 'small',
+  'profitFactor': 'medium',
+  'oneYearProjection': 'large',
   'avgPnLPerDay': 'small',
   'currentROI': 'small',
   'avgPnLPerTrade': 'small',

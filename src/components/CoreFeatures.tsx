@@ -1,120 +1,233 @@
 import { useTranslation } from "@/hooks/useTranslation";
+import {
+  Sparkles,
+  Upload,
+  Shield,
+  Image as ImageIcon,
+  LineChart,
+  BookOpen,
+  Activity,
+  Coins,
+  TrendingUp,
+  Calculator,
+  Lightbulb,
+  History,
+  FileDown,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+interface Feature {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  status?: "Live" | "Beta";
+}
 
 export const CoreFeatures = () => {
   const { t } = useTranslation();
 
-  const features: { code: string; label: string; status: "OK" | "BETA" | "LIVE" }[] = [
-    { code: "ai.extract",         label: "AI extracts for fast trade logging",     status: "OK" },
-    { code: "upload.unlimited",   label: "Unlimited manual uploads",               status: "OK" },
-    { code: "dedup.engine",       label: "Anti duplicate trade detection",         status: "OK" },
-    { code: "screenshot.ingest",  label: "Screenshot uploads",                     status: "OK" },
-    { code: "charts.advanced",    label: "Advanced charts and analytics",          status: "OK" },
-    { code: "journal.emotional",  label: "Journal with emotional tracking",        status: "OK" },
-    { code: "sentiment.lsr",      label: "Market sentiment with combined LSR",     status: "LIVE" },
-    { code: "fee.compare",        label: "Exchange fee comparison",                status: "OK" },
-    { code: "forecast.wealth",    label: "Wealth forecast",                        status: "OK" },
-    { code: "risk.calc",          label: "Risk calculator",                        status: "OK" },
-    { code: "insights.perf",      label: "Smart performance insights",             status: "OK" },
-    { code: "history.full",       label: "Trade history",                          status: "OK" },
-    { code: "tax.export",         label: "Tax report export",                      status: "BETA" },
+  const hero: Feature = {
+    icon: Sparkles,
+    title: t(
+      "landing.coreFeatures.hero.title",
+      "AI that reads your screenshots."
+    ),
+    description: t(
+      "landing.coreFeatures.hero.description",
+      "Drop a screenshot. The diary extracts entry, exit, size, side, and fees — then classifies the setup. No more copy-paste."
+    ),
+  };
+
+  const heroBullets = [
+    "Extracts trades from exchange screenshots",
+    "Detects and removes duplicates automatically",
+    "Learns your setup patterns over time",
   ];
+
+  const features: Feature[] = [
+    {
+      icon: Upload,
+      title: "Unlimited manual uploads",
+      description: "Log as many trades as you need, batch or one at a time.",
+    },
+    {
+      icon: Shield,
+      title: "Anti-duplicate engine",
+      description: "Never double-count a trade — even across exchanges.",
+    },
+    {
+      icon: ImageIcon,
+      title: "Screenshot ingest",
+      description: "Drag, drop, done. Works with Binance, Bybit, and more.",
+    },
+    {
+      icon: LineChart,
+      title: "Advanced analytics",
+      description: "Equity curves, drawdown, R-multiples, and heatmaps.",
+    },
+    {
+      icon: BookOpen,
+      title: "Emotional journal",
+      description: "Tag feelings per trade and spot patterns you never noticed.",
+    },
+    {
+      icon: Activity,
+      title: "Market sentiment",
+      description: "Combined Long/Short Ratio across the major exchanges.",
+      status: "Live",
+    },
+    {
+      icon: Coins,
+      title: "Fee comparison",
+      description: "Know exactly what each exchange is costing you.",
+    },
+    {
+      icon: TrendingUp,
+      title: "Wealth forecast",
+      description: "Project your equity curve based on real performance.",
+    },
+    {
+      icon: Calculator,
+      title: "Risk calculator",
+      description: "Size positions by risk %, stop distance, or leverage.",
+    },
+    {
+      icon: Lightbulb,
+      title: "Smart insights",
+      description: "Automated observations about your best and worst hours.",
+    },
+    {
+      icon: History,
+      title: "Full trade history",
+      description: "Every trade, forever — searchable and filterable.",
+    },
+    {
+      icon: FileDown,
+      title: "Tax export",
+      description: "Clean reports ready for your accountant.",
+      status: "Beta",
+    },
+  ];
+
+  const HeroIcon = hero.icon;
 
   return (
     <section
-      className="py-20 md:py-28 px-3 md:px-6"
+      className="py-20 md:py-28 px-4 md:px-6"
       aria-labelledby="core-features-heading"
     >
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
-        <header className="mb-10">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="font-mono text-[11px] tracking-[0.16em] uppercase text-cyan-term">
-              core_features.md
-            </span>
-            <span className="status-pill cyan">[ ready ]</span>
-            <div className="flex-1 border-b border-dashed border-phosphor/30" />
-          </div>
+        <header className="mb-12 max-w-2xl">
           <h2
             id="core-features-heading"
-            className="font-display text-3xl md:text-4xl text-phosphor glow-text tracking-tight"
+            className="font-display text-3xl md:text-4xl font-bold text-space-100 tracking-tight"
           >
-            &gt; MODULES /<span className="text-cyan-term glow-text-cyan"> LOADED</span>
+            Everything you need.{" "}
+            <span className="text-gradient-premium">Nothing you don't.</span>
           </h2>
-          <p className="font-mono text-sm text-phosphor-dim mt-3 max-w-2xl">
-            // 13/13 subsystems online. select one to drop into the dashboard.
+          <p className="text-base md:text-lg text-space-300 mt-3 leading-relaxed">
+            Thirteen focused tools that work together — built specifically for crypto
+            perp traders.
           </p>
         </header>
 
-        {/* Feature table */}
-        <div className="term-card !p-0 overflow-hidden">
-          <div className="term-header">
-            <span>./modules --list</span>
-            <span className="ml-auto text-phosphor-dim text-[10px]">13 rows</span>
-          </div>
-
-          <div className="divide-y divide-phosphor/15">
-            {/* table head */}
-            <div className="grid grid-cols-[60px_1fr_auto] md:grid-cols-[60px_220px_1fr_auto] gap-3 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-phosphor-dim bg-phosphor/5">
-              <div>idx</div>
-              <div className="hidden md:block">code</div>
-              <div>module</div>
-              <div>status</div>
+        {/* Hero feature */}
+        <div className="card-premium-highlight p-8 md:p-10 mb-6">
+          <div className="grid md:grid-cols-[1fr_1.1fr] gap-8 md:gap-12 items-center">
+            <div className="space-y-5">
+              <div
+                className="chip chip-electric w-12 h-12 !p-0 flex items-center justify-center !rounded-2xl"
+                aria-hidden
+              >
+                <HeroIcon className="w-6 h-6" />
+              </div>
+              <h3 className="font-display text-2xl md:text-3xl font-bold text-space-100 tracking-tight">
+                {hero.title}
+              </h3>
+              <p className="text-base text-space-200 leading-relaxed">
+                {hero.description}
+              </p>
+              <ul className="space-y-2 pt-2">
+                {heroBullets.map((b) => (
+                  <li key={b} className="flex items-start gap-3">
+                    <span className="chip chip-electric w-5 h-5 !p-0 flex items-center justify-center !rounded-full shrink-0 mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-electric" />
+                    </span>
+                    <span className="text-sm text-space-200">{b}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            {features.map((f, i) => {
-              const idx = String(i + 1).padStart(2, "0");
-              const pillClass =
-                f.status === "BETA" ? "status-pill amber" :
-                f.status === "LIVE" ? "status-pill cyan" :
-                "status-pill";
-
-              return (
-                <div
-                  key={f.code}
-                  className="grid grid-cols-[60px_1fr_auto] md:grid-cols-[60px_220px_1fr_auto] gap-3 px-4 py-2.5 items-center hover:bg-phosphor/5 transition-colors"
-                >
-                  <div className="font-mono text-xs text-phosphor-dim">{idx}</div>
-                  <div className="hidden md:block font-mono text-xs text-amber-term truncate">
-                    {f.code}
-                  </div>
-                  <div className="font-mono text-sm text-phosphor leading-tight">
-                    <span className="md:hidden text-amber-term">{f.code} </span>
-                    <span className="text-phosphor-dim">// </span>
-                    {f.label}
-                  </div>
-                  <div>
-                    <span className={pillClass}>
-                      {f.status === "OK" ? (
-                        <>
-                          <span className="pulse-dot" />
-                          OK
-                        </>
-                      ) : f.status === "LIVE" ? (
-                        <>
-                          <span className="pulse-dot" />
-                          LIVE
-                        </>
-                      ) : (
-                        <>
-                          <span className="pulse-dot amber" />
-                          BETA
-                        </>
-                      )}
-                    </span>
-                  </div>
+            {/* Illustration */}
+            <div className="relative">
+              <div className="glass-thick p-5 rounded-ios-card">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="chip chip-green">
+                    <span className="pulse-dot" />
+                    Extracting
+                  </span>
+                  <span className="text-xs text-space-300">screenshot.png</span>
                 </div>
-              );
-            })}
+                <div className="space-y-2">
+                  {[
+                    { k: "Asset", v: "ETH/USDT" },
+                    { k: "Side", v: "Long" },
+                    { k: "Entry", v: "3,412.60" },
+                    { k: "Exit", v: "3,498.20" },
+                    { k: "Size", v: "2.4 ETH" },
+                    { k: "PnL", v: "+$205.44" },
+                  ].map((row) => (
+                    <div
+                      key={row.k}
+                      className="flex items-center justify-between py-2 border-b border-space-500/60 last:border-0"
+                    >
+                      <span className="text-xs text-space-300">{row.k}</span>
+                      <span className="font-num text-sm font-semibold text-space-100">
+                        {row.v}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
 
-          {/* footer */}
-          <div className="border-t border-phosphor/30 bg-phosphor/5 px-4 py-2 flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-mono uppercase tracking-[0.14em] text-phosphor-dim">
-            <span>exit_code: 0</span>
-            <span className="text-phosphor-dim">|</span>
-            <span>elapsed: 0.14s</span>
-            <span className="text-phosphor-dim">|</span>
-            <span className="text-phosphor">all_subsystems_nominal<span className="cursor-blink" /></span>
-          </div>
+        {/* Feature grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {features.map((f) => {
+            const Icon = f.icon;
+            return (
+              <div key={f.title} className="card-premium p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div
+                    className="chip chip-electric w-10 h-10 !p-0 flex items-center justify-center !rounded-xl"
+                    aria-hidden
+                  >
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  {f.status && (
+                    <span
+                      className={`chip ${
+                        f.status === "Live" ? "chip-green" : "chip-orange"
+                      }`}
+                    >
+                      {f.status === "Live" && <span className="pulse-dot" />}
+                      {f.status}
+                    </span>
+                  )}
+                </div>
+                <h3 className="font-display text-base font-semibold text-space-100 mt-4">
+                  {f.title}
+                </h3>
+                <p className="text-sm text-space-300 leading-relaxed mt-1.5">
+                  {f.description}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

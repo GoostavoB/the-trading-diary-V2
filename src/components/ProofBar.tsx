@@ -1,136 +1,147 @@
 import { useTranslation } from "@/hooks/useTranslation";
+import { Zap, Clock, ShieldCheck, Target } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+type Tone = "electric" | "green" | "orange" | "purple";
+
+interface Metric {
+  id: string;
+  icon: LucideIcon;
+  value: string;
+  label: string;
+  description: string;
+  tone: Tone;
+  bar: number;
+}
 
 export const ProofBar = () => {
   const { t } = useTranslation();
 
-  const metrics = [
+  const metrics: Metric[] = [
     {
       id: "01",
+      icon: Zap,
       value: t("landing.performanceMetrics.metric1.value", "40x"),
-      label: t("landing.performanceMetrics.metric1.title", "Upload 40x Faster"),
+      label: t("landing.performanceMetrics.metric1.title", "Faster uploads"),
       description: t(
         "landing.performanceMetrics.metric1.description",
         "Batch upload screenshots and process trades in seconds."
       ),
-      tone: "phosphor" as const,
+      tone: "electric",
       bar: 92,
     },
     {
       id: "02",
+      icon: Clock,
       value: t("landing.performanceMetrics.metric2.value", "97%"),
-      label: t("landing.performanceMetrics.metric2.title", "Time Saved"),
+      label: t("landing.performanceMetrics.metric2.title", "Time saved"),
       description: t(
         "landing.performanceMetrics.metric2.description",
         "Focus on analysis instead of manual work."
       ),
-      tone: "amber" as const,
+      tone: "green",
       bar: 97,
     },
     {
       id: "03",
-      value: t("landing.performanceMetrics.metric3.value", "+3.4σ"),
-      label: t("landing.performanceMetrics.metric3.title", "Errors Caught"),
+      icon: ShieldCheck,
+      value: t("landing.performanceMetrics.metric3.value", "3.4σ"),
+      label: t("landing.performanceMetrics.metric3.title", "Errors caught"),
       description: t(
         "landing.performanceMetrics.metric3.description",
         "Daily review helps you detect mistakes early."
       ),
-      tone: "danger" as const,
+      tone: "orange",
       bar: 76,
     },
     {
       id: "04",
-      value: t("landing.performanceMetrics.metric4.value", "↑ 28%"),
-      label: t("landing.performanceMetrics.metric4.title", "Decision Accuracy"),
+      icon: Target,
+      value: t("landing.performanceMetrics.metric4.value", "+28%"),
+      label: t("landing.performanceMetrics.metric4.title", "Better decisions"),
       description: t(
         "landing.performanceMetrics.metric4.description",
         "Structured logs and clear analytics support better choices."
       ),
-      tone: "cyan" as const,
+      tone: "purple",
       bar: 84,
     },
   ];
 
+  const chipClassFor = (tone: Tone) => {
+    switch (tone) {
+      case "green":
+        return "chip chip-green";
+      case "orange":
+        return "chip chip-orange";
+      case "purple":
+        return "chip chip-purple";
+      default:
+        return "chip chip-electric";
+    }
+  };
+
+  const barColorFor = (tone: Tone) => {
+    switch (tone) {
+      case "green":
+        return "bg-apple-green";
+      case "orange":
+        return "bg-apple-orange";
+      case "purple":
+        return "bg-apple-purple";
+      default:
+        return "bg-electric";
+    }
+  };
+
   return (
     <section
-      className="relative -mt-10 z-20 px-3 md:px-6 py-10"
+      className="relative z-20 px-4 md:px-6 py-12 md:py-16"
       aria-label="Performance metrics"
     >
       <div className="container mx-auto max-w-7xl">
-        {/* section header */}
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-3 border-b border-phosphor/30 pb-3">
-          <div>
-            <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-phosphor-dim">
-              // diagnostics.module
-            </div>
-            <h2 className="font-display text-2xl md:text-3xl text-phosphor glow-text uppercase tracking-tight">
-              {t("landing.performanceMetrics.sectionTitle", "PERFORMANCE/READOUT")}
-            </h2>
-          </div>
-          <span className="status-pill cyan">
-            <span className="pulse-dot" />
-            stream.stable
-          </span>
+        {/* Header */}
+        <div className="mb-8 max-w-2xl">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-space-100 tracking-tight">
+            {t("landing.performanceMetrics.sectionTitle", "Built to make you better")}
+          </h2>
+          <p className="text-sm md:text-base text-space-300 mt-2">
+            Real outcomes from traders using the diary daily.
+          </p>
         </div>
 
-        {/* 4 HUD panels */}
+        {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {metrics.map((m) => {
-            const toneText =
-              m.tone === "amber" ? "text-amber-term glow-text-amber" :
-              m.tone === "danger" ? "text-danger glow-text-danger" :
-              m.tone === "cyan" ? "text-cyan-term glow-text-cyan" :
-              "text-phosphor glow-text";
-
-            const panelClass =
-              m.tone === "amber" ? "hud-panel hud-panel-amber" :
-              m.tone === "danger" ? "hud-panel hud-panel-danger" :
-              "hud-panel";
-
-            const barColor =
-              m.tone === "amber" ? "hsl(var(--amber))" :
-              m.tone === "danger" ? "hsl(var(--danger))" :
-              m.tone === "cyan" ? "hsl(var(--cyan-term))" :
-              "hsl(var(--phosphor))";
-
+            const Icon = m.icon;
             return (
-              <div key={m.id} className={`${panelClass} hud-corners group relative animate-fade-in`}>
-                <span className="hud-c tl" />
-                <span className="hud-c tr" />
-                <span className="hud-c bl" />
-                <span className="hud-c br" />
-
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-mono text-[10px] tracking-[0.14em] text-phosphor-dim uppercase">
-                    METRIC_{m.id}
-                  </span>
-                  <span className="font-mono text-[10px] tracking-[0.14em] text-phosphor-dim uppercase">
-                    [ OK ]
-                  </span>
+              <div
+                key={m.id}
+                className="card-premium p-5 animate-fade-in"
+              >
+                <div
+                  className={`${chipClassFor(m.tone)} w-8 h-8 !p-0 flex items-center justify-center !rounded-lg`}
+                  aria-hidden
+                >
+                  <Icon className="w-4 h-4" />
                 </div>
 
-                <div className={`font-display text-4xl md:text-5xl ${toneText} leading-none`}>
+                <div className="font-num text-2xl md:text-3xl font-bold text-space-100 mt-4">
                   {m.value}
                 </div>
-
-                <div className="font-mono text-xs text-phosphor uppercase tracking-[0.08em] mt-3">
+                <div className="text-sm font-medium text-space-100 mt-1">
                   {m.label}
                 </div>
-                <div className="font-mono text-[11px] text-phosphor-dim leading-relaxed mt-2">
-                  // {m.description}
+                <div className="text-xs text-space-300 leading-relaxed mt-2">
+                  {m.description}
                 </div>
 
-                {/* ASCII progress bar */}
-                <div className="mt-4">
-                  <div className="flex items-center justify-between text-[9px] font-mono text-phosphor-dim uppercase tracking-[0.12em] mb-1">
-                    <span>load</span>
-                    <span>{m.bar}%</span>
-                  </div>
-                  <div className="h-1 w-full bg-phosphor/10 relative overflow-hidden">
-                    <div
-                      className="h-full transition-all duration-700"
-                      style={{ width: `${m.bar}%`, background: barColor, boxShadow: `0 0 8px ${barColor}` }}
-                    />
-                  </div>
+                {/* progress bar */}
+                <div className="mt-4 h-1 bg-space-600 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full ${barColorFor(m.tone)} rounded-full transition-all duration-700`}
+                    style={{ width: `${m.bar}%` }}
+                  />
                 </div>
               </div>
             );

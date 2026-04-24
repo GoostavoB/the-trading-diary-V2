@@ -1,97 +1,121 @@
 import { useTranslation } from "@/hooks/useTranslation";
+import { TrendingDown, Brain, Target, Eye } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+interface Benefit {
+  id: string;
+  icon: LucideIcon;
+  chipClass: string;
+  title: string;
+  description: string;
+  tag: string;
+}
 
 export const WhyImprove = () => {
   const { t } = useTranslation();
 
-  const benefits = [
+  const benefits: Benefit[] = [
     {
       id: "01",
-      glyph: "[>]",
-      title: t("landing.whyImprove.benefit1.title", "You reduce repeated errors"),
-      description: t("landing.whyImprove.benefit1.description", "Tag mistakes and watch them decline over time."),
-      status: "TRACKED",
+      icon: TrendingDown,
+      chipClass: "chip chip-electric",
+      title: t("landing.whyImprove.benefit1.title", "Reduce repeated errors"),
+      description: t(
+        "landing.whyImprove.benefit1.description",
+        "Tag mistakes and watch them decline over time."
+      ),
+      tag: "Tracked",
     },
     {
       id: "02",
-      glyph: "[~]",
-      title: t("landing.whyImprove.benefit2.title", "You make calmer decisions"),
-      description: t("landing.whyImprove.benefit2.description", "Track emotional trades and improve control."),
-      status: "STABLE",
+      icon: Brain,
+      chipClass: "chip chip-purple",
+      title: t("landing.whyImprove.benefit2.title", "Make calmer decisions"),
+      description: t(
+        "landing.whyImprove.benefit2.description",
+        "Track emotional trades and improve control."
+      ),
+      tag: "Stable",
     },
     {
       id: "03",
-      glyph: "[+]",
-      title: t("landing.whyImprove.benefit3.title", "You build skill through daily review"),
-      description: t("landing.whyImprove.benefit3.description", "See what works and refine your process."),
-      status: "ACTIVE",
+      icon: Target,
+      chipClass: "chip chip-green",
+      title: t("landing.whyImprove.benefit3.title", "Build skill through daily review"),
+      description: t(
+        "landing.whyImprove.benefit3.description",
+        "See what works and refine your process."
+      ),
+      tag: "Active",
     },
     {
       id: "04",
-      glyph: "[#]",
-      title: t("landing.whyImprove.benefit4.title", "You find patterns faster"),
-      description: t("landing.whyImprove.benefit4.description", "Spot changes in setups, conditions, and timing."),
-      status: "SIGNAL",
+      icon: Eye,
+      chipClass: "chip chip-orange",
+      title: t("landing.whyImprove.benefit4.title", "Find patterns faster"),
+      description: t(
+        "landing.whyImprove.benefit4.description",
+        "Spot changes in setups, conditions, and timing."
+      ),
+      tag: "Signal",
     },
   ];
 
   return (
     <section
-      className="py-20 md:py-28 px-3 md:px-6"
+      className="py-20 md:py-28 px-4 md:px-6"
       aria-labelledby="why-improve-heading"
     >
       <div className="container mx-auto max-w-5xl">
         {/* Header */}
-        <header className="mb-12">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="font-mono text-[11px] tracking-[0.16em] uppercase text-amber-term">
-              why_improve.md
-            </span>
-            <span className="status-pill amber">[ ready ]</span>
-            <div className="flex-1 border-b border-dashed border-phosphor/30" />
-          </div>
+        <header className="mb-12 max-w-2xl">
           <h2
             id="why-improve-heading"
-            className="font-display text-3xl md:text-4xl text-phosphor glow-text tracking-tight"
+            className="font-display text-3xl md:text-4xl font-bold text-space-100 tracking-tight"
           >
-            &gt; A SIMPLE SYSTEM. <span className="text-amber-term glow-text-amber">BETTER DECISIONS.</span>
+            A simple system.{" "}
+            <span className="text-gradient-electric">Better decisions.</span>
           </h2>
-          <p className="font-mono text-sm text-phosphor-dim mt-3 max-w-2xl">
-            // four feedback loops. compounding output. zero guesswork.
+          <p className="text-base md:text-lg text-space-300 mt-3 leading-relaxed">
+            Four feedback loops that compound over time — with zero guesswork.
           </p>
         </header>
 
-        {/* Benefits list */}
+        {/* Benefits grid */}
         <div className="grid md:grid-cols-2 gap-4" role="list">
-          {benefits.map((b) => (
-            <div
-              key={b.id}
-              role="listitem"
-              className="term-card term-bracket group relative"
-            >
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <div className="font-mono text-amber-term glow-text-amber text-lg leading-none">
-                    {b.glyph}
+          {benefits.map((b) => {
+            const Icon = b.icon;
+            return (
+              <div
+                key={b.id}
+                role="listitem"
+                className="card-premium p-6 group"
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className={`${b.chipClass} w-10 h-10 !p-0 flex items-center justify-center !rounded-xl shrink-0`}
+                    aria-hidden
+                  >
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <div className="font-mono text-[10px] tracking-[0.14em] text-phosphor-dim mt-2">
-                    {b.id}
-                  </div>
-                </div>
 
-                <div className="flex-1 min-w-0 space-y-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="font-display text-base md:text-lg text-phosphor tracking-tight leading-snug uppercase">
-                      {b.title}
-                    </h3>
-                    <span className="status-pill shrink-0 hidden sm:inline-flex">{b.status}</span>
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="font-display text-lg font-semibold text-space-100 leading-snug">
+                        {b.title}
+                      </h3>
+                      <span className="chip shrink-0 hidden sm:inline-flex">
+                        {b.tag}
+                      </span>
+                    </div>
+                    <p className="text-sm text-space-300 leading-relaxed">
+                      {b.description}
+                    </p>
                   </div>
-                  <p className="font-mono text-sm text-phosphor-dim leading-relaxed">
-                    &gt; {b.description}
-                  </p>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

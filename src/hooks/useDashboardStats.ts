@@ -20,6 +20,8 @@ export const useDashboardStats = (trades: Trade[], capitalLog?: CapitalLogEntry[
         avgWin: 0,
         avgLoss: 0,
         profitFactor: 0,
+        grossProfit: 0,
+        grossLoss: 0,
         bestTrade: null,
         worstTrade: null,
         avgRoi: 0,
@@ -28,18 +30,20 @@ export const useDashboardStats = (trades: Trade[], capitalLog?: CapitalLogEntry[
 
     const winningTrades = trades.filter(t => calculateTradePnL(t, { includeFees: true }) > 0);
     const losingTrades = trades.filter(t => calculateTradePnL(t, { includeFees: true }) <= 0);
-    
+
     const totalPnL = calculateTotalPnL(trades, { includeFees: true });
-    
-    const avgWin = winningTrades.length > 0
-      ? calculateTotalPnL(winningTrades, { includeFees: true }) / winningTrades.length
-      : 0;
-    
-    const avgLoss = losingTrades.length > 0
-      ? Math.abs(calculateTotalPnL(losingTrades, { includeFees: true }) / losingTrades.length)
-      : 0;
-    
-    const profitFactor = avgLoss > 0 ? avgWin / avgLoss : 0;
+
+    // ── GROSS totals (sum of wins, absolute sum of losses) ──
+    const grossProfit = calculateTotalPnL(winningTrades, { includeFees: true });
+    const grossLoss = Math.abs(calculateTotalPnL(losingTrades, { includeFees: true }));
+
+    const avgWin = winningTrades.length > 0 ? grossProfit / winningTrades.length : 0;
+    const avgLoss = losingTrades.length > 0 ? grossLoss / losingTrades.length : 0;
+
+    // ── PROFIT FACTOR (corrected): gross profit / gross loss ──
+    // Previously used avgWin/avgLoss which is NOT Profit Factor.
+    // PF answers: "for every $1 I lost, how many $ did I win?"
+    const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : (grossProfit > 0 ? Infinity : 0);
     const winRate = (winningTrades.length / trades.length) * 100;
     
     // Calculate ROI considering capital log if available
@@ -89,6 +93,8 @@ export const useDashboardStats = (trades: Trade[], capitalLog?: CapitalLogEntry[
       avgWin,
       avgLoss,
       profitFactor,
+      grossProfit,
+      grossLoss,
       bestTrade,
       worstTrade,
       avgRoi,

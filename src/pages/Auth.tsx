@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { SEO } from '@/components/SEO';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SkipToContent } from '@/components/SkipToContent';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { LineChart, Mail, Lock, User, Globe, Gift, AlertCircle, ArrowLeft } from 'lucide-react';
 
 const passwordValidation = z.string()
   .min(12, 'Password must be at least 12 characters')
@@ -39,35 +40,6 @@ const signupSchema = z.object({
   path: ["confirmPassword"],
 });
 
-const pad = (n: number) => n.toString().padStart(2, '0');
-const stamp = (d: Date = new Date()) => `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-
-// ── ASCII wireframe cube as decorative background ──
-const ASCII_BG = `
-           ┌──────────────────────────┐
-          ╱│                         ╱│
-         ╱ │                        ╱ │
-        ╱  │     T R A D I N G     ╱  │
-       ╱   │                      ╱   │
-      ┌──────────────────────────┐    │
-      │    │     D I A R Y       │    │
-      │    │                     │    │
-      │    └─────────────────────│────┘
-      │   ╱                      │   ╱
-      │  ╱    SECURE CONSOLE     │  ╱
-      │ ╱                        │ ╱
-      │╱                         │╱
-      └──────────────────────────┘
-
-   01001000 01000001 01000011 01001011
-   11010010 01011011 10010110 10110101
-   0xFF 0xAE 0x3C 0x91 0x7B 0x2D 0xC0
-
-       >  AUTHENTICATED_SESSION_INIT
-       >  KEY_EXCHANGE__OK
-       >  CHANNEL_ENCRYPTED__OK
-`;
-
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -86,10 +58,6 @@ const Auth = () => {
   const [shake, setShake] = useState(false);
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const { i18n } = useTranslation();
-
-  // Boot timestamps for the session log
-  const bootStamp = useMemo(() => stamp(), []);
-  const [latestLog, setLatestLog] = useState<string | null>(null);
 
   // Detect language + mode from URL parameter
   useEffect(() => {
@@ -112,7 +80,6 @@ const Auth = () => {
   const triggerError = (msg: string) => {
     setErrorMsg(msg);
     setShake(true);
-    setLatestLog(`[${stamp()}] auth_failed :: ${msg.toLowerCase().slice(0, 60)}`);
     window.setTimeout(() => setShake(false), 500);
     toast.error(msg);
   };
@@ -121,7 +88,6 @@ const Auth = () => {
     e.preventDefault();
     setErrorMsg(null);
     setLoading(true);
-    setLatestLog(`[${stamp()}] transmitting credentials...`);
 
     try {
       if (isForgotPassword) {
@@ -141,7 +107,6 @@ const Auth = () => {
           triggerError(error.message || 'Failed to send reset email');
         } else {
           toast.success('Password reset email sent! Check your inbox.');
-          setLatestLog(`[${stamp()}] reset_link_dispatched :: ok`);
           setIsForgotPassword(false);
           setEmail('');
         }
@@ -160,7 +125,6 @@ const Auth = () => {
           triggerError(error.message || 'Failed to sign in');
         } else {
           toast.success('Welcome back!');
-          setLatestLog(`[${stamp()}] access_granted :: session established`);
         }
       } else {
         const result = signupSchema.safeParse({
@@ -187,7 +151,6 @@ const Auth = () => {
           triggerError(error.message || 'Failed to sign up');
         } else {
           toast.success('Account created successfully!');
-          setLatestLog(`[${stamp()}] operator_provisioned :: ok`);
         }
       }
     } catch (error) {
@@ -202,7 +165,6 @@ const Auth = () => {
       localStorage.setItem('pendingInviteCode', inviteCode.trim().toUpperCase());
     }
     setLoading(true);
-    setLatestLog(`[${stamp()}] sso_bypass :: google`);
     const { error } = await signInWithGoogle();
     if (error) {
       triggerError(error.message || 'Failed to sign in with Google');
@@ -210,128 +172,91 @@ const Auth = () => {
     }
   };
 
-  const inputCls = "w-full bg-carbon border border-phosphor-dim text-phosphor font-mono px-3 py-2 focus:border-phosphor focus:shadow-phosphor focus:outline-none transition-all";
+  const inputCls =
+    'w-full h-11 px-3.5 rounded-ios bg-space-600/60 border border-space-500 text-space-100 placeholder:text-space-400 focus:border-electric focus:shadow-electric focus:outline-none transition-all';
 
   const primaryLabel = loading
-    ? (isForgotPassword ? '[ DISPATCHING... ]' : isLogin ? '[ AUTHENTICATING... ]' : '[ PROVISIONING... ]')
-    : (isForgotPassword ? '[ SEND_RESET_LINK ]' : isLogin ? '[ AUTHENTICATE ]' : '[ CREATE_ACCOUNT ]');
+    ? (isForgotPassword ? 'Sending…' : isLogin ? 'Signing in…' : 'Creating account…')
+    : (isForgotPassword ? 'Send reset link' : isLogin ? 'Sign in' : 'Create account');
+
+  const title = isForgotPassword
+    ? 'Reset your password.'
+    : isLogin
+      ? 'Welcome back.'
+      : 'Create your account.';
+
+  const subtitle = isForgotPassword
+    ? 'Enter your email and we will send you a recovery link.'
+    : isLogin
+      ? 'Sign in to continue tracking your trades.'
+      : 'Start journaling your trades in minutes.';
 
   return (
     <>
-    <SEO
-      title="Sign In - The Trading Diary"
-      description="Sign in to your Trading Diary account to access your trades, analytics, and journal."
-      noindex={true}
-    />
-    <div className="min-h-screen w-full bg-void relative overflow-hidden flex items-center justify-center px-4 py-10 scanlines">
-      <SkipToContent />
+      <SEO
+        title="Sign In - The Trading Diary"
+        description="Sign in to your Trading Diary account to access your trades, analytics, and journal."
+        noindex={true}
+      />
 
-      {/* ── Decorative ASCII wireframe backdrop ── */}
-      <pre
-        aria-hidden="true"
-        className="absolute inset-0 flex items-center justify-center text-phosphor font-mono text-[10px] leading-[1.1] whitespace-pre opacity-[0.06] pointer-events-none select-none animate-flicker"
-      >
-        {ASCII_BG}
-      </pre>
+      <div className="min-h-screen w-full bg-space-900 relative overflow-hidden flex items-center justify-center px-4 py-12">
+        <SkipToContent />
 
-      {/* ── Terminal card ── */}
-      <div
-        className={`term-card hud-corners relative z-10 w-full max-w-[580px] p-0 animate-fade-in ${shake ? 'animate-shake' : ''}`}
-      >
-        <span className="hud-c tl" />
-        <span className="hud-c tr" />
-        <span className="hud-c bl" />
-        <span className="hud-c br" />
+        {/* Ambient electric-blue glow */}
+        <div
+          aria-hidden="true"
+          className="absolute left-1/2 -translate-x-1/2 top-[-120px] w-[600px] h-[600px] rounded-full bg-electric/15 blur-[120px] pointer-events-none"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-space-900 pointer-events-none"
+        />
 
-        {/* Title bar */}
-        <div className="term-header justify-between">
-          <span className="text-amber-term">AUTH://TRADING-DIARY</span>
-          <div className="flex items-center gap-2">
-            <span className="pulse-dot" />
-            <span className="pulse-dot amber" />
-            <span className="pulse-dot danger" />
-          </div>
-        </div>
-
-        {/* Scan bar */}
-        <div className="relative h-[2px] overflow-hidden">
-          <div className="scan-bar absolute inset-0" />
-        </div>
-
-        <div className="p-6 md:p-8 space-y-5">
-
-          {/* Boot sequence */}
-          <div className="space-y-1 text-xs">
-            <div className="term-stream animate-slide-up" style={{ animationDelay: '100ms' }}>
-              <span className="prompt" />
-              <span className="text-phosphor-dim">initialize --auth-session</span>
+        {/* Auth card */}
+        <div
+          className={`card-premium rounded-ios-sheet relative z-10 w-full max-w-[440px] p-8 md:p-10 animate-fade-in ${shake ? 'animate-shake' : ''}`}
+        >
+          {/* Logo + product name */}
+          <div className="flex items-center gap-2.5 mb-8">
+            <div className="w-9 h-9 rounded-ios bg-electric/15 border border-electric/30 flex items-center justify-center">
+              <LineChart className="w-5 h-5 text-electric" />
             </div>
-            <div className="term-stream animate-slide-up" style={{ animationDelay: '200ms' }}>
-              <span className="ok">[OK]</span>{' '}
-              <span className="text-phosphor-dim">connection secured</span>
-            </div>
-            <div className="term-stream animate-slide-up" style={{ animationDelay: '300ms' }}>
-              <span className="ok">[OK]</span>{' '}
-              <span className="text-phosphor-dim">key exchange complete</span>
-            </div>
+            <span className="text-sm font-medium text-space-100">The Trading Diary</span>
           </div>
 
-          {/* Tab selector */}
+          {/* Tab toggle — not shown during forgot-password */}
           {!isForgotPassword && (
-            <div className="flex items-center gap-4 border-b border-phosphor-dim pb-2 text-xs tracking-widest font-display">
+            <div className="glass-thin rounded-ios p-1 flex items-center mb-6">
               <button
                 type="button"
-                onClick={() => setIsLogin(true)}
-                className={`transition-colors ${isLogin ? 'text-phosphor underline' : 'text-phosphor-dim hover:text-phosphor'}`}
+                onClick={() => { setIsLogin(true); setErrorMsg(null); }}
+                className={`flex-1 h-9 text-sm font-medium rounded-[8px] transition-all ${
+                  isLogin ? 'bg-space-600 text-space-100 shadow-premium-sm' : 'text-space-300 hover:text-space-100'
+                }`}
               >
-                [LOGIN]
+                Sign in
               </button>
               <button
                 type="button"
-                onClick={() => setIsLogin(false)}
-                className={`transition-colors ${!isLogin ? 'text-phosphor underline' : 'text-phosphor-dim hover:text-phosphor'}`}
+                onClick={() => { setIsLogin(false); setErrorMsg(null); }}
+                className={`flex-1 h-9 text-sm font-medium rounded-[8px] transition-all ${
+                  !isLogin ? 'bg-space-600 text-space-100 shadow-premium-sm' : 'text-space-300 hover:text-space-100'
+                }`}
               >
-                [REGISTER]
+                Sign up
               </button>
-              <span className="ml-auto text-[10px] text-phosphor-dim">
-                MODE: <span className="text-amber-term">{isLogin ? 'AUTH' : 'PROVISION'}</span>
-              </span>
             </div>
           )}
 
-          {/* Title */}
-          <div>
-            <h1
-              id="auth-heading"
-              className="font-display text-2xl text-phosphor chromatic cursor-blink"
-            >
-              {isForgotPassword ? 'RESET VECTOR REQUIRED' : 'AUTHENTICATION REQUIRED'}
+          {/* Title + subtitle */}
+          <div className="mb-6">
+            <h1 id="auth-heading" className="font-display text-2xl font-semibold text-space-100 tracking-tight">
+              {title}
             </h1>
-            <div className="mt-1 border-t border-phosphor-dim" />
-            <p className="text-[11px] tracking-widest text-phosphor-dim mt-2 uppercase">
-              {isForgotPassword
-                ? '// recovery link will be transmitted'
-                : isLogin
-                  ? '// authorized operators only'
-                  : '// provisioning new operator'}
-            </p>
+            <p className="text-sm text-space-300 mt-1.5">{subtitle}</p>
           </div>
 
-          {/* Error panel */}
-          {errorMsg && (
-            <div className="hud-panel-danger p-3 text-xs flex items-start gap-2">
-              <span className="status-pill danger shrink-0">
-                <span className="pulse-dot danger" />
-                ERR
-              </span>
-              <div className="flex-1">
-                <span className="text-danger font-display text-[11px] tracking-widest block mb-0.5">[!] AUTH_FAILURE</span>
-                <span className="text-phosphor-dim">{errorMsg}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Forgot password back button */}
+          {/* Back button for forgot-password */}
           {isForgotPassword && (
             <button
               type="button"
@@ -340,303 +265,269 @@ const Auth = () => {
                 setEmail('');
                 setErrorMsg(null);
               }}
-              className="text-xs text-phosphor-dim hover:text-phosphor tracking-widest uppercase font-display"
+              className="flex items-center gap-1.5 text-xs text-electric hover:text-electric-bright mb-4 transition-colors"
             >
-              {'<< RETURN_TO_AUTH'}
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Back to sign in
             </button>
           )}
 
-          {/* ─── Form ─── */}
-          <form onSubmit={handleSubmit} className="space-y-4" aria-labelledby="auth-heading">
+          {/* Error chip */}
+          {errorMsg && (
+            <div className="chip-red mb-4 w-full py-2 flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span className="text-xs leading-tight">{errorMsg}</span>
+            </div>
+          )}
 
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4" aria-labelledby="auth-heading">
             {!isLogin && !isForgotPassword && (
               <>
-                <div className="space-y-1">
-                  <label htmlFor="inviteCode" className="text-xs tracking-widest font-display text-amber-term block">
-                    INVITE_CODE <span className="text-phosphor-dim">// optional</span>
+                <div>
+                  <label htmlFor="inviteCode" className="block text-sm font-medium text-space-200 mb-1.5">
+                    Invite code <span className="text-space-400 font-normal">(optional)</span>
                   </label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-phosphor-dim">&gt; [</span>
+                  <div className="relative">
+                    <Gift className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-space-400 pointer-events-none" />
                     <input
                       id="inviteCode"
                       type="text"
                       value={inviteCode}
                       onChange={(e) => setInviteCode(e.target.value)}
-                      className={inputCls}
+                      className={inputCls + ' pl-10'}
                       placeholder="HORISTIC"
                     />
-                    <span className="text-phosphor-dim">]</span>
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label htmlFor="fullName" className="text-xs tracking-widest font-display text-amber-term block">
-                    OPERATOR_NAME
+                <div>
+                  <label htmlFor="fullName" className="block text-sm font-medium text-space-200 mb-1.5">
+                    Full name
                   </label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-phosphor-dim">&gt; [</span>
+                  <div className="relative">
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-space-400 pointer-events-none" />
                     <input
                       id="fullName"
                       type="text"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      required={!isLogin}
-                      className={inputCls}
+                      required
+                      className={inputCls + ' pl-10'}
                       placeholder="John Doe"
-                      aria-required={!isLogin}
+                      aria-required="true"
                     />
-                    <span className="text-phosphor-dim">]</span>
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label htmlFor="country" className="text-xs tracking-widest font-display text-amber-term block">
-                    JURISDICTION
+                <div>
+                  <label htmlFor="country" className="block text-sm font-medium text-space-200 mb-1.5">
+                    Country
                   </label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-phosphor-dim">&gt; [</span>
+                  <div className="relative">
+                    <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-space-400 pointer-events-none" />
                     <input
                       id="country"
                       type="text"
                       value={country}
                       onChange={(e) => setCountry(e.target.value)}
-                      required={!isLogin}
-                      className={inputCls}
+                      required
+                      className={inputCls + ' pl-10'}
                       placeholder="United States"
-                      aria-required={!isLogin}
+                      aria-required="true"
                     />
-                    <span className="text-phosphor-dim">]</span>
                   </div>
                 </div>
               </>
             )}
 
-            <div className="space-y-1">
-              <label htmlFor="email" className="text-xs tracking-widest font-display text-amber-term block">
-                OPERATOR_ID
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-space-200 mb-1.5">
+                Email
               </label>
-              <div className="flex items-center gap-2">
-                <span className="text-phosphor-dim">&gt; [</span>
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-space-400 pointer-events-none" />
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className={inputCls}
-                  placeholder="trader@example.com"
+                  className={inputCls + ' pl-10'}
+                  placeholder="you@example.com"
                   aria-required="true"
                 />
-                <span className="text-phosphor-dim">]</span>
               </div>
             </div>
 
             {!isForgotPassword && (
               <>
-                <div className="space-y-1">
-                  <label htmlFor="password" className="text-xs tracking-widest font-display text-amber-term block">
-                    PASSPHRASE
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-phosphor-dim">&gt; [</span>
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="password" className="block text-sm font-medium text-space-200">
+                      Password
+                    </label>
+                    {isLogin && (
+                      <button
+                        type="button"
+                        onClick={() => { setIsForgotPassword(true); setErrorMsg(null); }}
+                        className="text-xs text-electric hover:text-electric-bright transition-colors"
+                      >
+                        Forgot password?
+                      </button>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-space-400 pointer-events-none" />
                     <input
                       id="password"
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className={inputCls}
-                      placeholder="************"
+                      className={inputCls + ' pl-10'}
+                      placeholder="••••••••••••"
                       minLength={isLogin ? 6 : 12}
                       aria-required="true"
-                      aria-describedby={!isLogin ? "password-requirements" : undefined}
+                      aria-describedby={!isLogin ? 'password-requirements' : undefined}
                     />
-                    <span className="text-phosphor-dim">]</span>
                   </div>
                   {!isLogin && (
-                    <p id="password-requirements" className="text-[10px] tracking-wide text-phosphor-dim mt-1">
-                      // min 12 chars / UPPER / lower / 0-9 / special
+                    <p id="password-requirements" className="text-xs text-space-400 mt-1.5">
+                      Min 12 characters, with upper, lower, number, and symbol.
                     </p>
                   )}
                 </div>
 
                 {!isLogin && (
-                  <div className="space-y-1">
-                    <label htmlFor="confirmPassword" className="text-xs tracking-widest font-display text-amber-term block">
-                      CONFIRM_PASSPHRASE
+                  <div>
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-space-200 mb-1.5">
+                      Confirm password
                     </label>
-                    <div className="flex items-center gap-2">
-                      <span className="text-phosphor-dim">&gt; [</span>
+                    <div className="relative">
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-space-400 pointer-events-none" />
                       <input
                         id="confirmPassword"
                         type="password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        required={!isLogin}
-                        className={inputCls}
-                        placeholder="************"
+                        required
+                        className={inputCls + ' pl-10'}
+                        placeholder="••••••••••••"
                         minLength={12}
-                        aria-required={!isLogin}
+                        aria-required="true"
                       />
-                      <span className="text-phosphor-dim">]</span>
                     </div>
                   </div>
                 )}
               </>
             )}
 
-            {isForgotPassword && (
-              <p className="text-xs text-phosphor-dim">
-                // transmit operator_id; a recovery vector will be dispatched to your registered address.
-              </p>
-            )}
-
             {/* Signup consents */}
             {!isLogin && !isForgotPassword && (
-              <div className="space-y-2 text-xs text-phosphor-dim border-l border-phosphor-dim pl-3">
-                <label className="flex items-start gap-2 cursor-pointer hover:text-phosphor transition-colors">
+              <div className="space-y-2.5 pt-1">
+                <label className="flex items-start gap-2.5 cursor-pointer group">
                   <input
                     type="checkbox"
                     checked={termsAccepted}
                     onChange={(e) => setTermsAccepted(e.target.checked)}
                     required
-                    className="mt-0.5 accent-phosphor"
+                    className="mt-0.5 accent-electric"
                   />
-                  <span>
-                    <span className="text-amber-term">[T]</span> Accept Terms &amp; Privacy Policy. Consent to non-personal trading data collection for analytics.
+                  <span className="text-xs text-space-300 group-hover:text-space-200 transition-colors leading-relaxed">
+                    I accept the Terms of Service and consent to non-personal trading data collection for analytics.
                   </span>
                 </label>
-                <label className="flex items-start gap-2 cursor-pointer hover:text-phosphor transition-colors">
+                <label className="flex items-start gap-2.5 cursor-pointer group">
                   <input
                     type="checkbox"
                     checked={privacyAccepted}
                     onChange={(e) => setPrivacyAccepted(e.target.checked)}
                     required
-                    className="mt-0.5 accent-phosphor"
+                    className="mt-0.5 accent-electric"
                   />
-                  <span>
-                    <span className="text-amber-term">[P]</span> Accept Privacy Policy for personal data collection &amp; processing.
+                  <span className="text-xs text-space-300 group-hover:text-space-200 transition-colors leading-relaxed">
+                    I accept the Privacy Policy and personal data processing.
                   </span>
                 </label>
-                <label className="flex items-start gap-2 cursor-pointer hover:text-phosphor transition-colors">
+                <label className="flex items-start gap-2.5 cursor-pointer group">
                   <input
                     type="checkbox"
                     checked={marketingConsent}
                     onChange={(e) => setMarketingConsent(e.target.checked)}
-                    className="mt-0.5 accent-phosphor"
+                    className="mt-0.5 accent-electric"
                   />
-                  <span>
-                    <span className="text-amber-term">[M]</span> Receive broadcast transmissions &amp; marketing updates.
+                  <span className="text-xs text-space-300 group-hover:text-space-200 transition-colors leading-relaxed">
+                    Send me product updates and marketing emails.
                   </span>
                 </label>
               </div>
             )}
 
             {isLogin && !isForgotPassword && (
-              <label className="flex items-center gap-2 text-xs text-phosphor-dim hover:text-phosphor transition-colors cursor-pointer">
+              <label className="flex items-center gap-2 text-sm text-space-300 hover:text-space-100 cursor-pointer transition-colors">
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="accent-phosphor"
+                  className="accent-electric"
                 />
-                <span>// persist session token</span>
+                Keep me signed in
               </label>
             )}
 
-            {/* Primary action + aux buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <button
-                type="submit"
-                disabled={loading}
-                className={`btn-term ${loading ? 'animate-pulse-glow' : ''}`}
-                aria-busy={loading}
-              >
-                {primaryLabel}
-              </button>
-
-              {!isForgotPassword && isLogin && (
-                <button
-                  type="button"
-                  onClick={() => { setIsForgotPassword(true); setErrorMsg(null); }}
-                  className="btn-term-amber"
-                >
-                  [ FORGOT_PASS ]
-                </button>
-              )}
-
-              {!isForgotPassword && (
-                <button
-                  type="button"
-                  onClick={() => { setIsLogin(!isLogin); setErrorMsg(null); }}
-                  className="btn-term"
-                >
-                  {isLogin ? '[ CREATE_ACCT ]' : '[ BACK_TO_LOGIN ]'}
-                </button>
-              )}
-            </div>
+            {/* Primary CTA */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full h-11 text-sm font-medium"
+              aria-busy={loading}
+            >
+              {primaryLabel}
+            </button>
           </form>
 
-          {/* Social auth */}
+          {/* Divider + Google */}
           {!isForgotPassword && (
-            <div className="space-y-2 pt-2">
-              <div className="flex items-center gap-2 text-[10px] tracking-widest text-phosphor-dim uppercase">
-                <span className="flex-1 border-t border-phosphor-dim" />
-                <span>// or bypass with</span>
-                <span className="flex-1 border-t border-phosphor-dim" />
+            <>
+              <div className="flex items-center gap-3 my-5">
+                <hr className="flex-1 border-space-500" />
+                <span className="text-xs text-space-400">or</span>
+                <hr className="flex-1 border-space-500" />
               </div>
-              <div className="flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  disabled={loading}
-                  className="btn-term"
-                  aria-label={`Sign ${isLogin ? 'in' : 'up'} with Google`}
-                >
-                  [ GOOGLE_SSO ]
-                </button>
-              </div>
-            </div>
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={loading}
+                className="btn-secondary w-full h-11 text-sm font-medium flex items-center justify-center gap-2.5"
+                aria-label={`Sign ${isLogin ? 'in' : 'up'} with Google`}
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+                  <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4" />
+                  <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853" />
+                  <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05" />
+                  <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335" />
+                </svg>
+                Continue with Google
+              </button>
+            </>
           )}
 
-          {/* Session log */}
-          <div className="border-t border-phosphor-dim pt-3">
-            <div className="text-xs tracking-widest text-amber-term font-display mb-2">
-              ─── SESSION LOG ──────────────────────────
-            </div>
-            <div className="space-y-1 text-[11px] font-mono text-phosphor-dim">
-              <div className="term-stream">
-                [{bootStamp}] attempt from {typeof window !== 'undefined' ? window.location.hostname : '127.0.0.1'}
-              </div>
-              <div className="term-stream">
-                [{bootStamp}] awaiting credentials<span className="cursor-blink" />
-              </div>
-              {latestLog && (
-                <div className="term-stream animate-slide-up text-phosphor">
-                  {latestLog}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Footer status strip */}
-          <div className="flex items-center justify-between text-[10px] tracking-widest text-phosphor-dim border-t border-phosphor-dim pt-2">
-            <div className="flex items-center gap-2">
-              <span className="status-pill">
-                <span className="pulse-dot" />
-                SECURE
-              </span>
-              <span className="status-pill amber">
-                <span className="pulse-dot amber" />
-                TLS 1.3
-              </span>
-            </div>
-            <span>v2.0 // {bootStamp}</span>
-          </div>
-
+          {/* Footer switch link */}
+          {!isForgotPassword && (
+            <p className="text-sm text-space-300 text-center mt-6">
+              {isLogin ? "Don't have an account? " : 'Already have an account? '}
+              <button
+                type="button"
+                onClick={() => { setIsLogin(!isLogin); setErrorMsg(null); }}
+                className="text-electric hover:text-electric-bright font-medium transition-colors"
+              >
+                {isLogin ? 'Sign up free →' : 'Sign in →'}
+              </button>
+            </p>
+          )}
         </div>
       </div>
-    </div>
     </>
   );
 };
