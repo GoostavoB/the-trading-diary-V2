@@ -22,18 +22,20 @@ export const useOnboarding = () => {
         .from('user_settings')
         .select('onboarding_completed')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error checking onboarding status:', error);
+        setShowOnboarding(true);
         setLoading(false);
         return;
       }
 
-      // Show onboarding if not completed
+      // No row => user is not onboarded. Show onboarding if not completed.
       setShowOnboarding(!data?.onboarding_completed);
     } catch (error) {
       console.error('Error in checkOnboardingStatus:', error);
+      setShowOnboarding(true);
     } finally {
       setLoading(false);
     }

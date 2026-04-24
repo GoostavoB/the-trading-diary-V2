@@ -61,11 +61,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 
     // Check for existing session with automatic refresh
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+      })
+      .catch((err) => {
+        console.error('[Auth] getSession failed', err);
+      })
+      .finally(() => setLoading(false));
 
     // Set up periodic session check (every 5 minutes)
     const sessionCheckInterval = setInterval(async () => {

@@ -79,6 +79,10 @@ export const useUserSettings = () => {
   useEffect(() => {
     if (user && activeSubAccount) {
       loadSettings();
+    } else {
+      // No user, or user has no active sub-account yet (fresh account).
+      // Ensure loading never hangs indefinitely — keep defaults.
+      setLoading(false);
     }
   }, [user, activeSubAccount]);
 

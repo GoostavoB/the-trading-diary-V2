@@ -1,5 +1,3 @@
-import { CheckCircle2 } from "lucide-react";
-import { motion } from "framer-motion";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export const WhyImprove = () => {
@@ -7,61 +5,92 @@ export const WhyImprove = () => {
 
   const benefits = [
     {
-      title: t('landing.whyImprove.benefit1.title', 'You reduce repeated errors'),
-      description: t('landing.whyImprove.benefit1.description', 'Tag mistakes and watch them decline over time.'),
+      id: "01",
+      glyph: "[>]",
+      title: t("landing.whyImprove.benefit1.title", "You reduce repeated errors"),
+      description: t("landing.whyImprove.benefit1.description", "Tag mistakes and watch them decline over time."),
+      status: "TRACKED",
     },
     {
-      title: t('landing.whyImprove.benefit2.title', 'You make calmer decisions'),
-      description: t('landing.whyImprove.benefit2.description', 'Track emotional trades and improve control.'),
+      id: "02",
+      glyph: "[~]",
+      title: t("landing.whyImprove.benefit2.title", "You make calmer decisions"),
+      description: t("landing.whyImprove.benefit2.description", "Track emotional trades and improve control."),
+      status: "STABLE",
     },
     {
-      title: t('landing.whyImprove.benefit3.title', 'You build skill through daily review'),
-      description: t('landing.whyImprove.benefit3.description', 'See what works and refine your process.'),
+      id: "03",
+      glyph: "[+]",
+      title: t("landing.whyImprove.benefit3.title", "You build skill through daily review"),
+      description: t("landing.whyImprove.benefit3.description", "See what works and refine your process."),
+      status: "ACTIVE",
     },
     {
-      title: t('landing.whyImprove.benefit4.title', 'You find patterns faster'),
-      description: t('landing.whyImprove.benefit4.description', 'Spot changes in setups, conditions, and timing.'),
+      id: "04",
+      glyph: "[#]",
+      title: t("landing.whyImprove.benefit4.title", "You find patterns faster"),
+      description: t("landing.whyImprove.benefit4.description", "Spot changes in setups, conditions, and timing."),
+      status: "SIGNAL",
     },
   ];
 
   return (
-    <section className="py-20 md:py-28 px-6 bg-gradient-to-b from-black/0 via-primary/5 to-black/0" aria-labelledby="why-improve-heading">
-      <div className="container mx-auto max-w-4xl">
-        <motion.header
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-          className="text-center mb-16 space-y-4"
-        >
-          <h2 id="why-improve-heading" className="text-3xl md:text-4xl font-bold leading-tight">
-            {t('landing.whyImprove.header', 'A Simple System That Improves Your Trading Decisions')}
+    <section
+      className="py-20 md:py-28 px-3 md:px-6"
+      aria-labelledby="why-improve-heading"
+    >
+      <div className="container mx-auto max-w-5xl">
+        {/* Header */}
+        <header className="mb-12">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="font-mono text-[11px] tracking-[0.16em] uppercase text-amber-term">
+              why_improve.md
+            </span>
+            <span className="status-pill amber">[ ready ]</span>
+            <div className="flex-1 border-b border-dashed border-phosphor/30" />
+          </div>
+          <h2
+            id="why-improve-heading"
+            className="font-display text-3xl md:text-4xl text-phosphor glow-text tracking-tight"
+          >
+            &gt; A SIMPLE SYSTEM. <span className="text-amber-term glow-text-amber">BETTER DECISIONS.</span>
           </h2>
-        </motion.header>
+          <p className="font-mono text-sm text-phosphor-dim mt-3 max-w-2xl">
+            // four feedback loops. compounding output. zero guesswork.
+          </p>
+        </header>
 
-        <div className="space-y-8" role="list">
-          {benefits.map((benefit, index) => (
-            <motion.div
-              key={index}
+        {/* Benefits list */}
+        <div className="grid md:grid-cols-2 gap-4" role="list">
+          {benefits.map((b) => (
+            <div
+              key={b.id}
               role="listitem"
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="flex gap-4 items-start group"
+              className="term-card term-bracket group relative"
             >
-              <div className="flex-shrink-0 mt-1">
-                <CheckCircle2 className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="font-mono text-amber-term glow-text-amber text-lg leading-none">
+                    {b.glyph}
+                  </div>
+                  <div className="font-mono text-[10px] tracking-[0.14em] text-phosphor-dim mt-2">
+                    {b.id}
+                  </div>
+                </div>
+
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-display text-base md:text-lg text-phosphor tracking-tight leading-snug uppercase">
+                      {b.title}
+                    </h3>
+                    <span className="status-pill shrink-0 hidden sm:inline-flex">{b.status}</span>
+                  </div>
+                  <p className="font-mono text-sm text-phosphor-dim leading-relaxed">
+                    &gt; {b.description}
+                  </p>
+                </div>
               </div>
-              <div className="space-y-2">
-                <h3 className="text-lg md:text-xl font-semibold text-foreground">
-                  {benefit.title}
-                </h3>
-                <p className="text-base text-muted-foreground leading-relaxed">
-                  {benefit.description}
-                </p>
-              </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

@@ -35,7 +35,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black">
+    <div className="min-h-screen bg-void text-phosphor font-mono">
       <HreflangLinks languages={[...SUPPORTED_LANGUAGES]} defaultLanguage="en" />
       <Helmet>
         <title>{meta.title}</title>

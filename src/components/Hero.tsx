@@ -1,247 +1,336 @@
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Expand, ArrowRight, Zap, Shield, TrendingUp, Star } from "lucide-react";
-import dashboardScreenshot from "@/assets/dashboard-screenshot-new.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const STATS = [
-  { value: "47,000+", label: "Trades tracked" },
-  { value: "98%", label: "Uptime" },
-  { value: "4.9★", label: "Rating" },
+const TERMINAL_LINES: { tone: "prompt" | "ok" | "warn" | "err" | "dim"; text: string }[] = [
+  { tone: "prompt", text: "./import --from=binance --last=7d" },
+  { tone: "ok",     text: "✓ 47,238 trades synced" },
+  { tone: "ok",     text: "✓ 142 setups classified" },
+  { tone: "prompt", text: "./analyze --mode=deep" },
+  { tone: "warn",   text: "⚠ 3 revenge-trade patterns detected" },
+  { tone: "warn",   text: "⚠ avg hold time after loss: 0.8x avg hold after win" },
+  { tone: "ok",     text: "✓ edge concentrated on: 10-14 UTC · BTC/ETH · breakout-retest" },
+  { tone: "dim",    text: "// ready. awaiting operator input_" },
 ];
 
-const BADGES = [
-  { icon: Zap, text: "AI-powered analysis" },
-  { icon: Shield, text: "Privacy first" },
-  { icon: TrendingUp, text: "Real-time data" },
+const HUD_STATS = [
+  { label: "TRADES INDEXED",  value: "47,238.00", unit: "records" },
+  { label: "OPERATORS LIVE",  value: "12,491",    unit: "sessions" },
+  { label: "UPTIME",          value: "99.97%",    unit: "rolling 30d" },
 ];
 
 const Hero = () => {
   const navigate = useNavigate();
-  const { t, isLoading } = useTranslation();
-  const [isImageOpen, setIsImageOpen] = useState(false);
+  const { isLoading } = useTranslation();
+
+  // Fake uptime ticker for the tmux status line
+  const [uptime, setUptime] = useState(42);
+  useEffect(() => {
+    const id = setInterval(() => setUptime((u) => u + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   if (isLoading) return null;
 
+  const formatUptime = (s: number) => {
+    const hh = String(Math.floor(s / 3600)).padStart(2, "0");
+    const mm = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+    const ss = String(s % 60).padStart(2, "0");
+    return `${hh}:${mm}:${ss}`;
+  };
+
   return (
     <section
-      className="relative min-h-screen flex items-center px-6 pt-24 pb-32 overflow-hidden"
+      className="relative min-h-screen flex items-stretch px-3 md:px-6 pt-6 pb-16 overflow-hidden"
       aria-labelledby="hero-title"
     >
-      {/* ── Ambient orbs ── */}
-      <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, hsl(36 100% 50% / 0.07) 0%, transparent 70%)' }} />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, hsl(210 90% 58% / 0.06) 0%, transparent 70%)' }} />
-      <div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[800px] h-[300px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, hsl(142 70% 50% / 0.03) 0%, transparent 70%)' }} />
+      {/* phosphor grid bg accent (layered on top of the global one) */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-30"
+        style={{
+          backgroundImage:
+            "linear-gradient(hsl(var(--phosphor)/0.05) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--phosphor)/0.05) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
+        }}
+      />
 
-      {/* ── Main grid ── */}
-      <div className="container mx-auto max-w-7xl relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      {/* The terminal "screen" */}
+      <div className="container relative mx-auto max-w-7xl z-10">
+        <div className="scanlines animate-flicker border border-phosphor/40 bg-carbon/80 shadow-[0_0_40px_hsl(var(--phosphor)/0.12),inset_0_0_0_1px_hsl(var(--phosphor)/0.2)]">
 
-          {/* LEFT — Text content */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-8"
-          >
-            {/* Floating badge */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="inline-flex"
-            >
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold
-                bg-primary/10 border border-primary/25 text-primary
-                shadow-[0_0_20px_-4px_hsl(36_100%_50%/0.3)]">
-                <Star className="h-3 w-3 fill-primary" />
-                The #1 Crypto Trading Journal
-                <span className="h-1 w-1 rounded-full bg-primary/60" />
-                Free to start
-              </span>
-            </motion.div>
+          {/* ── tmux status line ── */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-3 md:px-4 py-2 bg-phosphor/10 border-b border-phosphor/30 text-[11px] tracking-[0.12em] uppercase text-phosphor-dim">
+            <span className="text-phosphor glow-text">~/the-trading-diary</span>
+            <span className="hidden sm:inline text-phosphor-dim">|</span>
+            <span>SESSION: <span className="text-amber-term">guest@terminal</span></span>
+            <span className="hidden md:inline text-phosphor-dim">|</span>
+            <span className="hidden md:inline">UPTIME: <span className="text-phosphor">{formatUptime(uptime)}</span></span>
+            <span className="hidden md:inline text-phosphor-dim">|</span>
+            <span className="inline-flex items-center gap-2">
+              <span className="pulse-dot" />
+              <span>CONN: OK</span>
+            </span>
+            <span className="ml-auto inline-flex items-center gap-2">
+              <span className="pulse-dot amber" />
+              <span className="text-amber-term">MARKET: LIVE</span>
+            </span>
+          </div>
 
-            {/* Headline */}
-            <div className="space-y-2">
-              <h1
-                id="hero-title"
-                className="text-[clamp(40px,5.5vw,64px)] font-black leading-[1.05] tracking-tight"
-              >
-                <span className="text-gradient-white">
-                  {t('landing.hero.mainTitle', 'Track Every Trade.')}
+          {/* ── main body ── */}
+          <div className="relative p-5 md:p-10 grid lg:grid-cols-[1.2fr_1fr] gap-8 lg:gap-12">
+
+            {/* Background scan beam */}
+            <div className="scan-bar absolute inset-0 pointer-events-none" />
+
+            {/* LEFT — headline + stream + CTA */}
+            <div className="space-y-8 relative">
+
+              {/* Status pills */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="status-pill">
+                  <span className="pulse-dot" />
+                  v2.6 // TERMINAL BUILD
                 </span>
-              </h1>
-              <h1
-                className="text-[clamp(40px,5.5vw,64px)] font-black leading-[1.05] tracking-tight"
-              >
-                <span className="text-gradient-primary">
-                  Grow Every Day.
+                <span className="status-pill amber">
+                  <span className="pulse-dot amber" />
+                  NO_CREDIT_CARD
                 </span>
-              </h1>
-            </div>
-
-            {/* Subtitle */}
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-xl">
-              {t('landing.hero.subtitle',
-                'AI-powered crypto trading journal. Track, analyze, and improve every trade with real data — not guesswork.'
-              )}
-            </p>
-
-            {/* Feature badges */}
-            <div className="flex flex-wrap gap-2">
-              {BADGES.map(({ icon: Icon, text }) => (
-                <span key={text} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg
-                  text-xs font-medium text-muted-foreground
-                  bg-white/[0.04] border border-white/8 backdrop-blur-sm">
-                  <Icon className="h-3 w-3 text-primary/70" />
-                  {text}
-                </span>
-              ))}
-            </div>
-
-            {/* CTA */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2">
-              <Button
-                onClick={() => navigate('/auth')}
-                size="lg"
-                className="group relative h-13 px-8 text-base font-bold rounded-xl overflow-hidden
-                  bg-primary hover:bg-primary/90 transition-all duration-300
-                  shadow-[0_0_30px_-6px_hsl(36_100%_50%/0.5)]
-                  hover:shadow-[0_0_40px_-4px_hsl(36_100%_50%/0.7)]"
-                aria-label="Start using The Trading Diary for free"
-              >
-                {/* shine sweep */}
-                <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full
-                  bg-gradient-to-r from-transparent via-white/20 to-transparent
-                  transition-transform duration-700 ease-in-out pointer-events-none" />
-                {t('landing.hero.ctaPrimary', 'Get Started Free')}
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <span className="text-xs text-muted-foreground/60">
-                No credit card · Free forever plan
-              </span>
-            </div>
-
-            {/* Stats row */}
-            <div className="flex items-center gap-6 pt-2 border-t border-white/8">
-              {STATS.map(({ value, label }, i) => (
-                <div key={label} className="flex flex-col">
-                  <span className="text-xl font-black text-gradient-primary">{value}</span>
-                  <span className="text-[11px] text-muted-foreground/60 uppercase tracking-wider">{label}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* RIGHT — Dashboard preview */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative"
-          >
-            {/* Glow behind the mockup */}
-            <div className="absolute -inset-6 rounded-3xl pointer-events-none"
-              style={{ background: 'radial-gradient(ellipse at center, hsl(36 100% 50% / 0.12) 0%, transparent 70%)' }} />
-
-            {/* Browser frame */}
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl
-              border border-white/12
-              shadow-[0_30px_100px_-20px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.06)]">
-              {/* Browser chrome */}
-              <div className="bg-[hsl(220_15%_9%)] px-4 py-3 flex items-center gap-2 border-b border-white/8">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
-                  <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
-                  <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
-                </div>
-                <div className="flex-1 mx-4 bg-white/5 border border-white/8 rounded-md px-3 py-1 text-xs text-muted-foreground/60 font-mono">
-                  🔒 thetradingdiary.com/dashboard
-                </div>
+                <span className="status-pill cyan">CRYPTO_PERP_READY</span>
               </div>
 
-              {/* Dashboard screenshot */}
-              <Dialog open={isImageOpen} onOpenChange={setIsImageOpen}>
-                <DialogTrigger asChild>
-                  <button
-                    className="aspect-[16/10] bg-[hsl(220_15%_6%)] relative overflow-hidden cursor-pointer group w-full
-                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                    aria-label="View full dashboard screenshot"
-                  >
-                    <img
-                      src={dashboardScreenshot}
-                      alt="Trading Dashboard showing real-time analytics, win rate, ROI, and capital growth charts"
-                      className="w-full h-full object-contain object-center"
-                      width={1920}
-                      height={1200}
-                      loading="eager"
-                    />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                      <div className="p-4 rounded-full bg-primary/90 backdrop-blur-sm shadow-lg">
-                        <Expand className="h-6 w-6 text-primary-foreground" aria-hidden="true" />
+              {/* Main headline — chromatic, flickering */}
+              <div className="space-y-3">
+                <h1
+                  id="hero-title"
+                  className="font-display text-4xl md:text-6xl lg:text-7xl leading-[1.02] tracking-tight text-phosphor chromatic"
+                >
+                  TRADE LOG:
+                  <br />
+                  <span className="text-amber-term glow-text-amber">ONLINE.</span>
+                </h1>
+                <p className="font-mono text-[13px] md:text-sm text-phosphor whitespace-nowrap overflow-hidden">
+                  <span className="text-amber-term">$</span>{" "}
+                  <span className="type-reveal inline-block align-middle">initialize --track-every-trade</span>
+                </p>
+                <p className="font-mono text-sm md:text-base text-phosphor-dim max-w-xl leading-relaxed">
+                  // Built for crypto perp traders who need actual answers,<br />
+                  // not prettier charts. Import, classify, expose leaks.
+                </p>
+              </div>
+
+              {/* fake live terminal session */}
+              <div className="term-card term-bracket relative !p-0 overflow-hidden">
+                <div className="term-header">
+                  <span>session.log</span>
+                  <span className="ml-auto text-phosphor-dim text-[10px]">read-only</span>
+                </div>
+                <div className="term-stream p-4 md:p-5 space-y-1.5">
+                  {TERMINAL_LINES.map((line, i) => {
+                    const delay =
+                      i === 0 ? "" :
+                      i === 1 ? "delay-100" :
+                      i === 2 ? "delay-200" :
+                      i === 3 ? "delay-300" :
+                      i === 4 ? "delay-400" :
+                      "delay-500";
+                    return (
+                      <div
+                        key={i}
+                        className={`animate-fade-in opacity-0 ${delay}`}
+                        style={{ animationDelay: `${i * 180}ms` }}
+                      >
+                        {line.tone === "prompt" ? (
+                          <>
+                            <span className="prompt" />
+                            <span className="ok">{line.text}</span>
+                          </>
+                        ) : (
+                          <span className={line.tone}>{"  "}{line.text}</span>
+                        )}
                       </div>
-                    </div>
-                    {/* Bottom fade */}
-                    <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[hsl(220_15%_6%)] to-transparent pointer-events-none" />
-                  </button>
-                </DialogTrigger>
-                <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden">
-                  <div className="relative w-full h-full flex items-center justify-center bg-background/95 backdrop-blur-xl p-4">
-                    <img
-                      src={dashboardScreenshot}
-                      alt="Full Trading Dashboard"
-                      className="max-w-full max-h-[90vh] object-contain rounded-lg"
-                      width={1920}
-                      height={1200}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-                </DialogContent>
-              </Dialog>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                <button
+                  onClick={() => navigate("/auth")}
+                  className="btn-term animate-pulse-glow"
+                  aria-label="Execute — boot session into The Trading Diary"
+                >
+                  EXECUTE
+                </button>
+                <button
+                  onClick={() => {
+                    const el = document.getElementById("core-features-heading");
+                    el?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="btn-term btn-term-amber"
+                  aria-label="Read the feature docs"
+                >
+                  READ DOCS
+                </button>
+                <span className="font-mono text-[11px] text-phosphor-dim tracking-wider">
+                  &gt; no_credit_card · free_forever_tier
+                </span>
+              </div>
             </div>
 
-            {/* Floating stat card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="absolute -bottom-4 -left-4 hidden lg:block"
-            >
-              <div className="px-4 py-3 rounded-xl border border-white/12 backdrop-blur-xl
-                bg-card/90 shadow-xl space-y-0.5">
-                <div className="text-[10px] text-muted-foreground/60 uppercase tracking-wider font-semibold">
-                  Win Rate
-                </div>
-                <div className="text-2xl font-black text-gradient-green">68.4%</div>
-                <div className="text-[10px] text-emerald-400 font-semibold">▲ +3.2% this month</div>
-              </div>
-            </motion.div>
+            {/* RIGHT — oscilloscope + HUD stats */}
+            <div className="space-y-6 relative">
 
-            {/* Floating ROI card */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.65 }}
-              className="absolute -top-4 -right-4 hidden lg:block"
-            >
-              <div className="px-4 py-3 rounded-xl border border-primary/20 backdrop-blur-xl
-                bg-card/90 shadow-xl
-                shadow-[0_0_20px_-4px_hsl(36_100%_50%/0.2)] space-y-0.5">
-                <div className="text-[10px] text-muted-foreground/60 uppercase tracking-wider font-semibold">
-                  Total ROI
+              {/* Oscilloscope card */}
+              <div className="hud-panel hud-corners relative overflow-hidden">
+                <span className="hud-c tl" />
+                <span className="hud-c tr" />
+                <span className="hud-c bl" />
+                <span className="hud-c br" />
+
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-phosphor-dim">
+                    BTCUSDT.P // 15m
+                  </span>
+                  <span className="status-pill">
+                    <span className="pulse-dot" />
+                    LIVE
+                  </span>
                 </div>
-                <div className="text-2xl font-black text-gradient-primary">+142%</div>
-                <div className="text-[10px] text-primary/80 font-semibold">Last 90 days</div>
+
+                <svg
+                  viewBox="0 0 400 140"
+                  className="w-full h-32 md:h-40"
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <linearGradient id="oscFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(var(--phosphor))" stopOpacity="0.35" />
+                      <stop offset="100%" stopColor="hsl(var(--phosphor))" stopOpacity="0" />
+                    </linearGradient>
+                    <filter id="oscGlow">
+                      <feGaussianBlur stdDeviation="1.2" />
+                    </filter>
+                  </defs>
+                  {/* grid */}
+                  {[0.2, 0.4, 0.6, 0.8].map((y, i) => (
+                    <line
+                      key={i}
+                      x1="0"
+                      x2="400"
+                      y1={140 * y}
+                      y2={140 * y}
+                      stroke="hsl(var(--phosphor))"
+                      strokeOpacity="0.08"
+                    />
+                  ))}
+                  {[0.25, 0.5, 0.75].map((x, i) => (
+                    <line
+                      key={`v${i}`}
+                      y1="0"
+                      y2="140"
+                      x1={400 * x}
+                      x2={400 * x}
+                      stroke="hsl(var(--phosphor))"
+                      strokeOpacity="0.08"
+                    />
+                  ))}
+                  {/* waveform fill */}
+                  <path
+                    d="M0,90 L20,85 L40,92 L60,70 L80,78 L100,60 L120,65 L140,48 L160,55 L180,38 L200,50 L220,32 L240,44 L260,28 L280,42 L300,22 L320,36 L340,18 L360,28 L380,14 L400,24 L400,140 L0,140 Z"
+                    fill="url(#oscFill)"
+                  />
+                  {/* waveform line */}
+                  <path
+                    d="M0,90 L20,85 L40,92 L60,70 L80,78 L100,60 L120,65 L140,48 L160,55 L180,38 L200,50 L220,32 L240,44 L260,28 L280,42 L300,22 L320,36 L340,18 L360,28 L380,14 L400,24"
+                    fill="none"
+                    stroke="hsl(var(--phosphor))"
+                    strokeWidth="1.5"
+                    filter="url(#oscGlow)"
+                  />
+                  {/* latest price dot */}
+                  <circle cx="400" cy="24" r="3" fill="hsl(var(--amber))" />
+                  <circle cx="400" cy="24" r="7" fill="none" stroke="hsl(var(--amber))" strokeOpacity="0.6">
+                    <animate attributeName="r" from="3" to="12" dur="1.6s" repeatCount="indefinite" />
+                    <animate attributeName="stroke-opacity" from="0.7" to="0" dur="1.6s" repeatCount="indefinite" />
+                  </circle>
+                </svg>
+
+                <div className="grid grid-cols-3 gap-2 mt-3 text-[10px] md:text-xs font-mono uppercase tracking-[0.1em]">
+                  <div>
+                    <div className="text-phosphor-dim">LAST</div>
+                    <div className="text-phosphor glow-text">68,412.50</div>
+                  </div>
+                  <div>
+                    <div className="text-phosphor-dim">Δ 24H</div>
+                    <div className="text-phosphor glow-text">+2.14%</div>
+                  </div>
+                  <div>
+                    <div className="text-phosphor-dim">VOL</div>
+                    <div className="text-amber-term glow-text-amber">1.24B</div>
+                  </div>
+                </div>
               </div>
-            </motion.div>
-          </motion.div>
+
+              {/* HUD stats row */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {HUD_STATS.map((s) => (
+                  <div key={s.label} className="hud-panel hud-corners">
+                    <span className="hud-c tl" />
+                    <span className="hud-c tr" />
+                    <span className="hud-c bl" />
+                    <span className="hud-c br" />
+                    <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-phosphor-dim mb-1">
+                      {s.label}
+                    </div>
+                    <div className="font-display text-2xl text-phosphor glow-text">
+                      {s.value}
+                    </div>
+                    <div className="font-mono text-[10px] text-phosphor-dim mt-0.5">
+                      // {s.unit}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* ASCII art bull */}
+              <div className="term-card term-bracket">
+                <div className="flex items-start gap-3">
+                  <pre className="font-mono text-[9px] md:text-[10px] leading-[1.1] text-phosphor glow-text whitespace-pre">
+{`   /|       |\\
+  /_|_______|_\\
+ (   \\_o  o_/   )
+  \\    (  )    /
+   \\__/    \\__/
+      ||  ||
+      ||  ||
+      ^^  ^^`}
+                  </pre>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-amber-term mb-1">
+                      BULL.ASCII
+                    </div>
+                    <div className="font-mono text-[11px] text-phosphor-dim leading-relaxed">
+                      // edge is not a vibe.<br />
+                      // it is a measurement.<br />
+                      // log → review → iterate.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* bottom status bar */}
+          <div className="border-t border-phosphor/30 bg-phosphor/5 px-3 md:px-4 py-2 flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-mono uppercase tracking-[0.14em] text-phosphor-dim">
+            <span>BUF: 0% used</span>
+            <span className="text-phosphor-dim">|</span>
+            <span>PID: 00042</span>
+            <span className="text-phosphor-dim">|</span>
+            <span>LAT: 12ms</span>
+            <span className="text-phosphor-dim">|</span>
+            <span className="text-phosphor">READY_FOR_INPUT<span className="cursor-blink" /></span>
+          </div>
         </div>
       </div>
     </section>

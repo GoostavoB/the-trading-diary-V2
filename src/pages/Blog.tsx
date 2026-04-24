@@ -1,18 +1,13 @@
-import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Link, useParams } from 'react-router-dom';
 import { MobileHeader } from '@/components/MobileHeader';
 import Footer from '@/components/Footer';
 import { SkipToContent } from '@/components/SkipToContent';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, User, Search } from 'lucide-react';
 import { getArticlesByLanguage } from '@/data/blogArticles';
 import { fetchArticlesByLanguage } from '@/services/blogService';
 import { useTranslation } from '@/hooks/useTranslation';
 import { SEO } from '@/components/SEO';
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { preloadImages } from '@/utils/preloadStrategies';
 import { SUPPORTED_LANGUAGES, getLocalizedPath, getLanguageFromPath, type SupportedLanguage } from '@/utils/languageRouting';
 import { useLocation } from 'react-router-dom';
@@ -82,8 +77,23 @@ const Blog = () => {
     }
   }, [filteredArticles]);
 
+  const formatLogDate = (iso: string) => {
+    try {
+      const d = new Date(iso);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    } catch {
+      return iso;
+    }
+  };
+
+  const slugifyCat = (c: string) =>
+    c.toUpperCase().replace(/\s+/g, '-').replace(/[^A-Z0-9-]/g, '');
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black">
+    <div className="min-h-screen bg-void text-phosphor">
       <SEO
         title='Crypto Trading Blog | AI Tools, Strategies & Tips'
         description='Expert insights on crypto trading, AI-powered tools, trading psychology, risk management, and data-driven strategies. Learn from proven trading techniques.'
@@ -94,93 +104,223 @@ const Blog = () => {
       <MobileHeader />
 
       <main id="main-content" className="pt-20 pb-16 px-4">
-        <div className="max-w-5xl mx-auto space-y-8">
-          <div className="text-center space-y-3">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+        <div className="max-w-6xl mx-auto">
+          {/* Sticky terminal bar */}
+          <div className="term-header sticky top-20 z-20 mb-6 flex flex-wrap items-center justify-between gap-3">
+            <span className="text-phosphor font-mono text-xs sm:text-sm">
+              ./blog --sort=recent --filter={selectedCategory} --lang={currentLang}
+            </span>
+            <span className="flex items-center gap-2">
+              <span className={`pulse-dot ${isLoading ? 'amber' : ''}`} />
+              <span className={`status-pill ${isLoading ? 'amber' : ''}`}>
+                {isLoading ? '[LOADING]' : '[READY]'}
+              </span>
+            </span>
+          </div>
+
+          {/* Scan bar beneath header */}
+          <div className="scan-bar h-[2px] mb-8" />
+
+          {/* Title banner */}
+          <div className="mb-8 animate-fade-in">
+            <h1
+              className="font-display uppercase text-4xl sm:text-5xl tracking-wider glow-text glitch"
+              data-text={t('blog.title', 'Crypto Trading Blog')}
+            >
               {t('blog.title', 'Crypto Trading Blog')}
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-phosphor-dim font-mono text-sm mt-3">
+              <span className="text-amber-term">// </span>
               {t('blog.subtitle', 'Expert insights on AI-powered trading')}
             </p>
           </div>
 
-          {/* Search and Filter */}
-          <div className="space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder={t('blog.searchPlaceholder', 'Search articles...')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category === 'all' ? t('blog.allArticles', 'All Articles') : category}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Articles Count */}
-          <p className="text-sm text-muted-foreground">
-            {isLoading
-              ? 'Loading articles...'
-              : `Showing ${filteredArticles.length} ${filteredArticles.length === 1 ? 'article' : 'articles'}`}
-          </p>
-
-          <div className="grid gap-6">
-            {isLoading && (
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-32 rounded-lg bg-muted/40 animate-pulse" />
-              ))
-            )}
-            {!isLoading && filteredArticles.map((article) => (
-              <Link to={getLocalizedPath(`/blog/${article.slug}`, currentLang)} key={article.slug}>
-                <PremiumCard className="p-6 bg-card border-border hover:border-primary/50 transition-all duration-300 cursor-pointer group hover:shadow-lg">
-                  <div className="flex items-start justify-between gap-4 mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="secondary" className="text-xs">
-                          {article.category}
-                        </Badge>
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {new Date(article.date).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric'
-                            })}
+          {/* Grid: sidebar + log */}
+          <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
+            {/* Sidebar: categories + grep */}
+            <aside className="space-y-6">
+              <div className="term-card p-0 overflow-hidden">
+                <div className="term-header text-xs">CATEGORIES</div>
+                <ul className="py-2 font-mono text-sm">
+                  {categories.map((category) => {
+                    const active = selectedCategory === category;
+                    return (
+                      <li key={category}>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedCategory(category)}
+                          className={[
+                            'w-full text-left px-3 py-1.5 flex items-center gap-2',
+                            'transition-colors duration-150',
+                            active
+                              ? 'text-amber-term glow-text-amber'
+                              : 'text-phosphor-dim hover:text-phosphor hover:bg-phosphor-dim',
+                          ].join(' ')}
+                        >
+                          <span className={active ? 'text-amber-term' : 'opacity-40'}>
+                            {active ? '▸' : ' '}
                           </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {article.readTime}
+                          <span className="truncate">
+                            {category === 'all'
+                              ? t('blog.allArticles', 'all')
+                              : category.toLowerCase()}
                           </span>
-                          <span className="flex items-center gap-1">
-                            <User className="w-3 h-3" />
-                            {article.author}
-                          </span>
-                        </div>
-                      </div>
-                      <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">
-                        {article.title}
-                      </h2>
-                      <p className="text-muted-foreground line-clamp-2">{article.description}</p>
-                    </div>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+
+              {/* grep input */}
+              <div className="term-card p-0 overflow-hidden">
+                <div className="term-header text-xs">SEARCH</div>
+                <div className="p-3">
+                  <label className="flex items-center gap-2 text-xs font-mono">
+                    <span className="text-amber-term">&#10071; grep</span>
+                  </label>
+                  <div className="mt-2 flex items-center gap-1">
+                    <span className="text-phosphor-dim font-mono">&gt;</span>
+                    <input
+                      type="search"
+                      placeholder="pattern..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full bg-carbon border border-phosphor-dim text-phosphor font-mono px-2 py-1 text-sm outline-none focus:border-phosphor focus:shadow-phosphor placeholder:text-phosphor-dim"
+                    />
                   </div>
-                </PremiumCard>
-              </Link>
-            ))}
+                </div>
+              </div>
+
+              {/* Stats panel */}
+              <div className="hud-panel p-4 font-mono text-xs">
+                <div className="text-phosphor-dim">ENTRIES</div>
+                <div className="text-2xl text-phosphor glow-text mt-1">
+                  {String(filteredArticles.length).padStart(3, '0')}
+                </div>
+                <div className="mt-3 text-phosphor-dim">
+                  TOTAL: <span className="text-cyan-term">{languageArticles.length}</span>
+                </div>
+                <div className="text-phosphor-dim">
+                  LANG: <span className="text-cyan-term uppercase">{currentLang}</span>
+                </div>
+              </div>
+            </aside>
+
+            {/* Log list */}
+            <section>
+              <div className="mb-4 font-mono text-xs text-phosphor-dim flex items-center gap-2">
+                <span className="text-amber-term">$</span>
+                <span className="cursor-blink">
+                  cat ./posts/*.md | filter --cat={selectedCategory}
+                  {searchQuery ? ` --grep="${searchQuery}"` : ''}
+                </span>
+              </div>
+
+              <div className="term-card p-0 overflow-hidden">
+                <div className="term-header flex items-center justify-between">
+                  <span>posts.log</span>
+                  <span className="text-phosphor-dim">
+                    {isLoading
+                      ? 'loading...'
+                      : `${filteredArticles.length} ${filteredArticles.length === 1 ? 'entry' : 'entries'}`}
+                  </span>
+                </div>
+
+                <div className="p-2 sm:p-4 font-mono text-sm">
+                  {isLoading && (
+                    <div className="space-y-4 py-4">
+                      {Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} className="space-y-2 animate-pulse">
+                          <div className="h-3 w-3/4 bg-phosphor-dim" />
+                          <div className="h-2 w-1/2 bg-phosphor-dim opacity-50" />
+                          <div className="border-t border-phosphor-dim/30" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {!isLoading && filteredArticles.length === 0 && (
+                    <div className="py-10 text-center text-phosphor-dim">
+                      <span className="text-danger">!</span> no entries match current filter
+                      <div className="mt-2 text-xs">
+                        try: <span className="text-cyan-term">clear</span> or adjust --filter
+                      </div>
+                    </div>
+                  )}
+
+                  {!isLoading && filteredArticles.map((article, idx) => {
+                    const date = formatLogDate(article.date);
+                    const cat = slugifyCat(article.category);
+                    return (
+                      <div key={article.slug}>
+                        <Link
+                          to={getLocalizedPath(`/blog/${article.slug}`, currentLang)}
+                          className="group block py-4 px-2 sm:px-3 hover:bg-phosphor-dim transition-colors duration-150 relative"
+                        >
+                          {/* Meta line */}
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-phosphor-dim">
+                            <span className="text-amber-term">[{date}]</span>
+                            <span className="text-cyan-term">CAT_{cat}</span>
+                            <span className="text-phosphor-dim">&#9474;</span>
+                            <span className="text-phosphor">{article.readTime}</span>
+                            <span className="text-phosphor-dim">&#9474;</span>
+                            <span className="text-phosphor-dim">
+                              by <span className="text-phosphor">{article.author}</span>
+                            </span>
+                          </div>
+
+                          {/* Title line */}
+                          <div className="mt-2 flex items-start gap-2">
+                            <span className="text-amber-term select-none">&gt;</span>
+                            <h2
+                              className="text-base sm:text-lg text-phosphor group-hover:text-amber-term group-hover:glow-text-amber transition-colors font-display uppercase tracking-wide glitch"
+                              data-text={article.title}
+                            >
+                              {article.title}
+                            </h2>
+                          </div>
+
+                          {/* Description */}
+                          <div className="mt-1 flex items-start gap-2 text-phosphor-dim">
+                            <span className="text-phosphor-dim select-none">//</span>
+                            <p className="line-clamp-2 text-sm">{article.description}</p>
+                          </div>
+
+                          {/* Tags */}
+                          {article.tags && article.tags.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-1 text-xs">
+                              {article.tags.slice(0, 5).map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="text-cyan-term before:content-['#'] before:opacity-60"
+                                >
+                                  {tag.replace(/\s+/g, '_').toLowerCase()}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Hover scan beam */}
+                          <span
+                            aria-hidden
+                            className="absolute inset-x-0 top-0 h-[1px] bg-phosphor opacity-0 group-hover:opacity-80 transition-opacity"
+                          />
+                        </Link>
+
+                        {idx < filteredArticles.length - 1 && (
+                          <div className="border-t border-dashed border-phosphor-dim/40" />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="term-header text-xs border-t-0">
+                  <span className="text-phosphor-dim">EOF</span>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
       </main>

@@ -1,5 +1,4 @@
-import { memo } from 'react';
-import { Wallet, TrendingUp, TrendingDown, Sparkles } from 'lucide-react';
+import { memo, useMemo } from 'react';
 import { formatPercent } from '@/utils/formatNumber';
 import { WidgetProps } from '@/types/widget';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -14,13 +13,10 @@ interface TotalBalanceWidgetProps extends WidgetProps {
 }
 
 /**
- * Total Balance Widget - Compact responsive design
+ * Total Balance Widget — rendered as an oscilloscope / P_L live scope.
+ * Metaphor: a CRT scope showing a live waveform of account value.
  */
 export const TotalBalanceWidget = memo(({
-  id,
-  isEditMode,
-  onRemove,
-  onExpand,
   totalBalance,
   change24h = 0,
   changePercent24h = 0,
@@ -29,61 +25,90 @@ export const TotalBalanceWidget = memo(({
   const { t } = useTranslation();
   const isPositive = change24h >= 0;
 
+  // Deterministic waveform based on balance/change
+  const points = useMemo(() => {
+    const n = 64;
+    const seed = Math.abs(totalBalance + change24h * 31) % 997 || 11;
+    const amp = change24h === 0 ? 0.15 : 0.75;
+    const bias = isPositive ? 1 : -1;
+    const pts: string[] = [];
+    for (let i = 0; i < n; i++) {
+      const x = (i / (n - 1)) * 100;
+      const t = (i + seed % 9) * 0.37;
+      const y =
+        50 -
+        bias * (i / n) * 8 * amp +  // slow drift
+        Math.sin(t) * 16 * amp +
+        Math.sin(t * 2.4 + seed) * 7 * amp +
+        Math.sin(t * 0.6) * 3;
+      pts.push(`${x.toFixed(2)},${Math.max(5, Math.min(95, y)).toFixed(2)}`);
+    }
+    return pts.join(' ');
+  }, [totalBalance, change24h, isPositive]);
+
+  const stroke = isPositive ? 'hsl(var(--phosphor))' : 'hsl(var(--danger))';
+
   return (
-    <div className="flex flex-col h-full p-3 gap-2 justify-center">
-      {/* Header Row */}
-      <div className="flex items-center gap-2 shrink-0">
-        <div className="p-1.5 rounded-lg bg-primary/10">
-          <Wallet className="h-3.5 w-3.5 text-primary" />
-        </div>
-        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide truncate">
-          {t('widgets.totalBalance.title')}
+    <div className="relative flex flex-col h-full scanlines overflow-hidden">
+      {/* Header bar */}
+      <div className="term-header shrink-0">
+        <span className="tracking-widest">BAL.LIVE // USD</span>
+        <span className={cn('pulse-dot ml-auto', isPositive ? '' : 'danger')} />
+        <span className="text-[10px] text-phosphor-dim tracking-widest">
+          {tradingDays > 0 ? `${tradingDays}D` : 'IDLE'}
         </span>
       </div>
 
-      {/* Main Balance Value */}
-      <div className="flex-1 flex items-center min-h-0">
-        <BlurredCurrency 
-          amount={totalBalance} 
-          className="text-2xl font-bold tracking-tight text-foreground truncate" 
-        />
-      </div>
-
-      {/* P&L Change Row */}
-      {(change24h !== 0 || changePercent24h !== 0) && (
-        <div className="flex items-center gap-2 shrink-0">
-          <div className={cn(
-            "flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium",
-            isPositive 
-              ? "bg-neon-green/10 text-neon-green" 
-              : "bg-neon-red/10 text-neon-red"
-          )}>
-            {isPositive ? (
-              <TrendingUp className="h-3 w-3" />
-            ) : (
-              <TrendingDown className="h-3 w-3" />
-            )}
-            <span className="tabular-nums">
-              {isPositive ? '+' : ''}{formatPercent(changePercent24h)}
-            </span>
-          </div>
-          <BlurredCurrency 
-            amount={Math.abs(change24h)} 
+      {/* Big number */}
+      <div className="flex-1 flex items-center justify-between px-3 min-h-0 gap-2">
+        <div className="flex flex-col gap-0.5 min-w-0">
+          <span className="text-[9px] text-phosphor-dim tracking-widest uppercase">
+            {t('widgets.totalBalance.title')}
+          </span>
+          <BlurredCurrency
+            amount={totalBalance}
             className={cn(
-              "text-xs font-medium",
-              isPositive ? "text-neon-green" : "text-neon-red"
+              'font-display text-2xl chromatic tabular-nums truncate',
+              isPositive ? 'glow-text' : 'glow-text-danger'
             )}
           />
+          {(change24h !== 0 || changePercent24h !== 0) && (
+            <div className="flex items-center gap-2 text-[10px] font-mono tabular-nums">
+              <span className={cn('status-pill', isPositive ? '' : 'danger')} style={{ fontSize: '0.58rem', padding: '0 0.35rem' }}>
+                {isPositive ? '+' : ''}{formatPercent(changePercent24h)}
+              </span>
+              <BlurredCurrency
+                amount={Math.abs(change24h)}
+                className={cn('text-xs', isPositive ? 'text-phosphor' : 'text-danger')}
+              />
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
-      {/* Trading days indicator */}
-      {tradingDays > 0 && (
-        <div className="flex items-center gap-1 text-[10px] text-muted-foreground shrink-0">
-          <Sparkles className="h-3 w-3 text-primary/60" />
-          <span>{tradingDays} trading days</span>
-        </div>
-      )}
+      {/* Oscilloscope readout */}
+      <div className="relative mx-2 mb-2 h-14 border border-phosphor-dim bg-void overflow-hidden shrink-0">
+        {/* grid */}
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full">
+          {[20, 40, 60, 80].map((y) => (
+            <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="hsl(var(--phosphor) / 0.1)" strokeWidth="0.25" strokeDasharray="1 1.5" />
+          ))}
+          {[25, 50, 75].map((x) => (
+            <line key={x} x1={x} y1="0" x2={x} y2="100" stroke="hsl(var(--phosphor) / 0.1)" strokeWidth="0.25" strokeDasharray="1 1.5" />
+          ))}
+          <line x1="0" y1="50" x2="100" y2="50" stroke="hsl(var(--phosphor) / 0.25)" strokeWidth="0.35" strokeDasharray="2 2" />
+          <polyline
+            points={points}
+            fill="none"
+            stroke={stroke}
+            strokeWidth="1.1"
+            vectorEffect="non-scaling-stroke"
+            style={{ filter: `drop-shadow(0 0 3px ${stroke})` }}
+          />
+        </svg>
+        {/* sweeping scan line */}
+        <div className="scan-bar" />
+      </div>
     </div>
   );
 });

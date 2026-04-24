@@ -1,6 +1,4 @@
-import { memo } from 'react';
-import { BarChart3, TrendingUp, TrendingDown } from 'lucide-react';
-import { AnimatedCounter } from '@/components/AnimatedCounter';
+import { memo, useMemo } from 'react';
 import { WidgetProps } from '@/types/widget';
 import { useTranslation } from '@/hooks/useTranslation';
 import { cn } from '@/lib/utils';
@@ -11,13 +9,11 @@ interface TotalTradesWidgetProps extends WidgetProps {
 }
 
 /**
- * Total Trades Widget - Compact responsive design
+ * Total Trades Widget — rendered as an ASCII dot-matrix.
+ * Metaphor: each block = 1 trade. Green dots represent a deterministic
+ * "winning" distribution; red dots the losing ones. Capped at 200 visible.
  */
 export const TotalTradesWidget = memo(({
-  id,
-  isEditMode,
-  onRemove,
-  onExpand,
   totalTrades,
   trend,
 }: TotalTradesWidgetProps) => {
@@ -25,48 +21,81 @@ export const TotalTradesWidget = memo(({
   const hasTrend = trend !== undefined && trend !== 0;
   const isPositiveTrend = (trend ?? 0) > 0;
 
+  const cap = 200;
+  const visible = Math.min(totalTrades, cap);
+
+  // Deterministic pattern — we don't have real win/loss flags here,
+  // so we generate a stable mosaic: roughly 60% "wins" feel
+  const pattern = useMemo(() => {
+    const seed = totalTrades % 131 || 7;
+    return Array.from({ length: cap }).map((_, i) => {
+      const n = (i * 7 + seed * 3) % 10;
+      return n < 6; // true = win
+    });
+  }, [totalTrades]);
+
+  const winsViz = pattern.slice(0, visible).filter(Boolean).length;
+  const lossesViz = visible - winsViz;
+
   return (
-    <div className="flex flex-col h-full p-3 gap-2 justify-center">
-      {/* Header */}
-      <div className="flex items-center gap-2 shrink-0">
-        <div className="p-1.5 rounded-lg bg-primary/10">
-          <BarChart3 className="h-3.5 w-3.5 text-primary" />
-        </div>
-        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
-          {t('widgets.totalTrades.title')}
-        </span>
+    <div className="relative flex flex-col h-full scanlines overflow-hidden">
+      <div className="term-header shrink-0">
+        <span className="tracking-widest">TRADES.N // DUMP</span>
+        {hasTrend && (
+          <span className={cn('status-pill ml-auto', isPositiveTrend ? '' : 'danger')} style={{ fontSize: '0.58rem', padding: '0 0.35rem' }}>
+            {isPositiveTrend ? '+' : ''}{trend} {t('widgets.thisWeek')}
+          </span>
+        )}
       </div>
 
-      {/* Main Value */}
-      <div className="flex-1 flex items-center min-h-0">
-        <span className="text-2xl font-bold tracking-tight tabular-nums text-foreground">
-          <AnimatedCounter value={totalTrades} />
-        </span>
-      </div>
-
-      {/* Trend indicator */}
-      {hasTrend && (
-        <div className="flex items-center gap-1.5 shrink-0">
-          <div className={cn(
-            "flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium",
-            isPositiveTrend 
-              ? "bg-neon-green/10 text-neon-green" 
-              : "bg-neon-red/10 text-neon-red"
-          )}>
-            {isPositiveTrend ? (
-              <TrendingUp className="h-3 w-3" />
-            ) : (
-              <TrendingDown className="h-3 w-3" />
-            )}
-            <span className="tabular-nums">
-              {isPositiveTrend ? '+' : ''}{trend}
-            </span>
+      <div className="flex-1 flex flex-col gap-1.5 px-3 py-2 min-h-0">
+        <div className="flex items-baseline justify-between">
+          <span className="text-[10px] text-phosphor-dim tracking-widest uppercase">
+            {t('widgets.totalTrades.title')}
+          </span>
+          <div className="font-display text-3xl text-phosphor glow-text chromatic tabular-nums leading-none">
+            {totalTrades.toString().padStart(4, '0')}
           </div>
-          <span className="text-[10px] text-muted-foreground">
-            {t('widgets.thisWeek')}
+        </div>
+
+        {/* Matrix */}
+        <div
+          className="grid gap-[2px] mt-1"
+          style={{ gridTemplateColumns: 'repeat(25, minmax(0, 1fr))' }}
+        >
+          {Array.from({ length: cap }).map((_, i) => {
+            const active = i < visible;
+            const isWin = pattern[i];
+            return (
+              <div
+                key={i}
+                className={cn(
+                  'aspect-square animate-fade-in',
+                  !active ? 'bg-phosphor-dim opacity-20' :
+                  isWin ? 'bg-phosphor' : 'bg-danger'
+                )}
+                style={{
+                  animationDelay: active ? `${(i % 40) * 8}ms` : '0ms',
+                  ...(active ? { boxShadow: '0 0 3px currentColor' } : {}),
+                }}
+              />
+            );
+          })}
+        </div>
+
+        {/* Stats line */}
+        <div className="flex items-center justify-between text-[10px] font-mono pt-1 mt-auto border-t border-phosphor-dim">
+          <span className="text-phosphor">
+            <span className="text-phosphor-dim">W </span>{winsViz}
+          </span>
+          <span className="text-danger">
+            <span className="text-phosphor-dim">L </span>{lossesViz}
+          </span>
+          <span className="text-phosphor-dim">
+            {visible < totalTrades ? `VIZ=${visible}/${totalTrades}` : `TOTAL=${totalTrades}`}
           </span>
         </div>
-      )}
+      </div>
     </div>
   );
 });

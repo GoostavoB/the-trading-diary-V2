@@ -57,18 +57,20 @@ export function SubAccountProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    if (!user?.id) return;
+
     fetchSubAccounts();
-    
+
     // Set up realtime subscription for sub-accounts changes
     const channel = supabase
       .channel('sub-accounts-changes')
       .on(
         'postgres_changes',
-        { 
-          event: '*', 
-          schema: 'public', 
+        {
+          event: '*',
+          schema: 'public',
           table: 'sub_accounts',
-          filter: `user_id=eq.${user?.id}`
+          filter: `user_id=eq.${user.id}`
         },
         () => {
           fetchSubAccounts();

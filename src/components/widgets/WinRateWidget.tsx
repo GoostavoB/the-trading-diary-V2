@@ -10,14 +10,17 @@ interface WinRateWidgetProps extends WidgetProps {
   totalTrades: number;
 }
 
-function getWinRateTier(rate: number) {
-  if (rate >= 70) return { label: 'Elite', color: 'text-emerald-300', track: 'stroke-emerald-400', glow: 'drop-shadow-[0_0_8px_rgb(52,211,153)]' };
-  if (rate >= 60) return { label: 'Strong', color: 'text-lime-300', track: 'stroke-lime-400', glow: '' };
-  if (rate >= 50) return { label: 'Positive', color: 'text-amber-300', track: 'stroke-amber-400', glow: '' };
-  if (rate >= 40) return { label: 'Developing', color: 'text-orange-300', track: 'stroke-orange-400', glow: '' };
-  return { label: 'Needs work', color: 'text-rose-300', track: 'stroke-rose-400', glow: '' };
+function getTier(rate: number) {
+  if (rate >= 70) return { label: 'ELITE', pill: '', color: 'text-phosphor', bg: 'bg-phosphor', glow: 'glow-text' };
+  if (rate >= 55) return { label: 'STRONG', pill: '', color: 'text-phosphor', bg: 'bg-phosphor', glow: 'glow-text' };
+  if (rate >= 45) return { label: 'OK', pill: 'amber', color: 'text-amber-term', bg: 'bg-amber-term', glow: 'glow-text-amber' };
+  return { label: 'POOR', pill: 'danger', color: 'text-danger', bg: 'bg-danger', glow: 'glow-text-danger' };
 }
 
+/**
+ * Win Rate Widget — rendered as an ASCII progress bar / dos-readout.
+ * Metaphor: a terminal utility printing `[████░░░]` style progress.
+ */
 export const WinRateWidget = memo(({
   winRate,
   wins,
@@ -25,91 +28,60 @@ export const WinRateWidget = memo(({
   totalTrades,
 }: WinRateWidgetProps) => {
   const { t } = useTranslation();
-  const tier = getWinRateTier(winRate);
-
-  // Arc: 270° sweep (¾ circle), starts at -225° (bottom-left)
-  const size = 80;
-  const cx = size / 2;
-  const cy = size / 2;
-  const r = 30;
-  const circ = 2 * Math.PI * r;
-  const arcFraction = 0.75; // 270°
-  const totalArc = circ * arcFraction;
-  const filled = totalArc * (winRate / 100);
-  const gap = circ - totalArc;
+  const tier = getTier(winRate);
+  const cells = 24;
+  const filled = Math.round((Math.max(0, Math.min(100, winRate)) / 100) * cells);
 
   return (
-    <div className="flex flex-col h-full p-3 gap-2 justify-center">
-      {/* Label */}
-      <div className="text-[10px] font-bold tracking-widest text-muted-foreground/50 uppercase">
-        {t('widgets.winRate.title', 'Win Rate')}
+    <div className="relative flex flex-col h-full scanlines overflow-hidden">
+      <div className="term-header shrink-0">
+        <span className="tracking-widest">WR.PCT // ./winrate --live</span>
+        <span className={cn('status-pill ml-auto', tier.pill)} style={{ fontSize: '0.6rem', padding: '0 0.4rem' }}>
+          [ {tier.label} ]
+        </span>
       </div>
 
-      {/* Arc + Number */}
-      <div className="flex items-center gap-3">
-        {/* Custom arc gauge */}
-        <div className="relative shrink-0" style={{ width: size, height: size }}>
-          <svg
-            width={size} height={size}
-            style={{ transform: 'rotate(135deg)' }}
-          >
-            {/* Track */}
-            <circle
-              cx={cx} cy={cy} r={r}
-              fill="none"
-              stroke="rgba(255,255,255,0.06)"
-              strokeWidth={7}
-              strokeLinecap="round"
-              strokeDasharray={`${totalArc} ${gap}`}
-            />
-            {/* Fill */}
-            <circle
-              cx={cx} cy={cy} r={r}
-              fill="none"
-              className={tier.track}
-              strokeOpacity={0.75}
-              strokeWidth={7}
-              strokeLinecap="round"
-              strokeDasharray={`${filled} ${circ - filled}`}
-              style={{ transition: 'stroke-dasharray 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
-            />
-          </svg>
-          {/* Center: percent */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center -mt-1">
-            <span className={cn("text-lg font-black tabular-nums leading-none", tier.color)}>
-              {winRate.toFixed(0)}%
-            </span>
-            <span className="text-[8px] text-muted-foreground/40 mt-0.5">{totalTrades} trades</span>
+      <div className="flex-1 flex flex-col justify-center gap-2 px-3 py-2 min-h-0">
+        {/* Label + big number */}
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="text-[10px] tracking-widest text-phosphor-dim uppercase">
+            {t('widgets.winRate.title', 'Win Rate')}
+          </span>
+          <div className={cn('font-display text-3xl leading-none chromatic tabular-nums', tier.color, tier.glow)}>
+            {winRate.toFixed(1)}<span className="text-phosphor-dim">%</span>
           </div>
         </div>
 
-        {/* Stats column */}
-        <div className="flex flex-col gap-2 flex-1">
-          {/* Tier badge */}
-          <span className={cn(
-            "inline-flex text-[9px] font-bold tracking-widest uppercase px-1.5 py-0.5 rounded",
-            "border bg-white/[0.04]",
-            tier.color,
-            tier.color.replace('text-', 'border-').replace('-300', '-400/20')
-          )}>
-            {tier.label}
-          </span>
+        {/* bar: block cells */}
+        <div className="flex gap-[2px] mt-1">
+          {Array.from({ length: cells }).map((_, i) => (
+            <div
+              key={i}
+              className={cn(
+                'h-3 flex-1 transition-all',
+                i < filled ? tier.bg : 'bg-phosphor-dim opacity-40'
+              )}
+              style={i < filled ? { boxShadow: '0 0 5px currentColor' } : undefined}
+            />
+          ))}
+        </div>
 
-          {/* W / L split */}
-          <div className="space-y-1">
-            <div className="flex items-center gap-1.5">
-              <div className="h-1 flex-1 rounded-full overflow-hidden bg-white/5">
-                <div
-                  className="h-full bg-emerald-400/60 rounded-full transition-all duration-700"
-                  style={{ width: `${winRate}%` }}
-                />
-              </div>
-            </div>
-            <div className="flex items-center justify-between text-[9px]">
-              <span className="text-emerald-400/70 font-semibold">{wins}W</span>
-              <span className="text-rose-400/70 font-semibold">{losses}L</span>
-            </div>
-          </div>
+        {/* ASCII echo */}
+        <div className="text-[10px] font-mono text-phosphor-dim tracking-widest leading-none">
+          [{'█'.repeat(filled)}{'░'.repeat(cells - filled)}] {winRate.toFixed(1)}%
+        </div>
+
+        {/* W/L stream */}
+        <div className="flex items-center justify-between text-[10px] font-mono pt-1 border-t border-phosphor-dim">
+          <span className="text-phosphor">
+            <span className="text-phosphor-dim">WIN </span>{wins.toString().padStart(3, '0')}
+          </span>
+          <span className="text-danger">
+            <span className="text-phosphor-dim">LOSS </span>{losses.toString().padStart(3, '0')}
+          </span>
+          <span className="text-phosphor-dim">
+            N={totalTrades}
+          </span>
         </div>
       </div>
     </div>

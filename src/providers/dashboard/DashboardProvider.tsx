@@ -115,14 +115,23 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     const fetchInitialInvestment = useCallback(async () => {
         if (!user) return;
 
-        const { data } = await supabase
-            .from('user_settings')
-            .select('initial_investment')
-            .eq('user_id', user.id)
-            .single();
+        try {
+            const { data, error } = await supabase
+                .from('user_settings')
+                .select('initial_investment')
+                .eq('user_id', user.id)
+                .maybeSingle();
 
-        if (data) {
-            setInitialInvestment(data.initial_investment || 0);
+            if (error) {
+                console.error('Error fetching initial investment:', error);
+                setInitialInvestment(0);
+                return;
+            }
+
+            setInitialInvestment(data?.initial_investment ?? 0);
+        } catch (err) {
+            console.error('Unexpected error fetching initial investment:', err);
+            setInitialInvestment(0);
         }
     }, [user]);
 
@@ -241,16 +250,16 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
     // Effects
     useEffect(() => {
-        if (user) {
-            fetchCapitalLog();
-            fetchInitialInvestment();
-            fetchCustomWidgets();
-        }
+        if (!user?.id) return;
+
+        fetchCapitalLog();
+        fetchInitialInvestment();
+        fetchCustomWidgets();
 
         const tradesChannel = supabase
             .channel('trades-changes-dashboard')
             .on('postgres_changes',
-                { event: '*', schema: 'public', table: 'trades', filter: `user_id=eq.${user?.id}` },
+                { event: '*', schema: 'public', table: 'trades', filter: `user_id=eq.${user.id}` },
                 () => fetchStats()
             )
             .subscribe();
@@ -258,7 +267,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         const capitalChannel = supabase
             .channel('capital-changes-dashboard')
             .on('postgres_changes',
-                { event: '*', schema: 'public', table: 'capital_log', filter: `user_id=eq.${user?.id}` },
+                { event: '*', schema: 'public', table: 'capital_log', filter: `user_id=eq.${user.id}` },
                 () => fetchCapitalLog().then(() => fetchStats())
             )
             .subscribe();
