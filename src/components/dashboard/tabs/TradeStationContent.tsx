@@ -56,74 +56,61 @@ export function TradeStationContent() {
   }
 
   return (
-    <div className="flex flex-col gap-3" style={{ height: 'calc(100vh - 200px)' }}>
+    <div className="flex flex-col gap-4 pb-6">
       {/* Market Pulse Bar */}
       <LSRMiniBar />
 
-      {/* 60 / 40 split — Risk Calc on the left, complementary widgets stacked on the right */}
-      <div className="grid grid-cols-5 gap-3 flex-1 min-h-0">
-        {/* LEFT — Risk Calculator (60%) */}
-        <div className="col-span-3 flex flex-col min-h-0">
+      {/* Row 1: Next Trade Plan (hero — full width) */}
+      <div>
+        <SectionLabel icon={Compass} label="Next Trade Plan" />
+        <NextTradePlanCard />
+      </div>
+
+      {/* Row 2: Risk Calculator + Daily Loss Lock (2-col) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="flex flex-col">
           <SectionLabel icon={Crosshair} label="Risk Engine" />
           <div
             className={cn(
-              'flex-1 rounded-xl overflow-hidden relative min-h-0',
+              'rounded-ios-card overflow-hidden relative',
               'border border-white/8 bg-card/70 backdrop-blur-xl',
               'before:absolute before:inset-x-0 before:top-0 before:h-px',
               'before:bg-gradient-to-r before:from-transparent before:via-primary/30 before:to-transparent',
-              'shadow-[0_0_40px_-12px_rgba(var(--primary),0.2)]',
-              'hover:shadow-[0_0_50px_-10px_rgba(var(--primary),0.3)] transition-shadow duration-500',
             )}
           >
-            <div className="absolute top-0 left-0 w-12 h-12 pointer-events-none overflow-hidden rounded-tl-xl">
-              <div className="absolute -top-6 -left-6 w-12 h-12 bg-primary/10 blur-xl" />
-            </div>
-            <div className="h-full overflow-y-auto p-3 scrollbar-thin scrollbar-thumb-white/10">
-              <div className="max-w-[560px] mx-auto">
-                <RiskCalculatorV2Widget id="tradestation-risk-calculator" />
-              </div>
+            <div className="p-4">
+              <RiskCalculatorV2Widget id="tradestation-risk-calculator" />
             </div>
           </div>
         </div>
-
-        {/* RIGHT — stacked complementary widgets (40%) */}
-        <div className="col-span-2 flex flex-col min-h-0 gap-3">
-          {/* Next Trade Plan */}
-          <div className="flex flex-col min-h-0">
-            <SectionLabel icon={Compass} label="Next Trade Plan" />
-            <NextTradePlanCard />
-          </div>
-
-          {/* Daily Loss Lock */}
-          <div className="flex flex-col min-h-0">
-            <SectionLabel icon={ShieldAlert} label="Daily Loss Lock" />
-            <div
-              className={cn(
-                'rounded-xl overflow-hidden relative',
-                'border border-white/8 bg-card/70 backdrop-blur-xl',
-                'hover:border-white/14 transition-colors duration-300',
-              )}
-            >
-              <div className="overflow-y-auto p-3 scrollbar-thin scrollbar-thumb-white/10">
-                <DailyLossLockStatus id="tradestation-daily-loss-lock" />
-              </div>
+        <div className="flex flex-col">
+          <SectionLabel icon={ShieldAlert} label="Daily Loss Lock" />
+          <div
+            className={cn(
+              'rounded-ios-card overflow-hidden relative',
+              'border border-white/8 bg-card/70 backdrop-blur-xl',
+              'hover:border-white/14 transition-colors duration-300',
+            )}
+          >
+            <div className="p-4">
+              <DailyLossLockStatus id="tradestation-daily-loss-lock" />
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Leverage Calculator */}
-          <div className="flex flex-col min-h-0 flex-1">
-            <SectionLabel icon={Gauge} label="Leverage Calculator" />
-            <div
-              className={cn(
-                'flex-1 rounded-xl overflow-hidden relative min-h-0',
-                'border border-white/8 bg-card/70 backdrop-blur-xl',
-                'hover:border-white/14 transition-colors duration-300',
-              )}
-            >
-              <div className="h-full overflow-y-auto p-3 scrollbar-thin scrollbar-thumb-white/10">
-                <SimpleLeverageWidget id="tradestation-leverage-calculator" />
-              </div>
-            </div>
+      {/* Row 3: Leverage Calculator (full width) */}
+      <div>
+        <SectionLabel icon={Gauge} label="Leverage Calculator" />
+        <div
+          className={cn(
+            'rounded-ios-card overflow-hidden relative',
+            'border border-white/8 bg-card/70 backdrop-blur-xl',
+            'hover:border-white/14 transition-colors duration-300',
+          )}
+        >
+          <div className="p-4">
+            <SimpleLeverageWidget id="tradestation-leverage-calculator" />
           </div>
         </div>
       </div>
