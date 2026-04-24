@@ -1,7 +1,6 @@
-import { memo, useMemo } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { memo, useMemo, useState } from 'react';
+import { TrendingUp, TrendingDown, Calculator, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/hooks/useTranslation';
 
 interface OneYearProjectionWidgetProps {
   id: string;
@@ -11,237 +10,429 @@ interface OneYearProjectionWidgetProps {
   totalPnL: number;
   tradingDays: number;
   totalTrades: number;
-  winRate: number;               // 0-100
+  winRate: number;              // 0-100
   profitFactor: number;
-  avgWin: number;
-  avgLoss: number;
+  avgWin: number;               // absolute $ (historical avg)
+  avgLoss: number;              // absolute $ (historical avg)
 }
 
-type ProjectionRow = {
+type Horizon = {
   label: string;
-  months: number;
-  trades: number;
-  pnl: number;
-  balance: number;
-  growthPct: number;
+  shortLabel: string;
+  tradingDays: number;
 };
 
+const HORIZONS: Horizon[] = [
+  { label: '7 days',   shortLabel: '7d',  tradingDays: 5 },
+  { label: '14 days',  shortLabel: '14d', tradingDays: 10 },
+  { label: '30 days',  shortLabel: '30d', tradingDays: 21 },
+  { label: '3 months', shortLabel: '3m',  tradingDays: 63 },
+  { label: '6 months', shortLabel: '6m',  tradingDays: 126 },
+  { label: '1 year',   shortLabel: '1y',  tradingDays: 252 },
+  { label: '2 years',  shortLabel: '2y',  tradingDays: 504 },
+  { label: '3 years',  shortLabel: '3y',  tradingDays: 756 },
+  { label: '5 years',  shortLabel: '5y',  tradingDays: 1260 },
+];
+
+type Mode = 'compound' | 'linear';
+
 /**
- * 1-Year Projection Widget — Apple Premium
+ * Projection Widget — Interactive
  *
- * Projects forward using the trader's current behavior as baseline:
- *   - trades/day = totalTrades / tradingDays
- *   - expected value per trade = (winRate × avgWin) − ((1 − winRate) × avgLoss)
- *   - periods: 1m / 3m / 6m / 12m (21 trading days/month)
+ * Slider lets the user sweep horizons from 7d → 5y and the curve + hero balance
+ * update live. Two calculation models:
  *
- * Displays an animated sparkline + 4 rows with projected balance, % growth,
- * and trade count per horizon.
+ *   COMPOUND — position size scales with capital (risk % fixed). This is the
+ *   "trabalho de formiga" Gustavo described: stops grow as capital grows, so
+ *   gains accelerate. Growth is geometric.
+ *     riskPct = avgLoss / currentCapital
+ *     rewardPct = avgWin / currentCapital
+ *     growthFactor = (winRate × (1 + rewardPct)) + ((1-winRate) × (1 - riskPct))
+ *     capital_after_N = currentCapital × growthFactor^N
+ *
+ *   LINEAR — position size stays constant (fixed $ per trade). Growth is linear.
+ *     EV = (winRate × avgWin) − ((1-winRate) × avgLoss)
+ *     capital_after_N = currentCapital + EV × N
+ *
+ * Milestones ($1K / $10K / $50K / $100K / $500K / $1M) render as horizontal
+ * reference lines on the chart.
  */
 export const OneYearProjectionWidget = memo(({
   currentBalance,
-  totalPnL,
   tradingDays,
   totalTrades,
   winRate,
   avgWin,
   avgLoss,
 }: OneYearProjectionWidgetProps) => {
-  const { t } = useTranslation();
+  const [sliderIdx, setSliderIdx] = useState(5); // default = 1y
+  const [mode, setMode] = useState<Mode>('compound');
 
-  const TRADING_DAYS_PER_MONTH = 21;
-  const HORIZONS = [
-    { label: '1 Month',  months: 1 },
-    { label: '3 Months', months: 3 },
-    { label: '6 Months', months: 6 },
-    { label: '1 Year',   months: 12 },
-  ];
+  const horizon = HORIZONS[sliderIdx];
+  const hasNoData = totalTrades === 0 || tradingDays === 0 || currentBalance <= 0;
 
-  const projection = useMemo(() => {
+  // ── Core math ──
+  const model = useMemo(() => {
     const tradesPerDay = tradingDays > 0 ? totalTrades / tradingDays : 0;
-    const wrFraction = Math.max(0, Math.min(1, winRate / 100));
-    // Expected value per trade using current avgWin and avgLoss
-    const evPerTrade = (wrFraction * avgWin) - ((1 - wrFraction) * avgLoss);
+    const wrFrac = Math.max(0, Math.min(1, winRate / 100));
+    const lossFrac = 1 - wrFrac;
 
-    const rows: ProjectionRow[] = HORIZONS.map(({ label, months }) => {
-      const projectedTrades = tradesPerDay * TRADING_DAYS_PER_MONTH * months;
-      const projectedPnL = evPerTrade * projectedTrades;
-      const projectedBalance = currentBalance + projectedPnL;
-      const growthPct = currentBalance > 0 ? (projectedPnL / currentBalance) * 100 : 0;
-      return {
-        label,
-        months,
-        trades: Math.round(projectedTrades),
-        pnl: projectedPnL,
-        balance: projectedBalance,
-        growthPct,
-      };
-    });
+    // Linear EV
+    const evPerTrade = (wrFrac * avgWin) - (lossFrac * avgLoss);
 
-    return { rows, tradesPerDay, evPerTrade };
-  }, [currentBalance, tradingDays, totalTrades, winRate, avgWin, avgLoss]);
+    // Compound: derive risk % from avgLoss vs currentCapital
+    const rewardPct = currentBalance > 0 ? avgWin / currentBalance : 0;
+    const riskPct = currentBalance > 0 ? avgLoss / currentBalance : 0;
+    const growthFactor = wrFrac * (1 + rewardPct) + lossFrac * (1 - riskPct);
 
-  const formatCurrency = (n: number) => {
-    const abs = Math.abs(n);
-    if (abs >= 1_000_000) return `${n < 0 ? '-' : ''}$${(abs / 1_000_000).toFixed(2)}M`;
-    if (abs >= 1_000)     return `${n < 0 ? '-' : ''}$${(abs / 1_000).toFixed(1)}K`;
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
-  };
+    return { tradesPerDay, wrFrac, lossFrac, evPerTrade, rewardPct, riskPct, growthFactor };
+  }, [tradingDays, totalTrades, winRate, avgWin, avgLoss, currentBalance]);
 
-  // Sparkline path — daily interpolation across 12 months
-  const sparkline = useMemo(() => {
-    const tradesPerDay = projection.tradesPerDay;
-    const ev = projection.evPerTrade;
-    const DAYS = 252; // 1 year trading days
-    const points: { x: number; y: number }[] = [];
-    for (let d = 0; d <= DAYS; d++) {
-      const bal = currentBalance + (ev * tradesPerDay * d);
-      points.push({ x: d, y: bal });
+  // ── Horizon-specific result ──
+  const result = useMemo(() => {
+    const days = horizon.tradingDays;
+    const trades = model.tradesPerDay * days;
+    let projectedBalance: number;
+    let projectedPnL: number;
+
+    if (mode === 'compound') {
+      projectedBalance = currentBalance * Math.pow(model.growthFactor, trades);
+    } else {
+      projectedBalance = currentBalance + (model.evPerTrade * trades);
     }
-    const ys = points.map(p => p.y);
-    const yMin = Math.min(...ys);
-    const yMax = Math.max(...ys);
-    const yRange = yMax - yMin || 1;
-    const W = 100;
-    const H = 36;
-    const path = points
-      .map((p, i) => {
-        const x = (p.x / DAYS) * W;
-        const y = H - ((p.y - yMin) / yRange) * H;
-        return `${i === 0 ? 'M' : 'L'}${x.toFixed(2)} ${y.toFixed(2)}`;
-      })
-      .join(' ');
-    return { path, W, H };
-  }, [projection, currentBalance]);
+    projectedPnL = projectedBalance - currentBalance;
+    const growthPct = currentBalance > 0 ? (projectedPnL / currentBalance) * 100 : 0;
 
-  const isPositive = projection.evPerTrade > 0;
-  const hasNoData = totalTrades === 0 || tradingDays === 0;
+    return { trades: Math.round(trades), projectedBalance, projectedPnL, growthPct };
+  }, [horizon, mode, model, currentBalance]);
+
+  // ── Curve points across the selected horizon ──
+  const curve = useMemo(() => {
+    if (hasNoData) return { points: [] as { x: number; y: number }[], path: '', area: '', yMin: 0, yMax: 0, W: 100, H: 64 };
+
+    const days = horizon.tradingDays;
+    // Sample once per trading day for performance
+    const samples = Math.min(days, 300);
+    const step = days / samples;
+    const pts: { x: number; y: number }[] = [];
+
+    for (let i = 0; i <= samples; i++) {
+      const d = i * step;
+      const trades = model.tradesPerDay * d;
+      let y: number;
+      if (mode === 'compound') {
+        y = currentBalance * Math.pow(model.growthFactor, trades);
+      } else {
+        y = currentBalance + (model.evPerTrade * trades);
+      }
+      pts.push({ x: i / samples, y });
+    }
+
+    const ys = pts.map(p => p.y);
+    // Include currentBalance in yRange so the start point is honest
+    const yMin = Math.min(currentBalance, ...ys);
+    const yMax = Math.max(currentBalance, ...ys);
+    const yRange = (yMax - yMin) || 1;
+    const W = 100;
+    const H = 64;
+    const path = pts.map((p, i) => {
+      const x = p.x * W;
+      const y = H - ((p.y - yMin) / yRange) * H;
+      return `${i === 0 ? 'M' : 'L'}${x.toFixed(3)} ${y.toFixed(3)}`;
+    }).join(' ');
+    const area = `${path} L${W} ${H} L0 ${H} Z`;
+
+    return { points: pts, path, area, yMin, yMax, W, H };
+  }, [horizon, mode, model, currentBalance, hasNoData]);
+
+  // ── Milestones inside yRange ──
+  const milestones = useMemo(() => {
+    const targets = [1_000, 10_000, 50_000, 100_000, 500_000, 1_000_000, 5_000_000];
+    return targets
+      .filter(t => t > curve.yMin && t < curve.yMax)
+      .map(t => {
+        const y = curve.H - ((t - curve.yMin) / ((curve.yMax - curve.yMin) || 1)) * curve.H;
+        // When will it be crossed?
+        const crossedAt = curve.points.find(p => p.y >= t);
+        const crossedXPct = crossedAt ? crossedAt.x * 100 : null;
+        return { target: t, y, crossedXPct };
+      });
+  }, [curve]);
+
+  // ── Format ──
+  const formatCurrency = (n: number, compact = true) => {
+    const abs = Math.abs(n);
+    if (compact) {
+      if (abs >= 1_000_000_000) return `${n < 0 ? '-' : ''}$${(abs / 1_000_000_000).toFixed(2)}B`;
+      if (abs >= 1_000_000)     return `${n < 0 ? '-' : ''}$${(abs / 1_000_000).toFixed(2)}M`;
+      if (abs >= 10_000)        return `${n < 0 ? '-' : ''}$${(abs / 1_000).toFixed(1)}K`;
+    }
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: abs >= 1000 ? 0 : 2,
+    }).format(n);
+  };
 
   if (hasNoData) {
     return (
-      <div className="relative flex flex-col h-full overflow-hidden p-4">
+      <div className="relative flex flex-col h-full overflow-hidden p-5">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-medium text-space-200 tracking-tight uppercase">
-            1-Year Projection
+          <span className="text-[11px] font-medium text-space-200 tracking-tight">
+            Projection
           </span>
-          <span className="chip">No data yet</span>
+          <span className="chip">Need more data</span>
         </div>
-        <p className="text-sm text-space-300 leading-snug">
-          Log at least one trading day to unlock a forward projection based on your actual consistency.
-        </p>
+        <div className="flex-1 flex items-center justify-center text-center">
+          <p className="text-sm text-space-300 leading-snug max-w-[280px]">
+            Log a few trades to unlock a forward projection based on your actual win rate, R:R, and pace.
+          </p>
+        </div>
       </div>
     );
   }
 
+  const isPositive = result.projectedPnL >= 0;
+
   return (
     <div className="relative flex flex-col h-full overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-2">
-        <div className="flex items-baseline gap-2">
-          <span className="text-[11px] font-medium text-space-200 tracking-tight uppercase">
-            1-Year Projection
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between px-5 pt-5 pb-3 gap-3 flex-wrap">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-medium text-space-200 tracking-tight">
+            Projection
           </span>
-          <span className="text-[10px] text-space-400 tabular-nums">
-            · if you keep this pace
-          </span>
+          <span className="text-[10px] text-space-400">· drag to explore</span>
         </div>
-        <span
-          className={cn(
-            'chip',
-            isPositive ? 'chip-green' : 'chip-red'
-          )}
-        >
-          {isPositive ? 'Compounding up' : 'Compounding down'}
-        </span>
+        {/* Mode toggle (segmented control) */}
+        <div className="inline-flex items-center gap-1 p-0.5 rounded-ios glass-thin">
+          <button
+            type="button"
+            onClick={() => setMode('compound')}
+            className={cn(
+              'px-2.5 py-1 text-[11px] font-medium rounded-md transition-colors',
+              mode === 'compound'
+                ? 'bg-space-600 text-space-100'
+                : 'text-space-300 hover:text-space-100'
+            )}
+          >
+            Compound
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('linear')}
+            className={cn(
+              'px-2.5 py-1 text-[11px] font-medium rounded-md transition-colors',
+              mode === 'linear'
+                ? 'bg-space-600 text-space-100'
+                : 'text-space-300 hover:text-space-100'
+            )}
+          >
+            Linear
+          </button>
+        </div>
       </div>
 
-      {/* Sparkline */}
-      <div className="px-4 pb-2">
+      {/* ── Hero row: horizon + projected balance ── */}
+      <div className="px-5 pb-3 flex items-end justify-between gap-4">
+        <div>
+          <div className="text-[10px] text-space-300 uppercase tracking-wider">
+            In {horizon.label}
+          </div>
+          <div className={cn(
+            'font-display text-4xl md:text-5xl font-bold tabular-nums tracking-tight leading-none mt-1',
+            isPositive ? 'text-space-100' : 'text-apple-red'
+          )}>
+            {formatCurrency(result.projectedBalance, true)}
+          </div>
+        </div>
+
+        <div className="text-right">
+          <div className="text-[10px] text-space-300 uppercase tracking-wider">Growth</div>
+          <div className={cn(
+            'font-num text-lg font-semibold tabular-nums mt-1',
+            isPositive ? 'text-apple-green' : 'text-apple-red'
+          )}>
+            {isPositive ? '+' : ''}{formatCurrency(result.projectedPnL, true)}
+          </div>
+          <div className={cn(
+            'text-xs tabular-nums',
+            isPositive ? 'text-apple-green' : 'text-apple-red'
+          )}>
+            {result.growthPct >= 0 ? '+' : ''}{result.growthPct.toFixed(1)}%
+          </div>
+        </div>
+      </div>
+
+      {/* ── Chart ── */}
+      <div className="relative px-5 pb-2">
         <svg
-          viewBox={`0 0 ${sparkline.W} ${sparkline.H}`}
-          className="w-full h-9"
+          viewBox={`0 0 ${curve.W} ${curve.H}`}
+          className="w-full h-20 md:h-24"
           preserveAspectRatio="none"
         >
           <defs>
-            <linearGradient id="projGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={isPositive ? 'hsl(var(--apple-green))' : 'hsl(var(--apple-red))'} stopOpacity="0.35" />
-              <stop offset="100%" stopColor={isPositive ? 'hsl(var(--apple-green))' : 'hsl(var(--apple-red))'} stopOpacity="0" />
+            <linearGradient id="projFillP" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="hsl(var(--apple-green))" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="hsl(var(--apple-green))" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id="projFillN" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="hsl(var(--apple-red))" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="hsl(var(--apple-red))" stopOpacity="0" />
             </linearGradient>
           </defs>
-          <path
-            d={`${sparkline.path} L${sparkline.W} ${sparkline.H} L0 ${sparkline.H} Z`}
-            fill="url(#projGradient)"
-            opacity="0.9"
-          />
-          <path
-            d={sparkline.path}
-            fill="none"
-            stroke={isPositive ? 'hsl(var(--apple-green))' : 'hsl(var(--apple-red))'}
-            strokeWidth="1.4"
-            strokeLinejoin="round"
-          />
+
+          {/* Milestone reference lines */}
+          {milestones.map((m) => (
+            <g key={m.target}>
+              <line
+                x1="0"
+                x2={curve.W}
+                y1={m.y}
+                y2={m.y}
+                stroke="hsl(var(--space-gray-400))"
+                strokeWidth="0.3"
+                strokeDasharray="1 1.5"
+                opacity="0.55"
+              />
+              <text
+                x={curve.W - 1}
+                y={m.y - 1}
+                fill="hsl(var(--space-gray-300))"
+                fontSize="3"
+                textAnchor="end"
+                className="font-num"
+              >
+                {m.target >= 1_000_000 ? `$${m.target / 1_000_000}M` : `$${m.target / 1_000}K`}
+              </text>
+            </g>
+          ))}
+
+          {/* Fill + line */}
+          {curve.area && (
+            <path d={curve.area} fill={`url(#${isPositive ? 'projFillP' : 'projFillN'})`} />
+          )}
+          {curve.path && (
+            <path
+              d={curve.path}
+              fill="none"
+              stroke={isPositive ? 'hsl(var(--apple-green))' : 'hsl(var(--apple-red))'}
+              strokeWidth="1.4"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          )}
+
+          {/* End point */}
+          {curve.points.length > 0 && (() => {
+            const last = curve.points[curve.points.length - 1];
+            const x = last.x * curve.W;
+            const y = curve.H - ((last.y - curve.yMin) / ((curve.yMax - curve.yMin) || 1)) * curve.H;
+            return (
+              <g>
+                <circle cx={x} cy={y} r="1.6" fill={isPositive ? 'hsl(var(--apple-green))' : 'hsl(var(--apple-red))'} />
+                <circle cx={x} cy={y} r="4" fill="none" stroke={isPositive ? 'hsl(var(--apple-green))' : 'hsl(var(--apple-red))'} strokeWidth="0.5" opacity="0.5" />
+              </g>
+            );
+          })()}
         </svg>
       </div>
 
-      {/* Milestones row */}
-      <div className="flex-1 px-4 pb-4">
-        <div className="grid grid-cols-4 gap-2">
-          {projection.rows.map((row, idx) => (
-            <div
-              key={row.label}
-              className={cn(
-                'relative flex flex-col gap-1 rounded-ios px-2.5 py-2 border transition-all',
-                'animate-fade-in',
-                isPositive
-                  ? 'bg-apple-green/8 border-apple-green/20 hover:border-apple-green/40'
-                  : 'bg-apple-red/8 border-apple-red/20 hover:border-apple-red/40',
-                idx === 3 && 'ring-1 ring-electric/30' // highlight 1-year
-              )}
-              style={{ animationDelay: `${idx * 60}ms` }}
-            >
-              <span className="text-[9px] text-space-300 uppercase tracking-wider">{row.label}</span>
-              <span className={cn(
-                'text-sm font-semibold tabular-nums leading-tight',
-                isPositive ? 'text-apple-green' : 'text-apple-red'
-              )}>
-                {formatCurrency(row.balance)}
-              </span>
-              <div className="flex items-center gap-1">
-                <ArrowUpRight className={cn(
-                  'w-2.5 h-2.5',
-                  isPositive ? 'text-apple-green' : 'text-apple-red rotate-90'
-                )} />
-                <span className={cn(
-                  'text-[10px] tabular-nums font-medium',
-                  isPositive ? 'text-apple-green' : 'text-apple-red'
-                )}>
-                  {row.growthPct >= 0 ? '+' : ''}{row.growthPct.toFixed(1)}%
-                </span>
-              </div>
-              <span className="text-[9px] text-space-400 tabular-nums">
-                {row.trades.toLocaleString()} trades
-              </span>
-            </div>
-          ))}
+      {/* ── Slider ── */}
+      <div className="px-5 pb-3">
+        <div className="relative">
+          <input
+            type="range"
+            min={0}
+            max={HORIZONS.length - 1}
+            value={sliderIdx}
+            onChange={(e) => setSliderIdx(parseInt(e.target.value, 10))}
+            className="w-full h-1.5 appearance-none cursor-pointer bg-transparent
+              [&::-webkit-slider-runnable-track]:h-1.5
+              [&::-webkit-slider-runnable-track]:bg-space-600
+              [&::-webkit-slider-runnable-track]:rounded-full
+              [&::-webkit-slider-thumb]:appearance-none
+              [&::-webkit-slider-thumb]:w-4
+              [&::-webkit-slider-thumb]:h-4
+              [&::-webkit-slider-thumb]:-mt-[5px]
+              [&::-webkit-slider-thumb]:rounded-full
+              [&::-webkit-slider-thumb]:bg-electric
+              [&::-webkit-slider-thumb]:shadow-electric
+              [&::-webkit-slider-thumb]:border-2
+              [&::-webkit-slider-thumb]:border-space-800
+              [&::-webkit-slider-thumb]:cursor-grab
+              [&::-webkit-slider-thumb]:active:cursor-grabbing
+              [&::-moz-range-track]:h-1.5
+              [&::-moz-range-track]:bg-space-600
+              [&::-moz-range-track]:rounded-full
+              [&::-moz-range-thumb]:w-4
+              [&::-moz-range-thumb]:h-4
+              [&::-moz-range-thumb]:rounded-full
+              [&::-moz-range-thumb]:bg-electric
+              [&::-moz-range-thumb]:border-2
+              [&::-moz-range-thumb]:border-space-800
+              [&::-moz-range-thumb]:cursor-grab"
+          />
+          {/* Tick labels */}
+          <div className="mt-2 flex justify-between text-[9px] text-space-400 tabular-nums select-none">
+            {HORIZONS.map((h, i) => (
+              <button
+                key={h.shortLabel}
+                type="button"
+                onClick={() => setSliderIdx(i)}
+                className={cn(
+                  'transition-colors hover:text-space-200',
+                  i === sliderIdx && 'text-electric font-semibold'
+                )}
+              >
+                {h.shortLabel}
+              </button>
+            ))}
+          </div>
         </div>
+      </div>
 
-        {/* Footer assumptions */}
-        <div className="pt-3 mt-2.5 border-t border-space-500/40 flex items-center justify-between text-[10px] text-space-400 tabular-nums">
-          <span>
-            EV / trade:{' '}
-            <span className={cn('font-semibold',
-              isPositive ? 'text-apple-green' : 'text-apple-red'
-            )}>
-              {projection.evPerTrade >= 0 ? '+' : ''}${projection.evPerTrade.toFixed(2)}
-            </span>
-          </span>
-          <span>
-            Pace: <span className="text-space-200 font-semibold">
-              {projection.tradesPerDay.toFixed(1)}
-            </span> trades/day
-          </span>
-          <span className="hidden md:inline">
-            21 days/mo · compounding off
-          </span>
+      {/* ── Footer breakdown ── */}
+      <div className="grid grid-cols-4 gap-0 border-t border-space-500/40">
+        <div className="px-3 py-2.5 border-r border-space-500/40">
+          <div className="flex items-center gap-1 text-[9px] text-space-300 uppercase tracking-wider">
+            <Calculator className="w-2.5 h-2.5" />
+            Trades
+          </div>
+          <div className="mt-0.5 font-num text-xs font-semibold text-space-100 tabular-nums">
+            {result.trades.toLocaleString()}
+          </div>
+        </div>
+        <div className="px-3 py-2.5 border-r border-space-500/40">
+          <div className="text-[9px] text-space-300 uppercase tracking-wider">Pace</div>
+          <div className="mt-0.5 font-num text-xs font-semibold text-space-100 tabular-nums">
+            {model.tradesPerDay.toFixed(1)}/day
+          </div>
+        </div>
+        <div className="px-3 py-2.5 border-r border-space-500/40">
+          <div className="flex items-center gap-1 text-[9px] text-space-300 uppercase tracking-wider">
+            <Target className="w-2.5 h-2.5" />
+            Risk/trade
+          </div>
+          <div className="mt-0.5 font-num text-xs font-semibold text-apple-red tabular-nums">
+            {(model.riskPct * 100).toFixed(2)}%
+          </div>
+        </div>
+        <div className="px-3 py-2.5">
+          <div className="flex items-center gap-1 text-[9px] text-space-300 uppercase tracking-wider">
+            {isPositive ? (
+              <TrendingUp className="w-2.5 h-2.5 text-apple-green" />
+            ) : (
+              <TrendingDown className="w-2.5 h-2.5 text-apple-red" />
+            )}
+            EV/trade
+          </div>
+          <div className={cn(
+            'mt-0.5 font-num text-xs font-semibold tabular-nums',
+            model.evPerTrade >= 0 ? 'text-apple-green' : 'text-apple-red'
+          )}>
+            {model.evPerTrade >= 0 ? '+' : ''}${model.evPerTrade.toFixed(2)}
+          </div>
         </div>
       </div>
     </div>

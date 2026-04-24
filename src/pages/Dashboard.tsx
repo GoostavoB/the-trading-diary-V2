@@ -478,6 +478,13 @@ function DashboardContent() {
         widgetProps.avgWin = dashboardStats.avgWin;
         widgetProps.avgLoss = dashboardStats.avgLoss;
         break;
+      case 'totalCapital':
+        const capBase = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
+        widgetProps.initialCapital = capBase;
+        widgetProps.currentCapital = capBase + (stats?.total_pnl || 0);
+        widgetProps.totalPnL = stats?.total_pnl || 0;
+        widgetProps.trades = processedTrades;
+        break;
       case 'compactPerformance':
         // ROI data
         widgetProps.currentROI = stats?.current_roi || 0;
@@ -541,6 +548,7 @@ function DashboardContent() {
       'compactPerformance', // NEW: Handles own padding
       'profitFactor',       // NEW: own padding + own header
       'oneYearProjection',  // NEW: own padding + own header
+      'totalCapital',       // NEW: hero capital widget (own padding)
     ];
 
     const widgetsHandlingOwnHeader = widgetsWithCustomPadding;

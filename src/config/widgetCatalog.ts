@@ -36,6 +36,7 @@ import { AvgROIPerTradeWidget } from '@/components/widgets/AvgROIPerTradeWidget'
 import { SimpleAvgROIWidget } from '@/components/widgets/SimpleAvgROIWidget';
 import { ProfitFactorWidget } from '@/components/widgets/ProfitFactorWidget';
 import { OneYearProjectionWidget } from '@/components/widgets/OneYearProjectionWidget';
+import { TotalCapitalWidget } from '@/components/widgets/TotalCapitalWidget';
 import { WeightedAvgROIWidget } from '@/components/widgets/WeightedAvgROIWidget';
 import { CapitalGrowthWidget } from '@/components/widgets/CapitalGrowthWidget';
 import { CombinedPnLROIWidget } from '@/components/widgets/CombinedPnLROIWidget';
@@ -129,12 +130,23 @@ export const WIDGET_CATALOG: Record<string, WidgetConfig> = {
 
   oneYearProjection: {
     id: 'oneYearProjection',
-    title: '1-Year Projection',
-    description: 'Forward balance projection at your current pace (1m / 3m / 6m / 12m)',
+    title: 'Projection',
+    description: 'Interactive forward projection — sweep from 7 days to 5 years, linear or compounding',
     category: 'overview',
     icon: TrendingUp,
-    defaultSize: 'medium',
+    defaultSize: 'large',
     component: OneYearProjectionWidget,
+    requiresData: ['stats', 'trades'],
+  },
+
+  totalCapital: {
+    id: 'totalCapital',
+    title: 'Total Capital',
+    description: 'Initial → current balance, growth $, growth %, and the journey curve',
+    category: 'overview',
+    icon: Wallet,
+    defaultSize: 'large',
+    component: TotalCapitalWidget,
     requiresData: ['stats', 'trades'],
   },
 
@@ -422,18 +434,20 @@ export const TRADE_STATION_LAYOUT = [
 ];
 
 // Command Center: Core KPIs & charts
-// Row 1: P&L / Win Rate (via compactPerformance) + Balance
-// Row 2 (NEW): Profit Factor + 1-Year Projection — added per user request
-// Row 3+: capital growth, highlights, goals
+// Row 1: P&L (compactPerformance) + balance side
+// Row 2: Profit Factor + Projection (interactive)
+// Row 3: Performance Highlights + Total Capital (hero)
+// Row 4+: capital growth, goals, topMovers
 export const COMMAND_CENTER_LAYOUT = [
   'totalBalance',
   'compactPerformance',
   'profitFactor',
   'oneYearProjection',
-  'capitalGrowth',
-  'topMovers',
-  'goals',
   'performanceHighlights',
+  'totalCapital',
+  'capitalGrowth',
+  'goals',
+  'topMovers',
 ];
 
 // Behavior Analytics: Psychology & patterns (max 4 widgets)

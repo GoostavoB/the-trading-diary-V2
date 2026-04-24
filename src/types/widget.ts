@@ -90,6 +90,7 @@ export const WIDGET_SIZE_MAP: Record<string, WidgetSize> = {
   'winRate': 'small',
   'profitFactor': 'medium',
   'oneYearProjection': 'large',
+  'totalCapital': 'large',
   'avgPnLPerDay': 'small',
   'currentROI': 'small',
   'avgPnLPerTrade': 'small',
