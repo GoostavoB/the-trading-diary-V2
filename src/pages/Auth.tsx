@@ -8,11 +8,18 @@ import { Input } from '@/components/ui/input';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, TrendingUp, BarChart3, Shield, Zap, CheckCircle2 } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { SkipToContent } from '@/components/SkipToContent';
 import { toast } from 'sonner';
 import { z } from 'zod';
+
+const FEATURES = [
+  { icon: BarChart3, text: "AI trade analysis & pattern detection" },
+  { icon: TrendingUp, text: "Win rate, ROI and profit factor tracking" },
+  { icon: Shield, text: "Risk calculator & position sizing" },
+  { icon: Zap, text: "Real-time Long/Short ratio & market data" },
+];
 
 const passwordValidation = z.string()
   .min(12, 'Password must be at least 12 characters')
@@ -172,17 +179,80 @@ const Auth = () => {
       description="Sign in to your Trading Diary account to access your trades, analytics, and journal."
       noindex={true}
     />
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
+    <div className="min-h-screen flex bg-background relative overflow-hidden">
       <SkipToContent />
-      {/* Subtle background effect */}
-      <div className="absolute inset-0 bg-gradient-radial from-purple-accent/10 via-transparent to-transparent opacity-50" aria-hidden="true" />
-      <div className="absolute top-20 left-20 w-96 h-96 bg-purple-accent/5 rounded-full blur-3xl animate-float" aria-hidden="true" />
-      <div className="absolute bottom-20 right-20 w-96 h-96 bg-neon-green/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} aria-hidden="true" />
-      <PremiumCard className="w-full max-w-md p-8 glass border-border/50 shadow-2xl relative z-10">
-        <header className="flex items-center justify-center gap-2 mb-8">
-          <Logo size="lg" variant="icon" />
-          <h1 className="text-3xl font-bold gradient-text">The Trading Diary</h1>
-        </header>
+
+      {/* ── LEFT PANEL — Feature highlights ── */}
+      <div className="hidden lg:flex flex-col justify-between w-[480px] shrink-0 relative p-12 border-r border-white/8 overflow-hidden">
+        {/* Background orb */}
+        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+          <div className="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] rounded-full"
+            style={{ background: 'radial-gradient(circle, hsl(36 100% 50% / 0.08) 0%, transparent 65%)' }} />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full"
+            style={{ background: 'radial-gradient(circle, hsl(210 90% 58% / 0.06) 0%, transparent 65%)' }} />
+        </div>
+
+        {/* Logo */}
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-16">
+            <Logo size="md" variant="icon" />
+            <span className="text-lg font-bold">The Trading Diary</span>
+          </div>
+
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-3xl font-black leading-tight mb-3">
+                <span className="text-gradient-white">Stop losing</span><br />
+                <span className="text-gradient-primary">start learning.</span>
+              </h2>
+              <p className="text-muted-foreground leading-relaxed">
+                The only crypto trading journal built to turn your worst trades into your biggest lessons.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {FEATURES.map(({ icon: Icon, text }) => (
+                <div key={text} className="flex items-center gap-3">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+                    <Icon className="h-4 w-4 text-primary" />
+                  </div>
+                  <span className="text-sm text-foreground/80">{text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Social proof */}
+        <div className="relative z-10 p-4 rounded-xl border border-white/8 bg-white/[0.03] backdrop-blur-sm">
+          <div className="flex items-center gap-1 mb-2">
+            {[1,2,3,4,5].map(i => (
+              <svg key={i} className="w-4 h-4 fill-primary text-primary" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            ))}
+          </div>
+          <p className="text-sm text-foreground/80 italic leading-relaxed mb-2">
+            "Finally I can see WHY I'm losing money. The error analytics alone changed how I trade."
+          </p>
+          <span className="text-xs text-muted-foreground">— Verified trader, 6 months user</span>
+        </div>
+      </div>
+
+      {/* ── RIGHT PANEL — Form ── */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12 relative">
+        {/* Subtle orb */}
+        <div className="absolute top-1/3 right-1/4 w-64 h-64 rounded-full pointer-events-none" aria-hidden="true"
+          style={{ background: 'radial-gradient(circle, hsl(36 100% 50% / 0.04) 0%, transparent 70%)' }} />
+
+        <div className="w-full max-w-md relative z-10">
+          {/* Mobile logo */}
+          <div className="flex items-center justify-center gap-2 mb-8 lg:hidden">
+            <Logo size="md" variant="icon" />
+            <span className="text-xl font-bold">The Trading Diary</span>
+          </div>
+
+          <PremiumCard variant="glass" className="p-8 shadow-2xl border-white/10">
 
         {isForgotPassword && (
           <Button
@@ -198,9 +268,12 @@ const Auth = () => {
           </Button>
         )}
 
-        <h2 className="text-2xl font-semibold mb-6 text-center" id="auth-heading">
-          {isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome Back' : 'Create Account'}
+        <h2 className="text-2xl font-bold mb-1 text-center" id="auth-heading">
+          {isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome back 👋' : 'Create your account'}
         </h2>
+        <p className="text-sm text-muted-foreground text-center mb-6">
+          {isForgotPassword ? "We'll send you a reset link" : isLogin ? 'Sign in to your account' : 'Start tracking trades for free'}
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-4" aria-labelledby="auth-heading">
           {!isLogin && !isForgotPassword && (
@@ -366,10 +439,17 @@ const Auth = () => {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-foreground text-background hover:bg-foreground/90"
+            className="w-full relative overflow-hidden group
+              bg-primary hover:bg-primary/90 text-primary-foreground font-semibold
+              shadow-[0_0_20px_-4px_hsl(36_100%_50%/0.4)]
+              hover:shadow-[0_0_30px_-2px_hsl(36_100%_50%/0.6)]
+              transition-all duration-300"
             aria-busy={loading}
           >
-            {loading ? 'Loading...' : isForgotPassword ? 'Send Reset Link' : isLogin ? 'Sign In' : 'Sign Up'}
+            <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full
+              bg-gradient-to-r from-transparent via-white/15 to-transparent
+              transition-transform duration-700 ease-in-out pointer-events-none" />
+            {loading ? 'Loading...' : isForgotPassword ? 'Send Reset Link' : isLogin ? 'Sign In' : 'Create Account'}
           </Button>
         </form>
 
@@ -415,13 +495,16 @@ const Auth = () => {
             )}
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium"
             >
-              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+              {isLogin ? "Don't have an account? Sign up free →" : 'Already have an account? Sign in'}
             </button>
           </div>
         )}
-      </PremiumCard>
+
+          </PremiumCard>
+        </div>
+      </div>
     </div>
     </>
   );
