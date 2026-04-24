@@ -19,11 +19,11 @@ const changelog: ChangelogEntry[] = [
     version: '2.1.0',
     date: 'March 2024',
     changes: [
-      { type: 'feature', description: 'Added multi-language support (EN, ES, PT, FR, DE)' },
-      { type: 'feature', description: 'Introduced Social Feed for community interaction' },
+      { type: 'feature', description: 'Added multi-language support (EN, ES, PT, AR, VI)' },
+      { type: 'feature', description: 'Blog with educational trading articles' },
       { type: 'feature', description: 'New Advanced Analytics dashboard' },
       { type: 'enhancement', description: 'Improved mobile navigation experience' },
-      { type: 'improvement', description: 'Enhanced push notification system' },
+      { type: 'improvement', description: 'Improved performance with lazy loading and code splitting' },
     ],
   },
   {

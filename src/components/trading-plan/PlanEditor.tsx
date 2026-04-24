@@ -5,6 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Save, X } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface PlanEditorProps {
     plan?: any;
@@ -13,13 +16,42 @@ interface PlanEditorProps {
 }
 
 export const PlanEditor = ({ plan, onSave, onCancel }: PlanEditorProps) => {
+    const { user } = useAuth();
     const [title, setTitle] = useState(plan?.title || '');
     const [description, setDescription] = useState(plan?.description || '');
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: Implement save logic
-        onSave();
+        if (!user) return;
+
+        setLoading(true);
+        try {
+            if (plan?.id) {
+                // Update existing plan
+                const { error } = await supabase
+                    .from('trading_plans')
+                    .update({ title, description })
+                    .eq('id', plan.id)
+                    .eq('user_id', user.id);
+
+                if (error) throw error;
+                toast.success('Trading plan updated');
+            } else {
+                // Create new plan
+                const { error } = await supabase
+                    .from('trading_plans')
+                    .insert({ user_id: user.id, title, description });
+
+                if (error) throw error;
+                toast.success('Trading plan created');
+            }
+            onSave();
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to save trading plan');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -55,12 +87,12 @@ export const PlanEditor = ({ plan, onSave, onCancel }: PlanEditorProps) => {
                 </div>
 
                 <div className="flex justify-end gap-3">
-                    <Button type="button" variant="outline" onClick={onCancel}>
+                    <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
                         Cancel
                     </Button>
-                    <Button type="submit" className="gap-2">
+                    <Button type="submit" className="gap-2" disabled={loading}>
                         <Save className="h-4 w-4" />
-                        Save Plan
+                        {loading ? 'Saving...' : 'Save Plan'}
                     </Button>
                 </div>
             </form>

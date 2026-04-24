@@ -1,76 +1,9 @@
 import AppLayout from '@/components/layout/AppLayout';
 import { PremiumCard } from '@/components/ui/PremiumCard';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Star } from 'lucide-react';
+import { MessageSquareQuote, ExternalLink, Star } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { pageMeta } from '@/utils/seoHelpers';
-
-interface Testimonial {
-  id: string;
-  name: string;
-  role: string;
-  avatar: string;
-  rating: number;
-  content: string;
-  date: string;
-}
-
-const testimonials: Testimonial[] = [
-  {
-    id: '1',
-    name: 'Sarah Johnson',
-    role: 'Professional Day Trader',
-    avatar: '/placeholder.svg',
-    rating: 5,
-    content: 'The Trading Diary has completely transformed how I track my trades. The analytics features helped me identify patterns I never noticed before. My win rate has improved by 15% since I started using it!',
-    date: 'March 2024',
-  },
-  {
-    id: '2',
-    name: 'Michael Chen',
-    role: 'Swing Trader',
-    avatar: '/placeholder.svg',
-    rating: 5,
-    content: 'Finally, a trading journal that understands what traders actually need. The risk management tools and psychology tracking features are game-changers. Highly recommend!',
-    date: 'February 2024',
-  },
-  {
-    id: '3',
-    name: 'Emma Williams',
-    role: 'Crypto Investor',
-    avatar: '/placeholder.svg',
-    rating: 5,
-    content: 'The exchange integration makes importing trades effortless. I love the detailed performance reports and the AI-powered insights. Worth every penny!',
-    date: 'January 2024',
-  },
-  {
-    id: '4',
-    name: 'David Rodriguez',
-    role: 'Forex Trader',
-    avatar: '/placeholder.svg',
-    rating: 5,
-    content: 'Best trading journal I\'ve used in my 10 years of trading. The mobile app is fantastic, and the community features help me learn from other successful traders.',
-    date: 'March 2024',
-  },
-  {
-    id: '5',
-    name: 'Lisa Anderson',
-    role: 'Options Trader',
-    avatar: '/placeholder.svg',
-    rating: 4,
-    content: 'Great platform with comprehensive features. The learning resources are excellent for improving trading psychology. Customer support is responsive and helpful.',
-    date: 'February 2024',
-  },
-  {
-    id: '6',
-    name: 'James Kim',
-    role: 'Algorithmic Trader',
-    avatar: '/placeholder.svg',
-    rating: 5,
-    content: 'The API documentation is top-notch. I integrated my automated strategies seamlessly. The advanced analytics help me optimize my algorithms continuously.',
-    date: 'January 2024',
-  },
-];
+import { Button } from '@/components/ui/button';
 
 export default function Testimonials() {
   return (
@@ -82,84 +15,97 @@ export default function Testimonials() {
         canonical={pageMeta.testimonials.canonical}
       />
       <AppLayout>
-      <div className="max-w-7xl mx-auto space-y-8 p-6">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold">
-            What Our Traders Say
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Join thousands of successful traders who have improved their performance with The Trading Diary
-          </p>
-        </div>
+      <div className="min-h-screen bg-background">
+        <div className="max-w-4xl mx-auto px-4 py-16 space-y-16">
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <PremiumCard className="p-6 text-center">
-            <div className="text-4xl font-bold text-primary mb-2">50K+</div>
-            <div className="text-muted-foreground">Active Traders</div>
-          </PremiumCard>
-          <PremiumCard className="p-6 text-center">
-            <div className="text-4xl font-bold text-primary mb-2">4.9/5</div>
-            <div className="text-muted-foreground">Average Rating</div>
-          </PremiumCard>
-          <PremiumCard className="p-6 text-center">
-            <div className="text-4xl font-bold text-primary mb-2">1M+</div>
-            <div className="text-muted-foreground">Trades Analyzed</div>
-          </PremiumCard>
-        </div>
+          {/* Header */}
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl md:text-5xl font-bold">
+              What Traders Are Saying
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Real feedback from traders who use The Trading Diary every day.
+            </p>
+          </div>
 
-        {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testimonials.map((testimonial) => (
-            <PremiumCard key={testimonial.id} className="p-6 space-y-4 hover:shadow-lg transition-shadow">
-              <div className="flex items-center gap-4">
-                <Avatar>
-                  <AvatarImage src={testimonial.avatar} />
-                  <AvatarFallback>{testimonial.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <div className="font-semibold">{testimonial.name}</div>
-                  <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+          {/* Review Platforms */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <PremiumCard className="p-6 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#00b67a]/10 flex items-center justify-center">
+                  <Star className="h-5 w-5 fill-[#00b67a] text-[#00b67a]" />
+                </div>
+                <div>
+                  <div className="font-semibold">Trustpilot</div>
+                  <div className="text-sm text-muted-foreground">Independent verified reviews</div>
                 </div>
               </div>
-
-              <div className="flex gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-4 h-4 ${i < testimonial.rating
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'fill-muted text-muted'
-                      }`}
-                  />
-                ))}
-              </div>
-
-              <p className="text-sm text-foreground leading-relaxed">
-                "{testimonial.content}"
+              <p className="text-sm text-muted-foreground">
+                We're building our review profile on Trustpilot. If you've used The Trading Diary, your honest review helps other traders find us.
               </p>
-
-              <div className="text-xs text-muted-foreground pt-2 border-t border-border/50">
-                {testimonial.date}
-              </div>
+              <Button variant="outline" size="sm" className="gap-2 w-full" asChild>
+                <a href="https://www.trustpilot.com/review/thetradingdiary.com" target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-4 w-4" />
+                  View on Trustpilot
+                </a>
+              </Button>
             </PremiumCard>
-          ))}
-        </div>
 
-        {/* CTA */}
-        <PremiumCard className="p-8 text-center bg-primary/5 border-primary/20">
-          <h2 className="text-2xl font-bold mb-4">
-            Ready to Transform Your Trading?
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            Join thousands of traders who are already improving their performance
-          </p>
-          <a href="/auth" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-8 py-2">
-            Start Free Trial
-          </a>
-        </PremiumCard>
+            <PremiumCard className="p-6 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <MessageSquareQuote className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <div className="font-semibold">Share Your Experience</div>
+                  <div className="text-sm text-muted-foreground">Help other traders decide</div>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Have feedback about The Trading Diary? We'd love to hear what's working well and what we can improve.
+              </p>
+              <Button variant="outline" size="sm" className="gap-2 w-full" asChild>
+                <a href="/contact">
+                  Send Feedback
+                </a>
+              </Button>
+            </PremiumCard>
+          </div>
+
+          {/* Feature Highlights */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold text-center">What traders use it for</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                { title: 'Reviewing mistakes', desc: 'Identifying recurring errors to stop repeating them.' },
+                { title: 'Tracking performance', desc: 'Win rate, profit factor, and R:R over time.' },
+                { title: 'Managing psychology', desc: 'Logging emotions and seeing their impact on results.' },
+                { title: 'Uploading screenshots', desc: 'AI extracts trade data from exchange screenshots.' },
+                { title: 'Setting goals', desc: 'Monthly targets with progress tracking.' },
+                { title: 'Risk calculations', desc: 'Stop loss, leverage, and position size calculators.' },
+              ].map((item) => (
+                <PremiumCard key={item.title} className="p-4 space-y-1.5">
+                  <div className="font-medium text-sm">{item.title}</div>
+                  <div className="text-xs text-muted-foreground">{item.desc}</div>
+                </PremiumCard>
+              ))}
+            </div>
+          </div>
+
+          {/* CTA */}
+          <PremiumCard className="p-8 text-center bg-primary/5 border-primary/20 space-y-4">
+            <h2 className="text-2xl font-bold">Try it free, no credit card needed</h2>
+            <p className="text-muted-foreground">
+              Start tracking your trades and see what patterns emerge in your own data.
+            </p>
+            <Button size="lg" asChild>
+              <a href="/auth">Get Started Free</a>
+            </Button>
+          </PremiumCard>
+
+        </div>
       </div>
-    </AppLayout>
+      </AppLayout>
     </>
   );
 }

@@ -1,7 +1,7 @@
 import { useLocation, Link } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, BookOpen, TrendingUp, ArrowLeft, Home } from "lucide-react";
+import { LayoutDashboard, BookOpen, TrendingUp, Home } from "lucide-react";
 
 const NotFound = () => {
   const location = useLocation();

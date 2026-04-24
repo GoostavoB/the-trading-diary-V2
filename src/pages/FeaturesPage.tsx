@@ -61,7 +61,7 @@ const features = [
         icon: Bell,
         title: 'Smart Alerts',
         description: 'Automated notifications for performance milestones, risk thresholds, and more',
-        badge: 'Essential',
+        badge: 'Coming Soon',
       },
       {
         icon: RefreshCw,
@@ -83,14 +83,14 @@ const features = [
       {
         icon: BookOpen,
         title: 'Trading Lessons',
-        description: 'Access comprehensive educational content on trading strategies and psychology',
-        badge: 'Premium',
+        description: 'Structured lessons covering risk management, technical analysis, and trading psychology',
+        badge: 'Coming Soon',
       },
       {
         icon: Calendar,
         title: 'Economic Calendar',
         description: 'Stay informed with major economic events and market-moving news',
-        badge: 'Essential',
+        badge: 'Coming Soon',
       },
       {
         icon: FileText,
@@ -107,7 +107,7 @@ const features = [
         icon: Users,
         title: 'Social Trading',
         description: 'Share trades, strategies, and insights with the trading community',
-        badge: 'Premium',
+        badge: 'Coming Soon',
       },
       {
         icon: Award,
@@ -119,13 +119,13 @@ const features = [
         icon: Star,
         title: 'Leaderboard',
         description: 'Compete with other traders and see where you rank',
-        badge: 'Premium',
+        badge: 'Coming Soon',
       },
       {
         icon: CheckCircle,
         title: 'Challenges',
         description: 'Daily and weekly challenges to improve your trading discipline',
-        badge: 'Essential',
+        badge: 'Coming Soon',
       },
     ],
   },
@@ -141,7 +141,7 @@ const features = [
       {
         icon: Globe,
         title: 'Multi-Language',
-        description: 'Available in English, Spanish, Portuguese, French, and German',
+        description: 'Available in English, Portuguese, Spanish, Arabic, and Vietnamese',
         badge: 'Essential',
       },
       {

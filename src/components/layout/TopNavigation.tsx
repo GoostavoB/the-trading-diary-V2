@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
     BarChart3, Wallet, Plus, Receipt, Shield, BookMarked,
     LineChart, Target, Brain, AlertCircle, TrendingDown,
-    FileText, BookOpen, ChevronDown, Menu, X
+    FileText, BookOpen, ChevronDown, Menu, X, Newspaper, Link2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -43,6 +43,7 @@ export function TopNavigation() {
                 { title: 'Fee Analysis', url: '/fee-analysis', icon: Receipt, description: 'Analyze trading costs and commissions' },
                 { title: 'Tax Reports', url: '/tax-reports', icon: FileText, description: 'Generate tax reports for your trades' },
                 { title: 'Reports', url: '/reports', icon: BarChart3, description: 'AI-generated performance reports' },
+                { title: 'Exchange Connections', url: '/exchanges', icon: Link2, description: 'Connect exchanges for automatic trade sync' },
             ]
         },
         {
@@ -65,6 +66,11 @@ export function TopNavigation() {
                 { title: 'Capital Management', url: '/capital-management', icon: Plus, description: 'Log capital additions and track growth' },
             ]
         },
+        {
+            title: 'Blog',
+            url: '/blog',
+            icon: Newspaper
+        },
     ];
 
     return (
@@ -86,28 +92,35 @@ export function TopNavigation() {
                                             </NavLink>
                                         ) : (
                                             <>
-                                                <NavigationMenuTrigger className="bg-transparent hover:bg-white/5 data-[state=open]:bg-white/5">
+                                                <NavigationMenuTrigger className="bg-transparent hover:bg-white/8 data-[state=open]:bg-white/8 transition-colors duration-150">
                                                     {item.title}
                                                 </NavigationMenuTrigger>
                                                 <NavigationMenuContent>
-                                                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] bg-card/95 backdrop-blur-xl border border-border/10">
+                                                    <ul className="grid w-[420px] gap-1 p-3 md:w-[520px] md:grid-cols-2 bg-card/98 backdrop-blur-2xl border border-border/20 shadow-2xl rounded-xl">
                                                         {item.items?.map((subItem) => (
                                                             <li key={subItem.title}>
                                                                 <NavigationMenuLink asChild>
                                                                     <NavLink
                                                                         to={subItem.url}
                                                                         className={cn(
-                                                                            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/10 hover:text-accent-foreground focus:bg-accent/10 focus:text-accent-foreground",
-                                                                            isActive(subItem.url) && "bg-accent/10 text-primary"
+                                                                            "flex items-start gap-3 select-none rounded-lg p-3 leading-none no-underline outline-none transition-all duration-150 hover:bg-white/5 focus:bg-white/5 group",
+                                                                            isActive(subItem.url) && "bg-primary/[0.08] border border-primary/15"
                                                                         )}
                                                                     >
-                                                                        <div className="flex items-center gap-2 text-sm font-medium leading-none">
-                                                                            <subItem.icon className="h-4 w-4 text-primary" />
-                                                                            {subItem.title}
+                                                                        <div className={cn(
+                                                                            "mt-0.5 p-1.5 rounded-md shrink-0 transition-colors duration-150",
+                                                                            isActive(subItem.url) ? "bg-primary/15" : "bg-white/5 group-hover:bg-primary/10"
+                                                                        )}>
+                                                                            <subItem.icon className={cn("h-3.5 w-3.5", isActive(subItem.url) ? "text-primary" : "text-muted-foreground group-hover:text-primary")} />
                                                                         </div>
-                                                                        <p className="line-clamp-2 text-xs leading-snug text-muted-foreground mt-1.5">
-                                                                            {subItem.description}
-                                                                        </p>
+                                                                        <div className="flex-1 min-w-0">
+                                                                            <div className={cn("text-sm font-medium leading-none mb-1", isActive(subItem.url) ? "text-primary" : "text-foreground")}>
+                                                                                {subItem.title}
+                                                                            </div>
+                                                                            <p className="text-xs leading-snug text-muted-foreground line-clamp-1">
+                                                                                {subItem.description}
+                                                                            </p>
+                                                                        </div>
                                                                     </NavLink>
                                                                 </NavigationMenuLink>
                                                             </li>

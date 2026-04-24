@@ -9,7 +9,6 @@ import { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SmartWidgetWrapper } from '@/components/widgets/SmartWidgetWrapper';
-import { OverviewContent } from '@/components/dashboard/tabs/OverviewContent';
 import { CommandCenterContent } from '@/components/dashboard/tabs/CommandCenterContent';
 import { BehaviorContent } from '@/components/dashboard/tabs/BehaviorContent';
 import { RollingTargetContent } from '@/components/dashboard/tabs/RollingTargetContent';
@@ -56,7 +55,6 @@ import { UpgradePrompt } from '@/components/UpgradePrompt';
 import { useSubAccount } from '@/contexts/SubAccountContext';
 import { Badge } from '@/components/ui/badge';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
-import { SimplifiedDashboardGrid } from '@/components/dashboard/SimplifiedDashboardGrid';
 import { X } from 'lucide-react';
 import { DashboardProvider, useDashboard } from '@/providers/dashboard/DashboardProvider';
 import { SEO } from '@/components/SEO';
@@ -616,27 +614,17 @@ function DashboardContent() {
             </div>
           ) : (
             <>
+              {/* ── Primary tab bar: 5 clear sections ── */}
               <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-                <TabsList className="glass rounded-2xl flex w-full h-auto p-1.5 overflow-x-auto gap-1">
-                  <TabsTrigger value="tradestation" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Trade Station</TabsTrigger>
-                  <TabsTrigger value="overview" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Command Center</TabsTrigger>
-                  <TabsTrigger value="goals" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Goals</TabsTrigger>
-                  <TabsTrigger value="behavior" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Behavior</TabsTrigger>
-                  <TabsTrigger value="calendar" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Calendar</TabsTrigger>
-                  <TabsTrigger value="errors" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Errors</TabsTrigger>
-                  <TabsTrigger value="target" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Target</TabsTrigger>
-                  <TabsTrigger value="history" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">{t('trades.tradeHistory')}</TabsTrigger>
-                  <TabsTrigger value="dre" className="text-xs sm:text-sm py-2 px-3 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all flex-shrink-0">Risk Engine</TabsTrigger>
+                <TabsList className="glass rounded-2xl flex w-full h-auto p-1.5 gap-1">
+                  <TabsTrigger value="overview"      className="flex-1 text-sm py-2.5 px-4 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Overview</TabsTrigger>
+                  <TabsTrigger value="tradestation"  className="flex-1 text-sm py-2.5 px-4 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Trade Station</TabsTrigger>
+                  <TabsTrigger value="analytics"     className="flex-1 text-sm py-2.5 px-4 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Analytics</TabsTrigger>
+                  <TabsTrigger value="history"       className="flex-1 text-sm py-2.5 px-4 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">History</TabsTrigger>
+                  <TabsTrigger value="planning"      className="flex-1 text-sm py-2.5 px-4 whitespace-nowrap data-[state=active]:bg-white/80 dark:data-[state=active]:bg-white/10 data-[state=active]:shadow-sm rounded-xl transition-all">Planning</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="tradestation" className="space-y-6">
-                  <TradeStationContent />
-                </TabsContent>
-
-                <TabsContent value="errors" className="space-y-6">
-                  <ErrorsContent />
-                </TabsContent>
-
+                {/* ── Overview: Command Center + customisable widget grid ── */}
                 <TabsContent value="overview" className="space-y-4">
                   <DashboardHeader
                     dateRange={dateRange}
@@ -654,45 +642,58 @@ function DashboardContent() {
                     onForceReset={handleForceResetLayout}
                     onAddWidget={() => setShowWidgetLibrary(true)}
                   />
-
-                  <WidgetLibrary
-                    open={showWidgetLibrary}
-                    onClose={() => setShowWidgetLibrary(false)}
-                    onAddWidget={addWidget}
-                    onRemoveWidget={removeWidget}
-                    activeWidgets={activeWidgets}
-                  />
-
-                  <UpgradePrompt
-                    open={showUpgradePrompt}
-                    onClose={() => setShowUpgradePrompt(false)}
-                  />
-
                   <CommandCenterContent />
                 </TabsContent>
 
-                <TabsContent value="goals" className="space-y-4">
-                  <GoalsContent />
+                {/* ── Trade Station ── */}
+                <TabsContent value="tradestation" className="space-y-6">
+                  <TradeStationContent />
                 </TabsContent>
 
-                <TabsContent value="behavior" className="space-y-4">
-                  <BehaviorContent />
+                {/* ── Analytics: Behavior + Errors in sub-tabs ── */}
+                <TabsContent value="analytics" className="space-y-4">
+                  <Tabs defaultValue="behavior" className="space-y-4">
+                    <TabsList className="h-9 rounded-lg bg-muted/40 p-1 gap-1">
+                      <TabsTrigger value="behavior" className="rounded-md px-4 text-sm">Behavior</TabsTrigger>
+                      <TabsTrigger value="errors"   className="rounded-md px-4 text-sm">Errors</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="behavior" className="space-y-4">
+                      <BehaviorContent />
+                    </TabsContent>
+                    <TabsContent value="errors" className="space-y-4">
+                      <ErrorsContent />
+                    </TabsContent>
+                  </Tabs>
                 </TabsContent>
 
-                <TabsContent value="calendar" className="space-y-4">
-                  <CalendarContent />
+                {/* ── History: Trade History + Calendar in sub-tabs ── */}
+                <TabsContent value="history" className="space-y-4">
+                  <Tabs defaultValue="trades" className="space-y-4">
+                    <TabsList className="h-9 rounded-lg bg-muted/40 p-1 gap-1">
+                      <TabsTrigger value="trades"   className="rounded-md px-4 text-sm">{t('trades.tradeHistory')}</TabsTrigger>
+                      <TabsTrigger value="calendar" className="rounded-md px-4 text-sm">Calendar</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="trades" className="glass rounded-2xl p-6">
+                      <HistoryContent />
+                    </TabsContent>
+                    <TabsContent value="calendar" className="space-y-4">
+                      <CalendarContent />
+                    </TabsContent>
+                  </Tabs>
                 </TabsContent>
 
-                <TabsContent value="target" className="space-y-4">
-                  <RollingTargetContent />
-                </TabsContent>
-
-                <TabsContent value="history" className="relative glass rounded-2xl p-6">
-                  <HistoryContent />
-                </TabsContent>
-
-                <TabsContent value="dre" className="space-y-4">
-                  <DREContent />
+                {/* ── Planning: Goals + Rolling Target + Risk Engine in sub-tabs ── */}
+                <TabsContent value="planning" className="space-y-4">
+                  <Tabs defaultValue="goals" className="space-y-4">
+                    <TabsList className="h-9 rounded-lg bg-muted/40 p-1 gap-1">
+                      <TabsTrigger value="goals"  className="rounded-md px-4 text-sm">Goals</TabsTrigger>
+                      <TabsTrigger value="target" className="rounded-md px-4 text-sm">Rolling Target</TabsTrigger>
+                      <TabsTrigger value="risk"   className="rounded-md px-4 text-sm">Risk Engine</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="goals"  className="space-y-4"><GoalsContent /></TabsContent>
+                    <TabsContent value="target" className="space-y-4"><RollingTargetContent /></TabsContent>
+                    <TabsContent value="risk"   className="space-y-4"><DREContent /></TabsContent>
+                  </Tabs>
                 </TabsContent>
               </Tabs>
             </>
