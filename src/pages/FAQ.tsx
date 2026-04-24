@@ -8,6 +8,8 @@ import {
 } from '@/components/ui/accordion';
 import { useTranslation } from '@/hooks/useTranslation';
 import { SkipToContent } from '@/components/SkipToContent';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 
 const FAQ = () => {
   const { t } = useTranslation();
@@ -36,7 +38,14 @@ const FAQ = () => {
   ];
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.faqPage.title}
+        description={pageMeta.faqPage.description}
+        keywords={pageMeta.faqPage.keywords}
+        canonical={pageMeta.faqPage.canonical}
+      />
+      <AppLayout>
       <SkipToContent />
       <main id="main-content" className="max-w-3xl mx-auto space-y-6">
         <header>
@@ -60,6 +69,7 @@ const FAQ = () => {
         </PremiumCard>
       </main>
     </AppLayout>
+    </>
   );
 };
 

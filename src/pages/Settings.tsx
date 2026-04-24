@@ -7,6 +7,8 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import AppLayout from '@/components/layout/AppLayout';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -306,6 +308,14 @@ const Settings = () => {
   };
 
   return (
+    <>
+      <SEO
+        title={pageMeta.settings.title}
+        description={pageMeta.settings.description}
+        keywords={pageMeta.settings.keywords}
+        canonical={pageMeta.settings.canonical}
+        noindex={true}
+      />
     <AppLayout>
       <SkipToContent />
       <main id="main-content" className="max-w-4xl mx-auto space-y-6">
@@ -716,6 +726,7 @@ const Settings = () => {
         </Tabs>
       </main>
     </AppLayout>
+    </>
   );
 };
 

@@ -4,6 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import {
   BarChart3, Upload, Brain, TrendingUp, Shield, Users,
   Smartphone, Globe, Zap, FileText, Bell, Calendar,
@@ -174,7 +176,14 @@ export default function FeaturesPage() {
   };
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.features.title}
+        description={pageMeta.features.description}
+        keywords={pageMeta.features.keywords}
+        canonical={pageMeta.features.canonical}
+      />
+      <AppLayout>
       <div className="max-w-7xl mx-auto space-y-16">
         {/* Hero */}
         <div className="text-center space-y-4">
@@ -236,5 +245,6 @@ export default function FeaturesPage() {
         </PremiumCard>
       </div>
     </AppLayout>
+    </>
   );
 }

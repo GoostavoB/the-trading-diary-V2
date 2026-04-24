@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Crown, TrendingUp, Users, Calendar } from 'lucide-react';
 import { PremiumCard } from '@/components/ui/PremiumCard';
@@ -109,7 +111,15 @@ const Leaderboard = () => {
   };
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.leaderboard.title}
+        description={pageMeta.leaderboard.description}
+        keywords={pageMeta.leaderboard.keywords}
+        canonical={pageMeta.leaderboard.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <SkipToContent />
       <PremiumFeatureLock requiredPlan="pro" isLocked={isPremiumLocked}>
         <main id="main-content" className="container mx-auto p-6 max-w-7xl space-y-6">
@@ -273,6 +283,7 @@ const Leaderboard = () => {
         </main>
       </PremiumFeatureLock>
     </AppLayout>
+    </>
   );
 };
 

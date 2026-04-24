@@ -1,14 +1,16 @@
-import { Helmet } from 'react-helmet-async';
 import AppLayout from '@/components/layout/AppLayout';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 
 export default function CookiePolicy() {
   return (
     <>
-      <Helmet>
-        <title>Cookie Policy - The Trading Diary</title>
-        <meta name="description" content="Learn about how The Trading Diary uses cookies and similar technologies." />
-      </Helmet>
-
+      <SEO
+        title={pageMeta.cookiePolicy.title}
+        description={pageMeta.cookiePolicy.description}
+        keywords={pageMeta.cookiePolicy.keywords}
+        canonical={pageMeta.cookiePolicy.canonical}
+      />
       <AppLayout>
         <div className="container max-w-4xl mx-auto px-4 py-12">
           <h1 className="text-4xl font-bold mb-8">Cookie Policy</h1>

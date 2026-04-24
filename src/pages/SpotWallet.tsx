@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { PremiumCard } from '@/components/ui/PremiumCard';
@@ -121,7 +123,15 @@ export default function SpotWallet() {
   })) || [];
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.spotWallet.title}
+        description={pageMeta.spotWallet.description}
+        keywords={pageMeta.spotWallet.keywords}
+        canonical={pageMeta.spotWallet.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <SkipToContent />
       <main id="main-content" className="space-y-6 p-6">
         {/* Page Header */}
@@ -314,6 +324,7 @@ export default function SpotWallet() {
         />
       </main>
     </AppLayout>
+    </>
   );
 };
 

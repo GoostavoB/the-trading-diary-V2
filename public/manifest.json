@@ -36,10 +36,11 @@
   ],
   "screenshots": [
     {
-      "src": "/logo-512.png",
-      "sizes": "1280x720",
+      "src": "/og-image-en.png",
+      "sizes": "1200x630",
       "type": "image/png",
-      "form_factor": "wide"
+      "form_factor": "wide",
+      "label": "The Trading Diary — Dashboard overview"
     }
   ],
   "shortcuts": [

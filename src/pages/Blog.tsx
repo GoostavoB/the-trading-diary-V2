@@ -5,10 +5,12 @@ import Footer from '@/components/Footer';
 import { SkipToContent } from '@/components/SkipToContent';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, User, Search } from 'lucide-react';
-import { blogArticles, getArticlesByLanguage } from '@/data/blogArticles';
+import { getArticlesByLanguage } from '@/data/blogArticles';
+import { fetchArticlesByLanguage } from '@/services/blogService';
 import { useTranslation } from '@/hooks/useTranslation';
 import { SEO } from '@/components/SEO';
 import { useState, useMemo, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { preloadImages } from '@/utils/preloadStrategies';
@@ -34,11 +36,19 @@ const Blog = () => {
     }
   }, [lang, language, changeLanguage]);
 
-  // Get articles for current language, fallback to English
+  // Fetch articles from CMS (with static fallback built into the service)
+  const { data: cmsArticles, isLoading } = useQuery({
+    queryKey: ['blog-articles', currentLang],
+    queryFn: () => fetchArticlesByLanguage(currentLang),
+    staleTime: 1000 * 60 * 5, // cache for 5 minutes
+  });
+
+  // Get articles for current language, fallback to English (static)
   const languageArticles = useMemo(() => {
-    const articles = getArticlesByLanguage(currentLang);
-    return articles.length > 0 ? articles : getArticlesByLanguage('en');
-  }, [currentLang]);
+    if (cmsArticles && cmsArticles.length > 0) return cmsArticles;
+    const staticArticles = getArticlesByLanguage(currentLang);
+    return staticArticles.length > 0 ? staticArticles : getArticlesByLanguage('en');
+  }, [cmsArticles, currentLang]);
 
   // Get unique categories
   const categories = useMemo(() => {
@@ -123,11 +133,18 @@ const Blog = () => {
 
           {/* Articles Count */}
           <p className="text-sm text-muted-foreground">
-            Showing {filteredArticles.length} {filteredArticles.length === 1 ? 'article' : 'articles'}
+            {isLoading
+              ? 'Loading articles...'
+              : `Showing ${filteredArticles.length} ${filteredArticles.length === 1 ? 'article' : 'articles'}`}
           </p>
 
           <div className="grid gap-6">
-            {filteredArticles.map((article) => (
+            {isLoading && (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-32 rounded-lg bg-muted/40 animate-pulse" />
+              ))
+            )}
+            {!isLoading && filteredArticles.map((article) => (
               <Link to={getLocalizedPath(`/blog/${article.slug}`, currentLang)} key={article.slug}>
                 <PremiumCard className="p-6 bg-card border-border hover:border-primary/50 transition-all duration-300 cursor-pointer group hover:shadow-lg">
                   <div className="flex items-start justify-between gap-4 mb-3">

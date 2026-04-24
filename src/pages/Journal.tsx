@@ -12,6 +12,8 @@ import { BookOpen, Calendar, Tag, TrendingUp } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { SkipToContent } from "@/components/SkipToContent";
+import { SEO } from "@/components/SEO";
+import { pageMeta } from "@/utils/seoHelpers";
 
 export default function Journal() {
   const { user } = useAuth();
@@ -46,7 +48,15 @@ export default function Journal() {
   };
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.journal.title}
+        description={pageMeta.journal.description}
+        keywords={pageMeta.journal.keywords}
+        canonical={pageMeta.journal.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <SkipToContent />
       <main id="main-content" className="container mx-auto p-6 max-w-7xl">
         <header className="flex items-center justify-between mb-6">
@@ -241,5 +251,6 @@ export default function Journal() {
         </div>
       </main>
     </AppLayout>
+    </>
   );
 }

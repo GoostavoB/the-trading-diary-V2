@@ -171,11 +171,6 @@ export const getLandingStructuredData = (langCode: string) => {
         "description": "Elite plan with unlimited AI Extracts and priority support"
       }
     ],
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "2500"
-    },
     "featureList": "AI trade extraction, Screenshot uploads, Anti-duplicate detection, Advanced charts, Journal with emotional tracking, Market sentiment analysis, Exchange fee comparison, Wealth forecast, Risk calculator, Tax report export",
     "inLanguage": meta.lang
   };

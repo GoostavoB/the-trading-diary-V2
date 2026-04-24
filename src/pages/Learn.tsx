@@ -1,5 +1,6 @@
-import { Helmet } from 'react-helmet-async';
 import AppLayout from '@/components/layout/AppLayout';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { LessonCard } from '@/components/educational/LessonCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -67,10 +68,13 @@ const lessons = [
 export default function Learn() {
   return (
     <>
-      <Helmet>
-        <title>Learn Trading - The Trading Diary</title>
-        <meta name="description" content="Master trading with our comprehensive lessons and tutorials." />
-      </Helmet>
+      <SEO
+        title={pageMeta.learn.title}
+        description={pageMeta.learn.description}
+        keywords={pageMeta.learn.keywords}
+        canonical={pageMeta.learn.canonical}
+        noindex={true}
+      />
 
       <AppLayout>
         <div className="space-y-6">

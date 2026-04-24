@@ -85,7 +85,6 @@ const CreditsDisplay = () => {
 };
 const Upload = () => {
   useKeyboardShortcuts();
-  useKeyboardShortcuts();
 
 
   const {

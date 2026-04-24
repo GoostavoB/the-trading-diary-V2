@@ -1,4 +1,6 @@
 import AppLayout from '@/components/layout/AppLayout';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Star } from 'lucide-react';
 import { TradingStreaks } from '@/components/TradingStreaks';
@@ -24,7 +26,15 @@ const ProgressAnalytics = () => {
   });
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.progressAnalytics.title}
+        description={pageMeta.progressAnalytics.description}
+        keywords={pageMeta.progressAnalytics.keywords}
+        canonical={pageMeta.progressAnalytics.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <div className="space-y-6 p-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Progress Analytics</h1>
@@ -55,6 +65,7 @@ const ProgressAnalytics = () => {
         </div>
       </div>
     </AppLayout>
+    </>
   );
 };
 

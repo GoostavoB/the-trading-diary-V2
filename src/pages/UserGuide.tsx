@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -26,6 +28,14 @@ export default function UserGuide() {
   };
 
   return (
+    <>
+    <SEO
+      title={pageMeta.userGuide.title}
+      description={pageMeta.userGuide.description}
+      keywords={pageMeta.userGuide.keywords}
+      canonical={pageMeta.userGuide.canonical}
+      noindex={true}
+    />
     <AppLayout>
       <div className="container max-w-7xl mx-auto p-6 space-y-8">
         {/* Header */}
@@ -1006,5 +1016,6 @@ export default function UserGuide() {
         </PremiumCard>
       </div>
     </AppLayout>
+    </>
   );
 }

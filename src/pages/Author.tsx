@@ -6,44 +6,27 @@ import { MobileHeader } from '@/components/MobileHeader';
 import Footer from '@/components/Footer';
 import { SkipToContent } from '@/components/SkipToContent';
 import { blogArticles } from '@/data/blogArticles';
-import { ArrowLeft, User, Mail, Globe } from 'lucide-react';
+import { ArrowLeft, User, Mail, Globe, Twitter } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { addStructuredData } from '@/utils/seoHelpers';
 import { useEffect } from 'react';
 
-// Author data (in a real app, this would come from a database)
 const authorData: Record<string, {
   name: string;
   bio: string;
   expertise: string[];
   email?: string;
   website?: string;
+  twitter?: string;
   avatar?: string;
 }> = {
-  'sarah-johnson': {
-    name: 'Sarah Johnson',
-    bio: 'AI & Trading Technology Specialist with 8+ years of experience in fintech and cryptocurrency markets. Passionate about leveraging artificial intelligence to improve trading outcomes.',
-    expertise: ['AI & Machine Learning', 'Crypto Trading', 'Technical Analysis', 'Trading Automation'],
-    email: 'sarah@thetradingdiary.com',
-    website: 'https://sarahjohnson.trading'
-  },
-  'michael-chen': {
-    name: 'Michael Chen',
-    bio: 'Professional crypto trader and trading strategy consultant. Specializes in risk management and systematic trading approaches for digital assets.',
-    expertise: ['Trading Strategy', 'Risk Management', 'Portfolio Management', 'Market Analysis'],
-    email: 'michael@thetradingdiary.com'
-  },
-  'emily-roberts': {
-    name: 'Dr. Emily Roberts',
-    bio: 'Trading psychologist and behavioral finance expert. PhD in Cognitive Psychology with focus on decision-making under uncertainty in financial markets.',
-    expertise: ['Trading Psychology', 'Behavioral Finance', 'Emotional Intelligence', 'Mental Performance'],
-    email: 'emily@thetradingdiary.com'
-  },
-  'alex-kumar': {
-    name: 'Alex Kumar',
-    bio: 'Quantitative analyst and data scientist specializing in cryptocurrency markets. Expert in statistical analysis and algorithmic trading systems.',
-    expertise: ['Data Analytics', 'Quantitative Analysis', 'Statistical Modeling', 'Algorithm Development'],
-    email: 'alex@thetradingdiary.com'
+  'gustavo': {
+    name: 'Gustavo',
+    bio: 'Active crypto trader and founder of The Trading Diary. Built this platform after years of frustration with spreadsheets and scattered notes — to give traders a real system to track, analyze, and improve every trade. Focused on perpetual futures, risk management, and data-driven discipline.',
+    expertise: ['Crypto Futures Trading', 'Risk Management', 'Trading Psychology', 'Data-Driven Performance', 'Trading Journal Systems'],
+    email: 'gustavo@thetradingdiary.com',
+    website: 'https://www.thetradingdiary.com',
+    twitter: 'https://twitter.com/thetradingdiary'
   }
 };
 
@@ -70,7 +53,11 @@ const Author = () => {
         "url": `https://www.thetradingdiary.com/author/${authorSlug}`,
         "email": author.email,
         "jobTitle": author.expertise[0],
-        "knowsAbout": author.expertise
+        "knowsAbout": author.expertise,
+        "sameAs": [
+          author.twitter,
+          author.website
+        ].filter(Boolean)
       };
 
       addStructuredData(personSchema, 'author-schema');
@@ -156,6 +143,17 @@ const Author = () => {
                     >
                       <Globe className="w-4 h-4" />
                       Website
+                    </a>
+                  )}
+                  {author.twitter && (
+                    <a
+                      href={author.twitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      <Twitter className="w-4 h-4" />
+                      Twitter
                     </a>
                   )}
                 </div>

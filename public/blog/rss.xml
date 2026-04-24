@@ -5,7 +5,7 @@
     <link>https://www.thetradingdiary.com/blog</link>
     <description>Expert insights on crypto trading, AI tools, trading psychology, and strategies. Learn how to track, analyze, and improve your trading performance.</description>
     <language>en</language>
-    <lastBuildDate>Wed, 22 Oct 2025 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 24 Apr 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://www.thetradingdiary.com/blog/rss.xml" rel="self" type="application/rss+xml" />
     <image>
       <url>https://www.thetradingdiary.com/logo-512.png</url>
@@ -20,10 +20,10 @@
       <guid isPermaLink="true">https://www.thetradingdiary.com/blog/ai-tools-for-crypto-trading</guid>
       <pubDate>Wed, 22 Oct 2025 00:00:00 GMT</pubDate>
       <category>AI &amp; Technology</category>
-      <author>Sarah Johnson</author>
+      <author>The Trading Diary Team</author>
       <description><![CDATA[Discover how AI-powered tools revolutionize crypto trading with real-time market insights, pattern recognition, and data-driven decision making for better trading outcomes.]]></description>
     </item>
-    
+
     <!-- Article: Trading Journal for Crypto -->
     <item>
       <title>Why Every Crypto Trader Needs a Trading Journal</title>
@@ -31,10 +31,10 @@
       <guid isPermaLink="true">https://www.thetradingdiary.com/blog/trading-journal-for-crypto</guid>
       <pubDate>Mon, 20 Oct 2025 00:00:00 GMT</pubDate>
       <category>Trading Strategy</category>
-      <author>Michael Chen</author>
+      <author>The Trading Diary Team</author>
       <description><![CDATA[Learn why maintaining a comprehensive trading journal is essential for crypto traders. Track your trades, analyze patterns, and improve your strategy with proven methods.]]></description>
     </item>
-    
+
     <!-- Article: Trading Psychology -->
     <item>
       <title>Trading Psychology: How to Control Your Emotions</title>
@@ -42,10 +42,10 @@
       <guid isPermaLink="true">https://www.thetradingdiary.com/blog/trading-psychology-control-emotions</guid>
       <pubDate>Fri, 17 Oct 2025 00:00:00 GMT</pubDate>
       <category>Psychology</category>
-      <author>Dr. Emily Roberts</author>
+      <author>The Trading Diary Team</author>
       <description><![CDATA[Master your emotions and improve trading performance. Learn proven psychological techniques to overcome fear, greed, and FOMO in crypto trading.]]></description>
     </item>
-    
+
     <!-- Article: Data-Driven Trading -->
     <item>
       <title>Data-Driven Trading: Making Better Decisions</title>
@@ -53,10 +53,10 @@
       <guid isPermaLink="true">https://www.thetradingdiary.com/blog/data-driven-trading</guid>
       <pubDate>Wed, 15 Oct 2025 00:00:00 GMT</pubDate>
       <category>Analytics</category>
-      <author>Alex Kumar</author>
+      <author>The Trading Diary Team</author>
       <description><![CDATA[Transform your trading strategy with data-driven insights. Learn how to analyze metrics, identify patterns, and make informed decisions based on concrete data.]]></description>
     </item>
-    
+
     <!-- Article: AI-Powered Trading Journal -->
     <item>
       <title>The Future of Trading Journals: AI-Powered Analysis</title>
@@ -64,7 +64,7 @@
       <guid isPermaLink="true">https://www.thetradingdiary.com/blog/ai-powered-trading-journal</guid>
       <pubDate>Mon, 13 Oct 2025 00:00:00 GMT</pubDate>
       <category>AI &amp; Technology</category>
-      <author>Sarah Johnson</author>
+      <author>The Trading Diary Team</author>
       <description><![CDATA[Explore how AI-powered trading journals automatically analyze your trades, provide actionable insights, and help you identify winning patterns faster than ever.]]></description>
     </item>
   </channel>

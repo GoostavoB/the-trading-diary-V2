@@ -1,10 +1,11 @@
 
-import { Helmet } from 'react-helmet-async';
 import AppLayout from '@/components/layout/AppLayout';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useEffect } from 'react';
 import { HreflangLinks } from '@/components/HreflangLinks';
 import { SUPPORTED_LANGUAGES, SupportedLanguage } from '@/utils/languageRouting';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 
 export default function Privacy() {
   const { t, changeLanguage } = useTranslation();
@@ -19,11 +20,12 @@ export default function Privacy() {
   return (
     <>
       <HreflangLinks languages={[...SUPPORTED_LANGUAGES]} defaultLanguage="en" />
-      <Helmet>
-        <title>{t('legal.privacyTitle', 'Privacy Policy')} - The Trading Diary</title>
-        <meta name="description" content={t('legal.privacy.description', 'Learn how The Trading Diary collects, uses, and protects your personal information.')} />
-      </Helmet>
-
+      <SEO
+        title={pageMeta.privacy.title}
+        description={pageMeta.privacy.description}
+        keywords={pageMeta.privacy.keywords}
+        canonical={pageMeta.privacy.canonical}
+      />
       <AppLayout>
         <div className="container max-w-4xl mx-auto px-4 py-12">
           <h1 className="text-4xl font-bold mb-8">{t('legal.privacyTitle', 'Privacy Policy')}</h1>

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/layout/AppLayout";
 import { PremiumCard } from "@/components/ui/PremiumCard";
@@ -210,7 +212,15 @@ const PerformanceAlerts = () => {
   };
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.performanceAlerts.title}
+        description={pageMeta.performanceAlerts.description}
+        keywords={pageMeta.performanceAlerts.keywords}
+        canonical={pageMeta.performanceAlerts.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -448,6 +458,7 @@ const PerformanceAlerts = () => {
         </Tabs>
       </div>
     </AppLayout>
+    </>
   );
 };
 

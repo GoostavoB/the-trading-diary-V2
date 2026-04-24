@@ -2,6 +2,8 @@ import AppLayout from '@/components/layout/AppLayout';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Star } from 'lucide-react';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 
 interface Testimonial {
   id: string;
@@ -72,7 +74,14 @@ const testimonials: Testimonial[] = [
 
 export default function Testimonials() {
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.testimonials.title}
+        description={pageMeta.testimonials.description}
+        keywords={pageMeta.testimonials.keywords}
+        canonical={pageMeta.testimonials.canonical}
+      />
+      <AppLayout>
       <div className="max-w-7xl mx-auto space-y-8 p-6">
         <div className="text-center space-y-4">
           <h1 className="text-4xl md:text-5xl font-bold">
@@ -151,5 +160,6 @@ export default function Testimonials() {
         </PremiumCard>
       </div>
     </AppLayout>
+    </>
   );
 }

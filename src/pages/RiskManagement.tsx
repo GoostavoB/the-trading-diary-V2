@@ -12,6 +12,8 @@ import { Shield, Calculator, TrendingDown, BarChart3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { SEO } from "@/components/SEO";
+import { pageMeta } from "@/utils/seoHelpers";
 
 export default function RiskManagement() {
   const { user } = useAuth();
@@ -123,7 +125,15 @@ export default function RiskManagement() {
   };
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.riskManagement.title}
+        description={pageMeta.riskManagement.description}
+        keywords={pageMeta.riskManagement.keywords}
+        canonical={pageMeta.riskManagement.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <div className="container mx-auto p-6 max-w-7xl">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
@@ -239,5 +249,6 @@ export default function RiskManagement() {
         </Tabs>
       </div>
     </AppLayout>
+    </>
   );
 }

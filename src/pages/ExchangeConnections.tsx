@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -268,7 +270,15 @@ export default function ExchangeConnections() {
   }
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.exchangeConnections.title}
+        description={pageMeta.exchangeConnections.description}
+        keywords={pageMeta.exchangeConnections.keywords}
+        canonical={pageMeta.exchangeConnections.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <SkipToContent />
       <main id="main-content" className="container max-w-7xl mx-auto p-6 space-y-8">
         <header>
@@ -420,5 +430,6 @@ export default function ExchangeConnections() {
         />
       </main>
     </AppLayout>
+    </>
   );
 }

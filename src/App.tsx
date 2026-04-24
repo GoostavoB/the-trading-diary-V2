@@ -88,7 +88,7 @@ const PricingPage = lazy(() => import("./pages/PricingPage"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
-const BlogArticle = lazy(() => import("./pages/BlogArticle"));
+// BlogArticle removed — legacy route now redirects to /blog
 const Learn = lazy(() => import("./pages/Learn"));
 const ApiDocs = lazy(() => import("./pages/ApiDocs"));
 const AdvancedAnalytics = lazy(() => import("./pages/AdvancedAnalytics"));
@@ -99,6 +99,7 @@ const ChangelogPage = lazy(() => import("./pages/ChangelogPage"));
 const HowItWorks = lazy(() => import("./pages/HowItWorks"));
 const FeaturesPage = lazy(() => import("./pages/FeaturesPage"));
 const ErrorAnalytics = lazy(() => import("./pages/ErrorAnalytics"));
+const BlogAdmin = lazy(() => import("./pages/BlogAdmin"));
 
 // Loading fallback
 const PageLoader = () => (
@@ -184,14 +185,13 @@ const AppRoutes = () => {
           <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
           <Route path="/forecast" element={<ProtectedRoute><Forecast /></ProtectedRoute>} />
           <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
-          {/* Gamification route temporarily disabled - XP/Level/Challenges hidden */}
 
           <Route path="/market-data" element={<ProtectedRoute><MarketData /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-          {/* Phase 2: Social features - temporarily disabled for backlog #34 */}
+          {/* [Phase 2] Social features — roadmap Sprint 3 */}
           {/* <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} /> */}
           <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
-          {/* Trade Analysis temporarily disabled - incomplete module */}
+          {/* [Phase 2] Trade Analysis — module incomplete, roadmap Sprint 3 */}
           {/* <Route path="/trade-analysis" element={<ProtectedRoute><TradeAnalysis /></ProtectedRoute>} /> */}
           <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
           <Route path="/risk-management" element={<ProtectedRoute><RiskManagement /></ProtectedRoute>} />
@@ -203,34 +203,35 @@ const AppRoutes = () => {
           <Route path="/fee-analysis" element={<ProtectedRoute><FeeAnalysis /></ProtectedRoute>} />
           <Route path="/capital-management" element={<ProtectedRoute><CapitalManagementPage /></ProtectedRoute>} />
           <Route path="/faq" element={<ProtectedRoute><FAQ /></ProtectedRoute>} />
-          {/* Phase 2: Leaderboard - temporarily disabled for backlog #34 */}
+          {/* [Phase 2] Leaderboard — roadmap Sprint 3 */}
           {/* <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} /> */}
           <Route path="/long-short-ratio" element={<ProtectedRoute><LongShortRatio /></ProtectedRoute>} />
-          {/* Phase 2: Economic Calendar and Performance Alerts - temporarily disabled for backlog #30 */}
+          {/* [Phase 2] Economic Calendar — roadmap Sprint 3 */}
           {/* <Route path="/economic-calendar" element={<ProtectedRoute><EconomicCalendar /></ProtectedRoute>} /> */}
           <Route path="/tax-reports" element={<ProtectedRoute><TaxReports /></ProtectedRoute>} />
-          {/* Phase 2: Trading Accounts - temporarily disabled for backlog #18 */}
+          {/* [Phase 2] Accounts + Performance Alerts — roadmap Sprint 3 */}
           {/* <Route path="/accounts" element={<ProtectedRoute><Accounts /></ProtectedRoute>} /> */}
           {/* <Route path="/performance-alerts" element={<ProtectedRoute><PerformanceAlerts /></ProtectedRoute>} /> */}
-          <Route path="/exchange-connections" element={<ProtectedRoute><ExchangeConnections /></ProtectedRoute>} />
-          {/* Phase 2: Progress Analytics (IXP/XP) - temporarily disabled for backlog #36 */}
+          {/* [Phase 2] Progress Analytics (XP/Level) — roadmap Sprint 3, visual redesign needed */}
           {/* <Route path="/progress-analytics" element={<ProtectedRoute><ProgressAnalytics /></ProtectedRoute>} /> */}
           <Route path="/my-metrics" element={<ProtectedRoute><MyMetrics /></ProtectedRoute>} />
           <Route path="/user-guide" element={<ProtectedRoute><UserGuide /></ProtectedRoute>} />
           <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
           <Route path="/cookie-policy" element={<PublicPageThemeWrapper><CookiePolicy /></PublicPageThemeWrapper>} />
           <Route path="/:lang/cookie-policy" element={<PublicPageThemeWrapper><CookiePolicy /></PublicPageThemeWrapper>} />
-          <Route path="/blog/article/:slug" element={<PublicPageThemeWrapper><BlogArticle /></PublicPageThemeWrapper>} />
+          {/* Legacy route — redirect to canonical blog URL */}
+          <Route path="/blog/article/:slug" element={<Navigate to="/blog" replace />} />
           <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
           <Route path="/api-docs" element={<ProtectedRoute><ApiDocs /></ProtectedRoute>} />
           <Route path="/advanced-analytics" element={<ProtectedRoute><AdvancedAnalytics /></ProtectedRoute>} />
-          {/* Phase 2: Social Feed - temporarily disabled for backlog #34 */}
+          {/* [Phase 2] Social Feed — roadmap Sprint 3 */}
           {/* <Route path="/social-feed" element={<ProtectedRoute><SocialFeed /></ProtectedRoute>} /> */}
           <Route path="/testimonials" element={<PublicPageThemeWrapper><Testimonials /></PublicPageThemeWrapper>} />
           <Route path="/changelog" element={<PublicPageThemeWrapper><ChangelogPage /></PublicPageThemeWrapper>} />
           <Route path="/how-it-works" element={<PublicPageThemeWrapper><HowItWorks /></PublicPageThemeWrapper>} />
           <Route path="/features" element={<PublicPageThemeWrapper><FeaturesPage /></PublicPageThemeWrapper>} />
           <Route path="/error-analytics" element={<ProtectedRoute><ErrorAnalytics /></ProtectedRoute>} />
+          <Route path="/blog-admin" element={<ProtectedRoute><BlogAdmin /></ProtectedRoute>} />
           <Route path="/custom/:pageId" element={<ProtectedRoute><CustomPage /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>

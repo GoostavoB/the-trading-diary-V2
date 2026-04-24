@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { SEO } from '@/components/SEO';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { supabase } from '@/integrations/supabase/client';
@@ -165,6 +166,12 @@ const Auth = () => {
   };
 
   return (
+    <>
+    <SEO
+      title="Sign In - The Trading Diary"
+      description="Sign in to your Trading Diary account to access your trades, analytics, and journal."
+      noindex={true}
+    />
     <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
       <SkipToContent />
       {/* Subtle background effect */}
@@ -416,6 +423,7 @@ const Auth = () => {
         )}
       </PremiumCard>
     </div>
+    </>
   );
 };
 

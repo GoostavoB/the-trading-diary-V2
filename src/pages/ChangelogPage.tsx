@@ -2,6 +2,8 @@ import AppLayout from '@/components/layout/AppLayout';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Zap, Bug, Plus, Sparkles } from 'lucide-react';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 
 interface ChangelogEntry {
   version: string;
@@ -95,7 +97,14 @@ const getChangeBadge = (type: string) => {
 
 export default function ChangelogPage() {
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.changelog.title}
+        description={pageMeta.changelog.description}
+        keywords={pageMeta.changelog.keywords}
+        canonical={pageMeta.changelog.canonical}
+      />
+      <AppLayout>
       <div className="max-w-4xl mx-auto space-y-8 p-6">
         <div className="text-center space-y-4">
           <h1 className="text-4xl md:text-5xl font-bold">Changelog</h1>
@@ -147,5 +156,6 @@ export default function ChangelogPage() {
         </PremiumCard>
       </div>
     </AppLayout>
+    </>
   );
 }

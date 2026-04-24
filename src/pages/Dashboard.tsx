@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
-import { Plus, Columns } from 'lucide-react';
+import { Plus, Columns, UploadCloud, TrendingUp, BarChart3, Target } from 'lucide-react';
 import { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -569,15 +569,51 @@ function DashboardContent() {
           {loading ? (
             <DashboardSkeleton />
           ) : stats && stats.total_trades === 0 ? (
-            <PremiumCard className="p-8 text-center glass">
-              <h3 className="text-xl font-semibold mb-2">{t('trades.trades')}</h3>
-              <p className="text-muted-foreground mb-4">
-                Upload your first trades to activate the dashboard and see your performance metrics
+            <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+              {/* Hero icon */}
+              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+                <UploadCloud className="h-10 w-10 text-primary" />
+              </div>
+
+              {/* Headline */}
+              <h2 className="text-3xl font-bold text-center mb-3">Your dashboard is waiting</h2>
+              <p className="text-muted-foreground text-center max-w-md mb-8 text-base leading-relaxed">
+                Add your first trade and unlock real-time performance tracking, win-rate analysis, drawdown curves, and much more.
               </p>
-              <a href="/upload" className="text-primary hover:underline">
-                {t('trades.addTrade')} →
-              </a>
-            </PremiumCard>
+
+              {/* Primary CTA */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-12">
+                <a href="/upload">
+                  <Button size="lg" className="gap-2 px-8 font-semibold text-base">
+                    <UploadCloud className="h-5 w-5" />
+                    Upload a Trade
+                  </Button>
+                </a>
+                <a href="/upload?tab=manual">
+                  <Button size="lg" variant="outline" className="gap-2 px-8 font-semibold text-base">
+                    <Plus className="h-5 w-5" />
+                    Enter Manually
+                  </Button>
+                </a>
+              </div>
+
+              {/* Feature teaser grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-2xl">
+                {[
+                  { icon: TrendingUp, label: 'P&L Tracking', desc: 'Cumulative profit & loss curves' },
+                  { icon: BarChart3, label: 'Win Rate', desc: 'Real-time win/loss analytics' },
+                  { icon: Target, label: 'Goals', desc: 'Set targets and track progress' },
+                ].map(({ icon: Icon, label, desc }) => (
+                  <PremiumCard key={label} className="p-4 text-center border-border/40">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                      <Icon className="h-4 w-4 text-primary" />
+                    </div>
+                    <p className="text-sm font-semibold">{label}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+                  </PremiumCard>
+                ))}
+              </div>
+            </div>
           ) : (
             <>
               <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 animate-fade-in" style={{ animationDelay: '0.5s' }}>

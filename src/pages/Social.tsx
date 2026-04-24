@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { supabase } from "@/integrations/supabase/client";
 import { SocialPost } from "@/types/social";
 import { FeedPost } from "@/components/social/FeedPost";
@@ -92,7 +94,15 @@ export default function Social() {
   const displayPosts = activeTab === "following" ? followingPosts : posts;
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.social.title}
+        description={pageMeta.social.description}
+        keywords={pageMeta.social.keywords}
+        canonical={pageMeta.social.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <PremiumFeatureLock requiredPlan="pro" isLocked={isPremiumLocked}>
         <div className="max-w-4xl mx-auto space-y-6">
         <div>
@@ -143,5 +153,6 @@ export default function Social() {
       </div>
       </PremiumFeatureLock>
     </AppLayout>
+    </>
   );
 }

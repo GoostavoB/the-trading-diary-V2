@@ -5,7 +5,6 @@ import { InteractivePnLChart } from "@/components/charts/InteractivePnLChart";
 import { AssetPerformanceRadar } from "@/components/charts/AssetPerformanceRadar";
 import { WinsByHourChart } from "@/components/charts/WinsByHourChart";
 import { SetupPerformanceChart } from "@/components/charts/SetupPerformanceChart";
-import { TradeReplay } from "@/components/TradeReplay";
 import { TradeComparison } from "@/components/TradeComparison";
 import { LazyChart } from "@/components/LazyChart";
 import { CapitalManagement } from "@/components/CapitalManagement";
@@ -71,29 +70,68 @@ export default function Analytics() {
     fetchTrades();
   }, [fetchTrades]);
 
-  // Memoize chart data to prevent recalculation on every render
-  const pnlChartData = useMemo(() =>
-    Array.from({ length: 30 }, (_, i) => ({
-      date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toLocaleDateString(),
-      pnl: Math.random() * 1000 - 300,
-      cumulative: (i + 1) * (Math.random() * 200 - 50)
-    })),
-    []
-  );
+  // Derive real PnL chart from actual trades (sorted chronologically)
+  const pnlChartData = useMemo(() => {
+    if (!trades || trades.length === 0) return [];
+    const sorted = [...trades].sort(
+      (a, b) => new Date(a.trade_date ?? a.created_at).getTime() - new Date(b.trade_date ?? b.created_at).getTime()
+    );
+    let cumulative = 0;
+    return sorted.map(trade => {
+      const pnl = trade.profit_loss ?? 0;
+      cumulative += pnl;
+      return {
+        date: new Date(trade.trade_date ?? trade.created_at).toLocaleDateString(),
+        pnl: Math.round(pnl * 100) / 100,
+        cumulative: Math.round(cumulative * 100) / 100,
+      };
+    });
+  }, [trades]);
 
-  const assetData = useMemo(() => [
-    { asset: "BTCUSDT", winRate: 65, avgProfit: 250, tradeCount: 45, roi: 15 },
-    { asset: "ETHUSDT", winRate: 58, avgProfit: 180, tradeCount: 38, roi: 12 },
-    { asset: "SOLUSDT", winRate: 72, avgProfit: 320, tradeCount: 28, roi: 22 },
-  ], []);
+  // Derive real asset performance from actual trades
+  const assetData = useMemo(() => {
+    if (!trades || trades.length === 0) return [];
+    const byAsset: Record<string, { wins: number; total: number; profit: number }> = {};
+    trades.forEach(trade => {
+      const asset = trade.symbol || 'Unknown';
+      if (!byAsset[asset]) byAsset[asset] = { wins: 0, total: 0, profit: 0 };
+      byAsset[asset].total++;
+      byAsset[asset].profit += trade.profit_loss ?? 0;
+      if ((trade.profit_loss ?? 0) > 0) byAsset[asset].wins++;
+    });
+    return Object.entries(byAsset)
+      .map(([asset, d]) => ({
+        asset,
+        winRate: Math.round((d.wins / d.total) * 100),
+        avgProfit: Math.round(d.profit / d.total),
+        tradeCount: d.total,
+        roi: Math.round((d.profit / d.total) * 10) / 10,
+      }))
+      .sort((a, b) => b.tradeCount - a.tradeCount)
+      .slice(0, 8);
+  }, [trades]);
 
-
-  const setupData = useMemo(() => [
-    { setup: "Breakout", winRate: 68, roi: 18, tradeCount: 32 },
-    { setup: "Reversal", winRate: 55, roi: 12, tradeCount: 28 },
-    { setup: "Scalp", winRate: 72, roi: 8, tradeCount: 45 },
-    { setup: "Swing", winRate: 62, roi: 25, tradeCount: 18 },
-  ], []);
+  // Derive real setup performance from actual trades
+  const setupData = useMemo(() => {
+    if (!trades || trades.length === 0) return [];
+    const bySetup: Record<string, { wins: number; total: number; profit: number }> = {};
+    trades.forEach(trade => {
+      const setup = trade.setup || 'No Setup';
+      if (!bySetup[setup]) bySetup[setup] = { wins: 0, total: 0, profit: 0 };
+      bySetup[setup].total++;
+      bySetup[setup].profit += trade.profit_loss ?? 0;
+      if ((trade.profit_loss ?? 0) > 0) bySetup[setup].wins++;
+    });
+    return Object.entries(bySetup)
+      .map(([setup, d]) => ({
+        setup,
+        winRate: Math.round((d.wins / d.total) * 100),
+        roi: Math.round(d.profit / d.total),
+        tradeCount: d.total,
+      }))
+      .sort((a, b) => b.tradeCount - a.tradeCount)
+      .slice(0, 8);
+  }, [trades]);
 
   return (
     <AppLayout>

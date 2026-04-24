@@ -4,16 +4,26 @@ import { EmotionalStateLogger } from "@/components/psychology/EmotionalStateLogg
 import { EmotionalTimeline } from "@/components/psychology/EmotionalTimeline";
 import { BehaviorPatternAnalysis } from "@/components/psychology/BehaviorPatternAnalysis";
 import { EmotionPerformanceCorrelation } from "@/components/psychology/EmotionPerformanceCorrelation";
-import { Brain, Clock, BarChart3, Lightbulb, Tags } from "lucide-react";
+import { Brain, Clock, BarChart3, Tags } from "lucide-react";
 import { PremiumFeatureLock } from "@/components/PremiumFeatureLock";
 import { usePremiumFeatures } from "@/hooks/usePremiumFeatures";
+import { SEO } from "@/components/SEO";
+import { pageMeta } from "@/utils/seoHelpers";
 
 export default function Psychology() {
   const { isFeatureLocked } = usePremiumFeatures();
   const isPremiumLocked = isFeatureLocked('pro');
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.psychology.title}
+        description={pageMeta.psychology.description}
+        keywords={pageMeta.psychology.keywords}
+        canonical={pageMeta.psychology.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <PremiumFeatureLock requiredPlan="pro" isLocked={isPremiumLocked}>
         <div className="container mx-auto p-6 max-w-7xl">
         <div className="flex items-center gap-2 mb-6">
@@ -25,7 +35,7 @@ export default function Psychology() {
         </div>
 
         <Tabs defaultValue="log" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="log" className="flex items-center gap-2">
               <Brain className="h-4 w-4" />
               <span className="hidden sm:inline">Log State</span>
@@ -40,11 +50,7 @@ export default function Psychology() {
             </TabsTrigger>
             <TabsTrigger value="correlations" className="flex items-center gap-2">
               <Tags className="h-4 w-4" />
-              <span className="hidden sm:inline">Tags</span>
-            </TabsTrigger>
-            <TabsTrigger value="insights" className="flex items-center gap-2">
-              <Lightbulb className="h-4 w-4" />
-              <span className="hidden sm:inline">Insights</span>
+              <span className="hidden sm:inline">Correlations</span>
             </TabsTrigger>
           </TabsList>
 
@@ -66,19 +72,10 @@ export default function Psychology() {
           <TabsContent value="correlations">
             <EmotionPerformanceCorrelation />
           </TabsContent>
-
-          <TabsContent value="insights">
-            <div className="text-center py-16">
-              <Lightbulb className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-              <h3 className="text-lg font-semibold mb-2">AI Insights Coming Soon</h3>
-              <p className="text-sm text-muted-foreground">
-                Advanced AI-powered psychological insights and recommendations
-              </p>
-            </div>
-          </TabsContent>
         </Tabs>
       </div>
       </PremiumFeatureLock>
     </AppLayout>
+    </>
   );
 }

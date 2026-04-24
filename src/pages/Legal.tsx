@@ -1,6 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PremiumCard } from "@/components/ui/PremiumCard";
 import AppLayout from "@/components/layout/AppLayout";
+import { SEO } from '@/components/SEO';
 import { useTranslation } from "@/hooks/useTranslation";
 import { Shield, FileText, AlertCircle } from "lucide-react";
 
@@ -8,6 +9,12 @@ const Legal = () => {
   const { t } = useTranslation();
 
   return (
+    <>
+    <SEO
+      title="Legal - The Trading Diary"
+      description="Legal information for The Trading Diary including terms of service, privacy policy, and cookie policy."
+      canonical="https://www.thetradingdiary.com/legal"
+    />
     <AppLayout>
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="text-center space-y-4">
@@ -179,6 +186,7 @@ const Legal = () => {
         </Tabs>
       </div>
     </AppLayout>
+    </>
   );
 };
 

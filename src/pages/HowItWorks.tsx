@@ -2,6 +2,8 @@ import AppLayout from '@/components/layout/AppLayout';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Button } from '@/components/ui/button';
 import { Upload, BarChart3, Brain, TrendingUp, Users, Award } from 'lucide-react';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 
 const steps = [
   {
@@ -71,7 +73,14 @@ const features = [
 
 export default function HowItWorks() {
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.howItWorks.title}
+        description={pageMeta.howItWorks.description}
+        keywords={pageMeta.howItWorks.keywords}
+        canonical={pageMeta.howItWorks.canonical}
+      />
+      <AppLayout>
       <div className="max-w-7xl mx-auto space-y-16 p-6">
         {/* Hero */}
         <div className="text-center space-y-4">
@@ -139,5 +148,6 @@ export default function HowItWorks() {
         </PremiumCard>
       </div>
     </AppLayout>
+    </>
   );
 }

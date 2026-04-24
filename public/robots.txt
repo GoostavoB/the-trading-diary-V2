@@ -6,10 +6,37 @@ Allow: /
 Disallow: /dashboard
 Disallow: /upload
 Disallow: /analytics
+Disallow: /advanced-analytics
 Disallow: /tools
 Disallow: /settings
 Disallow: /auth
 Disallow: /api/
+Disallow: /journal
+Disallow: /risk-management
+Disallow: /reports
+Disallow: /trading-plan
+Disallow: /psychology
+Disallow: /forecast
+Disallow: /goals
+Disallow: /fee-analysis
+Disallow: /tax-reports
+Disallow: /achievements
+Disallow: /my-metrics
+Disallow: /accounts
+Disallow: /error-analytics
+Disallow: /progress-analytics
+Disallow: /leaderboard
+Disallow: /social
+Disallow: /social-feed
+Disallow: /spot-wallet
+Disallow: /economic-calendar
+Disallow: /market-data
+Disallow: /long-short-ratio
+Disallow: /exchange-connections
+Disallow: /performance-alerts
+Disallow: /trade-analysis
+Disallow: /capital-management
+Disallow: /blog-admin
 
 # Allow blog content (explicitly)
 Allow: /blog

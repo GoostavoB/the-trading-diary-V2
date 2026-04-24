@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import AppLayout from "@/components/layout/AppLayout";
 import { PremiumCard } from "@/components/ui/PremiumCard";
 import { Badge } from "@/components/ui/badge";
@@ -138,7 +140,15 @@ const EconomicCalendar = () => {
   };
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.economicCalendar.title}
+        description={pageMeta.economicCalendar.description}
+        keywords={pageMeta.economicCalendar.keywords}
+        canonical={pageMeta.economicCalendar.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -289,6 +299,7 @@ const EconomicCalendar = () => {
         </div>
       </div>
     </AppLayout>
+    </>
   );
 };
 

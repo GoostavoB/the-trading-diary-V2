@@ -1,4 +1,6 @@
 import AppLayout from "@/components/layout/AppLayout";
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TradeComparator } from "@/components/analysis/TradeComparator";
 import { BacktestingSystem } from "@/components/analytics/BacktestingSystem";
@@ -30,7 +32,15 @@ export default function TradeAnalysis() {
   });
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.tradeAnalysis.title}
+        description={pageMeta.tradeAnalysis.description}
+        keywords={pageMeta.tradeAnalysis.keywords}
+        canonical={pageMeta.tradeAnalysis.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <div className="container mx-auto p-6 max-w-7xl">
         <h1 className="text-3xl font-bold mb-6">Advanced Analytics & Market Intelligence</h1>
 
@@ -112,5 +122,6 @@ export default function TradeAnalysis() {
         </Tabs>
       </div>
     </AppLayout>
+    </>
   );
 }

@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { PremiumCard } from '@/components/ui/PremiumCard';
@@ -72,7 +74,15 @@ export default function SocialFeed() {
   };
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.socialFeed.title}
+        description={pageMeta.socialFeed.description}
+        keywords={pageMeta.socialFeed.keywords}
+        canonical={pageMeta.socialFeed.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Trading Community</h1>
@@ -184,5 +194,6 @@ export default function SocialFeed() {
         </div>
       </div>
     </AppLayout>
+    </>
   );
 }

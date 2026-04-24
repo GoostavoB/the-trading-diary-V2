@@ -14,6 +14,8 @@ import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { layout, spacing, typography } from '@/styles/design-tokens';
 import { SkipToContent } from '@/components/SkipToContent';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 
 export default function Reports() {
   const { user } = useAuth();
@@ -131,7 +133,15 @@ ${JSON.stringify(report.report_data, null, 2)}
   };
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.reports.title}
+        description={pageMeta.reports.description}
+        keywords={pageMeta.reports.keywords}
+        canonical={pageMeta.reports.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <SkipToContent />
       <main id="main-content" className={layout.container}>
         <div className={spacing.section}>
@@ -251,5 +261,6 @@ ${JSON.stringify(report.report_data, null, 2)}
         </div>
       </main>
     </AppLayout>
+    </>
   );
 }

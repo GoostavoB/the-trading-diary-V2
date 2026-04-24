@@ -1,4 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
+import AppLayout from '@/components/layout/AppLayout';
 import { PremiumCard } from "@/components/ui/PremiumCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea } from "recharts";
@@ -177,7 +180,16 @@ const LongShortRatio = () => {
   const distRef = getDistRefArea();
 
   return (
-    <div className="space-y-6">
+    <>
+      <SEO
+        title={pageMeta.longShortRatio.title}
+        description={pageMeta.longShortRatio.description}
+        keywords={pageMeta.longShortRatio.keywords}
+        canonical={pageMeta.longShortRatio.canonical}
+        noindex={true}
+      />
+      <AppLayout>
+      <div className="space-y-6">
       {/* Controls */}
       <div className="flex gap-4">
         <PremiumCard title="Symbol" className="flex-1">
@@ -390,6 +402,8 @@ const LongShortRatio = () => {
         </>
       )}
     </div>
+    </AppLayout>
+    </>
   );
 };
 

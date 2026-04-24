@@ -1,5 +1,7 @@
 import { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
+import { SEO } from "@/components/SEO";
+import { pageMeta } from "@/utils/seoHelpers";
 import { PremiumCard } from "@/components/ui/PremiumCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -129,6 +131,14 @@ export default function Goals() {
   ];
 
   return (
+    <>
+      <SEO
+        title={pageMeta.goals.title}
+        description={pageMeta.goals.description}
+        keywords={pageMeta.goals.keywords}
+        canonical={pageMeta.goals.canonical}
+        noindex={true}
+      />
     <AppLayout>
       <SkipToContent />
       <main id="main-content" className={layout.container}>
@@ -313,5 +323,6 @@ export default function Goals() {
         </div>
       </main>
     </AppLayout>
+    </>
   );
 }

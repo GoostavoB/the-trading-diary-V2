@@ -1,4 +1,6 @@
 import AppLayout from '@/components/layout/AppLayout';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { Bell, TrendingUp, TrendingDown } from 'lucide-react';
 import { lazy, Suspense } from 'react';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
@@ -22,7 +24,15 @@ const MarketData = () => {
   const { permission, requestPermission, isEnabled } = useLSRNotifications();
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.marketData.title}
+        description={pageMeta.marketData.description}
+        keywords={pageMeta.marketData.keywords}
+        canonical={pageMeta.marketData.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -64,6 +74,7 @@ const MarketData = () => {
         </div>
       </div>
     </AppLayout>
+    </>
   );
 };
 

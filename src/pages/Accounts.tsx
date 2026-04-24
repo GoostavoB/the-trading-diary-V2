@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/layout/AppLayout";
 import { PremiumCard } from "@/components/ui/PremiumCard";
@@ -172,7 +174,15 @@ const Accounts = () => {
   const activeAccounts = accounts.filter(acc => acc.is_active).length;
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.accounts.title}
+        description={pageMeta.accounts.description}
+        keywords={pageMeta.accounts.keywords}
+        canonical={pageMeta.accounts.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex-1">
@@ -454,6 +464,7 @@ const Accounts = () => {
         )}
       </div>
     </AppLayout>
+    </>
   );
 };
 

@@ -1,5 +1,7 @@
 import { useState, useMemo } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -177,7 +179,15 @@ export default function ErrorAnalytics() {
   };
 
   return (
-    <AppLayout>
+    <>
+      <SEO
+        title={pageMeta.errorAnalytics.title}
+        description={pageMeta.errorAnalytics.description}
+        keywords={pageMeta.errorAnalytics.keywords}
+        canonical={pageMeta.errorAnalytics.canonical}
+        noindex={true}
+      />
+      <AppLayout>
       <div className="container mx-auto py-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -458,5 +468,6 @@ export default function ErrorAnalytics() {
         )}
       </div>
     </AppLayout>
+    </>
   );
 }

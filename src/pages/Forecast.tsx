@@ -18,6 +18,9 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { Sparkles, Settings2, TrendingDown } from 'lucide-react';
 import { PremiumFeatureLock } from '@/components/PremiumFeatureLock';
 import { usePremiumFeatures } from '@/hooks/usePremiumFeatures';
+import { SmartCapitalProjection } from '@/components/forecast/SmartCapitalProjection';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 
 const Forecast = () => {
   useKeyboardShortcuts();
@@ -121,6 +124,14 @@ const Forecast = () => {
   };
 
   return (
+    <>
+      <SEO
+        title={pageMeta.forecast.title}
+        description={pageMeta.forecast.description}
+        keywords={pageMeta.forecast.keywords}
+        canonical={pageMeta.forecast.canonical}
+        noindex={true}
+      />
     <AppLayout>
       <PremiumFeatureLock requiredPlan="pro" isLocked={isPremiumLocked}>
         <div className="max-w-5xl mx-auto space-y-8">
@@ -128,6 +139,16 @@ const Forecast = () => {
             <h1 className="text-4xl md:text-5xl font-bold mb-2 text-foreground">Equity Forecast</h1>
             <p className="text-muted-foreground text-lg">Project your future equity based on historical performance</p>
           </header>
+
+          {/* ── Smart Capital Projection ── */}
+          <SmartCapitalProjection />
+
+          {/* ── Divider ── */}
+          <div className="flex items-center gap-4 pt-4">
+            <div className="flex-1 h-px bg-border/40" />
+            <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Legacy Avg Daily Forecast</span>
+            <div className="flex-1 h-px bg-border/40" />
+          </div>
 
           {loading ? (
             <div className="text-center py-16">
@@ -445,6 +466,7 @@ const Forecast = () => {
         />
       </PremiumFeatureLock>
     </AppLayout>
+    </>
   );
 };
 

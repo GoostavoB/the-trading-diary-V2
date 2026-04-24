@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import AppLayout from "@/components/layout/AppLayout";
+import { SEO } from "@/components/SEO";
+import { pageMeta } from "@/utils/seoHelpers";
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -142,6 +144,14 @@ const TaxReports = () => {
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
   return (
+    <>
+      <SEO
+        title={pageMeta.taxReports.title}
+        description={pageMeta.taxReports.description}
+        keywords={pageMeta.taxReports.keywords}
+        canonical={pageMeta.taxReports.canonical}
+        noindex={true}
+      />
     <AppLayout>
       <PremiumFeatureLock requiredPlan="pro" isLocked={isPremiumLocked}>
         <div className="space-y-6">
@@ -390,6 +400,7 @@ const TaxReports = () => {
         </div>
       </PremiumFeatureLock>
     </AppLayout>
+    </>
   );
 };
 

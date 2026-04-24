@@ -2,6 +2,8 @@ import { useState, useEffect, Suspense, lazy } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { useBadgeNotifications } from '@/hooks/useBadgeNotifications';
 import type { Trade } from '@/types/trade';
@@ -42,6 +44,14 @@ const Achievements = () => {
   useBadgeNotifications(trades);
 
   return (
+    <>
+      <SEO
+        title={pageMeta.achievements.title}
+        description={pageMeta.achievements.description}
+        keywords={pageMeta.achievements.keywords}
+        canonical={pageMeta.achievements.canonical}
+        noindex={true}
+      />
     <AppLayout>
       <SkipToContent />
       <main id="main-content" className="container mx-auto py-6 space-y-6">
@@ -61,6 +71,7 @@ const Achievements = () => {
         )}
       </main>
     </AppLayout>
+    </>
   );
 };
 

@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Trade } from '@/types/trade';
 import AppLayout from '@/components/layout/AppLayout';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { FeeOverviewCards } from '@/components/fee-analysis/FeeOverviewCards';
 import { ExchangeComparisonTable } from '@/components/fee-analysis/ExchangeComparisonTable';
 import { TradeDetailsTable } from '@/components/fee-analysis/TradeDetailsTable';
@@ -81,6 +83,14 @@ const FeeAnalysis = () => {
   }
 
   return (
+    <>
+      <SEO
+        title={pageMeta.feeAnalysis.title}
+        description={pageMeta.feeAnalysis.description}
+        keywords={pageMeta.feeAnalysis.keywords}
+        canonical={pageMeta.feeAnalysis.canonical}
+        noindex={true}
+      />
     <AppLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -109,6 +119,7 @@ const FeeAnalysis = () => {
         </Tabs>
       </div>
     </AppLayout>
+    </>
   );
 };
 

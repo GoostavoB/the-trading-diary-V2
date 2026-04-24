@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus, TrendingUp, Target, DollarSign, Percent } from 'lucide-react';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -39,6 +41,14 @@ const MyMetrics = () => {
   };
 
   return (
+    <>
+      <SEO
+        title={pageMeta.myMetrics.title}
+        description={pageMeta.myMetrics.description}
+        keywords={pageMeta.myMetrics.keywords}
+        canonical={pageMeta.myMetrics.canonical}
+        noindex={true}
+      />
     <AppLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -153,6 +163,7 @@ const MyMetrics = () => {
         </PremiumCard>
       </div>
     </AppLayout>
+    </>
   );
 };
 

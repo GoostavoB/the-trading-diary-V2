@@ -1,6 +1,7 @@
 
-import { Helmet } from 'react-helmet-async';
 import AppLayout from '@/components/layout/AppLayout';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useEffect } from 'react';
 import { HreflangLinks } from '@/components/HreflangLinks';
@@ -19,11 +20,12 @@ export default function Terms() {
   return (
     <>
       <HreflangLinks languages={[...SUPPORTED_LANGUAGES]} defaultLanguage="en" />
-      <Helmet>
-        <title>{t('legal.terms.title', 'Terms of Service')} - The Trading Diary</title>
-        <meta name="description" content={t('legal.terms.description', 'Read our terms of service and understand the rules for using The Trading Diary platform.')} />
-      </Helmet>
-
+      <SEO
+        title={pageMeta.terms.title}
+        description={pageMeta.terms.description}
+        keywords={pageMeta.terms.keywords}
+        canonical={pageMeta.terms.canonical}
+      />
       <AppLayout>
         <div className="container max-w-4xl mx-auto px-4 py-12">
           <h1 className="text-4xl font-bold mb-8">{t('legal.termsTitle', 'Terms of Service')}</h1>

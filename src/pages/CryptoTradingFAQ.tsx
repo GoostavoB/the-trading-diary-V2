@@ -6,8 +6,9 @@ import { useNavigate } from "react-router-dom";
 
 import { Logo } from "@/components/Logo";
 import Footer from "@/components/Footer";
-import { addStructuredData } from "@/utils/seoHelpers";
+import { addStructuredData, pageMeta } from "@/utils/seoHelpers";
 import { ArrowRight } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const CryptoTradingFAQ = () => {
   const navigate = useNavigate();
@@ -30,6 +31,13 @@ const CryptoTradingFAQ = () => {
   }, []);
 
   return (
+    <>
+      <SEO
+        title={pageMeta.cryptoTradingFaq.title}
+        description={pageMeta.cryptoTradingFaq.description}
+        keywords={pageMeta.cryptoTradingFaq.keywords}
+        canonical={pageMeta.cryptoTradingFaq.canonical}
+      />
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-background">
       {/* Header */}
       <header className="border-b border-border/50 bg-background/60 backdrop-blur-sm sticky top-0 z-50">
@@ -100,6 +108,7 @@ const CryptoTradingFAQ = () => {
 
       <Footer />
     </div>
+    </>
   );
 };
 

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
     BarChart3, Wallet, Plus, Receipt, Shield, BookMarked,
-    LineChart, Target, Brain, AlertCircle, FileText, Award,
-    ChevronDown, Menu, X
+    LineChart, Target, Brain, AlertCircle, TrendingDown,
+    FileText, BookOpen, ChevronDown, Menu, X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -36,37 +36,35 @@ export function TopNavigation() {
             icon: BarChart3
         },
         {
-            title: 'Portfolio',
-            items: [
-                { title: 'Spot Wallet', url: '/spot-wallet', icon: Wallet, description: 'Track your crypto assets and net worth' },
-                // { title: 'Trading Accounts', url: '/accounts', icon: PieChart, description: 'Manage multiple exchange accounts' },
-            ]
-        },
-        {
             title: 'Trades',
             items: [
-                { title: 'Add Trade', url: '/upload', icon: Plus, description: 'Import or manually log new trades' },
                 { title: 'Journal', url: '/journal', icon: BookMarked, description: 'Review your trading diary and notes' },
                 { title: 'Risk Management', url: '/risk-management', icon: Shield, description: 'Position sizing and risk calculators' },
                 { title: 'Fee Analysis', url: '/fee-analysis', icon: Receipt, description: 'Analyze trading costs and commissions' },
+                { title: 'Tax Reports', url: '/tax-reports', icon: FileText, description: 'Generate tax reports for your trades' },
+                { title: 'Reports', url: '/reports', icon: BarChart3, description: 'AI-generated performance reports' },
             ]
         },
         {
             title: 'Analytics',
             items: [
+                { title: 'Advanced Analytics', url: '/analytics', icon: BarChart3, description: 'Deep dive into performance metrics' },
                 { title: 'Market Data', url: '/market-data', icon: LineChart, description: 'Real-time crypto prices and movers' },
                 { title: 'Forecast', url: '/forecast', icon: Target, description: 'Project future growth scenarios' },
-                { title: 'Advanced Analytics', url: '/analytics', icon: BarChart3, description: 'Deep dive into performance metrics' },
+                { title: 'Error Analytics', url: '/error-analytics', icon: AlertCircle, description: 'Identify and reduce costly mistakes' },
+                { title: 'Long/Short Ratio', url: '/long-short-ratio', icon: TrendingDown, description: 'Market sentiment via long/short data' },
             ]
         },
         {
             title: 'Planning',
             items: [
                 { title: 'Goals', url: '/goals', icon: Target, description: 'Set and track trading objectives' },
+                { title: 'Trading Plan', url: '/trading-plan', icon: BookOpen, description: 'Create and follow your trading strategy' },
                 { title: 'Psychology', url: '/psychology', icon: Brain, description: 'Track emotional state and discipline' },
-                { title: 'Error Analytics', url: '/error-analytics', icon: AlertCircle, description: 'Identify and reduce costly mistakes' },
+                { title: 'Spot Wallet', url: '/spot-wallet', icon: Wallet, description: 'Track your crypto assets and net worth' },
+                { title: 'Capital Management', url: '/capital-management', icon: Plus, description: 'Log capital additions and track growth' },
             ]
-        }
+        },
     ];
 
     return (
@@ -127,6 +125,13 @@ export function TopNavigation() {
 
                 {/* Right Actions */}
                 <div className="flex items-center gap-2 md:gap-4">
+                    {/* Add Trade — primary CTA always visible */}
+                    <NavLink to="/upload" className="hidden sm:block">
+                        <Button size="sm" className="gap-1.5 font-semibold">
+                            <Plus className="h-4 w-4" />
+                            Add Trade
+                        </Button>
+                    </NavLink>
                     <div className="hidden md:flex items-center gap-2">
                         <CurrencySelector />
                         <BlurToggle />

@@ -33,12 +33,12 @@ const steps: OnboardingStep[] = [
     actionLabel: 'Upload Trade',
   },
   {
-    id: 'analyze',
-    title: 'Analyze Your Performance',
-    description: 'View detailed analytics, charts, and insights to understand your trading patterns.',
+    id: 'dashboard',
+    title: 'Your Command Center',
+    description: 'After adding trades, your dashboard shows real stats — win rate, P&L, streaks, and more. Everything in one place.',
     icon: BarChart3,
-    action: '/analytics',
-    actionLabel: 'View Analytics',
+    action: '/dashboard',
+    actionLabel: 'Go to Dashboard',
   },
   {
     id: 'goals',

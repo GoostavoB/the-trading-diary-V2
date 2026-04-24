@@ -2,7 +2,8 @@ import { useParams, Link } from 'react-router-dom';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { blogArticles, getRelatedArticles } from '@/data/blogArticles';
+import { getRelatedArticles } from '@/data/blogArticles';
+import { fetchArticleBySlug } from '@/services/blogService';
 import { MobileHeader } from '@/components/MobileHeader';
 import Footer from '@/components/Footer';
 import { SkipToContent } from '@/components/SkipToContent';
@@ -12,12 +13,19 @@ import ReactMarkdown from 'react-markdown';
 import { SEO } from '@/components/SEO';
 import { addStructuredData, generateBreadcrumbSchema, generateHowToSchema } from '@/utils/seoHelpers';
 import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { TableOfContents } from '@/components/TableOfContents';
 import { useArticleTracking } from '@/hooks/useArticleTracking';
 
 const BlogPost = () => {
   const { slug } = useParams();
-  const article = blogArticles.find(a => a.slug === slug);
+
+  const { data: article, isLoading } = useQuery({
+    queryKey: ['blog-post', slug],
+    queryFn: () => fetchArticleBySlug(slug!),
+    enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
+  });
 
   // Track article reading behavior
   useArticleTracking({
@@ -138,6 +146,28 @@ const BlogPost = () => {
     navigator.clipboard.writeText(url);
     toast.success('Link copied to clipboard!');
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black">
+        <SkipToContent />
+        <MobileHeader />
+        <main id="main-content" className="pt-20 pb-16 px-4">
+          <div className="max-w-4xl mx-auto space-y-4">
+            <div className="h-8 w-24 bg-muted/40 rounded animate-pulse" />
+            <div className="h-64 bg-muted/40 rounded-lg animate-pulse" />
+            <div className="h-10 w-3/4 bg-muted/40 rounded animate-pulse" />
+            <div className="space-y-2">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="h-4 bg-muted/30 rounded animate-pulse" />
+              ))}
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!article) {
     return (

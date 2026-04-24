@@ -47,13 +47,6 @@
         "price": "0",
         "priceCurrency": "USD"
       },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "ratingCount": "127",
-        "bestRating": "5",
-        "worstRating": "1"
-      },
       "screenshot": "https://www.thetradingdiary.com/og-image-en.png",
       "featureList": [
         "AI-powered trade analysis",
@@ -103,7 +96,7 @@
           "name": "Which exchanges are supported?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "We support all major crypto exchanges including Binance, Coinbase, Kraken, Bybit, OKX, and more. You can import trades automatically via CSV or API integration."
+            "text": "We support all major crypto exchanges including Binance, Bybit, OKX, Coinbase, Kraken, KuCoin, Gate.io, MEXC, BingX, Bitfinex, and Bitstamp. You can import trades automatically via CSV upload, screenshot, or direct API connection."
           }
         },
         {
@@ -111,7 +104,7 @@
           "name": "Is The Trading Diary free to use?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes, we offer a free plan with essential features. Premium plans unlock advanced analytics, unlimited trade history, AI insights, and priority support."
+            "text": "Yes, we offer a free Starter plan with essential features including manual trade logging, interactive charts, journal, risk calculator, and tax report export. Pro ($18/month) and Elite ($30/month) plans unlock advanced analytics, unlimited AI extracts, custom dashboard, and more."
           }
         },
         {
@@ -119,7 +112,55 @@
           "name": "How secure is my trading data?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Your data is encrypted end-to-end and stored securely. We never access your exchange accounts directly and only read trade data you explicitly share."
+            "text": "Your data is encrypted end-to-end and stored securely on enterprise-grade infrastructure. We never access your exchange accounts directly — API keys are stored with AES encryption and only read-only permissions are required. You can revoke access at any time."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I import my trades?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "There are three ways to import trades: (1) Upload a CSV file exported from your exchange, (2) Take a screenshot of your trade history and our AI will extract the data automatically, or (3) Connect your exchange API key for automatic real-time sync. All methods support batch import."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does The Trading Diary support futures and perpetual contracts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The Trading Diary is built specifically for crypto derivatives traders. It fully supports futures, perpetual contracts, leveraged positions, and spot trading. PnL, ROI, fees, and liquidation data are all tracked and analyzed."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What analytics and insights does the platform provide?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Trading Diary provides deep performance analytics including win rate, profit factor, average R:R, drawdown analysis, performance by setup and asset, trading psychology tracking, emotion-performance correlation, wealth forecast simulation, fee analysis, and AI-generated insights on your trading patterns."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I track my trading psychology and emotions?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The Psychology module lets you log your emotional state before and after each trade, track behavior patterns like revenge trading or FOMO, and see the direct correlation between your emotions and trading performance. It includes a Daily Lesson Learned system and emotional timeline."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does The Trading Diary generate tax reports?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The Tax Reports feature lets you export your trading history in formats compatible with tax filing. It summarizes realized PnL, fees paid, and trading activity by period, making it easier to report crypto gains and losses."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there a mobile app?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Trading Diary is a Progressive Web App (PWA) that works seamlessly on mobile browsers — you can install it to your home screen on iOS and Android for a native app experience. Dedicated iOS and Android apps are coming soon."
           }
         }
       ]
@@ -129,16 +170,21 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.thetradingdiary.com/" />
-    
-    
-    <meta property="og:image" content="https://www.thetradingdiary.com/og-image-en.png">
-    
+    <meta property="og:title" content="The #1 Crypto Trading Journal | Track &amp; Analyze Every Trade" />
+    <meta property="og:description" content="Track, analyze, and review every crypto trade with AI-powered insights. Built exclusively for crypto traders with advanced analytics, automated trade import, risk management tools, and real-time performance tracking. Free to start." />
+    <meta property="og:image" content="https://www.thetradingdiary.com/og-image-en.png" />
+    <meta property="og:site_name" content="The Trading Diary" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@thetradingdiary" />
+    <meta name="twitter:creator" content="@thetradingdiary" />
     <meta name="twitter:url" content="https://www.thetradingdiary.com/" />
-    
-    
-    <meta name="twitter:image" content="https://www.thetradingdiary.com/og-image-en.png">
+    <meta name="twitter:title" content="The #1 Crypto Trading Journal | Track &amp; Analyze Every Trade" />
+    <meta name="twitter:description" content="Track, analyze, and review every crypto trade with AI-powered insights. Built exclusively for crypto traders with advanced analytics, automated trade import, risk management tools, and real-time performance tracking. Free to start." />
+    <meta name="twitter:image" content="https://www.thetradingdiary.com/og-image-en.png" />
     
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -183,10 +229,7 @@
     <!-- RSS Feed -->
     <link rel="alternate" type="application/rss+xml" title="The Trading Diary Blog RSS" href="https://www.thetradingdiary.com/blog/rss.xml">
 
-    <meta property="og:title" content="The #1 Crypto Trading Journal | Track &amp; Analyze Every Trade">
-  <meta name="twitter:title" content="The #1 Crypto Trading Journal | Track &amp; Analyze Every Trade">
-  <meta property="og:description" content="Track, analyze, and review every crypto trade with AI-powered insights. Built exclusively for crypto traders with advanced analytics, automated trade import, risk management tools, and real-time performance tracking. Free to start.">
-  <meta name="twitter:description" content="Track, analyze, and review every crypto trade with AI-powered insights. Built exclusively for crypto traders with advanced analytics, automated trade import, risk management tools, and real-time performance tracking. Free to start.">
+
 </head>
 
   <body>

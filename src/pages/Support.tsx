@@ -11,8 +11,9 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Helmet } from 'react-helmet-async';
 import { Mail } from 'lucide-react';
+import { SEO } from '@/components/SEO';
+import { pageMeta } from '@/utils/seoHelpers';
 
 const supportSchema = z.object({
   category: z.string().min(1, { message: "Please select a category" }),
@@ -65,12 +66,14 @@ export default function Support() {
   };
 
   return (
-    <AppLayout>
-      <Helmet>
-        <title>{t('support.pageTitle')} - The Trading Diary</title>
-        <meta name="description" content={t('support.pageDescription')} />
-      </Helmet>
-
+    <>
+      <SEO
+        title={pageMeta.support.title}
+        description={pageMeta.support.description}
+        keywords={pageMeta.support.keywords}
+        canonical={pageMeta.support.canonical}
+      />
+      <AppLayout>
       <div className="container max-w-2xl mx-auto py-8 px-4">
         <PremiumCard className="shadow-lg">
           <div className="p-6 pb-3 text-center">
@@ -154,5 +157,6 @@ export default function Support() {
         </PremiumCard>
       </div>
     </AppLayout>
+    </>
   );
 }
