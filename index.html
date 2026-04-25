@@ -71,9 +71,68 @@
       "name": "The Trading Diary",
       "url": "https://www.thetradingdiary.com",
       "logo": "https://www.thetradingdiary.com/logo-512.png",
+      "description": "The Trading Diary is a crypto-specific trading journal and analytics platform for active derivatives traders. It combines AI trade extraction, advanced analytics, risk management, and psychology tracking.",
+      "foundingDate": "2024",
+      "founders": [
+        {
+          "@type": "Person",
+          "name": "Gustavo Belfiore",
+          "url": "https://www.thetradingdiary.com/author/gustavo",
+          "jobTitle": "Crypto trader & founder"
+        }
+      ],
+      "knowsAbout": [
+        "Crypto trading",
+        "Crypto perpetual futures",
+        "Trading psychology",
+        "Risk management",
+        "AI trade analysis",
+        "Trading journal systems",
+        "Data-driven trading performance"
+      ],
       "sameAs": [
-        "https://twitter.com/thetradingdiary"
-      ]
+        "https://twitter.com/thetradingdiary",
+        "https://x.com/thetradingdiary",
+        "https://www.linkedin.com/company/thetradingdiary",
+        "https://github.com/thetradingdiary",
+        "https://www.youtube.com/@thetradingdiary",
+        "https://www.instagram.com/thetradingdiary"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "support@thetradingdiary.com",
+        "url": "https://www.thetradingdiary.com/contact",
+        "availableLanguage": ["English", "Portuguese", "Spanish", "Arabic", "Vietnamese"]
+      }
+    }
+    </script>
+
+    <!-- Structured Data - WebSite Schema with SearchAction (sitelinks search box) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "The Trading Diary",
+      "alternateName": "The #1 Crypto Trading Journal",
+      "url": "https://www.thetradingdiary.com/",
+      "inLanguage": ["en", "pt", "es", "ar", "vi"],
+      "publisher": {
+        "@type": "Organization",
+        "name": "The Trading Diary",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.thetradingdiary.com/logo-512.png"
+        }
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://www.thetradingdiary.com/blog?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
     }
     </script>
     
@@ -161,6 +220,70 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "The Trading Diary is a Progressive Web App (PWA) that works seamlessly on mobile browsers — you can install it to your home screen on iOS and Android for a native app experience. Dedicated iOS and Android apps are coming soon."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does The Trading Diary compare to a spreadsheet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A spreadsheet requires manual entry for every trade, does not understand leverage, funding fees, or liquidation mechanics, and has no guardrails against revenge trading. The Trading Diary removes the friction with AI screenshot extraction, CSV import, and API sync, and adds automated analytics, psychology tracking, and daily loss locks. Traders typically abandon spreadsheets within a month but stay with The Trading Diary because it is maintenance-free and crypto-native."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a profit factor and how do I improve it?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Profit factor is gross profit divided by gross loss — a value above 1.5 is considered healthy, above 2 is strong. You improve it by cutting losing trades quicker, letting winners run closer to their full target, and filtering out low-edge setups. The Trading Diary shows your profit factor overall, by setup, and by asset, so you can see exactly which trades are dragging the number down and eliminate them."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can AI really extract trades from screenshots?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The Trading Diary's AI reads screenshots of trade history and position panels from major crypto exchanges and automatically extracts asset, direction, leverage, entry, exit, size, PnL, fees, and timestamp. Most screenshots are parsed in under 10 seconds and the trader reviews the result before saving, so manual typing is eliminated."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much does The Trading Diary cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Trading Diary has three plans: Starter is free forever and includes manual trade logging, charts, journal, risk calculator, and tax-report export. Pro is $18 per month and adds unlimited AI trade extractions, advanced analytics, custom dashboards, and the psychology module. Elite is $30 per month and adds priority support, extended integrations, and deeper psychology tools. Annual billing offers a discount."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is The Trading Diary good for beginners?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Beginners benefit the most from a journal because discipline and self-awareness are the skills that separate profitable traders from the rest. The Trading Diary onboards new users with a simple manual entry flow, built-in risk calculator, and daily loss lock so inexperienced traders cannot accidentally blow up their account. Advanced analytics unlock as the user logs more trades."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What makes a good trading journal?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A good trading journal captures every trade with minimal friction, enforces risk discipline, tags psychology, and surfaces patterns the trader cannot see on their own. It must be crypto-aware for derivatives traders — handling leverage, funding, and liquidation — and it should give the trader actionable breakdowns by setup, asset, and emotional state. The Trading Diary was built specifically to meet these criteria."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I track my crypto trades automatically?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Trading Diary offers three automated methods: upload a CSV exported from your exchange, drop a screenshot of your trade history (AI extracts the data), or connect a read-only API key for ongoing sync. All three populate the journal with asset, direction, size, leverage, entry, exit, PnL, and fees so you never have to type a trade manually."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between The Trading Diary and TradingView's journal?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "TradingView's journal is a lightweight feature attached to its charting product — fine for casual tracking but shallow on analytics, with no AI extraction, no psychology tracking, no risk guardrails, and no tax reports. The Trading Diary is a dedicated journaling platform focused entirely on helping crypto traders capture, analyze, and improve their trades, with crypto-native handling of perpetual futures and multi-exchange unification."
           }
         }
       ]

@@ -348,7 +348,7 @@ function DashboardContent() {
     };
 
     switch (widgetId) {
-      case 'totalBalance':
+      case 'totalBalance': {
         const totalInvestedCapital = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
         widgetProps.totalBalance = totalInvestedCapital + (stats?.total_pnl || 0);
         widgetProps.change24h = stats?.total_pnl || 0;
@@ -357,7 +357,8 @@ function DashboardContent() {
           : 0;
         widgetProps.tradingDays = stats?.trading_days || 0;
         break;
-      case 'winRate':
+      }
+      case 'winRate': {
         const winningTrades = processedTrades.filter(t => (t.profit_loss || 0) > 0).length;
         const losingTrades = processedTrades.filter(t => (t.profit_loss || 0) <= 0).length;
         widgetProps.winRate = stats?.win_rate || 0;
@@ -365,6 +366,7 @@ function DashboardContent() {
         widgetProps.losses = losingTrades;
         widgetProps.totalTrades = stats?.total_trades || 0;
         break;
+      }
       case 'totalTrades':
         widgetProps.totalTrades = stats?.total_trades || 0;
         break;
@@ -374,11 +376,12 @@ function DashboardContent() {
         widgetProps.changePercent24h = 0;
         widgetProps.tokenCount = holdings?.length || 0;
         break;
-      case 'portfolioOverview':
+      case 'portfolioOverview': {
         widgetProps.data = portfolioChartData;
         const totalInvestedForPortfolio = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
         widgetProps.totalValue = totalInvestedForPortfolio + (stats?.total_pnl || 0);
         break;
+      }
       case 'topMovers':
       case 'aiInsights':
       case 'recentTransactions':
@@ -409,7 +412,7 @@ function DashboardContent() {
       case 'avgPnLPerTrade':
         widgetProps.avgPnLPerTrade = stats?.avg_pnl_per_trade || 0;
         break;
-      case 'avgPnLPerDay':
+      case 'avgPnLPerDay': {
         const { tradingDays: filteredTradingDays } = calculateTradingDays(
           processedTrades,
           tradingDaysMode
@@ -428,6 +431,7 @@ function DashboardContent() {
           : 0;
         widgetProps.tradingDays = filteredTradingDays;
         break;
+      }
       case 'currentROI':
         widgetProps.currentROI = stats?.current_roi || 0;
         widgetProps.initialInvestment = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
@@ -455,13 +459,14 @@ function DashboardContent() {
         widgetProps.totalTrades = stats?.total_trades || 0;
         widgetProps.totalCapitalInvested = stats?.total_capital_invested || 0;
         break;
-      case 'capitalGrowth':
+      case 'capitalGrowth': {
         widgetProps.chartData = portfolioChartData;
         const baseCapitalForGrowth = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
         widgetProps.initialInvestment = baseCapitalForGrowth;
         widgetProps.totalCapitalAdditions = 0;
         widgetProps.currentBalance = baseCapitalForGrowth + (stats?.total_pnl || 0);
         break;
+      }
       case 'combinedPnLROI':
         widgetProps.avgPnLPerTrade = stats?.avg_pnl_per_trade || 0;
         break;
@@ -472,7 +477,7 @@ function DashboardContent() {
         widgetProps.winCount = dashboardStats.winningTrades.length;
         widgetProps.lossCount = dashboardStats.losingTrades.length;
         break;
-      case 'oneYearProjection':
+      case 'oneYearProjection': {
         const projBase = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
         widgetProps.currentBalance = projBase + (stats?.total_pnl || 0);
         widgetProps.totalPnL = stats?.total_pnl || 0;
@@ -483,14 +488,16 @@ function DashboardContent() {
         widgetProps.avgWin = dashboardStats.avgWin;
         widgetProps.avgLoss = dashboardStats.avgLoss;
         break;
-      case 'totalCapital':
+      }
+      case 'totalCapital': {
         const capBase = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
         widgetProps.initialCapital = capBase;
         widgetProps.currentCapital = capBase + (stats?.total_pnl || 0);
         widgetProps.totalPnL = stats?.total_pnl || 0;
         widgetProps.trades = processedTrades;
         break;
-      case 'compactPerformance':
+      }
+      case 'compactPerformance': {
         // ROI data
         widgetProps.currentROI = stats?.current_roi || 0;
         widgetProps.initialInvestment = totalCapitalAdditions > 0 ? totalCapitalAdditions : initialInvestment;
@@ -520,6 +527,7 @@ function DashboardContent() {
         // Mini chart data (last 7 days PnL)
         widgetProps.pnlTrendData = [] as any; // Will implement later if needed
         break;
+      }
       case 'goals':
         widgetProps.includeFeesInPnL = includeFeesInPnL;
         widgetProps.tradesOverride = processedTrades;

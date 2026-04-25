@@ -106,7 +106,7 @@ export const GoalsTracker = ({ trades }: GoalsTrackerProps) => {
 
   const calculateCurrentValue = (goal: any, relevantTrades: Trade[]) => {
     switch (goal.goal_type) {
-      case 'capital':
+      case 'capital': {
         // For capital goals, we need account equity
         // For now, use cumulative PnL as a proxy (would need actual account data in production)
         const totalPnl = calculateTotalPnL(relevantTrades, { includeFees: true });
@@ -116,24 +116,27 @@ export const GoalsTracker = ({ trades }: GoalsTrackerProps) => {
           return baseline > 0 ? ((totalPnl / baseline) * 100) : 0;
         }
         return totalPnl; // For absolute, return total capital (would be starting capital + PnL)
+      }
 
       case 'profit':
       case 'pnl':
         return calculateTotalPnL(relevantTrades, { includeFees: true });
 
-      case 'win_rate':
+      case 'win_rate': {
         const wins = relevantTrades.filter(t => calculateTradePnL(t, { includeFees: true }) > 0).length;
         return relevantTrades.length > 0 ? (wins / relevantTrades.length) * 100 : 0;
+      }
 
       case 'trades':
         return relevantTrades.length;
 
-      case 'roi':
+      case 'roi': {
         const totalRoiPnl = calculateTotalPnL(relevantTrades, { includeFees: true });
         const totalMargin = relevantTrades.reduce((sum, t) => sum + (t.margin || 0), 0);
         return totalMargin > 0 ? (totalRoiPnl / totalMargin) * 100 : 0;
+      }
 
-      case 'streak':
+      case 'streak': {
         // Calculate current winning streak
         let currentStreak = 0;
         const sortedTrades = [...relevantTrades].sort((a, b) =>
@@ -147,6 +150,7 @@ export const GoalsTracker = ({ trades }: GoalsTrackerProps) => {
           }
         }
         return currentStreak;
+      }
 
       default:
         return 0;

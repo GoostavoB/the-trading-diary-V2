@@ -136,11 +136,11 @@ export default function RiskManagement() {
       <AppLayout>
       <div className="container mx-auto p-6 max-w-7xl">
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <Shield className="h-8 w-8" />
-            <div>
-              <h1 className="text-3xl font-bold">Risk Management</h1>
-              <p className="text-muted-foreground">Monitor and control your trading risk exposure</p>
+          <div className="flex items-center gap-3">
+            <Shield className="h-8 w-8 text-space-200" />
+            <div className="space-y-2">
+              <h1 className="font-display text-3xl md:text-4xl text-gradient-electric-soft">Risk Management</h1>
+              <p className="text-sm text-space-300">Monitor and control your trading risk exposure</p>
             </div>
           </div>
           <BlurToggleButton />
@@ -237,10 +237,10 @@ export default function RiskManagement() {
                 currentDrawdown={metrics.currentDrawdown}
               />
             ) : (
-              <div className="text-center py-16">
-                <TrendingDown className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-                <h3 className="text-lg font-semibold mb-2">No Trade Data</h3>
-                <p className="text-sm text-muted-foreground">
+              <div className="text-center py-16 card-premium rounded-ios-card">
+                <TrendingDown className="h-16 w-16 mx-auto mb-4 text-space-400 opacity-50" />
+                <h3 className="text-lg font-semibold mb-2 text-space-100">No Trade Data</h3>
+                <p className="text-sm text-space-300">
                   Start trading to see your drawdown analysis
                 </p>
               </div>

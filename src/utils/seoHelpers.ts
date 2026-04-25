@@ -496,4 +496,40 @@ export const pageMeta = {
     keywords: 'crypto trading FAQ, trading questions, crypto strategy, trading education',
     canonical: 'https://www.thetradingdiary.com/crypto-trading-faq',
   },
+  about: {
+    title: 'About Us — Built by Traders, for Traders | The Trading Diary',
+    description: 'Meet the team behind The Trading Diary and learn about our mission to help crypto traders improve performance with AI-powered analytics and insights.',
+    keywords: 'about the trading diary, trading diary team, our mission, crypto trading platform, built by traders',
+    canonical: 'https://www.thetradingdiary.com/about',
+  },
+  contact: {
+    title: 'Contact The Trading Diary — Get Help Fast',
+    description: 'Contact The Trading Diary support team. Get help with account questions, technical issues, partnerships, feedback, and everything else.',
+    keywords: 'contact the trading diary, support, help, customer service, crypto trading journal support',
+    canonical: 'https://www.thetradingdiary.com/contact',
+  },
+  legal: {
+    title: 'Legal Information — Terms, Privacy & Cookies | The Trading Diary',
+    description: 'Legal documents for The Trading Diary, including Terms of Service, Privacy Policy, and Cookie Policy. Everything you need to know about using our platform.',
+    keywords: 'legal, terms, privacy policy, cookie policy, disclaimer, user agreement',
+    canonical: 'https://www.thetradingdiary.com/legal',
+  },
+  blog: {
+    title: 'Crypto Trading Blog — Strategies, Psychology & Analytics | The Trading Diary',
+    description: 'Expert articles on crypto trading, AI-powered tools, trading psychology, risk management, and data-driven strategies — from real traders, for real traders.',
+    keywords: 'crypto trading blog, trading articles, crypto strategy, trading psychology, trading analytics, data-driven trading',
+    canonical: 'https://www.thetradingdiary.com/blog',
+  },
+  author: {
+    title: 'Author Profile | The Trading Diary',
+    description: 'Read the latest articles from our crypto trading experts and authors on The Trading Diary blog.',
+    keywords: 'author, blog author, crypto trading writer, the trading diary contributor',
+    canonical: 'https://www.thetradingdiary.com/author',
+  },
+  sitemap: {
+    title: 'Sitemap — Find Every Page | The Trading Diary',
+    description: 'Complete sitemap of The Trading Diary. Find every blog article, feature page, and resource in one place.',
+    keywords: 'sitemap, site navigation, all pages, the trading diary index',
+    canonical: 'https://www.thetradingdiary.com/sitemap',
+  },
 };

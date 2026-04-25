@@ -46,9 +46,7 @@ interface BitstampOpenOrder {
   currency_pair: string;
 }
 
-interface BitstampUserTransaction extends BitstampTransaction {
-  // Additional fields specific to user transactions
-}
+type BitstampUserTransaction = BitstampTransaction
 
 /**
  * Bitstamp Exchange Adapter

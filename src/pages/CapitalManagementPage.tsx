@@ -187,16 +187,17 @@ const CapitalManagementPage = () => {
               variant="ghost"
               size="icon"
               onClick={() => navigate('/settings')}
-              className="rounded-full"
+              className="rounded-full text-space-300"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-3">
-                <DollarSign className="h-8 w-8 text-accent" />
+            <div className="space-y-2">
+              <p className="text-xs text-space-400">Settings / Capital</p>
+              <h1 className="font-display text-3xl md:text-4xl text-gradient-electric-soft flex items-center gap-3">
+                <DollarSign className="h-8 w-8 text-space-200" />
                 Capital Management
               </h1>
-              <p className="text-muted-foreground mt-1">
+              <p className="text-sm text-space-300">
                 Track your capital additions for accurate ROI calculations
               </p>
             </div>
@@ -285,42 +286,42 @@ const CapitalManagementPage = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <PremiumCard className="p-6">
+          <PremiumCard className="card-premium-highlight p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5">
+              <div className="p-3 rounded-ios-card bg-gradient-to-br from-accent/20 to-accent/5">
                 <TrendingUp className="h-6 w-6 text-accent" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground font-medium">Current Capital</p>
-                <p className="text-3xl font-bold mt-1">
+                <p className="text-xs text-space-400 uppercase tracking-wide font-medium">Current Capital</p>
+                <p className="text-3xl font-num font-bold mt-1 text-gradient-electric">
                   <BlurredCurrency amount={currentCapital} />
                 </p>
               </div>
             </div>
           </PremiumCard>
 
-          <PremiumCard className="p-6">
+          <PremiumCard className="card-premium p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
+              <div className="p-3 rounded-ios-card bg-gradient-to-br from-primary/20 to-primary/5">
                 <DollarSign className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground font-medium">Total Added</p>
-                <p className="text-3xl font-bold mt-1">
+                <p className="text-xs text-space-400 uppercase tracking-wide font-medium">Total Added</p>
+                <p className="text-3xl font-num font-bold mt-1 text-space-100">
                   <BlurredCurrency amount={totalAdded} />
                 </p>
               </div>
             </div>
           </PremiumCard>
 
-          <PremiumCard className="p-6">
+          <PremiumCard className="card-premium p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-secondary/20 to-secondary/5">
+              <div className="p-3 rounded-ios-card bg-gradient-to-br from-secondary/20 to-secondary/5">
                 <History className="h-6 w-6 text-secondary-foreground" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground font-medium">Average Addition</p>
-                <p className="text-3xl font-bold mt-1">
+                <p className="text-xs text-space-400 uppercase tracking-wide font-medium">Average Addition</p>
+                <p className="text-3xl font-num font-bold mt-1 text-space-100">
                   <BlurredCurrency amount={averageAddition} />
                 </p>
               </div>

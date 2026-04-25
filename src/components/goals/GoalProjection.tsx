@@ -94,14 +94,16 @@ export const GoalProjection = ({ goals, trades, onDelete, onEdit, includeFeesInP
       case 'trades':
         dailyRate = trades.length / daysPassed;
         break;
-      case 'win_rate':
+      case 'win_rate': {
         const winningTrades = trades.filter(t => calculateTradePnL(t, { includeFees: includeFeesInPnL }) > 0).length;
         dailyRate = ((winningTrades / trades.length) * 100) / daysPassed;
         break;
-      case 'roi':
+      }
+      case 'roi': {
         const avgRoi = trades.reduce((sum, t) => sum + ((t.roi || 0)), 0) / trades.length;
         dailyRate = avgRoi / daysPassed;
         break;
+      }
     }
 
     // Calculate days remaining and required daily rate

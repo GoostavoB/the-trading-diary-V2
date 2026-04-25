@@ -85,15 +85,18 @@ export const CustomWidgetRenderer = ({ widget, onDelete, showAddToDashboard = fa
   };
 
   const calculateMetric = (trades: any[], metric: string, aggregation: string) => {
+    if (!trades || trades.length === 0) return 0;
     switch (metric) {
-      case 'roi':
+      case 'roi': {
         const avgROI = trades.reduce((sum, t) => sum + (t.roi || 0), 0) / trades.length;
         return aggregation === 'avg' ? avgROI : avgROI;
+      }
       case 'pnl':
         return trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
-      case 'win_rate':
+      case 'win_rate': {
         const wins = trades.filter(t => (t.profit_loss || 0) > 0).length;
         return (wins / trades.length) * 100;
+      }
       case 'count':
         return trades.length;
       default:

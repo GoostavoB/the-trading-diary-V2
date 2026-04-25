@@ -49,7 +49,7 @@ function normalizeSymbol(symbol?: string): string {
   
   // Remove common separators and characters
   normalized = normalized
-    .replace(/[\s\-_\/\\]/g, '')
+    .replace(/[\s\-_/\\]/g, '')
     .replace(/[^A-Z0-9]/g, '');
   
   return normalized;

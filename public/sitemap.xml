@@ -76,13 +76,45 @@
 
   <!-- ========== PUBLIC MARKETING PAGES ========== -->
 
+  <!-- Pricing -->
   <url>
     <loc>https://www.thetradingdiary.com/pricing</loc>
     <lastmod>2026-04-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/pricing" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/pt/pricing" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/es/pricing" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/ar/pricing" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/vi/pricing" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.thetradingdiary.com/pricing" />
+  </url>
+  <url>
+    <loc>https://www.thetradingdiary.com/pt/pricing</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.thetradingdiary.com/es/pricing</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.thetradingdiary.com/ar/pricing</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.thetradingdiary.com/vi/pricing</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 
+  <!-- Features -->
   <url>
     <loc>https://www.thetradingdiary.com/features</loc>
     <lastmod>2026-04-24</lastmod>
@@ -90,13 +122,45 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- About -->
   <url>
     <loc>https://www.thetradingdiary.com/about</loc>
     <lastmod>2026-04-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/about" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/pt/about" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/es/about" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/ar/about" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/vi/about" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.thetradingdiary.com/about" />
+  </url>
+  <url>
+    <loc>https://www.thetradingdiary.com/pt/about</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.thetradingdiary.com/es/about</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.thetradingdiary.com/ar/about</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.thetradingdiary.com/vi/about</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 
+  <!-- How It Works -->
   <url>
     <loc>https://www.thetradingdiary.com/how-it-works</loc>
     <lastmod>2026-04-24</lastmod>
@@ -104,13 +168,45 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Contact -->
   <url>
     <loc>https://www.thetradingdiary.com/contact</loc>
     <lastmod>2026-04-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/contact" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/pt/contact" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/es/contact" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/ar/contact" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/vi/contact" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.thetradingdiary.com/contact" />
+  </url>
+  <url>
+    <loc>https://www.thetradingdiary.com/pt/contact</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.thetradingdiary.com/es/contact</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.thetradingdiary.com/ar/contact</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.thetradingdiary.com/vi/contact</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 
+  <!-- Testimonials -->
   <url>
     <loc>https://www.thetradingdiary.com/testimonials</loc>
     <lastmod>2026-04-24</lastmod>
@@ -118,6 +214,7 @@
     <priority>0.7</priority>
   </url>
 
+  <!-- Changelog -->
   <url>
     <loc>https://www.thetradingdiary.com/changelog</loc>
     <lastmod>2026-04-24</lastmod>
@@ -125,6 +222,7 @@
     <priority>0.6</priority>
   </url>
 
+  <!-- Crypto Trading FAQ -->
   <url>
     <loc>https://www.thetradingdiary.com/crypto-trading-faq</loc>
     <lastmod>2026-04-24</lastmod>
@@ -132,34 +230,34 @@
     <priority>0.7</priority>
   </url>
 
+  <!-- HTML Sitemap page -->
   <url>
-    <loc>https://www.thetradingdiary.com/support</loc>
+    <loc>https://www.thetradingdiary.com/sitemap</loc>
     <lastmod>2026-04-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://www.thetradingdiary.com/faq</loc>
-    <lastmod>2026-04-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://www.thetradingdiary.com/learn</loc>
-    <lastmod>2026-04-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <!-- ========== LEGAL PAGES ========== -->
+
+  <url>
+    <loc>https://www.thetradingdiary.com/legal</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
 
   <url>
     <loc>https://www.thetradingdiary.com/privacy</loc>
     <lastmod>2026-04-24</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/privacy" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/pt/privacy" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/es/privacy" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/ar/privacy" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/vi/privacy" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.thetradingdiary.com/privacy" />
   </url>
 
   <url>
@@ -167,6 +265,12 @@
     <lastmod>2026-04-24</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/terms" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/pt/terms" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/es/terms" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/ar/terms" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/vi/terms" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.thetradingdiary.com/terms" />
   </url>
 
   <url>
@@ -183,12 +287,29 @@
     <lastmod>2026-04-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/blog" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://www.thetradingdiary.com/pt/blog" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.thetradingdiary.com/es/blog" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.thetradingdiary.com/ar/blog" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/vi/blog" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.thetradingdiary.com/blog" />
   </url>
+
+  <!-- ========== AUTHOR PAGES ========== -->
+
+  <url>
+    <loc>https://www.thetradingdiary.com/author/gustavo</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- ========== BLOG ARTICLES ========== -->
 
   <!-- Blog Article 1: AI Tools for Crypto Trading -->
   <url>
     <loc>https://www.thetradingdiary.com/blog/ai-tools-for-crypto-trading</loc>
-    <lastmod>2025-10-22</lastmod>
+    <lastmod>2026-04-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/blog/ai-tools-for-crypto-trading" />
@@ -201,7 +322,7 @@
   <!-- Blog Article 2: Trading Journal for Crypto -->
   <url>
     <loc>https://www.thetradingdiary.com/blog/trading-journal-for-crypto</loc>
-    <lastmod>2025-10-22</lastmod>
+    <lastmod>2026-04-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/blog/trading-journal-for-crypto" />
@@ -214,7 +335,7 @@
   <!-- Blog Article 3: Trading Psychology -->
   <url>
     <loc>https://www.thetradingdiary.com/blog/trading-psychology-control-emotions</loc>
-    <lastmod>2025-10-22</lastmod>
+    <lastmod>2026-04-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/blog/trading-psychology-control-emotions" />
@@ -227,7 +348,7 @@
   <!-- Blog Article 4: Data-Driven Trading -->
   <url>
     <loc>https://www.thetradingdiary.com/blog/data-driven-trading</loc>
-    <lastmod>2025-10-22</lastmod>
+    <lastmod>2026-04-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/blog/data-driven-trading" />
@@ -240,7 +361,7 @@
   <!-- Blog Article 5: AI-Powered Trading Journal -->
   <url>
     <loc>https://www.thetradingdiary.com/blog/ai-powered-trading-journal</loc>
-    <lastmod>2025-10-22</lastmod>
+    <lastmod>2026-04-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.thetradingdiary.com/blog/ai-powered-trading-journal" />

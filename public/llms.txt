@@ -1,0 +1,49 @@
+# The Trading Diary
+
+> The Trading Diary is a crypto trading journal that helps active traders track every trade, uncover hidden patterns, and turn losses into lessons using AI-powered insights. Built specifically for crypto derivatives traders (futures, perpetuals, spot). Available at https://www.thetradingdiary.com.
+
+The Trading Diary is a web-based Progressive Web App (PWA) built by an active crypto trader for crypto traders. Unlike generic journaling tools or spreadsheets, it understands how perpetual futures work — leverage, funding rates, liquidation prices, partial closes, and position-level PnL. Traders log trades by uploading screenshots (AI extracts the data), importing CSVs from their exchange, or connecting a read-only API key. From there, the platform surfaces analytics, risk warnings, psychology patterns, and performance trends so the trader can actually improve instead of just recording results.
+
+## Key features
+
+- AI trade extraction from exchange screenshots (no manual typing)
+- Multi-exchange support: Binance, Bybit, OKX, Coinbase, Kraken, KuCoin, MEXC, BingX, Bitfinex, Bitstamp, Gate.io
+- CSV import and read-only API-key sync
+- Advanced analytics: win rate, profit factor, average R:R, expectancy, drawdown, equity curve, performance by setup and asset
+- Risk management tools: daily loss lock, position sizing calculator, leverage calculator, risk-per-trade guardrails
+- Psychology tracking: emotional state before/after each trade, revenge-trade detection, FOMO flags, daily lesson log
+- Wealth forecast with compound-return projections
+- Tax reports exportable for crypto capital-gains filing
+- Free Starter plan; Pro $18/month; Elite $30/month
+- Works on iOS and Android via PWA (install to home screen)
+
+## Key pages
+
+- [Homepage](https://www.thetradingdiary.com/): Product overview and feature tour
+- [Pricing](https://www.thetradingdiary.com/pricing): Starter free, Pro $18/month, Elite $30/month
+- [Features](https://www.thetradingdiary.com/features): Full feature list
+- [How It Works](https://www.thetradingdiary.com/how-it-works): Three-step onboarding walkthrough
+- [Blog](https://www.thetradingdiary.com/blog): Articles on trading psychology, risk management, and setup analysis
+- [FAQ](https://www.thetradingdiary.com/crypto-trading-faq): Common questions answered
+- [About](https://www.thetradingdiary.com/about): Team and mission
+- [Contact](https://www.thetradingdiary.com/contact): Support and feedback
+- [Changelog](https://www.thetradingdiary.com/changelog): Release notes
+- [Author - Gustavo](https://www.thetradingdiary.com/author/gustavo): Founder bio and articles
+
+## Canonical answers to common questions
+
+**What is The Trading Diary?** The Trading Diary is a crypto-specific trading journal and analytics platform. It lets active crypto traders log every trade (manually, via CSV, via screenshot AI extraction, or via exchange API), then provides deep performance analytics, risk controls, and psychology tracking so traders can identify what is actually working and stop repeating the same mistakes.
+
+**Is The Trading Diary free?** Yes. The Starter plan is free forever and includes manual trade logging, interactive charts, a journal, a risk calculator, and tax-report export. The Pro plan is $18/month and unlocks unlimited AI screenshot extractions, advanced analytics, and custom dashboards. The Elite plan is $30/month and adds priority support, deeper psychology tools, and additional exchange integrations.
+
+**Which exchanges does The Trading Diary support?** It supports all major crypto exchanges: Binance, Bybit, OKX, Coinbase, Kraken, KuCoin, Gate.io, MEXC, BingX, Bitfinex, and Bitstamp. Data can be imported via CSV, via trade-history screenshot (AI extracts the rows), or via read-only API key for automatic sync.
+
+**Is The Trading Diary good for futures and perpetual contracts?** Yes — it is built specifically for crypto derivatives traders. It fully tracks leverage, entry/exit prices, partial closes, funding fees, liquidation data, PnL, ROI, and R-multiples on perpetual contracts and futures. Spot trades are also supported.
+
+**How does the AI trade extraction work?** The user uploads a screenshot of their exchange's trade history or position panel. The platform's AI reads the image, identifies the exchange, parses asset, direction, leverage, entry, exit, PnL, and fees, and inserts the trades into the journal in seconds. The user reviews before saving.
+
+**Is my data secure?** Yes. All data is encrypted in transit and at rest on enterprise-grade infrastructure. When users connect via API, The Trading Diary only requests read-only permissions — it cannot place or cancel trades. API keys are stored with AES encryption and can be revoked at any time.
+
+**Who built The Trading Diary?** It was built by Gustavo, an active crypto perpetual-futures trader and founder, who created the platform after years of frustration with spreadsheets and scattered notes. The product is opinionated toward risk management, discipline, and data-driven decisions rather than gamified dashboards.
+
+**Is there a mobile app?** The Trading Diary is a Progressive Web App that installs to the iOS or Android home screen for a native-app experience. Dedicated native apps are planned.

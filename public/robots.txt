@@ -1,8 +1,13 @@
-# Allow all crawlers
+# ==========================================
+# The Trading Diary — robots.txt
+# Last updated: 2026-04-24
+# ==========================================
+
+# ---------- Default for all crawlers ----------
 User-agent: *
 Allow: /
 
-# Block dashboard and private pages from indexing
+# Block dashboard and private app pages from indexing
 Disallow: /dashboard
 Disallow: /upload
 Disallow: /analytics
@@ -11,6 +16,7 @@ Disallow: /tools
 Disallow: /settings
 Disallow: /auth
 Disallow: /api/
+Disallow: /api-docs
 Disallow: /journal
 Disallow: /risk-management
 Disallow: /reports
@@ -33,10 +39,15 @@ Disallow: /economic-calendar
 Disallow: /market-data
 Disallow: /long-short-ratio
 Disallow: /exchange-connections
+Disallow: /exchanges
 Disallow: /performance-alerts
 Disallow: /trade-analysis
 Disallow: /capital-management
 Disallow: /blog-admin
+Disallow: /seo-dashboard
+Disallow: /user-guide
+Disallow: /support
+Disallow: /custom/
 
 # Allow blog content (explicitly)
 Allow: /blog
@@ -48,9 +59,174 @@ Sitemap: https://www.thetradingdiary.com/image-sitemap.xml
 # Crawl-delay for polite crawling
 Crawl-delay: 1
 
-# Specific bot rules
+# ---------- Search engine crawlers ----------
 User-agent: Googlebot
+Allow: /
+Disallow: /dashboard
+Disallow: /upload
+Disallow: /settings
+Disallow: /auth
+Disallow: /blog-admin
+Disallow: /seo-dashboard
+
+User-agent: Googlebot-Image
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: Googlebot-News
+Allow: /blog
 Allow: /
 
 User-agent: Bingbot
 Allow: /
+Disallow: /dashboard
+Disallow: /upload
+Disallow: /settings
+Disallow: /auth
+Disallow: /blog-admin
+Disallow: /seo-dashboard
+
+User-agent: Slurp
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: DuckDuckBot
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: YandexBot
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: Baiduspider
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+# ---------- AI / LLM crawlers (allow public content) ----------
+User-agent: GPTBot
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: CCBot
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: Applebot
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: Bytespider
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: Meta-ExternalAgent
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: cohere-ai
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: DiffbotBot
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: MistralAI-User
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: YouBot
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: DuckAssistBot
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: FacebookBot
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+
+# LLM context files (flat text summaries for AI crawlers)
+# https://www.thetradingdiary.com/llms.txt
+# https://www.thetradingdiary.com/llms-full.txt
+
+# Re-declare sitemaps at end (some crawlers look here)
+Sitemap: https://www.thetradingdiary.com/sitemap.xml
+Sitemap: https://www.thetradingdiary.com/image-sitemap.xml

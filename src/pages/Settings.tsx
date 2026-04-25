@@ -319,9 +319,9 @@ const Settings = () => {
     <AppLayout>
       <SkipToContent />
       <main id="main-content" className="max-w-4xl mx-auto space-y-6">
-        <header>
-          <h1 className="text-4xl font-bold mb-2" id="settings-heading">Settings</h1>
-          <p className="text-muted-foreground">Manage your account and preferences</p>
+        <header className="space-y-2">
+          <h1 className="font-display text-3xl md:text-4xl text-gradient-electric-soft" id="settings-heading">Settings</h1>
+          <p className="text-sm text-space-300">Manage your account and preferences</p>
         </header>
 
         <Tabs defaultValue="profile" className="w-full">

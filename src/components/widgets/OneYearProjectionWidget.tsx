@@ -93,14 +93,13 @@ export const OneYearProjectionWidget = memo(({
     const days = horizon.tradingDays;
     const trades = model.tradesPerDay * days;
     let projectedBalance: number;
-    let projectedPnL: number;
 
     if (mode === 'compound') {
       projectedBalance = currentBalance * Math.pow(model.growthFactor, trades);
     } else {
       projectedBalance = currentBalance + (model.evPerTrade * trades);
     }
-    projectedPnL = projectedBalance - currentBalance;
+    const projectedPnL = projectedBalance - currentBalance;
     const growthPct = currentBalance > 0 ? (projectedPnL / currentBalance) * 100 : 0;
 
     return { trades: Math.round(trades), projectedBalance, projectedPnL, growthPct };

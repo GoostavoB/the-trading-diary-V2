@@ -209,7 +209,7 @@ function analyzeTimePatterns(trades: Trade[]) {
 
 function analyzeEmotionalPatterns(trades: Trade[]) {
   let tradesAfterLoss = 0;
-  let lossStreakCount = 0;
+  const lossStreakCount = 0;
   let overtradingCount = 0;
 
   for (let i = 1; i < trades.length; i++) {

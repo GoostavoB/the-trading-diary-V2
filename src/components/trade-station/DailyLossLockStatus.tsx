@@ -10,7 +10,7 @@ import { WidgetWrapper } from '@/components/widgets/WidgetWrapper';
 import { WidgetProps } from '@/types/widget';
 import { Label } from '@/components/ui/label';
 
-interface DailyLossLockStatusProps extends WidgetProps { }
+type DailyLossLockStatusProps = WidgetProps
 
 export const DailyLossLockStatus = ({
   id,

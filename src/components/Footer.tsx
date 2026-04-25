@@ -24,16 +24,38 @@ const Footer = () => {
               {t('landing.footer.tagline')}
             </p>
             <nav aria-label="Social media links" className="flex gap-3">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors p-1.5 glass-subtle rounded-lg hover-lift" aria-label="Follow us on Twitter">
+              <a
+                href="https://twitter.com/thetradingdiary"
+                target="_blank"
+                rel="noopener noreferrer me"
+                className="text-muted-foreground hover:text-primary transition-colors p-1.5 glass-subtle rounded-lg hover-lift"
+                aria-label="Follow The Trading Diary on Twitter"
+              >
                 <Twitter size={18} aria-hidden="true" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors p-1.5 glass-subtle rounded-lg hover-lift" aria-label="Follow us on GitHub">
+              <a
+                href="https://github.com/thetradingdiary"
+                target="_blank"
+                rel="noopener noreferrer me"
+                className="text-muted-foreground hover:text-primary transition-colors p-1.5 glass-subtle rounded-lg hover-lift"
+                aria-label="Follow The Trading Diary on GitHub"
+              >
                 <Github size={18} aria-hidden="true" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors p-1.5 glass-subtle rounded-lg hover-lift" aria-label="Connect on LinkedIn">
+              <a
+                href="https://www.linkedin.com/company/thetradingdiary"
+                target="_blank"
+                rel="noopener noreferrer me"
+                className="text-muted-foreground hover:text-primary transition-colors p-1.5 glass-subtle rounded-lg hover-lift"
+                aria-label="Connect with The Trading Diary on LinkedIn"
+              >
                 <Linkedin size={18} aria-hidden="true" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors p-1.5 glass-subtle rounded-lg hover-lift" aria-label="Contact us via Email">
+              <a
+                href="/contact"
+                className="text-muted-foreground hover:text-primary transition-colors p-1.5 glass-subtle rounded-lg hover-lift"
+                aria-label="Contact The Trading Diary via Email"
+              >
                 <Mail size={18} aria-hidden="true" />
               </a>
             </nav>
@@ -81,12 +103,12 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                <a href="/contact" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                   {t('landing.footer.help')}
                 </a>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                <a href="/how-it-works" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                   {t('landing.footer.documentation')}
                 </a>
               </li>

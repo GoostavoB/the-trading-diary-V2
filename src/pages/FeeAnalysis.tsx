@@ -94,9 +94,9 @@ const FeeAnalysis = () => {
     <AppLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">{t('feeAnalysis.title')}</h1>
-            <p className="text-muted-foreground">{t('feeAnalysis.subtitle')}</p>
+          <div className="space-y-2">
+            <h1 className="font-display text-3xl md:text-4xl text-gradient-electric-soft">{t('feeAnalysis.title')}</h1>
+            <p className="text-sm text-space-300">{t('feeAnalysis.subtitle')}</p>
           </div>
           <BlurToggleButton />
         </div>

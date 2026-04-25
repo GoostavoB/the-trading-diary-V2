@@ -48,19 +48,19 @@ const FAQ = () => {
       <AppLayout>
       <SkipToContent />
       <main id="main-content" className="max-w-3xl mx-auto space-y-6">
-        <header>
-          <h1 className="text-4xl font-bold mb-2" id="faq-heading">{t('faq.title')}</h1>
-          <p className="text-muted-foreground">{t('faq.subtitle')}</p>
+        <header className="space-y-2">
+          <h1 className="font-display text-3xl md:text-4xl text-gradient-electric-soft" id="faq-heading">{t('faq.title')}</h1>
+          <p className="text-sm text-space-300">{t('faq.subtitle')}</p>
         </header>
 
-        <PremiumCard className="p-6 bg-card border-border">
+        <PremiumCard className="card-premium p-6">
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-left">
+              <AccordionItem key={index} value={`item-${index}`} className="border-space-500/40">
+                <AccordionTrigger className="text-left text-space-100">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
+                <AccordionContent className="text-space-300">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>

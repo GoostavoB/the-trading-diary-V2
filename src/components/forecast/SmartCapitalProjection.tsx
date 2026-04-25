@@ -91,7 +91,7 @@ function buildCoachMessage(
     color: 'text-red-400',
     bg: 'bg-red-500/10 border-red-500/30',
     title: '⚠️ Negative expectancy — review your setups',
-    message: `Currently your average trade loses money after accounting for wins and losses. Review your stop-loss placement, check if you\'re cutting winners too early, and consider reducing size until you identify what's off. Every trade you take with negative expectancy compounds the drawdown.`,
+    message: `Currently your average trade loses money after accounting for wins and losses. Review your stop-loss placement, check if you're cutting winners too early, and consider reducing size until you identify what's off. Every trade you take with negative expectancy compounds the drawdown.`,
   };
 }
 

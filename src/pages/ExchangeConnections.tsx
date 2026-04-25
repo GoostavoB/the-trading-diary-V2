@@ -17,6 +17,10 @@ import { formatDistanceToNow } from 'date-fns';
 import AppLayout from '@/components/layout/AppLayout';
 import { useTranslation } from '@/hooks/useTranslation';
 import { SkipToContent } from '@/components/SkipToContent';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { QuickConnect } from '@/components/exchanges/QuickConnect';
+import { ConnectedAccountsList } from '@/components/exchanges/ConnectedAccountsList';
+import { Sparkles, KeyRound } from 'lucide-react';
 
 interface ExchangeConnection {
   id: string;
@@ -38,6 +42,7 @@ export default function ExchangeConnections() {
   const [syncConnectionId, setSyncConnectionId] = useState<string | null>(null);
   const [syncExchangeName, setSyncExchangeName] = useState<string>('');
   const queryClient = useQueryClient();
+  const [quickConnectKey, setQuickConnectKey] = useState(0);
 
   const { data: connections = [], isLoading } = useQuery({
     queryKey: ['exchange-connections'],
@@ -281,13 +286,42 @@ export default function ExchangeConnections() {
       <AppLayout>
       <SkipToContent />
       <main id="main-content" className="container max-w-7xl mx-auto p-6 space-y-8">
-        <header>
-          <h1 className="text-3xl font-bold" id="exchanges-heading">{t('exchanges.title')}</h1>
-          <p className="text-muted-foreground mt-2">
+        <header className="space-y-2">
+          <h1 className="font-display text-3xl md:text-4xl text-gradient-electric-soft" id="exchanges-heading">{t('exchanges.title')}</h1>
+          <p className="text-sm text-space-300">
             {t('exchanges.subtitle')}
           </p>
         </header>
 
+        <Tabs defaultValue="quick" className="w-full">
+          <TabsList className="glass-thin p-1 rounded-ios-card grid grid-cols-2 w-full max-w-md">
+            <TabsTrigger value="quick" className="rounded-ios flex items-center gap-2 data-[state=active]:bg-electric data-[state=active]:text-white">
+              <Sparkles className="h-3.5 w-3.5" />
+              1-Click
+              <span className="chip chip-electric text-[9px] !py-0 !px-1.5 ml-1">Recommended</span>
+            </TabsTrigger>
+            <TabsTrigger value="api" className="rounded-ios flex items-center gap-2 data-[state=active]:bg-space-600">
+              <KeyRound className="h-3.5 w-3.5" />
+              API Key (Advanced)
+            </TabsTrigger>
+          </TabsList>
+
+          {/* ── Tab 1: 1-Click via SnapTrade ─────────────────────────────── */}
+          <TabsContent value="quick" className="mt-6 space-y-6">
+            <QuickConnect onConnected={() => setQuickConnectKey(k => k + 1)} />
+            <ConnectedAccountsList refreshKey={quickConnectKey} />
+          </TabsContent>
+
+          {/* ── Tab 2: Manual API Key (existing flow) ────────────────────── */}
+          <TabsContent value="api" className="mt-6 space-y-6">
+            <div className="card-premium p-4 flex items-start gap-3">
+              <KeyRound className="h-4 w-4 text-space-300 shrink-0 mt-0.5" />
+              <div className="text-xs text-space-300 leading-relaxed">
+                Use this only if your exchange isn't available via 1-Click, or if you prefer to manage API keys yourself.
+                Generate <span className="text-space-100 font-medium">read-only</span> keys (never give withdrawal permission)
+                and paste them below.
+              </div>
+            </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" role="list">
           {exchanges.map((exchange) => {
             const connection = getConnection(exchange.id);
@@ -390,7 +424,9 @@ export default function ExchangeConnections() {
           })}
         </div>
 
-        <SyncHistoryWidget />
+            <SyncHistoryWidget />
+          </TabsContent>
+        </Tabs>
 
         <ConnectExchangeModal
           exchange={selectedExchange || 'bingx'}

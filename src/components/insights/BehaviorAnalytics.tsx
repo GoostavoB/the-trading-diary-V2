@@ -19,16 +19,6 @@ interface BehaviorAnalyticsProps {
 export const BehaviorAnalytics = memo(({ trades }: BehaviorAnalyticsProps) => {
   const { t } = useTranslation();
 
-  if (!trades || trades.length === 0) {
-    return (
-      <PremiumCard className="h-full bg-card border-border">
-        <div className="p-3 text-center py-4">
-          <p className="text-xs text-muted-foreground">{t('insights.noDataAvailable') || 'No data available'}</p>
-        </div>
-      </PremiumCard>
-    );
-  }
-
   const avgHoldingMinutes = useMemo(() => calculateAvgHoldingTime(trades), [trades]);
   const avgHoldingTime = useMemo(() => formatHoldingTime(avgHoldingMinutes), [avgHoldingMinutes]);
   const avgPositionSize = useMemo(() => calculateAvgPositionSize(trades), [trades]);
@@ -48,6 +38,16 @@ export const BehaviorAnalytics = memo(({ trades }: BehaviorAnalyticsProps) => {
       worstDay: sorted[sorted.length - 1]
     };
   }, [dayPerf]);
+
+  if (!trades || trades.length === 0) {
+    return (
+      <PremiumCard className="h-full bg-card border-border">
+        <div className="p-3 text-center py-4">
+          <p className="text-xs text-muted-foreground">{t('insights.noDataAvailable') || 'No data available'}</p>
+        </div>
+      </PremiumCard>
+    );
+  }
 
   return (
     <PremiumCard className="h-full bg-card border-border flex flex-col overflow-hidden">

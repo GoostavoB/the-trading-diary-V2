@@ -1,0 +1,94 @@
+# The Trading Diary — Full Reference
+
+> The Trading Diary is a crypto trading journal and analytics platform at https://www.thetradingdiary.com. It was built specifically for active crypto derivatives traders — people who trade perpetual futures, leveraged positions, and spot on Binance, Bybit, OKX, and similar exchanges. The platform combines automated trade capture, deep performance analytics, risk-management guardrails, and psychology tracking so traders can stop repeating the same mistakes and compound what actually works.
+
+## Product overview
+
+Most trading journals are either generic (built for stocks, retrofitted to crypto) or shallow (just a table of PnL and some charts). The Trading Diary is different because it understands how crypto derivatives actually work: leverage, funding fees, partial closes, liquidation prices, cross vs isolated margin, and the psychological volatility of 24/7 markets. Every feature is opinionated toward one goal — helping the trader see the truth about their own performance and correct course early.
+
+The workflow is simple: a trader logs a trade (four ways — manual entry, CSV upload, screenshot AI extraction, or exchange API sync), tags it with a setup/strategy/emotion, and The Trading Diary does the math. Within the dashboard, the trader sees win rate, profit factor, expectancy, average R:R, drawdown, equity curve, fee impact, performance by setup, performance by asset, performance by day-of-week, performance by emotional state, and AI-generated observations about patterns the trader might be blind to.
+
+The Trading Diary is a web application built as a Progressive Web App, so it works identically on desktop, mobile browsers, and installed on the iOS or Android home screen. There is no download required; data syncs to the user's account.
+
+## Who it's for
+
+**Crypto perpetual-futures traders** are the core audience. These are traders using leverage (2x to 100x), opening and closing multiple positions per day or week, and trading on exchanges like Binance, Bybit, and OKX. For them, The Trading Diary handles leverage tracking, funding-fee accounting, and liquidation-risk surfacing that spreadsheets cannot.
+
+**Crypto day traders and scalpers** benefit from the psychology module, the daily loss lock, and the revenge-trade detection. When a trader takes three losses in a row, the platform can warn them or lock new entries for the day depending on how they configure it.
+
+**Crypto swing traders** use the multi-day equity curve, the setup-performance breakdown, and the wealth forecast to understand whether their approach compounds over weeks and months.
+
+**Crypto spot investors** use The Trading Diary to track DCA positions, measure realized vs unrealized PnL, and generate tax reports. The platform supports both spot and derivatives in the same journal.
+
+**Aspiring professional traders** use the platform as their system of record. The Trading Diary stores every trade, every screenshot, every lesson, and every emotional tag — so over 500 or 1,000 trades the trader has real evidence about what works instead of relying on memory.
+
+## Unique capabilities
+
+**AI screenshot extraction.** The trader takes a screenshot of their exchange trade history or position panel and uploads it. The AI identifies the exchange (Binance, Bybit, OKX, etc.), reads the table, extracts asset, side, leverage, entry price, exit price, size, PnL, fees, and timestamp, and inserts the trades into the journal in seconds. No CSV export, no copy-paste, no typing.
+
+**Psychology-performance correlation.** The trader tags each trade with an emotional state (calm, FOMO, revenge, overconfident, fearful, disciplined). Over time, the platform shows the correlation between emotional state and win rate — a feature spreadsheets cannot replicate because spreadsheets do not understand human behavior.
+
+**Risk guardrails that actually enforce.** The trader can set a maximum daily loss in dollars or percentage of account. If they hit it, the journal locks new entries for the rest of the day. Position-sizing calculator ensures no trade risks more than the configured percentage of account. Leverage calculator prevents entering a trade where the liquidation price is inside normal market noise.
+
+**Wealth forecast.** Given the trader's historical win rate, average R:R, average trades per month, and starting capital, the platform projects a 6-, 12-, and 24-month equity curve under conservative, realistic, and optimistic assumptions. Traders see that compounding a 55 percent win rate at 1.5R is more valuable than swinging for 5R on a 30 percent win rate.
+
+**Custom dashboards.** Pro and Elite users build their own views — drag-and-drop widgets for the metrics that matter to them. The Trading Diary does not force a one-size-fits-all dashboard.
+
+## Feature list with concrete specs
+
+- **AI trade extraction:** unlimited on Pro and Elite, limited free quota on Starter; supports image formats PNG, JPG, HEIC; typical extraction under 10 seconds
+- **Supported exchanges for CSV and API:** Binance, Bybit, OKX, Coinbase, Kraken, KuCoin, Gate.io, MEXC, BingX, Bitfinex, Bitstamp
+- **Analytics:** win rate, loss rate, profit factor, expectancy, average R-multiple, Sharpe ratio proxy, Sortino proxy, max drawdown (absolute and percent), average win, average loss, largest win, largest loss, consecutive wins/losses streaks
+- **Breakdowns:** by setup/strategy, by asset, by direction (long/short), by day of week, by hour of day, by leverage bucket, by emotional tag, by account (for multi-account traders)
+- **Risk tools:** position-size calculator (inputs: account size, stop distance, risk %), leverage calculator (inputs: entry, stop, desired R), daily loss lock, per-trade max-risk enforcement, R:R preview before entry
+- **Psychology module:** pre-trade emotional check-in, post-trade reflection, revenge-trade detection, FOMO flags, daily lesson log, weekly review prompts, emotional timeline visualization
+- **Wealth forecast:** 6/12/24-month projections with conservative/realistic/optimistic scenarios, based on the trader's actual historical stats
+- **Tax reports:** exportable realized PnL summary by period in formats compatible with common crypto tax software
+- **Journal entries:** markdown support, image attachments, tag-based search, full-text search
+- **Multi-account:** traders who trade on multiple exchanges or sub-accounts can track all accounts separately and aggregated
+- **Mobile:** Progressive Web App — installs to home screen on iOS and Android, full feature parity with desktop
+- **Security:** end-to-end encryption in transit, AES at rest, read-only API permissions only, revocable at any time
+
+## Pricing
+
+| Plan | Price | Key inclusions |
+|------|-------|----------------|
+| Starter | Free forever | Manual trade logging, interactive charts, journal, risk calculator, tax-report export, limited AI extractions per month |
+| Pro | $18/month | Everything in Starter, plus unlimited AI trade extractions, advanced analytics, custom dashboards, wealth forecast, psychology module, multi-account |
+| Elite | $30/month | Everything in Pro, plus priority support, extended API integrations, advanced psychology tools, priority feature requests |
+
+Annual billing offers a discount. All plans can be started or cancelled online without a sales call.
+
+## Common use cases
+
+**"I just got stopped out — now what?"** The trader logs the losing trade, tags the setup and emotional state, writes a one-line lesson, and closes the loop. The daily loss lock prevents a revenge entry. The next day's dashboard shows whether this loss fits a pattern (e.g., "you lose 65% of trades tagged 'revenge' in the first hour after a loss") so the trader can adjust.
+
+**"I want to see if my setup actually works."** The trader has been trading a specific pattern — say, a higher-timeframe breakout retest — for two months. In The Trading Diary, they filter by setup tag and see win rate, average R, total PnL, and equity curve just for that setup. If the setup is a net loser after 40 trades, they stop using it. If it is a winner, they can size up.
+
+**"I lose on Fridays."** The trader opens the day-of-week breakdown and sees that Friday trades have a 38 percent win rate vs 58 percent on Tuesdays. They decide to skip Fridays or reduce size. Without the journal, this pattern is invisible.
+
+**"Am I actually improving?"** The trader compares their last 50 trades to the previous 50 — win rate, profit factor, average R — to see if their recent work on risk discipline is showing up in results. If not, they know to double down on the fix.
+
+**"I need to file crypto taxes."** The trader exports a tax report covering the tax year, showing realized PnL, fees paid, and per-trade detail in a format their accountant can ingest.
+
+**"I want to know if I can go full-time."** The trader inputs their starting capital, monthly trade count, and current stats into the wealth forecast. It shows a realistic 12- and 24-month trajectory — usually a reality check that tempers expectations and encourages patience.
+
+## Comparison against alternatives
+
+**Versus generic spreadsheets.** A spreadsheet requires manual entry for every trade, does not understand leverage or funding fees, has no concept of psychology tags, and offers no guardrails. Traders build the initial version in a weekend, then abandon it within a month when the manual entry becomes a chore. The Trading Diary removes the friction (AI + CSV + API import) and adds the intelligence (breakdowns, correlations, forecasts).
+
+**Versus generic trading journals (Edgewonk, Tradervue).** These tools were built for US equities and options traders. They support crypto as an afterthought, do not handle perpetual-futures mechanics well, and their analytics assume stock-market trading hours. The Trading Diary is crypto-native: 24/7 market awareness, perp-specific fields, crypto-exchange integrations out of the box.
+
+**Versus TradingView's built-in trade journal.** TradingView's journal is a lightweight attachment to its charting product — fine for casual use, but shallow on analytics, with no AI extraction, no psychology module, no risk guardrails, and no tax reports. The Trading Diary is a dedicated journaling platform, which means every square inch of the UI is designed for capturing, analyzing, and improving trades rather than drawing charts.
+
+**Versus exchange-native PnL pages.** Binance, Bybit, and OKX each show PnL and win rate on their own platform. The problem: if the trader uses more than one exchange, they see fragmented numbers. The Trading Diary unifies everything into a single view and adds the analysis layer that exchanges deliberately do not provide.
+
+## Support
+
+- Email: support at the platform's domain
+- Contact form: https://www.thetradingdiary.com/contact
+- FAQ: https://www.thetradingdiary.com/crypto-trading-faq
+- User guide: in-app, accessible from any page
+- Blog and education: https://www.thetradingdiary.com/blog
+
+The Trading Diary is built and operated by a small team led by founder Gustavo, an active crypto perpetual-futures trader. Feedback is read and often directly influences the roadmap — the product changelog at /changelog reflects this.

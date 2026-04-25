@@ -450,7 +450,7 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
           : 0;
         widgetProps.tradingDays = stats?.trading_days || 0;
         break;
-      case 'winRate':
+      case 'winRate': {
         const winningTrades = processedTrades.filter(t => (t.profit_loss || 0) > 0).length;
         const losingTrades = processedTrades.filter(t => (t.profit_loss || 0) <= 0).length;
         widgetProps.winRate = stats?.win_rate || 0;
@@ -458,6 +458,7 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
         widgetProps.losses = losingTrades;
         widgetProps.totalTrades = stats?.total_trades || 0;
         break;
+      }
       case 'totalTrades':
         widgetProps.totalTrades = stats?.total_trades || 0;
         break;
@@ -513,8 +514,8 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
         widgetProps.worstTrade = dashboardStats.worstTrade;
         widgetProps.currentStreak = currentStreak;
         break;
-      case 'tradingQuality':
-        const minPnl = processedTrades.length > 0 
+      case 'tradingQuality': {
+        const minPnl = processedTrades.length > 0
           ? Math.min(...processedTrades.map(t => t.profit_loss || 0))
           : 0;
         widgetProps.avgWin = dashboardStats.avgWin;
@@ -522,11 +523,12 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
         widgetProps.winCount = dashboardStats.winningTrades.length;
         widgetProps.lossCount = dashboardStats.losingTrades.length;
         widgetProps.maxDrawdownAmount = Math.min(0, minPnl);
-        widgetProps.maxDrawdownPercent = initialInvestment > 0 
-          ? Math.abs((minPnl / initialInvestment) * 100) 
+        widgetProps.maxDrawdownPercent = initialInvestment > 0
+          ? Math.abs((minPnl / initialInvestment) * 100)
           : 0;
         widgetProps.profitFactor = dashboardStats.profitFactor;
         break;
+      }
       case 'rollingTarget':
         widgetProps.trades = processedTrades;
         widgetProps.initialInvestment = totalInvestedCapital;

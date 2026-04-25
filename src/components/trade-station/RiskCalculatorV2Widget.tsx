@@ -11,7 +11,7 @@ import { useUserSettings } from '@/hooks/useUserSettings';
 import { WidgetWrapper } from '@/components/widgets/WidgetWrapper';
 import { WidgetProps } from '@/types/widget';
 
-interface RiskCalculatorV2WidgetProps extends WidgetProps {}
+type RiskCalculatorV2WidgetProps = WidgetProps
 
 export const RiskCalculatorV2Widget = ({ 
   id, 

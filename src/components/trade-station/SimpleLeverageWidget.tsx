@@ -12,7 +12,7 @@ import {
 import { WidgetWrapper } from '@/components/widgets/WidgetWrapper';
 import { WidgetProps } from '@/types/widget';
 
-interface SimpleLeverageWidgetProps extends WidgetProps {}
+type SimpleLeverageWidgetProps = WidgetProps
 
 export const SimpleLeverageWidget = ({ 
   id, 

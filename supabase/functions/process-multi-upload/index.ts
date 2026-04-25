@@ -20,14 +20,14 @@ function normalizeSymbol(symbol?: string): string {
     'YM': 'YM30',
   };
   
-  let normalized = symbol.toUpperCase().trim();
+  const normalized = symbol.toUpperCase().trim();
   
   if (mappings[normalized]) {
     return mappings[normalized];
   }
   
   return normalized
-    .replace(/[\s\-_\/\\]/g, '')
+    .replace(/[\s\-_/\\]/g, '')
     .replace(/[^A-Z0-9]/g, '');
 }
 

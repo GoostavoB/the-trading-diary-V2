@@ -208,7 +208,7 @@ export function resolveLayoutCollisions(
   const placedWidgets: GridWidget[] = [];
 
   for (const widget of sortedWidgets) {
-    let newPos = { column: widget.column, row: widget.row };
+    const newPos = { column: widget.column, row: widget.row };
 
     // Check if current position is valid
     const testWidget = { ...widget, ...newPos };

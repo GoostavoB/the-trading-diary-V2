@@ -2,9 +2,7 @@ import { memo } from 'react';
 import { QuickActionCard } from '@/components/QuickActionCard';
 import { WidgetProps } from '@/types/widget';
 
-interface QuickActionsWidgetProps extends WidgetProps {
-  // Component is self-contained
-}
+type QuickActionsWidgetProps = WidgetProps
 
 export const QuickActionsWidget = memo(({
   id,

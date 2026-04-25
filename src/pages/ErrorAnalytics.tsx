@@ -132,7 +132,7 @@ export default function ErrorAnalytics() {
 
   // Filter and sort
   const filteredAndSortedErrors = useMemo(() => {
-    let filtered = errorImpacts.filter((e) =>
+    const filtered = errorImpacts.filter((e) =>
       e.errorTag.toLowerCase().includes(searchQuery.toLowerCase())
     );
 

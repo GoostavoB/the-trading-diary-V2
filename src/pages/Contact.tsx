@@ -98,7 +98,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black">
+    <div className="min-h-screen bg-space-800">
       <HreflangLinks languages={[...SUPPORTED_LANGUAGES]} defaultLanguage="en" />
       <SEO
         title={t('contact.title', 'Contact Us - The Trading Diary')}
@@ -110,15 +110,15 @@ const Contact = () => {
       <main id="main-content" className="pt-20 pb-16 px-4">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="text-center space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold">
+            <h1 className="font-display text-4xl md:text-5xl text-gradient-electric">
               {t('contact.title', 'Contact Us')}
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm md:text-base text-space-300 max-w-2xl mx-auto">
               {t('contact.subtitle', 'Get in touch with our team')}
             </p>
           </div>
 
-          <PremiumCard className="p-8 bg-card/50 backdrop-blur-sm border-border">
+          <PremiumCard className="card-premium p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -193,7 +193,7 @@ const Contact = () => {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full"
+                className="btn-primary w-full"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? t('common.loading') : t('contact.send')}
@@ -202,7 +202,7 @@ const Contact = () => {
           </PremiumCard>
 
           <div className="text-center space-y-4 pt-8">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-space-400">
               {t('contact.orEmail')}
             </p>
             <a

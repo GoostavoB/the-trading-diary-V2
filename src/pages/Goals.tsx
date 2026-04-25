@@ -145,12 +145,12 @@ export default function Goals() {
         <div className={spacing.section}>
           {/* Header */}
           <header className={layout.flex.between}>
-            <div>
-              <h1 className={`${typography.pageTitle} flex items-center gap-2`} id="goals-heading">
-                <Target className="h-8 w-8" aria-hidden="true" />
+            <div className="space-y-2">
+              <h1 className="font-display text-3xl md:text-4xl text-gradient-electric-soft flex items-center gap-3" id="goals-heading">
+                <Target className="h-8 w-8 text-space-200" aria-hidden="true" />
                 Goals & Milestones
               </h1>
-              <p className={typography.pageSubtitle}>
+              <p className="text-sm text-space-300">
                 Set and track your trading objectives
               </p>
             </div>
@@ -165,11 +165,11 @@ export default function Goals() {
           <section className={layout.grid.stats} aria-labelledby="goals-stats-heading">
             <h2 id="goals-stats-heading" className="sr-only">Goal Statistics</h2>
             {stats.map((stat, index) => (
-              <PremiumCard key={index} className="p-4" role="article">
+              <PremiumCard key={index} className="p-4 card-premium" role="article">
                 <div className={layout.flex.between}>
                   <div>
-                    <p className={typography.body}>{stat.label}</p>
-                    <p className="text-2xl font-bold mt-1">{stat.value}</p>
+                    <p className="text-xs text-space-400 uppercase tracking-wide">{stat.label}</p>
+                    <p className="text-2xl font-num font-bold mt-1 text-space-100">{stat.value}</p>
                   </div>
                   <stat.icon className={`h-8 w-8 ${stat.color}`} aria-hidden="true" />
                 </div>

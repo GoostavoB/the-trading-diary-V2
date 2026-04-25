@@ -112,7 +112,22 @@ const BlogPost = () => {
         "author": {
           "@type": "Person",
           "name": article.author,
-          "url": `https://www.thetradingdiary.com/author/${authorSlug}`
+          "url": `https://www.thetradingdiary.com/author/${authorSlug}`,
+          "jobTitle": "Crypto trader & founder",
+          "description": "Active crypto perpetual-futures trader and founder of The Trading Diary. Writes about risk management, trading psychology, and data-driven performance.",
+          "knowsAbout": [
+            "Crypto trading",
+            "Crypto perpetual futures",
+            "Trading psychology",
+            "Risk management",
+            "Trading journal systems",
+            "Data-driven trading performance"
+          ],
+          "worksFor": {
+            "@type": "Organization",
+            "name": "The Trading Diary",
+            "url": "https://www.thetradingdiary.com"
+          }
         },
         "publisher": {
           "@type": "Organization",
@@ -132,6 +147,35 @@ const BlogPost = () => {
       };
 
       addStructuredData(articleSchema, 'article-schema');
+
+      // Standalone Person schema for the author (improves E-E-A-T signals for AI crawlers)
+      const personSchema = {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": article.author,
+        "url": `https://www.thetradingdiary.com/author/${authorSlug}`,
+        "jobTitle": "Crypto trader & founder",
+        "description": "Active crypto perpetual-futures trader and founder of The Trading Diary, building tools for disciplined, data-driven crypto traders.",
+        "knowsAbout": [
+          "Crypto trading",
+          "Crypto perpetual futures",
+          "Trading psychology",
+          "Risk management",
+          "Trading journal systems",
+          "Data-driven trading performance"
+        ],
+        "sameAs": [
+          "https://twitter.com/thetradingdiary",
+          "https://x.com/thetradingdiary"
+        ],
+        "worksFor": {
+          "@type": "Organization",
+          "name": "The Trading Diary",
+          "url": "https://www.thetradingdiary.com"
+        }
+      };
+
+      addStructuredData(personSchema, 'author-person-schema');
 
       // Breadcrumb Schema
       const breadcrumbSchema = generateBreadcrumbSchema([

@@ -69,29 +69,31 @@ Deno.serve(async (req) => {
       let shouldTrigger = false;
 
       switch (alert.alert_type) {
-        case 'win_rate':
+        case 'win_rate': {
           const winningTrades = trades.filter(t => (t.pnl || 0) > 0).length;
           currentValue = (winningTrades / trades.length) * 100;
           break;
+        }
 
         case 'total_pnl':
           currentValue = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
           break;
 
-        case 'daily_pnl':
+        case 'daily_pnl': {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
           const todayTrades = trades.filter(t => new Date(t.entry_time) >= today);
           currentValue = todayTrades.reduce((sum, t) => sum + (t.pnl || 0), 0);
           break;
+        }
 
         case 'total_trades':
           currentValue = trades.length;
           break;
 
-        case 'losing_streak':
+        case 'losing_streak': {
           let streak = 0;
-          const sortedTrades = [...trades].sort((a, b) => 
+          const sortedTrades = [...trades].sort((a, b) =>
             new Date(b.entry_time).getTime() - new Date(a.entry_time).getTime()
           );
           for (const trade of sortedTrades) {
@@ -103,6 +105,7 @@ Deno.serve(async (req) => {
           }
           currentValue = streak;
           break;
+        }
 
         default:
           continue;

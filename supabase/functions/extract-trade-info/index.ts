@@ -100,7 +100,7 @@ function estimateTradeCount(ocrText: string): number {
   const sideMatches = ocrText.match(/\b(long|short)\b/gi) || [];
   
   // Count timestamp patterns (YYYY/MM/DD or similar)
-  const dateMatches = ocrText.match(/\d{4}[-\/]\d{2}[-\/]\d{2}/g) || [];
+  const dateMatches = ocrText.match(/\d{4}[-/]\d{2}[-/]\d{2}/g) || [];
   
   // Use the maximum of these indicators
   const estimate = Math.max(
