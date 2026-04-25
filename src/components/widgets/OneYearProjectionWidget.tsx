@@ -36,6 +36,24 @@ const HORIZONS: Horizon[] = [
 
 type Mode = 'compound' | 'linear';
 
+// ── Realism caps ──
+// With small samples (23 trades), the observed per-trade edge grossly
+// overstates long-run reality. Without a cap, $500 → $7.95B in 1y appears.
+// We cap the per-trade growth factor and the total multiplier so the chart
+// stays in a useful envelope. The user is told when the cap kicks in.
+const PER_TRADE_GROWTH_MAX = 1.02;       // +2% per trade ceiling (already aggressive)
+const PER_TRADE_GROWTH_MIN = 0.95;       // -5% per trade floor
+const TOTAL_MULTIPLIER_MAX = 50;         // cap final balance at 50× starting capital
+const TOTAL_MULTIPLIER_MIN = 0.05;       // and at 5% (95% drawdown) on the down side
+
+const clampPerTrade = (g: number) =>
+  Math.max(PER_TRADE_GROWTH_MIN, Math.min(PER_TRADE_GROWTH_MAX, g));
+
+const clampMultiple = (m: number) => {
+  if (!isFinite(m) || isNaN(m)) return TOTAL_MULTIPLIER_MAX;
+  return Math.max(TOTAL_MULTIPLIER_MIN, Math.min(TOTAL_MULTIPLIER_MAX, m));
+};
+
 /**
  * Projection Widget — Interactive
  *
@@ -83,9 +101,11 @@ export const OneYearProjectionWidget = memo(({
     // Compound: derive risk % from avgLoss vs currentCapital
     const rewardPct = currentBalance > 0 ? avgWin / currentBalance : 0;
     const riskPct = currentBalance > 0 ? avgLoss / currentBalance : 0;
-    const growthFactor = wrFrac * (1 + rewardPct) + lossFrac * (1 - riskPct);
+    const rawGrowthFactor = wrFrac * (1 + rewardPct) + lossFrac * (1 - riskPct);
+    const growthFactor = clampPerTrade(rawGrowthFactor);
+    const wasCapped = rawGrowthFactor !== growthFactor;
 
-    return { tradesPerDay, wrFrac, lossFrac, evPerTrade, rewardPct, riskPct, growthFactor };
+    return { tradesPerDay, wrFrac, lossFrac, evPerTrade, rewardPct, riskPct, growthFactor, rawGrowthFactor, wasCapped };
   }, [tradingDays, totalTrades, winRate, avgWin, avgLoss, currentBalance]);
 
   // ── Horizon-specific result ──
@@ -93,16 +113,25 @@ export const OneYearProjectionWidget = memo(({
     const days = horizon.tradingDays;
     const trades = model.tradesPerDay * days;
     let projectedBalance: number;
+    let capped = model.wasCapped;
 
     if (mode === 'compound') {
-      projectedBalance = currentBalance * Math.pow(model.growthFactor, trades);
+      const rawMultiple = Math.pow(model.growthFactor, trades);
+      const safeMultiple = clampMultiple(rawMultiple);
+      if (safeMultiple !== rawMultiple) capped = true;
+      projectedBalance = currentBalance * safeMultiple;
     } else {
       projectedBalance = currentBalance + (model.evPerTrade * trades);
+      // Clamp linear too — at most 50× starting balance
+      const linearMax = currentBalance * TOTAL_MULTIPLIER_MAX;
+      const linearMin = currentBalance * TOTAL_MULTIPLIER_MIN;
+      if (projectedBalance > linearMax) { projectedBalance = linearMax; capped = true; }
+      if (projectedBalance < linearMin) { projectedBalance = linearMin; capped = true; }
     }
     const projectedPnL = projectedBalance - currentBalance;
     const growthPct = currentBalance > 0 ? (projectedPnL / currentBalance) * 100 : 0;
 
-    return { trades: Math.round(trades), projectedBalance, projectedPnL, growthPct };
+    return { trades: Math.round(trades), projectedBalance, projectedPnL, growthPct, capped };
   }, [horizon, mode, model, currentBalance]);
 
   // ── Curve points across the selected horizon ──
@@ -120,9 +149,13 @@ export const OneYearProjectionWidget = memo(({
       const trades = model.tradesPerDay * d;
       let y: number;
       if (mode === 'compound') {
-        y = currentBalance * Math.pow(model.growthFactor, trades);
+        const rawMultiple = Math.pow(model.growthFactor, trades);
+        y = currentBalance * clampMultiple(rawMultiple);
       } else {
         y = currentBalance + (model.evPerTrade * trades);
+        const linearMax = currentBalance * TOTAL_MULTIPLIER_MAX;
+        const linearMin = currentBalance * TOTAL_MULTIPLIER_MIN;
+        y = Math.max(linearMin, Math.min(linearMax, y));
       }
       pts.push({ x: i / samples, y });
     }
@@ -197,11 +230,19 @@ export const OneYearProjectionWidget = memo(({
     <div className="relative flex flex-col h-full overflow-hidden">
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3 gap-3 flex-wrap">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-[11px] font-medium text-space-200 tracking-tight">
             Projection
           </span>
           <span className="text-[10px] text-space-400">· drag to explore</span>
+          {result.capped && (
+            <span
+              className="chip chip-orange text-[10px] !py-0 !px-1.5"
+              title="Projection capped at 50× starting balance / 95% drawdown. Small samples grossly overstate compounded growth — treat this as an upper envelope, not a target."
+            >
+              Capped for realism
+            </span>
+          )}
         </div>
         {/* Mode toggle (segmented control) */}
         <div className="inline-flex items-center gap-1 p-0.5 rounded-ios glass-thin">

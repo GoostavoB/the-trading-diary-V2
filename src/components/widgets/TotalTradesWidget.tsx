@@ -6,19 +6,31 @@ import { cn } from '@/lib/utils';
 interface TotalTradesWidgetProps extends WidgetProps {
   totalTrades: number;
   trend?: number;
+  currentStreak?: { type: 'win' | 'loss'; count: number };
 }
 
 /**
  * Total Trades Widget — Apple Premium dot-matrix.
  * Each dot = 1 trade; winners apple-green, losers apple-red (50% opacity).
+ * Optional streak chip surfaces hot/cold runs.
  */
 export const TotalTradesWidget = memo(({
   totalTrades,
   trend,
+  currentStreak,
 }: TotalTradesWidgetProps) => {
   const { t } = useTranslation();
   const hasTrend = trend !== undefined && trend !== 0;
   const isPositiveTrend = (trend ?? 0) > 0;
+
+  // Streak chip — only show when count >= 3
+  const streakChip = (() => {
+    if (!currentStreak || currentStreak.count < 3) return null;
+    if (currentStreak.type === 'win') {
+      return { className: 'chip-green', label: `${currentStreak.count}W streak` };
+    }
+    return { className: 'chip-red', label: `${currentStreak.count}L streak` };
+  })();
 
   const cap = 200;
   const visible = Math.min(totalTrades, cap);
@@ -42,11 +54,18 @@ export const TotalTradesWidget = memo(({
         <span className="text-xs font-medium text-space-300">
           {t('widgets.totalTrades.title')}
         </span>
-        {hasTrend && (
-          <span className={cn('text-[10px]', isPositiveTrend ? 'chip-green' : 'chip-red')}>
-            {isPositiveTrend ? '+' : ''}{trend} {t('widgets.thisWeek')}
-          </span>
-        )}
+        <div className="flex items-center gap-1.5">
+          {streakChip && (
+            <span className={cn(streakChip.className, 'text-[10px]')}>
+              {streakChip.label}
+            </span>
+          )}
+          {hasTrend && (
+            <span className={cn('text-[10px]', isPositiveTrend ? 'chip-green' : 'chip-red')}>
+              {isPositiveTrend ? '+' : ''}{trend} {t('widgets.thisWeek')}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 flex flex-col gap-2 px-4 pb-4 min-h-0">

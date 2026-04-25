@@ -74,6 +74,8 @@ export function InsightsContent() {
                     lossCount={stats.losingTrades.length}
                     maxDrawdownPercent={maxDrawdown.percent}
                     maxDrawdownAmount={-Math.abs(maxDrawdown.amount)}
+                    trades={processedTrades}
+                    currentStreak={currentStreak}
                 />
                 <CostEfficiencyPanel trades={processedTrades} />
                 <BehaviorAnalytics trades={processedTrades} />
@@ -122,6 +124,8 @@ export function InsightsContent() {
                             lossCount={stats.losingTrades.length}
                             maxDrawdownPercent={maxDrawdown.percent}
                             maxDrawdownAmount={-Math.abs(maxDrawdown.amount)}
+                            trades={processedTrades}
+                            currentStreak={currentStreak}
                         />
                     </div>
                     <div className="flex-1 min-h-0 overflow-hidden">

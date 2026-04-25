@@ -17,11 +17,11 @@ interface ProfitFactorWidgetProps {
 /**
  * Profit Factor Widget — Apple Premium
  * Metaphor: gross profit vs gross loss side-by-side, with ratio highlighted.
- * Formula: PF = gross_profit / gross_loss
+ * Formula: PF = total gains ÷ total losses
  *   - Below 1.0 → losing system (red)
  *   - 1.0 – 1.5 → marginal (orange)
- *   - 1.5 – 2.5 → solid (blue)
- *   - Above 2.5 → elite (green)
+ *   - 1.5 – 2.5 → profitable (blue)
+ *   - 2.5+      → strong edge (green)
  */
 export const ProfitFactorWidget = memo(({
   profitFactor,
@@ -41,12 +41,12 @@ export const ProfitFactorWidget = memo(({
 
   const tier = useMemo(() => {
     if (!isFinite(profitFactor) || profitFactor > 100) {
-      return { label: 'PERFECT', color: 'apple-green', bgTone: 'from-apple-green/15 to-apple-green/5' };
+      return { label: 'Strong edge', color: 'apple-green', bgTone: 'from-apple-green/15 to-apple-green/5' };
     }
-    if (profitFactor >= 2.5) return { label: 'ELITE',    color: 'apple-green', bgTone: 'from-apple-green/15 to-apple-green/5' };
-    if (profitFactor >= 1.5) return { label: 'SOLID',    color: 'electric',     bgTone: 'from-electric/15 to-electric/5' };
-    if (profitFactor >= 1.0) return { label: 'MARGINAL', color: 'apple-orange', bgTone: 'from-apple-orange/15 to-apple-orange/5' };
-    return                   { label: 'LOSING',   color: 'apple-red',    bgTone: 'from-apple-red/15 to-apple-red/5' };
+    if (profitFactor >= 2.5) return { label: 'Strong edge',           color: 'apple-green',  bgTone: 'from-apple-green/15 to-apple-green/5' };
+    if (profitFactor >= 1.5) return { label: 'Profitable',            color: 'electric',     bgTone: 'from-electric/15 to-electric/5' };
+    if (profitFactor >= 1.0) return { label: 'Marginal — review setups', color: 'apple-orange', bgTone: 'from-apple-orange/15 to-apple-orange/5' };
+    return                   { label: 'Losing system',                color: 'apple-red',    bgTone: 'from-apple-red/15 to-apple-red/5' };
   }, [profitFactor]);
 
   // Proportion for the split bar (profit share vs loss share of combined absolute)
@@ -54,18 +54,20 @@ export const ProfitFactorWidget = memo(({
   const profitPct = total > 0 ? (grossProfit / total) * 100 : 50;
   const lossPct = 100 - profitPct;
 
+  const pfDisplay = isFinite(profitFactor) && profitFactor < 100 ? profitFactor.toFixed(2) : '∞';
+
   return (
     <div className="relative flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-medium text-space-200 tracking-tight uppercase">
-            Profit Factor
+          <span className="text-[11px] font-medium text-space-200 tracking-tight">
+            Profit factor
           </span>
         </div>
         <span
           className={cn(
-            'chip',
+            'chip text-[10px]',
             tier.color === 'apple-green' && 'chip-green',
             tier.color === 'electric' && 'chip-electric',
             tier.color === 'apple-orange' && 'chip-orange',
@@ -77,17 +79,24 @@ export const ProfitFactorWidget = memo(({
       </div>
 
       {/* Hero number */}
-      <div className="px-4 pb-3 flex items-baseline gap-3">
+      <div className="px-4 pb-1 flex items-baseline gap-3">
         <span className={cn('font-display text-5xl font-bold tabular-nums tracking-tight leading-none',
           tier.color === 'apple-green' && 'text-gradient-profit',
           tier.color === 'electric' && 'text-gradient-electric',
           tier.color === 'apple-orange' && 'text-apple-orange',
           tier.color === 'apple-red' && 'text-gradient-loss',
         )}>
-          {isFinite(profitFactor) && profitFactor < 100 ? profitFactor.toFixed(2) : '∞'}
+          {pfDisplay}
         </span>
         <span className="text-xs text-space-300 tabular-nums">
           × return per $1 risked
+        </span>
+      </div>
+
+      {/* Calculation footnote */}
+      <div className="px-4 pb-3">
+        <span className="text-[10px] text-space-400 tabular-nums">
+          Total gains ÷ total losses = {pfDisplay}
         </span>
       </div>
 
@@ -110,7 +119,7 @@ export const ProfitFactorWidget = memo(({
           <div className="flex flex-col gap-0.5">
             <div className="flex items-center gap-1.5">
               <TrendingUp className="w-3 h-3 text-apple-green" />
-              <span className="text-[10px] text-space-300 uppercase tracking-wide">Gross Profit</span>
+              <span className="text-[10px] text-space-300">Gross profit</span>
             </div>
             <span className="text-sm font-semibold text-apple-green tabular-nums">
               +{formatCurrency(grossProfit)}
@@ -122,7 +131,7 @@ export const ProfitFactorWidget = memo(({
 
           <div className="flex flex-col gap-0.5 items-end">
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-space-300 uppercase tracking-wide">Gross Loss</span>
+              <span className="text-[10px] text-space-300">Gross loss</span>
               <TrendingDown className="w-3 h-3 text-apple-red" />
             </div>
             <span className="text-sm font-semibold text-apple-red tabular-nums">
@@ -139,7 +148,7 @@ export const ProfitFactorWidget = memo(({
           <p className="text-[11px] text-space-300 leading-snug">
             For every <span className="text-apple-red font-semibold tabular-nums">$1</span> you lost,
             you earned <span className="text-apple-green font-semibold tabular-nums">
-              ${isFinite(profitFactor) && profitFactor < 100 ? profitFactor.toFixed(2) : '∞'}
+              ${pfDisplay}
             </span>.
           </p>
         </div>

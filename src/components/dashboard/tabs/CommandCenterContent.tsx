@@ -122,11 +122,17 @@ export function CommandCenterContent() {
                     lossCount={stats.losingTrades.length}
                     maxDrawdownPercent={maxDrawdown.percent}
                     maxDrawdownAmount={-Math.abs(maxDrawdown.amount)}
+                    trades={processedTrades}
+                    currentStreak={currentStreak}
                 />
             </div>
 
             {/* ── Row 5: Behavior Analytics ── */}
-            <BehaviorAnalytics trades={processedTrades} />
+            <BehaviorAnalytics
+                trades={processedTrades}
+                currentEquity={currentCapital}
+                currentStreak={currentStreak}
+            />
         </div>
     );
 }

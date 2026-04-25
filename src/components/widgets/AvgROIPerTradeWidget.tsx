@@ -1,6 +1,7 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { cn } from '@/lib/utils';
+import { Trade } from '@/types/trade';
 
 interface AvgROIPerTradeWidgetProps {
   id: string;
@@ -8,35 +9,54 @@ interface AvgROIPerTradeWidgetProps {
   onRemove?: () => void;
   avgROIPerTrade: number;
   totalTrades: number;
+  trades?: Trade[];
 }
 
 /**
- * Avg ROI Per Trade Widget — Apple Premium gauge ring.
- * Minimal 270° arc, electric-blue for positive / apple-red for negative.
+ * Avg ROI Per Trade Widget — Apple Premium.
+ * Hero number + 7-bar mini chart of last-7-trade ROIs.
+ * No more 270° gauge ring — ROI isn't a fraction of a circle.
  */
 export const AvgROIPerTradeWidget = memo(({
   avgROIPerTrade,
   totalTrades,
+  trades = [],
 }: AvgROIPerTradeWidgetProps) => {
   const { t } = useTranslation();
   const isPositive = avgROIPerTrade >= 0;
 
-  // Scale: cap ring at +/- 10% per-trade for full sweep
-  const scaleMax = 10;
-  const abs = Math.min(Math.abs(avgROIPerTrade), scaleMax);
-  const pct = abs / scaleMax;
+  // Last 7 trades (chronological order, oldest first)
+  const last7 = useMemo(() => {
+    if (!trades || trades.length === 0) return [];
+    const sorted = [...trades]
+      .filter((t) => typeof t.roi === 'number' && !Number.isNaN(t.roi))
+      .sort((a, b) => {
+        const aT = a.closed_at || a.opened_at || a.trade_date || a.created_at || '';
+        const bT = b.closed_at || b.opened_at || b.trade_date || b.created_at || '';
+        return new Date(aT).getTime() - new Date(bT).getTime();
+      });
+    return sorted.slice(-7);
+  }, [trades]);
 
-  const size = 140;
-  const cx = size / 2;
-  const cy = size / 2;
-  const r = 52;
-  const circ = 2 * Math.PI * r;
-  const arcFraction = 0.75;
-  const totalArc = circ * arcFraction;
-  const filled = totalArc * pct;
-  const gap = circ - totalArc;
+  // Best / worst across full history
+  const { bestROI, worstROI } = useMemo(() => {
+    if (!trades || trades.length === 0) return { bestROI: null as number | null, worstROI: null as number | null };
+    const rois = trades
+      .map((t) => t.roi)
+      .filter((r): r is number => typeof r === 'number' && !Number.isNaN(r));
+    if (rois.length === 0) return { bestROI: null, worstROI: null };
+    return { bestROI: Math.max(...rois), worstROI: Math.min(...rois) };
+  }, [trades]);
 
-  const stroke = isPositive ? 'hsl(var(--electric-blue))' : 'hsl(var(--apple-red))';
+  // Scale bars to max 32px height
+  const maxBarPx = 32;
+  const maxAbs = useMemo(() => {
+    if (last7.length === 0) return 1;
+    const m = Math.max(...last7.map((t) => Math.abs(t.roi || 0)));
+    return m > 0 ? m : 1;
+  }, [last7]);
+
+  const formatPct = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`;
 
   return (
     <div className="relative flex flex-col h-full overflow-hidden">
@@ -45,66 +65,76 @@ export const AvgROIPerTradeWidget = memo(({
         <span className="text-xs font-medium text-space-300">
           Avg ROI per trade
         </span>
-        <span className={cn('pulse-dot', isPositive ? '' : 'danger')} />
+        <span className="text-[10px] text-space-400 font-num tabular-nums">
+          n = {totalTrades}
+        </span>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-4 pb-4 min-h-0 gap-4">
-        {/* Gauge */}
-        <div className="relative shrink-0" style={{ width: size, height: size }}>
-          <svg width={size} height={size} style={{ transform: 'rotate(135deg)' }}>
-            {/* track */}
-            <circle
-              cx={cx} cy={cy} r={r}
-              fill="none"
-              stroke="hsl(var(--space-gray-600))"
-              strokeWidth={10}
-              strokeLinecap="round"
-              strokeDasharray={`${totalArc} ${gap}`}
-            />
-            {/* fill */}
-            <circle
-              cx={cx} cy={cy} r={r}
-              fill="none"
-              stroke={stroke}
-              strokeWidth={10}
-              strokeLinecap="round"
-              strokeDasharray={`${filled} ${circ - filled}`}
-              style={{
-                transition: 'stroke-dasharray 1s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              }}
-            />
-          </svg>
-          {/* center readout */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className={cn(
-              'font-display font-semibold text-2xl tabular-nums leading-none font-num',
-              isPositive ? 'text-space-100' : 'text-apple-red'
-            )}>
-              {isPositive ? '+' : '-'}{Math.abs(avgROIPerTrade).toFixed(2)}%
-            </span>
-            <span className="text-[10px] text-space-400 mt-1">per trade</span>
-          </div>
+      {/* Body */}
+      <div className="flex-1 flex flex-col justify-center gap-3 px-4 pb-4 min-h-0">
+        {/* Hero number */}
+        <div className="flex items-baseline gap-2">
+          <span className={cn(
+            'font-display font-semibold text-3xl leading-none tabular-nums font-num',
+            isPositive ? 'text-gradient-electric' : 'text-apple-red'
+          )}>
+            {isPositive ? '+' : '−'}{Math.abs(avgROIPerTrade).toFixed(2)}%
+          </span>
+          <span className="text-xs text-space-400">/ trade</span>
         </div>
 
-        {/* Side readout */}
-        <div className="flex flex-col gap-2 flex-1 text-xs">
-          <div className="flex justify-between">
-            <span className="text-space-400">Range</span>
-            <span className="text-space-200 font-num tabular-nums">±{scaleMax}%</span>
+        {/* Mini bar chart — last 7 trades */}
+        {last7.length === 0 ? (
+          <div className="flex items-end justify-center h-10">
+            <span className="text-space-400 text-sm">—</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-space-400">Filled</span>
-            <span className={cn('font-num tabular-nums', isPositive ? 'text-electric' : 'text-apple-red')}>
-              {(pct * 100).toFixed(0)}%
-            </span>
+        ) : (
+          <div className="flex flex-col gap-1.5">
+            <div
+              className="flex items-end gap-1"
+              style={{ height: maxBarPx }}
+              aria-label="Last 7 trades ROI"
+            >
+              {last7.map((t, i) => {
+                const roi = t.roi || 0;
+                const h = Math.max(2, (Math.abs(roi) / maxAbs) * maxBarPx);
+                const isUp = roi >= 0;
+                return (
+                  <div
+                    key={t.id || i}
+                    className={cn(
+                      'rounded-sm transition-all duration-500',
+                      isUp ? 'bg-apple-green' : 'bg-apple-red'
+                    )}
+                    style={{ width: 8, height: h }}
+                    title={`${t.symbol || 'Trade'}: ${formatPct(roi)}`}
+                  />
+                );
+              })}
+              {/* placeholders if < 7 */}
+              {Array.from({ length: Math.max(0, 7 - last7.length) }).map((_, i) => (
+                <div
+                  key={`ph-${i}`}
+                  className="rounded-sm bg-space-600/40"
+                  style={{ width: 8, height: 4 }}
+                />
+              ))}
+            </div>
+            <span className="text-[10px] text-space-400">Last 7 trades</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-space-400">Trades</span>
-            <span className="text-space-200 font-num tabular-nums">{totalTrades}</span>
-          </div>
-          <p className="text-[11px] text-space-400 mt-2 leading-snug">
-            {t('widgets.avgROIAcross', { count: totalTrades })}
-          </p>
+        )}
+
+        {/* Best / worst */}
+        <div className="text-[11px] text-space-400 tabular-nums font-num">
+          {bestROI !== null && worstROI !== null ? (
+            <>
+              <span className="text-apple-green">Best: {formatPct(bestROI)}</span>
+              <span className="text-space-500"> · </span>
+              <span className="text-apple-red">Worst: {formatPct(worstROI)}</span>
+            </>
+          ) : (
+            <span>Best: — · Worst: —</span>
+          )}
         </div>
       </div>
     </div>

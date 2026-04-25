@@ -55,6 +55,7 @@ export function CalendarContent() {
             lossCount={qualityStats.lossCount}
             maxDrawdownAmount={qualityStats.maxDrawdownAmount}
             maxDrawdownPercent={qualityStats.maxDrawdownPercent}
+            trades={processedTrades}
           />
         </SmartWidgetWrapper>
       </div>

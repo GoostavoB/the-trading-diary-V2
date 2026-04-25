@@ -30,19 +30,25 @@ export const useRiskCalculator = () => {
   useEffect(() => {
     if (user) {
       loadData();
+    } else {
+      // No user yet (or user signed out) — stop showing the spinner forever.
+      setLoading(false);
     }
   }, [user]);
 
   const loadData = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
-      // Fetch initial investment
+      // Fetch initial investment — use maybeSingle to gracefully handle 0 rows
       const { data: settings } = await supabase
         .from('user_settings')
         .select('initial_investment, risk_percent, daily_loss_percent, risk_base')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (settings) {
         setInitialCapital(settings.initial_investment || 0);

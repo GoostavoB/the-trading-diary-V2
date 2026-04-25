@@ -10,17 +10,17 @@ interface WinRateWidgetProps extends WidgetProps {
   totalTrades: number;
 }
 
-function getTier(rate: number) {
-  if (rate >= 70) return { label: 'Elite', chip: 'chip-green', bar: 'bg-apple-green' };
-  if (rate >= 55) return { label: 'Strong', chip: 'chip-green', bar: 'bg-apple-green' };
-  if (rate >= 45) return { label: 'Solid', chip: 'chip-electric', bar: 'bg-electric' };
-  if (rate >= 35) return { label: 'Weak', chip: 'chip-orange', bar: 'bg-apple-orange' };
-  return { label: 'Poor', chip: 'chip-red', bar: 'bg-apple-red' };
+function getBarColor(rate: number) {
+  if (rate >= 65) return 'bg-apple-green';
+  if (rate >= 50) return 'bg-electric';
+  if (rate >= 40) return 'bg-apple-orange';
+  return 'bg-apple-red';
 }
 
 /**
  * Win Rate Widget — Apple Premium.
- * Clean Apple progress bar + chip tier indicator.
+ * Smooth Apple progress bar + adaptive color, with industry benchmark caption.
+ * No subjective tier badge — the bar color carries the signal.
  */
 export const WinRateWidget = memo(({
   winRate,
@@ -29,23 +29,26 @@ export const WinRateWidget = memo(({
   totalTrades,
 }: WinRateWidgetProps) => {
   const { t } = useTranslation();
-  const tier = getTier(winRate);
+  const barColor = getBarColor(winRate);
   const clamped = Math.max(0, Math.min(100, winRate));
+  const tooltip = `${wins} winning trades, ${losses} losing trades = ${winRate.toFixed(1)}%`;
 
   return (
     <div className="relative flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <span className="text-xs font-medium text-space-300">
-          {t('widgets.winRate.title', 'Win Rate')}
+          {t('widgets.winRate.title', 'Win rate')}
         </span>
-        <span className={cn(tier.chip, 'text-[10px]')}>{tier.label}</span>
       </div>
 
       {/* Body */}
-      <div className="flex-1 flex flex-col justify-center gap-3 px-4 pb-4 min-h-0">
+      <div className="flex-1 flex flex-col justify-center gap-2 px-4 pb-4 min-h-0">
         <div className="flex items-baseline justify-between gap-2">
-          <span className="font-display font-semibold text-3xl leading-none tabular-nums text-space-100 font-num">
+          <span
+            className="font-display font-semibold text-3xl leading-none tabular-nums text-space-100 font-num cursor-help"
+            title={tooltip}
+          >
             {winRate.toFixed(1)}
             <span className="text-space-400 text-2xl">%</span>
           </span>
@@ -54,18 +57,22 @@ export const WinRateWidget = memo(({
         {/* Smooth progress bar */}
         <div className="h-2 bg-space-600 rounded-full overflow-hidden">
           <div
-            className={cn('h-full rounded-full transition-all duration-700 ease-out', tier.bar)}
+            className={cn('h-full rounded-full transition-all duration-700 ease-out', barColor)}
             style={{ width: `${clamped}%` }}
           />
         </div>
+
+        {/* Industry benchmark caption */}
+        <span className="text-xs text-space-400">
+          Industry avg: 50–55%
+        </span>
 
         {/* Stats */}
         <div className="flex items-center justify-between text-xs pt-1">
           <span className="text-space-300">
             <span className="text-apple-green font-medium font-num tabular-nums">{wins}</span>
             <span className="text-space-400"> wins</span>
-          </span>
-          <span className="text-space-300">
+            <span className="text-space-500"> · </span>
             <span className="text-apple-red font-medium font-num tabular-nums">{losses}</span>
             <span className="text-space-400"> losses</span>
           </span>

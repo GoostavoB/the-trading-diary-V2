@@ -12,7 +12,7 @@ interface SimpleAvgROIWidgetProps {
 
 /**
  * Simple Avg ROI Widget — Apple Premium tier rail.
- * 4-zone classifier rail with a sliding marker. Sentence-case labels.
+ * 4-zone classifier rail with a sliding white-dot marker. Sentence-case labels.
  */
 export const SimpleAvgROIWidget = memo(({
   simpleAvgROI,
@@ -27,10 +27,10 @@ export const SimpleAvgROIWidget = memo(({
   const markerPct = ((clamped - RAIL_MIN) / (RAIL_MAX - RAIL_MIN)) * 100;
 
   const zones = [
-    { label: 'Losing', color: 'bg-apple-red/60',    text: 'text-apple-red',    chip: 'chip-red',      range: '< 0%',  test: (v: number) => v < 0 },
-    { label: 'Weak',   color: 'bg-apple-orange/60', text: 'text-apple-orange', chip: 'chip-orange',   range: '0-2%',  test: (v: number) => v >= 0 && v < 2 },
-    { label: 'Solid',  color: 'bg-electric/60',     text: 'text-electric',     chip: 'chip-electric', range: '2-5%',  test: (v: number) => v >= 2 && v < 5 },
-    { label: 'Elite',  color: 'bg-apple-green/60',  text: 'text-apple-green',  chip: 'chip-green',    range: '> 5%',  test: (v: number) => v >= 5 },
+    { label: 'Losing', color: 'bg-apple-red',    text: 'text-apple-red',    chip: 'chip-red',      range: '< 0%',  test: (v: number) => v < 0 },
+    { label: 'Weak',   color: 'bg-apple-orange', text: 'text-apple-orange', chip: 'chip-orange',   range: '0–2%',  test: (v: number) => v >= 0 && v < 2 },
+    { label: 'Solid',  color: 'bg-electric',     text: 'text-electric',     chip: 'chip-electric', range: '2–5%',  test: (v: number) => v >= 2 && v < 5 },
+    { label: 'Elite',  color: 'bg-apple-green',  text: 'text-apple-green',  chip: 'chip-green',    range: '> 5%',  test: (v: number) => v >= 5 },
   ];
   const activeIdx = zones.findIndex((z) => z.test(simpleAvgROI));
   const active = zones[activeIdx === -1 ? 0 : activeIdx];
@@ -40,7 +40,7 @@ export const SimpleAvgROIWidget = memo(({
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <span className="text-xs font-medium text-space-300">
-          Simple Avg ROI
+          Simple avg ROI
         </span>
         <span className={cn(active.chip, 'text-[10px]')}>{active.label}</span>
       </div>
@@ -64,19 +64,20 @@ export const SimpleAvgROIWidget = memo(({
                   z.color,
                   i === activeIdx ? 'opacity-100' : 'opacity-40'
                 )}
+                title={`${z.label} (${z.range})`}
               />
             ))}
           </div>
-          {/* Marker */}
+          {/* Marker — white dot with shadow */}
           <div
             className="absolute top-[-7px] -translate-x-1/2 transition-[left] duration-700 ease-out pointer-events-none"
             style={{ left: `${markerPct}%` }}
             aria-hidden="true"
           >
-            <div className="w-3.5 h-3.5 rounded-full bg-white shadow-premium border border-space-500" />
+            <div className="w-4 h-4 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.45)] border border-white/80" />
           </div>
           {/* Tick labels */}
-          <div className="grid grid-cols-4 gap-1 mt-2 text-[10px]">
+          <div className="grid grid-cols-4 gap-1 mt-3 text-[10px]">
             {zones.map((z, i) => (
               <div key={z.label} className="flex flex-col items-center leading-tight">
                 <span className={i === activeIdx ? active.text + ' font-medium' : 'text-space-400'}>
@@ -89,8 +90,16 @@ export const SimpleAvgROIWidget = memo(({
         </div>
 
         {/* Footer */}
-        <div className="text-xs text-space-400 mt-auto">
-          Average across <span className="text-space-200 font-num tabular-nums">{totalTrades}</span> {totalTrades === 1 ? 'trade' : 'trades'}
+        <div className="flex items-center justify-between text-xs mt-auto">
+          <span className="text-space-400">
+            Average across <span className="text-space-200 font-num tabular-nums">{totalTrades}</span> {totalTrades === 1 ? 'trade' : 'trades'}
+          </span>
+          <span
+            className="text-[10px] text-space-400 cursor-help"
+            title="Industry conventions for per-trade ROI: < 0 losing, 0–2% weak, 2–5% solid, > 5% elite."
+          >
+            Where do these zones come from?
+          </span>
         </div>
       </div>
     </div>

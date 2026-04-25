@@ -67,9 +67,15 @@ export function TopNavigation() {
     return (
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
             <div className="w-full flex h-16 items-center justify-between px-4 md:px-6">
-                {/* Logo */}
+                {/* Logo — clicks return to Dashboard (default tab) */}
                 <div className="flex items-center gap-6">
-                    <Logo size="sm" variant="horizontal" showText={true} />
+                    <NavLink
+                        to="/dashboard"
+                        className="rounded-md transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                        aria-label="The Trading Diary — go to Dashboard"
+                    >
+                        <Logo size="sm" variant="horizontal" showText={true} />
+                    </NavLink>
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex">

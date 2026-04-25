@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, lazy, Suspense, useMemo, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -105,15 +106,27 @@ function DashboardContent() {
   } = useDashboard();
 
   // Read ?tab= from URL so that deep links like /dashboard?tab=history land on the right tab
-  const initialTab = (() => {
+  const ALLOWED_TABS = ['overview', 'tradestation', 'history', 'planning'] as const;
+  const readTabFromUrl = (): string => {
     if (typeof window === 'undefined') return 'overview';
     const params = new URLSearchParams(window.location.search);
     const t = params.get('tab');
-    const allowed = ['overview', 'tradestation', 'history', 'planning'];
-    return t && allowed.includes(t) ? t : 'overview';
-  })();
-  const [activeTab, setActiveTab] = useState<string>(initialTab);
+    return t && (ALLOWED_TABS as readonly string[]).includes(t) ? t : 'overview';
+  };
+  const [activeTab, setActiveTab] = useState<string>(readTabFromUrl);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Re-sync activeTab when react-router URL changes (top-nav <Link to="/dashboard?tab=history">
+  // navigation is push-state and won't fire popstate). useLocation re-renders on every
+  // push, so we read the fresh ?tab= here.
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const next = params.get('tab');
+    const safe = next && (ALLOWED_TABS as readonly string[]).includes(next) ? next : 'overview';
+    setActiveTab(prev => (prev !== safe ? safe : prev));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
 
   // Onboarding flow
   const { showOnboarding, loading: onboardingLoading, completeOnboarding } = useOnboarding();
@@ -137,6 +150,11 @@ function DashboardContent() {
     const container = tabsContainerRef.current?.closest('main') as HTMLElement | null;
     const prevScrollTop = container ? container.scrollTop : window.scrollY;
     setActiveTab(val);
+    // Mirror tab into URL so refresh + deep-link works
+    const url = new URL(window.location.href);
+    if (val === 'overview') url.searchParams.delete('tab');
+    else url.searchParams.set('tab', val);
+    window.history.replaceState({}, '', url.toString());
     requestAnimationFrame(() => {
       if (container) container.scrollTop = prevScrollTop;
       else window.scrollTo({ top: prevScrollTop });
@@ -369,6 +387,7 @@ function DashboardContent() {
       }
       case 'totalTrades':
         widgetProps.totalTrades = stats?.total_trades || 0;
+        widgetProps.currentStreak = currentStreak;
         break;
       case 'spotWallet':
         widgetProps.totalValue = spotWalletTotal || 0;
@@ -449,6 +468,7 @@ function DashboardContent() {
       case 'avgROIPerTrade':
         widgetProps.avgROIPerTrade = stats?.avg_roi_per_trade || 0;
         widgetProps.totalTrades = stats?.total_trades || 0;
+        widgetProps.trades = processedTrades;
         break;
       case 'simpleAvgROI':
         widgetProps.simpleAvgROI = stats?.simple_avg_roi || 0;
