@@ -371,4 +371,28 @@
     <xhtml:link rel="alternate" hreflang="vi" href="https://www.thetradingdiary.com/blog/nhat-ky-ai-vi" />
   </url>
 
+  <!-- ════════════════════════════════════════════════════════════════
+       Programmatic SEO: Exchange tutorials
+       /exchanges/:slug/trade-history-export
+       Targets queries like "binance trade history export"
+       ════════════════════════════════════════════════════════════════ -->
+  <url>
+    <loc>https://www.thetradingdiary.com/exchanges/binance/trade-history-export</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.thetradingdiary.com/exchanges/bybit/trade-history-export</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.thetradingdiary.com/exchanges/coinbase/trade-history-export</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
 </urlset>

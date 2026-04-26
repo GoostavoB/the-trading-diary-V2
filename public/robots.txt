@@ -39,7 +39,10 @@ Disallow: /economic-calendar
 Disallow: /market-data
 Disallow: /long-short-ratio
 Disallow: /exchange-connections
-Disallow: /exchanges
+# Disallow the auth-gated /exchanges page itself, but allow the public
+# programmatic SEO tutorials at /exchanges/:slug/trade-history-export
+Disallow: /exchanges$
+Allow: /exchanges/*/trade-history-export
 Disallow: /performance-alerts
 Disallow: /trade-analysis
 Disallow: /capital-management

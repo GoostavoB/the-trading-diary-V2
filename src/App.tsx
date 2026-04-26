@@ -61,6 +61,7 @@ const TradingPlan = lazy(() => import("./pages/TradingPlan"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const CustomPage = lazy(() => import("./pages/CustomPage"));
 const ExchangeConnections = lazy(() => import("./pages/ExchangeConnections"));
+const ExchangeTutorial = lazy(() => import("./pages/ExchangeTutorial"));
 const SpotWallet = lazy(() => import("./pages/SpotWallet"));
 const FeeAnalysis = lazy(() => import("./pages/FeeAnalysis"));
 const CapitalManagementPage = lazy(() => import("./pages/CapitalManagementPage"));
@@ -199,6 +200,8 @@ const AppRoutes = () => {
           <Route path="/psychology" element={<ProtectedRoute><Psychology /></ProtectedRoute>} />
           <Route path="/trading-plan" element={<ProtectedRoute><TradingPlan /></ProtectedRoute>} />
           <Route path="/exchanges" element={<ProtectedRoute><ExchangeConnections /></ProtectedRoute>} />
+          {/* Public programmatic SEO landing pages — no auth required */}
+          <Route path="/exchanges/:slug/trade-history-export" element={<PublicPageThemeWrapper><ExchangeTutorial /></PublicPageThemeWrapper>} />
           <Route path="/spot-wallet" element={<ProtectedRoute><SpotWallet /></ProtectedRoute>} />
           <Route path="/fee-analysis" element={<ProtectedRoute><FeeAnalysis /></ProtectedRoute>} />
           <Route path="/capital-management" element={<ProtectedRoute><CapitalManagementPage /></ProtectedRoute>} />

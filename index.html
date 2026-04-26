@@ -364,12 +364,12 @@
     <!-- Phase 6: Preload Critical Resources -->
     <link rel="modulepreload" href="/src/main.tsx">
     <link rel="modulepreload" href="/src/App.tsx">
-    <link rel="prefetch" href="/src/pages/Dashboard.tsx" as="script">
-    <link rel="prefetch" href="/src/pages/Upload.tsx" as="script">
-    
-    <!-- Preload hero image for faster LCP -->
-    <link rel="preload" as="image" href="/src/assets/bull-bear-realistic.png" fetchpriority="high" imagesrcset="/src/assets/bull-bear-realistic.png 1x" imagesizes="100vw">
-    
+    <!-- Removed prefetch of /src/pages/{Dashboard,Upload}.tsx — these are auth-gated;
+         prefetching them on every public visit wastes bandwidth and pollutes LCP. -->
+
+    <!-- (No hero image preload — Hero.tsx no longer renders bull-bear-realistic.png.
+         Preloading it cost ~122KB on every public visit and never improved LCP.) -->
+
     <!-- RSS Feed -->
     <link rel="alternate" type="application/rss+xml" title="The Trading Diary Blog RSS" href="https://www.thetradingdiary.com/blog/rss.xml">
 
