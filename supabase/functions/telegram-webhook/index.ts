@@ -10,7 +10,7 @@ import {
   sendMessage, logInbound, isRateLimited, sendTyping, downloadPhotoB64, answerCallback,
 } from '../_shared/telegram/api.ts';
 import {
-  extractTradesFromImage, previewText, saveTrades, type ExtractedTrade,
+  extractTradesFromImage, previewText, saveTrades, applyTradeContext, type ExtractedTrade,
 } from '../_shared/telegram/tradeCapture.ts';
 import { render } from '../_shared/telegram/templates.ts';
 import {
@@ -90,6 +90,10 @@ Deno.serve(async (req) => {
       await sendMessage(supabase, chatId, render('not_linked', 'en'), { messageType: 'system' });
     } else if (text.startsWith('tgsave:') || text === 'tgdiscard') {
       await handleTradeSaveCallback(supabase, chatId, text, linked as LinkedUser);
+    } else if (!photos.length && update.message?.reply_to_message?.message_id &&
+        await handleTradeContextReply(
+          supabase, chatId, update.message.reply_to_message.message_id, text, linked as LinkedUser)) {
+      // resposta (reply) à confirmação de trades salvos — contexto aplicado
     } else if (photos.length && wantsTradeCapture(text)) {
       await handleTradeCapture(supabase, chatId, photos, linked as LinkedUser);
     } else if (photos.length) {
@@ -398,12 +402,71 @@ async function handleTradeSaveCallback(
   } catch {
     trades = [];
   }
-  const saved = await saveTrades(supabase, user.user_id, user.timezone, trades);
-  await sendMessage(supabase, chatId,
+  const savedIds = await saveTrades(supabase, user.user_id, user.timezone, trades);
+  const confirmationId = await sendMessage(supabase, chatId,
     pt
-      ? `✅ ${saved} trade(s) salvos no diário — já aparecem no seu dashboard.\nDica: edita lá no site para etiquetar o SETUP de cada um; é assim que eu aprendo qual setup te dá dinheiro.`
-      : `✅ ${saved} trade(s) saved to the journal — already on your dashboard.\nTip: tag each one's SETUP on the site; that's how I learn which setup makes you money.`,
+      ? `✅ ${savedIds.length} trade(s) salvos no diário — já aparecem no seu dashboard.\n\n👉 Agora RESPONDE esta mensagem (reply) dizendo qual foi o setup e como você estava se sentindo — eu completo o registro.\nEx.: "Setup da Vitória no 4H, estava tranquilo, saí na parcial"`
+      : `✅ ${savedIds.length} trade(s) saved to the journal — already on your dashboard.\n\n👉 Now REPLY to this message with the setup used and how you felt — I'll complete the record.\nE.g.: "Vitória setup on the 4H, felt calm, took partials"`,
     { userId: user.user_id, messageType: 'system', plain: true });
+
+  // Vincula a mensagem de confirmação aos ids salvos: a resposta (reply) do
+  // usuário a ela vira setup/emoção/notas desses trades.
+  if (confirmationId && savedIds.length) {
+    await supabase.from('telegram_message_log').insert({
+      user_id: user.user_id,
+      chat_id: chatId,
+      direction: 'outbound',
+      message_type: 'trade_saved_ref',
+      content: JSON.stringify(savedIds),
+      telegram_message_id: confirmationId,
+    });
+  }
+}
+
+/** Trata a resposta (reply) à confirmação de trades salvos.
+ *  Retorna false se o reply não era para uma confirmação nossa. */
+async function handleTradeContextReply(
+  supabase: SupabaseClient,
+  chatId: number,
+  repliedMessageId: number,
+  text: string,
+  user: LinkedUser,
+): Promise<boolean> {
+  const { data: ref } = await supabase
+    .from('telegram_message_log')
+    .select('content')
+    .eq('chat_id', chatId)
+    .eq('message_type', 'trade_saved_ref')
+    .eq('telegram_message_id', repliedMessageId)
+    .maybeSingle();
+  if (!ref?.content) return false;
+
+  let tradeIds: string[] = [];
+  try {
+    tradeIds = JSON.parse(ref.content);
+  } catch {
+    return false;
+  }
+  if (!tradeIds.length || !text.trim()) return false;
+
+  await sendTyping(chatId);
+  const result = await applyTradeContext(supabase, user.user_id, tradeIds, text.trim());
+  const pt = user.locale === 'pt';
+  if (!result) {
+    await sendMessage(supabase, chatId, render('mentor_error', user.locale), {
+      userId: user.user_id, messageType: 'system', plain: true,
+    });
+    return true;
+  }
+  const parts: string[] = [];
+  if (result.setup) parts.push(pt ? `setup: ${result.setup}` : `setup: ${result.setup}`);
+  if (result.emotion) parts.push(pt ? `emoção: ${result.emotion}` : `emotion: ${result.emotion}`);
+  parts.push(pt ? 'notas salvas' : 'notes saved');
+  await sendMessage(supabase, chatId,
+    (pt ? `📝 Registro completo — ${parts.join(' · ')}.` : `📝 Record completed — ${parts.join(' · ')}.`) +
+    (result.setup ? '' : (pt ? '\n(Não identifiquei o setup — se quiser, edita no site.)' : '\n(No setup identified — edit on the site if needed.)')),
+    { userId: user.user_id, messageType: 'system', plain: true });
+  return true;
 }
 
 async function handleChart(

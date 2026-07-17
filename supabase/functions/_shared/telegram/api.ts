@@ -19,12 +19,13 @@ export interface SendOptions {
   plain?: boolean;
 }
 
+/** Envia mensagem e retorna o message_id do Telegram (null se pulada/falhou). */
 export async function sendMessage(
   supabase: SupabaseClient,
   chatId: number,
   text: string,
   opts: SendOptions,
-): Promise<boolean> {
+): Promise<number | null> {
   if (opts.refId && opts.userId) {
     const { data: dup } = await supabase
       .from('telegram_message_log')
@@ -34,7 +35,7 @@ export async function sendMessage(
       .eq('ref_id', opts.refId)
       .eq('direction', 'outbound')
       .maybeSingle();
-    if (dup) return false; // already sent
+    if (dup) return null; // already sent
   }
 
   const res = await fetch(`${API_BASE}/sendMessage`, {
@@ -52,8 +53,9 @@ export async function sendMessage(
   const body = await res.json().catch(() => null);
   if (!res.ok) {
     console.error('sendMessage failed', res.status, JSON.stringify(body));
-    return false;
+    return null;
   }
+  const messageId: number | null = body?.result?.message_id ?? null;
 
   await supabase.from('telegram_message_log').insert({
     user_id: opts.userId ?? null,
@@ -63,12 +65,12 @@ export async function sendMessage(
     template_name: opts.templateName ?? null,
     ref_id: opts.refId ?? null,
     content: text.slice(0, 4000),
-    telegram_message_id: body?.result?.message_id ?? null,
+    telegram_message_id: messageId,
   }).then(({ error }) => {
     if (error) console.error('message_log insert failed', error.message);
   });
 
-  return true;
+  return messageId;
 }
 
 export async function logInbound(
