@@ -6,11 +6,14 @@
 // Spec: AI_TRADING_MENTOR_BOT_SPEC.md §3B, §8.
 
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
-import { sendMessage, logInbound, isRateLimited } from '../_shared/telegram/api.ts';
+import {
+  sendMessage, logInbound, isRateLimited, sendTyping, downloadPhotoB64,
+} from '../_shared/telegram/api.ts';
 import { render } from '../_shared/telegram/templates.ts';
 import {
   computeStats, fetchTrades, fmtMoney, fmtPct, fmtTradeLine, localDate,
 } from '../_shared/telegram/stats.ts';
+import { mentorReply, saveLesson } from '../_shared/telegram/mentor.ts';
 
 interface LinkedUser {
   user_id: string;
@@ -40,8 +43,10 @@ Deno.serve(async (req) => {
     if (!message?.chat?.id) return new Response('ok');
 
     const chatId: number = message.chat.id;
-    const text: string = (update.message?.text ?? update.callback_query?.data ?? '').trim();
+    const text: string = (update.message?.text ?? update.message?.caption ?? update.callback_query?.data ?? '').trim();
     const tgUsername: string | null = update.message?.from?.username ?? null;
+    const photos: Array<{ file_id: string }> = update.message?.photo ?? [];
+    const inboundMessageId: number | null = update.message?.message_id ?? null;
 
     const { data: linked } = await supabase
       .from('telegram_users')
@@ -49,7 +54,24 @@ Deno.serve(async (req) => {
       .eq('chat_id', chatId)
       .maybeSingle();
 
-    await logInbound(supabase, chatId, linked?.user_id ?? null, text.startsWith('/') ? 'command' : 'free_text', text);
+    // Telegram re-delivers updates if we take too long (LLM analyses can).
+    // Skip anything we already logged as received.
+    if (inboundMessageId) {
+      const { data: seen } = await supabase
+        .from('telegram_message_log')
+        .select('id')
+        .eq('chat_id', chatId)
+        .eq('direction', 'inbound')
+        .eq('telegram_message_id', inboundMessageId)
+        .maybeSingle();
+      if (seen) return new Response('ok');
+    }
+
+    const inboundType = text.startsWith('/') ? 'command' : 'free_text';
+    await logInbound(
+      supabase, chatId, linked?.user_id ?? null, inboundType,
+      photos.length ? `[gráfico] ${text}` : text, inboundMessageId,
+    );
 
     if (await isRateLimited(supabase, chatId)) {
       console.warn('Rate limited chat', chatId);
@@ -60,6 +82,8 @@ Deno.serve(async (req) => {
       await handleStart(supabase, chatId, text, tgUsername, linked as LinkedUser | null);
     } else if (!linked) {
       await sendMessage(supabase, chatId, render('not_linked', 'en'), { messageType: 'system' });
+    } else if (photos.length) {
+      await handleChart(supabase, chatId, text, photos, linked as LinkedUser);
     } else {
       await handleLinked(supabase, chatId, text, linked as LinkedUser);
     }
@@ -224,8 +248,75 @@ async function handleLinked(
       await sendMessage(supabase, chatId, render('unmuted', user.locale), { userId: user.user_id, messageType: 'command' });
       return;
 
-    default:
-      // Unknown command or free text → P2 (LLM Q&A). Honest placeholder for now.
-      await sendMessage(supabase, chatId, render('free_text_soon', user.locale), { userId: user.user_id, messageType: 'free_text' });
+    case '/lesson': {
+      const lesson = text.replace(/^\/lesson\s*/, '').trim();
+      if (!lesson) {
+        await sendMessage(supabase, chatId,
+          user.locale === 'pt'
+            ? 'Me diz o que aprender. Ex.: /lesson quando o OI cai 5% antes de NY, order blocks de 15m falham'
+            : 'Tell me what to learn. E.g.: /lesson when OI drops 5% before NY open, 15m order blocks fail',
+          { userId: user.user_id, messageType: 'command' });
+        return;
+      }
+      const saved = await saveLesson(supabase, user.user_id, lesson);
+      await sendMessage(supabase, chatId,
+        render(saved ? 'lesson_saved' : 'mentor_error', user.locale),
+        { userId: user.user_id, messageType: 'command' });
+      return;
+    }
+
+    default: {
+      // Free text → socratic mentor (P2), grounded in journal + taught knowledge.
+      await sendTyping(chatId);
+      const reply = await mentorReply(supabase, {
+        userId: user.user_id,
+        timezone: user.timezone,
+        locale: user.locale,
+        text,
+      });
+      await sendMessage(supabase, chatId, reply ?? render('mentor_error', user.locale), {
+        userId: user.user_id,
+        messageType: 'mentor',
+    plain: true,
+        plain: true,
+      });
+    }
   }
+}
+
+async function handleChart(
+  supabase: SupabaseClient,
+  chatId: number,
+  caption: string,
+  photos: Array<{ file_id: string }>,
+  user: LinkedUser,
+): Promise<void> {
+  await sendTyping(chatId);
+
+  // Last entry = highest resolution. Image stays in memory only.
+  const imageB64 = await downloadPhotoB64(photos[photos.length - 1].file_id);
+  if (!imageB64) {
+    await sendMessage(supabase, chatId, render('mentor_error', user.locale), {
+      userId: user.user_id, messageType: 'mentor', plain: true,
+    });
+    return;
+  }
+
+  const defaultAsk = user.locale === 'pt'
+    ? 'Analise este gráfico seguindo seu método socrático.'
+    : 'Analyze this chart following your socratic method.';
+  const reply = await mentorReply(supabase, {
+    userId: user.user_id,
+    timezone: user.timezone,
+    locale: user.locale,
+    text: caption || defaultAsk,
+    imageB64,
+    imageMime: 'image/jpeg',
+  });
+
+  await sendMessage(supabase, chatId, reply ?? render('mentor_error', user.locale), {
+    userId: user.user_id,
+    messageType: 'mentor',
+    plain: true,
+  });
 }
