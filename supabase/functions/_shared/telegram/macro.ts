@@ -60,16 +60,75 @@ async function fetchBinanceLSR(symbol: string): Promise<string | null> {
   }
 }
 
+async function fetchBinanceFunding(symbol: string): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${symbol}`,
+      { signal: AbortSignal.timeout(8000) },
+    );
+    if (!res.ok) return null;
+    const rate = Number((await res.json())?.lastFundingRate);
+    if (!Number.isFinite(rate)) return null;
+    const pct = rate * 100;
+    const read = pct <= 0 ? 'NEGATIVO — shorts pagando, terreno de short squeeze'
+      : pct < 0.02 ? 'neutro/levemente altista (baseline)'
+      : pct < 0.05 ? 'aquecido em longs'
+      : 'SOBREALAVANCADO em longs — não comprar rompimento, risco de long squeeze';
+    return `${pct.toFixed(4)}% por 8h — ${read}`;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchBinanceOIDelta(symbol: string): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://fapi.binance.com/futures/data/openInterestHist?symbol=${symbol}&period=1h&limit=25`,
+      { signal: AbortSignal.timeout(8000) },
+    );
+    if (!res.ok) return null;
+    const rows = await res.json();
+    if (!Array.isArray(rows) || rows.length < 2) return null;
+    const first = Number(rows[0].sumOpenInterest);
+    const last = Number(rows[rows.length - 1].sumOpenInterest);
+    if (!first || !last) return null;
+    const chg = ((last - first) / first) * 100;
+    const dir = chg > 1 ? 'subindo (capital novo entrando)' : chg < -1 ? 'caindo (posições fechando — movimento sem força orgânica se o preço sobe)' : 'estável';
+    return `${chg >= 0 ? '+' : ''}${chg.toFixed(1)}% em 24h — ${dir}`;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchDominance(): Promise<string | null> {
+  try {
+    const res = await fetch('https://api.coingecko.com/api/v3/global', {
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return null;
+    const pct = (await res.json())?.data?.market_cap_percentage;
+    if (!pct?.btc) return null;
+    const parts = [`BTC.D ${pct.btc.toFixed(1)}%`];
+    if (pct.usdt) parts.push(`USDT.D ${pct.usdt.toFixed(1)}%`);
+    return parts.join(' · ');
+  } catch {
+    return null;
+  }
+}
+
 /** Bloco [CONTEXTO DE MERCADO] injetado em toda análise do mentor.
  *  Retorna null se absolutamente nada estiver disponível. */
 export async function marketContextBlock(symbolHint?: string): Promise<string | null> {
   const lsrSymbol = normalizeLsrSymbol(symbolHint);
-  const [spx, vix, dxy, btc, lsr] = await Promise.all([
+  const [spx, vix, dxy, btc, lsr, funding, oi, dom] = await Promise.all([
     fetchYahoo('^GSPC'),
     fetchYahoo('^VIX'),
     fetchYahoo('DX-Y.NYB'),
     fetchBtc(),
     fetchBinanceLSR(lsrSymbol),
+    fetchBinanceFunding(lsrSymbol),
+    fetchBinanceOIDelta(lsrSymbol),
+    fetchDominance(),
   ]);
 
   const quotes: Quote[] = [];
@@ -80,7 +139,10 @@ export async function marketContextBlock(symbolHint?: string): Promise<string | 
     quotes.push({ label: 'VIX', value: `${vix.toFixed(1)} — ${read}` });
   }
   if (btc) quotes.push({ label: 'Bitcoin', value: btc });
+  if (dom) quotes.push({ label: 'Dominância', value: dom });
   if (lsr) quotes.push({ label: `Long/Short ratio ${lsrSymbol}`, value: lsr });
+  if (funding) quotes.push({ label: `Funding rate ${lsrSymbol}`, value: funding });
+  if (oi) quotes.push({ label: `Open Interest ${lsrSymbol}`, value: oi });
 
   if (!quotes.length) return null;
   return '[CONTEXTO DE MERCADO — buscado automaticamente agora]\n' +
