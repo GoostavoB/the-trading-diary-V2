@@ -28,15 +28,49 @@ export interface ExtractedTrade {
 
 function extractPrompt(): string {
   const year = new Date().getUTCFullYear();
-  return `Extract ALL closed trades that are FULLY visible in this exchange screenshot.
-CRITICAL: IGNORE any trade that is partially cut off at the top or bottom edge of the image —
-only include trades where you can see the complete card/row.
+  return `Extract closed trades from this exchange screenshot.
+CRITICAL RULE #1: a trade only counts if its card is COMPLETELY visible — you can see the symbol,
+the PnL AND the bottom of the card. If a card is cut off at any edge of the image (top or bottom),
+DO NOT include it and DO NOT guess any of its values. It is always better to return fewer trades
+than to invent a number.
+CRITICAL RULE #2: copy numbers EXACTLY as displayed. Never estimate, never fill gaps. If a field is
+not literally visible, use null.
 Reply with ONLY a JSON array, no markdown, no commentary:
-[{"symbol":"BTCUSDT","side":"long|short","entry_price":0,"exit_price":0,"profit_loss":0,"roi":0,"leverage":0,"margin":0,"position_size":0,"trading_fee":0,"funding_fee":0,"opened_at":"YYYY-MM-DD HH:mm:ss or null","closed_at":"YYYY-MM-DD HH:mm:ss or null","broker":"exchange name or null"}]
-Rules: numbers as plain numbers (no $, %, commas or x); profit_loss is realized PnL in USD (negative for
-losses); roi is the percentage number; leverage from badges like "15X"; position_size = total volume;
-dates: if the year is not shown (e.g. "07/16 20:01"), assume ${year}; use null for anything not
-visible; if no fully-visible closed trades exist, reply [].`;
+[{"symbol":"BTCUSDT","side":"long|short","entry_price":0,"exit_price":0,"profit_loss":0,"roi":0,"leverage":0,"margin":0,"position_size":0,"trading_fee":0,"funding_fee":0,"opened_at":"YYYY-MM-DD HH:mm:ss or null","closed_at":"YYYY-MM-DD HH:mm:ss or null","broker":"exchange name or null","fully_visible":true}]
+Rules: numbers as plain numbers (no $, %, commas or x); profit_loss is realized PnL in USD (negative
+for losses); roi is the percentage number; leverage from badges like "15X"; position_size = total
+volume; dates: if the year is not shown (e.g. "07/16 20:01"), assume ${year}; set "fully_visible"
+honestly — false if you had ANY doubt the card was complete; if nothing qualifies, reply [].`;
+}
+
+/** Checagens de consistência — pega alucinação que passou pelo prompt.
+ *  Retorna avisos em pt para mostrar no preview. */
+export function validateTrade(t: ExtractedTrade): string[] {
+  const warnings: string[] = [];
+  const { side, entry_price: entry, exit_price: exit, profit_loss: pnl, roi, margin } = t;
+
+  if (entry != null && exit != null && pnl != null && side && pnl !== 0) {
+    const priceWentUp = exit > entry;
+    const expectProfit = side === 'long' ? priceWentUp : !priceWentUp;
+    if ((pnl > 0) !== expectProfit) {
+      warnings.push('lucro/prejuízo não bate com a direção e os preços');
+    }
+  }
+  if (roi != null && pnl != null && margin != null && margin > 0) {
+    const impliedRoi = (pnl / margin) * 100;
+    if (Math.abs(impliedRoi - roi) > Math.max(3, Math.abs(roi) * 0.3)) {
+      warnings.push(`ROI ${roi.toFixed(1)}% não bate com PnL/margem (~${impliedRoi.toFixed(1)}%)`);
+    }
+  }
+  if (t.opened_at && t.closed_at &&
+      new Date(t.closed_at).getTime() < new Date(t.opened_at).getTime()) {
+    warnings.push('fechamento antes da abertura');
+  }
+  if (t.leverage != null && (t.leverage < 1 || t.leverage > 200)) {
+    warnings.push('alavancagem estranha');
+  }
+  if (entry != null && entry <= 0) warnings.push('preço de entrada inválido');
+  return warnings;
 }
 
 export async function extractTradesFromImage(
@@ -76,6 +110,7 @@ export async function extractTradesFromImage(
     if (!Array.isArray(parsed)) return [];
     return parsed
       .filter((t) => t && typeof t.symbol === 'string' && t.symbol.trim())
+      .filter((t) => t.fully_visible !== false) // cortado na borda = fora, sem chance
       .slice(0, 10)
       .map((t) => ({
         symbol: String(t.symbol).toUpperCase().trim(),
@@ -107,18 +142,25 @@ function numOrNull(v: unknown): number | null {
 export function previewText(trades: ExtractedTrade[], locale: string): string {
   const pt = locale === 'pt';
   const lines = trades.map((t, i) => {
-    const pnl = t.profit_loss != null
-      ? `${t.profit_loss > 0 ? '+' : ''}$${Math.abs(t.profit_loss).toFixed(2)}`.replace('+$', '+$')
-      : '?';
-    const roi = t.roi != null ? ` (${t.roi > 0 ? '+' : ''}${t.roi.toFixed(1)}%)` : '';
+    const sign = (t.profit_loss ?? 0) < 0 ? '−' : '+';
+    const pnl = t.profit_loss != null ? `${sign}$${Math.abs(t.profit_loss).toFixed(2)}` : '?';
+    const roi = t.roi != null ? ` (${t.roi > 0 ? '+' : ''}${t.roi.toFixed(2)}%)` : '';
     const side = t.side ? ` ${t.side.toUpperCase()}` : '';
-    return `${i + 1}. ${t.symbol}${side} → ${t.profit_loss != null && t.profit_loss < 0 ? '-' : ''}${pnl.replace('-', '')}${roi}`;
+    const lev = t.leverage != null ? ` ${t.leverage}x` : '';
+    const prices = t.entry_price != null && t.exit_price != null
+      ? `\n   ${pt ? 'entrada' : 'entry'} ${t.entry_price} → ${pt ? 'saída' : 'exit'} ${t.exit_price}` : '';
+    const times = t.opened_at && t.closed_at
+      ? `\n   ${t.opened_at.slice(5, 16)} → ${t.closed_at.slice(5, 16)}` : '';
+    const warnings = validateTrade(t);
+    const warn = warnings.length
+      ? `\n   ⚠️ ${pt ? 'CONFERE' : 'CHECK'}: ${warnings.join('; ')}` : '';
+    return `${i + 1}. ${t.symbol}${side}${lev} → ${pnl}${roi}${prices}${times}${warn}`;
   });
   return (pt
-    ? `📥 Encontrei ${trades.length} trade(s) no print:\n\n`
-    : `📥 Found ${trades.length} trade(s) in the screenshot:\n\n`)
-    + lines.join('\n')
-    + (pt ? '\n\nSalvar no diário?' : '\n\nSave to the journal?');
+    ? `📥 Encontrei ${trades.length} trade(s) COMPLETOS no print (cortados na borda eu ignoro):\n\n`
+    : `📥 Found ${trades.length} COMPLETE trade(s) in the screenshot (edge-cut ones ignored):\n\n`)
+    + lines.join('\n\n')
+    + (pt ? '\n\nConfere os números acima. Salvar no diário?' : '\n\nCheck the numbers above. Save to the journal?');
 }
 
 /** Grava os trades extraídos (já confirmados) no diário.
