@@ -1861,6 +1861,30 @@ export type Database = {
         }
         Relationships: []
       }
+      mentor_knowledge: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          kind: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          kind?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       metric_conversations: {
         Row: {
           created_at: string | null
