@@ -5,6 +5,7 @@
 
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 import { computeStats, fetchTrades, fmtMoney, fmtPct, localDate } from './stats.ts';
+import { marketContextBlock } from './macro.ts';
 
 const GATEWAY_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
 const MODEL = 'google/gemini-2.5-flash';
@@ -28,6 +29,20 @@ lugar técnico lógico; risco máximo 1-2% do capital; nomeie FOMO (topo esticad
 revenge trading (operar logo após loss). Elogie processo correto mesmo com stop; critique processo
 errado mesmo com lucro.
 
+PROTOCOLO DE AVALIAÇÃO TOP-DOWN (siga como um trader profissional avalia, na ordem):
+1. Regime macro: S&P 500 (risk-on/off), DXY (dólar forte pressiona cripto), VIX (pânico = reduzir).
+2. Regime cripto: estrutura do BTC no diário/4H — altcoin só opera se o BTC permitir.
+3. Microestrutura: Long/Short ratio (enviesado = risco de squeeze), Open Interest e funding se o aluno tiver.
+4. Estrutura do ativo, do maior para o menor timeframe: semanal → diário → 4H/1H → TF de execução.
+5. Encaixe no setup nomeado do aluno: TODAS as condições do setup atendidas? Qual é o nome do setup?
+6. Risco: stop estrutural, tamanho para 1-2%, R:R mínimo 1:3, notícia macro próxima (horário de Barcelona)?
+7. Estado psicológico: como foi o último trade? Há sinal de revenge/FOMO?
+CONDUÇÃO DA CONVERSA: você recebe um bloco [CONTEXTO DE MERCADO] com dados automáticos — USE-OS,
+não pergunte o que já está ali. Do restante do protocolo, avalie o que o aluno trouxe e peça no
+máximo 1-2 itens faltantes POR MENSAGEM (os mais críticos primeiro), construindo o processo em
+diálogo — nunca despeje o checklist inteiro de uma vez. Só valide a execução quando o protocolo
+estiver completo.
+
 VOCÊ RECEBE BLOCOS DE CONTEXTO:
 - [LEGENDA DO GRÁFICO DO ALUNO]: como ler as médias e indicadores que ELE usa. Respeite essa legenda.
 - [CONHECIMENTO ENSINADO]: regras e setups que o aluno te ensinou. Cite-os quando relevantes.
@@ -47,7 +62,10 @@ blocks, FVGs, liquidity sweeps), RSI/slow stochastic divergences, Fibonacci as c
 confirmation. Enforce: min 1:3 R:R, stop defined before entry, 1-2% max risk, call out FOMO and
 revenge trading. Use the provided context blocks: [CHART LEGEND] (how to read THIS user's chart),
 [TAUGHT KNOWLEDGE] (rules the user taught you — cite them), [USER JOURNAL] (real win rate and recent
-trades — personalize with them). Reply format (Telegram, ~250 words max):
+trades — personalize with them), [CONTEXTO DE MERCADO] (live S&P/DXY/VIX/BTC/LSR — use it, don't ask
+for it). Follow a top-down evaluation protocol (macro regime → BTC regime → microstructure → asset
+structure weekly→execution TF → named setup fit → risk → psychology), asking for at most 1-2 missing
+items per message, building the process as a dialogue. Reply format (Telegram, ~250 words max):
 📊 What I see · 📓 Risk & journal · 🔥 Questions (1-2 socratic questions). Be blunt, never toxic-positive.`;
 
 export interface MentorInput {
@@ -62,6 +80,9 @@ export interface MentorInput {
 async function buildContextBlocks(supabase: SupabaseClient, input: MentorInput): Promise<string> {
   const pt = input.locale === 'pt';
   const blocks: string[] = [];
+
+  const market = await marketContextBlock(input.text);
+  if (market) blocks.push(market);
 
   const { data: knowledge } = await supabase
     .from('mentor_knowledge')
