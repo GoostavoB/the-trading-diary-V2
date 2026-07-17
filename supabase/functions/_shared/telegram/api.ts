@@ -90,6 +90,15 @@ export async function logInbound(
   if (error) console.error('inbound log failed', error.message);
 }
 
+/** Acknowledges an inline-button tap so Telegram stops the loading spinner. */
+export async function answerCallback(callbackQueryId: string): Promise<void> {
+  await fetch(`${API_BASE}/answerCallbackQuery`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ callback_query_id: callbackQueryId }),
+  }).catch(() => {});
+}
+
 /** Shows "typing…" in the chat while the mentor thinks. Fire-and-forget. */
 export async function sendTyping(chatId: number): Promise<void> {
   await fetch(`${API_BASE}/sendChatAction`, {
