@@ -1,49 +1,26 @@
-## Plano: deploy das 3 edge functions do Telegram
+## Deploy das 3 Edge Functions do Telegram
 
-### Observação importante (verificar antes)
-Fiz `ls supabase/functions/` no sandbox e **não vejo** `telegram-webhook`, `telegram-notifier`, `telegram-generate-link` nem `_shared/telegram/`. O sync do GitHub → Lovable pode estar atrasado ou o merge foi numa branch que não é a que o Lovable acompanha.
+Os arquivos já estão no repo (`supabase/functions/telegram-webhook`, `telegram-notifier`, `telegram-generate-link`, `_shared/telegram/`) e o `supabase/config.toml` já contém os 3 blocos corretos:
 
-Antes de rodar o plano, você confirma:
-- O merge foi na branch `main` (ou a branch conectada ao Lovable)?
-- Passou alguns minutos desde o merge?
+- `telegram-webhook` → `verify_jwt = false`
+- `telegram-notifier` → `verify_jwt = false` + `schedule = "*/5 * * * *"`
+- `telegram-generate-link` → `verify_jwt = true`
 
-Se sim e os arquivos ainda não apareceram, eu paro e sinalizo antes de deployar (não posso deployar código que não existe no filesystem). Se aparecerem, sigo os passos abaixo sem alterar nenhuma linha do código.
+Não vou tocar em nenhum código-fonte das funções nem no `config.toml`.
 
-### O que vou fazer (assumindo arquivos presentes)
+### Passos
 
-**1. Editar `supabase/config.toml`** — adicionar os 3 blocos de função:
-
-```toml
-[functions.telegram-webhook]
-verify_jwt = false
-
-[functions.telegram-notifier]
-verify_jwt = false
-schedule = "*/5 * * * *"  # a cada 5 minutos
-
-[functions.telegram-generate-link]
-verify_jwt = true
-```
-
-Justificativa:
-- `telegram-webhook` público — Telegram não manda JWT do Supabase; a autenticação é feita no código via `X-Telegram-Bot-Api-Secret-Token`.
-- `telegram-notifier` público + cron `*/5 * * * *` (padrão que o repo já usa em `calculate-leaderboard`, `check-user-activity`, etc).
-- `telegram-generate-link` exige JWT — usuário logado gerando link de vínculo.
-
-**2. Deploy das 3 funções** via `supabase--deploy_edge_functions` com `["telegram-webhook","telegram-notifier","telegram-generate-link"]`.
-
-**3. Verificar logs** de cada uma com `supabase--edge_function_logs` pra confirmar que subiram sem erro de import/bundle.
-
-**4. Reportar de volta**:
-- URL pública do webhook (`https://<project>.supabase.co/functions/v1/telegram-webhook`) pra você colar no `setWebhook` do BotFather / gateway.
-- Confirmação do cron ativo.
-- Lembrete pra você adicionar os 3 secrets (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_BOT_USERNAME`) no painel antes da primeira invocação — sem eles as funções sobem mas falham em runtime.
-
-### O que NÃO vou fazer
-- Não vou tocar em nenhum arquivo dentro de `supabase/functions/telegram-*/` nem em `_shared/telegram/`.
-- Não vou criar/editar secrets — você faz no painel.
-- Não vou registrar o webhook no Telegram (`setWebhook`) — só deploy da infra. Se quiser que eu registre depois com os secrets já configurados, é outra tarefa.
+1. **Deploy das 3 funções** via `supabase--deploy_edge_functions` com `["telegram-webhook", "telegram-notifier", "telegram-generate-link"]`.
+2. **Verificar logs** de cada função com `supabase--edge_function_logs` procurando erros de import/bundle.
+3. **Smoke test do `telegram-webhook`** com `supabase--curl_edge_functions` enviando um POST sem o header `X-Telegram-Bot-Api-Secret-Token` — resposta esperada: `403 forbidden` (confirma que o secret está lido e a função está no ar).
+4. **Reportar** ao usuário:
+   - URL pública do webhook: `https://<project>.supabase.co/functions/v1/telegram-webhook` (para registrar no `setWebhook` do BotFather).
+   - Confirmação do cron de 5 min no `telegram-notifier`.
+   - Lembrete: os 3 secrets (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_BOT_USERNAME`) já estão no painel — nada a fazer.
 
 ### Riscos
-- Se o código importado usar algum `npm:` ou `esm.sh` incompatível com edge-runtime, o deploy falha. Nesse caso eu te mostro o erro exato dos logs e paro — não vou "consertar" o código sem autorização.
-- Se `config.toml` já tiver algum bloco conflitante pros nomes, eu paro e mostro antes de sobrescrever.
+
+- Se algum `npm:`/`esm.sh` do código compartilhado falhar no bundler do edge-runtime, o deploy retorna erro; nesse caso mostro o log exato e paro (sem editar código, conforme instruído).
+- Se o `config.toml` tiver algum conflito ao aplicar o cron, aviso antes de qualquer mudança.
+
+Nenhuma alteração de código ou de schema será feita — só deploy e verificação.
