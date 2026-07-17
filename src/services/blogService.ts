@@ -8,8 +8,11 @@
  * CMS articles take precedence over static articles with the same slug.
  */
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase as supabaseTyped } from '@/integrations/supabase/client';
 import { BlogArticle, blogArticles as staticArticles } from '@/data/blogArticles';
+
+// blog_posts table is not yet in generated types; use loose typing until types regenerate.
+const supabase = supabaseTyped as any;
 
 export interface CmsPost {
   id: string;
