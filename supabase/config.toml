@@ -26,6 +26,17 @@ schedule = "0 */6 * * *"  # Every 6 hours
 verify_jwt = false
 schedule = "*/15 * * * *"  # Every 15 minutes
 
+# Telegram mentor bot (AI_TRADING_MENTOR_BOT_SPEC.md)
+[functions.telegram-webhook]
+verify_jwt = false            # Telegram calls without JWT; authed via X-Telegram-Bot-Api-Secret-Token
+
+[functions.telegram-notifier]
+verify_jwt = false
+schedule = "*/5 * * * *"      # digests + trade-closed alerts; every send deduped in telegram_message_log
+
+[functions.telegram-generate-link]
+verify_jwt = true
+
 [functions.economic-calendar-proxy]
 verify_jwt = true
 

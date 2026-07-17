@@ -3183,6 +3183,150 @@ export type Database = {
         }
         Relationships: []
       }
+      telegram_link_tokens: {
+        Row: {
+          token: string
+          user_id: string
+          timezone: string | null
+          locale: string | null
+          expires_at: string
+          used_at: string | null
+        }
+        Insert: {
+          token: string
+          user_id: string
+          timezone?: string | null
+          locale?: string | null
+          expires_at?: string
+          used_at?: string | null
+        }
+        Update: {
+          token?: string
+          user_id?: string
+          timezone?: string | null
+          locale?: string | null
+          expires_at?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
+      telegram_message_log: {
+        Row: {
+          id: number
+          user_id: string | null
+          chat_id: number | null
+          direction: string
+          message_type: string
+          template_name: string | null
+          ref_id: string | null
+          content: string | null
+          telegram_message_id: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          user_id?: string | null
+          chat_id?: number | null
+          direction: string
+          message_type: string
+          template_name?: string | null
+          ref_id?: string | null
+          content?: string | null
+          telegram_message_id?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          user_id?: string | null
+          chat_id?: number | null
+          direction?: string
+          message_type?: string
+          template_name?: string | null
+          ref_id?: string | null
+          content?: string | null
+          telegram_message_id?: number | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      telegram_preferences: {
+        Row: {
+          user_id: string
+          daily_digest: boolean
+          daily_digest_hour_local: number
+          weekly_digest: boolean
+          weekly_digest_day: number
+          alert_on_trade_close: boolean
+          alert_on_big_loss: boolean
+          alert_on_streak: boolean
+          alert_on_rule_violation: boolean
+          alert_on_daily_loss_lock: boolean
+          mute_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          daily_digest?: boolean
+          daily_digest_hour_local?: number
+          weekly_digest?: boolean
+          weekly_digest_day?: number
+          alert_on_trade_close?: boolean
+          alert_on_big_loss?: boolean
+          alert_on_streak?: boolean
+          alert_on_rule_violation?: boolean
+          alert_on_daily_loss_lock?: boolean
+          mute_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          daily_digest?: boolean
+          daily_digest_hour_local?: number
+          weekly_digest?: boolean
+          weekly_digest_day?: number
+          alert_on_trade_close?: boolean
+          alert_on_big_loss?: boolean
+          alert_on_streak?: boolean
+          alert_on_rule_violation?: boolean
+          alert_on_daily_loss_lock?: boolean
+          mute_until?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      telegram_users: {
+        Row: {
+          id: string
+          user_id: string
+          chat_id: number
+          telegram_username: string | null
+          timezone: string | null
+          locale: string | null
+          linked_at: string
+          last_active_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          chat_id: number
+          telegram_username?: string | null
+          timezone?: string | null
+          locale?: string | null
+          linked_at?: string
+          last_active_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          chat_id?: number
+          telegram_username?: string | null
+          timezone?: string | null
+          locale?: string | null
+          linked_at?: string
+          last_active_at?: string | null
+        }
+        Relationships: []
+      }
       themes: {
         Row: {
           created_at: string | null

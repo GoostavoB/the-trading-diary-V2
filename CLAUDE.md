@@ -224,6 +224,9 @@ SUPABASE_SERVICE_ROLE_KEY
 SNAPTRADE_CLIENT_ID          # from https://dashboard.snaptrade.com
 SNAPTRADE_CONSUMER_KEY       # from same dashboard
 OPENAI_API_KEY               # for AI trade extraction / pattern recognition
+TELEGRAM_BOT_TOKEN           # mentor bot — from @BotFather
+TELEGRAM_WEBHOOK_SECRET      # mentor bot — random string, shared with setWebhook
+TELEGRAM_BOT_USERNAME        # mentor bot — username without @, builds deep links
 ```
 
 Never commit any of these. If you see one leaked, rotate immediately.
@@ -276,7 +279,11 @@ Spec in `AI_TRADING_MENTOR_BOT_SPEC.md`. TL;DR:
 - Nightly digest: "Today's P&L: -$45. Best trade: BTCUSDT +$28. 2 rule violations."
 - Stack: Telegram Bot API + Supabase Edge Function + OpenAI or Claude API + trade data
 
-Not built yet. When Gustavo says "start the bot", open `AI_TRADING_MENTOR_BOT_SPEC.md` and follow it.
+**Status (2026-07-17): P0 code complete on branch `feat/telegram-bot-p0`, not yet deployed.**
+Migration + 3 edge functions (`telegram-webhook`, `telegram-notifier`, `telegram-generate-link`)
++ Settings card. Deploy checklist and deliberate spec deviations in `docs/TELEGRAM_BOT_SETUP.md`.
+P2 (LLM Q&A) will port the socratic mentor brain prototyped in Gustavo's standalone
+Python bot (chart vision, Mark Douglas risk audit, macro context).
 
 ---
 
