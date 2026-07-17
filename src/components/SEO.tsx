@@ -51,7 +51,7 @@ function deriveHreflangs(canonical: string): Array<{ lang: string; url: string }
     return `${DOMAIN}${path === '' ? '/' : path}`;
   };
 
-  const out = SUPPORTED_LOCALES.map(lang => ({ lang, url: buildUrl(lang) }));
+  const out: Array<{ lang: string; url: string }> = SUPPORTED_LOCALES.map(lang => ({ lang, url: buildUrl(lang) }));
   // x-default points to the English version
   out.push({ lang: 'x-default', url: buildUrl('en') });
   return out;

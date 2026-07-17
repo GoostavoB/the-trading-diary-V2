@@ -41,7 +41,7 @@ export const PlanEditor = ({ plan, onSave, onCancel }: PlanEditorProps) => {
                 // Create new plan
                 const { error } = await supabase
                     .from('trading_plans')
-                    .insert({ user_id: user.id, title, description });
+                    .insert({ user_id: user.id, name: title, description });
 
                 if (error) throw error;
                 toast.success('Trading plan created');
