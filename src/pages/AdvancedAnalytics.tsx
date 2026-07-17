@@ -206,7 +206,7 @@ export default function AdvancedAnalytics() {
                           <div className="flex items-center justify-between py-1">
                             <span className="text-sm text-muted-foreground">Total P&L</span>
                             <span className={`font-semibold ${metrics.totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                              <BlurredCurrency value={metrics.totalPnL} />
+                              <BlurredCurrency amount={metrics.totalPnL} />
                             </span>
                           </div>
                         </div>
