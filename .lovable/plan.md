@@ -1,38 +1,49 @@
+## Plano: deploy das 3 edge functions do Telegram
 
+### Observação importante (verificar antes)
+Fiz `ls supabase/functions/` no sandbox e **não vejo** `telegram-webhook`, `telegram-notifier`, `telegram-generate-link` nem `_shared/telegram/`. O sync do GitHub → Lovable pode estar atrasado ou o merge foi numa branch que não é a que o Lovable acompanha.
 
-## Problem
+Antes de rodar o plano, você confirma:
+- O merge foi na branch `main` (ou a branch conectada ao Lovable)?
+- Passou alguns minutos desde o merge?
 
-The two trades uploaded today (BTCUSDT +$18.05 and DAX +$14.56) have `trade_date = NULL` and `created_at = NULL` in the database. The DRE query filters by `.gte('trade_date', todayStart)`, so trades with null `trade_date` are excluded entirely. They also have `closed_at` set to today (Apr 7), which is the only reliable date field.
+Se sim e os arquivos ainda não apareceram, eu paro e sinalizo antes de deployar (não posso deployar código que não existe no filesystem). Se aparecerem, sigo os passos abaixo sem alterar nenhuma linha do código.
 
-## Fix
+### O que vou fazer (assumindo arquivos presentes)
 
-**File: `src/hooks/useDynamicRiskEngine.ts`**
+**1. Editar `supabase/config.toml`** — adicionar os 3 blocos de função:
 
-Change the "today's trades" query to use `closed_at` as a fallback when `trade_date` is null. Since Supabase JS client doesn't support `COALESCE` directly, use an `.or()` filter:
+```toml
+[functions.telegram-webhook]
+verify_jwt = false
 
-- Filter: trades where `trade_date >= today` OR (`trade_date` is null AND `closed_at >= today`)
-- Order by `COALESCE(trade_date, closed_at, created_at)` — use raw ordering or just `closed_at`
-- Also select `closed_at` so the compliance mapper can use it as timestamp fallback
+[functions.telegram-notifier]
+verify_jwt = false
+schedule = "*/5 * * * *"  # a cada 5 minutos
 
-Concrete changes to the query (lines 100-108):
-```typescript
-const todayStart = startOfDay(new Date()).toISOString();
-const { data, error } = await supabase
-  .from('trades')
-  .select('id, symbol, symbol_temp, profit_loss, trade_date, closed_at, created_at')
-  .eq('user_id', user!.id)
-  .is('deleted_at', null)
-  .or(`trade_date.gte.${todayStart},and(trade_date.is.null,closed_at.gte.${todayStart})`)
-  .order('closed_at', { ascending: true });
+[functions.telegram-generate-link]
+verify_jwt = true
 ```
 
-Also update the compliance mapper (around line 148) to use `closed_at` as fallback for `timestamp`:
-```typescript
-timestamp: t.trade_date || t.closed_at || t.created_at,
-```
+Justificativa:
+- `telegram-webhook` público — Telegram não manda JWT do Supabase; a autenticação é feita no código via `X-Telegram-Bot-Api-Secret-Token`.
+- `telegram-notifier` público + cron `*/5 * * * *` (padrão que o repo já usa em `calculate-leaderboard`, `check-user-activity`, etc).
+- `telegram-generate-link` exige JWT — usuário logado gerando link de vínculo.
 
-**Also fix `allTrades` query** — select `closed_at` too since those new trades also contribute to total PnL and the current query already works (no date filter), but verify it includes the new trades. It does — no change needed there.
+**2. Deploy das 3 funções** via `supabase--deploy_edge_functions` com `["telegram-webhook","telegram-notifier","telegram-generate-link"]`.
 
-### Files Modified
-- `src/hooks/useDynamicRiskEngine.ts` — fix today's trades query to handle null `trade_date`
+**3. Verificar logs** de cada uma com `supabase--edge_function_logs` pra confirmar que subiram sem erro de import/bundle.
 
+**4. Reportar de volta**:
+- URL pública do webhook (`https://<project>.supabase.co/functions/v1/telegram-webhook`) pra você colar no `setWebhook` do BotFather / gateway.
+- Confirmação do cron ativo.
+- Lembrete pra você adicionar os 3 secrets (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_BOT_USERNAME`) no painel antes da primeira invocação — sem eles as funções sobem mas falham em runtime.
+
+### O que NÃO vou fazer
+- Não vou tocar em nenhum arquivo dentro de `supabase/functions/telegram-*/` nem em `_shared/telegram/`.
+- Não vou criar/editar secrets — você faz no painel.
+- Não vou registrar o webhook no Telegram (`setWebhook`) — só deploy da infra. Se quiser que eu registre depois com os secrets já configurados, é outra tarefa.
+
+### Riscos
+- Se o código importado usar algum `npm:` ou `esm.sh` incompatível com edge-runtime, o deploy falha. Nesse caso eu te mostro o erro exato dos logs e paro — não vou "consertar" o código sem autorização.
+- Se `config.toml` já tiver algum bloco conflitante pros nomes, eu paro e mostro antes de sobrescrever.

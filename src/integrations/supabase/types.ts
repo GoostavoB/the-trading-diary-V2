@@ -3185,145 +3185,145 @@ export type Database = {
       }
       telegram_link_tokens: {
         Row: {
-          token: string
-          user_id: string
-          timezone: string | null
-          locale: string | null
           expires_at: string
+          locale: string | null
+          timezone: string | null
+          token: string
           used_at: string | null
+          user_id: string
         }
         Insert: {
-          token: string
-          user_id: string
-          timezone?: string | null
-          locale?: string | null
           expires_at?: string
+          locale?: string | null
+          timezone?: string | null
+          token: string
           used_at?: string | null
+          user_id: string
         }
         Update: {
-          token?: string
-          user_id?: string
-          timezone?: string | null
-          locale?: string | null
           expires_at?: string
+          locale?: string | null
+          timezone?: string | null
+          token?: string
           used_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
       telegram_message_log: {
         Row: {
-          id: number
-          user_id: string | null
           chat_id: number | null
-          direction: string
-          message_type: string
-          template_name: string | null
-          ref_id: string | null
           content: string | null
-          telegram_message_id: number | null
           created_at: string
+          direction: string
+          id: number
+          message_type: string
+          ref_id: string | null
+          telegram_message_id: number | null
+          template_name: string | null
+          user_id: string | null
         }
         Insert: {
-          id?: number
-          user_id?: string | null
           chat_id?: number | null
-          direction: string
-          message_type: string
-          template_name?: string | null
-          ref_id?: string | null
           content?: string | null
-          telegram_message_id?: number | null
           created_at?: string
+          direction: string
+          id?: number
+          message_type: string
+          ref_id?: string | null
+          telegram_message_id?: number | null
+          template_name?: string | null
+          user_id?: string | null
         }
         Update: {
-          id?: number
-          user_id?: string | null
           chat_id?: number | null
-          direction?: string
-          message_type?: string
-          template_name?: string | null
-          ref_id?: string | null
           content?: string | null
-          telegram_message_id?: number | null
           created_at?: string
+          direction?: string
+          id?: number
+          message_type?: string
+          ref_id?: string | null
+          telegram_message_id?: number | null
+          template_name?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
       telegram_preferences: {
         Row: {
-          user_id: string
+          alert_on_big_loss: boolean
+          alert_on_daily_loss_lock: boolean
+          alert_on_rule_violation: boolean
+          alert_on_streak: boolean
+          alert_on_trade_close: boolean
           daily_digest: boolean
           daily_digest_hour_local: number
-          weekly_digest: boolean
-          weekly_digest_day: number
-          alert_on_trade_close: boolean
-          alert_on_big_loss: boolean
-          alert_on_streak: boolean
-          alert_on_rule_violation: boolean
-          alert_on_daily_loss_lock: boolean
           mute_until: string | null
           updated_at: string
+          user_id: string
+          weekly_digest: boolean
+          weekly_digest_day: number
         }
         Insert: {
-          user_id: string
+          alert_on_big_loss?: boolean
+          alert_on_daily_loss_lock?: boolean
+          alert_on_rule_violation?: boolean
+          alert_on_streak?: boolean
+          alert_on_trade_close?: boolean
           daily_digest?: boolean
           daily_digest_hour_local?: number
-          weekly_digest?: boolean
-          weekly_digest_day?: number
-          alert_on_trade_close?: boolean
-          alert_on_big_loss?: boolean
-          alert_on_streak?: boolean
-          alert_on_rule_violation?: boolean
-          alert_on_daily_loss_lock?: boolean
           mute_until?: string | null
           updated_at?: string
+          user_id: string
+          weekly_digest?: boolean
+          weekly_digest_day?: number
         }
         Update: {
-          user_id?: string
+          alert_on_big_loss?: boolean
+          alert_on_daily_loss_lock?: boolean
+          alert_on_rule_violation?: boolean
+          alert_on_streak?: boolean
+          alert_on_trade_close?: boolean
           daily_digest?: boolean
           daily_digest_hour_local?: number
-          weekly_digest?: boolean
-          weekly_digest_day?: number
-          alert_on_trade_close?: boolean
-          alert_on_big_loss?: boolean
-          alert_on_streak?: boolean
-          alert_on_rule_violation?: boolean
-          alert_on_daily_loss_lock?: boolean
           mute_until?: string | null
           updated_at?: string
+          user_id?: string
+          weekly_digest?: boolean
+          weekly_digest_day?: number
         }
         Relationships: []
       }
       telegram_users: {
         Row: {
-          id: string
-          user_id: string
           chat_id: number
+          id: string
+          last_active_at: string | null
+          linked_at: string
+          locale: string | null
           telegram_username: string | null
           timezone: string | null
-          locale: string | null
-          linked_at: string
-          last_active_at: string | null
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
           chat_id: number
+          id?: string
+          last_active_at?: string | null
+          linked_at?: string
+          locale?: string | null
           telegram_username?: string | null
           timezone?: string | null
-          locale?: string | null
-          linked_at?: string
-          last_active_at?: string | null
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
           chat_id?: number
+          id?: string
+          last_active_at?: string | null
+          linked_at?: string
+          locale?: string | null
           telegram_username?: string | null
           timezone?: string | null
-          locale?: string | null
-          linked_at?: string
-          last_active_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
