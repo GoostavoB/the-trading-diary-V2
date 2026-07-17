@@ -38,20 +38,26 @@ Leio seus números direto do The Trading Diary. Sem dourar a pílula.`,
 /today — today's P&L and trades
 /week — this week's stats
 /stats — all-time stats
+/lesson — teach me a rule or setup
 /mute — pause alerts for 2h (or /mute 4h)
 /unmute — resume alerts
 /help — this list
 
-Free-form questions are coming soon.`,
+📊 Send a chart screenshot → socratic analysis
+📥 Send a trade-result screenshot with the word "log" → saved to your journal (after your ✅)
+💬 Or just talk to me — I answer with your real numbers`,
     pt: `<b>Comandos</b>
 /today — P&L e trades de hoje
 /week — estatísticas da semana
 /stats — estatísticas gerais
+/lesson — me ensina uma regra ou setup
 /mute — pausa alertas por 2h (ou /mute 4h)
 /unmute — retoma alertas
 /help — esta lista
 
-Perguntas em texto livre chegam em breve.`,
+📊 Manda print de gráfico → análise socrática
+📥 Manda print do RESULTADO com a palavra "registra" → salvo no diário (após seu ✅)
+💬 Ou só conversa comigo — respondo com seus números reais`,
   },
 
   not_linked: {
