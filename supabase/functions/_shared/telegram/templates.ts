@@ -149,6 +149,16 @@ ROI médio  {{avgRoi}}`,
     en: `I can't answer free-form questions yet — that's coming soon. For now: /today, /week, /stats.`,
     pt: `Ainda não respondo perguntas em texto livre — isso chega em breve. Por enquanto: /today, /week, /stats.`,
   },
+
+  lesson_saved: {
+    en: `📚 Learned. I'll hold you to it in future analyses.`,
+    pt: `📚 Aprendido. Vou te cobrar isso nas próximas análises.`,
+  },
+
+  mentor_error: {
+    en: `⚠️ My analysis engine choked on that one. Try again in a minute.`,
+    pt: `⚠️ Meu motor de análise engasgou nessa. Tenta de novo em um minuto.`,
+  },
 };
 
 export function render(

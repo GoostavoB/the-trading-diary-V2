@@ -14,6 +14,9 @@ export interface SendOptions {
    *  same (user, template, ref) exists, the send is skipped. */
   refId?: string;
   replyMarkup?: unknown;
+  /** Send as plain text (no parse_mode). Use for LLM output, which may contain
+   *  characters that break Telegram's HTML parser. */
+  plain?: boolean;
 }
 
 export async function sendMessage(
@@ -40,7 +43,7 @@ export async function sendMessage(
     body: JSON.stringify({
       chat_id: chatId,
       text,
-      parse_mode: 'HTML',
+      ...(opts.plain ? {} : { parse_mode: 'HTML' }),
       disable_web_page_preview: true,
       ...(opts.replyMarkup ? { reply_markup: opts.replyMarkup } : {}),
     }),
@@ -74,6 +77,7 @@ export async function logInbound(
   userId: string | null,
   messageType: string,
   content: string,
+  telegramMessageId: number | null = null,
 ): Promise<void> {
   const { error } = await supabase.from('telegram_message_log').insert({
     user_id: userId,
@@ -81,8 +85,44 @@ export async function logInbound(
     direction: 'inbound',
     message_type: messageType,
     content: content.slice(0, 4000),
+    telegram_message_id: telegramMessageId,
   });
   if (error) console.error('inbound log failed', error.message);
+}
+
+/** Shows "typing…" in the chat while the mentor thinks. Fire-and-forget. */
+export async function sendTyping(chatId: number): Promise<void> {
+  await fetch(`${API_BASE}/sendChatAction`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId, action: 'typing' }),
+  }).catch(() => {});
+}
+
+/** Downloads a Telegram photo straight into memory and returns it as base64.
+ *  Never touches disk. Returns null on any failure. */
+export async function downloadPhotoB64(fileId: string): Promise<string | null> {
+  try {
+    const metaRes = await fetch(`${API_BASE}/getFile?file_id=${encodeURIComponent(fileId)}`);
+    const meta = await metaRes.json();
+    const filePath: string | undefined = meta?.result?.file_path;
+    if (!filePath) return null;
+
+    const fileRes = await fetch(`https://api.telegram.org/file/bot${BOT_TOKEN}/${filePath}`);
+    if (!fileRes.ok) return null;
+    const bytes = new Uint8Array(await fileRes.arrayBuffer());
+
+    // Chunked conversion: String.fromCharCode(...bytes) overflows the stack on big images.
+    let binary = '';
+    const CHUNK = 0x8000;
+    for (let i = 0; i < bytes.length; i += CHUNK) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
+    }
+    return btoa(binary);
+  } catch (error) {
+    console.error('downloadPhotoB64 failed', error);
+    return null;
+  }
 }
 
 /** Basic outbound rate limit: max N sends to a chat in the last minute. */
