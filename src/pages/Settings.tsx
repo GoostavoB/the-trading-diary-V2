@@ -21,6 +21,7 @@ import { ThemeSelector } from '@/components/ThemeSelector';
 import { CurrencySelector } from '@/components/settings/CurrencySelector';
 import { BlurSettings } from '@/components/settings/BlurSettings';
 import { AccessibilitySettings } from '@/components/settings/AccessibilitySettings';
+import { TelegramIntegration } from '@/components/settings/TelegramIntegration';
 import { SocialShareRewards } from '@/components/SocialShareRewards';
 
 import { useCalmMode } from '@/contexts/CalmModeContext';
@@ -642,6 +643,8 @@ const Settings = () => {
           </TabsContent>
 
           <TabsContent value="notifications" className="space-y-6">
+            <TelegramIntegration />
+
             <PremiumCard className="p-6 glass">
               <h2 className="text-xl font-semibold mb-4">Notification Preferences</h2>
               <p className="text-sm text-muted-foreground mb-6">Choose what updates you want to receive</p>
