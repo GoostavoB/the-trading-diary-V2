@@ -12,6 +12,7 @@
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 import { sendMessage } from '../_shared/telegram/api.ts';
 import { render } from '../_shared/telegram/templates.ts';
+import { dailyMantra } from '../_shared/telegram/mantras.ts';
 import {
   computeStats, fetchTrades, fmtMoney, fmtPct, fmtTradeLine,
   localClock, localDate, tradePnl, tradeSymbol, type PeriodStats,
@@ -106,7 +107,7 @@ async function maybeSendDailyDigest(supabase: SupabaseClient, r: Recipient): Pro
     losses: s.losses,
     best: fmtTradeLine(s.best),
     worst: fmtTradeLine(s.worst),
-    comment: digestComment(s, r.locale),
+    comment: `${digestComment(s, r.locale)}\n\n📿 ${dailyMantra(today, r.locale)}`,
   }), {
     userId: r.user_id,
     messageType: 'digest',
