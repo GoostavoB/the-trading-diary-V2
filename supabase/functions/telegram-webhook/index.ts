@@ -343,7 +343,7 @@ async function handleAlbumPart(
 
   const caption_ = parts.map((p) => p.caption).filter(Boolean).join(' ').trim();
   const images: string[] = [];
-  for (const p of parts.slice(0, 4)) {
+  for (const p of parts.slice(0, 8)) {
     const b64 = await downloadPhotoB64(p.file_id);
     if (b64) images.push(b64);
   }
