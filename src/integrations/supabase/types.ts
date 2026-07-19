@@ -1013,6 +1013,72 @@ export type Database = {
         }
         Relationships: []
       }
+      economic_events: {
+        Row: {
+          all_day_date: string | null
+          currency: string | null
+          event: string
+          event_time: string | null
+          id: string
+          importance: string | null
+          updated_at: string
+          zone: string | null
+        }
+        Insert: {
+          all_day_date?: string | null
+          currency?: string | null
+          event: string
+          event_time?: string | null
+          id: string
+          importance?: string | null
+          updated_at?: string
+          zone?: string | null
+        }
+        Update: {
+          all_day_date?: string | null
+          currency?: string | null
+          event?: string
+          event_time?: string | null
+          id?: string
+          importance?: string | null
+          updated_at?: string
+          zone?: string | null
+        }
+        Relationships: []
+      }
+      etf_flows: {
+        Row: {
+          aum_change_pct: number | null
+          cum_net_inflow_usd: number | null
+          etf_type: string
+          flow_date: string
+          net_inflow_usd: number
+          total_net_assets_usd: number | null
+          updated_at: string
+          value_traded_usd: number | null
+        }
+        Insert: {
+          aum_change_pct?: number | null
+          cum_net_inflow_usd?: number | null
+          etf_type: string
+          flow_date: string
+          net_inflow_usd: number
+          total_net_assets_usd?: number | null
+          updated_at?: string
+          value_traded_usd?: number | null
+        }
+        Update: {
+          aum_change_pct?: number | null
+          cum_net_inflow_usd?: number | null
+          etf_type?: string
+          flow_date?: string
+          net_inflow_usd?: number
+          total_net_assets_usd?: number | null
+          updated_at?: string
+          value_traded_usd?: number | null
+        }
+        Relationships: []
+      }
       event_reminders: {
         Row: {
           created_at: string | null
@@ -1694,6 +1760,39 @@ export type Database = {
           id?: string
           shown_date?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      liq_zones: {
+        Row: {
+          id: string
+          liq_usd: number
+          pct_away: number | null
+          price: number
+          ref_price: number | null
+          side: string
+          symbol: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          liq_usd: number
+          pct_away?: number | null
+          price: number
+          ref_price?: number | null
+          side: string
+          symbol: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          liq_usd?: number
+          pct_away?: number | null
+          price?: number
+          ref_price?: number | null
+          side?: string
+          symbol?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -5231,6 +5330,42 @@ export type Database = {
           week_end?: string
           week_start?: string
           winning_trades?: number
+        }
+        Relationships: []
+      }
+      whale_flows: {
+        Row: {
+          amount: number
+          created_at: string
+          direction: string
+          exchange: string
+          happened_at: string
+          id: string
+          symbol: string
+          tx_id: string
+          usd: number
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          direction: string
+          exchange: string
+          happened_at: string
+          id?: string
+          symbol?: string
+          tx_id: string
+          usd: number
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          direction?: string
+          exchange?: string
+          happened_at?: string
+          id?: string
+          symbol?: string
+          tx_id?: string
+          usd?: number
         }
         Relationships: []
       }
