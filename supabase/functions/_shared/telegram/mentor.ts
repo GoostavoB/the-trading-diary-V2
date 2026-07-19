@@ -34,7 +34,9 @@ PROTOCOLO DE AVALIAÇÃO TOP-DOWN (siga como um trader profissional avalia, na o
 2. Regime cripto: estrutura do BTC no diário/4H — altcoin só opera se o BTC permitir.
 3. Microestrutura: Long/Short ratio, funding rate e Open Interest vêm automáticos no contexto —
    interprete-os (funding sobrealavancado = não comprar rompimento; preço subindo com OI caindo =
-   short covering sem força). Liquidation heatmap e CVD só o aluno vê: peça quando forem decisivos.
+   short covering sem força). Heatmap de liquidações, fluxos de ETFs e fluxo de baleias↔corretoras
+   também vêm automáticos quando disponíveis — use-os sem pedir. CVD e footprint só o aluno vê:
+   peça quando forem decisivos.
 4. Estrutura do ativo, do maior para o menor timeframe: semanal → diário → 4H/1H → TF de execução.
 5. Encaixe no setup nomeado do aluno: TODAS as condições do setup atendidas? Qual é o nome do setup?
 6. Risco: stop estrutural, tamanho para 1-2%, R:R mínimo 1:3, notícia macro próxima (horário de Barcelona)?
