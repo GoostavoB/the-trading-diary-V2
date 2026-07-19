@@ -1,12 +1,10 @@
-Redeploy da edge function `telegram-webhook` para pegar a atualização mergeada em `_shared/telegram/mentor.ts`.
+Redeploy das edge functions `telegram-webhook` e `telegram-notifier` com o código atual do repositório, sem alterar nenhum arquivo.
 
 ### Passos
-1. `supabase--deploy_edge_functions` com `["telegram-webhook"]`.
-2. `supabase--edge_function_logs` em `telegram-webhook` para confirmar boot sem erro de import/bundle.
-3. Smoke test com `supabase--curl_edge_functions` sem o header `X-Telegram-Bot-Api-Secret-Token` → esperar `403 forbidden`.
-4. Reportar resultado.
+1. `supabase--deploy_edge_functions` com `["telegram-webhook", "telegram-notifier"]`.
+2. Smoke test rápido em `telegram-webhook` via `supabase--curl_edge_functions` sem o header `X-Telegram-Bot-Api-Secret-Token` → esperar `403 forbidden`.
+3. Reportar resultado.
 
 ### Não faz parte
-- Nenhuma alteração em código-fonte (`telegram-webhook/index.ts`, `_shared/telegram/*`, `config.toml`).
-- Não mexo em `telegram-notifier` nem `telegram-generate-link`.
-- Não toco em secrets.
+- Nenhuma alteração de código (`index.ts`, `_shared/telegram/*`, `config.toml`).
+- Sem mexer em secrets, cron ou outras funções.
