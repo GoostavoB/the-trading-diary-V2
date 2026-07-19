@@ -307,7 +307,7 @@ function wantsTradeCapture(caption: string): boolean {
 // uma espera QUIET_MS; só a que NÃO viu ninguém chegar depois dela (a última)
 // junta TUDO que está pendente no chat e dispara UMA análise integrada.
 const QUIET_MS = 12_000;
-const MAX_IMAGES = 8;
+const MAX_IMAGES = 16;
 
 async function handlePhotoBuffer(
   supabase: SupabaseClient,

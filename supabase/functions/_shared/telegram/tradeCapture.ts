@@ -80,7 +80,7 @@ export async function extractTradesFromImage(
   const apiKey = Deno.env.get('LOVABLE_API_KEY');
   if (!apiKey) return null;
 
-  const images = Array.isArray(imageB64) ? imageB64.slice(0, 4) : [imageB64];
+  const images = Array.isArray(imageB64) ? imageB64.slice(0, 8) : [imageB64];
   const response = await fetch(GATEWAY_URL, {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
