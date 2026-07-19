@@ -152,9 +152,13 @@ export async function marketContextBlock(symbolHint?: string): Promise<string | 
     quotes.map((q) => `- ${q.label}: ${q.value}`).join('\n');
 }
 
-/** Próximos eventos macro de alto impacto (7 dias), horários em Barcelona.
+/** Próximos eventos macro de alto impacto (7 dias), horários no fuso do
+ *  usuário (telegram_users.timezone — muda de país, muda tudo junto).
  *  Alarme explícito quando faltar menos de 90 minutos. */
-export async function upcomingEventsBlock(supabase: SupabaseClient): Promise<string | null> {
+export async function upcomingEventsBlock(
+  supabase: SupabaseClient,
+  timezone = 'Europe/Madrid',
+): Promise<string | null> {
   try {
     const now = Date.now();
     const { data } = await supabase
@@ -168,7 +172,7 @@ export async function upcomingEventsBlock(supabase: SupabaseClient): Promise<str
     if (!data?.length) return null;
 
     const fmt = new Intl.DateTimeFormat('pt-BR', {
-      timeZone: 'Europe/Madrid', day: '2-digit', month: '2-digit',
+      timeZone: timezone || 'Europe/Madrid', day: '2-digit', month: '2-digit',
       hour: '2-digit', minute: '2-digit',
     });
     const lines = data.map((e) => {
@@ -176,9 +180,9 @@ export async function upcomingEventsBlock(supabase: SupabaseClient): Promise<str
       const minutes = Math.round((t.getTime() - now) / 60_000);
       const soon = minutes >= -60 && minutes <= 90
         ? ` ⚠️ EM ${Math.max(minutes, 0)} MIN — liquidez some, não operar` : '';
-      return `- ${fmt.format(t)} (Barcelona): ${e.event}${soon}`;
+      return `- ${fmt.format(t)} (hora local): ${e.event}${soon}`;
     });
-    return '[CALENDÁRIO MACRO EUA — alto impacto, próximos 7 dias]\n' + lines.join('\n');
+    return '[CALENDÁRIO MACRO EUA — alto impacto, próximos 7 dias, horários no fuso do aluno]\n' + lines.join('\n');
   } catch (error) {
     console.error('upcomingEventsBlock failed', error);
     return null;

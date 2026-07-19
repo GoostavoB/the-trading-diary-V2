@@ -96,7 +96,7 @@ async function buildContextBlocks(supabase: SupabaseClient, input: MentorInput):
   const market = await marketContextBlock(input.text);
   if (market) blocks.push(market);
 
-  const events = await upcomingEventsBlock(supabase);
+  const events = await upcomingEventsBlock(supabase, input.timezone);
   if (events) blocks.push(events);
 
   const { data: knowledge } = await supabase
