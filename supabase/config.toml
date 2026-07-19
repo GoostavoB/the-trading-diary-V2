@@ -39,7 +39,7 @@ verify_jwt = true
 
 [functions.economic-calendar-sync]
 verify_jwt = false
-schedule = "0 6 * * *"        # 1x/dia: puxa o último dataset do actor do Apify
+schedule = "0 6 * * *"        # 1x/dia: dispara o actor (run-sync) e grava eventos high EUA, hoje→+7d
 
 [functions.etf-flows-sync]
 verify_jwt = false

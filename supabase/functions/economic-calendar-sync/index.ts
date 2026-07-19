@@ -1,10 +1,12 @@
-// Sincroniza o calendário econômico a partir do actor do Apify
-// (investing.com scraper) que o usuário agenda no próprio Apify.
-// Roda 1x/dia (config.toml) e puxa o dataset da ÚLTIMA execução bem-sucedida
-// — não dispara o actor, só lê o resultado. Secrets: APIFY_TOKEN e
-// APIFY_ACTOR_ID (ex.: "usuario~economic-calendar-data-investing-com").
+// Sincroniza o calendário econômico (investing.com via Apify). Esta função
+// DISPARA o actor na hora (run-sync, ~7s) — não precisa de schedule no
+// console do Apify. Puxa só eventos de ALTA importância dos EUA, hoje→+7d,
+// horários em UTC (timeZone omitido de propósito: o actor rejeita "GMT +0:00").
+// Secret: APIFY_TOKEN. Actor configurável via APIFY_ACTOR_ID.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
+
+const DEFAULT_ACTOR = 'pintostudio~economic-calendar-data-investing-com';
 
 interface ApifyEvent {
   id: string;
@@ -18,11 +20,11 @@ interface ApifyEvent {
 
 Deno.serve(async (_req) => {
   const token = Deno.env.get('APIFY_TOKEN');
-  const actorId = Deno.env.get('APIFY_ACTOR_ID');
-  if (!token || !actorId) {
-    console.error('APIFY_TOKEN/APIFY_ACTOR_ID não configurados');
-    return json({ ok: false, error: 'missing secrets' });
+  if (!token) {
+    console.error('APIFY_TOKEN não configurado');
+    return json({ ok: false, error: 'missing APIFY_TOKEN' });
   }
+  const actorId = Deno.env.get('APIFY_ACTOR_ID') ?? DEFAULT_ACTOR;
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -30,10 +32,23 @@ Deno.serve(async (_req) => {
   );
 
   try {
+    const day = (offsetDays: number) =>
+      new Date(Date.now() + offsetDays * 86_400_000).toISOString().slice(0, 10);
     const res = await fetch(
-      `https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/runs/last/dataset/items` +
-      `?token=${encodeURIComponent(token)}&status=SUCCEEDED&clean=true`,
-      { signal: AbortSignal.timeout(30_000) },
+      `https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/run-sync-get-dataset-items` +
+      `?token=${encodeURIComponent(token)}&timeout=120&maxTotalChargeUsd=0.50&clean=true`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timeFilter: 'time_only',
+          importances: 'high',
+          country: 'united states',
+          fromDate: day(0),
+          toDate: day(7),
+        }),
+        signal: AbortSignal.timeout(140_000),
+      },
     );
     if (!res.ok) {
       console.error('Apify fetch failed', res.status, await res.text().catch(() => ''));
