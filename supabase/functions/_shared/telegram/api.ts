@@ -8,7 +8,7 @@ const API_BASE = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
 export interface SendOptions {
   userId?: string | null;
-  messageType: 'command' | 'digest' | 'alert' | 'free_text' | 'callback' | 'system';
+  messageType: 'command' | 'digest' | 'alert' | 'free_text' | 'callback' | 'system' | 'mentor';
   templateName?: string;
   /** Dedup key (e.g. 'daily:2026-07-17', 'trade:<id>'). If a log row with the
    *  same (user, template, ref) exists, the send is skipped. */
@@ -19,7 +19,36 @@ export interface SendOptions {
   plain?: boolean;
 }
 
-/** Envia mensagem e retorna o message_id do Telegram (null se pulada/falhou). */
+/** Limpa artefatos de markdown que os LLMs insistem em mandar — no Telegram em
+ *  texto puro, "**negrito**" aparece com os asteriscos crus (feio). */
+function sanitizePlain(text: string): string {
+  return text
+    .replace(/^#{1,6}\s+/gm, '')        // cabeçalhos markdown
+    .replace(/\*\*([^*\n]+)\*\*/g, '$1') // **negrito**
+    .replace(/__([^_\n]+)__/g, '$1')     // __negrito__
+    .replace(/^\s*[*-]\s+/gm, '• ')      // bullets * e - viram •
+    .replace(/```[a-z]*\n?/g, '')        // cercas de código
+    .trim();
+}
+
+/** Divide texto no limite do Telegram (4096), cortando em quebra de linha. */
+function chunksOf(text: string, max = 4000): string[] {
+  if (text.length <= max) return [text];
+  const out: string[] = [];
+  let rest = text;
+  while (rest.length > max) {
+    let cut = rest.lastIndexOf('\n', max);
+    if (cut < max * 0.5) cut = rest.lastIndexOf(' ', max);
+    if (cut < max * 0.5) cut = max;
+    out.push(rest.slice(0, cut).trimEnd());
+    rest = rest.slice(cut).trimStart();
+  }
+  if (rest) out.push(rest);
+  return out;
+}
+
+/** Envia mensagem (dividida se passar de 4096 chars) e retorna o message_id do
+ *  Telegram da ÚLTIMA parte (null se pulada/falhou) — os botões vão nela. */
 export async function sendMessage(
   supabase: SupabaseClient,
   chatId: number,
@@ -38,24 +67,28 @@ export async function sendMessage(
     if (dup) return null; // already sent
   }
 
-  const res = await fetch(`${API_BASE}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text,
-      ...(opts.plain ? {} : { parse_mode: 'HTML' }),
-      disable_web_page_preview: true,
-      ...(opts.replyMarkup ? { reply_markup: opts.replyMarkup } : {}),
-    }),
-  });
-
-  const body = await res.json().catch(() => null);
-  if (!res.ok) {
-    console.error('sendMessage failed', res.status, JSON.stringify(body));
-    return null;
+  const finalText = opts.plain ? sanitizePlain(text) : text;
+  const parts = chunksOf(finalText);
+  let messageId: number | null = null;
+  for (let i = 0; i < parts.length; i++) {
+    const res = await fetch(`${API_BASE}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: parts[i],
+        ...(opts.plain ? {} : { parse_mode: 'HTML' }),
+        disable_web_page_preview: true,
+        ...(opts.replyMarkup && i === parts.length - 1 ? { reply_markup: opts.replyMarkup } : {}),
+      }),
+    });
+    const body = await res.json().catch(() => null);
+    if (!res.ok) {
+      console.error('sendMessage failed', res.status, JSON.stringify(body));
+      return messageId; // partes já enviadas ficam; não trava o fluxo
+    }
+    messageId = body?.result?.message_id ?? messageId;
   }
-  const messageId: number | null = body?.result?.message_id ?? null;
 
   await supabase.from('telegram_message_log').insert({
     user_id: opts.userId ?? null,
@@ -64,7 +97,7 @@ export async function sendMessage(
     message_type: opts.messageType,
     template_name: opts.templateName ?? null,
     ref_id: opts.refId ?? null,
-    content: text.slice(0, 4000),
+    content: finalText.slice(0, 4000),
     telegram_message_id: messageId,
   }).then(({ error }) => {
     if (error) console.error('message_log insert failed', error.message);
