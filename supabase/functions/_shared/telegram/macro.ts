@@ -1,7 +1,10 @@
 // Contexto de mercado buscado automaticamente para o mentor: S&P 500, DXY,
-// VIX (Yahoo Finance, endpoint público), BTC (CoinGecko) e Long/Short ratio
-// (Binance Futures, público). Cada fonte falha de forma independente — o
-// mentor recebe o que estiver disponível e pede ao aluno o que faltar.
+// VIX (Yahoo Finance, endpoint público), BTC (CoinGecko), Long/Short ratio,
+// funding e OI (Binance Futures) + calendário econômico (tabela
+// economic_events, sincronizada do Apify). Cada fonte falha de forma
+// independente — o mentor recebe o que estiver disponível.
+
+import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 
 interface Quote {
   label: string;
@@ -147,6 +150,166 @@ export async function marketContextBlock(symbolHint?: string): Promise<string | 
   if (!quotes.length) return null;
   return '[CONTEXTO DE MERCADO — buscado automaticamente agora]\n' +
     quotes.map((q) => `- ${q.label}: ${q.value}`).join('\n');
+}
+
+/** Próximos eventos macro de alto impacto (7 dias), horários no fuso do
+ *  usuário (telegram_users.timezone — muda de país, muda tudo junto).
+ *  Alarme explícito quando faltar menos de 90 minutos. */
+export async function upcomingEventsBlock(
+  supabase: SupabaseClient,
+  timezone = 'Europe/Madrid',
+): Promise<string | null> {
+  try {
+    const now = Date.now();
+    const { data } = await supabase
+      .from('economic_events')
+      .select('event, event_time, all_day_date, importance')
+      .eq('importance', 'high')
+      .gte('event_time', new Date(now - 3_600_000).toISOString())
+      .lte('event_time', new Date(now + 7 * 86_400_000).toISOString())
+      .order('event_time', { ascending: true })
+      .limit(6);
+    if (!data?.length) return null;
+
+    const fmt = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: timezone || 'Europe/Madrid', day: '2-digit', month: '2-digit',
+      hour: '2-digit', minute: '2-digit',
+    });
+    const lines = data.map((e) => {
+      const t = new Date(e.event_time as string);
+      const minutes = Math.round((t.getTime() - now) / 60_000);
+      const soon = minutes >= -60 && minutes <= 90
+        ? ` ⚠️ EM ${Math.max(minutes, 0)} MIN — liquidez some, não operar` : '';
+      return `- ${fmt.format(t)} (hora local): ${e.event}${soon}`;
+    });
+    return '[CALENDÁRIO MACRO EUA — alto impacto, próximos 7 dias, horários no fuso do aluno]\n' + lines.join('\n');
+  } catch (error) {
+    console.error('upcomingEventsBlock failed', error);
+    return null;
+  }
+}
+
+/** Zonas densas de liquidação (CoinGlass via Apify) — os "ímãs" de preço.
+ *  Só mostra se o snapshot tem menos de 36h (heatmap velho engana). */
+export async function liquidationZonesBlock(supabase: SupabaseClient): Promise<string | null> {
+  try {
+    const { data } = await supabase
+      .from('liq_zones')
+      .select('side, price, liq_usd, pct_away, ref_price, updated_at')
+      .eq('symbol', 'BTC')
+      .order('liq_usd', { ascending: false });
+    if (!data?.length) return null;
+
+    const ageMs = Date.now() - new Date(data[0].updated_at as string).getTime();
+    if (ageMs > 36 * 3_600_000) return null;
+
+    const fmt = (z: { price: number; liq_usd: number; pct_away: number }) =>
+      `$${Math.round(z.price).toLocaleString('en-US')} → $${(z.liq_usd / 1e6).toFixed(0)}M (${z.pct_away >= 0 ? '+' : ''}${z.pct_away.toFixed(1)}%)`;
+    const above = data.filter((z) => z.side === 'above').slice(0, 3);
+    const below = data.filter((z) => z.side === 'below').slice(0, 3);
+
+    const lines: string[] = [];
+    if (above.length) lines.push(`- Acima do preço: ${above.map(fmt).join(' · ')}`);
+    if (below.length) lines.push(`- Abaixo do preço: ${below.map(fmt).join(' · ')}`);
+    if (!lines.length) return null;
+
+    const hours = Math.round(ageMs / 3_600_000);
+    return `[HEATMAP DE LIQUIDAÇÕES BTC — bolsões densos (ímãs de preço), snapshot de ${hours}h atrás]\n` +
+      lines.join('\n');
+  } catch (error) {
+    console.error('liquidationZonesBlock failed', error);
+    return null;
+  }
+}
+
+/** Fluxos dos ETFs spot (institucional): último dia + soma 7 dias, com
+ *  leitura de regime. Dados da tabela etf_flows (sync via Apify/SoSoValue). */
+export async function etfFlowsBlock(supabase: SupabaseClient): Promise<string | null> {
+  try {
+    const since = new Date(Date.now() - 8 * 86_400_000).toISOString().slice(0, 10);
+    const { data } = await supabase
+      .from('etf_flows')
+      .select('etf_type, flow_date, net_inflow_usd')
+      .gte('flow_date', since)
+      .order('flow_date', { ascending: false });
+    if (!data?.length) return null;
+
+    const LABELS: Record<string, string> = {
+      'us-btc-spot': 'ETFs BTC', 'us-eth-spot': 'ETFs ETH', 'us-sol-spot': 'ETFs SOL',
+    };
+    const byType = new Map<string, { latest: number; latestDate: string; sum7: number }>();
+    for (const r of data) {
+      const entry = byType.get(r.etf_type) ?? { latest: NaN, latestDate: '', sum7: 0 };
+      if (!entry.latestDate) { entry.latest = r.net_inflow_usd; entry.latestDate = r.flow_date; }
+      entry.sum7 += r.net_inflow_usd;
+      byType.set(r.etf_type, entry);
+    }
+
+    const fmtM = (v: number) => `${v < 0 ? '−' : '+'}$${Math.abs(v / 1e6).toFixed(0)}M`;
+    const lines: string[] = [];
+    for (const [type, e] of byType) {
+      const strong = Math.abs(e.latest) >= 500e6;
+      const read = e.latest >= 0
+        ? (strong ? 'inflow FORTE — demanda institucional' : 'inflow')
+        : (strong ? 'OUTFLOW FORTE — instituições reduzindo risco' : 'outflow');
+      lines.push(`- ${LABELS[type] ?? type}: ${fmtM(e.latest)} no último dia (${read}) · 7d: ${fmtM(e.sum7)}`);
+    }
+    if (!lines.length) return null;
+    return '[FLUXOS DE ETFs SPOT — posicionamento institucional]\n' + lines.join('\n');
+  } catch (error) {
+    console.error('etfFlowsBlock failed', error);
+    return null;
+  }
+}
+
+/** Baleias: transações ≥$1M de BTC entre carteiras e as grandes corretoras
+ *  (últimas 24h, tabela whale_flows via Apify/Arkham). Depósito em corretora =
+ *  possível distribuição; saque = acumulação. Só mostra com sync fresco (12h). */
+export async function whaleFlowsBlock(supabase: SupabaseClient): Promise<string | null> {
+  try {
+    const since = new Date(Date.now() - 24 * 3_600_000).toISOString();
+    const { data } = await supabase
+      .from('whale_flows')
+      .select('direction, exchange, amount, usd, happened_at, created_at')
+      .eq('symbol', 'BTC')
+      .gte('happened_at', since)
+      .order('usd', { ascending: false });
+    if (!data?.length) return null;
+
+    const newest = Math.max(...data.map((r) => new Date(r.created_at as string).getTime()));
+    if (Date.now() - newest > 12 * 3_600_000) return null; // sync parado: não confiar
+
+    const inflow = data.filter((r) => r.direction === 'in');
+    const outflow = data.filter((r) => r.direction === 'out');
+    const sum = (rows: typeof data) => rows.reduce((a, r) => a + Number(r.usd), 0);
+    const inUsd = sum(inflow);
+    const outUsd = sum(outflow);
+    const net = inUsd - outUsd;
+
+    const fmtM = (v: number) => `$${(Math.abs(v) / 1e6).toFixed(0)}M`;
+    const lines = [
+      `- Entrou nas corretoras: ${fmtM(inUsd)} (${inflow.length} depósitos ≥$1M) · Saiu: ${fmtM(outUsd)} (${outflow.length} saques)`,
+    ];
+    const top = inflow[0];
+    if (top) {
+      const hh = new Date(top.happened_at as string).toISOString().slice(11, 16);
+      lines.push(
+        `- Maior depósito: ${Number(top.amount).toFixed(0)} BTC (${fmtM(Number(top.usd))}) na ${top.exchange} às ${hh} UTC`,
+      );
+    }
+    const read = net >= 200e6
+      ? 'depósitos dominam FORTE — oferta potencial chegando nas corretoras (distribuição), cuidado com longs'
+      : net <= -200e6
+        ? 'saques dominam FORTE — BTC saindo das corretoras (acumulação)'
+        : net >= 0
+          ? 'leve viés de depósitos, sem dominância clara'
+          : 'leve viés de saques, sem dominância clara';
+    lines.push(`- Saldo 24h: ${net >= 0 ? '+' : '−'}${fmtM(net)} → ${read}`);
+    return '[BALEIAS BTC ↔ CORRETORAS — transações ≥$1M nas últimas 24h]\n' + lines.join('\n');
+  } catch (error) {
+    console.error('whaleFlowsBlock failed', error);
+    return null;
+  }
 }
 
 /** BTCUSDT por padrão; se o texto do aluno citar um par da Binance (ex.

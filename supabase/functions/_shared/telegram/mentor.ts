@@ -5,7 +5,7 @@
 
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 import { computeStats, fetchTrades, fmtMoney, fmtPct, localDate } from './stats.ts';
-import { marketContextBlock } from './macro.ts';
+import { marketContextBlock, upcomingEventsBlock, etfFlowsBlock, liquidationZonesBlock, whaleFlowsBlock } from './macro.ts';
 
 const GATEWAY_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
 const MODEL = 'google/gemini-2.5-flash';
@@ -34,7 +34,9 @@ PROTOCOLO DE AVALIAÇÃO TOP-DOWN (siga como um trader profissional avalia, na o
 2. Regime cripto: estrutura do BTC no diário/4H — altcoin só opera se o BTC permitir.
 3. Microestrutura: Long/Short ratio, funding rate e Open Interest vêm automáticos no contexto —
    interprete-os (funding sobrealavancado = não comprar rompimento; preço subindo com OI caindo =
-   short covering sem força). Liquidation heatmap e CVD só o aluno vê: peça quando forem decisivos.
+   short covering sem força). Heatmap de liquidações, fluxos de ETFs e fluxo de baleias↔corretoras
+   também vêm automáticos quando disponíveis — use-os sem pedir. CVD e footprint só o aluno vê:
+   peça quando forem decisivos.
 4. Estrutura do ativo, do maior para o menor timeframe: semanal → diário → 4H/1H → TF de execução.
 5. Encaixe no setup nomeado do aluno: TODAS as condições do setup atendidas? Qual é o nome do setup?
 6. Risco: stop estrutural, tamanho para 1-2%, R:R mínimo 1:3, notícia macro próxima (horário de Barcelona)?
@@ -95,6 +97,18 @@ async function buildContextBlocks(supabase: SupabaseClient, input: MentorInput):
 
   const market = await marketContextBlock(input.text);
   if (market) blocks.push(market);
+
+  const events = await upcomingEventsBlock(supabase, input.timezone);
+  if (events) blocks.push(events);
+
+  const etf = await etfFlowsBlock(supabase);
+  if (etf) blocks.push(etf);
+
+  const liq = await liquidationZonesBlock(supabase);
+  if (liq) blocks.push(liq);
+
+  const whales = await whaleFlowsBlock(supabase);
+  if (whales) blocks.push(whales);
 
   const { data: knowledge } = await supabase
     .from('mentor_knowledge')

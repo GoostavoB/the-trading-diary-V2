@@ -37,6 +37,22 @@ schedule = "*/5 * * * *"      # digests + trade-closed alerts; every send dedupe
 [functions.telegram-generate-link]
 verify_jwt = true
 
+[functions.economic-calendar-sync]
+verify_jwt = false
+schedule = "0 6 * * *"        # 1x/dia: dispara o actor (run-sync) e grava eventos high EUA, hoje→+7d
+
+[functions.etf-flows-sync]
+verify_jwt = false
+schedule = "30 22 * * *"      # 1x/dia após o fechamento de NY: dispara o actor (run-sync) e grava os fluxos
+
+[functions.liquidation-heatmap-sync]
+verify_jwt = false
+schedule = "0 */6 * * *"      # a cada 6h: dispara o actor (run-sync) e destila as zonas do heatmap
+
+[functions.whale-flows-sync]
+verify_jwt = false
+schedule = "20 */6 * * *"     # a cada 6h: dispara o actor (run-sync) e grava fluxos de baleias ≥$1M
+
 [functions.economic-calendar-proxy]
 verify_jwt = true
 
