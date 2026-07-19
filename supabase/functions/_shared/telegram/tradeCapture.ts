@@ -74,12 +74,13 @@ export function validateTrade(t: ExtractedTrade): string[] {
 }
 
 export async function extractTradesFromImage(
-  imageB64: string,
+  imageB64: string | string[],
   imageMime = 'image/jpeg',
 ): Promise<ExtractedTrade[] | null> {
   const apiKey = Deno.env.get('LOVABLE_API_KEY');
   if (!apiKey) return null;
 
+  const images = Array.isArray(imageB64) ? imageB64.slice(0, 4) : [imageB64];
   const response = await fetch(GATEWAY_URL, {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
@@ -89,7 +90,9 @@ export async function extractTradesFromImage(
       messages: [{
         role: 'user',
         content: [
-          { type: 'image_url', image_url: { url: `data:${imageMime};base64,${imageB64}` } },
+          ...images.map((b64) => (
+            { type: 'image_url', image_url: { url: `data:${imageMime};base64,${b64}` } }
+          )),
           { type: 'text', text: extractPrompt() },
         ],
       }],

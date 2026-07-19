@@ -49,6 +49,7 @@ Deno.serve(async (req) => {
     const text: string = (update.message?.text ?? update.message?.caption ?? update.callback_query?.data ?? '').trim();
     const tgUsername: string | null = update.message?.from?.username ?? null;
     const photos: Array<{ file_id: string }> = update.message?.photo ?? [];
+    const mediaGroupId: string | null = update.message?.media_group_id ?? null;
     const inboundMessageId: number | null = update.message?.message_id ?? null;
 
     const { data: linked } = await supabase
@@ -94,6 +95,9 @@ Deno.serve(async (req) => {
         await handleTradeContextReply(
           supabase, chatId, update.message.reply_to_message.message_id, text, linked as LinkedUser)) {
       // resposta (reply) à confirmação de trades salvos — contexto aplicado
+    } else if (photos.length && mediaGroupId) {
+      await handleAlbumPart(
+        supabase, chatId, mediaGroupId, photos, text, inboundMessageId, linked as LinkedUser);
     } else if (photos.length && wantsTradeCapture(text)) {
       await handleTradeCapture(supabase, chatId, photos, linked as LinkedUser);
     } else if (photos.length) {
@@ -302,15 +306,75 @@ function wantsTradeCapture(caption: string): boolean {
   return /\b(registr\w*|salvar?|sobe|subir|adicionar?|di[aá]rio|log)\b/i.test(caption);
 }
 
+// Álbum do Telegram: cada foto chega como update separado, o que fazia o bot
+// responder N vezes a mesma pergunta (e ignorar o gráfico do BTC mandado junto
+// com o do ativo). Cada parte se registra; todas esperam ~4s; só a de MENOR
+// message_id (o líder) baixa o conjunto e dispara UMA análise integrada.
+async function handleAlbumPart(
+  supabase: SupabaseClient,
+  chatId: number,
+  groupId: string,
+  photos: Array<{ file_id: string }>,
+  caption: string,
+  messageId: number | null,
+  user: LinkedUser,
+): Promise<void> {
+  const fileId = photos[photos.length - 1].file_id; // maior resolução desta foto
+  await supabase.from('telegram_message_log').insert({
+    user_id: user.user_id,
+    chat_id: chatId,
+    direction: 'inbound',
+    message_type: 'album_part',
+    content: JSON.stringify({ group: groupId, file_id: fileId, caption, mid: messageId ?? 0 }),
+  });
+
+  await new Promise((resolve) => setTimeout(resolve, 4000));
+
+  const { data } = await supabase
+    .from('telegram_message_log')
+    .select('content')
+    .eq('chat_id', chatId)
+    .eq('message_type', 'album_part')
+    .like('content', `%"group":"${groupId}"%`);
+  const parts = (data ?? [])
+    .map((r) => { try { return JSON.parse(r.content as string); } catch { return null; } })
+    .filter((p): p is { group: string; file_id: string; caption: string; mid: number } => !!p)
+    .sort((a, b) => a.mid - b.mid);
+  if (!parts.length || parts[0].mid !== (messageId ?? 0)) return; // não sou o líder
+
+  const caption_ = parts.map((p) => p.caption).filter(Boolean).join(' ').trim();
+  const images: string[] = [];
+  for (const p of parts.slice(0, 4)) {
+    const b64 = await downloadPhotoB64(p.file_id);
+    if (b64) images.push(b64);
+  }
+  if (!images.length) return;
+
+  if (wantsTradeCapture(caption_)) {
+    await handleTradeCaptureImages(supabase, chatId, images, user);
+  } else {
+    await handleChartImages(supabase, chatId, caption_, images, user);
+  }
+}
+
 async function handleTradeCapture(
   supabase: SupabaseClient,
   chatId: number,
   photos: Array<{ file_id: string }>,
   user: LinkedUser,
 ): Promise<void> {
-  await sendTyping(chatId);
   const imageB64 = await downloadPhotoB64(photos[photos.length - 1].file_id);
-  const trades = imageB64 ? await extractTradesFromImage(imageB64) : null;
+  await handleTradeCaptureImages(supabase, chatId, imageB64 ? [imageB64] : [], user);
+}
+
+async function handleTradeCaptureImages(
+  supabase: SupabaseClient,
+  chatId: number,
+  images: string[],
+  user: LinkedUser,
+): Promise<void> {
+  await sendTyping(chatId);
+  const trades = images.length ? await extractTradesFromImage(images) : null;
 
   if (trades === null) {
     await sendMessage(supabase, chatId, render('mentor_error', user.locale), {
@@ -476,11 +540,20 @@ async function handleChart(
   photos: Array<{ file_id: string }>,
   user: LinkedUser,
 ): Promise<void> {
-  await sendTyping(chatId);
-
   // Last entry = highest resolution. Image stays in memory only.
   const imageB64 = await downloadPhotoB64(photos[photos.length - 1].file_id);
-  if (!imageB64) {
+  await handleChartImages(supabase, chatId, caption, imageB64 ? [imageB64] : [], user);
+}
+
+async function handleChartImages(
+  supabase: SupabaseClient,
+  chatId: number,
+  caption: string,
+  images: string[],
+  user: LinkedUser,
+): Promise<void> {
+  await sendTyping(chatId);
+  if (!images.length) {
     await sendMessage(supabase, chatId, render('mentor_error', user.locale), {
       userId: user.user_id, messageType: 'mentor', plain: true,
     });
@@ -495,7 +568,7 @@ async function handleChart(
     timezone: user.timezone,
     locale: user.locale,
     text: caption || defaultAsk,
-    imageB64,
+    imagesB64: images,
     imageMime: 'image/jpeg',
   });
 
