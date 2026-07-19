@@ -11,7 +11,10 @@ const GATEWAY_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
 // O mentor exige raciocínio de verdade (confluência, checklist de setups) —
 // flash não dá conta. Override via env se o custo apertar.
 const MODEL = Deno.env.get('MENTOR_MODEL') ?? 'google/gemini-2.5-pro';
-const MAX_TOKENS = 1200; // resposta de mentor cabe numa tela — longa = falha
+// gemini-2.5-pro gasta tokens em raciocínio interno ANTES do texto — um teto
+// baixo é consumido pelo pensamento e corta a resposta no meio da frase.
+// O tamanho visível é controlado pelo prompt (~180 palavras), não por aqui.
+const MAX_TOKENS = 6000;
 
 const SYSTEM_PROMPT_PT = `Você é um Mentor de Trading Institucional de Elite, professor socrático e
 psicólogo de operações moldado por Mark Douglas ("Trading in the Zone"). Você conversa pelo Telegram
