@@ -49,7 +49,6 @@ Deno.serve(async (req) => {
     const text: string = (update.message?.text ?? update.message?.caption ?? update.callback_query?.data ?? '').trim();
     const tgUsername: string | null = update.message?.from?.username ?? null;
     const photos: Array<{ file_id: string }> = update.message?.photo ?? [];
-    const mediaGroupId: string | null = update.message?.media_group_id ?? null;
     const inboundMessageId: number | null = update.message?.message_id ?? null;
 
     const { data: linked } = await supabase
@@ -95,13 +94,10 @@ Deno.serve(async (req) => {
         await handleTradeContextReply(
           supabase, chatId, update.message.reply_to_message.message_id, text, linked as LinkedUser)) {
       // resposta (reply) à confirmação de trades salvos — contexto aplicado
-    } else if (photos.length && mediaGroupId) {
-      await handleAlbumPart(
-        supabase, chatId, mediaGroupId, photos, text, inboundMessageId, linked as LinkedUser);
-    } else if (photos.length && wantsTradeCapture(text)) {
-      await handleTradeCapture(supabase, chatId, photos, linked as LinkedUser);
     } else if (photos.length) {
-      await handleChart(supabase, chatId, text, photos, linked as LinkedUser);
+      // TODA foto passa pelo coletor — só a última da leva dispara a análise.
+      await handlePhotoBuffer(
+        supabase, chatId, photos, text, inboundMessageId, linked as LinkedUser);
     } else {
       await handleLinked(supabase, chatId, text, linked as LinkedUser);
     }
@@ -305,45 +301,62 @@ function wantsTradeCapture(caption: string): boolean {
   return /\b(registr\w*|salvar?|sobe|subir|adicionar?|di[aá]rio|log)\b/i.test(caption);
 }
 
-// Álbum do Telegram: cada foto chega como update separado, o que fazia o bot
-// responder N vezes a mesma pergunta (e ignorar o gráfico do BTC mandado junto
-// com o do ativo). Cada parte se registra; todas esperam ~4s; só a de MENOR
-// message_id (o líder) baixa o conjunto e dispara UMA análise integrada.
-async function handleAlbumPart(
+// Coletor de fotos com JANELA DE SILÊNCIO. O Telegram entrega cada foto como
+// update separado (e divide álbuns grandes em levas), o que fazia o bot
+// analisar em pedaços sem coerência. Agora: toda foto entra no buffer; cada
+// uma espera QUIET_MS; só a que NÃO viu ninguém chegar depois dela (a última)
+// junta TUDO que está pendente no chat e dispara UMA análise integrada.
+const QUIET_MS = 12_000;
+const MAX_IMAGES = 8;
+
+async function handlePhotoBuffer(
   supabase: SupabaseClient,
   chatId: number,
-  groupId: string,
   photos: Array<{ file_id: string }>,
   caption: string,
   messageId: number | null,
   user: LinkedUser,
 ): Promise<void> {
   const fileId = photos[photos.length - 1].file_id; // maior resolução desta foto
+  const myMid = messageId ?? 0;
   await supabase.from('telegram_message_log').insert({
     user_id: user.user_id,
     chat_id: chatId,
     direction: 'inbound',
     message_type: 'album_part',
-    content: JSON.stringify({ group: groupId, file_id: fileId, caption, mid: messageId ?? 0 }),
+    content: JSON.stringify({ file_id: fileId, caption, mid: myMid }),
   });
 
-  await new Promise((resolve) => setTimeout(resolve, 4000));
+  await new Promise((resolve) => setTimeout(resolve, QUIET_MS));
 
   const { data } = await supabase
     .from('telegram_message_log')
-    .select('content')
+    .select('id, content')
     .eq('chat_id', chatId)
-    .eq('message_type', 'album_part')
-    .like('content', `%"group":"${groupId}"%`);
-  const parts = (data ?? [])
-    .map((r) => { try { return JSON.parse(r.content as string); } catch { return null; } })
-    .filter((p): p is { group: string; file_id: string; caption: string; mid: number } => !!p)
+    .eq('message_type', 'album_part');
+  const rows = (data ?? [])
+    .map((r) => {
+      try { return { rowId: r.id as string, ...JSON.parse(r.content as string) }; }
+      catch { return null; }
+    })
+    .filter((p): p is { rowId: string; file_id: string; caption: string; mid: number } => !!p)
     .sort((a, b) => a.mid - b.mid);
-  if (!parts.length || parts[0].mid !== (messageId ?? 0)) return; // não sou o líder
+  if (!rows.length) return;
+  // Chegou foto DEPOIS de mim durante a janela? Então não sou o último — saio
+  // calado e deixo o último juntar tudo.
+  if (rows.some((p) => p.mid > myMid)) return;
 
-  const caption_ = parts.map((p) => p.caption).filter(Boolean).join(' ').trim();
+  // Sou o último: consumo o buffer inteiro (marca para não reanalisar depois).
+  await supabase.from('telegram_message_log')
+    .update({ message_type: 'album_part_used' })
+    .in('id', rows.map((p) => p.rowId));
+
+  if (rows.length > MAX_IMAGES) {
+    console.warn(`photo buffer: ${rows.length} fotos, analisando as ${MAX_IMAGES} primeiras`);
+  }
+  const caption_ = rows.map((p) => p.caption).filter(Boolean).join(' ').trim();
   const images: string[] = [];
-  for (const p of parts.slice(0, 8)) {
+  for (const p of rows.slice(0, MAX_IMAGES)) {
     const b64 = await downloadPhotoB64(p.file_id);
     if (b64) images.push(b64);
   }
@@ -354,16 +367,6 @@ async function handleAlbumPart(
   } else {
     await handleChartImages(supabase, chatId, caption_, images, user);
   }
-}
-
-async function handleTradeCapture(
-  supabase: SupabaseClient,
-  chatId: number,
-  photos: Array<{ file_id: string }>,
-  user: LinkedUser,
-): Promise<void> {
-  const imageB64 = await downloadPhotoB64(photos[photos.length - 1].file_id);
-  await handleTradeCaptureImages(supabase, chatId, imageB64 ? [imageB64] : [], user);
 }
 
 async function handleTradeCaptureImages(
@@ -530,18 +533,6 @@ async function handleTradeContextReply(
     (result.setup ? '' : (pt ? '\n(Não identifiquei o setup — se quiser, edita no site.)' : '\n(No setup identified — edit on the site if needed.)')),
     { userId: user.user_id, messageType: 'system', plain: true });
   return true;
-}
-
-async function handleChart(
-  supabase: SupabaseClient,
-  chatId: number,
-  caption: string,
-  photos: Array<{ file_id: string }>,
-  user: LinkedUser,
-): Promise<void> {
-  // Last entry = highest resolution. Image stays in memory only.
-  const imageB64 = await downloadPhotoB64(photos[photos.length - 1].file_id);
-  await handleChartImages(supabase, chatId, caption, imageB64 ? [imageB64] : [], user);
 }
 
 async function handleChartImages(
