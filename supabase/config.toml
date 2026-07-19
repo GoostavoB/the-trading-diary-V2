@@ -37,6 +37,10 @@ schedule = "*/5 * * * *"      # digests + trade-closed alerts; every send dedupe
 [functions.telegram-generate-link]
 verify_jwt = true
 
+[functions.economic-calendar-sync]
+verify_jwt = false
+schedule = "0 6 * * *"        # 1x/dia: puxa o último dataset do actor do Apify
+
 [functions.economic-calendar-proxy]
 verify_jwt = true
 

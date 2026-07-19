@@ -1,7 +1,10 @@
 // Contexto de mercado buscado automaticamente para o mentor: S&P 500, DXY,
-// VIX (Yahoo Finance, endpoint público), BTC (CoinGecko) e Long/Short ratio
-// (Binance Futures, público). Cada fonte falha de forma independente — o
-// mentor recebe o que estiver disponível e pede ao aluno o que faltar.
+// VIX (Yahoo Finance, endpoint público), BTC (CoinGecko), Long/Short ratio,
+// funding e OI (Binance Futures) + calendário econômico (tabela
+// economic_events, sincronizada do Apify). Cada fonte falha de forma
+// independente — o mentor recebe o que estiver disponível.
+
+import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 
 interface Quote {
   label: string;
@@ -147,6 +150,39 @@ export async function marketContextBlock(symbolHint?: string): Promise<string | 
   if (!quotes.length) return null;
   return '[CONTEXTO DE MERCADO — buscado automaticamente agora]\n' +
     quotes.map((q) => `- ${q.label}: ${q.value}`).join('\n');
+}
+
+/** Próximos eventos macro de alto impacto (7 dias), horários em Barcelona.
+ *  Alarme explícito quando faltar menos de 90 minutos. */
+export async function upcomingEventsBlock(supabase: SupabaseClient): Promise<string | null> {
+  try {
+    const now = Date.now();
+    const { data } = await supabase
+      .from('economic_events')
+      .select('event, event_time, all_day_date, importance')
+      .eq('importance', 'high')
+      .gte('event_time', new Date(now - 3_600_000).toISOString())
+      .lte('event_time', new Date(now + 7 * 86_400_000).toISOString())
+      .order('event_time', { ascending: true })
+      .limit(6);
+    if (!data?.length) return null;
+
+    const fmt = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'Europe/Madrid', day: '2-digit', month: '2-digit',
+      hour: '2-digit', minute: '2-digit',
+    });
+    const lines = data.map((e) => {
+      const t = new Date(e.event_time as string);
+      const minutes = Math.round((t.getTime() - now) / 60_000);
+      const soon = minutes >= -60 && minutes <= 90
+        ? ` ⚠️ EM ${Math.max(minutes, 0)} MIN — liquidez some, não operar` : '';
+      return `- ${fmt.format(t)} (Barcelona): ${e.event}${soon}`;
+    });
+    return '[CALENDÁRIO MACRO EUA — alto impacto, próximos 7 dias]\n' + lines.join('\n');
+  } catch (error) {
+    console.error('upcomingEventsBlock failed', error);
+    return null;
+  }
 }
 
 /** BTCUSDT por padrão; se o texto do aluno citar um par da Binance (ex.
