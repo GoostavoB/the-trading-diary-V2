@@ -25,6 +25,7 @@ function sanitizePlain(text: string): string {
   return text
     .replace(/^#{1,6}\s+/gm, '')        // cabeçalhos markdown
     .replace(/\*\*([^*\n]+)\*\*/g, '$1') // **negrito**
+    .replace(/\*([^*\n]{1,80})\*/g, '$1') // *itálico* solto
     .replace(/__([^_\n]+)__/g, '$1')     // __negrito__
     .replace(/^\s*[*-]\s+/gm, '• ')      // bullets * e - viram •
     .replace(/```[a-z]*\n?/g, '')        // cercas de código
