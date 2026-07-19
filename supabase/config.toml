@@ -49,6 +49,10 @@ schedule = "30 22 * * *"      # 1x/dia após o fechamento de NY: fluxos dos ETFs
 verify_jwt = false
 schedule = "0 */6 * * *"      # a cada 6h: destila as zonas do heatmap CoinGlass (Apify)
 
+[functions.whale-flows-sync]
+verify_jwt = false
+schedule = "20 */6 * * *"     # a cada 6h: dispara o actor (run-sync) e grava fluxos de baleias ≥$1M
+
 [functions.economic-calendar-proxy]
 verify_jwt = true
 

@@ -262,6 +262,56 @@ export async function etfFlowsBlock(supabase: SupabaseClient): Promise<string | 
   }
 }
 
+/** Baleias: transações ≥$1M de BTC entre carteiras e as grandes corretoras
+ *  (últimas 24h, tabela whale_flows via Apify/Arkham). Depósito em corretora =
+ *  possível distribuição; saque = acumulação. Só mostra com sync fresco (12h). */
+export async function whaleFlowsBlock(supabase: SupabaseClient): Promise<string | null> {
+  try {
+    const since = new Date(Date.now() - 24 * 3_600_000).toISOString();
+    const { data } = await supabase
+      .from('whale_flows')
+      .select('direction, exchange, amount, usd, happened_at, created_at')
+      .eq('symbol', 'BTC')
+      .gte('happened_at', since)
+      .order('usd', { ascending: false });
+    if (!data?.length) return null;
+
+    const newest = Math.max(...data.map((r) => new Date(r.created_at as string).getTime()));
+    if (Date.now() - newest > 12 * 3_600_000) return null; // sync parado: não confiar
+
+    const inflow = data.filter((r) => r.direction === 'in');
+    const outflow = data.filter((r) => r.direction === 'out');
+    const sum = (rows: typeof data) => rows.reduce((a, r) => a + Number(r.usd), 0);
+    const inUsd = sum(inflow);
+    const outUsd = sum(outflow);
+    const net = inUsd - outUsd;
+
+    const fmtM = (v: number) => `$${(Math.abs(v) / 1e6).toFixed(0)}M`;
+    const lines = [
+      `- Entrou nas corretoras: ${fmtM(inUsd)} (${inflow.length} depósitos ≥$1M) · Saiu: ${fmtM(outUsd)} (${outflow.length} saques)`,
+    ];
+    const top = inflow[0];
+    if (top) {
+      const hh = new Date(top.happened_at as string).toISOString().slice(11, 16);
+      lines.push(
+        `- Maior depósito: ${Number(top.amount).toFixed(0)} BTC (${fmtM(Number(top.usd))}) na ${top.exchange} às ${hh} UTC`,
+      );
+    }
+    const read = net >= 200e6
+      ? 'depósitos dominam FORTE — oferta potencial chegando nas corretoras (distribuição), cuidado com longs'
+      : net <= -200e6
+        ? 'saques dominam FORTE — BTC saindo das corretoras (acumulação)'
+        : net >= 0
+          ? 'leve viés de depósitos, sem dominância clara'
+          : 'leve viés de saques, sem dominância clara';
+    lines.push(`- Saldo 24h: ${net >= 0 ? '+' : '−'}${fmtM(net)} → ${read}`);
+    return '[BALEIAS BTC ↔ CORRETORAS — transações ≥$1M nas últimas 24h]\n' + lines.join('\n');
+  } catch (error) {
+    console.error('whaleFlowsBlock failed', error);
+    return null;
+  }
+}
+
 /** BTCUSDT por padrão; se o texto do aluno citar um par da Binance (ex.
  *  "ETH", "SOLUSDT"), usa o LSR desse par. */
 function normalizeLsrSymbol(hint?: string): string {

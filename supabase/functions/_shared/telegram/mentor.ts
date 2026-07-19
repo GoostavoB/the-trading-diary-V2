@@ -5,7 +5,7 @@
 
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 import { computeStats, fetchTrades, fmtMoney, fmtPct, localDate } from './stats.ts';
-import { marketContextBlock, upcomingEventsBlock, etfFlowsBlock, liquidationZonesBlock } from './macro.ts';
+import { marketContextBlock, upcomingEventsBlock, etfFlowsBlock, liquidationZonesBlock, whaleFlowsBlock } from './macro.ts';
 
 const GATEWAY_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
 const MODEL = 'google/gemini-2.5-flash';
@@ -104,6 +104,9 @@ async function buildContextBlocks(supabase: SupabaseClient, input: MentorInput):
 
   const liq = await liquidationZonesBlock(supabase);
   if (liq) blocks.push(liq);
+
+  const whales = await whaleFlowsBlock(supabase);
+  if (whales) blocks.push(whales);
 
   const { data: knowledge } = await supabase
     .from('mentor_knowledge')
