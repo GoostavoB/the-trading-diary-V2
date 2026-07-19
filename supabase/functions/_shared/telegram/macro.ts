@@ -189,6 +189,46 @@ export async function upcomingEventsBlock(
   }
 }
 
+/** Fluxos dos ETFs spot (institucional): último dia + soma 7 dias, com
+ *  leitura de regime. Dados da tabela etf_flows (sync via Apify/SoSoValue). */
+export async function etfFlowsBlock(supabase: SupabaseClient): Promise<string | null> {
+  try {
+    const since = new Date(Date.now() - 8 * 86_400_000).toISOString().slice(0, 10);
+    const { data } = await supabase
+      .from('etf_flows')
+      .select('etf_type, flow_date, net_inflow_usd')
+      .gte('flow_date', since)
+      .order('flow_date', { ascending: false });
+    if (!data?.length) return null;
+
+    const LABELS: Record<string, string> = {
+      'us-btc-spot': 'ETFs BTC', 'us-eth-spot': 'ETFs ETH', 'us-sol-spot': 'ETFs SOL',
+    };
+    const byType = new Map<string, { latest: number; latestDate: string; sum7: number }>();
+    for (const r of data) {
+      const entry = byType.get(r.etf_type) ?? { latest: NaN, latestDate: '', sum7: 0 };
+      if (!entry.latestDate) { entry.latest = r.net_inflow_usd; entry.latestDate = r.flow_date; }
+      entry.sum7 += r.net_inflow_usd;
+      byType.set(r.etf_type, entry);
+    }
+
+    const fmtM = (v: number) => `${v < 0 ? '−' : '+'}$${Math.abs(v / 1e6).toFixed(0)}M`;
+    const lines: string[] = [];
+    for (const [type, e] of byType) {
+      const strong = Math.abs(e.latest) >= 500e6;
+      const read = e.latest >= 0
+        ? (strong ? 'inflow FORTE — demanda institucional' : 'inflow')
+        : (strong ? 'OUTFLOW FORTE — instituições reduzindo risco' : 'outflow');
+      lines.push(`- ${LABELS[type] ?? type}: ${fmtM(e.latest)} no último dia (${read}) · 7d: ${fmtM(e.sum7)}`);
+    }
+    if (!lines.length) return null;
+    return '[FLUXOS DE ETFs SPOT — posicionamento institucional]\n' + lines.join('\n');
+  } catch (error) {
+    console.error('etfFlowsBlock failed', error);
+    return null;
+  }
+}
+
 /** BTCUSDT por padrão; se o texto do aluno citar um par da Binance (ex.
  *  "ETH", "SOLUSDT"), usa o LSR desse par. */
 function normalizeLsrSymbol(hint?: string): string {

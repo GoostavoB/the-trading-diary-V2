@@ -41,6 +41,10 @@ verify_jwt = true
 verify_jwt = false
 schedule = "0 6 * * *"        # 1x/dia: puxa o último dataset do actor do Apify
 
+[functions.etf-flows-sync]
+verify_jwt = false
+schedule = "30 22 * * *"      # 1x/dia após o fechamento de NY: fluxos dos ETFs spot
+
 [functions.economic-calendar-proxy]
 verify_jwt = true
 
