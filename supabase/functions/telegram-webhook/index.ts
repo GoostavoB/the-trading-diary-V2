@@ -295,7 +295,6 @@ async function handleLinked(
       await sendMessage(supabase, chatId, reply ?? render('mentor_error', user.locale), {
         userId: user.user_id,
         messageType: 'mentor',
-    plain: true,
         plain: true,
       });
     }
