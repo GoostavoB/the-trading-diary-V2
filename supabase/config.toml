@@ -43,11 +43,11 @@ schedule = "0 6 * * *"        # 1x/dia: puxa o último dataset do actor do Apify
 
 [functions.etf-flows-sync]
 verify_jwt = false
-schedule = "30 22 * * *"      # 1x/dia após o fechamento de NY: fluxos dos ETFs spot
+schedule = "30 22 * * *"      # 1x/dia após o fechamento de NY: dispara o actor (run-sync) e grava os fluxos
 
 [functions.liquidation-heatmap-sync]
 verify_jwt = false
-schedule = "0 */6 * * *"      # a cada 6h: destila as zonas do heatmap CoinGlass (Apify)
+schedule = "0 */6 * * *"      # a cada 6h: dispara o actor (run-sync) e destila as zonas do heatmap
 
 [functions.whale-flows-sync]
 verify_jwt = false

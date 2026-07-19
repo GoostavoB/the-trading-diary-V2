@@ -1,7 +1,7 @@
 // Sincroniza fluxos diários dos ETFs spot de cripto (BTC/ETH/SOL) a partir
 // do actor gochujang/crypto-etf-flow-tracker no Apify (dados SoSoValue).
-// O usuário agenda o actor no Apify; esta função (cron diário) lê o dataset
-// da última execução bem-sucedida. Secret: APIFY_TOKEN (o mesmo do calendário).
+// Esta função DISPARA o actor na hora (run-sync, ~6s) — não precisa de
+// schedule no console do Apify. Secret: APIFY_TOKEN (o mesmo do calendário).
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 
@@ -32,9 +32,22 @@ Deno.serve(async (_req) => {
 
   try {
     const res = await fetch(
-      `https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/runs/last/dataset/items` +
-      `?token=${encodeURIComponent(token)}&status=SUCCEEDED&clean=true`,
-      { signal: AbortSignal.timeout(30_000) },
+      `https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/run-sync-get-dataset-items` +
+      `?token=${encodeURIComponent(token)}&timeout=120&maxTotalChargeUsd=0.10&clean=true`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          etfTypes: ['us-btc-spot', 'us-eth-spot', 'us-sol-spot'],
+          lookbackDays: 8,
+          sortBy: 'date_desc',
+          alertOutflowUsd: 0,
+          alertInflowUsd: 0,
+          telegramBotToken: '',
+          telegramChatId: '',
+        }),
+        signal: AbortSignal.timeout(140_000),
+      },
     );
     if (!res.ok) {
       console.error('Apify fetch failed', res.status);

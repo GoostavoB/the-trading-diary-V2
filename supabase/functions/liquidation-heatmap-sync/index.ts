@@ -2,6 +2,9 @@
 // api_merge/coinglass-liquidation-heatmap no Apify) nas zonas densas que
 // importam: top bolsões acima e abaixo do preço atual. O dataset bruto tem
 // milhares de pontos [tempo, nivel, valor]; guardamos só o resumo.
+// Esta função DISPARA o actor na hora (run-sync, ~4s) — não precisa de
+// schedule no console do Apify. O preço atual vem do ticker spot da Binance
+// (o actor deixou de mandar candles no dataset).
 // Secret: APIFY_TOKEN (o mesmo). Actor configurável via APIFY_HEATMAP_ACTOR_ID.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
@@ -12,7 +15,16 @@ const TOP_ZONES_PER_SIDE = 4;
 interface HeatmapItem {
   y_axis: number[];
   liquidation_leverage_data: Array<[number, number, number]>;
-  price_candlesticks: Array<[number, string, string, string, string, string]>;
+  price_candlesticks?: Array<[number, string, string, string, string, string]>;
+}
+
+async function btcSpotPrice(): Promise<number> {
+  const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT', {
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!res.ok) return NaN;
+  const data = await res.json();
+  return Number(data?.price);
 }
 
 Deno.serve(async (_req) => {
@@ -30,9 +42,14 @@ Deno.serve(async (_req) => {
 
   try {
     const res = await fetch(
-      `https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/runs/last/dataset/items` +
-      `?token=${encodeURIComponent(token)}&status=SUCCEEDED&clean=true`,
-      { signal: AbortSignal.timeout(60_000) },
+      `https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/run-sync-get-dataset-items` +
+      `?token=${encodeURIComponent(token)}&timeout=120&maxTotalChargeUsd=0.10&clean=true`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symbol: 'BTC', model: 'model1', interval: '24h' }),
+        signal: AbortSignal.timeout(140_000),
+      },
     );
     if (!res.ok) {
       console.error('Apify fetch failed', res.status);
@@ -44,9 +61,10 @@ Deno.serve(async (_req) => {
       return json({ ok: false, error: 'dataset vazio ou formato inesperado' });
     }
 
-    // Preço atual = fechamento do último candle.
+    // Preço atual: último candle se o actor mandar; senão, ticker da Binance.
     const lastCandle = data.price_candlesticks?.[data.price_candlesticks.length - 1];
-    const currentPrice = lastCandle ? Number(lastCandle[4]) : NaN;
+    let currentPrice = lastCandle ? Number(lastCandle[4]) : NaN;
+    if (!Number.isFinite(currentPrice)) currentPrice = await btcSpotPrice();
     if (!Number.isFinite(currentPrice)) {
       return json({ ok: false, error: 'preço atual indisponível' });
     }
