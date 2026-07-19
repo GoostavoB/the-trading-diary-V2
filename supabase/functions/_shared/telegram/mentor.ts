@@ -436,7 +436,7 @@ export async function mentorReply(supabase: SupabaseClient, input: MentorInput):
 
   const userContent: unknown[] = [];
   const images = input.imagesB64 ?? (input.imageB64 ? [input.imageB64] : []);
-  for (const b64 of images.slice(0, 8)) {
+  for (const b64 of images.slice(0, 16)) {
     userContent.push({
       type: 'image_url',
       image_url: { url: `data:${input.imageMime ?? 'image/jpeg'};base64,${b64}` },
