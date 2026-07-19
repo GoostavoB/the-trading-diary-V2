@@ -4,7 +4,7 @@
 // Ported from the standalone Python prototype's system prompt.
 
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
-import { computeStats, fetchTrades, fmtMoney, fmtPct, localDate } from './stats.ts';
+import { computeStats, fetchTrades, fmtMoney, fmtPct, localClock, localDate } from './stats.ts';
 import { marketContextBlock, upcomingEventsBlock, etfFlowsBlock, liquidationZonesBlock, whaleFlowsBlock } from './macro.ts';
 
 const GATEWAY_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
@@ -46,6 +46,26 @@ não pergunte o que já está ali. Do restante do protocolo, avalie o que o alun
 máximo 1-2 itens faltantes POR MENSAGEM (os mais críticos primeiro), construindo o processo em
 diálogo — nunca despeje o checklist inteiro de uma vez. Só valide a execução quando o protocolo
 estiver completo.
+
+HIERARQUIA DE DECISÃO (a ordem em que as coisas mandam — nunca inverta):
+1. SETUP NOMEADO é o edge. Se o gráfico bate TODAS as condições de um setup do aluno (Vitória,
+   Scalp do Vitão, Meio-Dia, Torres Gêmeas, Lamborghini, Perfeição, DIVAP), o trade nasce válido:
+   diga QUAL setup e o que confirma cada condição. Sem setup nomeado, deixe claro — "isso é
+   impulso, não é plano" — e o placar de confluência fica no máximo 5, com mão reduzida.
+2. REGRAS DE OURO (vetos) do [CONHECIMENTO ENSINADO] passam por cima de TUDO, inclusive de setup
+   perfeito (ex.: LSR abaixo de 1 caindo rápido = short vetado). Veto bateu → é não, cite a regra.
+3. ESTRUTURA ANTES DE OPINIÃO: antes de qualquer veredito, localize o suporte e a resistência mais
+   PRÓXIMOS (acima e abaixo) e a tendência do timeframe maior. Calcule o R:R REALISTA em números:
+   stop no S/R lógico, alvo no PRIMEIRO obstáculo — não além dele. "Stop a 2,1% (caro), primeira
+   resistência a 1,3% (curta) → R:R ~1:0,6 = trade ruim" — R:R realista ruim mata o trade mesmo
+   com setup bonito. Long colado em resistência forte = realização curta; stop longe do suporte =
+   risco caro. Fale isso ANTES de discutir indicador.
+4. INDICADORES E FLUXOS MODULAM A MÃO, não a direção: funding, LSR, OI, ETFs, baleias e heatmap
+   decidem se vai de mão cheia, meia mão ou gestão apertada. A direção vem do setup + estrutura.
+5. CONTEXTO MODULA TAMBÉM: sábado/domingo = liquidez fina, volatilidade traiçoeira → mão menor por
+   padrão e diga isso. Notícia high em menos de 2h = alerta explícito — ainda mais se o trade é
+   swing ("vai carregar a posição através da notícia?"). A sessão ativa (Ásia/Londres/NY) muda o
+   comportamento esperado do ativo.
 
 CONFLUÊNCIA E CALIBRAGEM (o coração da análise — regras inegociáveis):
 1. NUNCA liste os dados um a um ("o funding tá X, o VIX tá Y, os ETFs tão Z"). CRUZE-OS: cada
@@ -100,7 +120,12 @@ revenge trading. Use the provided context blocks: [CHART LEGEND] (how to read TH
 trades — personalize with them), [CONTEXTO DE MERCADO] (live S&P/DXY/VIX/BTC/LSR — use it, don't ask
 for it). Follow a top-down evaluation protocol (macro regime → BTC regime → microstructure → asset
 structure weekly→execution TF → named setup fit → risk → psychology), asking for at most 1-2 missing
-items per message, building the process as a dialogue. CONFLUENCE IS THE CORE: never list data
+items per message, building the process as a dialogue. DECISION HIERARCHY: the user's named setup is
+the edge (no setup = impulse trade, score capped at 5, reduced size); taught golden-rule VETOES
+override everything including a perfect setup; locate nearest support/resistance and compute the
+REALISTIC R:R to the FIRST obstacle before any verdict (bad realistic R:R kills the trade);
+indicators/flows size the hand, not the direction; weekends and imminent high-impact news shrink
+size. CONFLUENCE IS THE CORE: never list data
 points one by one — cross them, say which signals agree vs conflict and which dominates for the
 trade's timeframe. Give a 0-10 confluence score for the side in question: 0-3 stay flat, 4-6
 tradeable at HALF risk, 7-10 normal risk. Absolute prohibition only for risk-management violations
@@ -144,7 +169,7 @@ async function buildContextBlocks(supabase: SupabaseClient, input: MentorInput):
     .select('kind, content')
     .eq('user_id', input.userId)
     .order('created_at', { ascending: true })
-    .limit(40);
+    .limit(200);
 
   const legend = (knowledge ?? []).filter((k) => k.kind === 'chart_legend');
   const taught = (knowledge ?? []).filter((k) => k.kind !== 'chart_legend');
@@ -175,8 +200,15 @@ async function buildContextBlocks(supabase: SupabaseClient, input: MentorInput):
     );
   }
 
+  const { dow } = localClock(input.timezone);
+  const dowName = (pt
+    ? ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado']
+    : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'])[dow];
+  const weekend = dow === 0 || dow === 6;
   blocks.push(
-    (pt ? 'Data/hora local do aluno: ' : "User's local date: ") + localDate(input.timezone),
+    (pt ? 'Data/hora local do aluno: ' : "User's local date: ") +
+    `${localDate(input.timezone)} (${dowName})` +
+    (weekend ? (pt ? ' — FIM DE SEMANA: liquidez fina, mão menor' : ' — WEEKEND: thin liquidity, size down') : ''),
   );
   return blocks.join('\n\n');
 }
