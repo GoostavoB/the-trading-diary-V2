@@ -189,6 +189,39 @@ export async function upcomingEventsBlock(
   }
 }
 
+/** Zonas densas de liquidação (CoinGlass via Apify) — os "ímãs" de preço.
+ *  Só mostra se o snapshot tem menos de 36h (heatmap velho engana). */
+export async function liquidationZonesBlock(supabase: SupabaseClient): Promise<string | null> {
+  try {
+    const { data } = await supabase
+      .from('liq_zones')
+      .select('side, price, liq_usd, pct_away, ref_price, updated_at')
+      .eq('symbol', 'BTC')
+      .order('liq_usd', { ascending: false });
+    if (!data?.length) return null;
+
+    const ageMs = Date.now() - new Date(data[0].updated_at as string).getTime();
+    if (ageMs > 36 * 3_600_000) return null;
+
+    const fmt = (z: { price: number; liq_usd: number; pct_away: number }) =>
+      `$${Math.round(z.price).toLocaleString('en-US')} → $${(z.liq_usd / 1e6).toFixed(0)}M (${z.pct_away >= 0 ? '+' : ''}${z.pct_away.toFixed(1)}%)`;
+    const above = data.filter((z) => z.side === 'above').slice(0, 3);
+    const below = data.filter((z) => z.side === 'below').slice(0, 3);
+
+    const lines: string[] = [];
+    if (above.length) lines.push(`- Acima do preço: ${above.map(fmt).join(' · ')}`);
+    if (below.length) lines.push(`- Abaixo do preço: ${below.map(fmt).join(' · ')}`);
+    if (!lines.length) return null;
+
+    const hours = Math.round(ageMs / 3_600_000);
+    return `[HEATMAP DE LIQUIDAÇÕES BTC — bolsões densos (ímãs de preço), snapshot de ${hours}h atrás]\n` +
+      lines.join('\n');
+  } catch (error) {
+    console.error('liquidationZonesBlock failed', error);
+    return null;
+  }
+}
+
 /** Fluxos dos ETFs spot (institucional): último dia + soma 7 dias, com
  *  leitura de regime. Dados da tabela etf_flows (sync via Apify/SoSoValue). */
 export async function etfFlowsBlock(supabase: SupabaseClient): Promise<string | null> {
