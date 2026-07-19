@@ -105,7 +105,13 @@ CONFLUÊNCIA E CALIBRAGEM (o coração da análise — regras inegociáveis):
 
 VOCÊ RECEBE BLOCOS DE CONTEXTO:
 - [LEGENDA DO GRÁFICO DO ALUNO]: como ler as médias e indicadores que ELE usa. Respeite essa legenda.
-- [CONHECIMENTO ENSINADO]: regras e setups que o aluno te ensinou. Cite-os quando relevantes.
+- [CONHECIMENTO ENSINADO]: o cérebro que o aluno construiu, organizado por ÁREAS (vetos, setups,
+  S/R, linhas de tendência, padrões, fibonacci, candles, gestão...). Em toda análise percorra as
+  áreas relevantes na ordem da hierarquia — VETOS primeiro — e diga de qual área veio cada
+  conclusão ("pela tua aula de padrões...", "teu veto de LSR..."). Nunca use só uma área quando o
+  caso toca várias: setup sem estrutura, ou padrão sem gestão, é análise pela metade.
+- QUANDO O ALUNO TE CORRIGIR ou ensinar algo novo no papo: incorpore NA HORA na análise e sugira
+  em uma linha: "quer que eu grave isso? manda /lesson <a regra>". É assim que você aprende.
 - [DIÁRIO DO ALUNO]: taxa de acerto real e trades recentes. Use para personalizar
   ("seu diário mostra X — por que repetir?").
 
@@ -253,6 +259,31 @@ structural one and confirm. Always classify the trade as scalp or swing (changes
 hand). Dual score when location changes the game ("at the zone: 7/10 · at market: 3/10").
 Truncated user message → answer what you can + one short question, never restart-protocol drama.`;
 
+// O cérebro do mentor: agrupa o conhecimento ensinado em áreas nomeadas para
+// o modelo NAVEGAR o conjunto (vetos primeiro — eles mandam em tudo), em vez
+// de receber uma sopa de ~100 regras soltas.
+const BRAIN_AREAS: Array<[RegExp, string]> = [
+  [/^(REGRA DE OURO|ATUALIZAÇÃO CME)/i, 'VETOS E REGRAS DE OURO'],
+  [/^S\/R \d/i, 'SUPORTE E RESISTÊNCIA (aula)'],
+  [/^SRI \d/i, 'S/R INSTITUCIONAL (on-chain, volume profile, players)'],
+  [/^LT \d/i, 'LINHAS DE TENDÊNCIA'],
+  [/^PG \d/i, 'PADRÕES GRÁFICOS'],
+  [/^MM-S\/R/i, 'MÉDIAS MÓVEIS COMO S/R'],
+  [/divap|aptc/i, 'DIVAP E SINAIS'],
+  [/fibo/i, 'FIBONACCI'],
+  [/mantra|douglas/i, 'PSICOLOGIA (MARK DOUGLAS)'],
+  [/candle|pavio|martelo|engolfo|doji/i, 'CANDLES'],
+  [/volume|dow/i, 'VOLUME E DOW'],
+  [/banca|alavancagem|gest[ãa]o|parcia|risco/i, 'GESTÃO DE RISCO E MÃO'],
+];
+const AREA_ORDER = [
+  'VETOS E REGRAS DE OURO', 'SETUPS DO ALUNO', 'SUPORTE E RESISTÊNCIA (aula)',
+  'S/R INSTITUCIONAL (on-chain, volume profile, players)', 'LINHAS DE TENDÊNCIA',
+  'MÉDIAS MÓVEIS COMO S/R', 'PADRÕES GRÁFICOS', 'FIBONACCI', 'CANDLES',
+  'VOLUME E DOW', 'DIVAP E SINAIS', 'GESTÃO DE RISCO E MÃO',
+  'PROCESSO E CONTEXTO INSTITUCIONAL', 'PSICOLOGIA (MARK DOUGLAS)', 'OUTRAS REGRAS',
+];
+
 export interface MentorInput {
   userId: string;
   timezone: string;
@@ -298,9 +329,26 @@ async function buildContextBlocks(supabase: SupabaseClient, input: MentorInput):
     );
   }
   if (taught.length) {
+    const areaOf = (k: { kind: string; content: string }): string => {
+      if (k.kind === 'setup') return 'SETUPS DO ALUNO';
+      if (k.kind === 'process') return 'PROCESSO E CONTEXTO INSTITUCIONAL';
+      for (const [re, area] of BRAIN_AREAS) if (re.test(k.content)) return area;
+      return 'OUTRAS REGRAS';
+    };
+    const byArea = new Map<string, string[]>();
+    for (const k of taught) {
+      const area = areaOf(k as { kind: string; content: string });
+      if (!byArea.has(area)) byArea.set(area, []);
+      byArea.get(area)!.push(`- ${k.content}`);
+    }
+    const sections = AREA_ORDER
+      .filter((a) => byArea.has(a))
+      .map((a) => `《${a}》\n${byArea.get(a)!.join('\n')}`);
     blocks.push(
-      (pt ? '[CONHECIMENTO ENSINADO]\n' : '[TAUGHT KNOWLEDGE]\n') +
-      taught.map((k) => `- ${k.content}`).join('\n'),
+      (pt
+        ? '[CONHECIMENTO ENSINADO — o cérebro que o aluno construiu, organizado por áreas. Percorra TODAS as áreas relevantes ao caso, não só a primeira que bater; vetos SEMPRE se checam primeiro]\n'
+        : '[TAUGHT KNOWLEDGE — the brain the user built, organized by areas. Traverse ALL areas relevant to the case; always check vetoes first]\n') +
+      sections.join('\n\n'),
     );
   }
 
