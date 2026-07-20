@@ -11,6 +11,7 @@ const GATEWAY_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
 // O mentor exige raciocínio de verdade (confluência, checklist de setups) —
 // flash não dá conta. Override via env se o custo apertar.
 const MODEL = Deno.env.get('MENTOR_MODEL') ?? 'google/gemini-2.5-pro';
+const FALLBACK_MODEL = 'google/gemini-2.5-flash';
 // gemini-2.5-pro gasta tokens em raciocínio interno ANTES do texto — um teto
 // baixo é consumido pelo pensamento e corta a resposta no meio da frase.
 // O tamanho visível é controlado pelo prompt (~180 palavras), não por aqui.
@@ -474,30 +475,45 @@ export async function mentorReply(supabase: SupabaseClient, input: MentorInput):
   }
   userContent.push({ type: 'text', text: `${context}\n\n---\n${input.text}` });
 
-  const response = await fetch(GATEWAY_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: MAX_TOKENS,
-      messages: [
-        { role: 'system', content: input.locale === 'pt' ? SYSTEM_PROMPT_PT : SYSTEM_PROMPT_EN },
-        ...history,
-        { role: 'user', content: userContent },
-      ],
-    }),
-  });
+  const messages = [
+    { role: 'system', content: input.locale === 'pt' ? SYSTEM_PROMPT_PT : SYSTEM_PROMPT_EN },
+    ...history,
+    { role: 'user', content: userContent },
+  ];
 
-  if (!response.ok) {
-    console.error('AI gateway error', response.status, await response.text().catch(() => ''));
-    return null;
+  // Resiliência: o gateway engasga de vez em quando (429/5xx). Tenta o modelo
+  // principal 2x; se seguir fora, cai para o flash — resposta pior > nenhuma.
+  const attempt = async (model: string): Promise<string | null> => {
+    try {
+      const response = await fetch(GATEWAY_URL, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model, max_tokens: MAX_TOKENS, messages }),
+        signal: AbortSignal.timeout(120_000),
+      });
+      if (!response.ok) {
+        console.error('AI gateway error', model, response.status, await response.text().catch(() => ''));
+        return null;
+      }
+      const data = await response.json();
+      const reply: string | undefined = data?.choices?.[0]?.message?.content;
+      return reply?.trim() || null;
+    } catch (error) {
+      console.error('AI gateway fetch failed', model, String(error));
+      return null;
+    }
+  };
+
+  let reply = await attempt(MODEL);
+  if (!reply) {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    reply = await attempt(MODEL);
   }
-  const data = await response.json();
-  const reply: string | undefined = data?.choices?.[0]?.message?.content;
-  return reply?.trim() || null;
+  if (!reply && MODEL !== FALLBACK_MODEL) {
+    console.warn('mentor: modelo principal fora, caindo para', FALLBACK_MODEL);
+    reply = await attempt(FALLBACK_MODEL);
+  }
+  return reply;
 }
 
 /** Persists something the user taught the mentor. Returns false on failure. */
