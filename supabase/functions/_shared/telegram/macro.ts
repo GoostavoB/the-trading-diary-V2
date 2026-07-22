@@ -119,11 +119,32 @@ async function fetchDominance(): Promise<string | null> {
   }
 }
 
+/** Preço spot atual do par citado — a ÂNCORA anti-alucinação: sem ela o
+ *  modelo inventa níveis da memória de treinamento (NEAR a "$6,80"...). */
+async function fetchSpotTicker(symbol: string): Promise<string | null> {
+  try {
+    const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`, {
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return null;
+    const d = await res.json();
+    const px = Number(d?.lastPrice);
+    const chg = Number(d?.priceChangePercent);
+    if (!Number.isFinite(px)) return null;
+    const fmt = px >= 100
+      ? px.toLocaleString('en-US', { maximumFractionDigits: 0 })
+      : px >= 1 ? px.toFixed(2) : px.toFixed(4);
+    return `$${fmt} (${Number.isFinite(chg) && chg >= 0 ? '+' : ''}${Number.isFinite(chg) ? chg.toFixed(1) : '?'}% 24h) — todo nível citado deve ser coerente com ESTE preço`;
+  } catch {
+    return null;
+  }
+}
+
 /** Bloco [CONTEXTO DE MERCADO] injetado em toda análise do mentor.
  *  Retorna null se absolutamente nada estiver disponível. */
 export async function marketContextBlock(symbolHint?: string): Promise<string | null> {
   const lsrSymbol = normalizeLsrSymbol(symbolHint);
-  const [spx, vix, dxy, btc, lsr, funding, oi, dom] = await Promise.all([
+  const [spx, vix, dxy, btc, lsr, funding, oi, dom, pairPx] = await Promise.all([
     fetchYahoo('^GSPC'),
     fetchYahoo('^VIX'),
     fetchYahoo('DX-Y.NYB'),
@@ -132,6 +153,7 @@ export async function marketContextBlock(symbolHint?: string): Promise<string | 
     fetchBinanceFunding(lsrSymbol),
     fetchBinanceOIDelta(lsrSymbol),
     fetchDominance(),
+    lsrSymbol !== 'BTCUSDT' ? fetchSpotTicker(lsrSymbol) : Promise.resolve(null),
   ]);
 
   const quotes: Quote[] = [];
@@ -142,6 +164,7 @@ export async function marketContextBlock(symbolHint?: string): Promise<string | 
     quotes.push({ label: 'VIX', value: `${vix.toFixed(1)} — ${read}` });
   }
   if (btc) quotes.push({ label: 'Bitcoin', value: btc });
+  if (pairPx) quotes.push({ label: `PREÇO ATUAL ${lsrSymbol}`, value: pairPx });
   if (dom) quotes.push({ label: 'Dominância', value: dom });
   if (lsr) quotes.push({ label: `Long/Short ratio ${lsrSymbol}`, value: lsr });
   if (funding) quotes.push({ label: `Funding rate ${lsrSymbol}`, value: funding });
