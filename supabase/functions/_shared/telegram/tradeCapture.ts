@@ -174,12 +174,22 @@ export async function saveTrades(
   timezone: string,
   trades: ExtractedTrade[],
 ): Promise<string[]> {
+  // O dashboard filtra por sub-conta ativa (sub_accounts.is_active) — trade
+  // sem sub_account_id fica INVISÍVEL lá. Carimbar a sub-conta ativa do user.
+  const { data: subAcc } = await supabase
+    .from('sub_accounts')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('is_active', true)
+    .maybeSingle();
+
   const ids: string[] = [];
   for (const t of trades) {
     const tradeDate = t.closed_at?.slice(0, 10) ?? localDate(timezone);
     const duration = computeDuration(t.opened_at, t.closed_at);
     const { data, error } = await supabase.from('trades').insert({
       user_id: userId,
+      sub_account_id: subAcc?.id ?? null,
       symbol: t.symbol,
       symbol_temp: t.symbol,
       side: t.side,
