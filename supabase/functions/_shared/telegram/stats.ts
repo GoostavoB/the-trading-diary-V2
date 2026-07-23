@@ -119,3 +119,57 @@ export function fmtTradeLine(t: TradeRow | null): string {
   const setup = t.setup ? ` (${t.setup})` : '';
   return `${tradeSymbol(t)} ${fmtMoney(tradePnl(t))}${setup}`;
 }
+
+// ── Recortes sênior do diário: por setup, horário e dia da semana ─────────
+// É o que deixa o mentor personalizar de verdade ("teu Vitória tem 75% de
+// acerto; teu pior horário é a madrugada").
+
+export interface GroupStats {
+  label: string;
+  trades: number;
+  winRate: number | null;
+  netPnl: number;
+}
+
+function groupBy(trades: TradeRow[], keyOf: (t: TradeRow) => string | null): GroupStats[] {
+  const map = new Map<string, TradeRow[]>();
+  for (const t of trades) {
+    const k = keyOf(t);
+    if (!k) continue;
+    if (!map.has(k)) map.set(k, []);
+    map.get(k)!.push(t);
+  }
+  return [...map.entries()]
+    .map(([label, rows]) => {
+      const s = computeStats(rows);
+      return { label, trades: s.trades, winRate: s.winRate, netPnl: s.netPnl };
+    })
+    .filter((g) => g.trades >= 2) // 1 trade não é estatística
+    .sort((a, b) => b.netPnl - a.netPnl);
+}
+
+export function statsBySetup(trades: TradeRow[]): GroupStats[] {
+  return groupBy(trades, (t) => t.setup?.trim() || null);
+}
+
+export function statsByHourBucket(trades: TradeRow[], timezone: string): GroupStats[] {
+  return groupBy(trades, (t) => {
+    if (!t.closed_at) return null;
+    const { hour } = localClock(timezone, new Date(t.closed_at));
+    const start = Math.floor(hour / 4) * 4;
+    return `${String(start).padStart(2, '0')}h-${String(start + 4).padStart(2, '0')}h`;
+  });
+}
+
+export function statsByWeekday(trades: TradeRow[], timezone: string): GroupStats[] {
+  const names = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+  return groupBy(trades, (t) => {
+    if (!t.closed_at) return null;
+    const { dow } = localClock(timezone, new Date(t.closed_at));
+    return names[dow] ?? null;
+  });
+}
+
+export function fmtGroup(g: GroupStats): string {
+  return `${g.label}: ${g.trades}t · ${fmtPct(g.winRate)} WR · ${fmtMoney(g.netPnl)}`;
+}

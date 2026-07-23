@@ -49,6 +49,8 @@ Deno.serve(async (req) => {
       await maybeSendTradeAlerts(supabase, r).catch((e) => console.error('trade alerts', r.user_id, e));
       await maybeSendDailyDigest(supabase, r).catch((e) => console.error('daily digest', r.user_id, e));
       await maybeSendWeeklyDigest(supabase, r).catch((e) => console.error('weekly digest', r.user_id, e));
+      await maybeSendMorningBriefing(supabase, r).catch((e) => console.error('morning briefing', r.user_id, e));
+      await maybeSendEventAlerts(supabase, r).catch((e) => console.error('event alerts', r.user_id, e));
     }
   } catch (error) {
     console.error('telegram-notifier error', error);
@@ -202,4 +204,98 @@ function digestComment(s: PeriodStats, locale: string): string {
   if (s.losses >= 3) return pt ? 'Dia pesado. Amanhã só volta com plano escrito.' : 'Rough day. Come back tomorrow with a written plan.';
   if (s.netPnl < 0) return pt ? 'No vermelho. O que o diário diz sobre esses setups?' : 'In the red. What does the journal say about these setups?';
   return '';
+}
+
+// ── Briefing matinal proativo (08h local do usuário) ─────────────────────
+// "Todo dia de manhã ele tem que falar: hoje o calendário tem X às Y."
+
+async function maybeSendMorningBriefing(supabase: SupabaseClient, r: Recipient): Promise<void> {
+  const { hour, dow } = localClock(r.timezone);
+  if (hour !== 8) return;
+  const today = localDate(r.timezone);
+  const pt = r.locale === 'pt';
+
+  const now = new Date();
+  const { data: events } = await supabase
+    .from('economic_events')
+    .select('event, event_time, importance')
+    .gte('event_time', now.toISOString())
+    .lte('event_time', new Date(now.getTime() + 20 * 3_600_000).toISOString())
+    .order('event_time', { ascending: true });
+
+  const clockOf = (iso: string) => new Intl.DateTimeFormat('en-GB', {
+    timeZone: r.timezone, hour: '2-digit', minute: '2-digit',
+  }).format(new Date(iso));
+
+  const evLines = (events ?? [])
+    .filter((e) => (e.importance ?? '').toLowerCase() === 'high' && e.event_time)
+    .slice(0, 6)
+    .map((e) => `• ${clockOf(e.event_time as string)} — ${e.event}`);
+
+  const weekend = dow === 0 || dow === 6;
+  const parts: string[] = [
+    pt ? `☀️ Bom dia! Briefing de ${today}:` : `☀️ Morning briefing — ${today}:`,
+    evLines.length
+      ? (pt ? '📅 Notícias HIGH de hoje (teu fuso):\n' : "📅 Today's HIGH events (your tz):\n") + evLines.join('\n')
+      : (pt ? '📅 Sem notícia high dos EUA hoje.' : '📅 No US high-impact events today.'),
+    weekend
+      ? (pt ? '🛋 Fim de semana: bolsa fechada, liquidez fina no cripto — mão menor por padrão.'
+            : '🛋 Weekend: stocks closed, thin crypto liquidity — size down by default.')
+      : (pt ? `🔔 S&P 500 abre às ${nyOpenLocal(r.timezone)} no teu fuso — atenção à volatilidade da abertura.`
+            : `🔔 S&P 500 opens at ${nyOpenLocal(r.timezone)} your time — mind the open volatility.`),
+  ];
+
+  await sendMessage(supabase, r.chat_id, parts.join('\n\n'), {
+    userId: r.user_id,
+    messageType: 'digest',
+    templateName: 'morning_briefing',
+    refId: `morning:${today}`,
+    plain: true,
+  });
+}
+
+/** Instante da abertura de NY (09:30 America/New_York) no fuso do usuário. */
+function nyOpenLocal(timezone: string): string {
+  const now = new Date();
+  const nyParts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York', hour: 'numeric', minute: 'numeric', hour12: false,
+  }).formatToParts(now);
+  const nyH = Number(nyParts.find((p) => p.type === 'hour')?.value ?? 0) % 24;
+  const nyM = Number(nyParts.find((p) => p.type === 'minute')?.value ?? 0);
+  const minutesUntilOpen = (9 * 60 + 30) - (nyH * 60 + nyM);
+  const openInstant = new Date(now.getTime() + minutesUntilOpen * 60_000);
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: timezone, hour: '2-digit', minute: '2-digit',
+  }).format(openInstant);
+}
+
+// ── Alerta pré-notícia high (≤75 min antes; 1x por evento) ───────────────
+
+async function maybeSendEventAlerts(supabase: SupabaseClient, r: Recipient): Promise<void> {
+  const now = Date.now();
+  const { data: events } = await supabase
+    .from('economic_events')
+    .select('id, event, event_time, importance')
+    .gte('event_time', new Date(now).toISOString())
+    .lte('event_time', new Date(now + 75 * 60_000).toISOString());
+
+  const pt = r.locale === 'pt';
+  for (const e of events ?? []) {
+    if ((e.importance ?? '').toLowerCase() !== 'high' || !e.event_time) continue;
+    const mins = Math.max(1, Math.round((new Date(e.event_time as string).getTime() - now) / 60_000));
+    const clock = new Intl.DateTimeFormat('en-GB', {
+      timeZone: r.timezone, hour: '2-digit', minute: '2-digit',
+    }).format(new Date(e.event_time as string));
+    await sendMessage(supabase, r.chat_id,
+      pt
+        ? `⚠️ Em ~${mins} min (${clock}): ${e.event}. Reduz a mão e evita carregar posição pela notícia.`
+        : `⚠️ In ~${mins} min (${clock}): ${e.event}. Size down and avoid holding through the release.`,
+      {
+        userId: r.user_id,
+        messageType: 'alert',
+        templateName: 'event_alert',
+        refId: `event:${e.id}`,
+        plain: true,
+      });
+  }
 }

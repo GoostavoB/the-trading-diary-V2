@@ -4,7 +4,10 @@
 // Ported from the standalone Python prototype's system prompt.
 
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
-import { computeStats, fetchTrades, fmtMoney, fmtPct, localClock, localDate } from './stats.ts';
+import {
+  computeStats, fetchTrades, fmtGroup, fmtMoney, fmtPct, localClock, localDate,
+  statsByHourBucket, statsBySetup, statsByWeekday,
+} from './stats.ts';
 import { marketContextBlock, upcomingEventsBlock, etfFlowsBlock, liquidationZonesBlock, whaleFlowsBlock } from './macro.ts';
 
 const GATEWAY_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
@@ -12,6 +15,26 @@ const GATEWAY_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
 // flash não dá conta. Override via env se o custo apertar.
 const MODEL = Deno.env.get('MENTOR_MODEL') ?? 'google/gemini-2.5-pro';
 const FALLBACK_MODEL = 'google/gemini-2.5-flash';
+// Pipeline em 2 passos: um leitor técnico extrai FATOS dos gráficos, e só
+// então o mentor julga — um modelo com um trabalho por vez enxerga cunha,
+// exaustão de vela e nível com preço; um modelo fazendo tudo junto vê "o óbvio".
+const PERCEPTION_MODEL = Deno.env.get('PERCEPTION_MODEL') ?? 'google/gemini-2.5-pro';
+
+const PERCEPTION_PROMPT = `Você é um leitor técnico de gráficos de trading. Para CADA imagem recebida,
+extraia SOMENTE FATOS OBSERVÁVEIS — zero opinião, zero recomendação:
+- ativo e timeframe (escritos na tela)
+- preço atual e variação visível
+- cada média móvel visível (período/cor) COM PREÇO e a posição do preço em relação a ela
+- topos, fundos e zonas de suporte/resistência COM PREÇOS (e quantos toques se distinguem)
+- linhas de tendência óbvias (ligando quais pontos)
+- padrão gráfico em formação — cunha, canal, topo/fundo duplo (M/W), retângulo, bandeira,
+  triângulo — ou "nenhum padrão claro"
+- comportamento das ÚLTIMAS 5-10 velas: corpos crescendo/encolhendo, pavios de rejeição/exaustão,
+  engolfo, doji, velas travando num nível
+- volume: expandindo ou secando vs a média visível
+- osciladores visíveis (RSI/estocástico): valores, zona, divergências marcadas
+Formato: bloco por imagem começando com "IMAGEM N — ATIVO TF:". Se algo não está visível,
+escreva "não visível" — NUNCA deduza nem invente número que não está na tela.`;
 // gemini-2.5-pro gasta tokens em raciocínio interno ANTES do texto — um teto
 // baixo é consumido pelo pensamento e corta a resposta no meio da frase.
 // O tamanho visível é controlado pelo prompt (~180 palavras), não por aqui.
@@ -29,6 +52,10 @@ AO ANALISAR UM GRÁFICO:
    que instituições varrem), premium/discount. Cace bull/bear traps.
 3. Osciladores: RSI e estocástico lento — zonas de sobrecompra/sobrevenda e divergências.
 4. Fibonacci como confluência, nunca sinal isolado.
+5. PRICE ACTION MANDA: o comportamento das velas NO nível (corpos encolhendo, pavios de exaustão,
+   engolfo, velas travando/perdendo força) vale mais que qualquer indicador. Média móvel NÃO é
+   parede — é zona que PODE romper: quem decide é a reação das velas nela. "Está acima da média"
+   nunca é veredito sozinho.
 
 GESTÃO DE RISCO (inegociável): R:R realista abaixo de 1:1,5 reprova o trade; 1:2 é o mínimo
 saudável; 1:3+ é o ideal a buscar. Exija stop definido ANTES da entrada em lugar técnico lógico.
@@ -95,6 +122,9 @@ CONFLUÊNCIA E CALIBRAGEM (o coração da análise — regras inegociáveis):
    nota 8-10 → 8-10% · 6-7 → 5-7% · 4-5 → 2-4% · ≤3 → 0%.
    Cortes: fim de semana/madrugada −30% · notícia high <2h −30% · funding/LSR esticado −20%.
    Mostre a conta: "Mão 5% (7% pela nota, −30% domingo)". O aluno é o crivo final.
+   Se a BANCA DE FUTUROS está no cérebro (área PERFIL DO TRADER), converta a mão em dólares
+   ("5% = $250"). Banca desconhecida na hora de sugerir mão? Peça UMA vez: "manda /banca <valor>
+   que eu passo a falar em $".
 3. PROIBIÇÃO ABSOLUTA ("não opere de jeito nenhum") só em dois casos: violação de gestão de risco
    (sem stop, tamanho errado, revenge/FOMO) ou placar ≤3. Com placar ≥4, calibre tamanho e
    condições em vez de proibir. Mercado é probabilidade, não certeza — fale como quem calibra
@@ -319,6 +349,7 @@ Truncated user message → answer what you can + one short question, never resta
 // o modelo NAVEGAR o conjunto (vetos primeiro — eles mandam em tudo), em vez
 // de receber uma sopa de ~100 regras soltas.
 const BRAIN_AREAS: Array<[RegExp, string]> = [
+  [/^BANCA DE FUTUROS/i, 'PERFIL DO TRADER'],
   [/^(REGRA DE OURO|ATUALIZAÇÃO CME)/i, 'VETOS E REGRAS DE OURO'],
   [/^S\/R \d/i, 'SUPORTE E RESISTÊNCIA (aula)'],
   [/^SRI \d/i, 'S/R INSTITUCIONAL (on-chain, volume profile, players)'],
@@ -333,7 +364,7 @@ const BRAIN_AREAS: Array<[RegExp, string]> = [
   [/banca|alavancagem|gest[ãa]o|parcia|risco/i, 'GESTÃO DE RISCO E MÃO'],
 ];
 const AREA_ORDER = [
-  'VETOS E REGRAS DE OURO', 'SETUPS DO ALUNO', 'SUPORTE E RESISTÊNCIA (aula)',
+  'PERFIL DO TRADER', 'VETOS E REGRAS DE OURO', 'SETUPS DO ALUNO', 'SUPORTE E RESISTÊNCIA (aula)',
   'S/R INSTITUCIONAL (on-chain, volume profile, players)', 'LINHAS DE TENDÊNCIA',
   'MÉDIAS MÓVEIS COMO S/R', 'PADRÕES GRÁFICOS', 'FIBONACCI', 'CANDLES',
   'VOLUME E DOW', 'DIVAP E SINAIS', 'GESTÃO DE RISCO E MÃO',
@@ -414,12 +445,25 @@ async function buildContextBlocks(supabase: SupabaseClient, input: MentorInput):
     const recent = trades.slice(0, 5).map((t) =>
       `${t.symbol ?? t.symbol_temp} ${fmtMoney(t.profit_loss ?? t.pnl ?? 0)}${t.setup ? ` (${t.setup})` : ''}`,
     ).join(' · ');
-    blocks.push(
-      (pt ? '[DIÁRIO DO ALUNO]\n' : '[USER JOURNAL]\n') +
-      (pt
-        ? `${s.trades} trades | taxa de acerto ${fmtPct(s.winRate)} | P&L total ${fmtMoney(s.netPnl)}\nÚltimos: ${recent}`
-        : `${s.trades} trades | win rate ${fmtPct(s.winRate)} | net P&L ${fmtMoney(s.netPnl)}\nRecent: ${recent}`),
-    );
+    const setups = statsBySetup(trades).slice(0, 4);
+    const hours = statsByHourBucket(trades, input.timezone);
+    const days = statsByWeekday(trades, input.timezone);
+    const lines = [
+      pt
+        ? `${s.trades} trades | acerto ${fmtPct(s.winRate)} | P&L ${fmtMoney(s.netPnl)}`
+        : `${s.trades} trades | win rate ${fmtPct(s.winRate)} | net P&L ${fmtMoney(s.netPnl)}`,
+    ];
+    if (setups.length) lines.push((pt ? 'Por setup: ' : 'By setup: ') + setups.map(fmtGroup).join(' | '));
+    if (hours.length >= 2) {
+      lines.push((pt ? 'Melhor/pior horário: ' : 'Best/worst hours: ') +
+        `${fmtGroup(hours[0])} × ${fmtGroup(hours[hours.length - 1])}`);
+    }
+    if (days.length >= 2) {
+      lines.push((pt ? 'Melhor/pior dia: ' : 'Best/worst day: ') +
+        `${fmtGroup(days[0])} × ${fmtGroup(days[days.length - 1])}`);
+    }
+    lines.push((pt ? 'Últimos: ' : 'Recent: ') + recent);
+    blocks.push((pt ? '[DIÁRIO DO ALUNO — use estes números para personalizar]\n' : '[USER JOURNAL]\n') + lines.join('\n'));
   }
 
   const { dow } = localClock(input.timezone);
@@ -470,25 +514,9 @@ export async function mentorReply(supabase: SupabaseClient, input: MentorInput):
   const context = await buildContextBlocks(supabase, input);
   const history = await recentConversation(supabase, input.userId);
 
-  const userContent: unknown[] = [];
-  const images = input.imagesB64 ?? (input.imageB64 ? [input.imageB64] : []);
-  for (const b64 of images.slice(0, 16)) {
-    userContent.push({
-      type: 'image_url',
-      image_url: { url: `data:${input.imageMime ?? 'image/jpeg'};base64,${b64}` },
-    });
-  }
-  userContent.push({ type: 'text', text: `${context}\n\n---\n${input.text}` });
-
-  const messages = [
-    { role: 'system', content: input.locale === 'pt' ? SYSTEM_PROMPT_PT : SYSTEM_PROMPT_EN },
-    ...history,
-    { role: 'user', content: userContent },
-  ];
-
   // Resiliência: o gateway engasga de vez em quando (429/5xx). Tenta o modelo
   // principal 2x; se seguir fora, cai para o flash — resposta pior > nenhuma.
-  const attempt = async (model: string): Promise<string | null> => {
+  const attempt = async (model: string, messages: unknown[]): Promise<string | null> => {
     try {
       const response = await fetch(GATEWAY_URL, {
         method: 'POST',
@@ -509,14 +537,52 @@ export async function mentorReply(supabase: SupabaseClient, input: MentorInput):
     }
   };
 
-  let reply = await attempt(MODEL);
+  // ── PASSO 1: PERCEPÇÃO — leitura técnica dos gráficos vira FATOS ────────
+  const images = (input.imagesB64 ?? (input.imageB64 ? [input.imageB64] : [])).slice(0, 16);
+  let facts: string | null = null;
+  if (images.length) {
+    const perceptionContent: unknown[] = images.map((b64) => ({
+      type: 'image_url',
+      image_url: { url: `data:${input.imageMime ?? 'image/jpeg'};base64,${b64}` },
+    }));
+    perceptionContent.push({ type: 'text', text: PERCEPTION_PROMPT });
+    const pMessages = [{ role: 'user', content: perceptionContent }];
+    facts = await attempt(PERCEPTION_MODEL, pMessages) ??
+      await attempt(FALLBACK_MODEL, pMessages);
+    if (facts) console.log('percepção ok:', facts.slice(0, 400));
+    else console.error('percepção falhou — julgamento verá as imagens direto');
+  }
+
+  // ── PASSO 2: JULGAMENTO — o mentor raciocina sobre fatos + cérebro ──────
+  const userContent: unknown[] = [];
+  if (images.length && !facts) {
+    // fallback: percepção fora do ar, manda as imagens direto
+    for (const b64 of images) {
+      userContent.push({
+        type: 'image_url',
+        image_url: { url: `data:${input.imageMime ?? 'image/jpeg'};base64,${b64}` },
+      });
+    }
+  }
+  const factsBlock = facts
+    ? `[FATOS DOS GRÁFICOS — extraídos AGORA por leitura técnica; é a tua verdade visual, use os preços daqui]\n${facts}\n\n`
+    : '';
+  userContent.push({ type: 'text', text: `${context}\n\n${factsBlock}---\n${input.text}` });
+
+  const messages = [
+    { role: 'system', content: input.locale === 'pt' ? SYSTEM_PROMPT_PT : SYSTEM_PROMPT_EN },
+    ...history,
+    { role: 'user', content: userContent },
+  ];
+
+  let reply = await attempt(MODEL, messages);
   if (!reply) {
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    reply = await attempt(MODEL);
+    reply = await attempt(MODEL, messages);
   }
   if (!reply && MODEL !== FALLBACK_MODEL) {
     console.warn('mentor: modelo principal fora, caindo para', FALLBACK_MODEL);
-    reply = await attempt(FALLBACK_MODEL);
+    reply = await attempt(FALLBACK_MODEL, messages);
   }
   return reply;
 }

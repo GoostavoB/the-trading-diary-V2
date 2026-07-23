@@ -279,6 +279,35 @@ async function handleLinked(
       return;
     }
 
+    case '/banca': {
+      // Banca segregada de futuros — vira PERFIL no cérebro; a mão passa a
+      // sair em % E em dólares.
+      const value = Number(args.join('').replace(/\D/g, ''));
+      const pt = user.locale === 'pt';
+      if (!Number.isFinite(value) || value <= 0) {
+        await sendMessage(supabase, chatId,
+          pt ? 'Me diz o valor da tua banca segregada de futuros, em dólares. Ex.: /banca 5000'
+             : 'Tell me your segregated futures bankroll in dollars. E.g.: /banca 5000',
+          { userId: user.user_id, messageType: 'command', plain: true });
+        return;
+      }
+      await supabase.from('mentor_knowledge')
+        .delete()
+        .eq('user_id', user.user_id)
+        .like('content', 'BANCA DE FUTUROS:%');
+      await supabase.from('mentor_knowledge').insert({
+        user_id: user.user_id,
+        kind: 'profile',
+        content: `BANCA DE FUTUROS: $${value.toLocaleString('en-US')} (informada em ${localDate(user.timezone)}). ` +
+          'Toda sugestão de mão deve sair em % E em dólares sobre este valor.',
+      });
+      await sendMessage(supabase, chatId,
+        pt ? `🏦 Banca registrada: $${value.toLocaleString('en-US')}. A partir de agora a mão sai em % e em $. Atualiza quando mudar: /banca <valor>.`
+           : `🏦 Bankroll saved: $${value.toLocaleString('en-US')}. Hand sizing now comes in % and $. Update anytime: /banca <value>.`,
+        { userId: user.user_id, messageType: 'command', plain: true });
+      return;
+    }
+
     default: {
       // Free text → socratic mentor (P2), grounded in journal + taught knowledge.
       await sendTyping(chatId);
