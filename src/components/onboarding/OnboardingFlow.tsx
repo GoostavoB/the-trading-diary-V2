@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Progress } from '@/components/ui/progress';
 import { Upload, BarChart3, Target, Sparkles, ChevronRight, CheckCircle2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { persistOnboardingDone } from '@/hooks/useOnboarding';
 import { toast } from 'sonner';
 
 interface OnboardingStep {
@@ -59,36 +59,30 @@ export const OnboardingFlow = ({ onComplete }: { onComplete: () => void }) => {
   const step = steps[currentStep];
   const Icon = step.icon;
 
+  const finish = async () => {
+    if (user) await persistOnboardingDone(user.id);
+    onComplete();
+  };
+
   const handleNext = async () => {
     if (currentStep === steps.length - 1) {
-      // Mark onboarding as complete
-      if (user) {
-        await supabase
-          .from('user_settings')
-          .update({ onboarding_completed: true })
-          .eq('user_id', user.id);
-      }
       toast.success('Welcome aboard! Let\'s start trading! 🚀');
-      onComplete();
+      await finish();
     } else {
       setCurrentStep(currentStep + 1);
     }
   };
 
   const handleSkip = async () => {
-    if (user) {
-      await supabase
-        .from('user_settings')
-        .update({ onboarding_completed: true })
-        .eq('user_id', user.id);
-    }
-    onComplete();
+    await finish();
   };
 
-  const handleAction = () => {
+  const handleAction = async () => {
     if (step.action) {
+      // Sair do fluxo para executar a ação ENCERRA o onboarding — antes, o
+      // usuário ia subir o trade e o modal voltava eternamente no dashboard.
+      await finish();
       navigate(step.action);
-      handleNext();
     }
   };
 
