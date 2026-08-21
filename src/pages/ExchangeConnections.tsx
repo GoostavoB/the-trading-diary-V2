@@ -92,30 +92,13 @@ export default function ExchangeConnections() {
 
   const syncMutation = useMutation({
     mutationFn: async (connectionId: string) => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { data, error } = await supabase.functions.invoke('fetch-exchange-trades', {
+        body: { connectionId, mode: 'preview' },
+      });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-exchange-trades`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            connectionId,
-            mode: 'preview'
-          }),
-        }
-      );
+      if (error) throw new Error(error.message || 'Sync failed');
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Sync failed');
-      }
-
-      return { ...await response.json(), connectionId };
+      return { ...data, connectionId };
     },
     onSuccess: (data) => {
       toast.success(`Fetched ${data.tradesFetched} trades. Review and select which to import.`);
