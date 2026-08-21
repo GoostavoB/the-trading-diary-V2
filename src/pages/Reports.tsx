@@ -55,27 +55,15 @@ export default function Reports() {
       }
 
       // Generate report using AI
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { data: result, error: fnError } = await supabase.functions.invoke('ai-generate-report', {
+        body: {
+          trade_ids: trades.map(t => t.id),
+          period: `${format(dateRange.from, 'yyyy-MM-dd')} to ${format(dateRange.to, 'yyyy-MM-dd')}`,
+          report_type: reportType,
+        },
+      });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-generate-report`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            trade_ids: trades.map(t => t.id),
-            period: `${format(dateRange.from, 'yyyy-MM-dd')} to ${format(dateRange.to, 'yyyy-MM-dd')}`,
-            report_type: reportType
-          }),
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to generate report');
-      const result = await response.json();
+      if (fnError) throw new Error(fnError.message || 'Failed to generate report');
 
       // Save to database
       const { error } = await (supabase.from('generated_reports' as any).insert({

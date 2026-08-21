@@ -44,39 +44,25 @@ export function ConnectExchangeModal({
 
   const connectMutation = useMutation({
     mutationFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
-
       const marketTypes = [
         ...(includeSpot ? ['spot'] : []),
         ...(includeSwap ? ['swap'] : []),
       ];
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/connect-exchange`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            exchange,
-            apiKey,
-            apiSecret,
-            apiPassphrase: apiPassphrase || undefined,
-            syncStartDate: new Date(syncStartDate).toISOString(),
-            marketTypes: marketTypes.length > 0 ? marketTypes : undefined,
-          }),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('connect-exchange', {
+        body: {
+          exchange,
+          apiKey,
+          apiSecret,
+          apiPassphrase: apiPassphrase || undefined,
+          syncStartDate: new Date(syncStartDate).toISOString(),
+          marketTypes: marketTypes.length > 0 ? marketTypes : undefined,
+        },
+      });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Connection failed');
-      }
+      if (error) throw new Error(error.message || 'Connection failed');
 
-      return response.json();
+      return data;
     },
     onSuccess: () => {
       toast.success(`Successfully connected to ${exchange}`);
