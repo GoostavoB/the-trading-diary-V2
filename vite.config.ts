@@ -106,9 +106,9 @@ export default defineConfig(({ mode }) => ({
           'vendor-utils': [
             'date-fns',
             'date-fns-tz',
-            'crypto-js',
             '@tanstack/react-query',
           ],
+
           
           // Supabase - only for authenticated pages
           'vendor-supabase': ['@supabase/supabase-js'],
