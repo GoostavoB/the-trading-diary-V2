@@ -45,14 +45,11 @@ export function SyncTradesDialog({
 
   const fetchMutation = useMutation({
     mutationFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
-
       let start: string | undefined;
       let end: string | undefined;
 
       const now = new Date();
-      
+
       if (preset === 'custom') {
         if (!startDate || !endDate) {
           throw new Error('Please select both start and end dates');
@@ -61,35 +58,24 @@ export function SyncTradesDialog({
         end = endDate.toISOString().split('T')[0];
       } else {
         end = now.toISOString().split('T')[0];
-        
+
         const daysBack = preset === 'last7days' ? 7 : preset === 'last30days' ? 30 : 90;
         const startTime = new Date(now.getTime() - daysBack * 24 * 60 * 60 * 1000);
         start = startTime.toISOString().split('T')[0];
       }
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-exchange-trades`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            connectionId,
-            mode: 'preview',
-            startDate: start,
-            endDate: end,
-          }),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('fetch-exchange-trades', {
+        body: {
+          connectionId,
+          mode: 'preview',
+          startDate: start,
+          endDate: end,
+        },
+      });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to fetch trades');
-      }
+      if (error) throw new Error(error.message || 'Failed to fetch trades');
 
-      return response.json();
+      return data;
     },
     onSuccess: (data) => {
       toast.success(`Fetched ${data.tradesFetched} trades for review`);

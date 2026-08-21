@@ -134,27 +134,13 @@ export default function ExchangeConnections() {
 
   const disconnectMutation = useMutation({
     mutationFn: async ({ connectionId, deleteTrades }: { connectionId: string; deleteTrades: boolean }) => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { data, error } = await supabase.functions.invoke('disconnect-exchange', {
+        body: { connectionId, deleteTrades },
+      });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/disconnect-exchange`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({ connectionId, deleteTrades }),
-        }
-      );
+      if (error) throw new Error(error.message || 'Disconnect failed');
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Disconnect failed');
-      }
-
-      return response.json();
+      return data;
     },
     onSuccess: () => {
       toast.success('Exchange disconnected successfully');

@@ -79,31 +79,17 @@ export function TradePreviewModal({
   // Import mutation
   const importMutation = useMutation({
     mutationFn: async (tradeIds: string[]) => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { data, error } = await supabase.functions.invoke('fetch-exchange-trades', {
+        body: {
+          connectionId,
+          mode: 'import',
+          selectedTradeIds: tradeIds,
+        },
+      });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-exchange-trades`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            connectionId,
-            mode: 'import',
-            selectedTradeIds: tradeIds,
-          }),
-        }
-      );
+      if (error) throw new Error(error.message || 'Import failed');
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Import failed');
-      }
-
-      return response.json();
+      return data;
     },
     onSuccess: (data) => {
       toast.success(
