@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 import { ExchangeService } from '../_shared/adapters/ExchangeService.ts';
+import { decrypt, LegacyCredentialError } from '../_shared/exchangeUtils.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,8 +15,9 @@ interface FetchRequest {
   endDate?: string;
 }
 
-function decrypt(encryptedText: string): string {
-  return atob(encryptedText);
+/** trades.trade_type CHECK only allows 'spot' | 'futures' | 'dex'. Map adapter marketType onto it — never hardcode. */
+function toTradeType(marketType: string | undefined): 'spot' | 'futures' {
+  return marketType === 'spot' ? 'spot' : 'futures';
 }
 
 Deno.serve(async (req) => {
@@ -137,18 +139,48 @@ Deno.serve(async (req) => {
       .select()
       .single();
 
-    // Decrypt credentials
-    const apiKey = decrypt(connection.api_key_encrypted);
-    const apiSecret = decrypt(connection.api_secret_encrypted);
-    const apiPassphrase = connection.api_passphrase_encrypted 
-      ? decrypt(connection.api_passphrase_encrypted)
-      : undefined;
+    // Decrypt credentials (AES-256-GCM — see _shared/exchangeUtils.ts).
+    // Rows saved before the encryption fix (plain Base64) will fail to
+    // decrypt here — that's expected, not a bug: prompt reconnect instead
+    // of crashing unhelpfully.
+    let apiKey: string;
+    let apiSecret: string;
+    let apiPassphrase: string | undefined;
+    try {
+      apiKey = await decrypt(connection.api_key_encrypted);
+      apiSecret = await decrypt(connection.api_secret_encrypted);
+      apiPassphrase = connection.api_passphrase_encrypted
+        ? await decrypt(connection.api_passphrase_encrypted)
+        : undefined;
+    } catch (error) {
+      const message =
+        error instanceof LegacyCredentialError
+          ? error.message
+          : 'Failed to read stored credentials. Please reconnect this exchange.';
 
-    // Calculate date range
+      await supabaseClient
+        .from('exchange_connections')
+        .update({ sync_status: 'error', sync_error: message })
+        .eq('id', connectionId);
+
+      throw new Error(message);
+    }
+
+    // Calculate date range. sync_start_date is a hard floor stored on the
+    // connection — it always wins over whatever the caller requests, so
+    // "only import trades from date X forward" holds true even if some
+    // future caller forgets to pass startDate (e.g. a cron job).
     const endTime = endDate ? new Date(endDate) : new Date();
-    const startTime = startDate
-      ? new Date(startDate)
-      : new Date(endTime.getTime() - 30 * 24 * 60 * 60 * 1000); // Default: last 30 days
+    const requestedStart = startDate ? new Date(startDate) : null;
+    const floor = connection.sync_start_date ? new Date(connection.sync_start_date) : null;
+    const defaultStart = new Date(endTime.getTime() - 30 * 24 * 60 * 60 * 1000); // fallback: last 30 days
+    const startTime =
+      floor && (!requestedStart || requestedStart < floor) ? floor : requestedStart ?? defaultStart;
+
+    const marketTypes: string[] =
+      Array.isArray(connection.market_types) && connection.market_types.length > 0
+        ? connection.market_types
+        : ['spot', 'swap'];
 
     // Initialize exchange service and fetch trades with timeout
     const exchangeService = new ExchangeService();
@@ -185,6 +217,7 @@ Deno.serve(async (req) => {
     const fetchPromise = exchangeService.syncExchange(connection.exchange_name, {
       startDate: startTime,
       endDate: endTime,
+      marketTypes,
     });
 
     const timeoutPromise = new Promise<never>((_, reject) =>
@@ -213,24 +246,43 @@ Deno.serve(async (req) => {
     // Normalize trades for database
     console.log(`[${displayName}] Normalizing ${result.trades.length} trades for database...`);
     
-    const allTrades = result.trades.map(trade => ({
-      user_id: user.id,
-      pair: trade.symbol,
-      side: trade.side === 'buy' ? 'long' : trade.side === 'sell' ? 'short' : trade.side,
-      type: 'spot' as const,
-      entry_price: trade.price,
-      exit_price: trade.price,
-      size: trade.quantity,
-      pnl: 0,
-      pnl_percentage: 0,
-      fee: trade.fee,
-      fee_currency: trade.feeCurrency || trade.feeAsset || 'USDT',
-      exchange: displayName,
-      opened_at: new Date(trade.timestamp).toISOString(),
-      closed_at: new Date(trade.timestamp).toISOString(),
-      notes: `Imported from ${displayName}. Order ID: ${trade.orderId}`,
-      broker_name: displayName,
-    }));
+    // IMPORTANT: these keys must match the REAL `trades` table columns (see
+    // src/integrations/supabase/types.ts, the generated source of truth —
+    // NOT what earlier versions of this function guessed). The previous
+    // version wrote `pair`, `type`, `size`, `fee`, `fee_currency`,
+    // `exchange`, `broker_name`, `pnl_percentage` — none of which exist as
+    // columns on `trades`, and it never set `symbol_temp` (a legacy NOT
+    // NULL column). That insert would have failed outright the moment
+    // anyone actually confirmed an import. Field mapping below mirrors the
+    // working manual-entry path in src/pages/Upload.tsx.
+    const allTrades = result.trades.map((trade) => {
+      const openedAt = new Date(trade.timestamp).toISOString();
+      const tradeType = toTradeType(trade.marketType);
+      const side = trade.side === 'buy' ? 'long' : trade.side === 'sell' ? 'short' : trade.side;
+
+      return {
+        user_id: user.id,
+        symbol: trade.symbol,
+        symbol_temp: trade.symbol, // legacy NOT NULL column — must always be set
+        side,
+        side_temp: side,
+        trade_type: tradeType, // 'spot' | 'futures' — never hardcode 'spot'
+        broker: displayName,
+        entry_price: trade.price,
+        exit_price: trade.price,
+        position_size: trade.quantity,
+        pnl: 0,
+        roi: 0,
+        trading_fee: trade.fee ?? 0,
+        opened_at: openedAt,
+        closed_at: openedAt,
+        trade_date: openedAt,
+        exchange_source: connection.exchange_name,
+        exchange_trade_id: trade.id || trade.orderId || null,
+        trade_hash: `${connection.exchange_name}_${trade.id || trade.orderId}_${openedAt}`,
+        notes: `Imported from ${displayName} (${tradeType}). Order ID: ${trade.orderId ?? trade.id}`,
+      };
+    });
 
     // Store trades in pending_trades table (preview mode)
     console.log(`[${displayName}] Storing ${allTrades.length} trades in pending_trades table...`);

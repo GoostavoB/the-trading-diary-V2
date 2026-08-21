@@ -1128,8 +1128,10 @@ export type Database = {
           last_synced_at: string | null
           last_trade_sync_at: string | null
           last_withdrawal_sync_at: string | null
+          market_types: string[]
           sync_cursor: Json | null
           sync_error: string | null
+          sync_start_date: string | null
           sync_status: string | null
           trading_type: string | null
           updated_at: string | null
@@ -1150,8 +1152,10 @@ export type Database = {
           last_synced_at?: string | null
           last_trade_sync_at?: string | null
           last_withdrawal_sync_at?: string | null
+          market_types?: string[]
           sync_cursor?: Json | null
           sync_error?: string | null
+          sync_start_date?: string | null
           sync_status?: string | null
           trading_type?: string | null
           updated_at?: string | null
@@ -1172,8 +1176,10 @@ export type Database = {
           last_synced_at?: string | null
           last_trade_sync_at?: string | null
           last_withdrawal_sync_at?: string | null
+          market_types?: string[]
           sync_cursor?: Json | null
           sync_error?: string | null
+          sync_start_date?: string | null
           sync_status?: string | null
           trading_type?: string | null
           updated_at?: string | null

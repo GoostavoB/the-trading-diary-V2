@@ -30,6 +30,7 @@ interface ExchangeConnection {
   sync_status: string;
   sync_error: string | null;
   created_at: string;
+  sync_start_date: string | null;
 }
 
 export default function ExchangeConnections() {
@@ -124,6 +125,27 @@ export default function ExchangeConnections() {
     },
     onError: (error: Error) => {
       toast.error(`Sync failed: ${error.message}`);
+    },
+  });
+
+  const [editingDateFor, setEditingDateFor] = useState<string | null>(null);
+  const [editedDate, setEditedDate] = useState('');
+
+  const updateSyncDateMutation = useMutation({
+    mutationFn: async ({ connectionId, date }: { connectionId: string; date: string }) => {
+      const { error } = await supabase
+        .from('exchange_connections')
+        .update({ sync_start_date: new Date(date).toISOString() })
+        .eq('id', connectionId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Sync start date updated. Future syncs will respect the new date.');
+      setEditingDateFor(null);
+      queryClient.invalidateQueries({ queryKey: ['exchange-connections'] });
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to update: ${error.message}`);
     },
   });
 
@@ -375,6 +397,54 @@ export default function ExchangeConnections() {
                               addSuffix: true,
                             })}
                           </p>
+                        )}
+                        {editingDateFor === connection.id ? (
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="date"
+                              value={editedDate}
+                              max={new Date().toISOString().slice(0, 10)}
+                              onChange={(e) => setEditedDate(e.target.value)}
+                              className="h-7 text-xs rounded border border-border/40 bg-transparent px-1.5"
+                            />
+                            <Button
+                              size="sm"
+                              className="h-7 px-2 text-xs"
+                              disabled={updateSyncDateMutation.isPending}
+                              onClick={() =>
+                                updateSyncDateMutation.mutate({ connectionId: connection.id, date: editedDate })
+                              }
+                            >
+                              Save
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 px-2 text-xs"
+                              onClick={() => setEditingDateFor(null)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            className="text-muted-foreground hover:text-foreground underline decoration-dotted underline-offset-2 text-xs"
+                            onClick={() => {
+                              setEditingDateFor(connection.id);
+                              setEditedDate(
+                                connection.sync_start_date
+                                  ? connection.sync_start_date.slice(0, 10)
+                                  : new Date().toISOString().slice(0, 10)
+                              );
+                            }}
+                          >
+                            Syncing since{' '}
+                            {connection.sync_start_date
+                              ? new Date(connection.sync_start_date).toLocaleDateString()
+                              : 'connection date'}{' '}
+                            (edit)
+                          </button>
                         )}
                         {connection.sync_error && (
                           <p className="text-destructive text-xs">{connection.sync_error}</p>

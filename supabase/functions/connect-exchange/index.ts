@@ -11,6 +11,10 @@ interface ConnectRequest {
   apiKey: string;
   apiSecret: string;
   apiPassphrase?: string;
+  /** Only import trades from this date forward. Never earlier, on every future sync. */
+  syncStartDate?: string;
+  /** Which market segments to sync. Defaults to both spot and perpetual futures. */
+  marketTypes?: ('spot' | 'swap')[];
 }
 
 Deno.serve(async (req) => {
@@ -39,7 +43,8 @@ Deno.serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    const { exchange, apiKey, apiSecret, apiPassphrase }: ConnectRequest = await req.json();
+    const { exchange, apiKey, apiSecret, apiPassphrase, syncStartDate, marketTypes }: ConnectRequest =
+      await req.json();
 
     // Validate required fields
     if (!exchange || !apiKey || !apiSecret) {
@@ -68,10 +73,10 @@ Deno.serve(async (req) => {
     // Note: Credential validation will be done during first sync
     // We store the credentials now and test them when syncing trades
 
-    // Encrypt credentials
-    const encryptedKey = encrypt(apiKey);
-    const encryptedSecret = encrypt(apiSecret);
-    const encryptedPassphrase = apiPassphrase ? encrypt(apiPassphrase) : null;
+    // Encrypt credentials (AES-256-GCM — see _shared/exchangeUtils.ts)
+    const encryptedKey = await encrypt(apiKey);
+    const encryptedSecret = await encrypt(apiSecret);
+    const encryptedPassphrase = apiPassphrase ? await encrypt(apiPassphrase) : null;
 
     // Store connection in database (upsert to handle reconnections)
     const { data: connection, error: dbError } = await supabaseClient
@@ -85,6 +90,8 @@ Deno.serve(async (req) => {
         is_active: true,
         sync_status: 'pending',
         sync_error: null,
+        sync_start_date: syncStartDate ?? new Date().toISOString(),
+        market_types: marketTypes && marketTypes.length > 0 ? marketTypes : ['spot', 'swap'],
         updated_at: new Date().toISOString(),
       }, {
         onConflict: 'user_id,exchange_name'

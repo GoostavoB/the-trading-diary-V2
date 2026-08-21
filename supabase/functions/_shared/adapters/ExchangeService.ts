@@ -94,6 +94,7 @@ export class ExchangeService {
     options?: {
       startDate?: Date;
       endDate?: Date;
+      marketTypes?: string[];
     }
   ): Promise<{
     success: boolean;
@@ -113,7 +114,9 @@ export class ExchangeService {
       const trades = await adapter.fetchTrades({
         startTime: options?.startDate,
         endTime: options?.endDate,
-      });
+        // Only BingXAdapter reads this today; other adapters ignore unknown options.
+        marketTypes: options?.marketTypes,
+      } as any);
 
       return { success: true, trades };
     } catch (error) {

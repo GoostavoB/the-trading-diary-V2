@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, EyeOff, AlertTriangle, Loader2, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -36,11 +37,20 @@ export function ConnectExchangeModal({
   const [showKey, setShowKey] = useState(false);
   const [showSecret, setShowSecret] = useState(false);
   const [showPassphrase, setShowPassphrase] = useState(false);
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const [syncStartDate, setSyncStartDate] = useState(todayStr);
+  const [includeSpot, setIncludeSpot] = useState(true);
+  const [includeSwap, setIncludeSwap] = useState(true);
 
   const connectMutation = useMutation({
     mutationFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
+
+      const marketTypes = [
+        ...(includeSpot ? ['spot'] : []),
+        ...(includeSwap ? ['swap'] : []),
+      ];
 
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/connect-exchange`,
@@ -55,6 +65,8 @@ export function ConnectExchangeModal({
             apiKey,
             apiSecret,
             apiPassphrase: apiPassphrase || undefined,
+            syncStartDate: new Date(syncStartDate).toISOString(),
+            marketTypes: marketTypes.length > 0 ? marketTypes : undefined,
           }),
         }
       );
@@ -193,6 +205,46 @@ export function ConnectExchangeModal({
                 >
                   {showPassphrase ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="syncStartDate">Import trades starting from *</Label>
+            <Input
+              id="syncStartDate"
+              type="date"
+              value={syncStartDate}
+              max={todayStr}
+              onChange={(e) => setSyncStartDate(e.target.value)}
+              required
+            />
+            <p className="text-xs text-muted-foreground">
+              Trades before this date are never imported, on this sync or any future sync. You can
+              change this later from the connection settings.
+            </p>
+          </div>
+
+          {exchange === 'bingx' && (
+            <div className="space-y-2">
+              <Label>Markets to sync</Label>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="includeSpot"
+                  checked={includeSpot}
+                  onCheckedChange={(checked) => setIncludeSpot(checked === true)}
+                />
+                <Label htmlFor="includeSpot" className="font-normal text-sm">Spot</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="includeSwap"
+                  checked={includeSwap}
+                  onCheckedChange={(checked) => setIncludeSwap(checked === true)}
+                />
+                <Label htmlFor="includeSwap" className="font-normal text-sm">
+                  Perpetual futures (swap)
+                </Label>
               </div>
             </div>
           )}
