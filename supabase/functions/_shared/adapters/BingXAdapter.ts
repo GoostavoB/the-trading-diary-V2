@@ -60,6 +60,10 @@ export class BingXAdapter extends BaseExchangeAdapter {
     }
 
     const data = await response.json();
+    // BingX returns HTTP 200 even for auth/permission errors; the real status is in the body
+    if (data && typeof data === 'object' && 'code' in data && data.code !== 0) {
+      throw new Error(`BingX API Error ${data.code}: ${data.msg || 'Unknown error'}`);
+    }
     return data.data || data;
   }
 
