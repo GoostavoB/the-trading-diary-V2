@@ -708,16 +708,27 @@ Map flexibly to schema. Schema: ${JSON.stringify(TRADE_SCHEMA)}. Expected ~${est
       let margin = Number(t.margin) || 0;
       let marginWasExtractedAsPositionSize = false;
       
-      // If no separate margin field but we have position_size, the AI likely extracted margin as position_size
-      // This is common for BingX/Bybit where column is labeled "Margin(Leverage)"
-      if (!margin && positionSize > 0 && leverage > 1) {
-        // The extracted "position_size" is actually the margin
-        margin = positionSize;
-        marginWasExtractedAsPositionSize = true;
-        // Real position_size = margin * leverage
-        positionSize = margin * leverage;
-        console.log(`✅ BingX format detected: margin=${margin.toFixed(2)}, position_size=${positionSize.toFixed(2)}`);
-      }
+     // Certain exchanges (BingX, Bybit) label their column "Margin(Leverage)" - the AI extracts
+            // that value as position_size, but it is actually margin. Other exchanges (Binance, OKX,
+            // Coinbase, Kraken, etc.) report true position_size directly, so this must be broker-specific.
+            const brokerLower = (broker || t.broker || '').toString().toLowerCase();
+            const marginReportedAsPositionSize = brokerLower.includes('bingx') || brokerLower.includes('bybit');
+
+            if (!margin && positionSize > 0 && leverage > 1) {
+                      if (marginReportedAsPositionSize) {
+                                  // The extracted "position_size" is actually the margin
+                                  margin = positionSize;
+                                  marginWasExtractedAsPositionSize = true;
+                                  // Real position_size = margin * leverage
+                                  positionSize = margin * leverage;
+                                  console.log(`✅ ${broker || 'BingX/Bybit'} format detected: margin=${margin.toFixed(2)}, position_size=${positionSize.toFixed(2)}`);
+                      } else {
+                                  // Other exchanges: the extracted position_size is the real position size.
+                                  // Derive margin from position_size / leverage instead of reinterpreting it.
+                                  margin = positionSize / leverage;
+                                  console.log(`📐 Derived margin from position_size/leverage: margin=${margin.toFixed(2)}, position_size=${positionSize.toFixed(2)}`);
+                      }
+            }
 
       // FALLBACK: Calculate entry_price from P&L if missing
       if (!entryPrice && exitPrice > 0 && margin > 0 && profitLoss !== 0) {
