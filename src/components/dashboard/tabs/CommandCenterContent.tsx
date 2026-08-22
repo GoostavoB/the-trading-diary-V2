@@ -7,6 +7,8 @@ import { TradingQualityMetrics } from '@/components/insights/TradingQualityMetri
 import { BehaviorAnalytics } from '@/components/insights/BehaviorAnalytics';
 import { TotalCapitalWidget } from '@/components/widgets/TotalCapitalWidget';
 import { OneYearProjectionWidget } from '@/components/widgets/OneYearProjectionWidget';
+import { MonthlyGoalWidget } from '@/components/widgets/MonthlyGoalWidget';
+
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useIsMobile } from '@/hooks/use-mobile';
 import type { Trade } from '@/types/trade';
