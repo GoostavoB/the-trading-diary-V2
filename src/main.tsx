@@ -5,11 +5,26 @@ import App from "./App.tsx";
 import "./index.css";
 import { reportWebVitals, sendVitalsToAnalytics } from "./utils/webVitals";
 import { setupGlobalErrorHandling } from "./utils/errorTracking";
+import { registerSW } from 'virtual:pwa-register';
 
 // Set up global error tracking
 setupGlobalErrorHandling();
 
 createRoot(document.getElementById("root")!).render(<App />);
+
+const updateSW = registerSW({
+    immediate: true,
+    onRegisteredSW(swUrl, registration) {
+          if (registration) {
+                  setInterval(() => {
+                            registration.update();
+                  }, 60000);
+          }
+    },
+    onNeedRefresh() {
+          updateSW(true);
+    },
+});
 
 // Phase 7: Defer analytics until after page is interactive
 if ('requestIdleCallback' in window) {
