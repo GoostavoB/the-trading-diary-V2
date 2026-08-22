@@ -61,13 +61,25 @@ export class BingXAdapter extends BaseExchangeAdapter {
 
   async testConnection(): Promise<boolean> {
     try {
+      // Warm up the edge runtime's outbound HTTPS/TLS connection to BingX
+      // before the first signed request after a cold boot. This is best-effort:
+      // the signed request and its retries remain the source of truth.
+      try {
+        await fetch('https://open-api.bingx.com/openApi/swap/v2/server/time');
+      } catch (warmupError) {
+        console.warn(
+          'BingX connection warm-up failed:',
+          warmupError instanceof Error ? warmupError.message : warmupError
+        );
+      }
+
       // fetchBalance is cheap and works regardless of which markets the
       // account actually trades — a much better connectivity check than
       // hitting a spot-only endpoint (the old version's mistake, which
       // made "connected" misleading for perp-only accounts).
-      // Retried: a single transient TLS/DNS blip reaching BingX from the
-      // edge runtime should not fail the whole connection check.
-      await this.retryRequest(() => this.client.fetchBalance({ type: 'spot' }), 2, 500);
+      // Four attempts give a cold edge instance time to establish outbound
+      // connectivity before treating the connection check as failed.
+      await this.retryRequest(() => this.client.fetchBalance({ type: 'spot' }), 4, 500);
       this.lastConnectionError = undefined;
       return true;
     } catch (error) {
