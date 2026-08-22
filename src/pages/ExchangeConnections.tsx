@@ -166,77 +166,66 @@ export default function ExchangeConnections() {
       name: 'Binance',
       description: t('exchanges.descriptions.binance'),
       comingSoon: false,
-      sizeScale: 1.0, // No change
     },
     {
       id: 'bybit',
       name: 'Bybit',
       description: 'Leading derivatives exchange - sync spot & futures trades',
       comingSoon: false,
-      sizeScale: 0.92, // -8%
     },
     {
       id: 'coinbase',
       name: 'Coinbase',
       description: 'US market leader - sync your trading activity',
       comingSoon: false,
-      sizeScale: 0.86, // -14%
     },
     {
       id: 'kraken',
       name: 'Kraken',
       description: 'European leader - comprehensive trade history sync',
       comingSoon: false,
-      sizeScale: 0.88, // -12%
     },
     {
       id: 'bitfinex',
       name: 'Bitfinex',
       description: 'OG exchange since 2012 - sync all your trades',
       comingSoon: false,
-      sizeScale: 0.94, // -6%
     },
     {
       id: 'bingx',
       name: 'BingX',
       description: 'Copy trading platform - sync spot & futures',
       comingSoon: false,
-      sizeScale: 0.96, // -4%
     },
     {
       id: 'mexc',
       name: 'MEXC',
       description: 'Altcoin specialist - sync your diverse portfolio',
       comingSoon: false,
-      sizeScale: 0.90, // -10%
     },
     {
       id: 'kucoin',
       name: 'KuCoin',
       description: 'Popular in Asia - requires API passphrase',
       comingSoon: false,
-      sizeScale: 0.97, // -3%
     },
     {
       id: 'okx',
       name: 'OKX',
       description: 'Major derivatives exchange - requires API passphrase',
       comingSoon: false,
-      sizeScale: 1.06, // +6%
     },
     {
       id: 'gateio',
       name: 'Gate.io',
       description: 'Comprehensive trading platform - full sync support',
       comingSoon: false,
-      sizeScale: 1.08, // +8%
     },
     {
       id: 'bitstamp',
       name: 'Bitstamp',
       description: 'Oldest exchange since 2011 - requires customer ID',
       comingSoon: false,
-      sizeScale: 1.10, // +10%
     },
   ];
 
@@ -334,13 +323,11 @@ export default function ExchangeConnections() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-muted/30 border border-border/30">
-                        <div style={{ transform: `scale(${exchange.sizeScale})` }}>
                           <ExchangeLogo
                             exchangeId={exchange.id}
                             exchangeName={exchange.name}
                             size="lg"
                           />
-                        </div>
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
