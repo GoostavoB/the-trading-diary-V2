@@ -1,4 +1,4 @@
-import { BaseExchangeAdapter } from './BaseExchangeAdapter.ts';
+import { BaseExchangeAdapter, classifyConnectionError } from './BaseExchangeAdapter.ts';
 import type {
   ExchangeCredentials,
   Trade,
