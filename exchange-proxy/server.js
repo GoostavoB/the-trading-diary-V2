@@ -56,7 +56,7 @@ const EXCHANGE_HANDLERS = {
 };
 
 const app = express();
-app.use express.json());
+app.use(express.json());
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   if (!ALLOWED_ORIGINS.length || (origin && ALLOWED_ORIGINS.includes(origin))) {
