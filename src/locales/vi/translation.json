@@ -11,8 +11,6 @@
     "success": "Thành công",
     "inDevelopment": "Đang Phát Triển",
     "comingSoon": "Sắp Ra Mắt",
-    "inDevelopment": "Đang Phát Triển",
-    "comingSoon": "Sắp Ra Mắt",
     "confirm": "Xác nhận",
     "close": "Đóng",
     "back": "Quay lại",
@@ -650,6 +648,26 @@
       "title": "Tham Gia Hàng Nghìn Trader",
       "subtitle": "Bắt đầu theo dõi giao dịch của bạn và cải thiện hiệu suất ngay hôm nay",
       "button": "Bắt Đầu Miễn Phí"
+    }
+  },
+  "monthlyGoal": {
+    "title": "Mục tiêu tháng",
+    "setGoal": "Đặt mục tiêu",
+    "editGoal": "Sửa mục tiêu",
+    "targetLabel": "Mục tiêu tháng (USD)",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "emptyState": "Đặt mục tiêu hằng tháng để theo dõi tiến độ và cấp bậc.",
+    "of": "trên",
+    "ofGoal": "của mục tiêu",
+    "noTier": "Chưa có cấp bậc",
+    "vsLastMonth": "so với tháng trước",
+    "average": "Trung bình mỗi tháng",
+    "trophyCase": "Các tháng trước",
+    "tiers": {
+      "bronze": "Đồng",
+      "silver": "Bạc",
+      "gold": "Vàng"
     }
   }
 }
