@@ -4820,6 +4820,7 @@ export type Database = {
           layout_mode_command_center: string | null
           layout_mode_trade_station: string | null
           longest_visit_streak: number | null
+          monthly_goal_target: number | null
           monthly_report: boolean | null
           onboarding_completed: boolean | null
           performance_alerts: boolean | null
@@ -4895,6 +4896,7 @@ export type Database = {
           layout_mode_command_center?: string | null
           layout_mode_trade_station?: string | null
           longest_visit_streak?: number | null
+          monthly_goal_target?: number | null
           monthly_report?: boolean | null
           onboarding_completed?: boolean | null
           performance_alerts?: boolean | null
@@ -4970,6 +4972,7 @@ export type Database = {
           layout_mode_command_center?: string | null
           layout_mode_trade_station?: string | null
           longest_visit_streak?: number | null
+          monthly_goal_target?: number | null
           monthly_report?: boolean | null
           onboarding_completed?: boolean | null
           performance_alerts?: boolean | null

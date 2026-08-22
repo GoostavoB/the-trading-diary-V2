@@ -7,6 +7,7 @@ import { TradingQualityMetrics } from '@/components/insights/TradingQualityMetri
 import { BehaviorAnalytics } from '@/components/insights/BehaviorAnalytics';
 import { TotalCapitalWidget } from '@/components/widgets/TotalCapitalWidget';
 import { OneYearProjectionWidget } from '@/components/widgets/OneYearProjectionWidget';
+import { MonthlyGoalWidget } from '@/components/widgets/MonthlyGoalWidget';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useIsMobile } from '@/hooks/use-mobile';
 import type { Trade } from '@/types/trade';
@@ -71,6 +72,9 @@ export function CommandCenterContent() {
     // Unified rendering — same content on mobile/desktop, differs only in grid columns.
     return (
         <div className="flex flex-col gap-4 animate-in fade-in-50 duration-500 pb-6">
+
+            {/* ── Row 0: Monthly Goal (auto-renewing, tiered) ── */}
+            <MonthlyGoalWidget />
 
             {/* ── Row 1: KPI Strip ── */}
             <InsightsQuickSummary
