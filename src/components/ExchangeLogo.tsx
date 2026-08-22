@@ -1,31 +1,36 @@
 import { useState } from "react";
 
 interface ExchangeLogoProps {
-  exchangeId: string;
-  exchangeName: string;
-  size?: "sm" | "md" | "lg";
-  className?: string;
-  showFallback?: boolean;
+    exchangeId: string;
+    exchangeName: string;
+    size?: "sm" | "md" | "lg";
+    className?: string;
+    showFallback?: boolean;
 }
 
 const exchangeLogos: Record<string, { svg: string; png?: string }> = {
-  binance: { svg: "/exchange-logos/binance.png?v=20251022-1" },
-  bybit: { svg: "/exchange-logos/bybit.png?v=20251022-1" },
-  coinbase: { svg: "/exchange-logos/coinbase.png" },
-  okx: { svg: "/exchange-logos/okx.svg" },
-  kraken: { svg: "/exchange-logos/kraken.svg" },
-  kucoin: { svg: "/exchange-logos/kucoin.png?v=20251022-1" },
-  gateio: { svg: "/exchange-logos/gateio.svg" },
-  mexc: { svg: "/exchange-logos/mexc.png?v=20251022-1" },
-  bitfinex: { svg: "/exchange-logos/bitfinex.png" },
-  bitstamp: { svg: "/exchange-logos/bitstamp.png" },
-  bingx: { svg: "/exchange-logos/bingx.png?v=20251022-1" },
+    binance: { svg: "/exchange-logos/binance.png?v=20251022-1" },
+    bybit: { svg: "/exchange-logos/bybit.png?v=20251022-1" },
+    coinbase: { svg: "/exchange-logos/coinbase.png" },
+    okx: { svg: "/exchange-logos/okx.svg" },
+    kraken: { svg: "/exchange-logos/kraken.svg" },
+    kucoin: { svg: "/exchange-logos/kucoin.png?v=20251022-1" },
+    gateio: { svg: "/exchange-logos/gateio.svg" },
+    mexc: { svg: "/exchange-logos/mexc.png?v=20251022-1" },
+    bitfinex: { svg: "/exchange-logos/bitfinex.png" },
+    bitstamp: { svg: "/exchange-logos/bitstamp.png" },
+    bingx: { svg: "/exchange-logos/bingx.png?v=20251022-1" },
 };
 
-const sizeClasses = {
-  sm: "h-5 md:h-6",
-  md: "h-6 md:h-8",
-  lg: "h-8 md:h-10",
+// Fixed bounding box per size — every logo, regardless of its native
+// aspect ratio or resolution, is constrained to the same box and centered
+// with object-contain. This replaces the old per-exchange manual
+// "sizeScale" transform hacks that were compensating for inconsistent
+// source assets (mixed PNG/SVG, different padding/whitespace).
+const sizeBoxClasses = {
+  sm: "h-8 w-20",
+  md: "h-10 w-24",
+  lg: "h-12 w-32",
 };
 
 export const ExchangeLogo = ({
@@ -43,10 +48,8 @@ export const ExchangeLogo = ({
 
   const handleError = () => {
     if (!usePng && logoData?.png) {
-      // Try PNG fallback
       setUsePng(true);
     } else {
-      // Show text fallback
       setImgError(true);
     }
   };
@@ -54,23 +57,24 @@ export const ExchangeLogo = ({
   if (imgError || !logoData) {
     return showFallback ? (
       <div
-        className={`${sizeClasses[size]} w-auto px-4 py-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 flex items-center justify-center ${className}`}
+        className={`${sizeBoxClasses[size]} rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 flex items-center justify-center ${className}`}
         aria-label={`${exchangeName} logo`}
-      >
-        <span className="text-sm font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent uppercase tracking-wider">
-          {exchangeName.slice(0, 4)}
-        </span>
+        >
+      <span className="text-sm font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent uppercase tracking-wider">
+        {exchangeName.slice(0, 4)}
+      </span>
       </div>
-    ) : null;
+      ) : null;
   }
-
+  
   const imgSrc = usePng && logoData.png ? logoData.png : logoData.svg;
-
+  
   return (
+    <div className={`${sizeBoxClasses[size]} flex items-center justify-center ${className}`}>
     <img
       src={imgSrc}
       alt={`${exchangeName} logo`}
-      className={`${sizeClasses[size]} w-auto object-contain dark:bg-background dark:rounded-lg dark:p-2 ${className}`}
+      className="max-h-full max-w-full object-contain dark:bg-background dark:rounded-lg dark:p-1"
       onError={handleError}
       loading="lazy"
       decoding="async"
@@ -79,6 +83,8 @@ export const ExchangeLogo = ({
         WebkitBackfaceVisibility: "hidden",
         backfaceVisibility: "hidden",
       }}
-    />
-  );
+      />
+    </div>
+    );
 };
+</div>
