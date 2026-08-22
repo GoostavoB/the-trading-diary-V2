@@ -31,7 +31,7 @@ interface DragSelection {
   endValue: number | null;
 }
 
-const LongShortRatio = () => {
+export const LongShortRatioContent = () => {
   const [binanceData, setBinanceData] = useState<BinanceLongShortData[]>([]);
   const [loadingBinance, setLoadingBinance] = useState(true);
   const [period, setPeriod] = useState("1h");
@@ -180,15 +180,6 @@ const LongShortRatio = () => {
   const distRef = getDistRefArea();
 
   return (
-    <>
-      <SEO
-        title={pageMeta.longShortRatio.title}
-        description={pageMeta.longShortRatio.description}
-        keywords={pageMeta.longShortRatio.keywords}
-        canonical={pageMeta.longShortRatio.canonical}
-        noindex={true}
-      />
-      <AppLayout>
       <div className="space-y-6">
       {/* Controls */}
       <div className="flex gap-4">
@@ -402,9 +393,23 @@ const LongShortRatio = () => {
         </>
       )}
     </div>
-    </AppLayout>
-    </>
   );
 };
+        const LongShortRatio = () => (
+            <>
 
-export default LongShortRatio;
+            <SEO
+                    title={pageMeta.longShortRatio.title}
+                    description={pageMeta.longShortRatio.description}
+                    keywords={pageMeta.longShortRatio.keywords}
+                    canonical={pageMeta.longShortRatio.canonical}
+                    noindex={true}
+                  />
+            <AppLayout>
+                  <LongShortRatioContent />
+            </AppLayout>
+      
+            </>
+        );
+      
+      export default LongShortRatio;
