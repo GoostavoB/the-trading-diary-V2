@@ -12,8 +12,72 @@ import type {
  * Base Exchange Adapter
  * Abstract class providing common functionality for all exchange adapters
  */
+export type ConnectionErrorType = 'auth' | 'network' | 'unknown';
+
+export interface ConnectionError {
+  type: ConnectionErrorType;
+  message: string;
+}
+
+/**
+ * Classify a raw adapter error so callers can tell an actual credential
+ * rejection from a transient network failure (fetch failed / timeout / DNS).
+ * Blaming credentials for a network blip sends users on a wild goose chase.
+ */
+export function classifyConnectionError(error: unknown): ConnectionError {
+  const raw = error instanceof Error ? error.message : String(error);
+  const lower = raw.toLowerCase();
+
+  const networkSignals = [
+    'fetch failed',
+    'timeout',
+    'timed out',
+    'etimedout',
+    'econnreset',
+    'econnrefused',
+    'enotfound',
+    'dns',
+    'network',
+    'socket',
+    'tls',
+    'certificate',
+    'connection closed',
+  ];
+  const authSignals = [
+    'invalid api',
+    'invalid signature',
+    'signature',
+    'apikey',
+    'api key',
+    'api-key',
+    'permission',
+    'unauthorized',
+    'authentication',
+    'forbidden',
+    'invalid credential',
+  ];
+
+  if (networkSignals.some((s) => lower.includes(s))) {
+    return {
+      type: 'network',
+      message: `Could not reach the exchange (network error): ${raw}`,
+    };
+  }
+
+  if (authSignals.some((s) => lower.includes(s))) {
+    return {
+      type: 'auth',
+      message: `Exchange rejected the API credentials: ${raw}`,
+    };
+  }
+
+  return { type: 'unknown', message: raw };
+}
+
 export abstract class BaseExchangeAdapter {
   protected credentials: ExchangeCredentials;
+  /** Set by testConnection() implementations when the check fails. */
+  public lastConnectionError?: ConnectionError;
   protected abstract baseUrl: string;
   protected abstract name: string;
   protected abstract rateLimitDelay: number;

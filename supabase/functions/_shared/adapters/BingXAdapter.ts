@@ -1,4 +1,4 @@
-import { BaseExchangeAdapter } from './BaseExchangeAdapter.ts';
+import { BaseExchangeAdapter, classifyConnectionError } from './BaseExchangeAdapter.ts';
 import type {
   ExchangeCredentials,
   Trade,
@@ -60,10 +60,17 @@ export class BingXAdapter extends BaseExchangeAdapter {
       // account actually trades — a much better connectivity check than
       // hitting a spot-only endpoint (the old version's mistake, which
       // made "connected" misleading for perp-only accounts).
-      await this.client.fetchBalance({ type: 'spot' });
+      // Retried: a single transient TLS/DNS blip reaching BingX from the
+      // edge runtime should not fail the whole connection check.
+      await this.retryRequest(() => this.client.fetchBalance({ type: 'spot' }), 2, 500);
+      this.lastConnectionError = undefined;
       return true;
     } catch (error) {
-      console.error('BingX testConnection failed:', error instanceof Error ? error.message : error);
+      this.lastConnectionError = classifyConnectionError(error);
+      console.error(
+        `BingX testConnection failed (${this.lastConnectionError.type}):`,
+        this.lastConnectionError.message
+      );
       return false;
     }
   }

@@ -192,8 +192,14 @@ Deno.serve(async (req) => {
     );
 
     if (!initialized) {
-      const errorMsg = 'Invalid API credentials. Please check your API key and secret.';
-      console.error(`[${connection.exchange_name}] Connection failed:`, errorMsg);
+      const initError = exchangeService.lastInitError;
+      const errorMsg =
+        initError?.type === 'network'
+          ? `Could not reach ${connection.exchange_name} right now. This is a network/connectivity issue, not your API key. Please try again in a moment. (${initError.message})`
+          : initError?.type === 'auth'
+            ? `Invalid API credentials. Please check your API key and secret. (${initError.message})`
+            : initError?.message ?? `Connection to ${connection.exchange_name} failed.`;
+      console.error(`[${connection.exchange_name}] Connection failed (${initError?.type ?? 'unknown'}):`, errorMsg);
       
       await supabaseClient
         .from('exchange_connections')
@@ -203,7 +209,7 @@ Deno.serve(async (req) => {
         })
         .eq('id', connectionId);
 
-      throw new Error(`Failed to connect to ${connection.exchange_name}. Please check your credentials.`);
+      throw new Error(errorMsg);
     }
     
     console.log(`[${connection.exchange_name}] Connection successful`);
