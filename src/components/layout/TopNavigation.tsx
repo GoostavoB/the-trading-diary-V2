@@ -7,16 +7,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import {
-    NavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    NavigationMenuList,
-    NavigationMenuTrigger,
-    navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu';
-import { Logo } from '@/components/Logo';
+import { MarketTicker } from './MarketTicker';
+   import { Logo } from '@/components/Logo';
 import { UserAccountMenu } from './UserAccountMenu';
 import { ThemeStudio } from '@/components/theme-studio/ThemeStudio';
 import { CurrencySelector } from '@/components/CurrencySelector';
@@ -26,6 +18,7 @@ import { MobileNav } from '@/components/mobile/MobileNav';
 export function TopNavigation() {
     const location = useLocation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
 
     const isActive = (path: string) => location.pathname === path;
 
@@ -67,81 +60,32 @@ export function TopNavigation() {
     return (
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
             <div className="w-full flex h-16 items-center justify-between px-4 md:px-6">
-                {/* Logo — clicks return to Dashboard (default tab) */}
-                <div className="flex items-center gap-6">
-                    <NavLink
-                        to="/dashboard"
-                        className="rounded-md transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                        aria-label="The Trading Diary — go to Dashboard"
-                    >
-                        <Logo size="sm" variant="horizontal" showText={true} />
-                    </NavLink>
-
-                    {/* Desktop Navigation */}
-                    <div className="hidden md:flex">
-                        <NavigationMenu>
-                            <NavigationMenuList>
-                                {menuItems.map((item) => (
-                                    <NavigationMenuItem key={item.title}>
-                                        {item.url ? (
-                                            <NavLink
-                                                to={item.url}
-                                                className={cn(
-                                                    // Base: transparent bg, iOS-style text, tight hit area
-                                                    "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
-                                                    // Active: subtle primary tint, clearly readable (AA contrast)
-                                                    isActive(item.url.split('?')[0])
-                                                        ? "bg-primary/15 text-primary ring-1 ring-primary/25"
-                                                        : "bg-transparent text-foreground/80 hover:bg-white/5 hover:text-foreground"
-                                                )}
-                                            >
-                                                {item.title}
-                                            </NavLink>
-                                        ) : (
-                                            <>
-                                                <NavigationMenuTrigger className="bg-transparent text-foreground/80 hover:bg-white/5 hover:text-foreground data-[state=open]:bg-white/5 data-[state=open]:text-foreground focus:bg-white/5 transition-colors duration-150">
-                                                    {item.title}
-                                                </NavigationMenuTrigger>
-                                                <NavigationMenuContent>
-                                                    <ul className="grid w-[420px] gap-1 p-3 md:w-[520px] md:grid-cols-2 bg-card/98 backdrop-blur-2xl border border-border/20 shadow-2xl rounded-xl">
-                                                        {item.items?.map((subItem) => (
-                                                            <li key={subItem.title}>
-                                                                <NavigationMenuLink asChild>
-                                                                    <NavLink
-                                                                        to={subItem.url}
-                                                                        className={cn(
-                                                                            "flex items-start gap-3 select-none rounded-lg p-3 leading-none no-underline outline-none transition-all duration-150 hover:bg-white/5 focus:bg-white/5 group",
-                                                                            isActive(subItem.url) && "bg-primary/[0.08] border border-primary/15"
-                                                                        )}
-                                                                    >
-                                                                        <div className={cn(
-                                                                            "mt-0.5 p-1.5 rounded-md shrink-0 transition-colors duration-150",
-                                                                            isActive(subItem.url) ? "bg-primary/15" : "bg-white/5 group-hover:bg-primary/10"
-                                                                        )}>
-                                                                            <subItem.icon className={cn("h-3.5 w-3.5", isActive(subItem.url) ? "text-primary" : "text-muted-foreground group-hover:text-primary")} />
-                                                                        </div>
-                                                                        <div className="flex-1 min-w-0">
-                                                                            <div className={cn("text-sm font-medium leading-none mb-1", isActive(subItem.url) ? "text-primary" : "text-foreground")}>
-                                                                                {subItem.title}
-                                                                            </div>
-                                                                            <p className="text-xs leading-snug text-muted-foreground line-clamp-1">
-                                                                                {subItem.description}
-                                                                            </p>
-                                                                        </div>
-                                                                    </NavLink>
-                                                                </NavigationMenuLink>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </NavigationMenuContent>
-                                            </>
-                                        )}
-                                    </NavigationMenuItem>
-                                ))}
-                            </NavigationMenuList>
-                        </NavigationMenu>
-                    </div>
-                </div>
+                {/* Hamburger + Logo */}
+            <div className="flex items-center gap-3">
+            <Button
+                variant="ghost"
+                size="icon"
+                className="hidden md:inline-flex"
+                onClick={() => setIsNavMenuOpen(!isNavMenuOpen)}
+                aria-label="Toggle navigation menu"
+                >
+            <Menu className="h-5 w-5" />
+            </Button>
+            <NavLink
+                to="/dashboard"
+                className="rounded-md transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                aria-label="The Trading Diary — go to Dashboard"
+                >
+            <Logo size="sm" variant="horizontal" showText={true} />
+            </NavLink>
+            </div>
+            
+                {/* Market Ticker */}
+            <div className="hidden lg:flex flex-1 items-center justify-center px-6">
+            <MarketTicker />
+            </div>
+            
+            </div>
 
                 {/* Right Actions */}
                 <div className="flex items-center gap-2 md:gap-4">
@@ -174,6 +118,49 @@ export function TopNavigation() {
                 </div>
             </div>
 
+        {/* Desktop Nav Dropdown Panel */}
+    {isNavMenuOpen && (
+        <div className="hidden md:block absolute left-4 top-16 z-50 w-80 rounded-xl border border-border/40 bg-background/95 backdrop-blur-xl p-4 shadow-xl space-y-4">
+            {menuItems.map((item) => (
+            <div key={item.title} className="space-y-2">
+                {item.url ? (
+                <NavLink
+                    to={item.url}
+                    onClick={() => setIsNavMenuOpen(false)}
+                    className={cn(
+                        "flex items-center gap-3 py-2 px-3 rounded-lg transition-colors",
+                        isActive(item.url) ? "bg-primary/10 text-primary" : "hover:bg-white/5 text-foreground"
+                        )}
+                    >
+                <item.icon className="h-4 w-4" />
+                <span className="text-sm font-medium">{item.title}</span>
+                </NavLink>
+                ) : (
+                <>
+                <h4 className="text-xs font-semibold text-muted-foreground px-3">{item.title}</h4>
+                <div className="grid grid-cols-1 gap-1">
+                    {item.items?.map((subItem) => (
+                    <NavLink
+                        key={subItem.title}
+                        to={subItem.url}
+                        onClick={() => setIsNavMenuOpen(false)}
+                        className={cn(
+                            "flex items-center gap-3 py-2 px-3 rounded-lg transition-colors",
+                            isActive(subItem.url) ? "bg-primary/10 text-primary" : "hover:bg-white/5 text-foreground"
+                            )}
+                        >
+                    <subItem.icon className="h-4 w-4" />
+                    <span className="text-sm font-medium">{subItem.title}</span>
+                    </NavLink>
+                    ))}
+                </div>
+                </>
+                )}
+            </div>
+            ))}
+        </div>
+        )}
+    
             {/* Mobile Menu Overlay */}
             {isMobileMenuOpen && (
                 <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur-xl p-4 space-y-4 absolute w-full left-0 top-16 h-[calc(100vh-4rem)] overflow-y-auto">
