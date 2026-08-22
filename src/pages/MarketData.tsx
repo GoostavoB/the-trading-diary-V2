@@ -11,13 +11,7 @@ import { LSRAlertSettings } from '@/components/LSRAlertSettings';
 import { useLSRNotifications } from '@/hooks/useLSRNotifications';
 
 // Lazy load heavy components
-const LongShortRatioContent = lazy(() => import('@/pages/LongShortRatio').then(m => ({
-  default: () => {
-    const Component = m.default;
-    return <Component />;
-  }
-})));
-
+const LongShortRatioContent = lazy(() => import('@/pages/LongShortRatio').then(m => ({ default: m.LongShortRatioContent })));
 const OpenInterestChartsContent = lazy(() => import('@/components/OpenInterestCharts').then(m => ({ default: m.OpenInterestCharts })));
 
 const MarketData = () => {
