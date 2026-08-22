@@ -22,6 +22,8 @@ import { ThemeStudio } from '@/components/theme-studio/ThemeStudio';
 import { CurrencySelector } from '@/components/CurrencySelector';
 import { BlurToggle } from '@/components/BlurToggle';
 import { MobileNav } from '@/components/mobile/MobileNav';
+import { MonthlyGoalNavBadge } from './MonthlyGoalNavBadge';
+
 
 export function TopNavigation() {
     const location = useLocation();
