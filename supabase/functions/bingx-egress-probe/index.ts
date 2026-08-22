@@ -19,6 +19,24 @@ function describe(error: unknown): string[] {
   return chain;
 }
 
+async function ccxtProbe(useNativeFetch: boolean) {
+  const ccxt = (await import('npm:ccxt@^4')).default;
+  const client = new (ccxt as any).bingx({
+    apiKey: 'dummy-invalid-key',
+    secret: 'dummy-invalid-secret',
+    enableRateLimit: true,
+  });
+  if (useNativeFetch) {
+    client.fetchImplementation = fetch;
+  }
+  try {
+    const bal = await client.fetchBalance({ type: 'spot' });
+    return { ok: true, sample: JSON.stringify(bal).slice(0, 150) };
+  } catch (error) {
+    return { ok: false, causeChain: describe(error) };
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
@@ -43,6 +61,9 @@ Deno.serve(async (req) => {
       console.error(`probe ${url} failed:`, JSON.stringify(describe(error)));
     }
   }
+
+  results['ccxt:default-transport'] = await ccxtProbe(false);
+  results['ccxt:native-fetch'] = await ccxtProbe(true);
 
   return new Response(JSON.stringify(results, null, 2), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
