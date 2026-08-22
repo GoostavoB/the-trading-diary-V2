@@ -52,6 +52,11 @@ export class BingXAdapter extends BaseExchangeAdapter {
       secret: credentials.apiSecret,
       enableRateLimit: true,
     });
+    // Force ccxt to use Deno's native fetch. Its default transport in the
+    // npm-compat layer is what produced bare "TypeError: fetch failed"
+    // errors with no cause, while raw fetch to the same BingX endpoints
+    // works from the same egress (verified 2026-08-22).
+    this.client.fetchImplementation = fetch;
   }
 
   async testConnection(): Promise<boolean> {
