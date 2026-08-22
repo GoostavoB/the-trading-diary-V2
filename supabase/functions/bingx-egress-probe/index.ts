@@ -26,6 +26,8 @@ Deno.serve(async (req) => {
     'https://open-api.bingx.com/openApi/swap/v2/server/time',
     'https://open-api.bingx.com/openApi/spot/v1/common/symbols',
     'https://api.binance.com/api/v3/time',
+    'https://open-api.bingx.com/openApi/wallets/v1/capital/config/getall?timestamp=1&signature=x',
+    'https://open-api.bingx.com/openApi/spot/v1/account/balance?timestamp=1&signature=x',
   ];
 
   const results: Record<string, unknown> = {};
