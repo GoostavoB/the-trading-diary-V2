@@ -67,10 +67,23 @@ export class BingXAdapter extends BaseExchangeAdapter {
       return true;
     } catch (error) {
       this.lastConnectionError = classifyConnectionError(error);
+      // Deno's "fetch failed" TypeError carries the real reason on .cause
+      // (ECONNREFUSED / ENOTFOUND / TLS / timeout). Log the whole cause
+      // chain — without it "fetch failed" is undiagnosable.
+      const causeChain: string[] = [];
+      let cur: any = error;
+      let depth = 0;
+      while (cur && depth < 5) {
+        causeChain.push(
+          `${cur?.name ?? typeof cur}: ${cur?.message ?? String(cur)}${cur?.code ? ` [code=${cur.code}]` : ''}${cur?.errno ? ` [errno=${cur.errno}]` : ''}`
+        );
+        cur = cur?.cause;
+        depth++;
+      }
       console.error(
-        `BingX testConnection failed (${this.lastConnectionError.type}):`,
-        this.lastConnectionError.message
+        `BingX testConnection failed (${this.lastConnectionError.type}): ${this.lastConnectionError.message}`
       );
+      console.error('BingX testConnection cause chain:', JSON.stringify(causeChain));
       return false;
     }
   }

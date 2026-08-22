@@ -127,6 +127,13 @@ export abstract class BaseExchangeAdapter {
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         
+        const cause = (error as any)?.cause;
+        if (cause) {
+          console.error(
+            `Request error cause: ${cause?.name ?? typeof cause}: ${cause?.message ?? String(cause)}${cause?.code ? ` [code=${cause.code}]` : ''}`
+          );
+        }
+
         if (attempt < maxRetries) {
           const delay = baseDelay * Math.pow(2, attempt);
           console.log(`Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms`);
