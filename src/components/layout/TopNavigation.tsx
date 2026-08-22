@@ -22,6 +22,8 @@ import { ThemeStudio } from '@/components/theme-studio/ThemeStudio';
 import { CurrencySelector } from '@/components/CurrencySelector';
 import { BlurToggle } from '@/components/BlurToggle';
 import { MobileNav } from '@/components/mobile/MobileNav';
+import { MonthlyGoalNavBadge } from './MonthlyGoalNavBadge';
+
 
 export function TopNavigation() {
     const location = useLocation();
@@ -145,8 +147,12 @@ export function TopNavigation() {
 
                 {/* Right Actions */}
                 <div className="flex items-center gap-2 md:gap-4">
+                    {/* Monthly goal — compact tier badge */}
+                    <MonthlyGoalNavBadge />
+
                     {/* Add Trade — primary CTA, always distinct from tabs (iOS blue gradient, white text) */}
                     <NavLink to="/upload" className="hidden sm:block">
+
                         <Button
                             size="sm"
                             className="gap-1.5 font-semibold !bg-primary !text-primary-foreground hover:!bg-primary/90 shadow-[0_4px_14px_hsl(var(--primary)/0.35)] border border-primary/60"

@@ -2097,5 +2097,25 @@
       "subtitle": "Explore and take your trading to the next level.",
       "footer": "You can review this tour anytime in settings."
     }
+  },
+  "monthlyGoal": {
+    "title": "Monthly goal",
+    "setGoal": "Set goal",
+    "editGoal": "Edit goal",
+    "targetLabel": "Monthly target (USD)",
+    "save": "Save",
+    "cancel": "Cancel",
+    "emptyState": "Set a monthly target to track your progress and tiers.",
+    "of": "of",
+    "ofGoal": "of goal",
+    "noTier": "No tier yet",
+    "vsLastMonth": "vs last month",
+    "average": "Monthly average",
+    "trophyCase": "Past months",
+    "tiers": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold"
+    }
   }
 }

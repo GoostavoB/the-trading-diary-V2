@@ -7,6 +7,8 @@ import { TradingQualityMetrics } from '@/components/insights/TradingQualityMetri
 import { BehaviorAnalytics } from '@/components/insights/BehaviorAnalytics';
 import { TotalCapitalWidget } from '@/components/widgets/TotalCapitalWidget';
 import { OneYearProjectionWidget } from '@/components/widgets/OneYearProjectionWidget';
+import { MonthlyGoalWidget } from '@/components/widgets/MonthlyGoalWidget';
+
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useIsMobile } from '@/hooks/use-mobile';
 import type { Trade } from '@/types/trade';
@@ -72,7 +74,11 @@ export function CommandCenterContent() {
     return (
         <div className="flex flex-col gap-4 animate-in fade-in-50 duration-500 pb-6">
 
+            {/* ── Row 0: Monthly goal ── */}
+            <MonthlyGoalWidget />
+
             {/* ── Row 1: KPI Strip ── */}
+
             <InsightsQuickSummary
                 totalPnL={stats.totalPnL}
                 winRate={stats.winRate}

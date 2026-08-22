@@ -29,117 +29,276 @@
     "upload": "Subir",
     "view": "Ver",
     "customize": "Personalizar",
-    "settings": "Configuración",
-    "inDevelopment": "En Desarrollo",
-    "comingSoon": "Próximamente"
+    "settings": "Configuración"
   },
   "landing": {
-    "stats": {
-      "fasterUploads": {
-        "title": "40× Más Rápido",
-        "description": "Carga por lotes desde capturas. Sin entrada manual."
-      },
-      "knowEveryFee": {
-        "title": "Conoce Cada Comisión",
-        "description": "Compara exchanges y descubre costos ocultos."
-      },
-      "yourRules": {
-        "title": "Tu Panel, Tus Reglas",
-        "description": "Métricas, colores y diseño completamente personalizables."
-      }
+    "hero": {
+      "title": "El Diario de Trading Crypto #1",
+      "subtitle": "Rastrea, analiza y revisa cada operación cripto con IA. Construido exclusivamente para traders de criptomonedas.",
+      "cta": "Comenzar Gratis",
+      "watchDemo": "Ver Demo"
     },
-    "benefits": {
-      "fasterUploads": {
-        "title": "40× Más Rápido",
-        "description": "Carga por lotes desde capturas. Sin entrada manual."
-      },
-      "knowEveryFee": {
-        "title": "Conoce Cada Comisión",
-        "description": "Compara exchanges y descubre costos ocultos."
-      },
-      "yourRules": {
-        "title": "Tu Panel, Tus Reglas",
-        "description": "Métricas, colores y diseño completamente personalizables."
-      }
+    "stats": {
+      "activeTraders": "Traders Activos",
+      "tradesLogged": "Operaciones Registradas",
+      "satisfaction": "Satisfacción"
     },
     "dashboardShowcase": {
-      "title": "Tus operaciones, organizadas. Este muestra el progreso.",
-      "subtitle": "Rastrea todo en un solo lugar: P&L, emociones, errores. Encuentra lo que funciona.",
-      "cta": "Comenzar a Rastrear"
-    },
-    "exchangeLogos": {
-      "title": "Confiado por más de 10,000 traders de cripto en todo el mundo",
-      "subtitle": "Conecta tus exchanges favoritos e importa operaciones automáticamente"
+      "title": "Otros journals muestran números. Este muestra progreso.",
+      "subtitle": "Cada función fue diseñada por traders activos para ayudarte a entender tus decisiones, no solo registrarlas. No es una herramienta, es tu coach de trading.",
+      "cta": "Verlo en acción"
     },
     "features": {
-      "title": "Opera Mejor con Datos",
-      "subtitle": "Todo lo que necesitas para mejorar tu rendimiento de trading",
+      "title": "Todo Lo Que Necesitas Para Operar Mejor",
+      "subtitle": "Funciones potentes diseñadas para ayudarte a tomar mejores decisiones.",
       "smartLogging": {
         "title": "Registro Inteligente",
-        "description": "Captura capturas de pantalla, añade etiquetas emocionales, rastrea errores—todo en un lugar.",
-        "blogLinkText": "Saber Más"
+        "description": "Añade operaciones en segundos con detalles, capturas y notas."
       },
       "autoImports": {
         "title": "Importación Automática",
-        "description": "Conecta Binance, Bybit y más. Sincroniza operaciones automáticamente.",
-        "blogLinkText": "Ver Exchanges"
+        "description": "Conecta tu exchange o broker para sincronización instantánea."
       },
       "advancedAnalytics": {
-        "title": "Análisis Avanzado",
-        "description": "Tasa de éxito, expectativa, rachas—ve qué es realmente rentable.",
-        "blogLinkText": "Explorar Análisis"
+        "title": "Análisis Avanzados",
+        "description": "Visualiza tasas de éxito, ratios de riesgo y rendimiento de estrategias."
       },
       "tagFilter": {
-        "title": "Etiquetar y Filtrar",
-        "description": "Organiza por configuración, marco temporal, emoción. Encuentra patrones al instante.",
-        "blogLinkText": "Cómo Funciona"
+        "title": "Etiqueta y Filtra Todo",
+        "description": "Rastrea setups, emociones y errores con métricas personalizadas."
       },
       "mobileFriendly": {
-        "title": "Compatible con Móviles",
-        "description": "Registra operaciones sobre la marcha. Experiencia completa en cualquier dispositivo.",
-        "blogLinkText": "Comenzar"
-      },
-      "learnMore": "Saber Más",
-      "readMoreInsights": "Leer Más Perspectivas de Trading"
-    },
-    "testimonials": {
-      "sectionTitle": "Confiado por Traders",
-      "testimonial1": {
-        "quote": "Este diario cambió completamente cómo analizo mis operaciones. Los insights de IA son increíbles.",
-        "author": "Marcus Chen",
-        "role": "Day Trader",
-        "exchange": "Binance"
-      },
-      "testimonial2": {
-        "quote": "Finalmente, una herramienta que entiende el trading cripto. Solo el seguimiento de comisiones me ahorró miles.",
-        "author": "Sarah Rodríguez",
-        "role": "Swing Trader",
-        "exchange": "Coinbase"
+        "title": "Amigable con Móviles",
+        "description": "Accede a tu journal en cualquier lugar: teléfono, tablet o escritorio."
       }
     },
-    "proofBar": {
-      "activeTraders": "Traders Activos",
-      "tradesAnalyzed": "Operaciones Analizadas",
-      "averageRating": "Calificación Promedio"
+    "testimonials": {
+      "title": "Confiado por Miles de Traders",
+      "subtitle": "Resultados reales de traders reales.",
+      "approvedByTraders": "Aprobado por traders profesionales",
+      "alex": {
+        "name": "Alex Chen",
+        "role": "Day Trader",
+        "text": "La tasa de éxito pasó del 52% al 68% en 3 meses."
+      },
+      "sarah": {
+        "name": "Sarah Mitchell",
+        "role": "Inversora Crypto",
+        "text": "La función de etiquetas emocionales es genial... Mi consistencia nunca ha sido mejor."
+      },
+      "marcus": {
+        "name": "Marcus Rodriguez",
+        "role": "Swing Trader",
+        "text": "La extracción con IA me ahorra 2 horas por semana... Vale cada centavo."
+      }
     },
-    "hero": {
-      "titleShort": "Rastrea cada operación cripto. Aprende más rápido.",
-      "benefits": [
-        "Importa operaciones en minutos",
-        "Ve P&L real con comisiones",
-        "Revisa setups con etiquetas"
-      ],
-      "ctaPrimary": "Comenzar gratis"
+    "exchangeLogos": {
+      "title": "Construido para traders crypto que toman el rendimiento en serio.",
+      "subtitle": "Ya sea que hagas scalping, day trading o swing, rastrea lo que funciona y lo que te cuesta."
+    },
+    "pricing": {
+      "title": "Precios Simples y Transparentes",
+      "subtitle": "Elige el plan que se ajuste a tu viaje de trading",
+      "mostPopular": "Más Popular",
+      "perMonth": "mes",
+      "perMonthBilledAnnually": "mes, facturado anualmente",
+      "savingsAmount": "Ahorra ${{amount}}/año",
+      "guaranteeNote": "Garantía de devolución de 7 días • Cancela en cualquier momento • Sin tarifas ocultas",
+      "hero": {
+        "title": "Opera con claridad.",
+        "subtitle": "Un diario de trading impulsado por IA para inversores en cripto. Captura cada operación, encuentra patrones y rastrea tu ventaja.",
+        "primaryCta": "Comenzar Prueba Gratis",
+        "secondaryCta": "Ver demo de 2 minutos"
+      },
+      "solutions": {
+        "title": "Resultados que Importan",
+        "subtitle": "Capacidades premium construidas para traders de élite",
+        "seePatterns": {
+          "headline": "Ver patrones instantáneamente",
+          "subhead": "La IA lee todo tu historial. Resalta lo que realmente genera dinero.",
+          "metric": "4.2x revisiones más rápidas",
+          "proofPoint": "El trader promedio descubre 3 patrones rentables en la primera semana"
+        },
+        "knowEdge": {
+          "headline": "Conoce tu ventaja",
+          "subhead": "Cada setup, cada hora, cada condición de mercado. Medido.",
+          "metric": "67%",
+          "metricValue": 67,
+          "proofPoint": "Mejora de tasa de éxito (usuario promedio)"
+        },
+        "tradeConfidence": {
+          "headline": "Opera con confianza",
+          "subhead": "Tamaño de posición calculado. Riesgo controlado. Drawdowns predecidos.",
+          "metric": "89%",
+          "metricValue": 89,
+          "proofPoint": "Menos pérdidas excesivas"
+        },
+        "trackEffortlessly": {
+          "headline": "Rastrea todo sin esfuerzo",
+          "subhead": "Capturas de pantalla, notas, estado emocional. Todo organizado. Siempre buscable.",
+          "metric": "12 minutos ahorrados",
+          "metricValue": 12,
+          "proofPoint": "Por sesión de revisión"
+        },
+        "performanceSpeaks": {
+          "headline": "Rendimiento que habla",
+          "subhead": "Tasa de éxito, expectativa, múltiplos R. Gráficos que cuentan tu historia.",
+          "metric": "2.3 Sharpe",
+          "metricValue": 2.3,
+          "proofPoint": "Rendimiento promedio de usuarios élite"
+        },
+        "yourRules": {
+          "headline": "Tu panel, tus reglas",
+          "subhead": "Widgets que necesitas. Métricas que importan. Nada más.",
+          "metric": "8 diseños",
+          "metricValue": 8,
+          "proofPoint": "Configuraciones personalizadas por usuario (promedio)"
+        },
+        "builtByTraders": {
+          "headline": "Construido por traders que lo entienden",
+          "subhead": "Cada flujo de trabajo de diarios reales. Cada función probada en batalla.",
+          "metric": "10,000+ horas",
+          "metricValue": 10000,
+          "proofPoint": "De retroalimentación de traders integrada"
+        }
+      },
+      "billing": {
+        "monthly": "Mensual",
+        "annual": "Anual",
+        "save20": "Ahorra 20%"
+      },
+      "plans": {
+        "cta": "Comenzar Prueba Gratis",
+        "basic": {
+          "name": "Basic",
+          "description": "Perfecto para traders activos construyendo estructura",
+          "features": {
+            "uploads": "50 cargas de operaciones IA/mes",
+            "manualUploads": "Cargas manuales ilimitadas",
+            "dashboard": "Panel personalizado con más de 15 widgets",
+            "charts": "Gráficos avanzados y análisis",
+            "basicJournal": "Diario básico con seguimiento emocional",
+            "feeAnalytics": "Análisis de comisiones con alertas",
+            "csv": "Importación y exportación CSV",
+            "social": "Acceso al feed social y tabla de clasificación"
+          }
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "Para traders serios mejorando la disciplina",
+          "features": {
+            "uploads": "100 cargas de operaciones IA/mes",
+            "aiAnalysis": "1 Análisis de Rendimiento IA por semana",
+            "tradingPlan": "Constructor de Plan de Trading con checklist",
+            "goals": "Seguimiento de objetivos y progreso",
+            "richJournal": "Diario completo con análisis de humor y patrones",
+            "customWidgets": "5 widgets KPI personalizados",
+            "fullSocial": "Funciones sociales completas (posts, XP, badges)",
+            "everythingBasic": "Todo en Basic"
+          }
+        },
+        "elite": {
+          "name": "Elite",
+          "description": "Traders profesionales y analistas",
+          "features": {
+            "uploads": "300 cargas de operaciones IA/mes",
+            "aiAnalysis": "5 Análisis de Rendimiento IA por semana",
+            "tradeReplay": "Trade Replay (revisión paso a paso)",
+            "positionCalculator": "Calculadora Avanzada de Tamaño de Posición",
+            "riskDashboard": "Panel de Riesgo con análisis de drawdown",
+            "advancedAlerts": "Alertas avanzadas de rendimiento y comisiones",
+            "customWidgets": "Widgets KPI personalizados ilimitados",
+            "everythingPro": "Todo en Pro"
+          }
+        }
+      },
+      "comparison": {
+        "title": "Compara Planes en Detalle",
+        "subtitle": "Ve exactamente qué está incluido en cada plan",
+        "feature": "Característica",
+        "unlimited": "Ilimitado",
+        "categories": {
+          "aiAnalytics": "IA y Análisis",
+          "tradingTools": "Herramientas de Trading",
+          "journaling": "Diario y Psicología",
+          "riskManagement": "Gestión de Riesgo",
+          "integrations": "Integraciones",
+          "social": "Social y Comunidad"
+        },
+        "features": {
+          "aiUploads": "Cargas de Operaciones IA",
+          "manualUploads": "Cargas de Operaciones Manuales",
+          "aiAnalysis": "Análisis de Rendimiento IA",
+          "customWidgets": "Widgets KPI Personalizados",
+          "advancedCharts": "Gráficos Avanzados y Análisis",
+          "tradingPlan": "Constructor de Plan de Trading",
+          "preTradeChecklist": "Checklist Pre-Operación",
+          "goalsTracking": "Seguimiento de Objetivos",
+          "tradeReplay": "Trade Replay",
+          "positionCalculator": "Calculadora de Tamaño de Posición",
+          "basicJournal": "Diario Básico",
+          "emotionalTimeline": "Línea de Tiempo Emocional",
+          "richJournal": "Diario Completo con Seguimiento de Humor",
+          "patternAnalysis": "Análisis de Patrones",
+          "feeAnalytics": "Análisis de Comisiones",
+          "riskDashboard": "Panel de Riesgo",
+          "drawdownAnalysis": "Análisis de Drawdown",
+          "performanceAlerts": "Alertas de Rendimiento",
+          "csvImport": "Importación/Exportación CSV",
+          "exchangeConnections": "Conexiones de Exchange",
+          "autoRefresh": "Actualización Automática",
+          "viewFeed": "Ver Feed Social",
+          "createPosts": "Crear Posts y Comentarios",
+          "leaderboard": "Tabla de Clasificación",
+          "xpBadges": "XP y Badges",
+          "challenges": "Desafíos Diarios/Semanales"
+        }
+      },
+      "roadmap": {
+        "title": "Próximamente",
+        "subtitle": "Nuevas funciones emocionantes que estamos construyendo para ti",
+        "targetQuarter": "Objetivo",
+        "highPriority": "Alta Prioridad",
+        "mediumPriority": "Media Prioridad",
+        "features": {
+          "bestAssetFinder": "Localizador de Mejor Activo - Identifica tus pares más rentables",
+          "batchEdit": "Edición por Lotes - Edita múltiples operaciones a la vez",
+          "valueAtRisk": "Calculadora de Valor en Riesgo (VaR)",
+          "apiAccess": "Acceso a Clave API Solo Lectura",
+          "portfolioTracking": "Análisis y Snapshots de Portafolio",
+          "inAppAlerts": "Sistema de Alertas en la Aplicación",
+          "autosyncDelta": "Importaciones Delta de Sincronización Automática",
+          "savedViews": "Filtros Rápidos y Vistas Guardadas",
+          "teamCollaboration": "Herramientas de Colaboración en Equipo"
+        },
+        "disclaimer": "Las funciones y el cronograma están sujetos a cambios según los comentarios de los usuarios y las prioridades de desarrollo"
+      }
     },
     "cta": {
-      "title": "¿Listo para Mejorar Tu Trading?",
-      "subtitle": "Únete a miles de traders mejorando su disciplina y rentabilidad.",
-      "button": "Comenzar Prueba Gratis",
-      "note": "No se requiere tarjeta de crédito"
+      "title": "Comienza a registrar de forma más inteligente hoy.",
+      "subtitle": "Crea tu cuenta gratuita y mira tu trading con claridad.",
+      "button": "Comenzar Gratis",
+      "note": "Gratis para siempre • Sin tarjeta de crédito • Configuración de 2 minutos"
+    },
+    "blog": {
+      "title": "Blog de Trading",
+      "subtitle": "Insights expertos sobre trading de criptomonedas, herramientas de IA y estrategias",
+      "searchPlaceholder": "Buscar artículos...",
+      "allCategories": "Todas Categorías",
+      "readMore": "Leer Más",
+      "relatedArticles": "Artículos Relacionados",
+      "shareArticle": "Compartir Artículo",
+      "categories": {
+        "ai-tools": "Herramientas de IA",
+        "trading-psychology": "Psicología de Trading",
+        "risk-management": "Gestión de Riesgo",
+        "data-analysis": "Análisis de Datos"
+      }
     },
     "footer": {
-      "tagline": "Rastrea más inteligente. Opera mejor.",
-      "product": "Producto",
+      "tagline": "La plataforma completa de diario de trading",
+      "madeWith": "Hecho con ❤️ para traders en todo el mundo",
+      "producto": "Producto",
       "features": "Características",
       "pricing": "Precios",
       "support": "Soporte",
@@ -147,29 +306,25 @@
       "documentation": "Documentación",
       "contact": "Contacto",
       "legal": "Legal",
-      "terms": "Términos",
-      "privacy": "Privacidad",
-      "securityBadge": "Datos encriptados en reposo y en tránsito",
-      "allRightsReserved": "Todos los derechos reservados.",
-      "madeWith": "Hecho con ❤️ para traders"
+      "privacy": "Política de Privacidad",
+      "terms": "Términos de Servicio",
+      "allRightsReserved": "Todos los derechos reservados"
     }
   },
   "contact": {
-    "title": "Contáctanos",
-    "subtitle": "Ponte en contacto con nuestro equipo",
+    "title": "Contáctenos",
+    "subtitle": "¿Tienes alguna pregunta o comentario? Nos encantaría saber de ti.",
     "name": "Nombre",
-    "email": "Correo Electrónico",
-    "company": "Empresa",
+    "namePlaceholder": "Juan Pérez",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "company": "Empresa (Opcional)",
+    "companyPlaceholder": "Nombre de tu empresa",
     "message": "Mensaje",
-    "send": "Enviar Mensaje",
-    "namePlaceholder": "Tu nombre",
-    "emailPlaceholder": "tu@correo.com",
-    "companyPlaceholder": "Tu empresa (opcional)",
     "messagePlaceholder": "Cuéntanos cómo podemos ayudarte...",
-    "success": "¡Mensaje enviado correctamente!",
-    "error": "Error al enviar mensaje. Por favor, inténtalo de nuevo.",
-    "messageSent": "Cliente de correo abierto. Por favor, envía el mensaje.",
-    "orEmail": "O envíanos un correo directamente:"
+    "send": "Enviar Mensaje",
+    "messageSent": "¡Mensaje enviado! Te contactaremos pronto.",
+    "directEmail": "O envíanos un correo directamente a:"
   },
   "premium": {
     "proFeature": "Función Pro",
@@ -205,19 +360,13 @@
     "terms": "Ambas partes reciben recompensas cuando el usuario referido completa el registro"
   },
   "errors": {
-    "title": "Errores de Trading",
-    "description": "Rastrea errores para aprender y mejorar tu disciplina de trading",
-    "addError": "Añadir Error",
-    "errorType": "Tipo de Error",
-    "notes": "Notas",
-    "notesPlaceholder": "¿Qué pasó y qué puedes aprender de esto?",
-    "save": "Guardar Error",
-    "added": "Error registrado correctamente",
-    "removed": "Error eliminado",
-    "selectType": "Por favor selecciona un tipo de error",
-    "noErrors": "No hay errores rastreados para esta operación",
-    "totalErrors": "Total de Errores: {{count}}",
-    "optional": "(opcional)"
+    "generic": "Algo salió mal",
+    "network": "Error de red. Verifica tu conexión",
+    "notFound": "Página no encontrada",
+    "unauthorized": "Acceso no autorizado",
+    "serverError": "Error del servidor. Inténtalo de nuevo más tarde",
+    "validationError": "Por favor verifica tu entrada",
+    "loadingFailed": "Error al cargar datos"
   },
   "fearGreed": {
     "title": "Índice de Miedo y Codicia",
@@ -248,15 +397,33 @@
     "snapshotNote": "Las capturas ayudan a rastrear el crecimiento de tu portafolio con el tiempo"
   },
   "achievements": {
-    "title": "Logros",
-    "firstUpload": "Primera Carga",
-    "firstUploadDesc": "Sube tu primer documento de operación",
-    "tradeMaster": "Maestro del Trading",
-    "tradeMasterDesc": "Procesa 100 operaciones",
-    "errorTracker": "Aprendiendo de Errores",
-    "errorTrackerDesc": "Rastrea 10 errores de trading",
-    "socialSharer": "Mariposa Social",
-    "socialSharerDesc": "Comparte en todas las plataformas sociales"
+    "title": "Distintivos de Logros",
+    "subtitle": "Rastrea tus hitos de trading y desbloquea distintivos mientras progresas",
+    "achievementBadges": "Distintivos de Logros",
+    "unlocked": "{{count}}/{{total}} Desbloqueados",
+    "unlockByReaching": "Desbloquea distintivos alcanzando hitos de trading",
+    "firstTrade": "Primer Trade",
+    "completeFirstTrade": "Completa tu primer trade",
+    "consistentTrader": "Trader Consistente",
+    "logTrades": "Registra {{count}} trades",
+    "veteranTrader": "Trader Veterano",
+    "hotStreak": "Racha Caliente",
+    "winInRow": "Gana {{count}} trades seguidos",
+    "onFire": "En Llamas",
+    "unstoppable": "Imparable",
+    "firstProfit": "Primer Beneficio",
+    "reachProfit": "Alcanza ${{amount}} de beneficio total",
+    "highRoller": "Gran Apostador",
+    "masterTrader": "Trader Maestro",
+    "sharpshooter": "Tirador Certero",
+    "achieveWinRate": "Alcanza {{percent}}% de tasa de éxito con {{count}}+ trades",
+    "beastMode": "Modo Bestia",
+    "daysWithWinRate": "Ten {{days}} días con >{{percent}}% de tasa de éxito",
+    "common": "común",
+    "rare": "raro",
+    "epic": "épico",
+    "legendary": "legendario",
+    "unlockedBadge": "Desbloqueado"
   },
   "journal": {
     "title": "Diario de Trading",
@@ -345,33 +512,6 @@
   "exchanges": {
     "title": "Conexiones de Exchange",
     "subtitle": "Conecta tus cuentas de exchange para sincronizar automáticamente tu historial de trading",
-    "connect": "Conectar",
-    "sync": "Sincronizar Operaciones",
-    "syncing": "Sincronizando...",
-    "disconnect": "Desconectar",
-    "connected": "Conectado",
-    "lastSynced": "Última sincronización",
-    "soon": "Pronto",
-    "confirmDisconnect": "¿Estás seguro de que quieres desconectar? Esto no eliminará tus operaciones sincronizadas.",
-    "status": {
-      "syncing": "sincronizando",
-      "error": "error",
-      "success": "éxito",
-      "pending_review": "revisión pendiente"
-    },
-    "descriptions": {
-      "binance": "Exchange de cripto más grande del mundo - sincroniza operaciones spot y futuros",
-      "bybit": "Exchange líder en derivados - sincroniza operaciones spot y futuros",
-      "coinbase": "Líder del mercado estadounidense - sincroniza tu actividad de trading",
-      "kraken": "Líder europeo - sincronización completa del historial de operaciones",
-      "bitfinex": "Exchange original desde 2012 - sincroniza todas tus operaciones",
-      "bingx": "Plataforma de copy trading - sincroniza spot y futuros",
-      "mexc": "Especialista en altcoins - sincroniza tu portafolio diverso",
-      "kucoin": "Popular en Asia - requiere frase de contraseña API",
-      "okx": "Exchange principal de derivados - requiere frase de contraseña API",
-      "gateio": "Plataforma de trading completa - soporte de sincronización completa",
-      "bitstamp": "Exchange más antiguo desde 2011 - requiere ID de cliente"
-    },
     "connect": {
       "title": "Conectar a {{exchange}}",
       "description": "Ingresa tus credenciales de API de {{exchange}} para sincronizar tus operaciones automáticamente",
@@ -408,6 +548,31 @@
       "fetchTrades": "Obtener Operaciones",
       "selectBothDates": "Por favor selecciona tanto la fecha de inicio como la de fin para el rango personalizado",
       "startBeforeEnd": "La fecha de inicio debe ser anterior a la fecha de fin"
+    },
+    "syncing": "Sincronizando...",
+    "disconnect": "Desconectar",
+    "connected": "Conectado",
+    "lastSynced": "Última sincronización",
+    "soon": "Pronto",
+    "confirmDisconnect": "¿Estás seguro de que quieres desconectar? Esto no eliminará tus operaciones sincronizadas.",
+    "status": {
+      "syncing": "sincronizando",
+      "error": "error",
+      "success": "éxito",
+      "pending_review": "revisión pendiente"
+    },
+    "descriptions": {
+      "binance": "Exchange de cripto más grande del mundo - sincroniza operaciones spot y futuros",
+      "bybit": "Exchange líder en derivados - sincroniza operaciones spot y futuros",
+      "coinbase": "Líder del mercado estadounidense - sincroniza tu actividad de trading",
+      "kraken": "Líder europeo - sincronización completa del historial de operaciones",
+      "bitfinex": "Exchange original desde 2012 - sincroniza todas tus operaciones",
+      "bingx": "Plataforma de copy trading - sincroniza spot y futuros",
+      "mexc": "Especialista en altcoins - sincroniza tu portafolio diverso",
+      "kucoin": "Popular en Asia - requiere frase de contraseña API",
+      "okx": "Exchange principal de derivados - requiere frase de contraseña API",
+      "gateio": "Plataforma de trading completa - soporte de sincronización completa",
+      "bitstamp": "Exchange más antiguo desde 2011 - requiere ID de cliente"
     },
     "preview": {
       "title": "Revisar Operaciones de {{exchange}}",
@@ -878,63 +1043,54 @@
   },
   "settings": {
     "title": "Configuración",
-    "subtitle": "Administra tu cuenta y preferencias",
+    "subtitle": "Gestiona tu cuenta y preferencias",
     "profile": "Perfil",
-    "trading": "Trading",
-    "setups": "Configuraciones",
     "appearance": "Apariencia",
     "notifications": "Notificaciones",
+    "preferences": "Preferencias",
     "data": "Datos",
-    "profileInformation": "Información del Perfil",
-    "uploadPhoto": "Subir Foto",
-    "fileInfo": "JPG, PNG o GIF. Máx 2MB.",
-    "fullName": "Nombre Completo",
-    "email": "Correo Electrónico",
-    "emailCannotChange": "El correo no se puede cambiar",
-    "saveChanges": "Guardar Cambios",
-    "capitalManagement": "Gestión de Capital",
-    "trackCapitalAdditions": "Rastrea adiciones de capital para cálculos precisos de ROI",
-    "addCapital": "Agregar Capital",
-    "currentCapital": "Capital Actual",
-    "totalAdded": "Total Agregado",
-    "date": "Fecha",
-    "amountAdded": "Monto Agregado",
-    "totalAfter": "Total Después",
-    "notes": "Notas",
-    "actions": "Acciones",
-    "displayPreferences": "Preferencias de Visualización",
-    "blurSensitiveData": "Desenfocar Datos Sensibles",
-    "hideFinancialNumbers": "Ocultar números financieros por defecto",
-    "tradeSetups": "Configuraciones de Trade",
-    "manageCustomSetups": "Gestiona tus etiquetas de configuración de trade personalizadas. Estarán disponibles al registrar trades.",
-    "enterNewSetup": "Ingresa el nombre de la nueva configuración (ej: Ruptura, Reversión)",
-    "add": "Agregar",
-    "themePreferences": "Preferencias de Tema",
-    "dashboardThemes": "Temas del Panel",
-    "defaultTheme": "Tema Predeterminado",
-    "cleanProfessional": "Limpio y profesional",
-    "level": "Nivel {{level}}",
-    "animationSound": "Animación y Sonido",
-    "calmMode": "Modo Tranquilo",
-    "reduceAnimations": "Reducir animaciones para una experiencia más enfocada",
-    "soundEffects": "Efectos de Sonido",
-    "playSounds": "Reproducir sonidos para logros y recompensas",
-    "notificationPreferences": "Preferencias de Notificación",
-    "chooseUpdates": "Elige qué actualizaciones deseas recibir",
-    "tradeConfirmations": "Confirmaciones de Trade",
-    "notifyTradesLogged": "Recibe notificaciones cuando se registren trades",
-    "milestoneAlerts": "Alertas de Hitos",
-    "celebrateMilestones": "Celebra cuando alcances hitos de beneficio",
-    "weeklySummary": "Resumen Semanal",
-    "receiveWeeklyReport": "Recibe un informe de rendimiento semanal",
-    "dataManagement": "Gestión de Datos",
-    "exportYourData": "Exportar Tus Datos",
-    "downloadTradingData": "Descarga todos tus datos de trading en formato CSV para usar en otras aplicaciones.",
-    "exportTradesToCSV": "Exportar Trades a CSV",
-    "dangerZone": "Zona de Peligro",
-    "deleteAccountWarning": "Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, estate seguro.",
+    "trading": "Trading",
+    "setups": "Configuraciones",
+    "account": "Cuenta",
+    "theme": "Tema",
+    "language": "Idioma",
+    "darkMode": "Modo Oscuro",
+    "lightMode": "Modo Claro",
+    "systemMode": "Sistema",
+    "accentColor": "Color de Acento",
+    "emailNotifications": "Notificaciones por Email",
+    "pushNotifications": "Notificaciones Push",
+    "tradingReminders": "Recordatorios de Trading",
+    "exportData": "Exportar Datos",
+    "importData": "Importar Datos",
     "deleteAccount": "Eliminar Cuenta",
-    "contactSupport": "Contacta al soporte para eliminar tu cuenta"
+    "changePassword": "Cambiar Contraseña",
+    "timezone": "Zona Horaria",
+    "currency": "Moneda",
+    "dateFormat": "Formato de Fecha",
+    "profileInfo": "Información del Perfil",
+    "fullName": "Nombre Completo",
+    "uploadPhoto": "Subir Foto",
+    "uploading": "Subiendo...",
+    "saveChanges": "Guardar Cambios",
+    "saving": "Guardando...",
+    "displayPreferences": "Preferencias de Visualización",
+    "blurSensitiveData": "Difuminar Datos Sensibles",
+    "blurDescription": "Ocultar números financieros por defecto",
+    "tradeSetups": "Configuraciones de Trading",
+    "setupsDescription": "Gestiona tus etiquetas personalizadas de configuración de trading. Estarán disponibles al registrar operaciones.",
+    "addSetup": "Añadir",
+    "noSetups": "Sin configuraciones aún. Añade tu primera configuración arriba.",
+    "enterSetupName": "Ingresa nombre de configuración (ej. Ruptura, Reversión)",
+    "notificationPreferences": "Preferencias de Notificación",
+    "notificationDescription": "Elige qué actualizaciones quieres recibir",
+    "tradeConfirmations": "Confirmaciones de Operaciones",
+    "tradeConfirmationsDesc": "Recibe notificaciones cuando se registren operaciones",
+    "milestoneAlerts": "Alertas de Hitos",
+    "milestoneAlertsDesc": "Celebra cuando alcances hitos de beneficio",
+    "weeklySummary": "Resumen Semanal",
+    "weeklySummaryDesc": "Recibe informes de rendimiento semanales",
+    "emailCannotChange": "El email no se puede cambiar"
   },
   "community": {
     "title": "Comunidad de Trading",
@@ -955,35 +1111,6 @@
     "allTime": "Todos los Tiempos",
     "noRankingsYet": "Aún No Hay Clasificaciones",
     "climbLeaderboard": "¡Sé el primero en escalar la clasificación! Comienza a operar para ganar tu rango."
-  },
-  "achievements": {
-    "title": "Distintivos de Logros",
-    "subtitle": "Rastrea tus hitos de trading y desbloquea distintivos mientras progresas",
-    "achievementBadges": "Distintivos de Logros",
-    "unlocked": "{{count}}/{{total}} Desbloqueados",
-    "unlockByReaching": "Desbloquea distintivos alcanzando hitos de trading",
-    "firstTrade": "Primer Trade",
-    "completeFirstTrade": "Completa tu primer trade",
-    "consistentTrader": "Trader Consistente",
-    "logTrades": "Registra {{count}} trades",
-    "veteranTrader": "Trader Veterano",
-    "hotStreak": "Racha Caliente",
-    "winInRow": "Gana {{count}} trades seguidos",
-    "onFire": "En Llamas",
-    "unstoppable": "Imparable",
-    "firstProfit": "Primer Beneficio",
-    "reachProfit": "Alcanza ${{amount}} de beneficio total",
-    "highRoller": "Gran Apostador",
-    "masterTrader": "Trader Maestro",
-    "sharpshooter": "Tirador Certero",
-    "achieveWinRate": "Alcanza {{percent}}% de tasa de éxito con {{count}}+ trades",
-    "beastMode": "Modo Bestia",
-    "daysWithWinRate": "Ten {{days}} días con >{{percent}}% de tasa de éxito",
-    "common": "común",
-    "rare": "raro",
-    "epic": "épico",
-    "legendary": "legendario",
-    "unlockedBadge": "Desbloqueado"
   },
   "metrics": {
     "title": "Mis Métricas",
@@ -1068,286 +1195,6 @@
     "searchPlaceholder": "Buscar artículos...",
     "allArticles": "Todos los Artículos"
   },
-  "landing": {
-    "hero": {
-      "title": "El Diario de Trading Crypto #1",
-      "subtitle": "Rastrea, analiza y revisa cada operación cripto con IA. Construido exclusivamente para traders de criptomonedas.",
-      "cta": "Comenzar Gratis",
-      "watchDemo": "Ver Demo"
-    },
-    "stats": {
-      "activeTraders": "Traders Activos",
-      "tradesLogged": "Operaciones Registradas",
-      "satisfaction": "Satisfacción"
-    },
-    "dashboardShowcase": {
-      "title": "Otros journals muestran números. Este muestra progreso.",
-      "subtitle": "Cada función fue diseñada por traders activos para ayudarte a entender tus decisiones, no solo registrarlas. No es una herramienta, es tu coach de trading.",
-      "cta": "Verlo en acción"
-    },
-    "features": {
-      "title": "Todo Lo Que Necesitas Para Operar Mejor",
-      "subtitle": "Funciones potentes diseñadas para ayudarte a tomar mejores decisiones.",
-      "smartLogging": {
-        "title": "Registro Inteligente",
-        "description": "Añade operaciones en segundos con detalles, capturas y notas."
-      },
-      "autoImports": {
-        "title": "Importación Automática",
-        "description": "Conecta tu exchange o broker para sincronización instantánea."
-      },
-      "advancedAnalytics": {
-        "title": "Análisis Avanzados",
-        "description": "Visualiza tasas de éxito, ratios de riesgo y rendimiento de estrategias."
-      },
-      "tagFilter": {
-        "title": "Etiqueta y Filtra Todo",
-        "description": "Rastrea setups, emociones y errores con métricas personalizadas."
-      },
-      "mobileFriendly": {
-        "title": "Amigable con Móviles",
-        "description": "Accede a tu journal en cualquier lugar: teléfono, tablet o escritorio."
-      }
-    },
-    "testimonials": {
-      "title": "Confiado por Miles de Traders",
-      "subtitle": "Resultados reales de traders reales.",
-      "approvedByTraders": "Aprobado por traders profesionales",
-      "alex": {
-        "name": "Alex Chen",
-        "role": "Day Trader",
-        "text": "La tasa de éxito pasó del 52% al 68% en 3 meses."
-      },
-      "sarah": {
-        "name": "Sarah Mitchell",
-        "role": "Inversora Crypto",
-        "text": "La función de etiquetas emocionales es genial... Mi consistencia nunca ha sido mejor."
-      },
-      "marcus": {
-        "name": "Marcus Rodriguez",
-        "role": "Swing Trader",
-        "text": "La extracción con IA me ahorra 2 horas por semana... Vale cada centavo."
-      }
-    },
-    "exchangeLogos": {
-      "title": "Construido para traders crypto que toman el rendimiento en serio.",
-      "subtitle": "Ya sea que hagas scalping, day trading o swing, rastrea lo que funciona y lo que te cuesta."
-    },
-    "pricing": {
-      "title": "Precios Simples y Transparentes",
-      "subtitle": "Elige el plan que se ajuste a tu viaje de trading",
-      "mostPopular": "Más Popular",
-      "perMonth": "mes",
-      "perMonthBilledAnnually": "mes, facturado anualmente",
-      "savingsAmount": "Ahorra ${{amount}}/año",
-      "guaranteeNote": "Garantía de devolución de 7 días • Cancela en cualquier momento • Sin tarifas ocultas",
-      "hero": {
-        "title": "Opera con claridad.",
-        "subtitle": "Un diario de trading impulsado por IA para inversores en cripto. Captura cada operación, encuentra patrones y rastrea tu ventaja.",
-        "primaryCta": "Comenzar Prueba Gratis",
-        "secondaryCta": "Ver demo de 2 minutos"
-      },
-      "solutions": {
-        "title": "Resultados que Importan",
-        "subtitle": "Capacidades premium construidas para traders de élite",
-        "seePatterns": {
-          "headline": "Ver patrones instantáneamente",
-          "subhead": "La IA lee todo tu historial. Resalta lo que realmente genera dinero.",
-          "metric": "4.2x revisiones más rápidas",
-          "proofPoint": "El trader promedio descubre 3 patrones rentables en la primera semana"
-        },
-        "knowEdge": {
-          "headline": "Conoce tu ventaja",
-          "subhead": "Cada setup, cada hora, cada condición de mercado. Medido.",
-          "metric": "67%",
-          "metricValue": 67,
-          "proofPoint": "Mejora de tasa de éxito (usuario promedio)"
-        },
-        "tradeConfidence": {
-          "headline": "Opera con confianza",
-          "subhead": "Tamaño de posición calculado. Riesgo controlado. Drawdowns predecidos.",
-          "metric": "89%",
-          "metricValue": 89,
-          "proofPoint": "Menos pérdidas excesivas"
-        },
-        "trackEffortlessly": {
-          "headline": "Rastrea todo sin esfuerzo",
-          "subhead": "Capturas de pantalla, notas, estado emocional. Todo organizado. Siempre buscable.",
-          "metric": "12 minutos ahorrados",
-          "metricValue": 12,
-          "proofPoint": "Por sesión de revisión"
-        },
-        "performanceSpeaks": {
-          "headline": "Rendimiento que habla",
-          "subhead": "Tasa de éxito, expectativa, múltiplos R. Gráficos que cuentan tu historia.",
-          "metric": "2.3 Sharpe",
-          "metricValue": 2.3,
-          "proofPoint": "Rendimiento promedio de usuarios élite"
-        },
-        "yourRules": {
-          "headline": "Tu panel, tus reglas",
-          "subhead": "Widgets que necesitas. Métricas que importan. Nada más.",
-          "metric": "8 diseños",
-          "metricValue": 8,
-          "proofPoint": "Configuraciones personalizadas por usuario (promedio)"
-        },
-        "builtByTraders": {
-          "headline": "Construido por traders que lo entienden",
-          "subhead": "Cada flujo de trabajo de diarios reales. Cada función probada en batalla.",
-          "metric": "10,000+ horas",
-          "metricValue": 10000,
-          "proofPoint": "De retroalimentación de traders integrada"
-        }
-      },
-      "billing": {
-        "monthly": "Mensual",
-        "annual": "Anual",
-        "save20": "Ahorra 20%"
-      },
-      "plans": {
-        "cta": "Comenzar Prueba Gratis",
-        "basic": {
-          "name": "Basic",
-          "description": "Perfecto para traders activos construyendo estructura",
-          "features": {
-            "uploads": "50 cargas de operaciones IA/mes",
-            "manualUploads": "Cargas manuales ilimitadas",
-            "dashboard": "Panel personalizado con más de 15 widgets",
-            "charts": "Gráficos avanzados y análisis",
-            "basicJournal": "Diario básico con seguimiento emocional",
-            "feeAnalytics": "Análisis de comisiones con alertas",
-            "csv": "Importación y exportación CSV",
-            "social": "Acceso al feed social y tabla de clasificación"
-          }
-        },
-        "pro": {
-          "name": "Pro",
-          "description": "Para traders serios mejorando la disciplina",
-          "features": {
-            "uploads": "100 cargas de operaciones IA/mes",
-            "aiAnalysis": "1 Análisis de Rendimiento IA por semana",
-            "tradingPlan": "Constructor de Plan de Trading con checklist",
-            "goals": "Seguimiento de objetivos y progreso",
-            "richJournal": "Diario completo con análisis de humor y patrones",
-            "customWidgets": "5 widgets KPI personalizados",
-            "fullSocial": "Funciones sociales completas (posts, XP, badges)",
-            "everythingBasic": "Todo en Basic"
-          }
-        },
-        "elite": {
-          "name": "Elite",
-          "description": "Traders profesionales y analistas",
-          "features": {
-            "uploads": "300 cargas de operaciones IA/mes",
-            "aiAnalysis": "5 Análisis de Rendimiento IA por semana",
-            "tradeReplay": "Trade Replay (revisión paso a paso)",
-            "positionCalculator": "Calculadora Avanzada de Tamaño de Posición",
-            "riskDashboard": "Panel de Riesgo con análisis de drawdown",
-            "advancedAlerts": "Alertas avanzadas de rendimiento y comisiones",
-            "customWidgets": "Widgets KPI personalizados ilimitados",
-            "everythingPro": "Todo en Pro"
-          }
-        }
-      },
-      "comparison": {
-        "title": "Compara Planes en Detalle",
-        "subtitle": "Ve exactamente qué está incluido en cada plan",
-        "feature": "Característica",
-        "unlimited": "Ilimitado",
-        "categories": {
-          "aiAnalytics": "IA y Análisis",
-          "tradingTools": "Herramientas de Trading",
-          "journaling": "Diario y Psicología",
-          "riskManagement": "Gestión de Riesgo",
-          "integrations": "Integraciones",
-          "social": "Social y Comunidad"
-        },
-        "features": {
-          "aiUploads": "Cargas de Operaciones IA",
-          "manualUploads": "Cargas de Operaciones Manuales",
-          "aiAnalysis": "Análisis de Rendimiento IA",
-          "customWidgets": "Widgets KPI Personalizados",
-          "advancedCharts": "Gráficos Avanzados y Análisis",
-          "tradingPlan": "Constructor de Plan de Trading",
-          "preTradeChecklist": "Checklist Pre-Operación",
-          "goalsTracking": "Seguimiento de Objetivos",
-          "tradeReplay": "Trade Replay",
-          "positionCalculator": "Calculadora de Tamaño de Posición",
-          "basicJournal": "Diario Básico",
-          "emotionalTimeline": "Línea de Tiempo Emocional",
-          "richJournal": "Diario Completo con Seguimiento de Humor",
-          "patternAnalysis": "Análisis de Patrones",
-          "feeAnalytics": "Análisis de Comisiones",
-          "riskDashboard": "Panel de Riesgo",
-          "drawdownAnalysis": "Análisis de Drawdown",
-          "performanceAlerts": "Alertas de Rendimiento",
-          "csvImport": "Importación/Exportación CSV",
-          "exchangeConnections": "Conexiones de Exchange",
-          "autoRefresh": "Actualización Automática",
-          "viewFeed": "Ver Feed Social",
-          "createPosts": "Crear Posts y Comentarios",
-          "leaderboard": "Tabla de Clasificación",
-          "xpBadges": "XP y Badges",
-          "challenges": "Desafíos Diarios/Semanales"
-        }
-      },
-      "roadmap": {
-        "title": "Próximamente",
-        "subtitle": "Nuevas funciones emocionantes que estamos construyendo para ti",
-        "targetQuarter": "Objetivo",
-        "highPriority": "Alta Prioridad",
-        "mediumPriority": "Media Prioridad",
-        "features": {
-          "bestAssetFinder": "Localizador de Mejor Activo - Identifica tus pares más rentables",
-          "batchEdit": "Edición por Lotes - Edita múltiples operaciones a la vez",
-          "valueAtRisk": "Calculadora de Valor en Riesgo (VaR)",
-          "apiAccess": "Acceso a Clave API Solo Lectura",
-          "portfolioTracking": "Análisis y Snapshots de Portafolio",
-          "inAppAlerts": "Sistema de Alertas en la Aplicación",
-          "autosyncDelta": "Importaciones Delta de Sincronización Automática",
-          "savedViews": "Filtros Rápidos y Vistas Guardadas",
-          "teamCollaboration": "Herramientas de Colaboración en Equipo"
-        },
-        "disclaimer": "Las funciones y el cronograma están sujetos a cambios según los comentarios de los usuarios y las prioridades de desarrollo"
-      }
-    },
-    "cta": {
-      "title": "Comienza a registrar de forma más inteligente hoy.",
-      "subtitle": "Crea tu cuenta gratuita y mira tu trading con claridad.",
-      "button": "Comenzar Gratis",
-      "note": "Gratis para siempre • Sin tarjeta de crédito • Configuración de 2 minutos"
-    },
-    "blog": {
-      "title": "Blog de Trading",
-      "subtitle": "Insights expertos sobre trading de criptomonedas, herramientas de IA y estrategias",
-      "searchPlaceholder": "Buscar artículos...",
-      "allCategories": "Todas Categorías",
-      "readMore": "Leer Más",
-      "relatedArticles": "Artículos Relacionados",
-      "shareArticle": "Compartir Artículo",
-      "categories": {
-        "ai-tools": "Herramientas de IA",
-        "trading-psychology": "Psicología de Trading",
-        "risk-management": "Gestión de Riesgo",
-        "data-analysis": "Análisis de Datos"
-      }
-    },
-    "footer": {
-      "tagline": "La plataforma completa de diario de trading",
-      "madeWith": "Hecho con ❤️ para traders en todo el mundo",
-      "producto": "Producto",
-      "features": "Características",
-      "pricing": "Precios",
-      "support": "Soporte",
-      "help": "Centro de Ayuda",
-      "documentation": "Documentación",
-      "contact": "Contacto",
-      "legal": "Legal",
-      "privacy": "Política de Privacidad",
-      "terms": "Términos de Servicio",
-      "allRightsReserved": "Todos los derechos reservados"
-    }
-  },
   "widgets": {
     "totalBalance": {
       "title": "Balance Total"
@@ -1426,57 +1273,6 @@
     "streaks": "Rachas",
     "heatmap": "Mapa de Calor",
     "charts": "Gráficos"
-  },
-  "settings": {
-    "title": "Configuración",
-    "subtitle": "Gestiona tu cuenta y preferencias",
-    "profile": "Perfil",
-    "appearance": "Apariencia",
-    "notifications": "Notificaciones",
-    "preferences": "Preferencias",
-    "data": "Datos",
-    "trading": "Trading",
-    "setups": "Configuraciones",
-    "account": "Cuenta",
-    "theme": "Tema",
-    "language": "Idioma",
-    "darkMode": "Modo Oscuro",
-    "lightMode": "Modo Claro",
-    "systemMode": "Sistema",
-    "accentColor": "Color de Acento",
-    "emailNotifications": "Notificaciones por Email",
-    "pushNotifications": "Notificaciones Push",
-    "tradingReminders": "Recordatorios de Trading",
-    "exportData": "Exportar Datos",
-    "importData": "Importar Datos",
-    "deleteAccount": "Eliminar Cuenta",
-    "changePassword": "Cambiar Contraseña",
-    "timezone": "Zona Horaria",
-    "currency": "Moneda",
-    "dateFormat": "Formato de Fecha",
-    "profileInfo": "Información del Perfil",
-    "fullName": "Nombre Completo",
-    "uploadPhoto": "Subir Foto",
-    "uploading": "Subiendo...",
-    "saveChanges": "Guardar Cambios",
-    "saving": "Guardando...",
-    "displayPreferences": "Preferencias de Visualización",
-    "blurSensitiveData": "Difuminar Datos Sensibles",
-    "blurDescription": "Ocultar números financieros por defecto",
-    "tradeSetups": "Configuraciones de Trading",
-    "setupsDescription": "Gestiona tus etiquetas personalizadas de configuración de trading. Estarán disponibles al registrar operaciones.",
-    "addSetup": "Añadir",
-    "noSetups": "Sin configuraciones aún. Añade tu primera configuración arriba.",
-    "enterSetupName": "Ingresa nombre de configuración (ej. Ruptura, Reversión)",
-    "notificationPreferences": "Preferencias de Notificación",
-    "notificationDescription": "Elige qué actualizaciones quieres recibir",
-    "tradeConfirmations": "Confirmaciones de Operaciones",
-    "tradeConfirmationsDesc": "Recibe notificaciones cuando se registren operaciones",
-    "milestoneAlerts": "Alertas de Hitos",
-    "milestoneAlertsDesc": "Celebra cuando alcances hitos de beneficio",
-    "weeklySummary": "Resumen Semanal",
-    "weeklySummaryDesc": "Recibe informes de rendimiento semanales",
-    "emailCannotChange": "El email no se puede cambiar"
   },
   "analytics": {
     "title": "Análisis Avanzados",
@@ -1584,21 +1380,6 @@
     "history": "Historial",
     "noTrades": "Sin operaciones aún",
     "uploadFirst": "Sube tu primera operación para comenzar"
-  },
-  "contact": {
-    "title": "Contáctenos",
-    "subtitle": "¿Tienes alguna pregunta o comentario? Nos encantaría saber de ti.",
-    "name": "Nombre",
-    "namePlaceholder": "Juan Pérez",
-    "email": "Correo electrónico",
-    "emailPlaceholder": "tu@ejemplo.com",
-    "company": "Empresa (Opcional)",
-    "companyPlaceholder": "Nombre de tu empresa",
-    "message": "Mensaje",
-    "messagePlaceholder": "Cuéntanos cómo podemos ayudarte...",
-    "send": "Enviar Mensaje",
-    "messageSent": "¡Mensaje enviado! Te contactaremos pronto.",
-    "directEmail": "O envíanos un correo directamente a:"
   },
   "support": {
     "pageTitle": "Soporte",
@@ -1775,15 +1556,6 @@
       "button": "Comenzar Gratis"
     }
   },
-  "errors": {
-    "generic": "Algo salió mal",
-    "network": "Error de red. Verifica tu conexión",
-    "notFound": "Página no encontrada",
-    "unauthorized": "Acceso no autorizado",
-    "serverError": "Error del servidor. Inténtalo de nuevo más tarde",
-    "validationError": "Por favor verifica tu entrada",
-    "loadingFailed": "Error al cargar datos"
-  },
   "success": {
     "saved": "Guardado correctamente",
     "updated": "Actualizado correctamente",
@@ -1948,6 +1720,26 @@
       "description": "Ahora conoces todas las principales funcionalidades de la plataforma.",
       "subtitle": "Explora y lleva tu trading al siguiente nivel.",
       "footer": "Puedes revisar este tour en cualquier momento en configuración."
+    }
+  },
+  "monthlyGoal": {
+    "title": "Meta mensual",
+    "setGoal": "Definir meta",
+    "editGoal": "Editar meta",
+    "targetLabel": "Meta mensual (USD)",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "emptyState": "Define una meta mensual para seguir tu progreso y niveles.",
+    "of": "de",
+    "ofGoal": "de la meta",
+    "noTier": "Sin nivel aún",
+    "vsLastMonth": "vs mes pasado",
+    "average": "Promedio mensual",
+    "trophyCase": "Meses anteriores",
+    "tiers": {
+      "bronze": "Bronce",
+      "silver": "Plata",
+      "gold": "Oro"
     }
   }
 }
