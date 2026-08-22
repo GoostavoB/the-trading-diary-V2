@@ -1,0 +1,20 @@
+{
+    "name": "trading-diary-exchange-proxy",
+    "private": true,
+    "version": "1.0.0",
+    "type": "module",
+    "description": "Always-on Node service that talks to crypto exchange APIs on behalf of The Trading Diary. Exists because Supabase Edge Functions (Deno, serverless) have a documented, unresolved intermittent outbound-fetch/DNS failure (see https://github.com/supabase/edge-runtime/issues/263) that made exchange syncs unreliable. This service runs as a normal long-lived Node process (no cold starts), so it doesn't have that failure mode.",
+    "main": "server.js",
+    "scripts": {
+          "start": "node server.js",
+          "dev": "node --watch server.js"
+    },
+    "dependencies": {
+          "@supabase/supabase-js": "^2.75.0",
+          "ccxt": "^4.4.0",
+          "express": "^4.21.0"
+    },
+    "engines": {
+          "node": ">=20"
+    }
+}
