@@ -70,11 +70,14 @@ export function TradePreviewModal({
 
   // Initialize selected trades when data loads
   useEffect(() => {
-    if (pendingTrades.length > 0 && selectedIds.size === 0) {
-      const allIds = pendingTrades.map((t) => t.id);
-      setSelectedIds(new Set(allIds));
+    if (isOpen && pendingTrades.length > 0) {
+      const preSelectedIds = pendingTrades.filter((t) => t.is_selected).map((t) => t.id);
+      setSelectedIds(new Set(preSelectedIds));
     }
-  }, [pendingTrades]);
+    if (!isOpen) {
+      setSelectedIds(new Set());
+    }
+  }, [pendingTrades, isOpen]);
 
   // Import mutation
   const importMutation = useMutation({
