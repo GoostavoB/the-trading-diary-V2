@@ -189,6 +189,103 @@
     --apple-pink: 348 100% 65%;          /* #FF375F */
     --apple-indigo: 240 85% 68%;         /* #5E5CE6 */
   }
+
+  /*  ═══════════════════════════════════════════════════════════════════════════════════
+    LIGHT MODE — APPLE PREMIUM GLASS (espelha o .dark, mesmos nomes de token)
+  ═══════════════════════════════════════════════════════════════════════════════════  */
+  .light {
+    /* ── SYSTEM GRAYS (iOS Light Mode) ── */
+    --background: 240 20% 98%;          /* #F7F7F9 — iOS secondary system bg */
+    --foreground: 240 6% 10%;           /* #17171A — near-black */
+    --card: 0 0% 100%;                  /* #FFFFFF — elevated surface */
+    --card-foreground: 240 6% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 6% 10%;
+
+    /* ── PRIMARY: Apple System Blue Light ── */
+    --primary: 211 100% 50%;            /* #007AFF — SF System Blue (light) */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 93%;            /* #EBEBEF — tertiary */
+    --secondary-foreground: 240 6% 10%;
+    --muted: 240 5% 95%;                /* #F1F1F4 */
+    --muted-foreground: 240 4% 40%;     /* #64646B — iOS secondary text */
+    --accent: 211 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 4 90% 58%;           /* #FA3F32 — Apple red light */
+    --destructive-foreground: 0 0% 100%;
+
+    /* ── BORDERS ── */
+    --border: 240 6% 88%;               /* #DDDDE1 — subtle divider */
+    --input: 240 10% 97%;               /* #F5F5F7 — input fill */
+    --ring: 211 100% 50%;
+
+    /* ── SEMANTIC (Apple's actual system colors) ── */
+    --positive: 142 69% 45%;            /* #22C35E — SF green light */
+    --negative: 4 90% 58%;              /* #FA3F32 — SF red light */
+    --warning: 35 100% 50%;             /* #FF9500 — SF orange light */
+    --info: 211 100% 50%;
+    --success: 142 69% 45%;
+    --error: 4 90% 58%;
+    --state-success: 142 69% 45%;
+    --state-warning: 35 100% 50%;
+    --state-error: 4 90% 58%;
+    --state-info: 211 100% 50%;
+    --state-focus: 211 100% 50%;
+    --profit: 142 69% 45%;
+    --loss: 4 90% 58%;
+
+    /* ── CHARTS (SF System palette) ── */
+    --chart-1: 211 100% 50%;            /* blue */
+    --chart-2: 142 69% 45%;             /* green */
+    --chart-3: 280 60% 57%;             /* purple #AF52DE */
+    --chart-4: 35 100% 50%;             /* orange */
+    --chart-5: 199 80% 45%;             /* cyan */
+
+    /* ── SIDEBAR ── */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 6% 10%;
+    --sidebar-primary: 211 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 5% 95%;
+    --sidebar-accent-foreground: 240 6% 10%;
+    --sidebar-border: 240 6% 88%;
+    --sidebar-ring: 211 100% 50%;
+
+    /* ── GLASS MATERIALS (iOS vibrancy levels) ── */
+    --glass-bg: rgba(255, 255, 255, 0.72);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-blur: 30px;
+
+    /* ── PREMIUM SHADOWS (Apple depth layers) ── */
+    --shadow-elegant:
+      0 0 0 0.5px rgba(0, 0, 0, 0.04) inset,
+      0 1px 2px rgba(0, 0, 0, 0.06),
+      0 8px 24px rgba(0, 0, 0, 0.08);
+    --shadow-glow: 0 0 0 1px hsl(211 100% 50% / 0.2), 0 0 24px hsl(211 100% 50% / 0.12);
+
+    /* ── APPLE PALETTE TOKENS ── */
+    --space-gray-900: 240 20% 98%;
+    --space-gray-800: 240 10% 94%;
+    --space-gray-700: 240 8% 88%;
+    --space-gray-600: 240 6% 80%;
+    --space-gray-500: 240 5% 70%;
+    --space-gray-400: 240 4% 58%;
+    --space-gray-300: 240 4% 45%;
+    --space-gray-200: 240 5% 30%;
+    --space-gray-100: 240 6% 15%;
+
+    --electric-blue: 211 100% 50%;       /* #007AFF SF Blue light */
+    --electric-blue-bright: 211 100% 60%;/* hover */
+    --electric-blue-soft: 211 90% 42%;   /* pressed */
+
+    --apple-green: 142 69% 45%;          /* #22C35E */
+    --apple-red: 4 90% 58%;              /* #FA3F32 */
+    --apple-orange: 35 100% 50%;         /* #FF9500 */
+    --apple-purple: 280 60% 57%;         /* #AF52DE */
+    --apple-cyan: 199 80% 45%;           /* #1C93C7 */
+    --apple-pink: 347 100% 59%;          /* #FF2D55 */
+    --apple-indigo: 240 62% 58%;         /* #5856D6 */
+  }
 }
 
 @layer base {
