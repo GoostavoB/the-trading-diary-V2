@@ -261,10 +261,12 @@ export function TradePreviewModal({
                   <TableHead>Status</TableHead>
                   <TableHead>{t('exchanges.preview.side')}</TableHead>
                   <TableHead>{t('exchanges.preview.size')}</TableHead>
-                  <TableHead>{t('exchanges.preview.price')}</TableHead>
+                  <TableHead>Entry</TableHead>
+                  <TableHead>Exit</TableHead>
                   <TableHead>{t('exchanges.preview.pnl')}</TableHead>
                   <TableHead>Leverage</TableHead>
                   <TableHead>Margin</TableHead>
+                  <TableHead>ROI</TableHead>
                   <TableHead>{t('exchanges.preview.fee')}</TableHead>
                 </TableRow>
               </TableHeader>
@@ -299,6 +301,7 @@ export function TradePreviewModal({
                     </TableCell>
                     <TableCell className="text-sm">{trade.trade_data.position_size}</TableCell>
                     <TableCell className="text-sm">${formatNumber(trade.trade_data.entry_price)}</TableCell>
+                    <TableCell className="text-sm">${formatNumber(trade.trade_data.exit_price)}</TableCell>
                     <TableCell
                       className={
                         trade.trade_data.profit_loss > 0
@@ -317,6 +320,9 @@ export function TradePreviewModal({
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {trade.trade_data.margin ? `$${formatNumber(trade.trade_data.margin)}` : '-'}
+                    </TableCell>
+                    <TableCell className={trade.trade_data.roi > 0 ? 'text-sm text-success' : trade.trade_data.roi < 0 ? 'text-sm text-destructive' : 'text-sm text-muted-foreground'}>
+                      {typeof trade.trade_data.roi === 'number' ? `${trade.trade_data.roi.toFixed(1)}%` : '-'}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       ${formatNumber(trade.trade_data.trading_fee || 0)}
