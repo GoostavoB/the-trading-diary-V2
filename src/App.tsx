@@ -43,6 +43,7 @@ const Forecast = lazy(() => import("./pages/Forecast"));
 const Achievements = lazy(() => import("./pages/Achievements"));
 
 const MarketData = lazy(() => import("./pages/MarketData"));
+const LSROIGrid = lazy(() => import("./pages/LSROIGrid"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
@@ -188,6 +189,7 @@ const AppRoutes = () => {
           <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
 
           <Route path="/market-data" element={<ProtectedRoute><MarketData /></ProtectedRoute>} />
+          <Route path="/lsr-oi-grid" element={<ProtectedRoute><LSROIGrid /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           {/* [Phase 2] Social features — roadmap Sprint 3 */}
           {/* <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} /> */}
