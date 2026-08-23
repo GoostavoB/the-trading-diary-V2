@@ -189,6 +189,7 @@ const AppRoutes = () => {
           <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
 
           <Route path="/market-data" element={<ProtectedRoute><MarketData /></ProtectedRoute>} />
+          <Route path="/lsr-oi-grid" element={<ProtectedRoute><LSROIGrid /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           {/* [Phase 2] Social features — roadmap Sprint 3 */}
           {/* <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} /> */}
