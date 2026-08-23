@@ -79,7 +79,7 @@ const CryptoTradingFAQ = () => {
                     <h2 className="text-lg font-semibold">{item.question}</h2>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <div className="text-muted-foreground space-y-3 pt-2" dangerouslySetInnerHTML={{ __html: item.answer }} />
+                    <div className="text-muted-foreground space-y-3 pt-2" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.answer) }} />
                   </AccordionContent>
                 </AccordionItem>
               ))}

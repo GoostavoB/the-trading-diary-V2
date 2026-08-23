@@ -151,7 +151,7 @@ export default function BlogArticle() {
 
             <div
               className="prose prose-invert max-w-none"
-              dangerouslySetInnerHTML={{ __html: article.content }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content) }}
             />
 
             <footer className="mt-12 pt-8 border-t border-border">
