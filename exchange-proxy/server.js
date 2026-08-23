@@ -229,6 +229,14 @@ app.post('/fetch-exchange-trades', async (req, res) => {
     const tradeType = toTradeType(trade.marketType);
     const side = trade.side === 'buy' ? 'long' : trade.side === 'sell' ? 'short' : trade.side;
 
+    // BingX/ccxt already hands us realizedPnl (info.profit) and leverage per
+    // order — the old code silently dropped both and hardcoded pnl/roi to 0.
+    const pnl = typeof trade.realizedPnl === 'number' ? trade.realizedPnl : 0;
+    const leverage = typeof trade.leverage === 'number' && trade.leverage > 0 ? trade.leverage : null;
+    const notional = trade.price * trade.quantity;
+    const margin = leverage ? notional / leverage : null;
+    const roi = margin && margin > 0 ? (pnl / margin) * 100 : null;
+
                                return {
                                  user_id: user.id,
                                  symbol: trade.symbol,
@@ -240,8 +248,11 @@ app.post('/fetch-exchange-trades', async (req, res) => {
                                  entry_price: trade.price,
                                  exit_price: trade.price,
                                  position_size: trade.quantity,
-                                 pnl: 0,
-                                 roi: 0,
+                                 pnl,
+                                 profit_loss: pnl,
+                                 roi,
+                                 leverage,
+                                 margin,
                                  trading_fee: trade.fee ?? 0,
                                  opened_at: openedAt,
                                  closed_at: openedAt,
@@ -249,7 +260,8 @@ app.post('/fetch-exchange-trades', async (req, res) => {
                                  exchange_source: connection.exchange_name,
                                  exchange_trade_id: trade.id || trade.orderId || null,
                                  trade_hash: `${connection.exchange_name}_${trade.id || trade.orderId}_${openedAt}`,
-                                 notes: `Imported from ${exchangeName} (${tradeType}). Order ID: ${trade.orderId ?? trade.id}`,
+                                 notes: `Imported from ${exchangeName} (${tradeType}). Order ID: ${trade.orderId ?? trade.id}` +
+                                   (trade.positionSide ? ` · Position: ${trade.positionSide}` : ''),
                                };
   });
 
