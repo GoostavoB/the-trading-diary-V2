@@ -13,7 +13,6 @@ import { useLSRNotifications } from '@/hooks/useLSRNotifications';
 // Lazy load heavy components
 const LongShortRatioContent = lazy(() => import('@/pages/LongShortRatio').then(m => ({ default: m.LongShortRatioContent })));
 const OpenInterestChartsContent = lazy(() => import('@/components/OpenInterestCharts').then(m => ({ default: m.OpenInterestCharts })));
-const MultiAssetLSRGridContent = lazy(() => import('@/components/market-data/MultiAssetLSRGrid').then(m => ({ default: m.MultiAssetLSRGrid })));
 
 const MarketData = () => {
   const { permission, requestPermission, isEnabled } = useLSRNotifications();
@@ -66,18 +65,6 @@ const MarketData = () => {
           <Suspense fallback={<DashboardSkeleton />}>
             <OpenInterestChartsContent />
           </Suspense>
-          {/* Multi-Asset Long/Short Ratio Grid */}
-          <div className="mt-8">
-          <div className="mb-4">
-          <h2 className="text-2xl font-bold">Visao geral multi-ativos</h2>
-          <p className="text-muted-foreground text-sm mt-1">
-          BTC, ETH, XAU e principais altcoins - razao long/short e open interest em um so lugar
-          </p>
-          </div>
-          <Suspense fallback={<DashboardSkeleton />}>
-          <MultiAssetLSRGridContent />
-          </Suspense>
-          </div>
         </div>
 
       </div>
