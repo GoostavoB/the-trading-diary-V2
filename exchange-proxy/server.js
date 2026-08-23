@@ -265,12 +265,31 @@ app.post('/fetch-exchange-trades', async (req, res) => {
                                };
   });
 
+  // Dedup: user_id+trade_hash is UNIQUE in trades (idx_trades_user_hash), so a
+  // literal re-import already fails safely — but the user should SEE which of
+  // the freshly-fetched candidates are already imported, not just have them
+  // silently rejected. Mark them + auto-deselect instead of hiding them.
+  const hashes = allTrades.map((t) => t.trade_hash).filter(Boolean);
+  const { data: existing } = hashes.length
+    ? await supabase.from('trades').select('trade_hash')
+        .eq('user_id', user.id).in('trade_hash', hashes).is('deleted_at', null)
+    : { data: [] };
+  const existingHashes = new Set((existing ?? []).map((r) => r.trade_hash));
+
   let stored = 0;
            let errors = 0;
+           let duplicates = 0;
            for (const trade of allTrades) {
+             const alreadyImported = existingHashes.has(trade.trade_hash);
+             if (alreadyImported) duplicates++;
              const { error } = await supabase
              .from('exchange_pending_trades')
-             .insert({ user_id: user.id, connection_id: connectionId, trade_data: trade, is_selected: true });
+             .insert({
+               user_id: user.id,
+               connection_id: connectionId,
+               trade_data: { ...trade, already_imported: alreadyImported },
+               is_selected: !alreadyImported,
+             });
              if (error) {
                errors++;
              } else {
@@ -290,7 +309,24 @@ app.post('/fetch-exchange-trades', async (req, res) => {
     .eq('id', syncHistory.id);
   }
 
-  return res.json({ success: true, tradesFetched: stored, exchangeName });
+  // "Your most recent imported trade" reference point, so the user knows
+  // where their data already ends instead of guessing a sync date range.
+  const { data: mostRecentRows } = await supabase
+    .from('trades')
+    .select('symbol, side, closed_at, profit_loss')
+    .eq('user_id', user.id)
+    .eq('exchange_source', connection.exchange_name)
+    .is('deleted_at', null)
+    .order('closed_at', { ascending: false })
+    .limit(1);
+
+  return res.json({
+    success: true,
+    tradesFetched: stored,
+    duplicatesFound: duplicates,
+    mostRecentTrade: mostRecentRows?.[0] ?? null,
+    exchangeName,
+  });
          } catch (error) {
            const message = error instanceof Error ? error.message : 'Internal server error';
 
