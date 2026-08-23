@@ -1,160 +1,196 @@
-import { BaseExchangeAdapter } from './BaseExchangeAdapter.ts';
-import type { 
-  ExchangeCredentials, 
-  Trade, 
-  Balance, 
-  Order, 
-  Deposit, 
+import { BaseExchangeAdapter, classifyConnectionError } from './BaseExchangeAdapter.ts';
+import type {
+  ExchangeCredentials,
+  Trade,
+  Balance,
+  Order,
+  Deposit,
   Withdrawal,
-  FetchOptions 
+  FetchOptions,
 } from './types.ts';
 
-async function hmacSha256(secret: string, message: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const keyData = encoder.encode(secret);
-  const messageData = encoder.encode(message);
-  const key = await crypto.subtle.importKey(
-    'raw',
-    keyData,
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign']
-  );
-  const signature = await crypto.subtle.sign('HMAC', key, messageData);
-  return Array.from(new Uint8Array(signature))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
-}
+// ── Why CCXT instead of hand-rolled request signing ────────────────────────
+// The previous version of this adapter hand-signed raw BingX REST calls
+// (HMAC-SHA256 over a query string) against endpoint paths that were never
+// verified against BingX's actual API and only ever covered the SPOT
+// market. BingX perpetual futures ("swap") trades live under a completely
+// different endpoint family this adapter never called — for an account that
+// trades perps only (the common case), that meant sync always returned zero
+// trades with no explanation.
+//
+// CCXT (https://github.com/ccxt/ccxt) ships a maintained, tested BingX
+// driver that unifies spot + swap (USDT-M perpetual futures) behind one
+// `fetchMyTrades` call, and the same driver interface already covers most
+// of the other exchanges this app supports (Binance, Bybit, Coinbase,
+// Kraken, Bitfinex, MEXC, KuCoin, OKX, Gate.io, Bitstamp), so this stops
+// being a "reverse-engineer one more exchange's API" problem.
+//
+// npm:ccxt is imported via Deno's native npm specifier support (no
+// package.json needed in the edge function). See docs/EXCHANGE_API_SYNC_FIXES.md
+// section 2 for the full rationale and rollback plan if this proves
+// impractical in the edge runtime (bundle size / cold start).
+//
+// ⚠️ VERIFY BEFORE SHIPPING: this has not been exercised against a live
+// BingX account yet. Test with a real read-only API key
+// (bingx.com/en/accounts/api) before trusting it in production — see the
+// "Test the adapter" step in docs/EXCHANGE_API_SYNC_FIXES.md.
+import ccxt from 'npm:ccxt@^4';
+
+type BingxMarketType = 'spot' | 'swap';
 
 export class BingXAdapter extends BaseExchangeAdapter {
-  protected baseUrl = 'https://open-api.bingx.com';
+  protected baseUrl = 'https://open-api.bingx.com'; // unused directly; ccxt manages URLs
   protected name = 'BingX';
-  protected rateLimitDelay = 100;
+  protected rateLimitDelay = 150;
+
+  private client: any;
 
   constructor(credentials: ExchangeCredentials) {
     super(credentials);
-  }
-
-  private async generateSignature(params: string): Promise<string> {
-    return await hmacSha256(this.credentials.apiSecret, params);
-  }
-
-  private async makeRequest<T>(endpoint: string, params: Record<string, any> = {}): Promise<T> {
-    await this.rateLimit();
-
-    const timestamp = Date.now().toString();
-    const allParams = { ...params, timestamp };
-    const queryString = new URLSearchParams(allParams).toString();
-    const signature = await this.generateSignature(queryString);
-
-    const url = `${this.baseUrl}${endpoint}?${queryString}&signature=${signature}`;
-
-    const response = await fetch(url, {
-      headers: {
-        'X-BX-APIKEY': this.credentials.apiKey,
-      },
+    this.client = new ccxt.bingx({
+      apiKey: credentials.apiKey,
+      secret: credentials.apiSecret,
+      enableRateLimit: true,
     });
-
-    if (!response.ok) {
-      throw new Error(`BingX API Error: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    // BingX returns HTTP 200 even for auth/permission errors; the real status is in the body
-    if (data && typeof data === 'object' && 'code' in data && data.code !== 0) {
-      throw new Error(`BingX API Error ${data.code}: ${data.msg || 'Unknown error'}`);
-    }
-    return data.data || data;
+    // Force ccxt to use Deno's native fetch. Its default transport in the
+    // npm-compat layer is what produced bare "TypeError: fetch failed"
+    // errors with no cause, while raw fetch to the same BingX endpoints
+    // works from the same egress (verified 2026-08-22).
+    this.client.fetchImplementation = fetch;
   }
 
   async testConnection(): Promise<boolean> {
     try {
-      await this.makeRequest('/openApi/spot/v1/account/balance');
+      // Warm up the edge runtime's outbound HTTPS/TLS connection to BingX
+      // before the first signed request after a cold boot. This is best-effort:
+      // the signed request and its retries remain the source of truth.
+      try {
+        await fetch('https://open-api.bingx.com/openApi/swap/v2/server/time');
+      } catch (warmupError) {
+        console.warn(
+          'BingX connection warm-up failed:',
+          warmupError instanceof Error ? warmupError.message : warmupError
+        );
+      }
+
+      // fetchBalance is cheap and works regardless of which markets the
+      // account actually trades — a much better connectivity check than
+      // hitting a spot-only endpoint (the old version's mistake, which
+      // made "connected" misleading for perp-only accounts).
+      // Four attempts give a cold edge instance time to establish outbound
+      // connectivity before treating the connection check as failed.
+      await this.retryRequest(() => this.client.fetchBalance({ type: 'spot' }), 4, 500);
+      this.lastConnectionError = undefined;
       return true;
-    } catch {
+    } catch (error) {
+      this.lastConnectionError = classifyConnectionError(error);
+      // Deno's "fetch failed" TypeError carries the real reason on .cause
+      // (ECONNREFUSED / ENOTFOUND / TLS / timeout). Log the whole cause
+      // chain — without it "fetch failed" is undiagnosable.
+      const causeChain: string[] = [];
+      let cur: any = error;
+      let depth = 0;
+      while (cur && depth < 5) {
+        causeChain.push(
+          `${cur?.name ?? typeof cur}: ${cur?.message ?? String(cur)}${cur?.code ? ` [code=${cur.code}]` : ''}${cur?.errno ? ` [errno=${cur.errno}]` : ''}`
+        );
+        cur = cur?.cause;
+        depth++;
+      }
+      console.error(
+        `BingX testConnection failed (${this.lastConnectionError.type}): ${this.lastConnectionError.message}`
+      );
+      console.error('BingX testConnection cause chain:', JSON.stringify(causeChain));
       return false;
     }
   }
 
-  async fetchTrades(options?: FetchOptions): Promise<Trade[]> {
-    try {
-      const params: Record<string, any> = { 
-        limit: Math.min(options?.limit || 500, 1000)
-      };
+  /**
+   * Fetches trades across the requested market types (default: spot + swap).
+   * Each returned trade is tagged with `marketType` so the caller can map it
+   * to the correct `trade_type` column ('spot' | 'futures') on import —
+   * never hardcode this.
+   */
+  async fetchTrades(options?: FetchOptions & { marketTypes?: BingxMarketType[] }): Promise<Trade[]> {
+    const marketTypes = options?.marketTypes ?? ['spot', 'swap'];
+    const since = options?.startTime ? options.startTime.getTime() : undefined;
+    const limit = Math.min(options?.limit ?? 500, 1000);
+    const until = options?.endTime ? options.endTime.getTime() : undefined;
 
-      // Add time filters if provided
-      if (options?.startTime) {
-        params.startTime = options.startTime.getTime();
-      }
-      if (options?.endTime) {
-        params.endTime = options.endTime.getTime();
-      }
-      if (options?.symbol) {
-        params.symbol = options.symbol.replace('/', '-');
-      }
+    const allTrades: Trade[] = [];
 
-      // BingX uses /openApi/spot/v2/trade/query for historical trades
-      const response = await this.makeRequest<{ orders: any[] }>(
-        '/openApi/spot/v2/trade/query', 
-        params
-      );
-      
-      if (!response.orders || !Array.isArray(response.orders)) {
-        console.warn('BingX returned no trades or invalid format');
-        return [];
-      }
+    for (const marketType of marketTypes) {
+      try {
+        await this.client.loadMarkets();
+        const rawTrades = await this.retryRequest(() =>
+          this.client.fetchMyTrades(undefined, since, limit, {
+            type: marketType,
+            ...(until ? { until } : {}),
+          })
+        );
 
-      return response.orders
-        .filter(trade => trade && trade.orderId)
-        .map(trade => ({
-          id: trade.orderId?.toString() || trade.tradeId?.toString() || '',
-          exchange: 'bingx',
-          symbol: trade.symbol?.replace('-', '/') || '',
-          side: trade.side?.toLowerCase() as 'buy' | 'sell',
-          price: parseFloat(trade.price || '0'),
-          quantity: parseFloat(trade.executedQty || trade.quantity || trade.origQty || '0'),
-          fee: parseFloat(trade.commission || trade.fee || '0'),
-          feeCurrency: trade.commissionAsset || trade.feeAsset || 'USDT',
-          timestamp: new Date(parseInt(trade.time || trade.transactTime) || Date.now()),
-          orderId: trade.orderId?.toString(),
-        }));
-    } catch (error) {
-      console.error('Error fetching BingX trades:', error);
-      throw error;
+        for (const t of rawTrades) {
+          allTrades.push({
+            id: String(t.id ?? t.order ?? ''),
+            symbol: t.symbol,
+            side: t.side, // 'buy' | 'sell'
+            price: Number(t.price ?? 0),
+            quantity: Number(t.amount ?? 0),
+            fee: Number(t.fee?.cost ?? 0),
+            feeCurrency: t.fee?.currency,
+            timestamp: t.timestamp ?? Date.now(),
+            orderId: t.order ? String(t.order) : undefined,
+            exchange: 'bingx',
+            marketType,
+          });
+        }
+      } catch (error) {
+        // Don't let one market type's failure (e.g. account has no swap
+        // permission) silently return zero trades for the whole sync —
+        // log it distinctly so it's diagnosable from function logs.
+        console.error(
+          `BingX fetchTrades failed for marketType=${marketType}:`,
+          error instanceof Error ? error.message : error
+        );
+      }
     }
+
+    return allTrades;
   }
 
   async fetchBalances(): Promise<Balance[]> {
     try {
-      const response = await this.makeRequest<{ balances: any[] }>('/openApi/spot/v1/account/balance');
-      return response.balances
-        .filter(b => parseFloat(b.free) > 0 || parseFloat(b.locked) > 0)
-        .map(balance => {
-          const free = parseFloat(balance.free);
-          const locked = parseFloat(balance.locked);
-          return {
-            exchange: 'bingx',
-            currency: balance.asset,
-            free,
-            locked,
-            total: free + locked,
-          };
-        });
+      const balance = await this.client.fetchBalance({ type: 'spot' });
+      const totals = balance.total ?? {};
+      const free = balance.free ?? {};
+      const used = balance.used ?? {};
+
+      return Object.keys(totals)
+        .filter((asset) => Number(totals[asset]) > 0)
+        .map((asset) => ({
+          exchange: 'bingx',
+          currency: asset,
+          free: Number(free[asset] ?? 0),
+          locked: Number(used[asset] ?? 0),
+          total: Number(totals[asset] ?? 0),
+        }));
     } catch (error) {
-      console.error('Error fetching BingX balances:', error);
+      console.error('Error fetching BingX balances:', error instanceof Error ? error.message : error);
       return [];
     }
   }
 
-  async fetchOrders(options?: FetchOptions): Promise<Order[]> {
+  async fetchOrders(_options?: FetchOptions): Promise<Order[]> {
+    // Not wired yet — out of scope for the sync-trades fix. fetchTrades()
+    // (fills) is what drives trade import, not order history.
     return [];
   }
 
-  async fetchDeposits(options?: FetchOptions): Promise<Deposit[]> {
+  async fetchDeposits(_options?: FetchOptions): Promise<Deposit[]> {
     return [];
   }
 
-  async fetchWithdrawals(options?: FetchOptions): Promise<Withdrawal[]> {
+  async fetchWithdrawals(_options?: FetchOptions): Promise<Withdrawal[]> {
     return [];
   }
 }
