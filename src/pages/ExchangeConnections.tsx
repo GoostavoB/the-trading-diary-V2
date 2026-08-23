@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { SEO } from '@/components/SEO';
 import { pageMeta } from '@/utils/seoHelpers';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, invokeEdgeFunction } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { RefreshCw, Unplug, Loader2 } from 'lucide-react';
@@ -91,30 +91,13 @@ export default function ExchangeConnections() {
 
   const syncMutation = useMutation({
     mutationFn: async (connectionId: string) => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { data, error } = await invokeEdgeFunction<any>('fetch-exchange-trades', {
+        body: { connectionId, mode: 'preview' },
+      });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-exchange-trades`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            connectionId,
-            mode: 'preview'
-          }),
-        }
-      );
+      if (error) throw error;
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Sync failed');
-      }
-
-      return { ...await response.json(), connectionId };
+      return { ...data, connectionId };
     },
     onSuccess: (data) => {
       toast.success(`Fetched ${data.tradesFetched} trades. Review and select which to import.`);
@@ -129,27 +112,13 @@ export default function ExchangeConnections() {
 
   const disconnectMutation = useMutation({
     mutationFn: async ({ connectionId, deleteTrades }: { connectionId: string; deleteTrades: boolean }) => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { data, error } = await invokeEdgeFunction<any>('disconnect-exchange', {
+        body: { connectionId, deleteTrades },
+      });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/disconnect-exchange`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({ connectionId, deleteTrades }),
-        }
-      );
+      if (error) throw error;
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Disconnect failed');
-      }
-
-      return response.json();
+      return data;
     },
     onSuccess: () => {
       toast.success('Exchange disconnected successfully');

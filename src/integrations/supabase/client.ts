@@ -18,14 +18,58 @@ function isUnset(value: string | undefined): boolean {
 const rawUrl = import.meta.env.VITE_SUPABASE_URL;
 const rawKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-const SUPABASE_URL = isUnset(rawUrl) ? 'https://qziawervfvptoretkjrn.supabase.co' : rawUrl;
-const SUPABASE_PUBLISHABLE_KEY = isUnset(rawKey)
+export const SUPABASE_URL = isUnset(rawUrl) ? 'https://qziawervfvptoretkjrn.supabase.co' : rawUrl;
+export const SUPABASE_PUBLISHABLE_KEY = isUnset(rawKey)
   ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6aWF3ZXJ2ZnZwdG9yZXRranJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NTE5NjUsImV4cCI6MjA3NjAyNzk2NX0.PLz3klmy0iN1GKTSPNW2tgq0GeDWfVGaBqnPq7zLyAo'
   : rawKey;
+
+/**
+ * Calls an edge function via a manually built absolute URL.
+ * Bypasses supabase-js FunctionsClient, which in some production chunk-splitting
+ * scenarios resolved its base URL to the literal string "undefined".
+ */
+export async function invokeEdgeFunction<T = any>(
+  functionName: string,
+  options: { body?: unknown } = {}
+): Promise<{ data: T | null; error: Error | null }> {
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token ?? SUPABASE_PUBLISHABLE_KEY;
+
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/${functionName}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+        apikey: SUPABASE_PUBLISHABLE_KEY,
+      },
+      body: JSON.stringify(options.body ?? {}),
+    });
+
+    const text = await res.text();
+    let parsed: any = null;
+    try {
+      parsed = text ? JSON.parse(text) : null;
+    } catch {
+      throw new Error(
+        `Edge function "${functionName}" returned a non-JSON response (status ${res.status}). This usually means the request hit the wrong URL.`
+      );
+    }
+
+    if (!res.ok) {
+      throw new Error(parsed?.error || `Edge function "${functionName}" failed with status ${res.status}`);
+    }
+
+    return { data: parsed as T, error: null };
+  } catch (error) {
+    return { data: null, error: error instanceof Error ? error : new Error(String(error)) };
+  }
+}
 
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   throw new Error('Supabase configuration is missing. Please check your environment variables.');
 }
+
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
