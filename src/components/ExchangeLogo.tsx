@@ -27,10 +27,10 @@ const exchangeLogos: Record<string, { svg: string; png?: string }> = {
 // with object-contain. This replaces the old per-exchange manual
 // "sizeScale" transform hacks that were compensating for inconsistent
 // source assets (mixed PNG/SVG, different padding/whitespace).
-const sizeBoxClasses = {
-  sm: "h-8 w-20",
-  md: "h-10 w-24",
-  lg: "h-12 w-32",
+const logoHeightClasses = {
+  sm: "h-5",
+  md: "h-6",
+  lg: "h-7",
 };
 
 export const ExchangeLogo = ({
@@ -57,7 +57,7 @@ export const ExchangeLogo = ({
   if (imgError || !logoData) {
     return showFallback ? (
       <div
-        className={`${sizeBoxClasses[size]} rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 flex items-center justify-center ${className}`}
+        className={`${logoHeightClasses[size]} w-20 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 flex items-center justify-center ${className}`}
         aria-label={`${exchangeName} logo`}
         >
       <span className="text-sm font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent uppercase tracking-wider">
@@ -70,11 +70,11 @@ export const ExchangeLogo = ({
   const imgSrc = usePng && logoData.png ? logoData.png : logoData.svg;
   
   return (
-    <div className={`${sizeBoxClasses[size]} flex items-center justify-center ${className}`}>
+    <div className={`inline-flex items-center justify-center rounded-lg bg-white border border-black/[0.06] shadow-sm px-3 py-2 ${className}`}>
     <img
       src={imgSrc}
       alt={`${exchangeName} logo`}
-      className="max-h-full max-w-full object-contain dark:bg-background dark:rounded-lg dark:p-1"
+      className={`${logoHeightClasses[size]} w-auto object-contain`}
       onError={handleError}
       loading="lazy"
       decoding="async"
