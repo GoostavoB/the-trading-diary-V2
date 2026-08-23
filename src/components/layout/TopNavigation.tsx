@@ -42,6 +42,7 @@ export function TopNavigation() {
             items: [
                 { title: 'Forecast', url: '/forecast', icon: Target, description: 'Project future growth scenarios' },
                 { title: 'Market Data', url: '/market-data', icon: LineChart, description: 'Real-time prices, long/short ratio and open interest' },
+                { title: 'LSR & OI Grid', url: '/lsr-oi-grid', icon: BarChart3, description: 'Multi-asset long/short ratio and open interest grid' },
             ]
         },
         {
