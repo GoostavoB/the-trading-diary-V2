@@ -1,4 +1,5 @@
-import { BaseExchangeAdapter } from './BaseExchangeAdapter.ts';
+import { BaseExchangeAdapter, classifyConnectionError } from './BaseExchangeAdapter.ts';
+import type { ConnectionError } from './BaseExchangeAdapter.ts';
 import type { ExchangeCredentials, Trade, Balance, Order, Deposit, Withdrawal } from './types.ts';
 import { BinanceAdapter } from './BinanceAdapter.ts';
 import { BybitAdapter } from './BybitAdapter.ts';
@@ -30,6 +31,8 @@ export type SupportedExchange = typeof SUPPORTED_EXCHANGES[number];
 
 export class ExchangeService {
   private adapters: Map<string, BaseExchangeAdapter> = new Map();
+  /** Real reason the last initializeExchange() call failed, if any. */
+  public lastInitError?: ConnectionError;
 
   private createAdapter(exchange: string, credentials: ExchangeCredentials): BaseExchangeAdapter {
     const exchangeLower = exchange.toLowerCase();
@@ -64,6 +67,7 @@ export class ExchangeService {
   }
 
   async initializeExchange(exchange: string, credentials: ExchangeCredentials): Promise<boolean> {
+    this.lastInitError = undefined;
     try {
       const adapter = this.createAdapter(exchange, credentials);
       const isConnected = await adapter.testConnection();
@@ -73,9 +77,14 @@ export class ExchangeService {
         return true;
       }
 
+      this.lastInitError = adapter.lastConnectionError ?? {
+        type: 'unknown',
+        message: `Connection check to ${exchange} failed.`,
+      };
       return false;
     } catch (error) {
-      console.error(`Failed to initialize ${exchange}:`, error);
+      this.lastInitError = classifyConnectionError(error);
+      console.error(`Failed to initialize ${exchange}:`, this.lastInitError.message);
       return false;
     }
   }
@@ -94,6 +103,7 @@ export class ExchangeService {
     options?: {
       startDate?: Date;
       endDate?: Date;
+      marketTypes?: string[];
     }
   ): Promise<{
     success: boolean;
@@ -113,7 +123,9 @@ export class ExchangeService {
       const trades = await adapter.fetchTrades({
         startTime: options?.startDate,
         endTime: options?.endDate,
-      });
+        // Only BingXAdapter reads this today; other adapters ignore unknown options.
+        marketTypes: options?.marketTypes,
+      } as any);
 
       return { success: true, trades };
     } catch (error) {
