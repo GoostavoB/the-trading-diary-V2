@@ -3,8 +3,25 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 import { brokeredPreviewStorage } from './previewAuthStorage';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://qziawervfvptoretkjrn.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6aWF3ZXJ2ZnZwdG9yZXRranJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NTE5NjUsImV4cCI6MjA3NjAyNzk2NX0.PLz3klmy0iN1GKTSPNW2tgq0GeDWfVGaBqnPq7zLyAo';
+// Some build pipelines interpolate an unset env var as the literal text
+// "undefined" (e.g. shell `--build-arg VITE_SUPABASE_URL=$UNSET_VAR`) rather
+// than leaving it truly undefined. A plain `||` fallback does NOT catch that
+// case because a non-empty string is truthy — this was silently sending every
+// supabase.functions.invoke() call to `undefined/functions/v1/...` (resolved
+// as a same-origin relative path, which the SPA catch-all served as index.html,
+// causing "Unexpected token '<' is not valid JSON" errors on every exchange
+// sync). isUnset() treats "undefined"/"null"/empty string as unset too.
+function isUnset(value: string | undefined): boolean {
+  return !value || value === 'undefined' || value === 'null';
+}
+
+const rawUrl = import.meta.env.VITE_SUPABASE_URL;
+const rawKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+const SUPABASE_URL = isUnset(rawUrl) ? 'https://qziawervfvptoretkjrn.supabase.co' : rawUrl;
+const SUPABASE_PUBLISHABLE_KEY = isUnset(rawKey)
+  ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6aWF3ZXJ2ZnZwdG9yZXRranJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NTE5NjUsImV4cCI6MjA3NjAyNzk2NX0.PLz3klmy0iN1GKTSPNW2tgq0GeDWfVGaBqnPq7zLyAo'
+  : rawKey;
 
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   throw new Error('Supabase configuration is missing. Please check your environment variables.');
