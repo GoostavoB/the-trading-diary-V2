@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import { addStructuredData, pageMeta } from "@/utils/seoHelpers";
 import { ArrowRight } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import DOMPurify from "dompurify";
 
 const CryptoTradingFAQ = () => {
   const navigate = useNavigate();

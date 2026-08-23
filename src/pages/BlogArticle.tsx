@@ -7,6 +7,7 @@ import { Clock, Calendar, User, ArrowLeft, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
 import { getLanguageFromPath } from '@/utils/languageRouting';
+import DOMPurify from 'dompurify';
 
 // Mock blog data - in real app, fetch from API/CMS
 const blogArticles: Record<string, any> = {
