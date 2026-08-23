@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
+import { isAuthorizedCronRequest, forbiddenResponse } from "../_shared/cronAuth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,6 +19,10 @@ interface Alert {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  if (!isAuthorizedCronRequest(req)) {
+    return forbiddenResponse(corsHeaders);
   }
 
   try {
@@ -170,11 +175,12 @@ Deno.serve(async (req) => {
 
     console.log(`Monitoring complete. Triggered ${triggeredAlerts.length} alerts.`);
 
+    // Do not return user ids or performance values in the HTTP response;
+    // details stay in server-side logs only.
     return new Response(
       JSON.stringify({
         success: true,
         triggeredCount: triggeredAlerts.length,
-        triggeredAlerts,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

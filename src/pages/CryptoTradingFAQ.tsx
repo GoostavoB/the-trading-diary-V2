@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import { addStructuredData, pageMeta } from "@/utils/seoHelpers";
 import { ArrowRight } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import DOMPurify from "dompurify";
 
 const CryptoTradingFAQ = () => {
   const navigate = useNavigate();
@@ -79,7 +80,7 @@ const CryptoTradingFAQ = () => {
                     <h2 className="text-lg font-semibold">{item.question}</h2>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <div className="text-muted-foreground space-y-3 pt-2" dangerouslySetInnerHTML={{ __html: item.answer }} />
+                    <div className="text-muted-foreground space-y-3 pt-2" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.answer) }} />
                   </AccordionContent>
                 </AccordionItem>
               ))}
