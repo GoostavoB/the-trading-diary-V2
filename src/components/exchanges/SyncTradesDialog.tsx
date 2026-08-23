@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchExchangeTrades } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetchExchangeTrades, supabase } from '@/integrations/supabase/client';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   Dialog,
@@ -28,7 +28,7 @@ interface SyncTradesDialogProps {
   onFetchComplete: () => void;
 }
 
-type DateRangePreset = 'last7days' | 'last30days' | 'last90days' | 'custom';
+type DateRangePreset = 'sinceLastTrade' | 'last7days' | 'last30days' | 'last90days' | 'custom';
 
 export function SyncTradesDialog({
   connectionId,
@@ -43,6 +43,26 @@ export function SyncTradesDialog({
   const [endDate, setEndDate] = useState<Date | undefined>();
   const queryClient = useQueryClient();
 
+  const { data: mostRecentTrade } = useQuery({
+    queryKey: ['most-recent-trade', exchangeName],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('trades')
+        .select('symbol, side, closed_at, profit_loss')
+        .eq('exchange_source', exchangeName)
+        .is('deleted_at', null)
+        .order('closed_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+    enabled: isOpen,
+  });
+
+  useEffect(() => {
+    if (mostRecentTrade) setPreset('sinceLastTrade');
+  }, [mostRecentTrade]);
+
   const fetchMutation = useMutation({
     mutationFn: async () => {
       let start: string | undefined;
@@ -50,7 +70,10 @@ export function SyncTradesDialog({
 
       const now = new Date();
       
-      if (preset === 'custom') {
+      if (preset === 'sinceLastTrade' && mostRecentTrade) {
+        start = new Date(mostRecentTrade.closed_at).toISOString().split('T')[0];
+        end = now.toISOString().split('T')[0];
+      } else if (preset === 'custom') {
         if (!startDate || !endDate) {
           throw new Error('Please select both start and end dates');
         }
@@ -102,6 +125,10 @@ export function SyncTradesDialog({
   };
 
   const getDateRangeLabel = () => {
+    if (preset === 'sinceLastTrade' && mostRecentTrade) {
+      return `${format(new Date(mostRecentTrade.closed_at), 'MMM dd, yyyy')} - ${format(new Date(), 'MMM dd, yyyy')}`;
+    }
+
     if (preset === 'custom' && startDate && endDate) {
       return `${format(startDate, 'MMM dd, yyyy')} - ${format(endDate, 'MMM dd, yyyy')}`;
     }
@@ -123,11 +150,28 @@ export function SyncTradesDialog({
           </DialogDescription>
         </DialogHeader>
 
+        {mostRecentTrade && (
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm">
+            <span className="text-muted-foreground">Ultimo trade importado: </span>
+            <span className="font-medium">{mostRecentTrade.symbol}</span>
+            <span className="text-muted-foreground"> ({mostRecentTrade.side}) em </span>
+            <span className="font-medium">{format(new Date(mostRecentTrade.closed_at), 'MMM dd, yyyy HH:mm')}</span>
+          </div>
+        )}
+
         <div className="space-y-6 py-4">
           {/* Date Range Preset */}
           <div className="space-y-3">
             <Label>{t('exchanges.sync.timePeriod')}</Label>
             <RadioGroup value={preset} onValueChange={(v) => setPreset(v as DateRangePreset)}>
+              {mostRecentTrade && (
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="sinceLastTrade" id="sinceLastTrade" />
+                  <Label htmlFor="sinceLastTrade" className="font-normal cursor-pointer">
+                    Desde o ultimo trade ({format(new Date(mostRecentTrade.closed_at), 'MMM dd')})
+                  </Label>
+                </div>
+              )}
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="last7days" id="last7days" />
                 <Label htmlFor="last7days" className="font-normal cursor-pointer">
