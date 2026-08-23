@@ -77,8 +77,9 @@ const MarketData = () => {
           <Suspense fallback={<DashboardSkeleton />}>
           <MultiAssetLSRGridContent />
           </Suspense>
-          </div></div>
+          </div>
         </div>
+
       </div>
     </AppLayout>
     </>
