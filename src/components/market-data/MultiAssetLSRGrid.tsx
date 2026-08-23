@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { ChevronUp, ChevronDown, X, Zap } from 'lucide-react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { ListFilter, Zap, Check } from 'lucide-react';
+import { AreaChart, Area, ResponsiveContainer, YAxis } from 'recharts';
 
 interface AssetConfig {
     symbol: string;
@@ -11,10 +12,12 @@ interface AssetMetrics {
     ratio: number | null;
     longPct: number | null;
     shortPct: number | null;
+    ratioChange15m: number | null;
     ratioChange1h: number | null;
     ratioChange24h: number | null;
     oiValue: number | null;
     oiChangePct: number | null;
+    history: { v: number }[];
 }
 
 type AssetStatus = 'avoid-longs' | 'avoid-shorts' | 'caution' | 'neutral' | 'no-data';
@@ -43,9 +46,8 @@ const DEFAULT_ASSETS: AssetConfig[] = [
   { symbol: 'ARBUSDT', label: 'ARB', color: '#28A0F0' },
   { symbol: 'OPUSDT', label: 'OP', color: '#FF0420' },
   { symbol: 'SUIUSDT', label: 'SUI', color: '#6FBCF0' },
-  ];
+];
 
-const ORDER_KEY = 'ttd:multiAssetGrid:order';
 const HIDDEN_KEY = 'ttd:multiAssetGrid:hidden';
 
 const LEVEL_HIGH = 1.8;
@@ -91,225 +93,287 @@ const formatOI = (v: number | null) => {
     return `$${v.toFixed(0)}`;
 };
 
+// Last 4h of history at 15m granularity = 16 candles
+const HISTORY_WINDOW = 16;
+
 async function fetchAssetMetrics(symbol: string): Promise<AssetMetrics> {
     try {
-          const [ratioRes, oiRes] = await Promise.all([
-                  fetch(`https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${symbol}&period=15m&limit=97`),
-                  fetch(`https://fapi.binance.com/futures/data/openInterestHist?symbol=${symbol}&period=1h&limit=2`),
-                ]);
-          const ratioJson = ratioRes.ok ? await ratioRes.json() : [];
-          const oiJson = oiRes.ok ? await oiRes.json() : [];
+        const [ratioRes, oiRes] = await Promise.all([
+            fetch(`https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${symbol}&period=15m&limit=97`),
+            fetch(`https://fapi.binance.com/futures/data/openInterestHist?symbol=${symbol}&period=1h&limit=2`),
+        ]);
+        const ratioJson = ratioRes.ok ? await ratioRes.json() : [];
+        const oiJson = oiRes.ok ? await oiRes.json() : [];
 
-      let ratio: number | null = null;
-          let longPct: number | null = null;
-          let shortPct: number | null = null;
-          let ratioChange1h: number | null = null;
-          let ratioChange24h: number | null = null;
-          if (Array.isArray(ratioJson) && ratioJson.length > 0) {
-                  const last = ratioJson[ratioJson.length - 1];
-                  ratio = parseFloat(last.longShortRatio);
-                  longPct = parseFloat(last.longAccount) * 100;
-                  shortPct = parseFloat(last.shortAccount) * 100;
+        let ratio: number | null = null;
+        let longPct: number | null = null;
+        let shortPct: number | null = null;
+        let ratioChange15m: number | null = null;
+        let ratioChange1h: number | null = null;
+        let ratioChange24h: number | null = null;
+        let history: { v: number }[] = [];
 
-                  const idx1h = ratioJson.length - 1 - 4;
-                  if (idx1h >= 0) {
-                            const prev1h = parseFloat(ratioJson[idx1h].longShortRatio);
-                            if (prev1h !== 0) ratioChange1h = ((ratio - prev1h) / prev1h) * 100;
-                  }
+        if (Array.isArray(ratioJson) && ratioJson.length > 0) {
+            const last = ratioJson[ratioJson.length - 1];
+            ratio = parseFloat(last.longShortRatio);
+            longPct = parseFloat(last.longAccount) * 100;
+            shortPct = parseFloat(last.shortAccount) * 100;
 
-                  const first = parseFloat(ratioJson[0].longShortRatio);
-                  if (first !== 0) ratioChange24h = ((ratio - first) / first) * 100;
-          }
+            const idx15m = ratioJson.length - 2;
+            if (idx15m >= 0) {
+                const prev15m = parseFloat(ratioJson[idx15m].longShortRatio);
+                if (prev15m !== 0) ratioChange15m = ((ratio - prev15m) / prev15m) * 100;
+            }
 
-      let oiValue: number | null = null;
-          let oiChangePct: number | null = null;
-          if (Array.isArray(oiJson) && oiJson.length > 0) {
-                  oiValue = parseFloat(oiJson[oiJson.length - 1].sumOpenInterestValue);
-                  if (oiJson.length >= 2) {
-                            const prevOi = parseFloat(oiJson[0].sumOpenInterestValue);
-                            if (prevOi !== 0) oiChangePct = ((oiValue - prevOi) / prevOi) * 100;
-                  }
-          }
+            const idx1h = ratioJson.length - 1 - 4;
+            if (idx1h >= 0) {
+                const prev1h = parseFloat(ratioJson[idx1h].longShortRatio);
+                if (prev1h !== 0) ratioChange1h = ((ratio - prev1h) / prev1h) * 100;
+            }
 
-      return { ratio, longPct, shortPct, ratioChange1h, ratioChange24h, oiValue, oiChangePct };
+            const first = parseFloat(ratioJson[0].longShortRatio);
+            if (first !== 0) ratioChange24h = ((ratio - first) / first) * 100;
+
+            history = ratioJson
+                .slice(-HISTORY_WINDOW)
+                .map((p: { longShortRatio: string }) => ({ v: parseFloat(p.longShortRatio) }));
+        }
+
+        let oiValue: number | null = null;
+        let oiChangePct: number | null = null;
+        if (Array.isArray(oiJson) && oiJson.length > 0) {
+            oiValue = parseFloat(oiJson[oiJson.length - 1].sumOpenInterestValue);
+            if (oiJson.length >= 2) {
+                const prevOi = parseFloat(oiJson[0].sumOpenInterestValue);
+                if (prevOi !== 0) oiChangePct = ((oiValue - prevOi) / prevOi) * 100;
+            }
+        }
+
+        return { ratio, longPct, shortPct, ratioChange15m, ratioChange1h, ratioChange24h, oiValue, oiChangePct, history };
     } catch {
-          return { ratio: null, longPct: null, shortPct: null, ratioChange1h: null, ratioChange24h: null, oiValue: null, oiChangePct: null };
+        return { ratio: null, longPct: null, shortPct: null, ratioChange15m: null, ratioChange1h: null, ratioChange24h: null, oiValue: null, oiChangePct: null, history: [] };
     }
 }
 
 interface AssetCardProps {
     asset: AssetConfig;
     metrics: AssetMetrics | undefined;
-    onHide: (symbol: string) => void;
-    onMoveUp: () => void;
-    onMoveDown: () => void;
-    disableUp: boolean;
-    disableDown: boolean;
 }
 
-const AssetCard = ({ asset, metrics, onHide, onMoveUp, onMoveDown, disableUp, disableDown }: AssetCardProps) => {
+const AssetCard = ({ asset, metrics }: AssetCardProps) => {
     const ratio = metrics?.ratio ?? null;
     const status = getStatus(metrics);
+    const change15mClass = metrics?.ratioChange15m != null ? (metrics.ratioChange15m >= 0 ? 'text-profit' : 'text-loss') : 'text-space-400';
     const change1hClass = metrics?.ratioChange1h != null ? (metrics.ratioChange1h >= 0 ? 'text-profit' : 'text-loss') : 'text-space-400';
     const change24hClass = metrics?.ratioChange24h != null ? (metrics.ratioChange24h >= 0 ? 'text-profit' : 'text-loss') : 'text-space-400';
     const longPct = metrics?.longPct ?? null;
     const shortPct = metrics?.shortPct ?? null;
+    const history = metrics?.history ?? [];
+
+    // Trend color for the mini chart: compare first vs last point of the 4h window
+    const trendUp = history.length >= 2 ? history[history.length - 1].v >= history[0].v : null;
+    const trendColor = trendUp === null ? 'hsl(var(--muted-foreground))' : trendUp ? 'hsl(var(--profit))' : 'hsl(var(--loss))';
 
     return (
-          <div className="card-premium p-4 flex flex-col gap-2 min-h-[280px]">
-                <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: asset.color }} />
-                                  <span className="font-semibold text-sm">{asset.label}</span>
-                                  {status === 'caution' && <Zap className="h-3.5 w-3.5 text-amber-500" />}
-                        </div>
-                        <div className="flex items-center gap-1">
-                                  <button onClick={onMoveUp} disabled={disableUp} className="p-1 rounded hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors" aria-label={`Mover ${asset.label} para cima`}>
-                                              <ChevronUp className="h-3.5 w-3.5" />
-                                  </button>
-                                  <button onClick={onMoveDown} disabled={disableDown} className="p-1 rounded hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors" aria-label={`Mover ${asset.label} para baixo`}>
-                                              <ChevronDown className="h-3.5 w-3.5" />
-                                  </button>
-                                  <button onClick={() => onHide(asset.symbol)} className="p-1 rounded hover:bg-white/5 transition-colors" aria-label={`Ocultar ${asset.label}`}>
-                                              <X className="h-3.5 w-3.5" />
-                                  </button>
-                        </div>
-                </div>
+        <div className="card-premium p-4 flex flex-col gap-2 min-h-[300px]">
+            <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: asset.color }} />
+                <span className="font-semibold text-sm">{asset.label}</span>
+                {status === 'caution' && <Zap className="h-3.5 w-3.5 text-amber-500" />}
+            </div>
 
-                <div className="flex-1 flex flex-col items-center justify-center py-2">
-                        <p className="text-xs text-muted-foreground mb-1">Razao L/S</p>
-                        <p className="text-6xl font-bold font-num tabular-nums leading-none">{formatRatio(ratio)}</p>
-                        {(longPct !== null || shortPct !== null) && (
-                          <p className="text-xs text-muted-foreground mt-2 font-num tabular-nums">
-                            <span className="text-profit">{formatSharePct(longPct)} longs</span>{' / '}<span className="text-loss">{formatSharePct(shortPct)} shorts</span>
-                          </p>
-                        )}
-                </div>
+            <div className="flex flex-col items-center justify-center pt-1">
+                <p className="text-xs text-muted-foreground mb-1">Razao L/S</p>
+                <p className="text-5xl font-bold font-num tabular-nums leading-none">{formatRatio(ratio)}</p>
+                {(longPct !== null || shortPct !== null) && (
+                    <p className="text-xs text-muted-foreground mt-2 font-num tabular-nums">
+                        <span className="text-profit">{formatSharePct(longPct)} longs</span>{' / '}<span className="text-loss">{formatSharePct(shortPct)} shorts</span>
+                    </p>
+                )}
+            </div>
 
-                <div className="grid grid-cols-2 gap-3 text-center">
-                        <div>
-                                  <p className="text-xs text-muted-foreground">Var. 1h</p>
-                                  <p className={`text-sm font-semibold font-num tabular-nums ${change1hClass}`}>{formatPct(metrics?.ratioChange1h ?? null)}</p>
-                        </div>
-                        <div>
-                                  <p className="text-xs text-muted-foreground">Var. 24h</p>
-                                  <p className={`text-sm font-semibold font-num tabular-nums ${change24hClass}`}>{formatPct(metrics?.ratioChange24h ?? null)}</p>
-                        </div>
-                </div>
+            {/* Mini 4h trend sparkline */}
+            <div className="h-12 -mx-1">
+                {history.length >= 2 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={history} margin={{ top: 2, right: 4, bottom: 0, left: 4 }}>
+                            <YAxis domain={['dataMin', 'dataMax']} hide />
+                            <defs>
+                                <linearGradient id={`spark-${asset.symbol}`} x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor={trendColor} stopOpacity={0.35} />
+                                    <stop offset="100%" stopColor={trendColor} stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
+                            <Area type="monotone" dataKey="v" stroke={trendColor} strokeWidth={1.5} fill={`url(#spark-${asset.symbol})`} isAnimationActive={false} />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                ) : (
+                    <div className="h-full flex items-center justify-center text-[10px] text-muted-foreground">Sem historico suficiente</div>
+                )}
+            </div>
+            <p className="text-[10px] text-muted-foreground text-center -mt-1">Tendencia 4h</p>
 
-                <div className="flex items-center justify-between pt-1">
-                        <div>
-                                  <p className="text-xs text-muted-foreground">Open interest</p>
-                                  <p className="text-sm font-semibold font-num tabular-nums">{formatOI(metrics?.oiValue ?? null)}</p>
-                        </div>
-                        <span className={`text-xs font-medium px-2 py-1 rounded-full border ${statusClass[status]}`}>{statusLabel[status]}</span>
+            <div className="grid grid-cols-3 gap-2 text-center pt-1">
+                <div>
+                    <p className="text-xs text-muted-foreground">Var. 15m</p>
+                    <p className={`text-sm font-semibold font-num tabular-nums ${change15mClass}`}>{formatPct(metrics?.ratioChange15m ?? null)}</p>
                 </div>
-          </div>
-        );
+                <div>
+                    <p className="text-xs text-muted-foreground">Var. 1h</p>
+                    <p className={`text-sm font-semibold font-num tabular-nums ${change1hClass}`}>{formatPct(metrics?.ratioChange1h ?? null)}</p>
+                </div>
+                <div>
+                    <p className="text-xs text-muted-foreground">Var. 24h</p>
+                    <p className={`text-sm font-semibold font-num tabular-nums ${change24hClass}`}>{formatPct(metrics?.ratioChange24h ?? null)}</p>
+                </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-1">
+                <div>
+                    <p className="text-xs text-muted-foreground">Open interest</p>
+                    <p className="text-sm font-semibold font-num tabular-nums">{formatOI(metrics?.oiValue ?? null)}</p>
+                </div>
+                <span className={`text-xs font-medium px-2 py-1 rounded-full border ${statusClass[status]}`}>{statusLabel[status]}</span>
+            </div>
+        </div>
+    );
+};
+
+// Single "choose which assets to show" menu — replaces the old per-card up/down/hide buttons
+const AssetPicker = ({
+    visible,
+    onToggle,
+}: {
+    visible: Set<string>;
+    onToggle: (symbol: string) => void;
+}) => {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
+    return (
+        <div className="relative" ref={ref}>
+            <button
+                onClick={() => setOpen((o) => !o)}
+                className="flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg border border-border/40 bg-white/5 hover:bg-white/10 transition-colors"
+            >
+                <ListFilter className="h-4 w-4" />
+                Selecionar ativos ({visible.size}/{DEFAULT_ASSETS.length})
+            </button>
+            {open && (
+                <div className="absolute right-0 top-full mt-2 z-50 w-64 max-h-96 overflow-y-auto rounded-xl border border-border/40 bg-background/95 backdrop-blur-xl p-2 shadow-xl">
+                    {DEFAULT_ASSETS.map((a) => {
+                        const isVisible = visible.has(a.symbol);
+                        return (
+                            <button
+                                key={a.symbol}
+                                onClick={() => onToggle(a.symbol)}
+                                className="w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors text-left"
+                            >
+                                <span className="flex items-center gap-2">
+                                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: a.color }} />
+                                    <span className="text-sm">{a.label}</span>
+                                </span>
+                                {isVisible && <Check className="h-3.5 w-3.5 text-primary" />}
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
 };
 
 export const MultiAssetLSRGrid = () => {
     const [metrics, setMetrics] = useState<Record<string, AssetMetrics>>({});
-    const [order, setOrder] = useState<string[]>(() => {
-          try {
-                  const saved = localStorage.getItem(ORDER_KEY);
-                  if (saved) {
-                            const parsed: string[] = JSON.parse(saved);
-                            const known = new Set(DEFAULT_ASSETS.map((a) => a.symbol));
-                            const filtered = parsed.filter((s) => known.has(s));
-                            const missing = DEFAULT_ASSETS.map((a) => a.symbol).filter((s) => !filtered.includes(s));
-                            return [...filtered, ...missing];
-                  }
-          } catch {}
-          return DEFAULT_ASSETS.map((a) => a.symbol);
-    });
     const [hidden, setHidden] = useState<Set<string>>(() => {
-          try {
-                  const saved = localStorage.getItem(HIDDEN_KEY);
-                  if (saved) return new Set(JSON.parse(saved));
-          } catch {}
-          return new Set();
+        try {
+            const saved = localStorage.getItem(HIDDEN_KEY);
+            if (saved) return new Set(JSON.parse(saved));
+        } catch {
+            // ignore malformed localStorage value
+        }
+        return new Set();
     });
 
     const assetsBySymbol = useMemo(() => {
-          const map: Record<string, AssetConfig> = {};
-          DEFAULT_ASSETS.forEach((a) => { map[a.symbol] = a; });
-          return map;
+        const map: Record<string, AssetConfig> = {};
+        DEFAULT_ASSETS.forEach((a) => { map[a.symbol] = a; });
+        return map;
     }, []);
 
     const loadAll = useCallback(async () => {
-          const results = await Promise.allSettled(DEFAULT_ASSETS.map((a) => fetchAssetMetrics(a.symbol)));
-          setMetrics((prev) => {
-                  const next = { ...prev };
-                  results.forEach((r, i) => { if (r.status === 'fulfilled') next[DEFAULT_ASSETS[i].symbol] = r.value; });
-                  return next;
-          });
+        const results = await Promise.allSettled(DEFAULT_ASSETS.map((a) => fetchAssetMetrics(a.symbol)));
+        setMetrics((prev) => {
+            const next = { ...prev };
+            results.forEach((r, i) => { if (r.status === 'fulfilled') next[DEFAULT_ASSETS[i].symbol] = r.value; });
+            return next;
+        });
     }, []);
 
     useEffect(() => {
-          loadAll();
-          const interval = setInterval(loadAll, 60000);
-          return () => clearInterval(interval);
+        loadAll();
+        const interval = setInterval(loadAll, 60000);
+        return () => clearInterval(interval);
     }, [loadAll]);
 
-    useEffect(() => { localStorage.setItem(ORDER_KEY, JSON.stringify(order)); }, [order]);
     useEffect(() => { localStorage.setItem(HIDDEN_KEY, JSON.stringify(Array.from(hidden))); }, [hidden]);
 
-    const handleHide = (symbol: string) => { setHidden((prev) => new Set(prev).add(symbol)); };
-    const handleRestore = (symbol: string) => { setHidden((prev) => { const next = new Set(prev); next.delete(symbol); return next; }); };
-    const handleMove = (symbol: string, direction: -1 | 1) => {
-          setOrder((prev) => {
-                  const idx = prev.indexOf(symbol);
-                  const targetIdx = idx + direction;
-                  if (idx < 0 || targetIdx < 0 || targetIdx >= prev.length) return prev;
-                  const next = [...prev];
-                  const tmp = next[idx];
-                  next[idx] = next[targetIdx];
-                  next[targetIdx] = tmp;
-                  return next;
-          });
+    const toggleVisible = (symbol: string) => {
+        setHidden((prev) => {
+            const next = new Set(prev);
+            if (next.has(symbol)) next.delete(symbol);
+            else next.add(symbol);
+            return next;
+        });
     };
 
-    const visibleOrder = order.filter((s) => !hidden.has(s));
-    const hiddenList = order.filter((s) => hidden.has(s));
+    const visibleSymbols = DEFAULT_ASSETS.map((a) => a.symbol).filter((s) => !hidden.has(s));
+    const visibleSet = new Set(visibleSymbols);
 
     const summary = useMemo(() => {
-          const ratios = visibleOrder.map((s) => metrics[s]?.ratio).filter((r): r is number => r != null);
-          const avgRatio = ratios.length > 0 ? ratios.reduce((a, b) => a + b, 0) / ratios.length : null;
-          const avoidLongs = visibleOrder.filter((s) => getStatus(metrics[s]) === 'avoid-longs').length;
-          const avoidShorts = visibleOrder.filter((s) => getStatus(metrics[s]) === 'avoid-shorts').length;
-          const caution = visibleOrder.filter((s) => getStatus(metrics[s]) === 'caution').length;
-          return { avgRatio, avoidLongs, avoidShorts, caution, total: visibleOrder.length };
-    }, [visibleOrder, metrics]);
+        const ratios = visibleSymbols.map((s) => metrics[s]?.ratio).filter((r): r is number => r != null);
+        const avgRatio = ratios.length > 0 ? ratios.reduce((a, b) => a + b, 0) / ratios.length : null;
+        const avoidLongs = visibleSymbols.filter((s) => getStatus(metrics[s]) === 'avoid-longs').length;
+        const avoidShorts = visibleSymbols.filter((s) => getStatus(metrics[s]) === 'avoid-shorts').length;
+        const caution = visibleSymbols.filter((s) => getStatus(metrics[s]) === 'caution').length;
+        return { avgRatio, avoidLongs, avoidShorts, caution, total: visibleSymbols.length };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hidden, metrics]);
 
     return (
-          <div className="space-y-4">
-                <div className="card-premium p-4">
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                                  <div><p className="text-xs text-muted-foreground">Ativos monitorados</p><p className="text-xl font-bold font-num tabular-nums">{summary.total}</p></div>
-                                  <div><p className="text-xs text-muted-foreground">Razao media L/S</p><p className="text-xl font-bold font-num tabular-nums">{formatRatio(summary.avgRatio)}</p></div>
-                                  <div><p className="text-xs text-muted-foreground">Evite longs</p><p className="text-xl font-bold font-num tabular-nums text-loss">{summary.avoidLongs}</p></div>
-                                  <div><p className="text-xs text-muted-foreground">Evite shorts</p><p className="text-xl font-bold font-num tabular-nums text-profit">{summary.avoidShorts}</p></div>
-                                  <div><p className="text-xs text-muted-foreground">Em movimento</p><p className="text-xl font-bold font-num tabular-nums text-amber-500">{summary.caution}</p></div>
-                        </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {visibleOrder.map((symbol, idx) => (
-                      <AssetCard key={symbol} asset={assetsBySymbol[symbol]} metrics={metrics[symbol]} onHide={handleHide} onMoveUp={() => handleMove(symbol, -1)} onMoveDown={() => handleMove(symbol, 1)} disableUp={idx === 0} disableDown={idx === visibleOrder.length - 1} />
-                    ))}
-                </div>
-
-            {hiddenList.length > 0 && (
-                    <div className="card-premium p-4">
-                              <p className="text-xs text-muted-foreground mb-2">Ativos ocultos</p>
-                              <div className="flex flex-wrap gap-2">
-                                {hiddenList.map((symbol) => (
-                                    <button key={symbol} onClick={() => handleRestore(symbol)} className="text-xs font-medium px-3 py-1.5 rounded-full border border-border/40 bg-white/5 hover:bg-white/10 transition-colors">+ {assetsBySymbol[symbol]?.label ?? symbol}</button>
-                                  ))}
-                              </div>
+        <div className="space-y-4">
+            <div className="card-premium p-4">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 flex-1">
+                        <div><p className="text-xs text-muted-foreground">Ativos monitorados</p><p className="text-xl font-bold font-num tabular-nums">{summary.total}</p></div>
+                        <div><p className="text-xs text-muted-foreground">Razao media L/S</p><p className="text-xl font-bold font-num tabular-nums">{formatRatio(summary.avgRatio)}</p></div>
+                        <div><p className="text-xs text-muted-foreground">Evite longs</p><p className="text-xl font-bold font-num tabular-nums text-loss">{summary.avoidLongs}</p></div>
+                        <div><p className="text-xs text-muted-foreground">Evite shorts</p><p className="text-xl font-bold font-num tabular-nums text-profit">{summary.avoidShorts}</p></div>
+                        <div><p className="text-xs text-muted-foreground">Em movimento</p><p className="text-xl font-bold font-num tabular-nums text-amber-500">{summary.caution}</p></div>
                     </div>
-                )}
-          </div>
-        );
+                    <AssetPicker visible={visibleSet} onToggle={toggleVisible} />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {visibleSymbols.map((symbol) => (
+                    <AssetCard key={symbol} asset={assetsBySymbol[symbol]} metrics={metrics[symbol]} />
+                ))}
+            </div>
+
+            {visibleSymbols.length === 0 && (
+                <div className="card-premium p-8 text-center text-sm text-muted-foreground">
+                    Nenhum ativo selecionado. Use "Selecionar ativos" acima para escolher o que exibir.
+                </div>
+            )}
+        </div>
+    );
 };
