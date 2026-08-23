@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { SEO } from '@/components/SEO';
 import { pageMeta } from '@/utils/seoHelpers';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase, invokeEdgeFunction } from '@/integrations/supabase/client';
+import { supabase, invokeEdgeFunction, fetchExchangeTrades } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { RefreshCw, Unplug, Loader2 } from 'lucide-react';
@@ -91,9 +91,7 @@ export default function ExchangeConnections() {
 
   const syncMutation = useMutation({
     mutationFn: async (connectionId: string) => {
-      const { data, error } = await invokeEdgeFunction<any>('fetch-exchange-trades', {
-        body: { connectionId, mode: 'preview' },
-      });
+      const { data, error } = await fetchExchangeTrades<any>({ connectionId, mode: 'preview' });
 
       if (error) throw error;
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { invokeEdgeFunction } from '@/integrations/supabase/client';
+import { fetchExchangeTrades } from '@/integrations/supabase/client';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   Dialog,
@@ -64,13 +64,11 @@ export function SyncTradesDialog({
         start = startTime.toISOString().split('T')[0];
       }
 
-      const { data, error } = await invokeEdgeFunction<any>('fetch-exchange-trades', {
-        body: {
-          connectionId,
-          mode: 'preview',
-          startDate: start,
-          endDate: end,
-        },
+      const { data, error } = await fetchExchangeTrades<any>({
+        connectionId,
+        mode: 'preview',
+        startDate: start,
+        endDate: end,
       });
 
       if (error) throw error;

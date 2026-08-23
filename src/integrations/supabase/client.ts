@@ -66,6 +66,42 @@ export async function invokeEdgeFunction<T = any>(
   }
 }
 
+export const EXCHANGE_PROXY_URL = 'https://exchange-proxy-production-f489.up.railway.app';
+
+export async function fetchExchangeTrades<T = any>(
+  body: unknown
+): Promise<{ data: T | null; error: Error | null }> {
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token ?? SUPABASE_PUBLISHABLE_KEY;
+
+    const res = await fetch(`${EXCHANGE_PROXY_URL}/fetch-exchange-trades`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(body ?? {}),
+    });
+
+    const text = await res.text();
+    let parsed: any = null;
+    try {
+      parsed = text ? JSON.parse(text) : null;
+    } catch {
+      throw new Error(`Exchange proxy returned a non-JSON response (status ${res.status}).`);
+    }
+
+    if (!res.ok) {
+      throw new Error(parsed?.error || `Exchange proxy failed with status ${res.status}`);
+    }
+
+    return { data: parsed as T, error: null };
+  } catch (error) {
+    return { data: null, error: error instanceof Error ? error : new Error(String(error)) };
+  }
+}
+
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   throw new Error('Supabase configuration is missing. Please check your environment variables.');
 }

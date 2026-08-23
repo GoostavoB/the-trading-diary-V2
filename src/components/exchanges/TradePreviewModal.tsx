@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase, invokeEdgeFunction } from '@/integrations/supabase/client';
+import { supabase, fetchExchangeTrades } from '@/integrations/supabase/client';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   Dialog,
@@ -79,12 +79,10 @@ export function TradePreviewModal({
   // Import mutation
   const importMutation = useMutation({
     mutationFn: async (tradeIds: string[]) => {
-      const { data, error } = await invokeEdgeFunction<any>('fetch-exchange-trades', {
-        body: {
-          connectionId,
-          mode: 'import',
-          selectedTradeIds: tradeIds,
-        },
+      const { data, error } = await fetchExchangeTrades<any>({
+        connectionId,
+        mode: 'import',
+        selectedTradeIds: tradeIds,
       });
 
       if (error) throw error;
