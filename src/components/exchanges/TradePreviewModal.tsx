@@ -177,7 +177,7 @@ export function TradePreviewModal({
               {t('exchanges.preview.selected', { count: selectedIds.size, total: filteredTrades.length })}
               {totalPnL !== 0 && (
                 <span className={totalPnL > 0 ? 'text-success' : 'text-destructive'}>
-                  {' • '}{t('exchanges.preview.totalPnL')}: ${formatNumber(totalPnL)}
+                  {' • '}{t('exchanges.preview.totalPnL', { amount: formatNumber(totalPnL) })}
                 </span>
               )}
             </div>
