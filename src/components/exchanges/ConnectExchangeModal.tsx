@@ -39,32 +39,18 @@ export function ConnectExchangeModal({
 
   const connectMutation = useMutation({
     mutationFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { data, error } = await invokeEdgeFunction('connect-exchange', {
+        body: {
+          exchange,
+          apiKey,
+          apiSecret,
+          apiPassphrase: apiPassphrase || undefined,
+        },
+      });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/connect-exchange`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            exchange,
-            apiKey,
-            apiSecret,
-            apiPassphrase: apiPassphrase || undefined,
-          }),
-        }
-      );
+      if (error) throw error;
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Connection failed');
-      }
-
-      return response.json();
+      return data;
     },
     onSuccess: () => {
       toast.success(`Successfully connected to ${exchange}`);
