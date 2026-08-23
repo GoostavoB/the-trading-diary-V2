@@ -283,6 +283,13 @@ export function TradePreviewModal({
                     </TableCell>
                     <TableCell className="font-mono text-sm">{trade.trade_data.symbol}</TableCell>
                     <TableCell>
+                      {trade.trade_data.already_imported ? (
+                        <Badge variant="outline" className="text-xs text-muted-foreground">Já importado</Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-xs text-success border-success/30">Novo</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       <Badge variant={trade.trade_data.side === 'long' ? 'default' : 'destructive'}>
                         {trade.trade_data.side}
                       </Badge>
