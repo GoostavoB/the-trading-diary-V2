@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdgeFunction } from '@/integrations/supabase/client';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   Dialog,
