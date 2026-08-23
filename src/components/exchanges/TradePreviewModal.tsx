@@ -159,6 +159,14 @@ export function TradePreviewModal({
     });
   };
 
+  const EXCHANGE_DISPLAY_NAMES: Record<string, string> = {
+    binance: 'Binance', bingx: 'BingX', bybit: 'Bybit', coinbase: 'Coinbase',
+    kraken: 'Kraken', bitfinex: 'Bitfinex', mexc: 'MEXC', kucoin: 'KuCoin',
+    okx: 'OKX', gateio: 'Gate.io', bitstamp: 'Bitstamp',
+  };
+  const exchangeBroker = pendingTrades[0]?.trade_data?.broker as string | undefined;
+  const exchangeName = exchangeBroker ? (EXCHANGE_DISPLAY_NAMES[exchangeBroker.toLowerCase()] ?? exchangeBroker) : '';
+
   const handleImport = () => {
     if (selectedIds.size === 0) return;
     importMutation.mutate(Array.from(selectedIds));
@@ -168,7 +176,7 @@ export function TradePreviewModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>{t('exchanges.preview.title')}</DialogTitle>
+          <DialogTitle>{t('exchanges.preview.title', { exchange: exchangeName })}</DialogTitle>
           <DialogDescription>
             {t('exchanges.preview.description')}
           </DialogDescription>
