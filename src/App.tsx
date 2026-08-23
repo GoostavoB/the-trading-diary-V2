@@ -43,6 +43,7 @@ const Forecast = lazy(() => import("./pages/Forecast"));
 const Achievements = lazy(() => import("./pages/Achievements"));
 
 const MarketData = lazy(() => import("./pages/MarketData"));
+const LSROIGrid = lazy(() => import("./pages/LSROIGrid"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
