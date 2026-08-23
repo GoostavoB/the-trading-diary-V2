@@ -203,7 +203,7 @@ serve(async (req) => {
       JSON.stringify({ 
         message: `Checked activity for ${users.length} users`,
         notifications: notifications.length,
-        lucky_trader: luckyTrader?.id || 'none'
+        lucky_trader_selected: Boolean(luckyTrader)
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
