@@ -289,13 +289,11 @@ export default function ExchangeConnections() {
                 <div className="p-6 pb-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-muted/30 border border-border/30">
-                          <ExchangeLogo
-                            exchangeId={exchange.id}
-                            exchangeName={exchange.name}
-                            size="lg"
-                          />
-                      </div>
+                      <ExchangeLogo
+                        exchangeId={exchange.id}
+                        exchangeName={exchange.name}
+                        size="lg"
+                      />
                       <div>
                         <div className="flex items-center gap-2">
                           {exchange.comingSoon && !isConnected && (
