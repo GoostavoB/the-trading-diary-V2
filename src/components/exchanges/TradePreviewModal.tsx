@@ -303,6 +303,12 @@ export function TradePreviewModal({
                         : '-'}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
+                      {trade.trade_data.leverage ? `${trade.trade_data.leverage}x` : '-'}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {trade.trade_data.margin ? `$${formatNumber(trade.trade_data.margin)}` : '-'}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
                       ${formatNumber(trade.trade_data.trading_fee || 0)}
                     </TableCell>
                   </TableRow>
