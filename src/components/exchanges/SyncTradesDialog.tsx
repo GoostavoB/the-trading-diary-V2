@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { invokeEdgeFunction } from '@/integrations/supabase/client';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   Dialog,
@@ -45,9 +45,6 @@ export function SyncTradesDialog({
 
   const fetchMutation = useMutation({
     mutationFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
-
       let start: string | undefined;
       let end: string | undefined;
 
@@ -67,29 +64,18 @@ export function SyncTradesDialog({
         start = startTime.toISOString().split('T')[0];
       }
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-exchange-trades`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            connectionId,
-            mode: 'preview',
-            startDate: start,
-            endDate: end,
-          }),
-        }
-      );
+      const { data, error } = await invokeEdgeFunction<any>('fetch-exchange-trades', {
+        body: {
+          connectionId,
+          mode: 'preview',
+          startDate: start,
+          endDate: end,
+        },
+      });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to fetch trades');
-      }
+      if (error) throw error;
 
-      return response.json();
+      return data;
     },
     onSuccess: (data) => {
       toast.success(`Fetched ${data.tradesFetched} trades for review`);
