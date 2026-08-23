@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { ListFilter, Zap, Check } from 'lucide-react';
+import { ListFilter, Zap, Check, ChevronUp, ChevronDown } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer, YAxis } from 'recharts';
 
 interface AssetConfig {
@@ -49,6 +49,7 @@ const DEFAULT_ASSETS: AssetConfig[] = [
 ];
 
 const HIDDEN_KEY = 'ttd:multiAssetGrid:hidden';
+const ORDER_KEY = 'ttd:multiAssetGrid:order';
 
 const LEVEL_HIGH = 1.8;
 const LEVEL_LOW = 0.6;
@@ -239,13 +240,19 @@ const AssetCard = ({ asset, metrics }: AssetCardProps) => {
     );
 };
 
-// Single "choose which assets to show" menu — replaces the old per-card up/down/hide buttons
+// Single "choose which assets to show, and in what order" menu — replaces the old per-card up/down/hide buttons
 const AssetPicker = ({
+    order,
+    assetsBySymbol,
     visible,
     onToggle,
+    onMove,
 }: {
+    order: string[];
+    assetsBySymbol: Record<string, AssetConfig>;
     visible: Set<string>;
     onToggle: (symbol: string) => void;
+    onMove: (symbol: string, direction: -1 | 1) => void;
 }) => {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -259,30 +266,55 @@ const AssetPicker = ({
     }, []);
 
     return (
-        <div className="relative" ref={ref}>
+        <div className="relative z-30" ref={ref}>
             <button
                 onClick={() => setOpen((o) => !o)}
                 className="flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg border border-border/40 bg-white/5 hover:bg-white/10 transition-colors"
             >
                 <ListFilter className="h-4 w-4" />
-                Selecionar ativos ({visible.size}/{DEFAULT_ASSETS.length})
+                Selecionar ativos ({visible.size}/{order.length})
             </button>
             {open && (
-                <div className="absolute right-0 top-full mt-2 z-50 w-64 max-h-96 overflow-y-auto rounded-xl border border-border/40 bg-background/95 backdrop-blur-xl p-2 shadow-xl">
-                    {DEFAULT_ASSETS.map((a) => {
-                        const isVisible = visible.has(a.symbol);
+                <div className="absolute right-0 top-full mt-2 z-50 w-72 max-h-96 overflow-y-auto rounded-xl border border-border/40 bg-background/95 backdrop-blur-xl p-2 shadow-xl">
+                    <p className="text-[11px] text-muted-foreground px-2 pb-1">Marque para exibir. Use as setas para reordenar.</p>
+                    {order.map((symbol, idx) => {
+                        const a = assetsBySymbol[symbol];
+                        if (!a) return null;
+                        const isVisible = visible.has(symbol);
                         return (
-                            <button
-                                key={a.symbol}
-                                onClick={() => onToggle(a.symbol)}
-                                className="w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors text-left"
+                            <div
+                                key={symbol}
+                                className="w-full flex items-center gap-1 px-1 py-1 rounded-lg hover:bg-white/5 transition-colors"
                             >
-                                <span className="flex items-center gap-2">
-                                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: a.color }} />
-                                    <span className="text-sm">{a.label}</span>
-                                </span>
-                                {isVisible && <Check className="h-3.5 w-3.5 text-primary" />}
-                            </button>
+                                <div className="flex flex-col">
+                                    <button
+                                        onClick={() => onMove(symbol, -1)}
+                                        disabled={idx === 0}
+                                        className="p-0.5 rounded hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                                        aria-label={`Mover ${a.label} para cima`}
+                                    >
+                                        <ChevronUp className="h-3 w-3" />
+                                    </button>
+                                    <button
+                                        onClick={() => onMove(symbol, 1)}
+                                        disabled={idx === order.length - 1}
+                                        className="p-0.5 rounded hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                                        aria-label={`Mover ${a.label} para baixo`}
+                                    >
+                                        <ChevronDown className="h-3 w-3" />
+                                    </button>
+                                </div>
+                                <button
+                                    onClick={() => onToggle(symbol)}
+                                    className="flex-1 flex items-center justify-between gap-2 px-1.5 py-1 rounded-lg text-left"
+                                >
+                                    <span className="flex items-center gap-2">
+                                        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: a.color }} />
+                                        <span className="text-sm">{a.label}</span>
+                                    </span>
+                                    {isVisible && <Check className="h-3.5 w-3.5 text-primary" />}
+                                </button>
+                            </div>
                         );
                     })}
                 </div>
@@ -301,6 +333,21 @@ export const MultiAssetLSRGrid = () => {
             // ignore malformed localStorage value
         }
         return new Set();
+    });
+    const [order, setOrder] = useState<string[]>(() => {
+        try {
+            const saved = localStorage.getItem(ORDER_KEY);
+            if (saved) {
+                const parsed: string[] = JSON.parse(saved);
+                const known = new Set(DEFAULT_ASSETS.map((a) => a.symbol));
+                const filtered = parsed.filter((s) => known.has(s));
+                const missing = DEFAULT_ASSETS.map((a) => a.symbol).filter((s) => !filtered.includes(s));
+                return [...filtered, ...missing];
+            }
+        } catch {
+            // ignore malformed localStorage value
+        }
+        return DEFAULT_ASSETS.map((a) => a.symbol);
     });
 
     const assetsBySymbol = useMemo(() => {
@@ -325,6 +372,7 @@ export const MultiAssetLSRGrid = () => {
     }, [loadAll]);
 
     useEffect(() => { localStorage.setItem(HIDDEN_KEY, JSON.stringify(Array.from(hidden))); }, [hidden]);
+    useEffect(() => { localStorage.setItem(ORDER_KEY, JSON.stringify(order)); }, [order]);
 
     const toggleVisible = (symbol: string) => {
         setHidden((prev) => {
@@ -335,7 +383,20 @@ export const MultiAssetLSRGrid = () => {
         });
     };
 
-    const visibleSymbols = DEFAULT_ASSETS.map((a) => a.symbol).filter((s) => !hidden.has(s));
+    const moveInOrder = (symbol: string, direction: -1 | 1) => {
+        setOrder((prev) => {
+            const idx = prev.indexOf(symbol);
+            const targetIdx = idx + direction;
+            if (idx < 0 || targetIdx < 0 || targetIdx >= prev.length) return prev;
+            const next = [...prev];
+            const tmp = next[idx];
+            next[idx] = next[targetIdx];
+            next[targetIdx] = tmp;
+            return next;
+        });
+    };
+
+    const visibleSymbols = order.filter((s) => !hidden.has(s));
     const visibleSet = new Set(visibleSymbols);
 
     const summary = useMemo(() => {
@@ -346,11 +407,11 @@ export const MultiAssetLSRGrid = () => {
         const caution = visibleSymbols.filter((s) => getStatus(metrics[s]) === 'caution').length;
         return { avgRatio, avoidLongs, avoidShorts, caution, total: visibleSymbols.length };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [hidden, metrics]);
+    }, [order, hidden, metrics]);
 
     return (
         <div className="space-y-4">
-            <div className="card-premium p-4">
+            <div className="card-premium p-4 relative z-30">
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4 flex-1">
                         <div><p className="text-xs text-muted-foreground">Ativos monitorados</p><p className="text-xl font-bold font-num tabular-nums">{summary.total}</p></div>
@@ -359,11 +420,11 @@ export const MultiAssetLSRGrid = () => {
                         <div><p className="text-xs text-muted-foreground">Evite shorts</p><p className="text-xl font-bold font-num tabular-nums text-profit">{summary.avoidShorts}</p></div>
                         <div><p className="text-xs text-muted-foreground">Em movimento</p><p className="text-xl font-bold font-num tabular-nums text-amber-500">{summary.caution}</p></div>
                     </div>
-                    <AssetPicker visible={visibleSet} onToggle={toggleVisible} />
+                    <AssetPicker order={order} assetsBySymbol={assetsBySymbol} visible={visibleSet} onToggle={toggleVisible} onMove={moveInOrder} />
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-0">
                 {visibleSymbols.map((symbol) => (
                     <AssetCard key={symbol} asset={assetsBySymbol[symbol]} metrics={metrics[symbol]} />
                 ))}
