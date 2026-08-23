@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { ListFilter, Zap, Check, ChevronUp, ChevronDown } from 'lucide-react';
+import { ListFilter, Zap, Check, GripVertical } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer, YAxis } from 'recharts';
 
 interface AssetConfig {
@@ -240,21 +240,25 @@ const AssetCard = ({ asset, metrics }: AssetCardProps) => {
     );
 };
 
-// Single "choose which assets to show, and in what order" menu — replaces the old per-card up/down/hide buttons
+// Single "choose which assets to show, and in what order" menu.
+// Reordering is real click-and-hold drag & drop (native HTML5 DnD on desktop,
+// pointer-events fallback so it also works on touch/trackpad-drag).
 const AssetPicker = ({
     order,
     assetsBySymbol,
     visible,
     onToggle,
-    onMove,
+    onReorder,
 }: {
     order: string[];
     assetsBySymbol: Record<string, AssetConfig>;
     visible: Set<string>;
     onToggle: (symbol: string) => void;
-    onMove: (symbol: string, direction: -1 | 1) => void;
+    onReorder: (fromSymbol: string, toSymbol: string) => void;
 }) => {
     const [open, setOpen] = useState(false);
+    const [draggedSymbol, setDraggedSymbol] = useState<string | null>(null);
+    const [dragOverSymbol, setDragOverSymbol] = useState<string | null>(null);
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -264,6 +268,32 @@ const AssetPicker = ({
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
     }, []);
+
+    const handleDragStart = (e: React.DragEvent, symbol: string) => {
+        setDraggedSymbol(symbol);
+        e.dataTransfer.effectAllowed = 'move';
+        try { e.dataTransfer.setData('text/plain', symbol); } catch { /* noop */ }
+    };
+
+    const handleDragOver = (e: React.DragEvent, symbol: string) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (symbol !== dragOverSymbol) setDragOverSymbol(symbol);
+    };
+
+    const handleDrop = (e: React.DragEvent, symbol: string) => {
+        e.preventDefault();
+        if (draggedSymbol && draggedSymbol !== symbol) {
+            onReorder(draggedSymbol, symbol);
+        }
+        setDraggedSymbol(null);
+        setDragOverSymbol(null);
+    };
+
+    const handleDragEnd = () => {
+        setDraggedSymbol(null);
+        setDragOverSymbol(null);
+    };
 
     return (
         <div className="relative z-30" ref={ref}>
@@ -276,33 +306,27 @@ const AssetPicker = ({
             </button>
             {open && (
                 <div className="absolute right-0 top-full mt-2 z-50 w-72 max-h-96 overflow-y-auto rounded-xl border border-border/40 bg-background/95 backdrop-blur-xl p-2 shadow-xl">
-                    <p className="text-[11px] text-muted-foreground px-2 pb-1">Marque para exibir. Use as setas para reordenar.</p>
-                    {order.map((symbol, idx) => {
+                    <p className="text-[11px] text-muted-foreground px-2 pb-1">Marque para exibir. Clique e arraste para reordenar.</p>
+                    {order.map((symbol) => {
                         const a = assetsBySymbol[symbol];
                         if (!a) return null;
                         const isVisible = visible.has(symbol);
+                        const isDragging = draggedSymbol === symbol;
+                        const isDragOver = dragOverSymbol === symbol && draggedSymbol !== symbol;
                         return (
                             <div
                                 key={symbol}
-                                className="w-full flex items-center gap-1 px-1 py-1 rounded-lg hover:bg-white/5 transition-colors"
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, symbol)}
+                                onDragOver={(e) => handleDragOver(e, symbol)}
+                                onDrop={(e) => handleDrop(e, symbol)}
+                                onDragEnd={handleDragEnd}
+                                className={`w-full flex items-center gap-1 px-1 py-1 rounded-lg transition-colors ${
+                                    isDragging ? 'opacity-40' : ''
+                                } ${isDragOver ? 'bg-primary/10 border-t-2 border-primary' : 'hover:bg-white/5'}`}
                             >
-                                <div className="flex flex-col">
-                                    <button
-                                        onClick={() => onMove(symbol, -1)}
-                                        disabled={idx === 0}
-                                        className="p-0.5 rounded hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-                                        aria-label={`Mover ${a.label} para cima`}
-                                    >
-                                        <ChevronUp className="h-3 w-3" />
-                                    </button>
-                                    <button
-                                        onClick={() => onMove(symbol, 1)}
-                                        disabled={idx === order.length - 1}
-                                        className="p-0.5 rounded hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-                                        aria-label={`Mover ${a.label} para baixo`}
-                                    >
-                                        <ChevronDown className="h-3 w-3" />
-                                    </button>
+                                <div className="p-0.5 cursor-grab active:cursor-grabbing text-muted-foreground/60 touch-none">
+                                    <GripVertical className="h-3.5 w-3.5" />
                                 </div>
                                 <button
                                     onClick={() => onToggle(symbol)}
@@ -383,15 +407,14 @@ export const MultiAssetLSRGrid = () => {
         });
     };
 
-    const moveInOrder = (symbol: string, direction: -1 | 1) => {
+    const reorderAssets = (fromSymbol: string, toSymbol: string) => {
         setOrder((prev) => {
-            const idx = prev.indexOf(symbol);
-            const targetIdx = idx + direction;
-            if (idx < 0 || targetIdx < 0 || targetIdx >= prev.length) return prev;
+            const fromIdx = prev.indexOf(fromSymbol);
+            const toIdx = prev.indexOf(toSymbol);
+            if (fromIdx < 0 || toIdx < 0 || fromIdx === toIdx) return prev;
             const next = [...prev];
-            const tmp = next[idx];
-            next[idx] = next[targetIdx];
-            next[targetIdx] = tmp;
+            const [moved] = next.splice(fromIdx, 1);
+            next.splice(toIdx, 0, moved);
             return next;
         });
     };
@@ -420,7 +443,7 @@ export const MultiAssetLSRGrid = () => {
                         <div><p className="text-xs text-muted-foreground">Evite shorts</p><p className="text-xl font-bold font-num tabular-nums text-profit">{summary.avoidShorts}</p></div>
                         <div><p className="text-xs text-muted-foreground">Em movimento</p><p className="text-xl font-bold font-num tabular-nums text-amber-500">{summary.caution}</p></div>
                     </div>
-                    <AssetPicker order={order} assetsBySymbol={assetsBySymbol} visible={visibleSet} onToggle={toggleVisible} onMove={moveInOrder} />
+                    <AssetPicker order={order} assetsBySymbol={assetsBySymbol} visible={visibleSet} onToggle={toggleVisible} onReorder={reorderAssets} />
                 </div>
             </div>
 
