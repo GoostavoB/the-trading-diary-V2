@@ -26,6 +26,7 @@ const DEFAULT_ASSETS: AssetConfig[] = [
   { symbol: 'BTCUSDT', label: 'BTC', color: '#F7931A' },
   { symbol: 'ETHUSDT', label: 'ETH', color: '#627EEA' },
   { symbol: 'PAXGUSDT', label: 'XAU (Gold)', color: '#D4AF37' },
+  { symbol: 'XAGUSDT', label: 'XAG (Silver)', color: '#C0C0C0' },
   { symbol: 'BNBUSDT', label: 'BNB', color: '#F3BA2F' },
   { symbol: 'SOLUSDT', label: 'SOL', color: '#14F195' },
   { symbol: 'XRPUSDT', label: 'XRP', color: '#3AA5DD' },
