@@ -70,11 +70,14 @@ export function TradePreviewModal({
 
   // Initialize selected trades when data loads
   useEffect(() => {
-    if (pendingTrades.length > 0 && selectedIds.size === 0) {
-      const allIds = pendingTrades.map((t) => t.id);
-      setSelectedIds(new Set(allIds));
+    if (isOpen && pendingTrades.length > 0) {
+      const preSelectedIds = pendingTrades.filter((t) => t.is_selected).map((t) => t.id);
+      setSelectedIds(new Set(preSelectedIds));
     }
-  }, [pendingTrades]);
+    if (!isOpen) {
+      setSelectedIds(new Set());
+    }
+  }, [pendingTrades, isOpen]);
 
   // Import mutation
   const importMutation = useMutation({
@@ -255,10 +258,13 @@ export function TradePreviewModal({
                   </TableHead>
                   <TableHead>{t('exchanges.preview.date')}</TableHead>
                   <TableHead>{t('exchanges.preview.symbol')}</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>{t('exchanges.preview.side')}</TableHead>
                   <TableHead>{t('exchanges.preview.size')}</TableHead>
                   <TableHead>{t('exchanges.preview.price')}</TableHead>
                   <TableHead>{t('exchanges.preview.pnl')}</TableHead>
+                  <TableHead>Leverage</TableHead>
+                  <TableHead>Margin</TableHead>
                   <TableHead>{t('exchanges.preview.fee')}</TableHead>
                 </TableRow>
               </TableHeader>
@@ -280,6 +286,13 @@ export function TradePreviewModal({
                     </TableCell>
                     <TableCell className="font-mono text-sm">{trade.trade_data.symbol}</TableCell>
                     <TableCell>
+                      {trade.trade_data.already_imported ? (
+                        <Badge variant="outline" className="text-xs text-muted-foreground">Já importado</Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-xs text-success border-success/30">Novo</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       <Badge variant={trade.trade_data.side === 'long' ? 'default' : 'destructive'}>
                         {trade.trade_data.side}
                       </Badge>
@@ -298,6 +311,12 @@ export function TradePreviewModal({
                       {trade.trade_data.profit_loss
                         ? `$${formatNumber(trade.trade_data.profit_loss)}`
                         : '-'}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {trade.trade_data.leverage ? `${trade.trade_data.leverage}x` : '-'}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {trade.trade_data.margin ? `$${formatNumber(trade.trade_data.margin)}` : '-'}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       ${formatNumber(trade.trade_data.trading_fee || 0)}
