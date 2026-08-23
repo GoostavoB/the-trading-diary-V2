@@ -21,6 +21,8 @@ export interface Trade {
   orderId?: string;
   exchange?: string;
   role?: string;
+  /** 'spot' | 'swap' (perpetual futures) | 'future' — which market this trade came from. Must be set by any adapter that supports multiple markets; callers map this to trades.trade_type ('spot' -> 'spot', anything else -> 'futures'). Never assume spot. */
+  marketType?: 'spot' | 'swap' | 'future';
   [key: string]: any; // Allow additional properties
 }
 
