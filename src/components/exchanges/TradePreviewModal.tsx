@@ -258,10 +258,13 @@ export function TradePreviewModal({
                   </TableHead>
                   <TableHead>{t('exchanges.preview.date')}</TableHead>
                   <TableHead>{t('exchanges.preview.symbol')}</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>{t('exchanges.preview.side')}</TableHead>
                   <TableHead>{t('exchanges.preview.size')}</TableHead>
                   <TableHead>{t('exchanges.preview.price')}</TableHead>
                   <TableHead>{t('exchanges.preview.pnl')}</TableHead>
+                  <TableHead>Leverage</TableHead>
+                  <TableHead>Margin</TableHead>
                   <TableHead>{t('exchanges.preview.fee')}</TableHead>
                 </TableRow>
               </TableHeader>
