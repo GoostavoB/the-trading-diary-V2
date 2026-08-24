@@ -413,27 +413,181 @@ function drawGannFan(ctx: CanvasRenderingContext2D, w: number, h: number) {
   });
 }
 
+const heroStats = [
+  { label: 'Top 1 Padrão Absoluto', value: 'Bandeira HTF', sub: '85% de sucesso em 1D / 4H', colorClass: 'text-apple-green' },
+  { label: 'Melhor Estratégia Trap', value: 'Rising Wedge Trap', sub: '79% de acerto no Short', colorClass: 'text-apple-cyan' },
+  { label: 'Execução Protegida', value: 'Piso / Reteste', sub: 'Sem ordens a mercado em breakout', colorClass: 'text-apple-orange' },
+  { label: 'Tempo Gráfico Ideal', value: 'Diário (1D)', sub: 'Filtra ruídos operacionais', colorClass: 'text-primary' },
+];
+
+const patterns = [
+  {
+    id: 'htf',
+    title: '1. Bandeira HTF (High & Tight)',
+    success: '85% Sucesso',
+    badgeClass: 'bg-apple-green/10 text-apple-green border-apple-green/20',
+    description: 'Mastro explosivo (>90%) seguido de consolidação estreita com retração <20%.',
+    draw: drawHtfCard,
+    stats: [
+      ['Inclinação', '< 15° (Rasa)'],
+      ['Janela Ideal', '1D e 4H'],
+    ],
+  },
+  {
+    id: 'falling',
+    title: '2. Cunha Descendente',
+    success: '68% Sucesso',
+    badgeClass: 'bg-apple-cyan/10 text-apple-cyan border-apple-cyan/20',
+    description: 'Canal afunilado para baixo com exaustão vendedora no vértice e molas de liquidez.',
+    draw: drawFallingCard,
+    stats: [
+      ['Convergência', 'Ângulo 60°-90°'],
+      ['Janela Ideal', '1D e 4H'],
+    ],
+  },
+  {
+    id: 'asc-tri',
+    title: '3. Triângulo Ascendente',
+    success: '67% Sucesso',
+    badgeClass: 'bg-primary/10 text-primary border-primary/20',
+    description: 'Resistência horizontal plana combinada com linha de tendência de alta (fundos mais altos).',
+    draw: drawAscTriangleCard,
+    stats: [
+      ['Topo', 'Estático (m=0)'],
+      ['Janela Ideal', '4H e 1H'],
+    ],
+  },
+  {
+    id: 'sym-tri',
+    title: '4. Triângulo Simétrico',
+    success: '67% Sucesso',
+    badgeClass: 'bg-primary/10 text-primary border-primary/20',
+    description: 'Compressão espelhada de volatilidade com convergência simétrica de topos e fundos.',
+    draw: drawSymTriangleCard,
+    stats: [
+      ['Vértice', 'Ponto neutro'],
+      ['Janela Ideal', '4H e 1H'],
+    ],
+  },
+  {
+    id: 'bull-flag',
+    title: '5. Bandeira de Alta Clássica',
+    success: '56% Sucesso',
+    badgeClass: 'bg-apple-orange/10 text-apple-orange border-apple-orange/20',
+    description: 'Canal inclinado contra a tendência (até 30°) com retração saudável de 38% a 50%.',
+    draw: drawBullFlagCard,
+    stats: [
+      ['Retração', '38.2% - 50.0%'],
+      ['Janela Ideal', '1D e 4H'],
+    ],
+  },
+  {
+    id: 'rising-wedge',
+    title: '6. Cunha Ascendente',
+    success: '51% Alta / 79% Short',
+    badgeClass: 'bg-destructive/10 text-destructive border-destructive/20',
+    description: 'Subida íngreme com perda de fôlego. Péssimo para compras, excelente para Trap Short.',
+    draw: drawRisingWedgeCard,
+    stats: [
+      ['Declive', 'Íngreme (Exhaustion)'],
+      ['Estratégia', 'Short na Ruptura'],
+    ],
+  },
+];
+
+const barChartData = [
+  { name: 'Bandeira HTF', Tradicional: 85, Trap: 78 },
+  { name: 'Cunha Desc.', Tradicional: 68, Trap: 72 },
+  { name: 'Tri. Asc.', Tradicional: 67, Trap: 74 },
+  { name: 'Tri. Simétrico', Tradicional: 67, Trap: 69 },
+  { name: 'Bandeira Clás.', Tradicional: 56, Trap: 76 },
+  { name: 'Cunha Asc.', Tradicional: 51, Trap: 79 },
+];
+
+const timeframeData = [
+  { name: 'Diário (1D)', taxa: 82 },
+  { name: '4 Horas', taxa: 75 },
+  { name: '1 Hora', taxa: 64 },
+  { name: '15 Min', taxa: 48 },
+  { name: '5m / 1m', taxa: 28 },
+];
+
+const gannRows = [
+  { angle: '1x8', ratio: '1 Preço / 8 Tempo', degrees: '82.5° (Baixa)', state: 'Suporte Extremo de Baixa', highlight: false },
+  { angle: '1x1', ratio: '1 Preço / 1 Tempo', degrees: '45.0° (Geométrico)', state: 'Linha Principal de Equilíbrio (Bull)', highlight: true },
+  { angle: '2x1', ratio: '2 Preço / 1 Tempo', degrees: '26.25°', state: 'Alta Acelerada', highlight: false },
+];
+
+function SectionHeading({
+  icon: Icon,
+  title,
+  subtitle,
+  accentClass = 'border-primary',
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  subtitle: string;
+  accentClass?: string;
+}) {
+  return (
+    <div className={`border-l-4 ${accentClass} pl-4 flex items-start gap-3`}>
+      <Icon className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
+      <div>
+        <h2 className="text-lg sm:text-xl font-bold text-foreground">{title}</h2>
+        <p className="text-sm text-muted-foreground mt-1 max-w-2xl">{subtitle}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function AcademyChartPatterns() {
   return (
     <>
       <SEO
         title="Chart Patterns & Price Geometry — Academy | The Trading Diary"
-        description="Manual ilustrado de padroes graficos, angulos de Gann e armadilhas de liquidez."
+        description="Manual ilustrado de padrões gráficos, ângulos de Gann e armadilhas de liquidez, com desenhos técnicos e estatísticas de taxa de sucesso."
         canonical="https://www.thetradingdiary.com/learn/chart-patterns"
         noindex={true}
       />
       <AppLayout>
         <div className="max-w-6xl mx-auto space-y-10 pb-16">
-          <Link to="/learn" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            to="/learn"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
             <ArrowLeft className="h-3.5 w-3.5" />
             Voltar para Academy
           </Link>
 
           <PremiumCard variant="gradient" className="p-6 lg:p-8" contentClassName="p-0">
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight leading-tight">
-              Angulos, Traps e Estruturas de Reteste
-            </h1>
-            <p className="text-muted-foreground text-sm mt-2">Carregando conteudo completo na proxima mensagem...</p>
+            <div className="max-w-3xl space-y-3">
+              <div className="inline-flex items-center gap-2 text-xs font-mono font-semibold text-apple-cyan uppercase tracking-wider bg-apple-cyan/10 px-3 py-1 rounded-md border border-apple-cyan/20">
+                <Compass className="h-3.5 w-3.5" />
+                Manual Ilustrado • Geometria de Ação do Preço
+              </div>
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight leading-tight">
+                Ângulos, Traps e Estruturas de Reteste
+              </h1>
+              <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+                Todas as formações geométricas, técnicas de entrada antirrompimento seco e zonas de liquidez com
+                esquemas visuais desenhados em tempo real. Veja os pontos exatos de entrada, stops e comportamento
+                de volume.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+              {heroStats.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="bg-background/60 border border-border rounded-xl p-4 flex flex-col justify-between"
+                >
+                  <div className="text-xs font-mono text-muted-foreground uppercase">{stat.label}</div>
+                  <div className={`text-lg lg:text-xl font-extrabold font-mono my-1 ${stat.colorClass}`}>
+                    {stat.value}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground">{stat.sub}</div>
+                </div>
+              ))}
+            </div>
           </PremiumCard>
         </div>
       </AppLayout>
