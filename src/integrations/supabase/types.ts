@@ -4921,6 +4921,7 @@ export type Database = {
           risk_percent: number | null
           risk_position_pct: number | null
           risk_profile: string | null
+          risk_profiles_seeded: boolean
           risk_scalp_pct: number | null
           risk_strategy: string | null
           risk_swing_pct: number | null
@@ -5004,6 +5005,7 @@ export type Database = {
           risk_percent?: number | null
           risk_position_pct?: number | null
           risk_profile?: string | null
+          risk_profiles_seeded?: boolean
           risk_scalp_pct?: number | null
           risk_strategy?: string | null
           risk_swing_pct?: number | null
@@ -5087,6 +5089,7 @@ export type Database = {
           risk_percent?: number | null
           risk_position_pct?: number | null
           risk_profile?: string | null
+          risk_profiles_seeded?: boolean
           risk_scalp_pct?: number | null
           risk_strategy?: string | null
           risk_swing_pct?: number | null
