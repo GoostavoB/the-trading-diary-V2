@@ -31,7 +31,7 @@ import { toast } from 'sonner';
 const TIER_COLOR: Record<string, string> = {
   red: 'text-destructive',
   defense: 'text-apple-orange',
-  standard: 'text-primary',
+  standard: 'text-[#f5c542]',
   sniper: 'text-apple-green',
 };
 
@@ -503,7 +503,10 @@ export function RiskCopilotDrawer() {
           Risk Copilot
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto p-0">
+      <SheetContent
+        side="right"
+        className="dark w-full sm:max-w-xl overflow-y-auto p-0 bg-background/95 backdrop-blur-2xl border-l border-white/10 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.9),-24px_0_70px_-20px_rgba(0,0,0,0.8)]"
+      >
         <div className="p-6 space-y-7">
           <SheetHeader className="flex flex-row items-center justify-between space-y-0 pr-8">
             <SheetTitle className="flex items-center gap-2 text-lg">
