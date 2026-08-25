@@ -9,16 +9,16 @@ import { calculateTradePnL } from '@/utils/pnl';
 export type RiskTier = 'red' | 'defense' | 'standard' | 'sniper';
 
 const TIER_MESSAGES: Record<RiskTier, string> = {
-  red: 'Porra, seu Win Rate esta muito baixo. Fica alguns dias sem operar, espera o mercado fazer alguma tendencia clara, porque voce esta tomando muito stop. Volte a focar nos sinais dos mentores.',
-  defense: 'Modo Defesa. Reduza a mao e proteja o capital.',
-  standard: 'Setup Tecnico padrao. Mantenha a disciplina.',
-  sniper: 'Modo Sniper Elite. Mao no teto maximo autorizada.',
+  red: 'Porra, seu Win Rate está muito baixo. Fica alguns dias sem operar, espera o mercado fazer alguma tendência clara, porque você está tomando muito stop. Volte a focar nos sinais dos mentores.',
+  defense: 'Modo Defesa. Reduza a mão e proteja o capital.',
+  standard: 'Setup Técnico padrão. Mantenha a disciplina.',
+  sniper: 'Modo Sniper Elite. Mão no teto máximo autorizada.',
 };
 
 const TIER_LABELS: Record<RiskTier, string> = {
   red: 'RED ALERT',
   defense: 'DEFESA',
-  standard: 'PADRAO',
+  standard: 'PADRÃO',
   sniper: 'SNIPER ELITE',
 };
 
