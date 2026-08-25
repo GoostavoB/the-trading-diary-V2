@@ -4916,6 +4916,7 @@ export type Database = {
           risk_day_pct: number | null
           risk_kelly_ceiling_pct: number
           risk_kelly_floor_pct: number
+          risk_manual_win_rate: number
           risk_max_drawdown: number | null
           risk_percent: number | null
           risk_position_pct: number | null
@@ -4923,6 +4924,7 @@ export type Database = {
           risk_scalp_pct: number | null
           risk_strategy: string | null
           risk_swing_pct: number | null
+          risk_win_rate_source: string
           risk_worst_streak: number | null
           rolling_target_carryover_cap: number | null
           rolling_target_dismissed_suggestion: boolean | null
@@ -4997,6 +4999,7 @@ export type Database = {
           risk_day_pct?: number | null
           risk_kelly_ceiling_pct?: number
           risk_kelly_floor_pct?: number
+          risk_manual_win_rate?: number
           risk_max_drawdown?: number | null
           risk_percent?: number | null
           risk_position_pct?: number | null
@@ -5004,6 +5007,7 @@ export type Database = {
           risk_scalp_pct?: number | null
           risk_strategy?: string | null
           risk_swing_pct?: number | null
+          risk_win_rate_source?: string
           risk_worst_streak?: number | null
           rolling_target_carryover_cap?: number | null
           rolling_target_dismissed_suggestion?: boolean | null
@@ -5078,6 +5082,7 @@ export type Database = {
           risk_day_pct?: number | null
           risk_kelly_ceiling_pct?: number
           risk_kelly_floor_pct?: number
+          risk_manual_win_rate?: number
           risk_max_drawdown?: number | null
           risk_percent?: number | null
           risk_position_pct?: number | null
@@ -5085,6 +5090,7 @@ export type Database = {
           risk_scalp_pct?: number | null
           risk_strategy?: string | null
           risk_swing_pct?: number | null
+          risk_win_rate_source?: string
           risk_worst_streak?: number | null
           rolling_target_carryover_cap?: number | null
           rolling_target_dismissed_suggestion?: boolean | null

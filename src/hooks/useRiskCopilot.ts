@@ -9,22 +9,28 @@ import { calculateTradePnL } from '@/utils/pnl';
 export type RiskTier = 'red' | 'defense' | 'standard' | 'sniper';
 
 const TIER_MESSAGES: Record<RiskTier, string> = {
-  red: 'Porra, seu Win Rate está muito baixo. Fica alguns dias sem operar, espera o mercado fazer alguma tendência clara, porque você está tomando muito stop. Volte a focar nos sinais dos mentores.',
-  defense: 'Modo Defesa. Reduza a mão e proteja o capital.',
-  standard: 'Setup Técnico padrão. Mantenha a disciplina.',
-  sniper: 'Modo Sniper Elite. Mão no teto máximo autorizada.',
+  red: 'Porra, seu Win Rate esta muito baixo. Fica alguns dias sem operar, espera o mercado fazer alguma tendencia clara, porque voce esta tomando muito stop. Volte a focar nos sinais dos mentores.',
+  defense: 'Modo Defesa. Reduza a mao e proteja o capital.',
+  standard: 'Setup Tecnico padrao. Mantenha a disciplina.',
+  sniper: 'Modo Sniper Elite. Mao no teto maximo autorizada.',
 };
 
 const TIER_LABELS: Record<RiskTier, string> = {
   red: 'RED ALERT',
   defense: 'DEFESA',
-  standard: 'PADRÃO',
+  standard: 'PADRAO',
   sniper: 'SNIPER ELITE',
 };
+
+export type WinRateMode = 'manual' | 'real';
 
 export interface RiskCopilotState {
   loading: boolean;
   winRate: number;
+  realWinRate: number;
+  winRateMode: WinRateMode;
+  canUseRealWinRate: boolean;
+  manualWinRatePct: number;
   sampleSize: number;
   tier: RiskTier;
   tierLabel: string;
@@ -42,8 +48,7 @@ export interface RiskCopilotState {
   ceilingPct: number;
 }
 
-function getTier(winRate: number, sampleSize: number): RiskTier {
-  if (sampleSize === 0) return 'standard';
+function getTier(winRate: number): RiskTier {
   if (winRate < 60) return 'red';
   if (winRate < 70) return 'defense';
   if (winRate < 80) return 'standard';
@@ -76,7 +81,7 @@ export function useRiskCopilot() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('user_settings')
-        .select('monthly_goal_target, risk_kelly_floor_pct, risk_kelly_ceiling_pct, gordura_locked_base, gordura_lock_month, risk_copilot_last_month_closed, initial_investment')
+        .select('monthly_goal_target, risk_kelly_floor_pct, risk_kelly_ceiling_pct, gordura_locked_base, gordura_lock_month, risk_copilot_last_month_closed, initial_investment, risk_win_rate_source, risk_manual_win_rate')
         .eq('sub_account_id', subAccountId!)
         .maybeSingle();
       if (error) throw error;
@@ -125,7 +130,7 @@ export function useRiskCopilot() {
         .eq('user_id', user!.id)
         .eq('sub_account_id', subAccountId!)
         .is('deleted_at', null)
-        .or(`trade_date.gte.${monthStart},and(trade_date.is.null,closed_at.gte.${monthStart})`);
+        .or(`trade_date.gte.${monthStart},and(trade_date.is.null,closed_at.gte.${monthStart})`)
       if (error) throw error;
       return data || [];
     },
@@ -146,10 +151,16 @@ export function useRiskCopilot() {
   const state: RiskCopilotState = useMemo(() => {
     const wins = last20Trades.filter((t) => calculateTradePnL(t, { includeFees: true }) > 0);
     const sampleSize = last20Trades.length;
-    const winRate = sampleSize > 0 ? (wins.length / sampleSize) * 100 : 0;
+    const realWinRate = sampleSize > 0 ? (wins.length / sampleSize) * 100 : 0;
+    const canUseRealWinRate = sampleSize >= 4;
+    const manualWinRatePct = settings?.risk_manual_win_rate ?? 70;
+    const winRateMode: WinRateMode =
+      settings?.risk_win_rate_source === 'real' && canUseRealWinRate ? 'real' : 'manual';
+    const winRate = winRateMode === 'real' ? realWinRate : manualWinRatePct;
+
     const floorPct = Math.min(12, settings?.risk_kelly_floor_pct ?? 5);
     const ceilingPct = Math.min(12, settings?.risk_kelly_ceiling_pct ?? 10);
-    const tier = getTier(winRate, sampleSize);
+    const tier = getTier(winRate);
     const riskPct = getTierRiskPct(tier, winRate, floorPct, ceilingPct);
 
     const bySide = { long: [] as typeof last20Trades, short: [] as typeof last20Trades };
@@ -177,6 +188,10 @@ export function useRiskCopilot() {
     return {
       loading: false,
       winRate,
+      realWinRate,
+      winRateMode,
+      canUseRealWinRate,
+      manualWinRatePct,
       sampleSize,
       tier,
       tierLabel: TIER_LABELS[tier],
@@ -234,11 +249,28 @@ export function useRiskCopilot() {
     queryClient.invalidateQueries({ queryKey: ['risk-copilot-settings', subAccountId] });
   };
 
+  const updateWinRateMode = async (mode: WinRateMode, manualPct?: number) => {
+    if (!subAccountId) return;
+    const updates: { risk_win_rate_source: WinRateMode; risk_manual_win_rate?: number } = {
+      risk_win_rate_source: mode,
+    };
+    if (manualPct !== undefined) {
+      updates.risk_manual_win_rate = Math.max(0, Math.min(100, manualPct));
+    }
+    const { error } = await supabase
+      .from('user_settings')
+      .update(updates)
+      .eq('sub_account_id', subAccountId);
+    if (error) throw error;
+    queryClient.invalidateQueries({ queryKey: ['risk-copilot-settings', subAccountId] });
+  };
+
   return {
     ...state,
     loading,
     addCapital,
     updateKellyRange,
     updateMonthlyGoal,
+    updateWinRateMode,
   };
 }
