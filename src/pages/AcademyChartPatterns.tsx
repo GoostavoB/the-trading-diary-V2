@@ -687,6 +687,152 @@ export default function AcademyChartPatterns() {
               ))}
             </div>
           </section>
+
+          <section className="space-y-6">
+            <SectionHeading
+              icon={TrendingUp}
+              accentClass="border-primary"
+              title="Comparativo Quantitativo: Tradicional vs. Trap Trading"
+              subtitle="Eficiência de cada padrão — compare como a execução de contra-ataque a falsos rompimentos altera a taxa de acerto."
+            />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <PremiumCard className="p-6" contentClassName="p-0">
+                <h4 className="text-sm font-bold text-foreground mb-1">Taxa de Sucesso: Normal vs. Estratégia Trap</h4>
+                <p className="text-xs text-muted-foreground mb-4">Barras comparando eficácia no breakout vs. pós-captura de liquidez.</p>
+                <div className="h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={barChartData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} interval={0} angle={-20} textAnchor="end" height={50} />
+                      <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
+                      <Tooltip
+                        contentStyle={{ background: 'hsl(var(--popover))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                      />
+                      <Legend wrapperStyle={{ fontSize: 11 }} />
+                      <Bar dataKey="Tradicional" fill="hsl(var(--electric-blue))" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="Trap" fill="hsl(var(--apple-cyan))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </PremiumCard>
+              <PremiumCard className="p-6" contentClassName="p-0">
+                <h4 className="text-sm font-bold text-foreground mb-1">Confiabilidade por Tempo Gráfico</h4>
+                <p className="text-xs text-muted-foreground mb-4">Degradação da relação sinal-ruído do Diário (1D) até os 5 minutos.</p>
+                <div className="h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={timeframeData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} interval={0} angle={-20} textAnchor="end" height={50} />
+                      <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
+                      <Tooltip
+                        contentStyle={{ background: 'hsl(var(--popover))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="taxa"
+                        name="Taxa de respeito aos ângulos (%)"
+                        stroke="hsl(var(--apple-green))"
+                        strokeWidth={2.5}
+                        dot={{ r: 4, fill: 'hsl(var(--apple-green))' }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </PremiumCard>
+            </div>
+          </section>
+
+          <section className="space-y-6">
+            <SectionHeading
+              icon={Compass}
+              accentClass="border-apple-cyan"
+              title="Captura de Liquidez (Spring & Violino)"
+              subtitle="Passo-a-passo de como instituições acionam stops de varejistas para acumular posições no sentido oposto."
+            />
+            <PremiumCard className="p-6 lg:p-8" contentClassName="p-0">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div className="lg:col-span-5 space-y-4">
+                  <h4 className="text-lg font-bold text-foreground">Anatomia do Violino (Bear/Bull Trap)</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    O preço rompe a linha de suporte por poucas barras para caçar a liquidez dos stops. O fechamento
+                    ocorre de volta dentro da estrutura, deixando um longo pavio (shadow) de rejeição.
+                  </p>
+                  <div className="space-y-2 text-xs font-mono">
+                    <div className="bg-muted/40 p-3 rounded-lg border border-border flex items-center gap-3">
+                      <span className="w-6 h-6 rounded bg-apple-cyan/10 text-apple-cyan border border-apple-cyan/20 flex items-center justify-center font-bold shrink-0">1</span>
+                      <span className="text-muted-foreground">Violação rápida do suporte sem confirmação de volume.</span>
+                    </div>
+                    <div className="bg-muted/40 p-3 rounded-lg border border-border flex items-center gap-3">
+                      <span className="w-6 h-6 rounded bg-apple-orange/10 text-apple-orange border border-apple-orange/20 flex items-center justify-center font-bold shrink-0">2</span>
+                      <span className="text-muted-foreground">Absorção institucional imediata com pavio longo.</span>
+                    </div>
+                    <div className="bg-muted/40 p-3 rounded-lg border border-border flex items-center gap-3">
+                      <span className="w-6 h-6 rounded bg-apple-green/10 text-apple-green border border-apple-green/20 flex items-center justify-center font-bold shrink-0">3</span>
+                      <span className="text-muted-foreground">Gatilho de compra contra a massa (76%+ acerto).</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="lg:col-span-7 bg-background rounded-xl p-3 border border-border space-y-2">
+                  <div className="flex justify-between items-center text-xs font-mono text-muted-foreground">
+                    <span>Desenho Técnico do Falso Rompimento (Spring Trap)</span>
+                    <span className="text-apple-cyan">Diagrama</span>
+                  </div>
+                  <CanvasIllustration draw={drawTrapDiagram} heightClass="h-64" />
+                </div>
+              </div>
+            </PremiumCard>
+          </section>
+
+          <section className="space-y-6">
+            <SectionHeading
+              icon={Compass}
+              accentClass="border-apple-cyan"
+              title="Teoria Geométrica de W.D. Gann: o Leque de Ângulos"
+              subtitle="A proporção invariante entre unidades de Preço e unidades de Tempo na geometria dos mercados financeiros."
+            />
+            <PremiumCard className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center" contentClassName="p-0 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
+              <div className="lg:col-span-6 space-y-4">
+                <h4 className="text-base font-bold text-foreground">Proporção Preço × Tempo no Gráfico 1:1</h4>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Quando o preço avança 1 unidade de preço para cada 1 unidade de tempo, o mercado trafega no ângulo
+                  perfeito de 45° (Linha de Equilíbrio Principal).
+                </p>
+                <div className="overflow-x-auto rounded-lg border border-border">
+                  <table className="w-full text-left font-mono text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-muted/40 text-muted-foreground border-b border-border">
+                        <th className="p-2">Ângulo</th>
+                        <th className="p-2">Relação P/T</th>
+                        <th className="p-2">Graus (1:1)</th>
+                        <th className="p-2">Estado de Mercado</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border text-muted-foreground">
+                      {gannRows.map((row) => (
+                        <tr key={row.angle} className={row.highlight ? 'bg-primary/5 border-l-2 border-apple-cyan' : ''}>
+                          <td className={`p-2 font-bold ${row.highlight ? 'text-apple-cyan' : 'text-foreground'}`}>{row.angle}</td>
+                          <td className={`p-2 ${row.highlight ? 'font-bold text-foreground' : ''}`}>{row.ratio}</td>
+                          <td className={`p-2 ${row.highlight ? 'font-bold text-foreground' : ''}`}>{row.degrees}</td>
+                          <td className={`p-2 text-[11px] ${row.highlight ? 'font-bold text-apple-cyan' : ''}`}>{row.state}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="lg:col-span-6 space-y-3">
+                <div className="flex justify-between items-center text-xs font-mono">
+                  <span className="text-muted-foreground font-bold">Desenho Geométrico do Leque de Gann</span>
+                  <span className="text-apple-cyan">Canvas</span>
+                </div>
+                <div className="w-full bg-background rounded-xl border border-border p-2">
+                  <CanvasIllustration draw={drawGannFan} heightClass="h-72" />
+                </div>
+              </div>
+            </PremiumCard>
+          </section>
         </div>
       </AppLayout>
     </>
