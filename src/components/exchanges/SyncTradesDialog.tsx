@@ -69,18 +69,28 @@ export function SyncTradesDialog({
       let end: string | undefined;
 
       const now = new Date();
+      // The API filters by exact UTC instant. Truncating 'end' to a bare
+      // YYYY-MM-DD date makes it parse as UTC midnight on the backend, which
+      // for anyone west of UTC is *before* today even starts locally -
+      // silently dropping the whole current day (and part of yesterday) from
+      // every sync. Send the end of the LOCAL day as a full ISO instant instead.
+      const endOfLocalDay = (d: Date) => {
+        const x = new Date(d);
+        x.setHours(23, 59, 59, 999);
+        return x.toISOString();
+      };
       
       if (preset === 'sinceLastTrade' && mostRecentTrade) {
         start = new Date(mostRecentTrade.closed_at).toISOString().split('T')[0];
-        end = now.toISOString().split('T')[0];
+        end = endOfLocalDay(now);
       } else if (preset === 'custom') {
         if (!startDate || !endDate) {
           throw new Error('Please select both start and end dates');
         }
         start = startDate.toISOString().split('T')[0];
-        end = endDate.toISOString().split('T')[0];
+        end = endOfLocalDay(endDate);
       } else {
-        end = now.toISOString().split('T')[0];
+        end = endOfLocalDay(now);
         
         const daysBack = preset === 'last7days' ? 7 : preset === 'last30days' ? 30 : 90;
         const startTime = new Date(now.getTime() - daysBack * 24 * 60 * 60 * 1000);
