@@ -1,7 +1,15 @@
+import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubAccount } from '@/contexts/SubAccountContext';
 import { supabase } from '@/integrations/supabase/client';
+
+const DEFAULT_PRESETS = [
+  { name: 'Scalp', risk_pct: 2 },
+  { name: 'Day Trade', risk_pct: 3 },
+  { name: 'Swing', risk_pct: 5 },
+  { name: 'Position', risk_pct: 8 },
+];
 
 export interface RiskProfile {
   id: string;
@@ -36,6 +44,38 @@ export function useRiskProfiles() {
   });
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey });
+
+  useEffect(() => {
+    if (!user || !subAccountId || isLoading || profiles.length > 0) return;
+
+    (async () => {
+      const { data: settings } = await supabase
+        .from('user_settings')
+        .select('risk_profiles_seeded')
+        .eq('sub_account_id', subAccountId)
+        .maybeSingle();
+
+      if (settings?.risk_profiles_seeded) return;
+
+      await supabase.from('risk_profiles').insert(
+        DEFAULT_PRESETS.map((preset, i) => ({
+          user_id: user.id,
+          sub_account_id: subAccountId,
+          name: preset.name,
+          risk_pct: preset.risk_pct,
+          sort_order: i,
+        }))
+      );
+
+      await supabase.from('user_settings').upsert(
+        { user_id: user.id, sub_account_id: subAccountId, risk_profiles_seeded: true },
+        { onConflict: 'sub_account_id' }
+      );
+
+      invalidate();
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, subAccountId, isLoading, profiles.length]);
 
   const createProfile = async (name: string, riskPct: number) => {
     if (!user || !subAccountId) return;
