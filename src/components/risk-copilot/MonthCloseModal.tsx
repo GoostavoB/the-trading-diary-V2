@@ -15,7 +15,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 
 const MEDAL_EMOJI: Record<string, string> = { gold: '🥇', silver: '🥈', bronze: '🥉' };
-const MEDAL_LABEL: Record<string, string> = { gold: 'Ouro', silver: 'Prata', bronze: 'Bronze' };
+const MEDAL_LABEL: Record<string, string> = { gold: 'Gold', silver: 'Silver', bronze: 'Bronze' };
 
 export function MonthCloseModal() {
   const { pendingClose, closeMonth } = useMonthlyMedals();
@@ -29,9 +29,9 @@ export function MonthCloseModal() {
     setSubmitting(true);
     try {
       await closeMonth(reinvestPct);
-      toast.success('Ciclo mensal fechado');
+      toast.success('Monthly cycle closed');
     } catch {
-      toast.error('Erro ao fechar o ciclo mensal');
+      toast.error('Failed to close the monthly cycle');
     } finally {
       setSubmitting(false);
     }
@@ -45,47 +45,44 @@ export function MonthCloseModal() {
     <Dialog open onOpenChange={() => {}}>
       <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle>Fechamento do Ciclo — {format(pendingClose.month, 'MMMM/yyyy')}</DialogTitle>
+          <DialogTitle>Cycle Close — {format(pendingClose.month, 'MMMM yyyy')}</DialogTitle>
           <DialogDescription>
-            Confira o resultado do mês antes de seguir para o próximo ciclo.
+            Review this month's result before moving on to the next cycle.
           </DialogDescription>
         </DialogHeader>
-
         <div className="space-y-5">
           {pendingClose.medal ? (
             <div className="rounded-xl border border-border bg-muted/20 p-5 text-center space-y-1">
               <div className="text-4xl">{MEDAL_EMOJI[pendingClose.medal]}</div>
-              <div className="text-sm font-bold">Medalha de {MEDAL_LABEL[pendingClose.medal]}</div>
+              <div className="text-sm font-bold">{MEDAL_LABEL[pendingClose.medal]} Medal</div>
               <div className="text-xs text-muted-foreground font-mono">
-                {pendingClose.pct.toFixed(0)}% da meta ({formatAmount(pendingClose.profit)} / {formatAmount(pendingClose.goal)})
+                {pendingClose.pct.toFixed(0)}% of goal ({formatAmount(pendingClose.profit)} / {formatAmount(pendingClose.goal)})
               </div>
             </div>
           ) : (
             <div className="rounded-xl border border-border bg-muted/20 p-5 text-center space-y-1">
-              <div className="text-sm font-bold text-muted-foreground">Meta não atingida este mês</div>
+              <div className="text-sm font-bold text-muted-foreground">Goal not reached this month</div>
               <div className="text-xs text-muted-foreground font-mono">
                 {formatAmount(pendingClose.profit)} / {formatAmount(pendingClose.goal)} ({pendingClose.pct.toFixed(0)}%)
               </div>
             </div>
           )}
-
           {profit > 0 && (
             <div className="space-y-2">
               <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-                O que deseja fazer com o lucro do mês ({formatAmount(profit)})?
+                What do you want to do with this month's profit ({formatAmount(profit)})?
               </div>
               <Slider value={[reinvestPct]} onValueChange={(v) => setReinvestPct(v[0])} min={0} max={100} step={5} />
               <div className="flex justify-between text-xs font-mono">
-                <span className="text-apple-green">Reinvestir: {formatAmount(reinvestAmount)} ({reinvestPct}%)</span>
-                <span className="text-apple-orange">Sacar: {formatAmount(withdrawAmount)} ({100 - reinvestPct}%)</span>
+                <span className="text-apple-green">Reinvest: {formatAmount(reinvestAmount)} ({reinvestPct}%)</span>
+                <span className="text-apple-orange">Withdraw: {formatAmount(withdrawAmount)} ({100 - reinvestPct}%)</span>
               </div>
             </div>
           )}
         </div>
-
         <DialogFooter>
           <Button className="w-full" onClick={handleConfirm} disabled={submitting}>
-            Confirmar e Iniciar Novo Ciclo
+            Confirm and Start New Cycle
           </Button>
         </DialogFooter>
       </DialogContent>
