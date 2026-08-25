@@ -2025,6 +2025,45 @@ export type Database = {
           },
         ]
       }
+      monthly_medals: {
+        Row: {
+          actual_profit: number
+          allocation_reinvest_pct: number
+          created_at: string
+          goal_target: number
+          id: string
+          medal: string
+          month: string
+          pct_achieved: number
+          sub_account_id: string | null
+          user_id: string
+        }
+        Insert: {
+          actual_profit: number
+          allocation_reinvest_pct?: number
+          created_at?: string
+          goal_target: number
+          id?: string
+          medal: string
+          month: string
+          pct_achieved: number
+          sub_account_id?: string | null
+          user_id: string
+        }
+        Update: {
+          actual_profit?: number
+          allocation_reinvest_pct?: number
+          created_at?: string
+          goal_target?: number
+          id?: string
+          medal?: string
+          month?: string
+          pct_achieved?: number
+          sub_account_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       mystery_rewards: {
         Row: {
           created_at: string
@@ -2666,6 +2705,42 @@ export type Database = {
           id?: string
           reward_value?: Json
           triggered_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      risk_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          is_favorite: boolean
+          name: string
+          risk_pct: number
+          sort_order: number
+          sub_account_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          name: string
+          risk_pct: number
+          sort_order?: number
+          sub_account_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          name?: string
+          risk_pct?: number
+          sort_order?: number
+          sub_account_id?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -4815,6 +4890,8 @@ export type Database = {
           error_pnl_threshold_value: number | null
           error_reminder_paused_until: string | null
           event_reminders: boolean | null
+          gordura_lock_month: string | null
+          gordura_locked_base: number | null
           guided_tour_completed: boolean | null
           id: string
           initial_investment: number | null
@@ -4833,9 +4910,12 @@ export type Database = {
           preflight_calendar_url: string | null
           preflight_required: boolean | null
           risk_base: string | null
+          risk_copilot_last_month_closed: string | null
           risk_currency: string | null
           risk_daily_loss_pct: number | null
           risk_day_pct: number | null
+          risk_kelly_ceiling_pct: number
+          risk_kelly_floor_pct: number
           risk_max_drawdown: number | null
           risk_percent: number | null
           risk_position_pct: number | null
@@ -4891,6 +4971,8 @@ export type Database = {
           error_pnl_threshold_value?: number | null
           error_reminder_paused_until?: string | null
           event_reminders?: boolean | null
+          gordura_lock_month?: string | null
+          gordura_locked_base?: number | null
           guided_tour_completed?: boolean | null
           id?: string
           initial_investment?: number | null
@@ -4909,9 +4991,12 @@ export type Database = {
           preflight_calendar_url?: string | null
           preflight_required?: boolean | null
           risk_base?: string | null
+          risk_copilot_last_month_closed?: string | null
           risk_currency?: string | null
           risk_daily_loss_pct?: number | null
           risk_day_pct?: number | null
+          risk_kelly_ceiling_pct?: number
+          risk_kelly_floor_pct?: number
           risk_max_drawdown?: number | null
           risk_percent?: number | null
           risk_position_pct?: number | null
@@ -4967,6 +5052,8 @@ export type Database = {
           error_pnl_threshold_value?: number | null
           error_reminder_paused_until?: string | null
           event_reminders?: boolean | null
+          gordura_lock_month?: string | null
+          gordura_locked_base?: number | null
           guided_tour_completed?: boolean | null
           id?: string
           initial_investment?: number | null
@@ -4985,9 +5072,12 @@ export type Database = {
           preflight_calendar_url?: string | null
           preflight_required?: boolean | null
           risk_base?: string | null
+          risk_copilot_last_month_closed?: string | null
           risk_currency?: string | null
           risk_daily_loss_pct?: number | null
           risk_day_pct?: number | null
+          risk_kelly_ceiling_pct?: number
+          risk_kelly_floor_pct?: number
           risk_max_drawdown?: number | null
           risk_percent?: number | null
           risk_position_pct?: number | null
