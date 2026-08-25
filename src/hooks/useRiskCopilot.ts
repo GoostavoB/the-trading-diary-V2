@@ -228,30 +228,36 @@ export function useRiskCopilot() {
   };
 
   const updateKellyRange = async (floor: number, ceiling: number) => {
-    if (!subAccountId) return;
+    if (!user || !subAccountId) return;
     const clampedFloor = Math.max(0, Math.min(12, floor));
     const clampedCeiling = Math.max(clampedFloor, Math.min(12, ceiling));
     const { error } = await supabase
       .from('user_settings')
-      .update({ risk_kelly_floor_pct: clampedFloor, risk_kelly_ceiling_pct: clampedCeiling })
-      .eq('sub_account_id', subAccountId);
+      .upsert(
+        { user_id: user.id, sub_account_id: subAccountId, risk_kelly_floor_pct: clampedFloor, risk_kelly_ceiling_pct: clampedCeiling },
+        { onConflict: 'sub_account_id' }
+      );
     if (error) throw error;
     queryClient.invalidateQueries({ queryKey: ['risk-copilot-settings', subAccountId] });
   };
 
   const updateMonthlyGoal = async (goal: number) => {
-    if (!subAccountId) return;
+    if (!user || !subAccountId) return;
     const { error } = await supabase
       .from('user_settings')
-      .update({ monthly_goal_target: Math.max(0, goal) })
-      .eq('sub_account_id', subAccountId);
+      .upsert(
+        { user_id: user.id, sub_account_id: subAccountId, monthly_goal_target: Math.max(0, goal) },
+        { onConflict: 'sub_account_id' }
+      );
     if (error) throw error;
     queryClient.invalidateQueries({ queryKey: ['risk-copilot-settings', subAccountId] });
   };
 
   const updateWinRateMode = async (mode: WinRateMode, manualPct?: number) => {
-    if (!subAccountId) return;
-    const updates: { risk_win_rate_source: WinRateMode; risk_manual_win_rate?: number } = {
+    if (!user || !subAccountId) return;
+    const updates: { user_id: string; sub_account_id: string; risk_win_rate_source: WinRateMode; risk_manual_win_rate?: number } = {
+      user_id: user.id,
+      sub_account_id: subAccountId,
       risk_win_rate_source: mode,
     };
     if (manualPct !== undefined) {
@@ -259,8 +265,7 @@ export function useRiskCopilot() {
     }
     const { error } = await supabase
       .from('user_settings')
-      .update(updates)
-      .eq('sub_account_id', subAccountId);
+      .upsert(updates, { onConflict: 'sub_account_id' });
     if (error) throw error;
     queryClient.invalidateQueries({ queryKey: ['risk-copilot-settings', subAccountId] });
   };
