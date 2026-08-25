@@ -391,7 +391,7 @@ function RiskProfileCardsStrip({
   return (
     <div className="grid grid-cols-2 gap-2">
       {sorted.map((p) => {
-        const isSelected = selectedProfileId === p.id;
+        const isSelected = selectedId === p.id;
         return (
           <button
             key={p.id}
