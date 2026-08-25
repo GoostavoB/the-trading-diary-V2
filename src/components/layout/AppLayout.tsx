@@ -7,6 +7,8 @@ import { QuickAddTrade } from '@/components/mobile/QuickAddTrade';
 import { InstallPrompt } from '@/components/mobile/InstallPrompt';
 import { GuidedTour } from '@/components/tour/GuidedTour';
 import { UpdatesModal } from '@/components/tour/UpdatesModal';
+import { RiskCopilotDrawer } from '@/components/risk-copilot/RiskCopilotDrawer';
+import { MonthCloseModal } from '@/components/risk-copilot/MonthCloseModal';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -26,6 +28,8 @@ const AppLayout = ({
       <ThemeUnlockNotification />
       <UpdatesModal />
       <GuidedTour />
+      <RiskCopilotDrawer />
+      <MonthCloseModal />
 
       {/* Top Navigation */}
       <TopNavigation />
