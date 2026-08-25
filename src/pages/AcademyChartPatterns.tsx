@@ -589,6 +589,104 @@ export default function AcademyChartPatterns() {
               ))}
             </div>
           </PremiumCard>
+
+          <section className="space-y-6">
+            <SectionHeading
+              icon={Target}
+              accentClass="border-apple-orange"
+              title="Ilustração Prática dos Métodos de Entrada (Sem Rompimento Seco)"
+              subtitle="Anatomia exata de onde posicionar ordens, stops, e como interpretar o volume footprint."
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <PremiumCard className="p-6 space-y-4 flex flex-col justify-between" contentClassName="p-0 space-y-4 flex flex-col justify-between h-full">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between border-b border-border pb-3 flex-wrap gap-2">
+                    <span className="font-mono text-xs font-bold text-apple-green uppercase tracking-wider bg-apple-green/10 px-3 py-1 rounded border border-apple-green/20">
+                      Desenho A: Entrada Antecipada
+                    </span>
+                    <span className="text-xs text-muted-foreground font-mono">Risco/Retorno &gt; 1:4</span>
+                  </div>
+                  <h3 className="text-base font-bold text-foreground">Comprar no Suporte/Piso com Seca de Volume</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Entrada realizada diretamente no toque do suporte da consolidação. O gatilho é a desidratação do
+                    volume vendedor (barras amarelas).
+                  </p>
+                </div>
+                <div className="bg-background rounded-xl p-2 border border-border">
+                  <div className="flex justify-between items-center text-[10px] font-mono text-muted-foreground px-2 py-1">
+                    <span>Esquema Visual: Entrada no Piso da Consolidação</span>
+                    <span className="text-apple-green">Método A</span>
+                  </div>
+                  <CanvasIllustration draw={drawMethodA} />
+                </div>
+                <div className="bg-muted/40 p-3.5 rounded-xl border border-border text-xs space-y-1 font-mono">
+                  <div className="text-apple-green font-bold">● Entrada: no toque da linha inferior com volume amarelo</div>
+                  <div className="text-destructive">● Stop-Loss: logo abaixo do suporte da figura</div>
+                </div>
+              </PremiumCard>
+              <PremiumCard className="p-6 space-y-4 flex flex-col justify-between" contentClassName="p-0 space-y-4 flex flex-col justify-between h-full">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between border-b border-border pb-3 flex-wrap gap-2">
+                    <span className="font-mono text-xs font-bold text-apple-cyan uppercase tracking-wider bg-apple-cyan/10 px-3 py-1 rounded border border-apple-cyan/20">
+                      Desenho B: Entrada Confirmada
+                    </span>
+                    <span className="text-xs text-muted-foreground font-mono">Taxa de Acerto &gt; 78%</span>
+                  </div>
+                  <h3 className="text-base font-bold text-foreground">Comprar Apenas no Throwback</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    O preço rompe com volume azul e recua suavemente. Compra-se quando a resistência rompida se
+                    confirma como suporte sustentado.
+                  </p>
+                </div>
+                <div className="bg-background rounded-xl p-2 border border-border">
+                  <div className="flex justify-between items-center text-[10px] font-mono text-muted-foreground px-2 py-1">
+                    <span>Esquema Visual: Throwback &amp; Validação por Volume</span>
+                    <span className="text-apple-cyan">Método B</span>
+                  </div>
+                  <CanvasIllustration draw={drawMethodB} />
+                </div>
+                <div className="bg-muted/40 p-3.5 rounded-xl border border-border text-xs space-y-1 font-mono">
+                  <div className="text-apple-cyan font-bold">● Entrada: no toque de reteste após o pivô de rompimento</div>
+                  <div className="text-apple-orange">● Confirmação: volume azul no breakout + volume baixo no pullback</div>
+                </div>
+              </PremiumCard>
+            </div>
+          </section>
+
+          <section className="space-y-6">
+            <SectionHeading
+              icon={Layers}
+              accentClass="border-apple-green"
+              title="Galeria dos 6 Padrões Gráficos Principais"
+              subtitle="Cada card contém o desenho anatômico do padrão: estrutura geométrica, linhas de tendência e comportamento de volume."
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {patterns.map((p) => (
+                <PremiumCard key={p.id} className="p-5 space-y-3 flex flex-col justify-between" contentClassName="p-0 space-y-3 flex flex-col justify-between h-full">
+                  <div>
+                    <div className="flex items-center justify-between border-b border-border pb-2 gap-2">
+                      <h4 className="font-bold text-sm text-foreground">{p.title}</h4>
+                      <Badge variant="outline" className={`text-[10px] font-mono shrink-0 ${p.badgeClass}`}>
+                        {p.success}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">{p.description}</p>
+                  </div>
+                  <div className="bg-background rounded-lg p-1.5 border border-border">
+                    <CanvasIllustration draw={p.draw} heightClass="h-40" />
+                  </div>
+                  <div className="text-[11px] font-mono text-muted-foreground space-y-1">
+                    {p.stats.map(([k, v]) => (
+                      <div key={k} className="flex justify-between">
+                        <span>{k}:</span>
+                        <span className="text-foreground font-semibold">{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                </PremiumCard>
+              ))}
+            </div>
+          </section>
         </div>
       </AppLayout>
     </>
