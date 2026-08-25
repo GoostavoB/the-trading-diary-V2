@@ -505,7 +505,7 @@ export function RiskCopilotDrawer() {
       </SheetTrigger>
       <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto p-0">
         <div className="p-6 space-y-7">
-          <SheetHeader className="flex flex-row items-center justify-between space-y-0">
+          <SheetHeader className="flex flex-row items-center justify-between space-y-0 pr-8">
             <SheetTitle className="flex items-center gap-2 text-lg">
               <Shield className="h-5 w-5 text-primary" />
               Risk Copilot
