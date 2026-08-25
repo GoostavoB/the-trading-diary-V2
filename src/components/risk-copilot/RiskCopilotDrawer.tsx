@@ -265,5 +265,175 @@ function RiskProfileStrip({ capitalBase, formatAmount }: { capitalBase: number; 
 }
 
 export function RiskCopilotDrawer() {
-  return null;
+  const rc = useRiskCopilot();
+  const { medals } = useMonthlyMedals();
+  const { formatAmount } = useCurrency();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [floorInput, setFloorInput] = useState('');
+  const [ceilingInput, setCeilingInput] = useState('');
+  const [goalInput, setGoalInput] = useState('');
+
+  const openSettings = () => {
+    setFloorInput(String(rc.floorPct));
+    setCeilingInput(String(rc.ceilingPct));
+    setGoalInput(String(rc.monthlyGoal));
+    setSettingsOpen(true);
+  };
+
+  const saveSettings = async () => {
+    await rc.updateKellyRange(parseFloat(floorInput) || 0, parseFloat(ceilingInput) || 0);
+    await rc.updateMonthlyGoal(parseFloat(goalInput) || 0);
+    toast.success('Configurações de risco salvas');
+    setSettingsOpen(false);
+  };
+
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button
+          className="hidden md:flex fixed bottom-6 right-6 z-40 h-12 rounded-full shadow-lg gap-2 px-5 font-semibold"
+          size="lg"
+        >
+          <Shield className="h-4 w-4" />
+          Risk Copilot
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto p-0">
+        <div className="p-6 space-y-6">
+          <SheetHeader className="flex flex-row items-center justify-between space-y-0">
+            <SheetTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              Risk Copilot
+            </SheetTitle>
+            {settingsOpen ? null : (
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={openSettings}>
+                <Settings className="h-4 w-4" />
+              </Button>
+            )}
+          </SheetHeader>
+
+          {rc.loading ? (
+            <div className="text-sm text-muted-foreground text-center py-12">Carregando...</div>
+          ) : settingsOpen ? (
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold">Configurações de Risco</h3>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Risco Piso % (Modo Defesa)</Label>
+                <Input type="number" value={floorInput} onChange={(e) => setFloorInput(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Risco Teto % (Modo Sniper — máx 12%)</Label>
+                <Input type="number" value={ceilingInput} onChange={(e) => setCeilingInput(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Meta Mensal</Label>
+                <Input type="number" value={goalInput} onChange={(e) => setGoalInput(e.target.value)} />
+              </div>
+              <div className="flex gap-2 pt-2">
+                <Button variant="outline" className="flex-1" onClick={() => setSettingsOpen(false)}>Cancelar</Button>
+                <Button className="flex-1" onClick={saveSettings}>Salvar</Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* BLOCK 1: Status & Stop Autorizado */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-muted-foreground">
+                    Win Rate (últimos {rc.sampleSize || 20} trades)
+                  </div>
+                  <Badge variant="outline" className={cn('font-mono text-xs', TIER_COLOR[rc.tier])}>
+                    {rc.tierLabel}
+                  </Badge>
+                </div>
+                <div className={cn('text-3xl font-extrabold font-mono', TIER_COLOR[rc.tier])}>
+                  {rc.winRate.toFixed(0)}%
+                </div>
+                {rc.bias && (
+                  <div className="inline-flex items-center gap-1.5 text-xs font-mono bg-muted/40 border border-border rounded-md px-2.5 py-1">
+                    {rc.bias.side === 'long' ? <TrendingUp className="h-3 w-3 text-apple-green" /> : <TrendingDown className="h-3 w-3 text-apple-red" />}
+                    Maior assertividade em: {rc.bias.side === 'long' ? 'LONG' : 'SHORT'} ({rc.bias.winRate.toFixed(0)}%)
+                  </div>
+                )}
+                {rc.tier === 'red' && (
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 flex gap-2">
+                    <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                    <p className="text-xs text-destructive leading-relaxed">{rc.tierMessage}</p>
+                  </div>
+                )}
+                <div className="rounded-xl border border-border bg-muted/20 p-5 text-center space-y-1">
+                  <div className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
+                    Stop Autorizado Hoje
+                  </div>
+                  <div className={cn('text-4xl font-extrabold font-mono', TIER_COLOR[rc.tier])}>
+                    {formatAmount(rc.authorizedStopDollar)}
+                  </div>
+                  <div className="text-xs text-muted-foreground font-mono">({rc.authorizedStopPct.toFixed(1)}%)</div>
+                  {rc.tier !== 'red' && (
+                    <p className="text-[11px] text-muted-foreground pt-1">
+                      Lembrete: Alvo 1 = Parcial + Stop no 0x0 (Break Even)
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <RiskProfileStrip
+                capitalBase={rc.isGorduraActive ? rc.gorduraAmount : rc.capitalBase}
+                formatAmount={formatAmount}
+              />
+
+              {/* BLOCK 2: Monitor de Meta & Gordurinha */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Meta Mensal</span>
+                  <span className="font-mono font-semibold">
+                    {formatAmount(rc.monthlyProfit)} / {formatAmount(rc.monthlyGoal)}
+                  </span>
+                </div>
+                <Progress value={rc.monthlyGoalPct} className="h-2" />
+                {rc.isGorduraActive && (
+                  <div className="rounded-lg border border-apple-orange/30 bg-gradient-to-r from-apple-orange/10 to-apple-purple/10 p-3 flex items-center gap-2.5">
+                    <Trophy className="h-5 w-5 text-apple-orange shrink-0" />
+                    <div>
+                      <div className="text-xs font-bold text-apple-orange">Meta Batida!</div>
+                      <div className="text-[11px] text-muted-foreground">
+                        Gordura Operacional Livre: <span className="font-mono font-semibold text-foreground">{formatAmount(rc.gorduraAmount)}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* BLOCK 3: Gestão de Caixa Ativa */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Capital de Trade Atual</span>
+                  <span className="text-lg font-bold font-mono">{formatAmount(rc.capitalBase)}</span>
+                </div>
+                <div className="flex gap-2">
+                  <CapitalAdjustPopover mode="add" capitalBase={rc.capitalBase} onConfirm={rc.addCapital} formatAmount={formatAmount} />
+                  <CapitalAdjustPopover mode="remove" capitalBase={rc.capitalBase} onConfirm={rc.addCapital} formatAmount={formatAmount} />
+                </div>
+              </div>
+
+              {/* BLOCK 4: Quadro de Medalhas */}
+              {medals.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Quadro de Medalhas</Label>
+                  <div className="flex gap-2 flex-wrap">
+                    {medals.map((m) => (
+                      <div key={m.id} className="flex flex-col items-center gap-0.5 bg-muted/30 rounded-lg px-2.5 py-2 border border-border">
+                        <span className="text-lg leading-none">{MEDAL_EMOJI[m.medal]}</span>
+                        <span className="text-[10px] text-muted-foreground font-mono">{m.monthLabel}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
 }
