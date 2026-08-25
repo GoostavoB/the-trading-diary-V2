@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubAccount } from '@/contexts/SubAccountContext';
@@ -44,9 +44,12 @@ export function useRiskProfiles() {
   });
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey });
+  const seedingRef = useRef(false);
 
   useEffect(() => {
     if (!user || !subAccountId || isLoading || profiles.length > 0) return;
+    if (seedingRef.current) return;
+    seedingRef.current = true;
 
     (async () => {
       const { data: settings } = await supabase
