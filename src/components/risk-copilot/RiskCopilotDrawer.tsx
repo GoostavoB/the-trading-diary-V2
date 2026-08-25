@@ -400,6 +400,68 @@ function RiskProfileCardsStrip({
   );
 }
 
+function WinRateControl({
+  mode,
+  manualPct,
+  realPct,
+  sampleSize,
+  canUseReal,
+  onChange,
+}: {
+  mode: 'manual' | 'real';
+  manualPct: number;
+  realPct: number;
+  sampleSize: number;
+  canUseReal: boolean;
+  onChange: (mode: 'manual' | 'real', manualPct?: number) => Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState(manualPct);
+  return (
+    <div className="flex items-center gap-1.5">
+      <div className="flex rounded-lg border border-border overflow-hidden text-[11px] font-mono">
+        <button
+          type="button"
+          className={cn('px-2 py-1', mode === 'manual' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground')}
+          onClick={() => onChange('manual')}
+        >
+          Meu
+        </button>
+        <button
+          type="button"
+          disabled={!canUseReal}
+          className={cn(
+            'px-2 py-1 border-l border-border',
+            mode === 'real' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+            !canUseReal && 'opacity-30 cursor-not-allowed'
+          )}
+          onClick={() => canUseReal && onChange('real')}
+          title={canUseReal ? `Real: ${realPct.toFixed(0)}% (${sampleSize} trades)` : 'Precisa de 4+ trades fechados'}
+        >
+          Real
+        </button>
+      </div>
+      {mode === 'manual' && (
+        <Popover open={open} onOpenChange={(o) => { setOpen(o); if (o) setDraft(manualPct); }}>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-6 w-6">
+              <Pencil className="h-3 w-3" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64 space-y-3" align="end">
+            <Label className="text-xs text-muted-foreground">Meu Win Rate</Label>
+            <div className="text-center text-2xl font-bold font-mono">{draft}%</div>
+            <Slider value={[draft]} onValueChange={(v) => setDraft(v[0])} min={0} max={100} step={1} />
+            <Button size="sm" className="w-full h-7 text-xs" onClick={() => { onChange('manual', draft); setOpen(false); }}>
+              Salvar
+            </Button>
+          </PopoverContent>
+        </Popover>
+      )}
+    </div>
+  );
+}
+
 export function RiskCopilotDrawer() {
   const rc = useRiskCopilot();
   const { medals } = useMonthlyMedals();
