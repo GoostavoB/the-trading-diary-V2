@@ -340,13 +340,23 @@ function GordurinhaCard({
   );
 }
 
-function MedalsBoard({ medals }: { medals: { id: string; medal: string; monthLabel: string }[] }) {
+function MedalsBoard({ medals }: { medals: { id: string; medal: string; monthLabel: string; pct_achieved: number }[] }) {
+  const [expanded, setExpanded] = useState(false);
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-1.5">
-        <Label className="text-sm font-semibold">Medal Board</Label>
-        <InfoTooltip text="Earn a Bronze, Silver or Gold medal each month based on how much of your goal you hit (70%/90%/100%). Medals are permanent." />
-      </div>
+      <button
+        type="button"
+        onClick={() => medals.length > 0 && setExpanded((v) => !v)}
+        className="w-full flex items-center justify-between"
+      >
+        <div className="flex items-center gap-1.5">
+          <Label className="text-sm font-semibold cursor-pointer">Medal Board</Label>
+          <InfoTooltip text="Earn a Bronze, Silver or Gold medal each month based on how much of your goal you hit (70%/90%/100%). Medals are permanent. Tap to see your month-by-month history." />
+        </div>
+        {medals.length > 0 && (
+          <ChevronDown className={cn('h-4 w-4 text-muted-foreground transition-transform', expanded && 'rotate-180')} />
+        )}
+      </button>
       {medals.length > 0 ? (
         <div className="flex gap-2 flex-wrap">
           {medals.map((m) => (
@@ -368,6 +378,19 @@ function MedalsBoard({ medals }: { medals: { id: string; medal: string; monthLab
       )}
       {medals.length === 0 && (
         <p className="text-[11px] text-muted-foreground text-center">Close your first goal-hit month to start your collection.</p>
+      )}
+      {expanded && medals.length > 0 && (
+        <div className="space-y-1.5 pt-1">
+          {medals.map((m) => (
+            <div key={m.id} className="flex items-center justify-between rounded-lg bg-muted/20 px-3 py-2 border border-border">
+              <div className="flex items-center gap-2">
+                <span className="text-base leading-none">{MEDAL_EMOJI[m.medal]}</span>
+                <span className="text-sm font-medium">{m.monthLabel}</span>
+              </div>
+              <span className="text-xs font-mono text-muted-foreground">{m.pct_achieved.toFixed(0)}% of goal</span>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
@@ -555,7 +578,10 @@ export function RiskCopilotDrawer() {
               </div>
               <div className="space-y-3 rounded-xl border border-border p-4">
                 <div className="flex items-center justify-between">
-                  <Label className="text-sm font-semibold">Floor Risk (Defense Mode)</Label>
+                  <div className="flex items-center gap-1.5">
+                    <Label className="text-sm font-semibold">Floor Risk (Defense Mode)</Label>
+                    <InfoTooltip text="The minimum position size (as % of capital) the system authorizes when your win rate is weak (60-69%). Protects you from overtrading in a rough patch." />
+                  </div>
                   <span className="text-sm font-mono font-bold text-apple-orange">{floorInput}%</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground">Minimum risk used when your win rate is weak.</p>
@@ -563,7 +589,10 @@ export function RiskCopilotDrawer() {
               </div>
               <div className="space-y-3 rounded-xl border border-border p-4">
                 <div className="flex items-center justify-between">
-                  <Label className="text-sm font-semibold">Ceiling Risk (Sniper Elite Mode)</Label>
+                  <div className="flex items-center gap-1.5">
+                    <Label className="text-sm font-semibold">Ceiling Risk (Sniper Elite Mode)</Label>
+                    <InfoTooltip text="The maximum position size (as % of capital) the system ever authorizes, even at your best win rate (80%+). Hard-capped at 12% so a hot streak can't turn into overconfidence." />
+                  </div>
                   <span className="text-sm font-mono font-bold text-apple-green">{ceilingInput}%</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground">Maximum risk authorized when your win rate is strong. Hard cap: 12%.</p>
