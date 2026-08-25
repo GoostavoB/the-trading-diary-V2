@@ -3,7 +3,8 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
     BarChart3, Plus, Receipt, Shield,
     LineChart, Target,
-    Menu, X, Link2, History as HistoryIcon
+    Menu, X, Link2, History as HistoryIcon,
+    GraduationCap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,11 @@ export function TopNavigation() {
             title: 'Dashboard',
             url: '/dashboard',
             icon: BarChart3
+        },
+        {
+            title: 'Academy',
+            url: '/learn',
+            icon: GraduationCap
         },
         {
             title: 'Trades',

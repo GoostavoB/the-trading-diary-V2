@@ -4,6 +4,7 @@ import { pageMeta } from '@/utils/seoHelpers';
 import { Badge } from '@/components/ui/badge';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { BookOpen, Clock, Lock, ChevronRight, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const upcomingLessons = [
   {
@@ -45,6 +46,7 @@ const upcomingLessons = [
     duration: '40 min',
     difficulty: 'Advanced' as const,
     category: 'Technical Analysis',
+    href: '/learn/chart-patterns',
   },
 ];
 
@@ -102,35 +104,53 @@ export default function Learn() {
           <div className="space-y-3">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Preview — Upcoming Lessons</h2>
             <div className="grid gap-3">
-              {upcomingLessons.map((lesson) => (
-                <PremiumCard
-                  key={lesson.id}
-                  className="p-4 flex items-center gap-4 opacity-70 cursor-not-allowed select-none"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center shrink-0">
-                    <Lock className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="font-medium text-sm">{lesson.title}</span>
-                      <Badge
-                        variant="outline"
-                        className={`text-xs ${difficultyColor[lesson.difficulty]}`}
-                      >
-                        {lesson.difficulty}
-                      </Badge>
+              {upcomingLessons.map((lesson) => {
+                const cardBody = (
+                  <>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
+                      {lesson.href ? (
+                        <BookOpen className="h-4 w-4 text-primary" />
+                      ) : (
+                        <Lock className="h-4 w-4 text-muted-foreground" />
+                      )}
                     </div>
-                    <p className="text-xs text-muted-foreground line-clamp-1">{lesson.description}</p>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      {lesson.duration}
-                    </span>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </PremiumCard>
-              ))}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="font-medium text-sm">{lesson.title}</span>
+                        <Badge
+                          variant="outline"
+                          className={`text-xs ${difficultyColor[lesson.difficulty]}`}
+                        >
+                          {lesson.difficulty}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground line-clamp-1">{lesson.description}</p>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Clock className="h-3 w-3" />
+                        {lesson.duration}
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  </>
+                );
+
+                return lesson.href ? (
+                  <Link key={lesson.id} to={lesson.href} className="block">
+                    <PremiumCard className="p-4 flex items-center gap-4 cursor-pointer hover:border-primary/40 transition-colors">
+                      {cardBody}
+                    </PremiumCard>
+                  </Link>
+                ) : (
+                  <PremiumCard
+                    key={lesson.id}
+                    className="p-4 flex items-center gap-4 opacity-70 cursor-not-allowed select-none"
+                  >
+                    {cardBody}
+                  </PremiumCard>
+                );
+              })}
             </div>
           </div>
 

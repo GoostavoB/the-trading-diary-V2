@@ -92,6 +92,7 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 // BlogArticle removed — legacy route now redirects to /blog
 const Learn = lazy(() => import("./pages/Learn"));
+const AcademyChartPatterns = lazy(() => import("./pages/AcademyChartPatterns"));
 const ApiDocs = lazy(() => import("./pages/ApiDocs"));
 const AdvancedAnalytics = lazy(() => import("./pages/AdvancedAnalytics"));
 // Phase 2: Social Feed - temporarily disabled for backlog #34
@@ -227,6 +228,7 @@ const AppRoutes = () => {
           {/* Legacy route — redirect to canonical blog URL */}
           <Route path="/blog/article/:slug" element={<Navigate to="/blog" replace />} />
           <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
+          <Route path="/learn/chart-patterns" element={<ProtectedRoute><AcademyChartPatterns /></ProtectedRoute>} />
           <Route path="/api-docs" element={<ProtectedRoute><ApiDocs /></ProtectedRoute>} />
           <Route path="/advanced-analytics" element={<ProtectedRoute><AdvancedAnalytics /></ProtectedRoute>} />
           {/* [Phase 2] Social Feed — roadmap Sprint 3 */}
