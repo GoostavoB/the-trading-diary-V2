@@ -145,7 +145,7 @@ export function useMonthlyMedals() {
           sub_account_id: subAccountId,
           amount_added: reinvestAmount,
           total_after: currentTotal + reinvestAmount,
-          notes: `Reinvestimento do fechamento de ${format(pendingClose.month, 'MMM/yy')}`,
+          notes: `Reinvestment from ${format(pendingClose.month, 'MMM/yy')} close`,
           log_date: new Date().toISOString().split('T')[0],
         });
       }
