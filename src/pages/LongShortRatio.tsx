@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea } from "recharts";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SymbolSearch } from "@/components/market/SymbolSearch";
 
 interface BinanceLongShortData {
   symbol: string;
@@ -31,11 +32,20 @@ interface DragSelection {
   endValue: number | null;
 }
 
-export const LongShortRatioContent = () => {
+interface LongShortRatioContentProps {
+  symbol?: string;
+  onSymbolChange?: (symbol: string) => void;
+}
+
+export const LongShortRatioContent = ({ symbol: symbolProp, onSymbolChange }: LongShortRatioContentProps = {}) => {
   const [binanceData, setBinanceData] = useState<BinanceLongShortData[]>([]);
   const [loadingBinance, setLoadingBinance] = useState(true);
   const [period, setPeriod] = useState("1h");
+  const [internalSymbol, setInternalSymbol] = useState("BTCUSDT");
+  const symbol = symbolProp ?? internalSymbol;
+  const setSymbol = onSymbolChange ?? setInternalSymbol;
   const { toast } = useToast();
+
 
   // Drag selection state for ratio chart
   const [ratioDrag, setRatioDrag] = useState<DragSelection>({ startIndex: null, endIndex: null, startValue: null, endValue: null });
@@ -51,7 +61,7 @@ export const LongShortRatioContent = () => {
     setLoadingBinance(true);
     try {
       const response = await fetch(
-        `https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=BTCUSDT&period=${period}&limit=100`
+        `https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${symbol}&period=${period}&limit=100`
       );
 
       if (!response.ok) {
@@ -74,7 +84,7 @@ export const LongShortRatioContent = () => {
 
   useEffect(() => {
     fetchBinanceData();
-  }, [period]);
+  }, [period, symbol]);
 
   const chartData: ChartDataPoint[] = useMemo(() => binanceData.map((item, index) => ({
     time: new Date(parseInt(item.timestamp)).toLocaleString(),
@@ -184,9 +194,7 @@ export const LongShortRatioContent = () => {
       {/* Controls */}
       <div className="flex gap-4">
         <PremiumCard title="Symbol" className="flex-1">
-          <div className="flex items-center gap-2 text-lg font-semibold">
-            BTC/USDT
-          </div>
+          <SymbolSearch value={symbol} onChange={setSymbol} />
         </PremiumCard>
 
         <PremiumCard title="Time Period" className="flex-1">

@@ -2,7 +2,7 @@ import AppLayout from '@/components/layout/AppLayout';
 import { SEO } from '@/components/SEO';
 import { pageMeta } from '@/utils/seoHelpers';
 import { Bell, TrendingUp, TrendingDown } from 'lucide-react';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { Button } from '@/components/ui/button';
 
@@ -16,6 +16,7 @@ const OpenInterestChartsContent = lazy(() => import('@/components/OpenInterestCh
 
 const MarketData = () => {
   const { permission, requestPermission, isEnabled } = useLSRNotifications();
+  const [symbol, setSymbol] = useState('BTCUSDT');
 
   return (
     <>
@@ -51,7 +52,7 @@ const MarketData = () => {
         </div>
 
         <Suspense fallback={<DashboardSkeleton />}>
-          <LongShortRatioContent />
+          <LongShortRatioContent symbol={symbol} onSymbolChange={setSymbol} />
         </Suspense>
 
         {/* Open Interest Charts Section */}
@@ -63,7 +64,7 @@ const MarketData = () => {
             </p>
           </div>
           <Suspense fallback={<DashboardSkeleton />}>
-            <OpenInterestChartsContent />
+            <OpenInterestChartsContent symbol={symbol} onSymbolChange={setSymbol} />
           </Suspense>
         </div>
 

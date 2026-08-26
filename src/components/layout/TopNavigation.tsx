@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
     BarChart3, Plus, Receipt, Shield,
     LineChart, Target,
     Menu, X, Link2, History as HistoryIcon,
-    GraduationCap
+    GraduationCap, Star
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -16,11 +16,15 @@ import { CurrencySelector } from '@/components/CurrencySelector';
 import { BlurToggle } from '@/components/BlurToggle';
 import { MobileNav } from '@/components/mobile/MobileNav';
 import { MonthlyGoalNavBadge } from './MonthlyGoalNavBadge';
+import { useNavFavorites } from '@/hooks/useNavFavorites';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function TopNavigation() {
     const location = useLocation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
+
+    const { isFavorite, toggleFavorite, favorites } = useNavFavorites();
 
     const isActive = (path: string) => location.pathname === path;
 
@@ -65,6 +69,34 @@ export function TopNavigation() {
         },
     ];
 
+    const flatItems = useMemo(
+        () =>
+            menuItems.flatMap((item) =>
+                item.url
+                    ? [{ title: item.title, url: item.url, icon: item.icon }]
+                    : (item.items ?? []).map((sub) => ({ title: sub.title, url: sub.url, icon: sub.icon }))
+            ),
+        []
+    );
+
+    const favoriteItems = flatItems.filter((item) => favorites.includes(item.url));
+
+    const FavoriteStar = ({ url, title }: { url: string; title: string }) => (
+        <button
+            type="button"
+            onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleFavorite(url);
+            }}
+            aria-label={isFavorite(url) ? `Remove ${title} from favorites` : `Add ${title} to favorites`}
+            aria-pressed={isFavorite(url)}
+            className="ml-auto rounded p-1 text-muted-foreground transition-colors hover:text-primary"
+        >
+            <Star className={cn('h-4 w-4', isFavorite(url) && 'fill-primary text-primary')} />
+        </button>
+    );
+
     return (
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
             <div className="w-full flex h-16 items-center justify-between px-4 md:px-6">
@@ -99,6 +131,33 @@ export function TopNavigation() {
                 <div className="flex items-center gap-2 md:gap-4">
                     {/* Monthly goal — compact tier badge, hidden until a goal is set */}
                     <MonthlyGoalNavBadge />
+
+                    {/* Pinned favorites — quick access without opening the side menu */}
+                    {favoriteItems.length > 0 && (
+                        <TooltipProvider delayDuration={200}>
+                            <div className="hidden lg:flex items-center gap-1">
+                                {favoriteItems.map((item) => (
+                                    <Tooltip key={item.url}>
+                                        <TooltipTrigger asChild>
+                                            <NavLink
+                                                to={item.url}
+                                                className={cn(
+                                                    'flex h-9 items-center gap-1.5 rounded-lg border border-border/40 px-2.5 text-xs font-medium transition-colors',
+                                                    isActive(item.url)
+                                                        ? 'bg-primary/10 text-primary border-primary/40'
+                                                        : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
+                                                )}
+                                            >
+                                                <item.icon className="h-4 w-4" />
+                                                <span className="hidden xl:inline">{item.title}</span>
+                                            </NavLink>
+                                        </TooltipTrigger>
+                                        <TooltipContent>{item.title}</TooltipContent>
+                                    </Tooltip>
+                                ))}
+                            </div>
+                        </TooltipProvider>
+                    )}
                     {/* Add Trade — primary CTA, always distinct from tabs (iOS blue gradient, white text) */}
                     <NavLink to="/upload" className="hidden sm:block">
                         <Button
@@ -144,6 +203,7 @@ export function TopNavigation() {
                     >
                 <item.icon className="h-4 w-4" />
                 <span className="text-sm font-medium">{item.title}</span>
+                <FavoriteStar url={item.url} title={item.title} />
                 </NavLink>
                 ) : (
                 <>
@@ -161,6 +221,7 @@ export function TopNavigation() {
                         >
                     <subItem.icon className="h-4 w-4" />
                     <span className="text-sm font-medium">{subItem.title}</span>
+                    <FavoriteStar url={subItem.url} title={subItem.title} />
                     </NavLink>
                     ))}
                 </div>
@@ -207,6 +268,7 @@ export function TopNavigation() {
                                             >
                                                 <subItem.icon className="h-4 w-4" />
                                                 <span className="text-sm font-medium">{subItem.title}</span>
+                                                <FavoriteStar url={subItem.url} title={subItem.title} />
                                             </NavLink>
                                         ))}
                                     </div>
