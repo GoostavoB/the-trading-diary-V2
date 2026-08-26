@@ -258,6 +258,7 @@ const AssetPicker = ({
     onReorder: (fromSymbol: string, toSymbol: string) => void;
 }) => {
     const [open, setOpen] = useState(false);
+    const [query, setQuery] = useState('');
     const [draggedSymbol, setDraggedSymbol] = useState<string | null>(null);
     const [dragOverSymbol, setDragOverSymbol] = useState<string | null>(null);
     const ref = useRef<HTMLDivElement>(null);
@@ -307,8 +308,23 @@ const AssetPicker = ({
             </button>
             {open && (
                 <div className="absolute right-0 top-full mt-2 z-50 w-72 max-h-96 overflow-y-auto rounded-xl border border-border/40 bg-background/95 backdrop-blur-xl p-2 shadow-xl">
+                    <div className="sticky top-0 bg-background/95 pb-2">
+                        <input
+                            autoFocus
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            placeholder="Buscar ativo (ex: XRP)"
+                            aria-label="Buscar ativo"
+                            className="w-full rounded-lg border border-border/40 bg-white/5 px-2.5 py-1.5 text-sm outline-none focus:border-primary/60"
+                        />
+                    </div>
                     <p className="text-[11px] text-muted-foreground px-2 pb-1">Marque para exibir. Clique e arraste para reordenar.</p>
-                    {order.map((symbol) => {
+                    {order.filter((symbol) => {
+                        const a = assetsBySymbol[symbol];
+                        if (!a) return false;
+                        const q = query.trim().toLowerCase();
+                        return !q || a.label.toLowerCase().includes(q) || symbol.toLowerCase().includes(q);
+                    }).map((symbol) => {
                         const a = assetsBySymbol[symbol];
                         if (!a) return null;
                         const isVisible = visible.has(symbol);
@@ -349,6 +365,7 @@ const AssetPicker = ({
 };
 
 export const MultiAssetLSRGrid = () => {
+    const [cardQuery, setCardQuery] = useState('');
     const [metrics, setMetrics] = useState<Record<string, AssetMetrics>>({});
     const [hidden, setHidden] = useState<Set<string>>(() => {
         try {
@@ -422,6 +439,12 @@ export const MultiAssetLSRGrid = () => {
 
     const visibleSymbols = order.filter((s) => !hidden.has(s));
     const visibleSet = new Set(visibleSymbols);
+    const displayedSymbols = visibleSymbols.filter((s) => {
+        const q = cardQuery.trim().toLowerCase();
+        if (!q) return true;
+        const a = assetsBySymbol[s];
+        return s.toLowerCase().includes(q) || (a?.label ?? '').toLowerCase().includes(q);
+    });
 
     const summary = useMemo(() => {
         const ratios = visibleSymbols.map((s) => metrics[s]?.ratio).filter((r): r is number => r != null);
@@ -448,8 +471,18 @@ export const MultiAssetLSRGrid = () => {
                 </div>
             </div>
 
+            <div className="card-premium p-3">
+                <input
+                    value={cardQuery}
+                    onChange={(e) => setCardQuery(e.target.value)}
+                    placeholder="Buscar ativo no grid (ex: XRP)"
+                    aria-label="Buscar ativo no grid"
+                    className="w-full rounded-lg border border-border/40 bg-white/5 px-3 py-2 text-sm outline-none focus:border-primary/60"
+                />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-0">
-                {visibleSymbols.map((symbol) => (
+                {displayedSymbols.map((symbol) => (
                     <AssetCard key={symbol} asset={assetsBySymbol[symbol]} metrics={metrics[symbol]} />
                 ))}
             </div>
@@ -457,6 +490,12 @@ export const MultiAssetLSRGrid = () => {
             {visibleSymbols.length === 0 && (
                 <div className="card-premium p-8 text-center text-sm text-muted-foreground">
                     Nenhum ativo selecionado. Use "Selecionar ativos" acima para escolher o que exibir.
+                </div>
+            )}
+
+            {visibleSymbols.length > 0 && displayedSymbols.length === 0 && (
+                <div className="card-premium p-8 text-center text-sm text-muted-foreground">
+                    Nenhum ativo corresponde a "{cardQuery}".
                 </div>
             )}
         </div>
