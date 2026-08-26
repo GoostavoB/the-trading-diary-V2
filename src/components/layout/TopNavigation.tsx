@@ -24,7 +24,9 @@ export function TopNavigation() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
 
-    const { isFavorite, toggleFavorite, favorites } = useNavFavorites();
+    // Account-level favorites (Supabase `user_favorites`) — same source as the
+    // existing "Add Trade" / "Dashboard" pins, so they sync across devices.
+    const { isFavorite, toggleFavorite, favorites } = useFavorites();
 
     const isActive = (path: string) => location.pathname === path;
 
