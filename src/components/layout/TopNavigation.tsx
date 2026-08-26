@@ -81,14 +81,37 @@ export function TopNavigation() {
         []
     );
 
-    const favoriteItems = flatItems.filter((item) => favorites.includes(item.url));
+    // Icon names persisted alongside each favorite (page_icon column).
+    const ICON_NAMES: Record<string, string> = {
+        '/dashboard': 'BarChart3',
+        '/learn': 'GraduationCap',
+        '/fee-analysis': 'Receipt',
+        '/risk-management': 'Shield',
+        '/exchanges': 'Link2',
+        '/forecast': 'Target',
+        '/market-data': 'LineChart',
+        '/lsr-oi-grid': 'BarChart3',
+        '/goals': 'Target',
+        '/capital-management': 'Plus',
+        '/dashboard?tab=history': 'History',
+    };
+
+    // Pinned bar: every account favorite, using the nav icon when we know the route.
+    const favoriteItems = favorites.map((fav) => {
+        const match = flatItems.find((item) => item.url === fav.page_url);
+        return {
+            url: fav.page_url,
+            title: match?.title ?? fav.page_title,
+            icon: match?.icon ?? Star,
+        };
+    });
 
     // Rendered as a SIBLING of the NavLink (never nested inside the <a>):
     // a <button> inside an <a> is invalid HTML and gets dropped from the a11y tree.
     const FavoriteStar = ({ url, title }: { url: string; title: string }) => (
         <button
             type="button"
-            onClick={() => toggleFavorite(url)}
+            onClick={() => toggleFavorite(url, title, ICON_NAMES[url] ?? 'Star')}
             title={isFavorite(url) ? `Remove ${title} from favorites` : `Add ${title} to favorites`}
             aria-label={isFavorite(url) ? `Remove ${title} from favorites` : `Add ${title} to favorites`}
             aria-pressed={isFavorite(url)}
