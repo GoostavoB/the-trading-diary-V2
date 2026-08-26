@@ -147,6 +147,35 @@ async function fetchSwapTrades(client, { since, until, limit }, debug) {
           positionId: p.info?.positionId,
         })),
       };
+
+      // Test hypothesis: GET /openApi/swap/v2/user/income with
+      // incomeType=REALIZED_PNL is the ledger of realized-PnL events and
+      // may not suffer from positionHistory's apparent slot-overwrite
+      // behavior on rapid reopen/close. Debug-only, not used for real data
+      // yet - checking completeness first.
+      try {
+        const market = client.market(symbol);
+        const incomeResp = await client.swapV2PrivateGetUserIncome({
+          symbol: market.id,
+          incomeType: 'REALIZED_PNL',
+          startTime: since,
+          endTime: until,
+          limit: 100,
+        });
+        const incomeData = incomeResp?.data ?? [];
+        debug.swap.perSymbol[symbol].incomeRealizedPnl = {
+          count: incomeData.length,
+          records: incomeData.map((r) => ({
+            time: r.time ? new Date(Number(r.time)).toISOString() : null,
+            income: r.income,
+            tradeId: r.tradeId,
+            tranId: r.tranId,
+            symbol: r.symbol,
+          })),
+        };
+      } catch (error) {
+        debug.swap.perSymbol[symbol].incomeError = error instanceof Error ? error.message : String(error);
+      }
     }
 
     for (const p of positions) {
