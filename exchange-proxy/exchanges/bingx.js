@@ -185,55 +185,59 @@ async function fetchSwapTrades(client, { since, until, limit }, debug) {
   // of trusting positionHistory to be complete.
   const coveredKeys = new Set(trades.map((tr) => fillRecoveryKey(tr.symbol, tr.timestamp)));
   const recoveredTrades = [];
-  try {
-    const rawFills = await paginate(
-      (cursor) =>
-        client.fetchMyTrades(undefined, cursor, limit, {
-          type: 'swap',
-          ...(until ? { until } : {}),
-        }),
-      { since, until, limit, getTimestamp: (t) => t.timestamp ?? 0 }
-    );
+  const fillErrors = [];
+  // BingX's fetchMyTrades requires a symbol argument - it throws outright
+  // with undefined. Reuse the symbol list from fetchClosedOrders above.
+  for (const symbol of symbols) {
+    try {
+      const rawFills = await paginate(
+        (cursor) =>
+          client.fetchMyTrades(symbol, cursor, limit, {
+            type: 'swap',
+            ...(until ? { until } : {}),
+          }),
+        { since, until, limit, getTimestamp: (t) => t.timestamp ?? 0 }
+      );
 
-    for (const t of rawFills) {
-      const info = t.info ?? {};
-      const pnl = Number(info.realizedPnl ?? info.realisedProfit ?? info.profit ?? 0);
-      if (!pnl) continue; // opening fill, or no PnL to report - not a closed trade by itself
+      for (const t of rawFills) {
+        const info = t.info ?? {};
+        const pnl = Number(info.realizedPnl ?? info.realisedProfit ?? info.profit ?? 0);
+        if (!pnl) continue; // opening fill, or no PnL to report - not a closed trade by itself
 
-      const ts = t.timestamp ?? Date.now();
-      const key = fillRecoveryKey(t.symbol, ts);
-      if (coveredKeys.has(key)) continue; // already have this close from positionHistory
+        const ts = t.timestamp ?? Date.now();
+        const key = fillRecoveryKey(t.symbol, ts);
+        if (coveredKeys.has(key)) continue; // already have this close from positionHistory
 
-      coveredKeys.add(key);
-      recoveredTrades.push({
-        id: String(t.id ?? info.tradeId ?? info.orderId ?? `${t.symbol}_${ts}`),
-        symbol: t.symbol,
-        // Fill side is the execution direction, not the position side - a
-        // BUY fill with realized PnL closed a SHORT; a SELL fill with
-        // realized PnL closed a LONG.
-        side: t.side === 'buy' ? 'short' : 'long',
-        entryPrice: Number(t.price ?? 0),
-        exitPrice: Number(t.price ?? 0),
-        quantity: Number(t.amount ?? 0),
-        fee: Math.abs(Number(t.fee?.cost ?? 0)),
-        openTimestamp: ts,
-        timestamp: ts,
-        orderId: t.order ? String(t.order) : String(info.orderId ?? ''),
-        exchange: 'bingx',
-        marketType: 'swap',
-        realizedPnl: pnl,
-        leverage: undefined,
-        positionSide: undefined,
-      });
-    }
-  } catch (error) {
-    if (debug) {
-      debug.swap.fillRecoveryError = error instanceof Error ? error.message : String(error);
+        coveredKeys.add(key);
+        recoveredTrades.push({
+          id: String(t.id ?? info.tradeId ?? info.orderId ?? `${t.symbol}_${ts}`),
+          symbol: t.symbol,
+          // Fill side is the execution direction, not the position side - a
+          // BUY fill with realized PnL closed a SHORT; a SELL fill with
+          // realized PnL closed a LONG.
+          side: t.side === 'buy' ? 'short' : 'long',
+          entryPrice: Number(t.price ?? 0),
+          exitPrice: Number(t.price ?? 0),
+          quantity: Number(t.amount ?? 0),
+          fee: Math.abs(Number(t.fee?.cost ?? 0)),
+          openTimestamp: ts,
+          timestamp: ts,
+          orderId: t.order ? String(t.order) : String(info.orderId ?? ''),
+          exchange: 'bingx',
+          marketType: 'swap',
+          realizedPnl: pnl,
+          leverage: undefined,
+          positionSide: undefined,
+        });
+      }
+    } catch (error) {
+      fillErrors.push(`${symbol}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
   if (debug) {
     debug.swap.recoveredFromFills = recoveredTrades.length;
+    if (fillErrors.length) debug.swap.fillRecoveryErrors = fillErrors;
   }
 
   return [...trades, ...recoveredTrades];
