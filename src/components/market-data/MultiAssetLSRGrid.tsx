@@ -308,8 +308,23 @@ const AssetPicker = ({
             </button>
             {open && (
                 <div className="absolute right-0 top-full mt-2 z-50 w-72 max-h-96 overflow-y-auto rounded-xl border border-border/40 bg-background/95 backdrop-blur-xl p-2 shadow-xl">
+                    <div className="sticky top-0 bg-background/95 pb-2">
+                        <input
+                            autoFocus
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            placeholder="Buscar ativo (ex: XRP)"
+                            aria-label="Buscar ativo"
+                            className="w-full rounded-lg border border-border/40 bg-white/5 px-2.5 py-1.5 text-sm outline-none focus:border-primary/60"
+                        />
+                    </div>
                     <p className="text-[11px] text-muted-foreground px-2 pb-1">Marque para exibir. Clique e arraste para reordenar.</p>
-                    {order.map((symbol) => {
+                    {order.filter((symbol) => {
+                        const a = assetsBySymbol[symbol];
+                        if (!a) return false;
+                        const q = query.trim().toLowerCase();
+                        return !q || a.label.toLowerCase().includes(q) || symbol.toLowerCase().includes(q);
+                    }).map((symbol) => {
                         const a = assetsBySymbol[symbol];
                         if (!a) return null;
                         const isVisible = visible.has(symbol);
