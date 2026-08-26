@@ -35,6 +35,13 @@ interface PendingTrade {
   fetched_at: string;
 }
 
+const getTradeTime = (tradeData: any): number => {
+  const raw = tradeData?.closed_at ?? tradeData?.closedAt ?? tradeData?.timestamp ?? null;
+  if (!raw) return 0;
+  const time = new Date(raw).getTime();
+  return Number.isNaN(time) ? 0 : time;
+};
+
 export function TradePreviewModal({
   connectionId,
   isOpen,
@@ -63,14 +70,9 @@ export function TradePreviewModal({
         .order('fetched_at', { ascending: false });
 
       if (error) throw error;
-      const getTradeTime = (row: any): number => {
-        const td = row?.trade_data ?? {};
-        const raw = td.closed_at ?? td.closedAt ?? td.timestamp ?? null;
-        if (!raw) return 0;
-        const t = new Date(raw).getTime();
-        return Number.isNaN(t) ? 0 : t;
-      };
-      const sorted = [...(data ?? [])].sort((a, b) => getTradeTime(b) - getTradeTime(a));
+      const sorted = [...(data ?? [])].sort(
+        (a, b) => getTradeTime(b?.trade_data) - getTradeTime(a?.trade_data)
+      );
       return sorted as PendingTrade[];
     },
     enabled: isOpen && !!connectionId,
@@ -300,7 +302,7 @@ export function TradePreviewModal({
                       />
                     </TableCell>
                     <TableCell className="text-sm">
-                      {format(new Date(trade.trade_data.opened_at), 'MMM dd, HH:mm')}
+                      {format(new Date(getTradeTime(trade.trade_data)), 'MMM dd, HH:mm')}
                     </TableCell>
                     <TableCell className="font-mono text-sm">{trade.trade_data.symbol}</TableCell>
                     <TableCell>
