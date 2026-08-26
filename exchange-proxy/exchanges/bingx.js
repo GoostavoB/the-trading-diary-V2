@@ -138,44 +138,7 @@ async function fetchSwapTrades(client, { since, until, limit }, debug) {
         rawPositionCount: positions.length,
         closedPositionCount: withExit.length,
         rawLatestTimestamp: positions.length ? new Date(Math.max(...positions.map(positionTimestamp))).toISOString() : null,
-        last5Raw: positions.slice(-5).map((p) => ({
-          timestamp: new Date(positionTimestamp(p)).toISOString(),
-          avgClosePrice: p.info?.avgClosePrice,
-          avgPrice: p.info?.avgPrice,
-          positionAmt: p.info?.positionAmt,
-          closePositionAmt: p.info?.closePositionAmt,
-          positionId: p.info?.positionId,
-        })),
       };
-
-      // Test hypothesis: GET /openApi/swap/v2/user/income with
-      // incomeType=REALIZED_PNL is the ledger of realized-PnL events and
-      // may not suffer from positionHistory's apparent slot-overwrite
-      // behavior on rapid reopen/close. Debug-only, not used for real data
-      // yet - checking completeness first.
-      try {
-        const market = client.market(symbol);
-        const incomeResp = await client.swapV2PrivateGetUserIncome({
-          symbol: market.id,
-          incomeType: 'REALIZED_PNL',
-          startTime: since,
-          endTime: until,
-          limit: 100,
-        });
-        const incomeData = incomeResp?.data ?? [];
-        debug.swap.perSymbol[symbol].incomeRealizedPnl = {
-          count: incomeData.length,
-          records: incomeData.map((r) => ({
-            time: r.time ? new Date(Number(r.time)).toISOString() : null,
-            income: r.income,
-            tradeId: r.tradeId,
-            tranId: r.tranId,
-            symbol: r.symbol,
-          })),
-        };
-      } catch (error) {
-        debug.swap.perSymbol[symbol].incomeError = error instanceof Error ? error.message : String(error);
-      }
     }
 
     for (const p of positions) {
@@ -209,16 +172,94 @@ async function fetchSwapTrades(client, { since, until, limit }, debug) {
     }
   }
 
-  // NOTE: tried cross-checking against BingX's per-fill trade history
-  // (ccxt fetchMyTrades -> swap/v2/trade/allFillOrders) to recover closes
-  // that fetchPositionHistory seems to silently drop on rapid reopen/close
-  // of the same symbol. Confirmed live and in ccxt's own source that for
-  // LINEAR (USDT-margined) swap, that endpoint's response has no PnL field
-  // at all (only inverse/coin-margined swap fills carry realizedPnl) - so
-  // there's no way to identify which fills are genuine closes from that
-  // data. Reverted; this gap is still open, see session notes.
+  // fetchPositionHistory keeps only one record per symbol/side "slot" and
+  // silently overwrites it when the same symbol is closed and reopened
+  // again in the requested window - confirmed live (a real BTC close with
+  // -105.02 PnL never appeared, even after fixing pagination and page
+  // size). GET /openApi/swap/v2/user/income with incomeType=REALIZED_PNL
+  // is BingX's ledger of realized-PnL events and does NOT have this
+  // problem - every close, including ones positionHistory drops, shows up
+  // there with its exact PnL (confirmed live: the missing -105.02 BTC
+  // close is present in this ledger). Use it as the authoritative list of
+  // "a position closed here" and only fall back to nearby order data for
+  // entry/exit price when positionHistory didn't already cover it.
+  const coveredKeys = new Set(trades.map((tr) => fillRecoveryKey(tr.symbol, tr.timestamp)));
+  const recoveredTrades = [];
+  try {
+    const incomeRecords = await paginate(
+      async (cursor) => {
+        const resp = await client.swapV2PrivateGetUserIncome({
+          incomeType: 'REALIZED_PNL',
+          startTime: cursor,
+          endTime: until,
+          limit: 1000,
+        });
+        return resp?.data ?? [];
+      },
+      { since, until, limit: 1000, getTimestamp: (r) => Number(r.time ?? 0) }
+    );
 
-  return trades;
+    if (debug) debug.swap.incomeLedgerCount = incomeRecords.length;
+
+    for (const rec of incomeRecords) {
+      const pnl = Number(rec.income ?? 0);
+      if (!pnl) continue;
+
+      const ts = Number(rec.time ?? 0);
+      const unifiedSymbol = client.safeSymbol(rec.symbol, undefined, undefined, 'swap');
+      const key = fillRecoveryKey(unifiedSymbol, ts);
+      if (coveredKeys.has(key)) continue; // positionHistory already has this close
+      coveredKeys.add(key);
+
+      // positionHistory is the only source of a real entry price for this
+      // close (that's why we're here - it doesn't have this record). Best
+      // effort: use the nearest closed order for this symbol as a stand-in
+      // for exit price/quantity; entry price is left equal to exit price,
+      // same degraded-precision fallback already used for spot/import
+      // edge cases elsewhere in this adapter.
+      const nearOrder = rawOrders
+        .filter((o) => o.symbol === unifiedSymbol && Math.abs(orderTimestamp(o) - ts) <= 60000)
+        .sort((a, b) => Math.abs(orderTimestamp(a) - ts) - Math.abs(orderTimestamp(b) - ts))[0];
+
+      const exitPrice = nearOrder ? Number(nearOrder.average ?? nearOrder.price ?? 0) : 0;
+      const quantity = nearOrder ? Number(nearOrder.filled ?? nearOrder.amount ?? 0) : 0;
+      // The CLOSING order's side is the opposite of the position side - a
+      // BUY order closes a SHORT, a SELL order closes a LONG.
+      const side = nearOrder ? (nearOrder.side === 'buy' ? 'short' : 'long') : (pnl < 0 ? 'long' : 'short');
+
+      recoveredTrades.push({
+        id: String(rec.tradeId ?? rec.tranId ?? `${rec.symbol}_${ts}`),
+        symbol: unifiedSymbol,
+        side,
+        entryPrice: exitPrice,
+        exitPrice,
+        quantity,
+        fee: 0,
+        openTimestamp: ts,
+        timestamp: ts,
+        orderId: nearOrder ? String(nearOrder.id ?? '') : '',
+        exchange: 'bingx',
+        marketType: 'swap',
+        realizedPnl: pnl,
+        leverage: undefined,
+        positionSide: undefined,
+      });
+    }
+  } catch (error) {
+    if (debug) debug.swap.incomeLedgerError = error instanceof Error ? error.message : String(error);
+  }
+
+  if (debug) debug.swap.recoveredFromIncomeLedger = recoveredTrades.length;
+
+  return [...trades, ...recoveredTrades];
+}
+
+// Dedup key for cross-checking a positionHistory-derived close against an
+// income-ledger-derived close of the same real event. Bucketed to 5s: the
+// two endpoints report the same close a couple seconds apart, never
+// identically.
+function fillRecoveryKey(symbol, timestamp) {
+  return `${symbol}|${Math.round(timestamp / 5000)}`;
 }
 
 export async function fetchTrades({ apiKey, apiSecret, startTime, endTime, marketTypes }) {
