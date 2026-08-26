@@ -63,12 +63,14 @@ export function TradePreviewModal({
         .order('fetched_at', { ascending: false });
 
       if (error) throw error;
-      const sorted = [...(data ?? [])].sort((a, b) => {
-        const aTime = new Date((a.trade_data as any)?.closed_at ?? 0).getTime();
-        const bTime = new Date((b.trade_data as any)?.closed_at ?? 0).getTime();
-        return bTime - aTime;
-      });
-      console.log('[sort-debug]', sorted.map((t) => ({ symbol: (t.trade_data as any)?.symbol, closed_at: (t.trade_data as any)?.closed_at })));
+      const getTradeTime = (row: any): number => {
+        const td = row?.trade_data ?? {};
+        const raw = td.closed_at ?? td.closedAt ?? td.timestamp ?? null;
+        if (!raw) return 0;
+        const t = new Date(raw).getTime();
+        return Number.isNaN(t) ? 0 : t;
+      };
+      const sorted = [...(data ?? [])].sort((a, b) => getTradeTime(b) - getTradeTime(a));
       return sorted as PendingTrade[];
     },
     enabled: isOpen && !!connectionId,
