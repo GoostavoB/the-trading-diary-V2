@@ -365,6 +365,7 @@ const AssetPicker = ({
 };
 
 export const MultiAssetLSRGrid = () => {
+    const [cardQuery, setCardQuery] = useState('');
     const [metrics, setMetrics] = useState<Record<string, AssetMetrics>>({});
     const [hidden, setHidden] = useState<Set<string>>(() => {
         try {
