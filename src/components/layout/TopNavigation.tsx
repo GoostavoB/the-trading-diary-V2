@@ -247,16 +247,7 @@ export function TopNavigation() {
                     {menuItems.map((item) => (
                         <div key={item.title} className="space-y-2">
                             {item.url ? (
-                                <NavLink
-                                    to={item.url}
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className={cn(
-                                        "block py-2 text-lg font-medium",
-                                        isActive(item.url) ? "text-primary" : "text-foreground"
-                                    )}
-                                >
-                                    {item.title}
-                                </NavLink>
+                                <NavRow url={item.url} title={item.title} icon={item.icon} onNavigate={() => setIsMobileMenuOpen(false)} />
                             ) : (
                                 <div className="space-y-2">
                                     <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
@@ -264,21 +255,13 @@ export function TopNavigation() {
                                     </h4>
                                     <div className="grid grid-cols-1 gap-2 pl-2">
                                         {item.items?.map((subItem) => (
-                                            <NavLink
+                                            <NavRow
                                                 key={subItem.title}
-                                                to={subItem.url}
-                                                onClick={() => setIsMobileMenuOpen(false)}
-                                                className={cn(
-                                                    "flex items-center gap-3 py-2 px-3 rounded-lg transition-colors",
-                                                    isActive(subItem.url)
-                                                        ? "bg-primary/10 text-primary"
-                                                        : "hover:bg-white/5 text-foreground"
-                                                )}
-                                            >
-                                                <subItem.icon className="h-4 w-4" />
-                                                <span className="text-sm font-medium">{subItem.title}</span>
-                                                <FavoriteStar url={subItem.url} title={subItem.title} />
-                                            </NavLink>
+                                                url={subItem.url}
+                                                title={subItem.title}
+                                                icon={subItem.icon}
+                                                onNavigate={() => setIsMobileMenuOpen(false)}
+                                            />
                                         ))}
                                     </div>
                                 </div>
