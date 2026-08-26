@@ -64,8 +64,8 @@ export function TradePreviewModal({
 
       if (error) throw error;
       const sorted = [...(data ?? [])].sort((a, b) => {
-        const aTime = new Date(a.trade_data?.closed_at ?? 0).getTime();
-        const bTime = new Date(b.trade_data?.closed_at ?? 0).getTime();
+        const aTime = new Date((a.trade_data as any)?.closed_at ?? 0).getTime();
+        const bTime = new Date((b.trade_data as any)?.closed_at ?? 0).getTime();
         return bTime - aTime;
       });
       return sorted as PendingTrade[];
