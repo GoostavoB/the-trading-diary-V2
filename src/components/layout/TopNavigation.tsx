@@ -219,36 +219,19 @@ export function TopNavigation() {
             {menuItems.map((item) => (
             <div key={item.title} className="space-y-2">
                 {item.url ? (
-                <NavLink
-                    to={item.url}
-                    onClick={() => setIsNavMenuOpen(false)}
-                    className={cn(
-                        "flex items-center gap-3 py-2 px-3 rounded-lg transition-colors",
-                        isActive(item.url) ? "bg-primary/10 text-primary" : "hover:bg-white/5 text-foreground"
-                        )}
-                    >
-                <item.icon className="h-4 w-4" />
-                <span className="text-sm font-medium">{item.title}</span>
-                <FavoriteStar url={item.url} title={item.title} />
-                </NavLink>
+                <NavRow url={item.url} title={item.title} icon={item.icon} onNavigate={() => setIsNavMenuOpen(false)} />
                 ) : (
                 <>
                 <h4 className="text-xs font-semibold text-muted-foreground px-3">{item.title}</h4>
                 <div className="grid grid-cols-1 gap-1">
                     {item.items?.map((subItem) => (
-                    <NavLink
+                    <NavRow
                         key={subItem.title}
-                        to={subItem.url}
-                        onClick={() => setIsNavMenuOpen(false)}
-                        className={cn(
-                            "flex items-center gap-3 py-2 px-3 rounded-lg transition-colors",
-                            isActive(subItem.url) ? "bg-primary/10 text-primary" : "hover:bg-white/5 text-foreground"
-                            )}
-                        >
-                    <subItem.icon className="h-4 w-4" />
-                    <span className="text-sm font-medium">{subItem.title}</span>
-                    <FavoriteStar url={subItem.url} title={subItem.title} />
-                    </NavLink>
+                        url={subItem.url}
+                        title={subItem.title}
+                        icon={subItem.icon}
+                        onNavigate={() => setIsNavMenuOpen(false)}
+                    />
                     ))}
                 </div>
                 </>
