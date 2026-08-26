@@ -31,11 +31,20 @@ interface DragSelection {
   endValue: number | null;
 }
 
-export const LongShortRatioContent = () => {
+interface LongShortRatioContentProps {
+  symbol?: string;
+  onSymbolChange?: (symbol: string) => void;
+}
+
+export const LongShortRatioContent = ({ symbol: symbolProp, onSymbolChange }: LongShortRatioContentProps = {}) => {
   const [binanceData, setBinanceData] = useState<BinanceLongShortData[]>([]);
   const [loadingBinance, setLoadingBinance] = useState(true);
   const [period, setPeriod] = useState("1h");
+  const [internalSymbol, setInternalSymbol] = useState("BTCUSDT");
+  const symbol = symbolProp ?? internalSymbol;
+  const setSymbol = onSymbolChange ?? setInternalSymbol;
   const { toast } = useToast();
+
 
   // Drag selection state for ratio chart
   const [ratioDrag, setRatioDrag] = useState<DragSelection>({ startIndex: null, endIndex: null, startValue: null, endValue: null });
