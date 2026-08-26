@@ -173,7 +173,77 @@ async function fetchSwapTrades(client, { since, until, limit }, debug) {
       });
     }
   }
-  return trades;
+
+  // fetchPositionHistory confirmed (via BingX's own API docs plus a live
+  // side-by-side check against the account's real trade log) to silently
+  // drop or merge closes when the same symbol is opened and closed again in
+  // quick succession - it looks like one "position" slot per symbol/side
+  // gets overwritten rather than each close being kept as its own record.
+  // BingX's per-fill trade history (ccxt: fetchMyTrades) doesn't have that
+  // grouping - every fill, including its own realizedPnl, is its own record.
+  // Cross-check against it and add back anything genuinely missing instead
+  // of trusting positionHistory to be complete.
+  const coveredKeys = new Set(trades.map((tr) => fillRecoveryKey(tr.symbol, tr.timestamp)));
+  const recoveredTrades = [];
+  try {
+    const rawFills = await paginate(
+      (cursor) =>
+        client.fetchMyTrades(undefined, cursor, limit, {
+          type: 'swap',
+          ...(until ? { until } : {}),
+        }),
+      { since, until, limit, getTimestamp: (t) => t.timestamp ?? 0 }
+    );
+
+    for (const t of rawFills) {
+      const info = t.info ?? {};
+      const pnl = Number(info.realizedPnl ?? info.realisedProfit ?? info.profit ?? 0);
+      if (!pnl) continue; // opening fill, or no PnL to report - not a closed trade by itself
+
+      const ts = t.timestamp ?? Date.now();
+      const key = fillRecoveryKey(t.symbol, ts);
+      if (coveredKeys.has(key)) continue; // already have this close from positionHistory
+
+      coveredKeys.add(key);
+      recoveredTrades.push({
+        id: String(t.id ?? info.tradeId ?? info.orderId ?? `${t.symbol}_${ts}`),
+        symbol: t.symbol,
+        // Fill side is the execution direction, not the position side - a
+        // BUY fill with realized PnL closed a SHORT; a SELL fill with
+        // realized PnL closed a LONG.
+        side: t.side === 'buy' ? 'short' : 'long',
+        entryPrice: Number(t.price ?? 0),
+        exitPrice: Number(t.price ?? 0),
+        quantity: Number(t.amount ?? 0),
+        fee: Math.abs(Number(t.fee?.cost ?? 0)),
+        openTimestamp: ts,
+        timestamp: ts,
+        orderId: t.order ? String(t.order) : String(info.orderId ?? ''),
+        exchange: 'bingx',
+        marketType: 'swap',
+        realizedPnl: pnl,
+        leverage: undefined,
+        positionSide: undefined,
+      });
+    }
+  } catch (error) {
+    if (debug) {
+      debug.swap.fillRecoveryError = error instanceof Error ? error.message : String(error);
+    }
+  }
+
+  if (debug) {
+    debug.swap.recoveredFromFills = recoveredTrades.length;
+  }
+
+  return [...trades, ...recoveredTrades];
+}
+
+// Dedup key for cross-checking a positionHistory-derived close against a
+// fill-derived close of the same real event. Bucketed to 5s: the two
+// endpoints report the same close a couple seconds apart, never identically.
+function fillRecoveryKey(symbol, timestamp) {
+  return `${symbol}|${Math.round(timestamp / 5000)}`;
 }
 
 export async function fetchTrades({ apiKey, apiSecret, startTime, endTime, marketTypes }) {
