@@ -16,7 +16,7 @@ import { CurrencySelector } from '@/components/CurrencySelector';
 import { BlurToggle } from '@/components/BlurToggle';
 import { MobileNav } from '@/components/mobile/MobileNav';
 import { MonthlyGoalNavBadge } from './MonthlyGoalNavBadge';
-import { useNavFavorites } from '@/hooks/useNavFavorites';
+import { useFavorites } from '@/hooks/useFavorites';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function TopNavigation() {
