@@ -63,7 +63,12 @@ export function TradePreviewModal({
         .order('fetched_at', { ascending: false });
 
       if (error) throw error;
-      return data as PendingTrade[];
+      const sorted = [...(data ?? [])].sort((a, b) => {
+        const aTime = new Date((a.trade_data as any)?.closed_at ?? 0).getTime();
+        const bTime = new Date((b.trade_data as any)?.closed_at ?? 0).getTime();
+        return bTime - aTime;
+      });
+      return sorted as PendingTrade[];
     },
     enabled: isOpen && !!connectionId,
   });
