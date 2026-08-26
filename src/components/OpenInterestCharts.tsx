@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SymbolSearch } from '@/components/market/SymbolSearch';
 
 interface OpenInterestData {
   timestamp: number;
@@ -17,13 +18,6 @@ interface ProcessedOIData {
   changePercent: number;
 }
 
-const SYMBOLS = [
-  { value: 'BTCUSDT', label: 'BTC/USDT' },
-  { value: 'ETHUSDT', label: 'ETH/USDT' },
-  { value: 'BNBUSDT', label: 'BNB/USDT' },
-  { value: 'SOLUSDT', label: 'SOL/USDT' },
-];
-
 const PERIODS = [
   { value: '5m', label: '5 Minutes' },
   { value: '15m', label: '15 Minutes' },
@@ -32,8 +26,15 @@ const PERIODS = [
   { value: '1d', label: '1 Day' },
 ];
 
-export const OpenInterestCharts = () => {
-  const [symbol, setSymbol] = useState('BTCUSDT');
+interface OpenInterestChartsProps {
+  symbol?: string;
+  onSymbolChange?: (symbol: string) => void;
+}
+
+export const OpenInterestCharts = ({ symbol: symbolProp, onSymbolChange }: OpenInterestChartsProps = {}) => {
+  const [internalSymbol, setInternalSymbol] = useState('BTCUSDT');
+  const symbol = symbolProp ?? internalSymbol;
+  const setSymbol = onSymbolChange ?? setInternalSymbol;
   const [period, setPeriod] = useState('1h');
   const [data, setData] = useState<ProcessedOIData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -110,18 +111,7 @@ export const OpenInterestCharts = () => {
       {/* Controls */}
       <div className="flex gap-4 flex-wrap">
         <PremiumCard title="Symbol" className="flex-1 min-w-[200px]">
-          <Select value={symbol} onValueChange={setSymbol}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select symbol" />
-            </SelectTrigger>
-            <SelectContent>
-              {SYMBOLS.map((s) => (
-                <SelectItem key={s.value} value={s.value}>
-                  {s.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SymbolSearch value={symbol} onChange={setSymbol} />
         </PremiumCard>
 
         <PremiumCard title="Period" className="flex-1 min-w-[200px]">
