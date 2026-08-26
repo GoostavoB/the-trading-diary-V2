@@ -438,6 +438,12 @@ export const MultiAssetLSRGrid = () => {
 
     const visibleSymbols = order.filter((s) => !hidden.has(s));
     const visibleSet = new Set(visibleSymbols);
+    const displayedSymbols = visibleSymbols.filter((s) => {
+        const q = cardQuery.trim().toLowerCase();
+        if (!q) return true;
+        const a = assetsBySymbol[s];
+        return s.toLowerCase().includes(q) || (a?.label ?? '').toLowerCase().includes(q);
+    });
 
     const summary = useMemo(() => {
         const ratios = visibleSymbols.map((s) => metrics[s]?.ratio).filter((r): r is number => r != null);
