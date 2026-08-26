@@ -186,6 +186,7 @@ async function fetchSwapTrades(client, { since, until, limit }, debug) {
   const coveredKeys = new Set(trades.map((tr) => fillRecoveryKey(tr.symbol, tr.timestamp)));
   const recoveredTrades = [];
   const fillErrors = [];
+  if (debug) debug.swap.fillsPerSymbol = {};
   // BingX's fetchMyTrades requires a symbol argument - it throws outright
   // with undefined. Reuse the symbol list from fetchClosedOrders above.
   for (const symbol of symbols) {
@@ -198,6 +199,20 @@ async function fetchSwapTrades(client, { since, until, limit }, debug) {
           }),
         { since, until, limit, getTimestamp: (t) => t.timestamp ?? 0 }
       );
+
+      if (debug) {
+        debug.swap.fillsPerSymbol[symbol] = {
+          rawFillCount: rawFills.length,
+          last5Raw: rawFills.slice(-5).map((t) => ({
+            timestamp: t.timestamp ? new Date(t.timestamp).toISOString() : null,
+            side: t.side,
+            price: t.price,
+            amount: t.amount,
+            infoKeys: Object.keys(t.info ?? {}),
+            info: t.info,
+          })),
+        };
+      }
 
       for (const t of rawFills) {
         const info = t.info ?? {};
