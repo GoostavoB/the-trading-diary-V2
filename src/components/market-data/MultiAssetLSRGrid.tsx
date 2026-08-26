@@ -258,6 +258,7 @@ const AssetPicker = ({
     onReorder: (fromSymbol: string, toSymbol: string) => void;
 }) => {
     const [open, setOpen] = useState(false);
+    const [query, setQuery] = useState('');
     const [draggedSymbol, setDraggedSymbol] = useState<string | null>(null);
     const [dragOverSymbol, setDragOverSymbol] = useState<string | null>(null);
     const ref = useRef<HTMLDivElement>(null);
