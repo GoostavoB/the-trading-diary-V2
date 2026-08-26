@@ -113,7 +113,7 @@ export class BingXAdapter extends BaseExchangeAdapter {
    */
   async fetchTrades(options?: FetchOptions & { marketTypes?: BingxMarketType[] }): Promise<Trade[]> {
     const marketTypes = options?.marketTypes ?? ['spot', 'swap'];
-    const since = options?.startTime ? options.startTime.getTime() : undefined;
+    const initialSince = options?.startTime ? options.startTime.getTime() : undefined;
     const limit = Math.min(options?.limit ?? 500, 1000);
     const until = options?.endTime ? options.endTime.getTime() : undefined;
 
@@ -122,27 +122,48 @@ export class BingXAdapter extends BaseExchangeAdapter {
     for (const marketType of marketTypes) {
       try {
         await this.client.loadMarkets();
-        const rawTrades = await this.retryRequest(() =>
-          this.client.fetchMyTrades(undefined, since, limit, {
-            type: marketType,
-            ...(until ? { until } : {}),
-          })
-        );
+        // A single fetchMyTrades call is capped at `limit` results. An
+        // account with more trades than that in the requested window would
+        // silently lose everything after the first page - including the
+        // most recent trades - if we only called this once. Page forward
+        // from `since` until a page comes back short or we pass `until`.
+        let cursor = initialSince;
+        let pageCount = 0;
+        const maxPages = 50; // safety cap: 50 * 1000 = 50k trades per market type
 
-        for (const t of rawTrades) {
-          allTrades.push({
-            id: String(t.id ?? t.order ?? ''),
-            symbol: t.symbol,
-            side: t.side, // 'buy' | 'sell'
-            price: Number(t.price ?? 0),
-            quantity: Number(t.amount ?? 0),
-            fee: Number(t.fee?.cost ?? 0),
-            feeCurrency: t.fee?.currency,
-            timestamp: t.timestamp ?? Date.now(),
-            orderId: t.order ? String(t.order) : undefined,
-            exchange: 'bingx',
-            marketType,
-          });
+        while (pageCount < maxPages) {
+          const rawTrades = await this.retryRequest(() =>
+            this.client.fetchMyTrades(undefined, cursor, limit, {
+              type: marketType,
+              ...(until ? { until } : {}),
+            })
+          );
+
+          if (!rawTrades || rawTrades.length === 0) break;
+
+          for (const t of rawTrades) {
+            allTrades.push({
+              id: String(t.id ?? t.order ?? ''),
+              symbol: t.symbol,
+              side: t.side, // 'buy' | 'sell'
+              price: Number(t.price ?? 0),
+              quantity: Number(t.amount ?? 0),
+              fee: Number(t.fee?.cost ?? 0),
+              feeCurrency: t.fee?.currency,
+              timestamp: t.timestamp ?? Date.now(),
+              orderId: t.order ? String(t.order) : undefined,
+              exchange: 'bingx',
+              marketType,
+            });
+          }
+
+          pageCount++;
+          const lastTs = rawTrades[rawTrades.length - 1].timestamp;
+          const reachedEnd = rawTrades.length < limit || (until !== undefined && lastTs >= until);
+          if (reachedEnd) break;
+
+          // Advance past the last trade so the next page doesn't repeat it.
+          cursor = lastTs + 1;
         }
       } catch (error) {
         // Don't let one market type's failure (e.g. account has no swap
