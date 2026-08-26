@@ -6,12 +6,47 @@ export async function testConnection({ apiKey, apiSecret }) {
   return true;
 }
 
+// A single fetchClosedOrders/fetchPositionHistory call is capped at `limit`
+// results. An account with more activity than that in the requested window
+// would silently lose everything after the first page - including the most
+// recent trades - if we only ever fetched once. Page forward from `since`
+// until a page comes back short or we pass `until`.
+const MAX_PAGES = 20; // safety cap: 20 * 1000 = 20k records per call site
+
+async function paginate(fetchPage, { since, until, limit, getTimestamp }) {
+  const all = [];
+  let cursor = since;
+
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const batch = await fetchPage(cursor);
+    if (!batch || batch.length === 0) break;
+
+    all.push(...batch);
+
+    const lastTs = getTimestamp(batch[batch.length - 1]);
+    const reachedEnd = batch.length < limit || (until !== undefined && lastTs >= until);
+    if (reachedEnd) break;
+
+    // Advance past the last record so the next page doesn't repeat it.
+    cursor = lastTs + 1;
+  }
+
+  return all;
+}
+
+const orderTimestamp = (o) => o.lastUpdateTimestamp ?? o.timestamp ?? 0;
+const positionTimestamp = (p) => Number(p.info?.updateTime ?? p.lastUpdateTimestamp ?? p.timestamp ?? 0);
+
 // Spot has no leveraged "position" to close - every filled order is its own trade.
 async function fetchSpotTrades(client, { since, until, limit }) {
-  const rawOrders = await client.fetchClosedOrders(undefined, since, limit, {
-    type: 'spot',
-    ...(until ? { until } : {}),
-  });
+  const rawOrders = await paginate(
+    (cursor) =>
+      client.fetchClosedOrders(undefined, cursor, limit, {
+        type: 'spot',
+        ...(until ? { until } : {}),
+      }),
+    { since, until, limit, getTimestamp: orderTimestamp }
+  );
 
   const trades = [];
   for (const o of rawOrders) {
@@ -19,7 +54,7 @@ async function fetchSpotTrades(client, { since, until, limit }) {
     if (filled <= 0) continue;
 
     const price = Number(o.average ?? o.price ?? 0);
-    const ts = o.lastUpdateTimestamp ?? o.timestamp ?? Date.now();
+    const ts = orderTimestamp(o) || Date.now();
 
     trades.push({
       id: String(o.id ?? ''),
@@ -50,17 +85,24 @@ async function fetchSpotTrades(client, { since, until, limit }) {
 // the actual round-trip: real entry price (avgPrice), real exit price
 // (avgClosePrice), real realized PnL (realisedProfit), per closed position.
 async function fetchSwapTrades(client, { since, until, limit }) {
-  const rawOrders = await client.fetchClosedOrders(undefined, since, limit, {
-    type: 'swap',
-    ...(until ? { until } : {}),
-  });
+  const rawOrders = await paginate(
+    (cursor) =>
+      client.fetchClosedOrders(undefined, cursor, limit, {
+        type: 'swap',
+        ...(until ? { until } : {}),
+      }),
+    { since, until, limit, getTimestamp: orderTimestamp }
+  );
   const symbols = [...new Set(rawOrders.map((o) => o.symbol).filter(Boolean))];
 
   const trades = [];
   for (const symbol of symbols) {
     let positions;
     try {
-      positions = await client.fetchPositionHistory(symbol, since, limit, until ? { until } : {});
+      positions = await paginate(
+        (cursor) => client.fetchPositionHistory(symbol, cursor, limit, until ? { until } : {}),
+        { since, until, limit, getTimestamp: positionTimestamp }
+      );
     } catch {
       continue; // e.g. inverse contracts aren't supported by this endpoint
     }

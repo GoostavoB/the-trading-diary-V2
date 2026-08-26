@@ -78,7 +78,12 @@ let imported = 0;
   let skipped = 0;
 
 for (const pending of pendingTrades || []) {
-  const { error } = await supabase.from('trades').insert(pending.trade_data);
+  // trade_data carries an `already_imported` marker used only by the
+  // preview screen - it's not a real column on `trades`, and PostgREST
+  // rejects the whole insert if it's present (PGRST204). Strip it here
+  // right before the real insert so every import doesn't fail.
+  const { already_imported, ...tradeToInsert } = pending.trade_data || {};
+  const { error } = await supabase.from('trades').insert(tradeToInsert);
   if (error) {
     if (error.code === '23505') skipped++;
     else console.error('Insert error:', error);
@@ -279,6 +284,12 @@ app.post('/fetch-exchange-trades', async (req, res) => {
         .eq('user_id', user.id).in('trade_hash', hashes).is('deleted_at', null)
     : { data: [] };
   const existingHashes = new Set((existing ?? []).map((r) => r.trade_hash));
+
+  // Clear any previous preview batch for this connection before storing the
+  // new one - otherwise every "Fetch Trades" click just appends on top of
+  // whatever was already pending, and re-fetching accumulates duplicates of
+  // the same real trades instead of replacing them.
+  await supabase.from('exchange_pending_trades').delete().eq('connection_id', connectionId);
 
   let stored = 0;
            let errors = 0;
