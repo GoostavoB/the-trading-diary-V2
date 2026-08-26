@@ -229,6 +229,11 @@ app.post('/fetch-exchange-trades', async (req, res) => {
              return res.status(502).json({ error: message });
            }
 
+  // Temporary diagnostic: raw adapter output before any of our own mapping/
+  // filtering, so we can see exactly what the exchange API returned instead
+  // of inferring it from what ends up in the database.
+  const proxyDebug = trades._debug ?? null;
+
   const allTrades = trades.map((trade) => {
     const openedAt = new Date(trade.openTimestamp ?? trade.timestamp).toISOString();
     const closedAt = new Date(trade.timestamp).toISOString();
@@ -341,6 +346,7 @@ app.post('/fetch-exchange-trades', async (req, res) => {
     duplicatesFound: duplicates,
     mostRecentTrade: mostRecentRows?.[0] ?? null,
     exchangeName,
+    debug: proxyDebug,
   });
          } catch (error) {
            const message = error instanceof Error ? error.message : 'Internal server error';

@@ -38,7 +38,7 @@ const orderTimestamp = (o) => o.lastUpdateTimestamp ?? o.timestamp ?? 0;
 const positionTimestamp = (p) => Number(p.info?.updateTime ?? p.lastUpdateTimestamp ?? p.timestamp ?? 0);
 
 // Spot has no leveraged "position" to close - every filled order is its own trade.
-async function fetchSpotTrades(client, { since, until, limit }) {
+async function fetchSpotTrades(client, { since, until, limit }, debug) {
   const rawOrders = await paginate(
     (cursor) =>
       client.fetchClosedOrders(undefined, cursor, limit, {
@@ -47,6 +47,13 @@ async function fetchSpotTrades(client, { since, until, limit }) {
       }),
     { since, until, limit, getTimestamp: orderTimestamp }
   );
+
+  if (debug) {
+    debug.spot = {
+      rawOrderCount: rawOrders.length,
+      rawLatestTimestamp: rawOrders.length ? new Date(Math.max(...rawOrders.map(orderTimestamp))).toISOString() : null,
+    };
+  }
 
   const trades = [];
   for (const o of rawOrders) {
@@ -84,7 +91,7 @@ async function fetchSpotTrades(client, { since, until, limit }) {
 // P&L and no real entry/exit distinction. fetchPositionHistory asks BingX for
 // the actual round-trip: real entry price (avgPrice), real exit price
 // (avgClosePrice), real realized PnL (realisedProfit), per closed position.
-async function fetchSwapTrades(client, { since, until, limit }) {
+async function fetchSwapTrades(client, { since, until, limit }, debug) {
   const rawOrders = await paginate(
     (cursor) =>
       client.fetchClosedOrders(undefined, cursor, limit, {
@@ -95,6 +102,15 @@ async function fetchSwapTrades(client, { since, until, limit }) {
   );
   const symbols = [...new Set(rawOrders.map((o) => o.symbol).filter(Boolean))];
 
+  if (debug) {
+    debug.swap = {
+      rawClosedOrderCount: rawOrders.length,
+      rawClosedOrderLatestTimestamp: rawOrders.length ? new Date(Math.max(...rawOrders.map(orderTimestamp))).toISOString() : null,
+      symbols,
+      perSymbol: {},
+    };
+  }
+
   const trades = [];
   for (const symbol of symbols) {
     let positions;
@@ -103,8 +119,28 @@ async function fetchSwapTrades(client, { since, until, limit }) {
         (cursor) => client.fetchPositionHistory(symbol, cursor, limit, until ? { until } : {}),
         { since, until, limit, getTimestamp: positionTimestamp }
       );
-    } catch {
+    } catch (error) {
+      if (debug) {
+        debug.swap.perSymbol[symbol] = { error: error instanceof Error ? error.message : String(error) };
+      }
       continue; // e.g. inverse contracts aren't supported by this endpoint
+    }
+
+    if (debug) {
+      const withExit = positions.filter((p) => Number(p.info?.avgClosePrice ?? 0) > 0);
+      debug.swap.perSymbol[symbol] = {
+        rawPositionCount: positions.length,
+        closedPositionCount: withExit.length,
+        rawLatestTimestamp: positions.length ? new Date(Math.max(...positions.map(positionTimestamp))).toISOString() : null,
+        last5Raw: positions.slice(-5).map((p) => ({
+          timestamp: new Date(positionTimestamp(p)).toISOString(),
+          avgClosePrice: p.info?.avgClosePrice,
+          avgPrice: p.info?.avgPrice,
+          positionAmt: p.info?.positionAmt,
+          closePositionAmt: p.info?.closePositionAmt,
+          positionId: p.info?.positionId,
+        })),
+      };
     }
 
     for (const p of positions) {
@@ -149,12 +185,17 @@ export async function fetchTrades({ apiKey, apiSecret, startTime, endTime, marke
 
   const allTrades = [];
   const errors = [];
+  const debug = {
+    since: since ? new Date(since).toISOString() : null,
+    until: until ? new Date(until).toISOString() : null,
+    types,
+  };
 
   for (const marketType of types) {
     try {
       const trades = marketType === 'swap'
-        ? await fetchSwapTrades(client, { since, until, limit })
-        : await fetchSpotTrades(client, { since, until, limit });
+        ? await fetchSwapTrades(client, { since, until, limit }, debug)
+        : await fetchSpotTrades(client, { since, until, limit }, debug);
       allTrades.push(...trades);
     } catch (error) {
       errors.push(`${marketType}: ${error instanceof Error ? error.message : String(error)}`);
@@ -165,5 +206,6 @@ export async function fetchTrades({ apiKey, apiSecret, startTime, endTime, marke
     throw new Error(`BingX fetchTrades failed for all market types: ${errors.join('; ')}`);
   }
 
+  allTrades._debug = debug;
   return allTrades;
 }
