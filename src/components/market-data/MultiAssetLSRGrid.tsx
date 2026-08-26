@@ -471,8 +471,18 @@ export const MultiAssetLSRGrid = () => {
                 </div>
             </div>
 
+            <div className="card-premium p-3">
+                <input
+                    value={cardQuery}
+                    onChange={(e) => setCardQuery(e.target.value)}
+                    placeholder="Buscar ativo no grid (ex: XRP)"
+                    aria-label="Buscar ativo no grid"
+                    className="w-full rounded-lg border border-border/40 bg-white/5 px-3 py-2 text-sm outline-none focus:border-primary/60"
+                />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-0">
-                {visibleSymbols.map((symbol) => (
+                {displayedSymbols.map((symbol) => (
                     <AssetCard key={symbol} asset={assetsBySymbol[symbol]} metrics={metrics[symbol]} />
                 ))}
             </div>
@@ -480,6 +490,12 @@ export const MultiAssetLSRGrid = () => {
             {visibleSymbols.length === 0 && (
                 <div className="card-premium p-8 text-center text-sm text-muted-foreground">
                     Nenhum ativo selecionado. Use "Selecionar ativos" acima para escolher o que exibir.
+                </div>
+            )}
+
+            {visibleSymbols.length > 0 && displayedSymbols.length === 0 && (
+                <div className="card-premium p-8 text-center text-sm text-muted-foreground">
+                    Nenhum ativo corresponde a "{cardQuery}".
                 </div>
             )}
         </div>
