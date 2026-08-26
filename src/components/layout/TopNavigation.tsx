@@ -81,20 +81,46 @@ export function TopNavigation() {
 
     const favoriteItems = flatItems.filter((item) => favorites.includes(item.url));
 
+    // Rendered as a SIBLING of the NavLink (never nested inside the <a>):
+    // a <button> inside an <a> is invalid HTML and gets dropped from the a11y tree.
     const FavoriteStar = ({ url, title }: { url: string; title: string }) => (
         <button
             type="button"
-            onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleFavorite(url);
-            }}
+            onClick={() => toggleFavorite(url)}
+            title={isFavorite(url) ? `Remove ${title} from favorites` : `Add ${title} to favorites`}
             aria-label={isFavorite(url) ? `Remove ${title} from favorites` : `Add ${title} to favorites`}
             aria-pressed={isFavorite(url)}
-            className="ml-auto rounded p-1 text-muted-foreground transition-colors hover:text-primary"
+            className="shrink-0 rounded p-1.5 text-muted-foreground transition-colors hover:bg-white/5 hover:text-primary"
         >
             <Star className={cn('h-4 w-4', isFavorite(url) && 'fill-primary text-primary')} />
         </button>
+    );
+
+    const NavRow = ({
+        url,
+        title,
+        icon: Icon,
+        onNavigate,
+    }: {
+        url: string;
+        title: string;
+        icon: React.ComponentType<{ className?: string }>;
+        onNavigate: () => void;
+    }) => (
+        <div className="flex items-center gap-1">
+            <NavLink
+                to={url}
+                onClick={onNavigate}
+                className={cn(
+                    'flex flex-1 items-center gap-3 py-2 px-3 rounded-lg transition-colors',
+                    isActive(url) ? 'bg-primary/10 text-primary' : 'hover:bg-white/5 text-foreground'
+                )}
+            >
+                <Icon className="h-4 w-4" />
+                <span className="text-sm font-medium">{title}</span>
+            </NavLink>
+            <FavoriteStar url={url} title={title} />
+        </div>
     );
 
     return (
