@@ -295,7 +295,16 @@ Deno.serve(async (req) => {
     
     let stored = 0;
     let errors = 0;
-    
+
+    // Clear any previous preview batch for this connection before storing the
+    // new one - otherwise every "Fetch Trades" click just appends on top of
+    // whatever was already pending, and re-fetching accumulates duplicates of
+    // the same real trades instead of replacing them.
+    await supabaseClient
+      .from('exchange_pending_trades')
+      .delete()
+      .eq('connection_id', connectionId);
+
     for (const trade of allTrades) {
       const { error } = await supabaseClient
         .from('exchange_pending_trades')
