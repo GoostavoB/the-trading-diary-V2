@@ -249,6 +249,23 @@ Deno.serve(async (req) => {
     
     console.log(`[${displayName}] Successfully fetched ${result.trades.length} trades`);
 
+    const debugSortedByTime = [...result.trades].sort((a, b) => b.timestamp - a.timestamp);
+    const debugInfo = {
+      queryStartTime: startTime.toISOString(),
+      queryEndTime: endTime.toISOString(),
+      queryMarketTypes: marketTypes,
+      rawTradeCountFromAdapter: result.trades.length,
+      rawMaxTimestamp: debugSortedByTime.length ? new Date(debugSortedByTime[0].timestamp).toISOString() : null,
+      rawLatest10: debugSortedByTime.slice(0, 10).map((t) => ({
+        symbol: t.symbol,
+        side: t.side,
+        marketType: t.marketType,
+        timestamp: new Date(t.timestamp).toISOString(),
+        orderId: t.orderId,
+      })),
+    };
+    console.log(`[${displayName}] DEBUG raw adapter output:`, JSON.stringify(debugInfo));
+
     // Normalize trades for database
     console.log(`[${displayName}] Normalizing ${result.trades.length} trades for database...`);
     
@@ -353,6 +370,7 @@ Deno.serve(async (req) => {
         success: true,
         tradesFetched: stored,
         exchangeName: displayName,
+        debug: debugInfo,
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
