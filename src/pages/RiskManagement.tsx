@@ -7,6 +7,7 @@ import { StopLossCalculator } from "@/components/risk/StopLossCalculator";
 import { LeverageCalculator } from "@/components/risk/LeverageCalculator";
 import { DrawdownChart } from "@/components/risk/DrawdownChart";
 import { LeverageStopWidget } from "@/components/leverage-stop/LeverageStopWidget";
+import { LeverageTableModal } from "@/components/risk/LeverageTableModal";
 import { BlurToggleButton } from "@/components/ui/BlurToggleButton";
 import { Shield, Calculator, TrendingDown, BarChart3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
