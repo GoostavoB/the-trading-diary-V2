@@ -69,16 +69,16 @@ export function getPublicSignal(m?: PublicMetrics): PublicSignal {
 
 export const signalLabels: Record<'pt' | 'en', Record<PublicSignal, string>> = {
   pt: {
-    'avoid-buy': 'Evite compras',
-    'avoid-sell': 'Evite vendas',
+    'avoid-buy': 'Evite compras/LONG',
+    'avoid-sell': 'Evite vendas/SHORT',
     longs: 'Longs',
     shorts: 'Shorts',
     neutral: 'Neutro',
     'no-data': 'Sem dados',
   },
   en: {
-    'avoid-buy': 'Avoid buying',
-    'avoid-sell': 'Avoid selling',
+    'avoid-buy': 'Avoid buying/Long',
+    'avoid-sell': 'Avoid selling/Short',
     longs: 'Longs',
     shorts: 'Shorts',
     neutral: 'Neutral',
