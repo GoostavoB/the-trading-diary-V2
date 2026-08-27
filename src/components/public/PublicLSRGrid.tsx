@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { AreaChart, Area, ResponsiveContainer, YAxis } from 'recharts';
 
 /**
  * Grid público e simplificado de Long/Short Ratio + Open Interest.
@@ -49,6 +50,7 @@ export interface PublicMetrics {
   longPct: number | null;
   shortPct: number | null;
   oiValue: number | null;
+  history: { v: number }[];
 }
 
 const LEVEL_HIGH = 1.8;
@@ -104,10 +106,13 @@ const fmtOI = (v: number | null) => {
   return `$${v.toFixed(0)}`;
 };
 
+// Last 4h of LSR history at 15m granularity = 16 points
+const HISTORY_WINDOW = 16;
+
 async function fetchMetrics(symbol: string): Promise<PublicMetrics> {
   try {
     const [ratioRes, oiRes] = await Promise.all([
-      fetch(`https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${symbol}&period=15m&limit=1`),
+      fetch(`https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${symbol}&period=15m&limit=${HISTORY_WINDOW}`),
       fetch(`https://fapi.binance.com/futures/data/openInterestHist?symbol=${symbol}&period=1h&limit=1`),
     ]);
     const ratioJson = ratioRes.ok ? await ratioRes.json() : [];
@@ -116,20 +121,24 @@ async function fetchMetrics(symbol: string): Promise<PublicMetrics> {
     let ratio: number | null = null;
     let longPct: number | null = null;
     let shortPct: number | null = null;
+    let history: { v: number }[] = [];
     if (Array.isArray(ratioJson) && ratioJson.length > 0) {
       const last = ratioJson[ratioJson.length - 1];
       ratio = parseFloat(last.longShortRatio);
       longPct = parseFloat(last.longAccount) * 100;
       shortPct = parseFloat(last.shortAccount) * 100;
+      history = ratioJson
+        .slice(-HISTORY_WINDOW)
+        .map((p: { longShortRatio: string }) => ({ v: parseFloat(p.longShortRatio) }));
     }
 
     let oiValue: number | null = null;
     if (Array.isArray(oiJson) && oiJson.length > 0) {
       oiValue = parseFloat(oiJson[oiJson.length - 1].sumOpenInterestValue);
     }
-    return { ratio, longPct, shortPct, oiValue };
+    return { ratio, longPct, shortPct, oiValue, history };
   } catch {
-    return { ratio: null, longPct: null, shortPct: null, oiValue: null };
+    return { ratio: null, longPct: null, shortPct: null, oiValue: null, history: [] };
   }
 }
 
