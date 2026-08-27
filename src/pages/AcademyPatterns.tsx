@@ -16,6 +16,10 @@ import {
   Layers,
   Triangle,
   Ruler,
+  Crosshair,
+  Scaling,
+  Scissors,
+  Info,
 } from 'lucide-react';
 import {
   DoubleTop,
@@ -33,6 +37,9 @@ import {
   SymmetricTriangle,
   FibExtension,
   FibRetracement,
+  FalseBreakTriangle,
+  ChannelMirror,
+  SuccessiveMirror,
 } from '@/components/academy/patternDiagrams';
 
 type Pattern = {
@@ -43,6 +50,7 @@ type Pattern = {
   entry: string;
   target: string;
   riskWarning?: string;
+  precisionNote?: string;
 };
 
 const topPatterns: Pattern[] = [
