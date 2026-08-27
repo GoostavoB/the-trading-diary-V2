@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { SnapTradeService } from '@/services/exchanges/aggregator/SnapTradeService';
 import type { AggregatorConnection } from '@/types/aggregator';
 import { cn } from '@/lib/utils';
+import { ExchangeLogoChip } from '@/components/exchanges/ExchangeLogoChip';
 
 interface ConnectedAccountsListProps {
   /** Set by parent's QuickConnect.onConnected to nudge the list to refetch. */
