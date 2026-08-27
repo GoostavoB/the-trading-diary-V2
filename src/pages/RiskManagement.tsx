@@ -7,6 +7,7 @@ import { StopLossCalculator } from "@/components/risk/StopLossCalculator";
 import { LeverageCalculator } from "@/components/risk/LeverageCalculator";
 import { DrawdownChart } from "@/components/risk/DrawdownChart";
 import { LeverageStopWidget } from "@/components/leverage-stop/LeverageStopWidget";
+import { LeverageTableModal } from "@/components/risk/LeverageTableModal";
 import { BlurToggleButton } from "@/components/ui/BlurToggleButton";
 import { Shield, Calculator, TrendingDown, BarChart3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -143,7 +144,10 @@ export default function RiskManagement() {
               <p className="text-sm text-space-300">Monitor and control your trading risk exposure</p>
             </div>
           </div>
-          <BlurToggleButton />
+          <div className="flex items-center gap-3">
+            <LeverageTableModal />
+            <BlurToggleButton />
+          </div>
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">

@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { SnapTradeService } from '@/services/exchanges/aggregator/SnapTradeService';
 import type { AggregatorConnection } from '@/types/aggregator';
 import { cn } from '@/lib/utils';
+import { ExchangeLogoChip } from '@/components/exchanges/ExchangeLogoChip';
 
 interface ConnectedAccountsListProps {
   /** Set by parent's QuickConnect.onConnected to nudge the list to refetch. */
@@ -15,7 +16,7 @@ const StatusChip = ({ status }: { status: AggregatorConnection['status'] }) => {
   const config: Record<AggregatorConnection['status'], { label: string; cls: string; Icon: React.ElementType }> = {
     active:          { label: 'Active',         cls: 'chip-green',    Icon: CheckCircle2 },
     syncing:         { label: 'Syncing…',       cls: 'chip-electric', Icon: Loader2 },
-    pending:         { label: 'Pending',        cls: 'chip',          Icon: Clock },
+    pending:         { label: 'Pending review', cls: 'chip-orange',   Icon: Clock },
     requires_reauth: { label: 'Reauth needed',  cls: 'chip-orange',   Icon: AlertTriangle },
     error:           { label: 'Error',          cls: 'chip-red',      Icon: AlertTriangle },
     disconnected:    { label: 'Disconnected',   cls: 'chip',          Icon: AlertTriangle },
@@ -116,17 +117,12 @@ export function ConnectedAccountsList({ refreshKey = 0 }: ConnectedAccountsListP
               key={c.id}
               className="card-premium p-4 flex items-center gap-4"
             >
-              {/* Logo */}
-              <div className="h-10 w-10 rounded-ios bg-space-600 flex items-center justify-center shrink-0 overflow-hidden border border-space-500/40">
-                {c.meta?.logo ? (
-                  <img src={c.meta.logo} alt={c.broker_label || c.broker_slug}
-                    className="h-7 w-7 object-contain" />
-                ) : (
-                  <span className="font-num text-xs text-space-200">
-                    {(c.broker_label || c.broker_slug).slice(0, 2).toUpperCase()}
-                  </span>
-                )}
-              </div>
+              {/* Brand chip — theme-safe in light and dark mode */}
+              <ExchangeLogoChip
+                exchangeId={c.broker_slug}
+                exchangeName={c.broker_label || c.broker_slug}
+                size="md"
+              />
 
               {/* Identity */}
               <div className="flex-1 min-w-0">

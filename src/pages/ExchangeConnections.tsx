@@ -12,7 +12,7 @@ import { ConnectExchangeModal } from '@/components/exchanges/ConnectExchangeModa
 import { SyncHistoryWidget } from '@/components/exchanges/SyncHistoryWidget';
 import { TradePreviewModal } from '@/components/exchanges/TradePreviewModal';
 import { SyncTradesDialog } from '@/components/exchanges/SyncTradesDialog';
-import { ExchangeLogo } from '@/components/ExchangeLogo';
+import { ExchangeLogoChip } from '@/components/exchanges/ExchangeLogoChip';
 import { formatDistanceToNow } from 'date-fns';
 import AppLayout from '@/components/layout/AppLayout';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -289,25 +289,26 @@ export default function ExchangeConnections() {
                 <div className="p-6 pb-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <ExchangeLogo
+                      <ExchangeLogoChip
                         exchangeId={exchange.id}
                         exchangeName={exchange.name}
                         size="lg"
                       />
                       <div>
                         <div className="flex items-center gap-2">
+                          <span className="font-semibold text-space-100">{exchange.name}</span>
                           {exchange.comingSoon && !isConnected && (
-                            <Badge variant="secondary" className="text-xs">Soon</Badge>
+                            <Badge variant="secondary" className="text-xs px-2 py-0.5">Soon</Badge>
                           )}
                         </div>
                         {isConnected && (
-                          <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center gap-1.5 mt-1">
                             <div className={`h-2 w-2 rounded-full ${connection.sync_status === 'error' ? 'bg-destructive' :
-                                connection.sync_status === 'syncing' ? 'bg-yellow-500 animate-pulse' :
+                                connection.sync_status === 'syncing' ? 'bg-amber-500 animate-pulse' :
                                   'bg-green-500'
                               }`} />
                             <span className="text-xs text-muted-foreground capitalize">
-                              {connection.sync_status}
+                              {connection.sync_status === 'pending' ? 'Pending review' : connection.sync_status}
                             </span>
                           </div>
                         )}

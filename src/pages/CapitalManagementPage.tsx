@@ -193,8 +193,8 @@ const CapitalManagementPage = () => {
             </Button>
             <div className="space-y-2">
               <p className="text-xs text-space-400">Settings / Capital</p>
-              <h1 className="font-display text-3xl md:text-4xl text-gradient-electric-soft flex items-center gap-3">
-                <DollarSign className="h-8 w-8 text-space-200" />
+              <h1 className="font-display text-3xl md:text-4xl text-indigo-400 flex items-center gap-3">
+                <DollarSign className="h-8 w-8 text-indigo-400" />
                 Capital Management
               </h1>
               <p className="text-sm text-space-300">
@@ -204,7 +204,7 @@ const CapitalManagementPage = () => {
           </div>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2" size="lg">
+              <Button className="gap-2 bg-indigo-600 hover:bg-indigo-500 text-white border-0 shadow-lg shadow-indigo-600/20" size="lg">
                 <Plus className="h-5 w-5" />
                 Add Capital Entry
               </Button>
@@ -288,12 +288,12 @@ const CapitalManagementPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <PremiumCard className="card-premium-highlight p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-ios-card bg-gradient-to-br from-accent/20 to-accent/5">
-                <TrendingUp className="h-6 w-6 text-accent" />
+              <div className="p-3 rounded-ios-card bg-indigo-500/15 border border-indigo-500/25">
+                <TrendingUp className="h-6 w-6 text-indigo-400" />
               </div>
               <div>
                 <p className="text-xs text-space-400 uppercase tracking-wide font-medium">Current Capital</p>
-                <p className="text-3xl font-num font-bold mt-1 text-gradient-electric">
+                <p className="text-3xl font-num font-bold mt-1 text-indigo-400">
                   <BlurredCurrency amount={currentCapital} />
                 </p>
               </div>
@@ -302,8 +302,8 @@ const CapitalManagementPage = () => {
 
           <PremiumCard className="card-premium p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-ios-card bg-gradient-to-br from-primary/20 to-primary/5">
-                <DollarSign className="h-6 w-6 text-primary" />
+              <div className="p-3 rounded-ios-card bg-indigo-500/15 border border-indigo-500/25">
+                <DollarSign className="h-6 w-6 text-indigo-400" />
               </div>
               <div>
                 <p className="text-xs text-space-400 uppercase tracking-wide font-medium">Total Added</p>
@@ -316,8 +316,8 @@ const CapitalManagementPage = () => {
 
           <PremiumCard className="card-premium p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-ios-card bg-gradient-to-br from-secondary/20 to-secondary/5">
-                <History className="h-6 w-6 text-secondary-foreground" />
+              <div className="p-3 rounded-ios-card bg-indigo-500/15 border border-indigo-500/25">
+                <History className="h-6 w-6 text-indigo-400" />
               </div>
               <div>
                 <p className="text-xs text-space-400 uppercase tracking-wide font-medium">Average Addition</p>
@@ -338,7 +338,7 @@ const CapitalManagementPage = () => {
             </h2>
             <div className="relative">
               {/* Timeline line */}
-              <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-accent via-primary to-accent/20" />
+              <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-500 to-indigo-500/10" />
 
               {/* Timeline entries */}
               <div className="space-y-6">
@@ -346,11 +346,11 @@ const CapitalManagementPage = () => {
                   <div key={entry.id} className="relative flex gap-6 group">
                     {/* Timeline dot */}
                     <div className="relative z-10 flex-shrink-0">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center shadow-lg">
+                      <div className="w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/25">
                         <DollarSign className="h-7 w-7 text-white" />
                       </div>
                       {index === capitalLog.length - 1 && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent animate-pulse" />
+                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-indigo-400 animate-pulse" />
                       )}
                     </div>
 
@@ -421,8 +421,8 @@ const CapitalManagementPage = () => {
         {capitalLog.length === 0 && !isLoading && (
           <PremiumCard className="p-12 text-center">
             <div className="max-w-md mx-auto space-y-4">
-              <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center">
-                <DollarSign className="h-10 w-10 text-accent" />
+              <div className="w-20 h-20 mx-auto rounded-full bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center">
+                <DollarSign className="h-10 w-10 text-indigo-400" />
               </div>
               <h3 className="text-2xl font-semibold">Start Tracking Your Capital</h3>
               <p className="text-muted-foreground">
