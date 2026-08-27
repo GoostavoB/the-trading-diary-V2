@@ -93,6 +93,7 @@ const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 // BlogArticle removed — legacy route now redirects to /blog
 const Learn = lazy(() => import("./pages/Learn"));
 const AcademyChartPatterns = lazy(() => import("./pages/AcademyChartPatterns"));
+const AcademyPatterns = lazy(() => import("./pages/AcademyPatterns"));
 const ApiDocs = lazy(() => import("./pages/ApiDocs"));
 const AdvancedAnalytics = lazy(() => import("./pages/AdvancedAnalytics"));
 // Phase 2: Social Feed - temporarily disabled for backlog #34
