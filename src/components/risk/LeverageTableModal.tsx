@@ -44,22 +44,22 @@ export function LeverageTableModal() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-3xl w-[95vw] max-h-[92vh] overflow-hidden p-0 border-indigo-500/20">
-        <DialogHeader className="px-6 pt-6 pb-4 border-b border-indigo-500/15 bg-gradient-to-r from-indigo-500/10 to-transparent">
-          <DialogTitle className="flex items-center gap-3 text-2xl">
-            <span className="h-10 w-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center">
-              <Table className="h-5 w-5 text-indigo-400" />
+      <DialogContent className="w-[92vw] max-w-none h-[92vh] max-h-[92vh] overflow-hidden p-0 border-indigo-500/20 flex flex-col">
+        <DialogHeader className="px-8 pt-8 pb-5 border-b border-indigo-500/15 bg-gradient-to-r from-indigo-500/10 to-transparent shrink-0">
+          <DialogTitle className="flex items-center gap-4 text-3xl md:text-4xl">
+            <span className="h-14 w-14 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center">
+              <Table className="h-7 w-7 text-indigo-400" />
             </span>
             Leverage reference table
           </DialogTitle>
-          <p className="text-sm text-muted-foreground pt-1">
+          <p className="text-base md:text-lg text-muted-foreground pt-2">
             Find your unleveraged move to the stop, then read the maximum leverage to use.
           </p>
         </DialogHeader>
 
-        <div className="overflow-y-auto max-h-[65vh] px-6 pb-6 pt-2">
+        <div className="overflow-y-auto flex-1 px-8 pb-8 pt-3">
           {/* Column headers */}
-          <div className="sticky top-0 z-10 grid grid-cols-[1fr_auto] items-center gap-4 bg-background/95 backdrop-blur py-3 text-xs uppercase tracking-wide text-muted-foreground border-b border-border">
+          <div className="sticky top-0 z-10 grid grid-cols-[1fr_auto] items-center gap-6 bg-background/95 backdrop-blur py-4 text-sm md:text-base uppercase tracking-wide text-muted-foreground border-b border-border">
             <span>Move without leverage</span>
             <span className="text-right pr-1">Max leverage</span>
           </div>
@@ -68,21 +68,21 @@ export function LeverageTableModal() {
             {LEVERAGE_ROWS.map((row, i) => (
               <div
                 key={row.range}
-                className={`grid grid-cols-[1fr_auto] items-center gap-4 px-2 py-3.5 rounded-lg transition-colors ${
+                className={`grid grid-cols-[1fr_auto] items-center gap-6 px-3 py-5 md:py-6 rounded-xl transition-colors ${
                   i % 2 === 1 ? "bg-muted/30" : ""
                 } hover:bg-indigo-500/10`}
               >
-                <span className="text-base md:text-lg font-medium tabular-nums text-foreground">
+                <span className="text-xl md:text-2xl font-medium tabular-nums text-foreground">
                   {row.range}
                 </span>
-                <span className="justify-self-end min-w-[86px] text-center rounded-lg px-3 py-1.5 text-lg md:text-xl font-bold tabular-nums bg-indigo-500/15 border border-indigo-500/30 text-indigo-400">
+                <span className="justify-self-end min-w-[120px] md:min-w-[140px] text-center rounded-xl px-4 py-2 text-2xl md:text-3xl font-bold tabular-nums bg-indigo-500/15 border border-indigo-500/30 text-indigo-400">
                   {row.leverage}
                 </span>
               </div>
             ))}
           </div>
 
-          <p className="text-xs text-muted-foreground mt-5 leading-relaxed">
+          <p className="text-sm md:text-base text-muted-foreground mt-6 leading-relaxed">
             Reference only. Higher leverage shortens the distance to liquidation — always size the
             position from your risk per trade, not from the maximum allowed.
           </p>
