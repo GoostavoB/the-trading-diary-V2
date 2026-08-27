@@ -467,6 +467,109 @@ export default function AcademyPatterns() {
             </div>
           </section>
 
+          {/* Exemplo prático: falso rompimento */}
+          <section className="space-y-5">
+            <SectionHeading
+              icon={Crosshair}
+              title="Exemplo prático: falso rompimento"
+              subtitle="Estudo de caso no triângulo descendente — e uma técnica de entrada que vale para qualquer padrão, não só para este."
+            />
+            <PremiumCard className="p-5 lg:p-6" contentClassName="p-0">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <FalseBreakTriangle />
+                <div className="space-y-4">
+                  <div className="flex gap-2.5">
+                    <Brain className="h-4 w-4 text-indigo-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-indigo-300">O cenário</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed mt-1">
+                        Triângulo descendente clássico: linha de tendência de baixa no topo, suporte plano embaixo e,
+                        dentro da formação, uma estrutura tipo ombro-cabeça-ombro. No último pico, o preço rompe
+                        ACIMA da linha de tendência — e falha. É o falso rompimento clássico: o mercado varre os
+                        stops dos vendidos e as compras de rompimento dos otimistas, e então desaba pelo suporte
+                        plano.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2.5">
+                    <LogIn className="h-4 w-4 text-violet-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-violet-300">
+                        Como entrar no short depois do falso rompimento
+                      </p>
+                      <ul className="text-sm text-muted-foreground leading-relaxed mt-1 space-y-2 list-disc pl-4">
+                        <li>
+                          <strong className="text-foreground">Opção A — Retração de Fibonacci:</strong> traça a
+                          retração do topo do rompimento falso até o fundo seguinte. Um dos níveis
+                          (0,382 · 0,5 · 0,618 · 0,786) marca o fim do pullback — a entrada é na reação do preço a
+                          esse nível.
+                        </li>
+                        <li>
+                          <strong className="text-foreground">Opção B — Reteste da linha rompida:</strong> espera o
+                          preço voltar até a própria linha de tendência que foi rompida, que agora atua como
+                          resistência, e entra na rejeição.
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="flex gap-2.5 rounded-xl border border-indigo-500/30 bg-indigo-500/[0.08] p-3">
+                    <Info className="h-4 w-4 text-indigo-400 shrink-0 mt-0.5" />
+                    <p className="text-sm text-indigo-200/90 leading-relaxed">
+                      Essa técnica não é exclusiva do triângulo descendente. Ela vale para{' '}
+                      <strong>qualquer padrão</strong>: depois de um falso rompimento, a retração de Fibonacci ou o
+                      reteste da linha rompida oferecem a entrada com o melhor risco/retorno — porque o stop fica
+                      logo acima do pavio do rompimento falso.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </PremiumCard>
+          </section>
+
+          {/* Técnicas avançadas de alvo e gestão */}
+          <section className="space-y-5">
+            <SectionHeading
+              icon={Scaling}
+              title="Técnicas de alvo e gestão de saída"
+              subtitle="Duas ferramentas heurísticas para projetar alvos e escalar saídas em movimentos estendidos."
+            />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <PremiumCard className="p-5" contentClassName="p-0">
+                <div className="space-y-3">
+                  <h3 className="text-base font-semibold">Espelhamento de canal</h3>
+                  <ChannelMirror />
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Quando o preço rompe um canal, uma técnica heurística de alvo é espelhar o próprio canal: copiar
+                    a mesma amplitude e inclinação a partir do ponto de rompimento. O topo do canal espelhado vira a
+                    região de alvo. É uma ferramenta <strong className="text-foreground">menos precisa</strong> do
+                    que a projeção do mastro da bandeira — trate como zona de atenção, não como número exato.
+                  </p>
+                </div>
+              </PremiumCard>
+              <PremiumCard className="p-5" contentClassName="p-0">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Scissors className="h-4 w-4 text-indigo-400" />
+                    <h3 className="text-base font-semibold">Parciais por espelhamento sucessivo</h3>
+                  </div>
+                  <SuccessiveMirror />
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Técnica de gestão para movimentos estendidos: durante a tendência, vá espelhando a mesma figura
+                    repetidamente. Faça uma parcial na <strong className="text-foreground">metade</strong> de cada
+                    projeção e outra no <strong className="text-foreground">fim</strong> dela. Quando a próxima
+                    bandeira/consolidação se formar, repita o processo — metade, depois fim — escalando as saídas ao
+                    longo de todo o movimento.
+                  </p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Alternativa discricionária: em vez de seguir mecanicamente, analise se o mercado está sinalizando
+                    reversão (perda de força, divergência, nível de timeframe maior). Se estiver, saia de vez em vez
+                    de continuar escalando.
+                  </p>
+                </div>
+              </PremiumCard>
+            </div>
+          </section>
+
           {/* Ferramentas de projeção de alvo */}
           <section className="space-y-5">
             <SectionHeading
@@ -536,8 +639,8 @@ export default function AcademyPatterns() {
 
           <PremiumCard className="p-5" contentClassName="p-0">
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Este módulo continua sendo expandido. Próximas adições: padrões de continuação adicionais, retângulos,
-              triângulos simétricos em tendência e exemplos aplicados aos seus próprios trades.
+              Este módulo continua sendo expandido. Próximas adições: retângulos, mais estudos de caso de falso
+              rompimento e exemplos aplicados aos seus próprios trades.
             </p>
           </PremiumCard>
         </div>
