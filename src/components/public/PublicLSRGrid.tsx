@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from 'react';
-import { AreaChart, Area, ResponsiveContainer, YAxis } from 'recharts';
 
 /**
  * Grid público e simplificado de Long/Short Ratio + Open Interest.
