@@ -134,6 +134,14 @@ export default function Learn() {
                         >
                           {lesson.difficulty}
                         </Badge>
+                        {lesson.available && (
+                          <Badge
+                            variant="outline"
+                            className="text-xs border-indigo-500/30 bg-indigo-500/10 text-indigo-400"
+                          >
+                            Available now
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-xs text-muted-foreground line-clamp-1">{lesson.description}</p>
                     </div>
