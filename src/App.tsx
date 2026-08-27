@@ -71,6 +71,7 @@ const LogoGenerator = lazy(() => import("./pages/LogoGenerator"));
 // Phase 2: Leaderboard feature - temporarily disabled for backlog #34
 // const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 const LongShortRatio = lazy(() => import("./pages/LongShortRatio"));
+const PublicLongShortRatio = lazy(() => import("./pages/PublicLongShortRatio"));
 // const EconomicCalendar = lazy(() => import("./pages/EconomicCalendar"));
 const TaxReports = lazy(() => import("./pages/TaxReports"));
 // Phase 2: Trading Accounts module - temporarily disabled for backlog #18 (incomplete form)
@@ -212,7 +213,11 @@ const AppRoutes = () => {
           <Route path="/faq" element={<ProtectedRoute><FAQ /></ProtectedRoute>} />
           {/* [Phase 2] Leaderboard — roadmap Sprint 3 */}
           {/* <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} /> */}
-          <Route path="/long-short-ratio" element={<ProtectedRoute><LongShortRatio /></ProtectedRoute>} />
+          {/* Monitor interno de LSR (autenticado) — a rota /long-short-ratio agora é a landing pública */}
+          <Route path="/lsr-monitor" element={<ProtectedRoute><LongShortRatio /></ProtectedRoute>} />
+          {/* Landing pública bilíngue de Long/Short Ratio — sem auth, dados da API pública da Binance */}
+          <Route path="/long-short-ratio" element={<PublicPageThemeWrapper><PublicLongShortRatio /></PublicPageThemeWrapper>} />
+          <Route path="/pt/long-short-ratio" element={<PublicPageThemeWrapper><PublicLongShortRatio /></PublicPageThemeWrapper>} />
           {/* [Phase 2] Economic Calendar — roadmap Sprint 3 */}
           {/* <Route path="/economic-calendar" element={<ProtectedRoute><EconomicCalendar /></ProtectedRoute>} /> */}
           <Route path="/tax-reports" element={<ProtectedRoute><TaxReports /></ProtectedRoute>} />

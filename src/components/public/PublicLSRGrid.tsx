@@ -1,0 +1,243 @@
+import { useEffect, useState, useCallback } from 'react';
+
+/**
+ * Grid público e simplificado de Long/Short Ratio + Open Interest.
+ * Os dados vêm da API pública de futuros da Binance direto do navegador —
+ * não há chamada ao backend, portanto nenhuma policy de RLS bloqueia visitantes anônimos.
+ */
+
+export type PublicSignal = 'avoid-buy' | 'avoid-sell' | 'longs' | 'shorts' | 'neutral' | 'no-data';
+
+export interface PublicAsset {
+  symbol: string;
+  ticker: string;
+  color: string;
+  namePt: string;
+  nameEn: string;
+  slug: string;
+}
+
+export const PUBLIC_ASSETS: PublicAsset[] = [
+  { symbol: 'BTCUSDT', ticker: 'BTC', color: '#F7931A', namePt: 'Bitcoin', nameEn: 'Bitcoin', slug: 'bitcoin' },
+  { symbol: 'ETHUSDT', ticker: 'ETH', color: '#627EEA', namePt: 'Ethereum', nameEn: 'Ethereum', slug: 'ethereum' },
+  { symbol: 'PAXGUSDT', ticker: 'XAU', color: '#D4AF37', namePt: 'Ouro', nameEn: 'Gold', slug: 'ouro-gold' },
+  { symbol: 'XAGUSDT', ticker: 'XAG', color: '#C0C0C0', namePt: 'Prata', nameEn: 'Silver', slug: 'prata-silver' },
+  { symbol: 'BNBUSDT', ticker: 'BNB', color: '#F3BA2F', namePt: 'BNB', nameEn: 'BNB', slug: 'bnb' },
+  { symbol: 'SOLUSDT', ticker: 'SOL', color: '#14F195', namePt: 'Solana', nameEn: 'Solana', slug: 'solana' },
+  { symbol: 'XRPUSDT', ticker: 'XRP', color: '#3AA5DD', namePt: 'XRP (Ripple)', nameEn: 'XRP (Ripple)', slug: 'xrp' },
+  { symbol: 'ADAUSDT', ticker: 'ADA', color: '#0033AD', namePt: 'Cardano', nameEn: 'Cardano', slug: 'cardano' },
+  { symbol: 'DOGEUSDT', ticker: 'DOGE', color: '#C2A633', namePt: 'Dogecoin', nameEn: 'Dogecoin', slug: 'dogecoin' },
+  { symbol: 'AVAXUSDT', ticker: 'AVAX', color: '#E84142', namePt: 'Avalanche', nameEn: 'Avalanche', slug: 'avalanche' },
+  { symbol: 'LINKUSDT', ticker: 'LINK', color: '#2A5ADA', namePt: 'Chainlink', nameEn: 'Chainlink', slug: 'chainlink' },
+  { symbol: 'TONUSDT', ticker: 'TON', color: '#0088CC', namePt: 'Toncoin', nameEn: 'Toncoin', slug: 'toncoin' },
+  { symbol: 'DOTUSDT', ticker: 'DOT', color: '#E6007A', namePt: 'Polkadot', nameEn: 'Polkadot', slug: 'polkadot' },
+  { symbol: 'POLUSDT', ticker: 'POL', color: '#8247E5', namePt: 'Polygon (POL, ex-MATIC)', nameEn: 'Polygon (POL, ex-MATIC)', slug: 'polygon' },
+  { symbol: 'LTCUSDT', ticker: 'LTC', color: '#A6A9AA', namePt: 'Litecoin', nameEn: 'Litecoin', slug: 'litecoin' },
+  { symbol: '1000SHIBUSDT', ticker: 'SHIB', color: '#FFA409', namePt: 'Shiba Inu', nameEn: 'Shiba Inu', slug: 'shiba-inu' },
+  { symbol: 'TRXUSDT', ticker: 'TRX', color: '#FF060A', namePt: 'TRON', nameEn: 'TRON', slug: 'tron' },
+  { symbol: 'UNIUSDT', ticker: 'UNI', color: '#FF007A', namePt: 'Uniswap', nameEn: 'Uniswap', slug: 'uniswap' },
+  { symbol: 'ATOMUSDT', ticker: 'ATOM', color: '#6F7390', namePt: 'Cosmos', nameEn: 'Cosmos', slug: 'cosmos' },
+  { symbol: 'NEARUSDT', ticker: 'NEAR', color: '#00EC97', namePt: 'NEAR Protocol', nameEn: 'NEAR Protocol', slug: 'near' },
+  { symbol: 'APTUSDT', ticker: 'APT', color: '#2DD8A7', namePt: 'Aptos', nameEn: 'Aptos', slug: 'aptos' },
+  { symbol: 'ARBUSDT', ticker: 'ARB', color: '#28A0F0', namePt: 'Arbitrum', nameEn: 'Arbitrum', slug: 'arbitrum' },
+  { symbol: 'OPUSDT', ticker: 'OP', color: '#FF0420', namePt: 'Optimism', nameEn: 'Optimism', slug: 'optimism' },
+  { symbol: 'SUIUSDT', ticker: 'SUI', color: '#6FBCF0', namePt: 'Sui', nameEn: 'Sui', slug: 'sui' },
+];
+
+export interface PublicMetrics {
+  ratio: number | null;
+  longPct: number | null;
+  shortPct: number | null;
+  oiValue: number | null;
+}
+
+const LEVEL_HIGH = 1.8;
+const LEVEL_LOW = 0.6;
+const TILT_LONG = 1.05;
+const TILT_SHORT = 0.95;
+
+export function getPublicSignal(m?: PublicMetrics): PublicSignal {
+  const ratio = m?.ratio ?? null;
+  if (ratio === null) return 'no-data';
+  if (ratio >= LEVEL_HIGH) return 'avoid-buy';
+  if (ratio <= LEVEL_LOW) return 'avoid-sell';
+  if (ratio >= TILT_LONG) return 'longs';
+  if (ratio <= TILT_SHORT) return 'shorts';
+  return 'neutral';
+}
+
+export const signalLabels: Record<'pt' | 'en', Record<PublicSignal, string>> = {
+  pt: {
+    'avoid-buy': 'Evite compras',
+    'avoid-sell': 'Evite vendas',
+    longs: 'Longs',
+    shorts: 'Shorts',
+    neutral: 'Neutro',
+    'no-data': 'Sem dados',
+  },
+  en: {
+    'avoid-buy': 'Avoid buying',
+    'avoid-sell': 'Avoid selling',
+    longs: 'Longs',
+    shorts: 'Shorts',
+    neutral: 'Neutral',
+    'no-data': 'No data',
+  },
+};
+
+const signalClass: Record<PublicSignal, string> = {
+  'avoid-buy': 'bg-rose-500/12 text-rose-300 border-rose-500/30',
+  'avoid-sell': 'bg-emerald-500/12 text-emerald-300 border-emerald-500/30',
+  longs: 'bg-emerald-500/8 text-emerald-300/90 border-emerald-500/20',
+  shorts: 'bg-rose-500/8 text-rose-300/90 border-rose-500/20',
+  neutral: 'bg-white/5 text-muted-foreground border-border/40',
+  'no-data': 'bg-white/5 text-muted-foreground border-border/40',
+};
+
+const fmtRatio = (v: number | null) => (v === null ? '—' : v.toFixed(2));
+const fmtShare = (v: number | null) => (v === null ? '—' : `${v.toFixed(1)}%`);
+const fmtOI = (v: number | null) => {
+  if (v === null) return '—';
+  if (v >= 1e9) return `$${(v / 1e9).toFixed(2)}B`;
+  if (v >= 1e6) return `$${(v / 1e6).toFixed(1)}M`;
+  if (v >= 1e3) return `$${(v / 1e3).toFixed(1)}K`;
+  return `$${v.toFixed(0)}`;
+};
+
+async function fetchMetrics(symbol: string): Promise<PublicMetrics> {
+  try {
+    const [ratioRes, oiRes] = await Promise.all([
+      fetch(`https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${symbol}&period=15m&limit=1`),
+      fetch(`https://fapi.binance.com/futures/data/openInterestHist?symbol=${symbol}&period=1h&limit=1`),
+    ]);
+    const ratioJson = ratioRes.ok ? await ratioRes.json() : [];
+    const oiJson = oiRes.ok ? await oiRes.json() : [];
+
+    let ratio: number | null = null;
+    let longPct: number | null = null;
+    let shortPct: number | null = null;
+    if (Array.isArray(ratioJson) && ratioJson.length > 0) {
+      const last = ratioJson[ratioJson.length - 1];
+      ratio = parseFloat(last.longShortRatio);
+      longPct = parseFloat(last.longAccount) * 100;
+      shortPct = parseFloat(last.shortAccount) * 100;
+    }
+
+    let oiValue: number | null = null;
+    if (Array.isArray(oiJson) && oiJson.length > 0) {
+      oiValue = parseFloat(oiJson[oiJson.length - 1].sumOpenInterestValue);
+    }
+    return { ratio, longPct, shortPct, oiValue };
+  } catch {
+    return { ratio: null, longPct: null, shortPct: null, oiValue: null };
+  }
+}
+
+const copy = {
+  pt: {
+    ratio: 'Proporção long/short',
+    buyers: 'compradores',
+    sellers: 'vendedores',
+    oi: 'Contratos em aberto',
+    updated: 'Atualizado',
+    loading: 'Carregando dados ao vivo…',
+    refresh: 'Atualizar agora',
+  },
+  en: {
+    ratio: 'Long/short ratio',
+    buyers: 'buyers',
+    sellers: 'sellers',
+    oi: 'Open interest',
+    updated: 'Updated',
+    loading: 'Loading live data…',
+    refresh: 'Refresh now',
+  },
+};
+
+export function PublicLSRGrid({ lang }: { lang: 'pt' | 'en' }) {
+  const [data, setData] = useState<Record<string, PublicMetrics>>({});
+  const [loading, setLoading] = useState(true);
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+  const t = copy[lang];
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const entries = await Promise.all(
+      PUBLIC_ASSETS.map(async (a) => [a.symbol, await fetchMetrics(a.symbol)] as const),
+    );
+    setData(Object.fromEntries(entries));
+    setUpdatedAt(new Date());
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+    const id = setInterval(load, 5 * 60 * 1000);
+    return () => clearInterval(id);
+  }, [load]);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3 flex-wrap text-sm text-muted-foreground">
+        <span>
+          {loading && !updatedAt
+            ? t.loading
+            : updatedAt
+              ? `${t.updated}: ${updatedAt.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : 'en-US')}`
+              : ''}
+        </span>
+        <button
+          type="button"
+          onClick={load}
+          className="rounded-lg border border-border/60 px-3 py-1.5 text-xs font-medium hover:bg-white/5 transition-colors"
+        >
+          {t.refresh}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {PUBLIC_ASSETS.map((a) => {
+          const m = data[a.symbol];
+          const signal = getPublicSignal(m);
+          const name = lang === 'pt' ? a.namePt : a.nameEn;
+          return (
+            <article
+              key={a.symbol}
+              id={`ativo-${a.slug}`}
+              className="card-premium p-4 flex flex-col gap-3 scroll-mt-24"
+            >
+              <header className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: a.color }} />
+                <h3 className="text-sm font-semibold leading-tight">
+                  {name} <span className="text-muted-foreground font-normal">({a.ticker})</span>
+                </h3>
+              </header>
+
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">{t.ratio}</p>
+                <p className="text-4xl font-bold font-num tabular-nums leading-none mt-1">{fmtRatio(m?.ratio ?? null)}</p>
+              </div>
+
+              <span
+                className={`self-center rounded-full border px-3 py-1 text-xs font-semibold ${signalClass[signal]}`}
+              >
+                {signalLabels[lang][signal]}
+              </span>
+
+              <div className="text-xs text-center font-num tabular-nums text-muted-foreground">
+                <span className="text-emerald-400">{fmtShare(m?.longPct ?? null)} {t.buyers}</span>
+                {' · '}
+                <span className="text-rose-400">{fmtShare(m?.shortPct ?? null)} {t.sellers}</span>
+              </div>
+
+              <div className="flex items-center justify-between text-xs border-t border-border/40 pt-2">
+                <span className="text-muted-foreground">{t.oi}</span>
+                <span className="font-num tabular-nums font-medium">{fmtOI(m?.oiValue ?? null)}</span>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
