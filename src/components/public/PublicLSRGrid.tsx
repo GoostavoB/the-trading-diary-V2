@@ -170,6 +170,96 @@ const copy = {
   },
 };
 
+/**
+ * Mini sparkline de tendência 4h.
+ *
+ * Renderiza um SVG puro com viewBox fixo + preserveAspectRatio="none" em vez de
+ * usar o ResponsiveContainer do Recharts: o container do Recharts mede a largura
+ * do pai de forma assíncrona e, quando o card do grid ainda não tem largura
+ * calculada no primeiro render, ele monta o gráfico com uma largura mínima e
+ * nunca re-mede — foi isso que deixou a curva espremida na borda esquerda em
+ * alguns cards. Com viewBox + preserveAspectRatio="none" o desenho é escalado
+ * pelo próprio SVG e sempre ocupa 100% da largura e da altura disponíveis.
+ */
+function Sparkline({
+  history,
+  label,
+  gradientId,
+}: {
+  history: { v: number }[];
+  label: string;
+  gradientId: string;
+}) {
+  const values = history.map((h) => h.v).filter((v) => Number.isFinite(v));
+
+  if (values.length < 2) {
+    return (
+      <div className="overflow-hidden rounded-md">
+        <div className="h-10 w-full flex items-center justify-center text-[10px] text-muted-foreground">
+          —
+        </div>
+        <p className="text-[10px] text-muted-foreground text-center">{label}</p>
+      </div>
+    );
+  }
+
+  const W = 100;
+  const H = 40;
+  const PAD = 3; // margem vertical para topo/fundo da curva não colarem na borda
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+
+  // X sempre distribuído por toda a largura do viewBox, qualquer que seja a
+  // quantidade de pontos daquele ativo. Y normalizado pelos próprios min/max.
+  const points = values.map((v, i) => {
+    const x = (i / (values.length - 1)) * W;
+    const y = H - PAD - ((v - min) / range) * (H - PAD * 2);
+    return { x, y };
+  });
+
+  const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' ');
+  const area = `${line} L${W},${H} L0,${H} Z`;
+
+  const trendUp = values[values.length - 1] >= values[0];
+  const color = trendUp ? '#34d399' : '#f87171';
+
+  return (
+    <div className="overflow-hidden rounded-md">
+      <div className="h-10 w-full overflow-hidden">
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          preserveAspectRatio="none"
+          width="100%"
+          height="100%"
+          className="block h-full w-full"
+          aria-hidden="true"
+        >
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity={0.35} />
+              <stop offset="100%" stopColor={color} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <path d={area} fill={`url(#${gradientId})`} stroke="none" />
+          <path
+            d={line}
+            fill="none"
+            stroke={color}
+            strokeWidth={1.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+      </div>
+      <p className="text-[10px] text-muted-foreground text-center">{label}</p>
+    </div>
+  );
+}
+
+
 export function PublicLSRGrid({ lang }: { lang: 'pt' | 'en' }) {
   const [data, setData] = useState<Record<string, PublicMetrics>>({});
   const [loading, setLoading] = useState(true);
