@@ -286,47 +286,7 @@ export function PublicLSRGrid({ lang }: { lang: 'pt' | 'en' }) {
               </div>
 
               {/* Mini 4h trend sparkline */}
-              {(() => {
-                const history = m?.history ?? [];
-                const trendUp = history.length >= 2 ? history[history.length - 1].v >= history[0].v : null;
-                const trendColor = trendUp === null ? 'hsl(var(--muted-foreground))' : trendUp ? '#34d399' : '#f87171';
-                // Normalize each card's history to fill the mini-chart height.
-                // The sparkline shows only shape, not absolute values, so scaling
-                // per-card is intentional and keeps curves visible regardless of
-                // how small the 4h LSR variation is for that asset.
-                const values = history.map((h) => h.v);
-                const rawMin = values.length ? Math.min(...values) : 0;
-                const rawMax = values.length ? Math.max(...values) : 0;
-                const range = rawMax - rawMin || 1;
-                const paddedMin = 0.05;
-                const paddedMax = 0.95;
-                const chartData = history.map((h) => ({
-                  v: paddedMin + ((h.v - rawMin) / range) * (paddedMax - paddedMin),
-                }));
-                return (
-                  <div className="overflow-hidden rounded-md">
-                    <div className="h-10 w-full overflow-hidden">
-                      {chartData.length >= 2 ? (
-                        <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={chartData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                            <YAxis domain={[0, 1]} hide />
-                            <defs>
-                              <linearGradient id={`pub-spark-${a.symbol}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor={trendColor} stopOpacity={0.35} />
-                                <stop offset="100%" stopColor={trendColor} stopOpacity={0} />
-                              </linearGradient>
-                            </defs>
-                            <Area type="monotone" dataKey="v" stroke={trendColor} strokeWidth={1.5} fill={`url(#pub-spark-${a.symbol})`} isAnimationActive={false} />
-                          </AreaChart>
-                        </ResponsiveContainer>
-                      ) : (
-                        <div className="h-full flex items-center justify-center text-[10px] text-muted-foreground">—</div>
-                      )}
-                    </div>
-                    <p className="text-[10px] text-muted-foreground text-center">{t.trend}</p>
-                  </div>
-                );
-              })()}
+              <Sparkline history={m?.history ?? []} label={t.trend} gradientId={`pub-spark-${a.symbol}`} />
 
               <div className="flex items-center justify-between text-xs border-t border-border/40 pt-2">
                 <span className="text-muted-foreground">{t.oi}</span>
