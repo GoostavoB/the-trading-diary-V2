@@ -238,23 +238,27 @@ export default function PublicLongShortRatio() {
               <Link to={lang === 'pt' ? '/pt' : '/'} className="text-sm font-semibold text-gradient-electric">
                 The Trading Diary
               </Link>
-              <nav aria-label="Language" className="flex items-center rounded-full border border-border/60 overflow-hidden text-xs font-semibold">
+              <nav
+                aria-label="Language"
+                className="flex items-center rounded-full border border-primary/40 bg-primary/5 overflow-hidden text-sm font-bold shadow-[0_0_18px_-6px_hsl(var(--primary))]"
+              >
                 <Link
                   to="/pt/long-short-ratio"
-                  className={`px-3 py-1.5 ${lang === 'pt' ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-white/5'}`}
+                  className={`px-5 py-2.5 transition-colors ${lang === 'pt' ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:bg-white/5'}`}
                   hrefLang="pt"
                 >
                   PT
                 </Link>
-                <span className="w-px h-4 bg-border/60" />
+                <span className="w-px h-5 bg-primary/30" />
                 <Link
                   to="/long-short-ratio"
-                  className={`px-3 py-1.5 ${lang === 'en' ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-white/5'}`}
+                  className={`px-5 py-2.5 transition-colors ${lang === 'en' ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:bg-white/5'}`}
                   hrefLang="en"
                 >
                   EN
                 </Link>
               </nav>
+
             </div>
 
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight max-w-4xl">{t.h1}</h1>
