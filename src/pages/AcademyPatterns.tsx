@@ -190,6 +190,8 @@ const continuationPatterns: Pattern[] = [
     why: 'Depois de um movimento impulsivo forte (o mastro), o preço consolida num canal pequeno e apertado contra a tendência. Não é venda de verdade: é realização parcial e entrada de novos compradores em preço melhor. O canal apertado mostra que ninguém quer vender barato — o mercado está apenas descansando.',
     entry: 'No rompimento do canal da bandeira, a favor do impulso original. Stop logo abaixo da bandeira — por isso o risco é pequeno.',
     target: 'Alvo 1 (conservador): altura da própria bandeira projetada do rompimento. Alvo 2 (completo): altura do mastro projetada do rompimento — é o que dá o risco/retorno excelente.',
+    precisionNote:
+      'Nota de precisão: medir o mastro projetando-o a partir do TOPO da bandeira (não do ponto de rompimento) costuma cravar o alvo com mais precisão. Essa projeção serve tanto como referência de entrada quanto de saída — total ou parcial.',
   },
   {
     name: 'Bandeira de Baixa',
@@ -198,6 +200,8 @@ const continuationPatterns: Pattern[] = [
     why: 'Espelho exato em tendência de queda: impulso vendedor forte, depois um canal estreito subindo devagar. Quem tenta comprar o fundo fornece liquidez para o vendedor reposicionar.',
     entry: 'Short no rompimento da parte inferior do canal da bandeira.',
     target: 'Alvo 1: altura da bandeira. Alvo 2: altura do mastro projetada do rompimento.',
+    precisionNote:
+      'Nota de precisão: medir o mastro a partir do FUNDO da bandeira (não do rompimento) crava o alvo com mais precisão — no espelho de baixa, é a borda da bandeira mais próxima do mastro. Use como referência de entrada ou saída, total ou parcial.',
   },
   {
     name: 'Flâmula de Alta',
