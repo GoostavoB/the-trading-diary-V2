@@ -15,6 +15,7 @@ import {
   Brain,
   Layers,
   Triangle,
+  Ruler,
 } from 'lucide-react';
 import {
   DoubleTop,
@@ -30,6 +31,8 @@ import {
   Pivot,
   FalseBreak,
   SymmetricTriangle,
+  FibExtension,
+  FibRetracement,
 } from '@/components/academy/patternDiagrams';
 
 type Pattern = {
@@ -443,6 +446,73 @@ export default function AcademyPatterns() {
               {continuationPatterns.map((p) => (
                 <PatternCard key={p.name} p={p} />
               ))}
+            </div>
+          </section>
+
+          {/* Ferramentas de projeção de alvo */}
+          <section className="space-y-5">
+            <SectionHeading
+              icon={Ruler}
+              title="Ferramentas de projeção de alvo — Fibonacci"
+              subtitle="Os padrões dizem para onde o preço tende a ir. O Fibonacci dá a régua: extensão projeta alvos de continuação, retração estima até onde o pullback pode ir."
+            />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <PremiumCard className="p-5" contentClassName="p-0">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-base font-bold">Fibonacci Extensão</h3>
+                    <Badge variant="outline" className="text-[11px] border-indigo-500/30 bg-indigo-500/10 text-indigo-300">
+                      Alvos de continuação
+                    </Badge>
+                  </div>
+                  <FibExtension />
+                  <div className="space-y-2 text-sm">
+                    <p className="text-muted-foreground leading-relaxed">
+                      Usada para projetar alvos de long depois que o preço sai de um fundo e faz um topo. É uma
+                      ferramenta de 3 cliques: <span className="text-foreground font-medium">1</span> no fundo,{' '}
+                      <span className="text-foreground font-medium">2</span> no topo e{' '}
+                      <span className="text-foreground font-medium">3</span> no pullback (a retração antes da
+                      continuação). A partir daí, os níveis acima do topo são os alvos prováveis do movimento.
+                    </p>
+                    <div className="rounded-lg border border-indigo-500/20 bg-indigo-500/[0.05] p-3">
+                      <p className="text-[11px] uppercase tracking-wider text-indigo-300 font-semibold mb-1">Níveis</p>
+                      <p className="font-num tabular-nums text-sm text-foreground">
+                        0 · 0,618 · 1 · 1,618 · 2,272 · 2,618 · 3,272 · 4,236
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </PremiumCard>
+
+              <PremiumCard className="p-5" contentClassName="p-0">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-base font-bold">Fibonacci Retração</h3>
+                    <Badge variant="outline" className="text-[11px] border-indigo-500/30 bg-indigo-500/10 text-indigo-300">
+                      Alvo do pullback
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <FibRetracement />
+                    <FibRetracement flip />
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <p className="text-muted-foreground leading-relaxed">
+                      Usada para estimar até onde um pullback pode ir. Depois de uma{' '}
+                      <span className="text-foreground font-medium">queda</span>, traça de cima para baixo (do topo
+                      para o fundo) para achar o alvo do repique. Depois de uma{' '}
+                      <span className="text-foreground font-medium">alta</span>, o oposto: de baixo para cima (do fundo
+                      para o topo) para achar o alvo da correção. O preço tende a reagir nesses níveis intermediários
+                      do movimento.
+                    </p>
+                    <div className="rounded-lg border border-indigo-500/20 bg-indigo-500/[0.05] p-3">
+                      <p className="text-[11px] uppercase tracking-wider text-indigo-300 font-semibold mb-1">Níveis</p>
+                      <p className="font-num tabular-nums text-sm text-foreground">0 · 0,382 · 0,5 · 0,618 · 0,786 · 1</p>
+                    </div>
+                  </div>
+                </div>
+              </PremiumCard>
             </div>
           </section>
 

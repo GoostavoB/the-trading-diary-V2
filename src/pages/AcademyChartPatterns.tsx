@@ -546,7 +546,7 @@ export default function AcademyChartPatterns() {
       <SEO
         title="Chart Patterns & Price Geometry — Academy | The Trading Diary"
         description="Manual ilustrado de padrões gráficos, ângulos de Gann e armadilhas de liquidez, com desenhos técnicos e estatísticas de taxa de sucesso."
-        canonical="https://www.thetradingdiary.com/learn/chart-patterns"
+        canonical="https://www.thetradingdiary.com/learn/price-geometry"
         noindex={true}
       />
       <AppLayout>
