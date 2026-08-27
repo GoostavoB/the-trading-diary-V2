@@ -289,7 +289,7 @@ export default function ExchangeConnections() {
                 <div className="p-6 pb-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <ExchangeLogo
+                      <ExchangeLogoChip
                         exchangeId={exchange.id}
                         exchangeName={exchange.name}
                         size="lg"
