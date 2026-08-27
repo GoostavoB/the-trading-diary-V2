@@ -273,6 +273,12 @@ function PatternCard({ p }: { p: Pattern }) {
               <p className="text-sm text-muted-foreground leading-relaxed mt-1">{p.target}</p>
             </div>
           </div>
+          {p.precisionNote && (
+            <div className="flex gap-2.5 rounded-xl border border-indigo-500/30 bg-indigo-500/[0.08] p-3">
+              <Info className="h-4 w-4 text-indigo-400 shrink-0 mt-0.5" />
+              <p className="text-sm text-indigo-200/90 leading-relaxed">{p.precisionNote}</p>
+            </div>
+          )}
           {p.riskWarning && (
             <div className="flex gap-2.5 rounded-xl border border-amber-500/30 bg-amber-500/[0.08] p-3">
               <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
