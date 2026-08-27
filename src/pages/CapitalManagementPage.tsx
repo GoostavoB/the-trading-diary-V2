@@ -421,8 +421,8 @@ const CapitalManagementPage = () => {
         {capitalLog.length === 0 && !isLoading && (
           <PremiumCard className="p-12 text-center">
             <div className="max-w-md mx-auto space-y-4">
-              <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center">
-                <DollarSign className="h-10 w-10 text-accent" />
+              <div className="w-20 h-20 mx-auto rounded-full bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center">
+                <DollarSign className="h-10 w-10 text-indigo-400" />
               </div>
               <h3 className="text-2xl font-semibold">Start Tracking Your Capital</h3>
               <p className="text-muted-foreground">
