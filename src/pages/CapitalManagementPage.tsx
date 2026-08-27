@@ -193,8 +193,8 @@ const CapitalManagementPage = () => {
             </Button>
             <div className="space-y-2">
               <p className="text-xs text-space-400">Settings / Capital</p>
-              <h1 className="font-display text-3xl md:text-4xl text-gradient-electric-soft flex items-center gap-3">
-                <DollarSign className="h-8 w-8 text-space-200" />
+              <h1 className="font-display text-3xl md:text-4xl text-indigo-400 flex items-center gap-3">
+                <DollarSign className="h-8 w-8 text-indigo-400" />
                 Capital Management
               </h1>
               <p className="text-sm text-space-300">
