@@ -76,7 +76,7 @@ const topPatterns: Pattern[] = [
     diagram: <HeadShoulders />,
     why: 'Numa tendência de alta, o mercado forma o ombro esquerdo, depois a cabeça (topo mais alto) e finalmente um ombro direito mais baixo. Esse topo mais baixo é a evidência objetiva: o comprador não conseguiu mais empurrar o preço para uma nova máxima. A força compradora acabou antes do preço cair.',
     entry: 'Short no rompimento do neckline — a linha que liga os dois vales entre ombros e cabeça.',
-    target: 'Alvo 1: 50% da extensão (da cabeça até o neckline). Alvo 2: 100% da extensão.',
+    target: 'Alvo 1: altura do PRÓPRIO OMBRO — medida do topo do ombro até o neckline, replicada para baixo a partir do rompimento. É uma distância menor, específica do ombro (não 50% da cabeça). Alvo 2: distância total da cabeça até o neckline, replicada a partir do rompimento.',
   },
   {
     name: 'Diamante no Topo',
@@ -84,7 +84,7 @@ const topPatterns: Pattern[] = [
     diagram: <Diamond />,
     why: 'Primeiro a volatilidade explode (topos mais altos e fundos mais baixos: indecisão e disputa), depois contrai (o mercado se acalma, mas em um nível esticado). A expansão mostra exaustão da tendência; a contração mostra que ninguém mais quer pagar mais caro. Quando quebra, quebra para o lado de quem ficou preso: os comprados.',
     entry: 'Short no rompimento da parte inferior do diamante.',
-    target: 'Alvo 1: 50% da altura do diamante. Alvo 2: 100%.',
+    target: 'Alvo único: a altura TOTAL do diamante — do pico à base, na parte mais larga — projetada a partir do ponto de rompimento. O diamante não é dividido em 50%/100% como os outros padrões; a convenção técnica usa um alvo único.',
   },
   {
     name: 'Triângulo Descendente',
@@ -127,7 +127,7 @@ const bottomPatterns: Pattern[] = [
     diagram: <HeadShoulders flip />,
     why: 'Ombro esquerdo, cabeça (fundo mais baixo) e ombro direito mais alto. Esse fundo mais alto é a assinatura da perda de força vendedora — o vendedor não consegue mais levar o preço para uma nova mínima. Antecipa o pivô de alta.',
     entry: 'Long no rompimento do neckline — a linha que liga os dois picos entre ombros e cabeça.',
-    target: 'Alvo 1: 50% da extensão (da cabeça até o neckline). Alvo 2: 100% da extensão.',
+    target: 'Alvo 1: altura do PRÓPRIO OMBRO — medida do fundo do ombro até o neckline, replicada para cima a partir do rompimento. É uma distância menor, específica do ombro (não 50% da cabeça). Alvo 2: distância total da cabeça até o neckline, replicada a partir do rompimento.',
   },
   {
     name: 'Fundo Arredondado',
@@ -143,7 +143,7 @@ const bottomPatterns: Pattern[] = [
     diagram: <Diamond flip />,
     why: 'Espelho do diamante no topo: expansão de volatilidade (capitulação e disputa) seguida de contração. Quando a contração resolve para cima, os vendidos presos viram combustível da alta.',
     entry: 'Long no rompimento da parte superior do diamante.',
-    target: 'Alvo 1: 50% da altura do diamante. Alvo 2: 100%.',
+    target: 'Alvo único: a altura TOTAL do diamante — do pico à base, na parte mais larga — projetada a partir do ponto de rompimento. O diamante não é dividido em 50%/100% como os outros padrões; a convenção técnica usa um alvo único.',
   },
   {
     name: 'Triângulo Ascendente',
@@ -209,7 +209,7 @@ const continuationPatterns: Pattern[] = [
     diagram: <Pennant />,
     why: 'Igual à bandeira, mas a consolidação converge num triangulozinho simétrico em vez de um canal paralelo (às vezes com uma leve curvatura, tipo colherzinha). A convergência mostra compressão: compradores e vendedores vão apertando o spread até o impulso retomar.',
     entry: 'No rompimento da flâmula, a favor do mastro.',
-    target: 'Alvo 1: altura da consolidação. Alvo 2: altura do mastro projetada do rompimento.',
+    target: 'Alvo 1: altura da consolidação, projetada do rompimento. Alvo 2: o mastro que veio antes da flâmula tende a gerar um movimento de tamanho parecido depois do rompimento — mesma lógica da bandeira: mastro medido antes = projeção depois.',
   },
   {
     name: 'Flâmula de Baixa',
@@ -217,7 +217,7 @@ const continuationPatterns: Pattern[] = [
     diagram: <Pennant flip />,
     why: 'Espelho em tendência de queda: impulso forte para baixo, consolidação convergente e retomada da queda.',
     entry: 'Short no rompimento da flâmula, a favor do mastro.',
-    target: 'Alvo 1: altura da consolidação. Alvo 2: altura do mastro.',
+    target: 'Alvo 1: altura da consolidação, projetada do rompimento. Alvo 2: o mastro anterior à flâmula tende a gerar um movimento de tamanho parecido depois do rompimento — mesma régua, replicada para baixo.',
   },
   {
     name: 'Triângulo Simétrico',
@@ -233,25 +233,42 @@ const continuationPatterns: Pattern[] = [
 function PatternCard({ p }: { p: Pattern }) {
   const isBull = p.bias === 'bull';
   return (
-    <PremiumCard className="p-5" contentClassName="p-0">
+    <PremiumCard
+      className={`p-5 border-l-4 ${isBull ? 'border-l-emerald-500/70' : 'border-l-rose-500/70'}`}
+      contentClassName="p-0"
+    >
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="text-base font-semibold text-foreground">{p.name}</h3>
-          <Badge
-            variant="outline"
-            className={
-              isBull
-                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-[11px]'
-                : 'border-rose-500/30 bg-rose-500/10 text-rose-400 text-[11px]'
-            }
-          >
-            {isBull ? 'Viés de alta' : 'Viés de baixa'}
-          </Badge>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <h3 className="text-lg font-semibold text-foreground">{p.name}</h3>
+          <div className="flex items-center gap-2">
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ${
+                isBull
+                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                  : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
+              }`}
+            >
+              {isBull ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
+              {isBull ? 'Long' : 'Short'}
+            </span>
+            <Badge
+              variant="outline"
+              className={
+                isBull
+                  ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-[11px]'
+                  : 'border-rose-500/30 bg-rose-500/10 text-rose-400 text-[11px]'
+              }
+            >
+              {isBull ? 'Viés de alta' : 'Viés de baixa'}
+            </Badge>
+          </div>
         </div>
 
-        {p.diagram}
+        <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-5 items-start">
+          <div>{p.diagram}</div>
 
-        <div className="space-y-3">
+          <div className="space-y-3">
+
           <div className="flex gap-2.5">
             <Brain className="h-4 w-4 text-indigo-400 shrink-0 mt-0.5" />
             <div>
@@ -285,8 +302,10 @@ function PatternCard({ p }: { p: Pattern }) {
               <p className="text-sm text-amber-200/90 leading-relaxed">{p.riskWarning}</p>
             </div>
           )}
+          </div>
         </div>
       </div>
+
     </PremiumCard>
   );
 }
@@ -453,7 +472,7 @@ export default function AcademyPatterns() {
               <TrendingDown className="h-4 w-4 text-rose-400" />
               <h3 className="text-sm font-semibold uppercase tracking-wider text-rose-400">No topo — viés de baixa</h3>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 gap-5">
               {topPatterns.map((p) => (
                 <PatternCard key={p.name} p={p} />
               ))}
@@ -465,7 +484,7 @@ export default function AcademyPatterns() {
                 No fundo — viés de alta (espelho de cada padrão acima)
               </h3>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 gap-5">
               {bottomPatterns.map((p) => (
                 <PatternCard key={p.name} p={p} />
               ))}
@@ -479,7 +498,7 @@ export default function AcademyPatterns() {
               title="Cunhas"
               subtitle="Duas linhas convergentes na mesma direção. A convergência estreita a volatilidade e cria um viés probabilístico contrário à inclinação da cunha."
             />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 gap-5">
               {wedgePatterns.map((p) => (
                 <PatternCard key={p.name} p={p} />
               ))}
@@ -493,7 +512,7 @@ export default function AcademyPatterns() {
               title="Padrões de continuação"
               subtitle="Pausas dentro de uma tendência. O preço não reverte — apenas descansa antes de continuar. São os padrões com melhor risco/retorno, porque o stop fica curto e o alvo é o tamanho do impulso anterior."
             />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 gap-5">
               {continuationPatterns.map((p) => (
                 <PatternCard key={p.name} p={p} />
               ))}
@@ -532,15 +551,19 @@ export default function AcademyPatterns() {
                       </p>
                       <ul className="text-sm text-muted-foreground leading-relaxed mt-1 space-y-2 list-disc pl-4">
                         <li>
-                          <strong className="text-foreground">Opção A — Retração de Fibonacci:</strong> traça a
-                          retração do topo do rompimento falso até o fundo seguinte. Um dos níveis
-                          (0,382 · 0,5 · 0,618 · 0,786) marca o fim do pullback — a entrada é na reação do preço a
-                          esse nível.
+                          <strong className="text-foreground">Opção A — Reteste do suporte plano rompido:</strong>{' '}
+                          depois que o preço perde o suporte plano do triângulo, espera o pullback voltar até esse
+                          mesmo nível — que agora atua como resistência — e entra na rejeição.
                         </li>
                         <li>
-                          <strong className="text-foreground">Opção B — Reteste da linha rompida:</strong> espera o
-                          preço voltar até a própria linha de tendência que foi rompida, que agora atua como
-                          resistência, e entra na rejeição.
+                          <strong className="text-foreground">Opção B — Retração de Fibonacci:</strong> traça a
+                          retração do topo do rompimento falso até o fundo seguinte e procura a entrada nos níveis
+                          centrais — <span className="text-foreground font-medium">0,5 e 0,618</span>, o "coração do
+                          Fibo". É ali que o pullback costuma terminar.
+                        </li>
+                        <li>
+                          <strong className="text-foreground">Opção C — Reteste da linha de tendência:</strong> espera
+                          o preço voltar até a própria LTA que foi rompida no falso rompimento e entra na rejeição.
                         </li>
                       </ul>
                     </div>
@@ -611,23 +634,35 @@ export default function AcademyPatterns() {
               subtitle="Os padrões dizem para onde o preço tende a ir. O Fibonacci dá a régua: extensão projeta alvos de continuação, retração estima até onde o pullback pode ir."
             />
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 gap-5">
               <PremiumCard className="p-5" contentClassName="p-0">
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex items-center justify-between gap-3">
                     <h3 className="text-base font-bold">Fibonacci Extensão</h3>
                     <Badge variant="outline" className="text-[11px] border-indigo-500/30 bg-indigo-500/10 text-indigo-300">
                       Alvos de continuação
                     </Badge>
                   </div>
-                  <FibExtension />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Long — depois de uma alta</p>
+                      <FibExtension />
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-rose-400">Short — espelho para baixo</p>
+                      <FibExtension flip />
+                    </div>
+                  </div>
                   <div className="space-y-2 text-sm">
                     <p className="text-muted-foreground leading-relaxed">
-                      Usada para projetar alvos de long depois que o preço sai de um fundo e faz um topo. É uma
-                      ferramenta de 3 cliques: <span className="text-foreground font-medium">1</span> no fundo,{' '}
+                      Usada para projetar alvos de continuação. É uma ferramenta de 3 cliques:{' '}
+                      <span className="text-foreground font-medium">1</span> no fundo,{' '}
                       <span className="text-foreground font-medium">2</span> no topo e{' '}
                       <span className="text-foreground font-medium">3</span> no pullback (a retração antes da
-                      continuação). A partir daí, os níveis acima do topo são os alvos prováveis do movimento.
+                      continuação). Importante: o <span className="text-foreground font-medium">nível 0 sai do topo</span>{' '}
+                      (clique 2), não do pullback — o clique 3 é só o ponto de referência para desenhar a extensão. No
+                      short é o espelho exato: clique 1 no topo, 2 no fundo (nível 0) e 3 no pullback, com os níveis
+                      projetados para baixo.
                     </p>
                     <div className="rounded-lg border border-indigo-500/20 bg-indigo-500/[0.05] p-3">
                       <p className="text-[11px] uppercase tracking-wider text-indigo-300 font-semibold mb-1">Níveis</p>
@@ -640,16 +675,26 @@ export default function AcademyPatterns() {
               </PremiumCard>
 
               <PremiumCard className="p-5" contentClassName="p-0">
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex items-center justify-between gap-3">
                     <h3 className="text-base font-bold">Fibonacci Retração</h3>
                     <Badge variant="outline" className="text-[11px] border-indigo-500/30 bg-indigo-500/10 text-indigo-300">
                       Alvo do pullback
                     </Badge>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <FibRetracement />
-                    <FibRetracement flip />
+                  <div className="space-y-5">
+                    <div className="space-y-2">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-rose-400">
+                        Depois de uma queda — traça do topo para o fundo
+                      </p>
+                      <FibRetracement />
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
+                        Depois de uma alta — traça do fundo para o topo
+                      </p>
+                      <FibRetracement flip />
+                    </div>
                   </div>
                   <div className="space-y-2 text-sm">
                     <p className="text-muted-foreground leading-relaxed">
@@ -657,8 +702,9 @@ export default function AcademyPatterns() {
                       <span className="text-foreground font-medium">queda</span>, traça de cima para baixo (do topo
                       para o fundo) para achar o alvo do repique. Depois de uma{' '}
                       <span className="text-foreground font-medium">alta</span>, o oposto: de baixo para cima (do fundo
-                      para o topo) para achar o alvo da correção. O preço tende a reagir nesses níveis intermediários
-                      do movimento.
+                      para o topo) para achar o alvo da correção. Os níveis centrais —{' '}
+                      <span className="text-foreground font-medium">0,5 e 0,618</span> — são a faixa de reação mais
+                      observada, o "coração do Fibo".
                     </p>
                     <div className="rounded-lg border border-indigo-500/20 bg-indigo-500/[0.05] p-3">
                       <p className="text-[11px] uppercase tracking-wider text-indigo-300 font-semibold mb-1">Níveis</p>
