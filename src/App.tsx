@@ -228,7 +228,8 @@ const AppRoutes = () => {
           {/* Legacy route — redirect to canonical blog URL */}
           <Route path="/blog/article/:slug" element={<Navigate to="/blog" replace />} />
           <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
-          <Route path="/learn/chart-patterns" element={<ProtectedRoute><AcademyChartPatterns /></ProtectedRoute>} />
+          <Route path="/learn/chart-patterns" element={<ProtectedRoute><AcademyPatterns /></ProtectedRoute>} />
+          <Route path="/learn/price-geometry" element={<ProtectedRoute><AcademyChartPatterns /></ProtectedRoute>} />
           <Route path="/api-docs" element={<ProtectedRoute><ApiDocs /></ProtectedRoute>} />
           <Route path="/advanced-analytics" element={<ProtectedRoute><AdvancedAnalytics /></ProtectedRoute>} />
           {/* [Phase 2] Social Feed — roadmap Sprint 3 */}
