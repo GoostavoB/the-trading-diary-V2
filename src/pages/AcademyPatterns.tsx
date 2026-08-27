@@ -29,6 +29,7 @@ import {
   Pennant,
   Pivot,
   FalseBreak,
+  SymmetricTriangle,
 } from '@/components/academy/patternDiagrams';
 
 type Pattern = {
@@ -38,6 +39,7 @@ type Pattern = {
   why: string;
   entry: string;
   target: string;
+  riskWarning?: string;
 };
 
 const topPatterns: Pattern[] = [
