@@ -42,11 +42,22 @@ const upcomingLessons = [
   {
     id: '5',
     title: 'Advanced Chart Patterns',
-    description: 'Master complex chart patterns and price action strategies used by professional traders.',
+    description: 'Reversal and continuation patterns with order-flow logic, entry rules and targets.',
     duration: '40 min',
     difficulty: 'Advanced' as const,
     category: 'Technical Analysis',
     href: '/learn/chart-patterns',
+    available: true,
+  },
+  {
+    id: '6',
+    title: 'Price Geometry, Angles & Liquidity Traps',
+    description: 'Gann angles, entry methods without blind breakouts and liquidity trap anatomy.',
+    duration: '35 min',
+    difficulty: 'Advanced' as const,
+    category: 'Technical Analysis',
+    href: '/learn/price-geometry',
+    available: true,
   },
 ];
 
