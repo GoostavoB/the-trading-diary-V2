@@ -288,12 +288,12 @@ const CapitalManagementPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <PremiumCard className="card-premium-highlight p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-ios-card bg-gradient-to-br from-accent/20 to-accent/5">
-                <TrendingUp className="h-6 w-6 text-accent" />
+              <div className="p-3 rounded-ios-card bg-indigo-500/15 border border-indigo-500/25">
+                <TrendingUp className="h-6 w-6 text-indigo-400" />
               </div>
               <div>
                 <p className="text-xs text-space-400 uppercase tracking-wide font-medium">Current Capital</p>
-                <p className="text-3xl font-num font-bold mt-1 text-gradient-electric">
+                <p className="text-3xl font-num font-bold mt-1 text-indigo-400">
                   <BlurredCurrency amount={currentCapital} />
                 </p>
               </div>
