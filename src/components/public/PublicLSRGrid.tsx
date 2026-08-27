@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { AreaChart, Area, ResponsiveContainer, YAxis } from 'recharts';
 
 /**
  * Grid público e simplificado de Long/Short Ratio + Open Interest.
@@ -49,6 +50,7 @@ export interface PublicMetrics {
   longPct: number | null;
   shortPct: number | null;
   oiValue: number | null;
+  history: { v: number }[];
 }
 
 const LEVEL_HIGH = 1.8;
@@ -104,10 +106,13 @@ const fmtOI = (v: number | null) => {
   return `$${v.toFixed(0)}`;
 };
 
+// Last 4h of LSR history at 15m granularity = 16 points
+const HISTORY_WINDOW = 16;
+
 async function fetchMetrics(symbol: string): Promise<PublicMetrics> {
   try {
     const [ratioRes, oiRes] = await Promise.all([
-      fetch(`https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${symbol}&period=15m&limit=1`),
+      fetch(`https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${symbol}&period=15m&limit=${HISTORY_WINDOW}`),
       fetch(`https://fapi.binance.com/futures/data/openInterestHist?symbol=${symbol}&period=1h&limit=1`),
     ]);
     const ratioJson = ratioRes.ok ? await ratioRes.json() : [];
@@ -116,20 +121,24 @@ async function fetchMetrics(symbol: string): Promise<PublicMetrics> {
     let ratio: number | null = null;
     let longPct: number | null = null;
     let shortPct: number | null = null;
+    let history: { v: number }[] = [];
     if (Array.isArray(ratioJson) && ratioJson.length > 0) {
       const last = ratioJson[ratioJson.length - 1];
       ratio = parseFloat(last.longShortRatio);
       longPct = parseFloat(last.longAccount) * 100;
       shortPct = parseFloat(last.shortAccount) * 100;
+      history = ratioJson
+        .slice(-HISTORY_WINDOW)
+        .map((p: { longShortRatio: string }) => ({ v: parseFloat(p.longShortRatio) }));
     }
 
     let oiValue: number | null = null;
     if (Array.isArray(oiJson) && oiJson.length > 0) {
       oiValue = parseFloat(oiJson[oiJson.length - 1].sumOpenInterestValue);
     }
-    return { ratio, longPct, shortPct, oiValue };
+    return { ratio, longPct, shortPct, oiValue, history };
   } catch {
-    return { ratio: null, longPct: null, shortPct: null, oiValue: null };
+    return { ratio: null, longPct: null, shortPct: null, oiValue: null, history: [] };
   }
 }
 
@@ -142,6 +151,7 @@ const copy = {
     updated: 'Atualizado',
     loading: 'Carregando dados ao vivo…',
     refresh: 'Atualizar agora',
+    trend: 'Tendência 4h',
   },
   en: {
     ratio: 'Long/short ratio',
@@ -151,6 +161,7 @@ const copy = {
     updated: 'Updated',
     loading: 'Loading live data…',
     refresh: 'Refresh now',
+    trend: '4h trend',
   },
 };
 
@@ -229,6 +240,36 @@ export function PublicLSRGrid({ lang }: { lang: 'pt' | 'en' }) {
                 {' · '}
                 <span className="text-rose-400">{fmtShare(m?.shortPct ?? null)} {t.sellers}</span>
               </div>
+
+              {/* Mini 4h trend sparkline */}
+              {(() => {
+                const history = m?.history ?? [];
+                const trendUp = history.length >= 2 ? history[history.length - 1].v >= history[0].v : null;
+                const trendColor = trendUp === null ? 'hsl(var(--muted-foreground))' : trendUp ? '#34d399' : '#f87171';
+                return (
+                  <div>
+                    <div className="h-10 -mx-1">
+                      {history.length >= 2 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={history} margin={{ top: 2, right: 4, bottom: 0, left: 4 }}>
+                            <YAxis domain={['dataMin', 'dataMax']} hide />
+                            <defs>
+                              <linearGradient id={`pub-spark-${a.symbol}`} x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor={trendColor} stopOpacity={0.35} />
+                                <stop offset="100%" stopColor={trendColor} stopOpacity={0} />
+                              </linearGradient>
+                            </defs>
+                            <Area type="monotone" dataKey="v" stroke={trendColor} strokeWidth={1.5} fill={`url(#pub-spark-${a.symbol})`} isAnimationActive={false} />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-[10px] text-muted-foreground">—</div>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-muted-foreground text-center">{t.trend}</p>
+                  </div>
+                );
+              })()}
 
               <div className="flex items-center justify-between text-xs border-t border-border/40 pt-2">
                 <span className="text-muted-foreground">{t.oi}</span>
