@@ -66,7 +66,9 @@ export const TradeDetailsTable = memo(({ trades }: TradeDetailsTableProps) => {
             
             return (
               <TableRow key={trade.tradeId}>
-                <TableCell className="font-medium">{trade.symbol}</TableCell>
+                <TableCell className="font-medium">
+                  <SymbolLabel symbol={trade.symbol} />
+                </TableCell>
                 <TableCell>
                   <div className="flex flex-col gap-0.5">
                     <span>{trade.broker}</span>
