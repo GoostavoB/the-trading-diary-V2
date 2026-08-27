@@ -191,7 +191,7 @@ const continuationPatterns: Pattern[] = [
     entry: 'No rompimento do canal da bandeira, a favor do impulso original. Stop logo abaixo da bandeira — por isso o risco é pequeno.',
     target: 'Alvo 1 (conservador): altura da própria bandeira projetada do rompimento. Alvo 2 (completo): altura do mastro projetada do rompimento — é o que dá o risco/retorno excelente.',
     precisionNote:
-      'Nota de precisão: medir o mastro projetando-o a partir do TOPO da bandeira (não do ponto de rompimento) costuma cravar o alvo com mais precisão. Essa projeção serve tanto como referência de entrada quanto de saída — total ou parcial.',
+      'Nota de precisão: medir o mastro projetando-o a partir do TOPO da bandeira (não do ponto de rompimento) costuma cravar o alvo com mais precisão. A confiabilidade aumenta muito quando esse alvo coincide com um suporte ou resistência real já existente no gráfico — confluência de projeção + zona histórica. Sem confluência, a projeção ainda é útil, mas menos precisa. Use como referência de entrada ou saída — total ou parcial.',
   },
   {
     name: 'Bandeira de Baixa',
