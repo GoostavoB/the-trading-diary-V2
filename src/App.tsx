@@ -94,7 +94,6 @@ const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 const Learn = lazy(() => import("./pages/Learn"));
 const AcademyChartPatterns = lazy(() => import("./pages/AcademyChartPatterns"));
 const AcademyPatterns = lazy(() => import("./pages/AcademyPatterns"));
-const DiagramPreview = lazy(() => import("./pages/__DiagramPreview"));
 const ApiDocs = lazy(() => import("./pages/ApiDocs"));
 const AdvancedAnalytics = lazy(() => import("./pages/AdvancedAnalytics"));
 // Phase 2: Social Feed - temporarily disabled for backlog #34
@@ -230,7 +229,6 @@ const AppRoutes = () => {
           {/* Legacy route — redirect to canonical blog URL */}
           <Route path="/blog/article/:slug" element={<Navigate to="/blog" replace />} />
           <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
-          <Route path="/__diagrams" element={<DiagramPreview />} />
           <Route path="/learn/chart-patterns" element={<ProtectedRoute><AcademyPatterns /></ProtectedRoute>} />
           <Route path="/learn/price-geometry" element={<ProtectedRoute><AcademyChartPatterns /></ProtectedRoute>} />
           <Route path="/api-docs" element={<ProtectedRoute><ApiDocs /></ProtectedRoute>} />
