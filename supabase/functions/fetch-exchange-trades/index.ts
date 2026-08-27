@@ -10,6 +10,7 @@ const corsHeaders = {
 interface FetchRequest {
   connectionId: string;
   mode: 'preview' | 'import';
+  subAccountId?: string;
   selectedTradeIds?: string[];
   startDate?: string;
   endDate?: string;
@@ -45,7 +46,7 @@ Deno.serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    const { connectionId, mode, selectedTradeIds, startDate, endDate }: FetchRequest = await req.json();
+    const { connectionId, mode, subAccountId, selectedTradeIds, startDate, endDate }: FetchRequest = await req.json();
 
     // Fetch connection
     const { data: connection, error: connectionError } = await supabaseClient
@@ -57,6 +58,35 @@ Deno.serve(async (req) => {
 
     if (connectionError || !connection) {
       throw new Error('Connection not found');
+    }
+
+    // Resolve the account scope on the server and verify ownership. The
+    // frontend sends the currently selected sub-account, while the active
+    // account fallback keeps older clients safe during rollout.
+    let resolvedSubAccountId = subAccountId;
+    if (resolvedSubAccountId) {
+      const { data: requestedSubAccount, error: requestedSubAccountError } = await supabaseClient
+        .from('sub_accounts')
+        .select('id')
+        .eq('id', resolvedSubAccountId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (requestedSubAccountError || !requestedSubAccount) {
+        throw new Error('Invalid trading account selected');
+      }
+    } else {
+      const { data: activeSubAccount, error: activeSubAccountError } = await supabaseClient
+        .from('sub_accounts')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (activeSubAccountError || !activeSubAccount) {
+        throw new Error('No active trading account selected');
+      }
+      resolvedSubAccountId = activeSubAccount.id;
     }
 
     // Handle import mode
@@ -79,9 +109,14 @@ Deno.serve(async (req) => {
       let skipped = 0;
 
       for (const pending of pendingTrades || []) {
+        const tradeData = {
+          ...pending.trade_data,
+          user_id: user.id,
+          sub_account_id: resolvedSubAccountId,
+        };
         const { error } = await supabaseClient
           .from('trades')
-          .insert(pending.trade_data);
+          .insert(tradeData);
 
         if (error) {
           if (error.code === '23505') {
@@ -285,6 +320,7 @@ Deno.serve(async (req) => {
 
       return {
         user_id: user.id,
+        sub_account_id: resolvedSubAccountId,
         symbol: trade.symbol,
         symbol_temp: trade.symbol, // legacy NOT NULL column — must always be set
         side,

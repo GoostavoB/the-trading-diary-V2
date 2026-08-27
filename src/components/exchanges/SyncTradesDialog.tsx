@@ -19,6 +19,7 @@ import { CalendarIcon, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useSubAccount } from '@/contexts/SubAccountContext';
 
 interface SyncTradesDialogProps {
   connectionId: string | null;
@@ -38,6 +39,7 @@ export function SyncTradesDialog({
   onFetchComplete,
 }: SyncTradesDialogProps) {
   const { t } = useTranslation();
+  const { activeSubAccount } = useSubAccount();
   const [preset, setPreset] = useState<DateRangePreset>('last30days');
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
@@ -100,6 +102,7 @@ export function SyncTradesDialog({
       const { data, error } = await fetchExchangeTrades<any>({
         connectionId,
         mode: 'preview',
+        subAccountId: activeSubAccount?.id,
         startDate: start,
         endDate: end,
       });
@@ -121,6 +124,11 @@ export function SyncTradesDialog({
   });
 
   const handleFetch = () => {
+    if (!activeSubAccount?.id) {
+      toast.error('No active trading account selected');
+      return;
+    }
+
     if (preset === 'custom' && (!startDate || !endDate)) {
       toast.error(t('exchanges.sync.selectBothDates'));
       return;

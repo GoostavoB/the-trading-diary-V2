@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase, fetchExchangeTrades } from '@/integrations/supabase/client';
+import { supabase, invokeEdgeFunction } from '@/integrations/supabase/client';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   Dialog,
@@ -20,6 +20,7 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { formatNumber } from '@/utils/formatNumber';
+import { useSubAccount } from '@/contexts/SubAccountContext';
 
 interface TradePreviewModalProps {
   connectionId: string | null;
@@ -49,6 +50,7 @@ export function TradePreviewModal({
   onImportComplete,
 }: TradePreviewModalProps) {
   const { t } = useTranslation();
+  const { activeSubAccount } = useSubAccount();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState({
     symbol: 'all',
@@ -92,10 +94,13 @@ export function TradePreviewModal({
   // Import mutation
   const importMutation = useMutation({
     mutationFn: async (tradeIds: string[]) => {
-      const { data, error } = await fetchExchangeTrades<any>({
-        connectionId,
-        mode: 'import',
-        selectedTradeIds: tradeIds,
+      const { data, error } = await invokeEdgeFunction<any>('fetch-exchange-trades', {
+        body: {
+          connectionId,
+          mode: 'import',
+          subAccountId: activeSubAccount?.id,
+          selectedTradeIds: tradeIds,
+        },
       });
 
       if (error) throw error;
@@ -179,6 +184,10 @@ export function TradePreviewModal({
 
   const handleImport = () => {
     if (selectedIds.size === 0) return;
+    if (!activeSubAccount?.id) {
+      toast.error('No active trading account selected');
+      return;
+    }
     importMutation.mutate(Array.from(selectedIds));
   };
 
