@@ -152,6 +152,9 @@ const copy = {
     loading: 'Carregando dados ao vivo…',
     refresh: 'Atualizar agora',
     trend: 'Tendência 4h',
+    searchPlaceholder: 'Buscar ativo (ex: gold, btc)',
+    searchLabel: 'Buscar',
+    noResults: 'Nenhum ativo encontrado.',
   },
   en: {
     ratio: 'Long/short ratio',
@@ -162,6 +165,9 @@ const copy = {
     loading: 'Loading live data…',
     refresh: 'Refresh now',
     trend: '4h trend',
+    searchPlaceholder: 'Search asset (e.g. gold, btc)',
+    searchLabel: 'Search',
+    noResults: 'No assets found.',
   },
 };
 
@@ -169,7 +175,20 @@ export function PublicLSRGrid({ lang }: { lang: 'pt' | 'en' }) {
   const [data, setData] = useState<Record<string, PublicMetrics>>({});
   const [loading, setLoading] = useState(true);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+  const [query, setQuery] = useState('');
   const t = copy[lang];
+
+  const filteredAssets = PUBLIC_ASSETS.filter((a) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    const name = lang === 'pt' ? a.namePt : a.nameEn;
+    return (
+      a.ticker.toLowerCase().includes(q) ||
+      a.symbol.toLowerCase().includes(q) ||
+      name.toLowerCase().includes(q) ||
+      a.slug.toLowerCase().includes(q)
+    );
+  });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -189,25 +208,50 @@ export function PublicLSRGrid({ lang }: { lang: 'pt' | 'en' }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3 flex-wrap text-sm text-muted-foreground">
-        <span>
-          {loading && !updatedAt
-            ? t.loading
-            : updatedAt
-              ? `${t.updated}: ${updatedAt.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : 'en-US')}`
-              : ''}
-        </span>
-        <button
-          type="button"
-          onClick={load}
-          className="rounded-lg border border-border/60 px-3 py-1.5 text-xs font-medium hover:bg-white/5 transition-colors"
-        >
-          {t.refresh}
-        </button>
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-sm text-muted-foreground">
+        <div className="relative flex-1 max-w-md">
+          <label htmlFor="public-lsr-search" className="sr-only">
+            {t.searchLabel}
+          </label>
+          <input
+            id="public-lsr-search"
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t.searchPlaceholder}
+            className="w-full rounded-lg border border-border/60 bg-card/60 px-3 py-2 pl-9 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
+          />
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+            aria-hidden="true"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197M16.5 10.5a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z" />
+          </svg>
+        </div>
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <span>
+            {loading && !updatedAt
+              ? t.loading
+              : updatedAt
+                ? `${t.updated}: ${updatedAt.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : 'en-US')}`
+                : ''}
+          </span>
+          <button
+            type="button"
+            onClick={load}
+            className="rounded-lg border border-border/60 px-3 py-1.5 text-xs font-medium hover:bg-white/5 transition-colors"
+          >
+            {t.refresh}
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {PUBLIC_ASSETS.map((a) => {
+        {filteredAssets.map((a) => {
           const m = data[a.symbol];
           const signal = getPublicSignal(m);
           const name = lang === 'pt' ? a.namePt : a.nameEn;
@@ -279,6 +323,10 @@ export function PublicLSRGrid({ lang }: { lang: 'pt' | 'en' }) {
           );
         })}
       </div>
+
+      {filteredAssets.length === 0 && (
+        <p className="text-center text-sm text-muted-foreground py-8">{t.noResults}</p>
+      )}
     </div>
   );
 }
