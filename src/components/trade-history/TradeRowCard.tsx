@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Trade } from '@/types/trade';
 import { TokenIcon } from '@/components/TokenIcon';
+import { SymbolLabel } from '@/components/common/SymbolLabel';
 import { BlurredCurrency, BlurredPercent } from '@/components/ui/BlurredValue';
 import { getFinancialColor } from '@/lib/utils';
 import { cn } from '@/lib/utils';
