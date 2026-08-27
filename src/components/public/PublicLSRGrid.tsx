@@ -241,6 +241,36 @@ export function PublicLSRGrid({ lang }: { lang: 'pt' | 'en' }) {
                 <span className="text-rose-400">{fmtShare(m?.shortPct ?? null)} {t.sellers}</span>
               </div>
 
+              {/* Mini 4h trend sparkline */}
+              {(() => {
+                const history = m?.history ?? [];
+                const trendUp = history.length >= 2 ? history[history.length - 1].v >= history[0].v : null;
+                const trendColor = trendUp === null ? 'hsl(var(--muted-foreground))' : trendUp ? '#34d399' : '#f87171';
+                return (
+                  <div>
+                    <div className="h-10 -mx-1">
+                      {history.length >= 2 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={history} margin={{ top: 2, right: 4, bottom: 0, left: 4 }}>
+                            <YAxis domain={['dataMin', 'dataMax']} hide />
+                            <defs>
+                              <linearGradient id={`pub-spark-${a.symbol}`} x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor={trendColor} stopOpacity={0.35} />
+                                <stop offset="100%" stopColor={trendColor} stopOpacity={0} />
+                              </linearGradient>
+                            </defs>
+                            <Area type="monotone" dataKey="v" stroke={trendColor} strokeWidth={1.5} fill={`url(#pub-spark-${a.symbol})`} isAnimationActive={false} />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-[10px] text-muted-foreground">—</div>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-muted-foreground text-center">{t.trend}</p>
+                  </div>
+                );
+              })()}
+
               <div className="flex items-center justify-between text-xs border-t border-border/40 pt-2">
                 <span className="text-muted-foreground">{t.oi}</span>
                 <span className="font-num tabular-nums font-medium">{fmtOI(m?.oiValue ?? null)}</span>
