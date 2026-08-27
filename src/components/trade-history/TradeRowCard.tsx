@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Trade } from '@/types/trade';
 import { TokenIcon } from '@/components/TokenIcon';
+import { SymbolLabel } from '@/components/common/SymbolLabel';
 import { BlurredCurrency, BlurredPercent } from '@/components/ui/BlurredValue';
 import { getFinancialColor } from '@/lib/utils';
 import { cn } from '@/lib/utils';
@@ -90,7 +91,7 @@ export const TradeRowCard = memo(({
               "font-semibold text-foreground",
               density === 'compact' ? 'text-xs' : 'text-[11px]'
             )}>
-              {trade.symbol}
+              <SymbolLabel symbol={trade.symbol} />
             </div>
             {/* Summary line: Broker • Setup • Notes icon */}
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">

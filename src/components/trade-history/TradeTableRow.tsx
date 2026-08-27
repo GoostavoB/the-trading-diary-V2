@@ -9,6 +9,7 @@ import { Trade } from '@/types/trade';
 import { getFinancialColor } from '@/lib/utils';
 import { TokenIcon } from '@/components/TokenIcon';
 import { BlurredCurrency, BlurredPercent } from '@/components/ui/BlurredValue';
+import { SymbolLabel } from '@/components/common/SymbolLabel';
 
 type ColumnKey = 'date' | 'symbol' | 'setup' | 'broker' | 'type' | 'entry' | 'exit' | 'size' | 'pnl' | 'roi' | 'fundingFee' | 'tradingFee';
 
@@ -58,7 +59,7 @@ export const TradeTableRow = memo(({
         <TableCell>
           <div className="flex items-center gap-2">
             <TokenIcon symbol={trade.symbol} size="sm" />
-            <span className="font-medium">{trade.symbol}</span>
+            <SymbolLabel symbol={trade.symbol} className="font-medium" />
           </div>
         </TableCell>
       )}
