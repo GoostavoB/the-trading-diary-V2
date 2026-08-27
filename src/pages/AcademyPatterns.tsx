@@ -204,6 +204,15 @@ const continuationPatterns: Pattern[] = [
     entry: 'Short no rompimento da flâmula, a favor do mastro.',
     target: 'Alvo 1: altura da consolidação. Alvo 2: altura do mastro.',
   },
+  {
+    name: 'Triângulo Simétrico',
+    bias: 'bull',
+    diagram: <SymmetricTriangle />,
+    why: 'Duas linhas de tendência convergem — uma descendo (topos mais baixos) e outra subindo (fundos mais altos). A volatilidade vai sendo comprimida até o mercado escolher um lado. O viés não é tão claro quanto num triângulo ascendente/descendente: ele tende a continuar na direção da perna que o originou, mas isso é tendência, não certeza.',
+    entry: 'Operar no rompimento da borda do triângulo, a favor da perna que originou o padrão — se veio de alta, entra long; se veio de baixa, entra short.',
+    target: 'Alvo 1 (conservador): altura da abertura do triângulo, projetada a partir do rompimento. Alvo 2 (estendido): movimento de tamanho parecido com a perna de origem, como numa flâmula.',
+    riskWarning: 'Padrão bilateral e perigoso. O preço pode romper para qualquer lado, especialmente se falhar volume/contexto. Não opere só pela forma — exige confirmação de contexto (suporte/resistência de timeframe maior, volume, momentum) e stop apertado fora do triângulo.',
+  },
 ];
 
 function PatternCard({ p }: { p: Pattern }) {
@@ -249,6 +258,12 @@ function PatternCard({ p }: { p: Pattern }) {
               <p className="text-sm text-muted-foreground leading-relaxed mt-1">{p.target}</p>
             </div>
           </div>
+          {p.riskWarning && (
+            <div className="flex gap-2.5 rounded-xl border border-amber-500/30 bg-amber-500/[0.08] p-3">
+              <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-200/90 leading-relaxed">{p.riskWarning}</p>
+            </div>
+          )}
         </div>
       </div>
     </PremiumCard>
