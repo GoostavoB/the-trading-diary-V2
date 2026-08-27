@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from 'react';
-import { AreaChart, Area, ResponsiveContainer, YAxis } from 'recharts';
 
 /**
  * Grid público e simplificado de Long/Short Ratio + Open Interest.
@@ -171,6 +170,96 @@ const copy = {
   },
 };
 
+/**
+ * Mini sparkline de tendência 4h.
+ *
+ * Renderiza um SVG puro com viewBox fixo + preserveAspectRatio="none" em vez de
+ * usar o ResponsiveContainer do Recharts: o container do Recharts mede a largura
+ * do pai de forma assíncrona e, quando o card do grid ainda não tem largura
+ * calculada no primeiro render, ele monta o gráfico com uma largura mínima e
+ * nunca re-mede — foi isso que deixou a curva espremida na borda esquerda em
+ * alguns cards. Com viewBox + preserveAspectRatio="none" o desenho é escalado
+ * pelo próprio SVG e sempre ocupa 100% da largura e da altura disponíveis.
+ */
+function Sparkline({
+  history,
+  label,
+  gradientId,
+}: {
+  history: { v: number }[];
+  label: string;
+  gradientId: string;
+}) {
+  const values = history.map((h) => h.v).filter((v) => Number.isFinite(v));
+
+  if (values.length < 2) {
+    return (
+      <div className="overflow-hidden rounded-md">
+        <div className="h-10 w-full flex items-center justify-center text-[10px] text-muted-foreground">
+          —
+        </div>
+        <p className="text-[10px] text-muted-foreground text-center">{label}</p>
+      </div>
+    );
+  }
+
+  const W = 100;
+  const H = 40;
+  const PAD = 3; // margem vertical para topo/fundo da curva não colarem na borda
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+
+  // X sempre distribuído por toda a largura do viewBox, qualquer que seja a
+  // quantidade de pontos daquele ativo. Y normalizado pelos próprios min/max.
+  const points = values.map((v, i) => {
+    const x = (i / (values.length - 1)) * W;
+    const y = H - PAD - ((v - min) / range) * (H - PAD * 2);
+    return { x, y };
+  });
+
+  const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' ');
+  const area = `${line} L${W},${H} L0,${H} Z`;
+
+  const trendUp = values[values.length - 1] >= values[0];
+  const color = trendUp ? '#34d399' : '#f87171';
+
+  return (
+    <div className="overflow-hidden rounded-md">
+      <div className="h-10 w-full overflow-hidden">
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          preserveAspectRatio="none"
+          width="100%"
+          height="100%"
+          className="block h-full w-full"
+          aria-hidden="true"
+        >
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity={0.35} />
+              <stop offset="100%" stopColor={color} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <path d={area} fill={`url(#${gradientId})`} stroke="none" />
+          <path
+            d={line}
+            fill="none"
+            stroke={color}
+            strokeWidth={1.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+      </div>
+      <p className="text-[10px] text-muted-foreground text-center">{label}</p>
+    </div>
+  );
+}
+
+
 export function PublicLSRGrid({ lang }: { lang: 'pt' | 'en' }) {
   const [data, setData] = useState<Record<string, PublicMetrics>>({});
   const [loading, setLoading] = useState(true);
@@ -286,47 +375,7 @@ export function PublicLSRGrid({ lang }: { lang: 'pt' | 'en' }) {
               </div>
 
               {/* Mini 4h trend sparkline */}
-              {(() => {
-                const history = m?.history ?? [];
-                const trendUp = history.length >= 2 ? history[history.length - 1].v >= history[0].v : null;
-                const trendColor = trendUp === null ? 'hsl(var(--muted-foreground))' : trendUp ? '#34d399' : '#f87171';
-                // Normalize each card's history to fill the mini-chart height.
-                // The sparkline shows only shape, not absolute values, so scaling
-                // per-card is intentional and keeps curves visible regardless of
-                // how small the 4h LSR variation is for that asset.
-                const values = history.map((h) => h.v);
-                const rawMin = values.length ? Math.min(...values) : 0;
-                const rawMax = values.length ? Math.max(...values) : 0;
-                const range = rawMax - rawMin || 1;
-                const paddedMin = 0.05;
-                const paddedMax = 0.95;
-                const chartData = history.map((h) => ({
-                  v: paddedMin + ((h.v - rawMin) / range) * (paddedMax - paddedMin),
-                }));
-                return (
-                  <div className="overflow-hidden rounded-md">
-                    <div className="h-10 w-full overflow-hidden">
-                      {chartData.length >= 2 ? (
-                        <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={chartData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                            <YAxis domain={[0, 1]} hide />
-                            <defs>
-                              <linearGradient id={`pub-spark-${a.symbol}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor={trendColor} stopOpacity={0.35} />
-                                <stop offset="100%" stopColor={trendColor} stopOpacity={0} />
-                              </linearGradient>
-                            </defs>
-                            <Area type="monotone" dataKey="v" stroke={trendColor} strokeWidth={1.5} fill={`url(#pub-spark-${a.symbol})`} isAnimationActive={false} />
-                          </AreaChart>
-                        </ResponsiveContainer>
-                      ) : (
-                        <div className="h-full flex items-center justify-center text-[10px] text-muted-foreground">—</div>
-                      )}
-                    </div>
-                    <p className="text-[10px] text-muted-foreground text-center">{t.trend}</p>
-                  </div>
-                );
-              })()}
+              <Sparkline history={m?.history ?? []} label={t.trend} gradientId={`pub-spark-${a.symbol}`} />
 
               <div className="flex items-center justify-between text-xs border-t border-border/40 pt-2">
                 <span className="text-muted-foreground">{t.oi}</span>
