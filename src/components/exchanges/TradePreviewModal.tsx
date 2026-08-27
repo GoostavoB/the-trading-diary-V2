@@ -20,6 +20,7 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { formatNumber } from '@/utils/formatNumber';
+import { useSubAccount } from '@/contexts/SubAccountContext';
 
 interface TradePreviewModalProps {
   connectionId: string | null;
@@ -49,6 +50,7 @@ export function TradePreviewModal({
   onImportComplete,
 }: TradePreviewModalProps) {
   const { t } = useTranslation();
+  const { activeSubAccount } = useSubAccount();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState({
     symbol: 'all',
@@ -95,6 +97,7 @@ export function TradePreviewModal({
       const { data, error } = await fetchExchangeTrades<any>({
         connectionId,
         mode: 'import',
+        subAccountId: activeSubAccount?.id,
         selectedTradeIds: tradeIds,
       });
 
@@ -179,6 +182,10 @@ export function TradePreviewModal({
 
   const handleImport = () => {
     if (selectedIds.size === 0) return;
+    if (!activeSubAccount?.id) {
+      toast.error('No active trading account selected');
+      return;
+    }
     importMutation.mutate(Array.from(selectedIds));
   };
 
