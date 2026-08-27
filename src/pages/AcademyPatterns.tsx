@@ -408,6 +408,39 @@ export default function AcademyPatterns() {
             </div>
           </section>
 
+          {/* Como operar os padrões: regras gerais */}
+          <section className="space-y-4">
+            <PremiumCard className="p-5 lg:p-6" contentClassName="p-0">
+              <div className="flex items-start gap-3 mb-4">
+                <div className="h-8 w-8 rounded-lg bg-indigo-500/15 flex items-center justify-center shrink-0">
+                  <Info className="h-4 w-4 text-indigo-400" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-foreground">
+                    Falso rompimento não é a única forma de operar — e padrões podem estar aninhados
+                  </h3>
+                </div>
+              </div>
+              <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
+                <p>
+                  O falso rompimento é <strong className="text-foreground">uma técnica de entrada</strong>, não a
+                  regra geral dos padrões. Se uma reversão se formou de forma completa e válida — por exemplo, um
+                  topo duplo limpo, com rejeição no segundo topo e rompimento do neckline — esse padrão por si só já
+                  é gatilho suficiente, sem precisar esperar um falso rompimento antes.
+                </p>
+                <p>
+                  Além disso, padrões podem aparecer <strong className="text-foreground">aninhados</strong> dentro de
+                  outros padrões maiores: um topo duplo pequeno pode se formar dentro de uma cunha ascendente maior,
+                  ou uma bandeira dentro de um canal de alta. Nesses casos, o padrão menor pode ser operado de forma
+                  independente — com seu próprio critério de entrada, stop e alvo — mesmo que o padrão maior ainda não
+                  tenha se resolvido.
+                </p>
+              </div>
+            </PremiumCard>
+          </section>
+
+
+
           {/* Reversão */}
           <section className="space-y-6">
             <SectionHeading
