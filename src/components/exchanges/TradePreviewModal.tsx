@@ -193,18 +193,28 @@ export function TradePreviewModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh]">
-        <DialogHeader>
-          <DialogTitle>{t('exchanges.preview.title', { exchange: exchangeName })}</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-w-[min(1600px,96vw)] w-[96vw] max-h-[92vh] flex flex-col gap-0 p-0 overflow-hidden">
+        <DialogHeader className="px-6 pt-6 pb-4 space-y-1">
+          <DialogTitle className="text-xl font-semibold tracking-tight">
+            {t('exchanges.preview.title', { exchange: exchangeName })}
+          </DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
             {t('exchanges.preview.description')}
           </DialogDescription>
-          <div className="flex items-center justify-between pt-4">
-            <div className="text-sm text-muted-foreground">
-              {t('exchanges.preview.selected', { count: selectedIds.size, total: filteredTrades.length })}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
+            <div className="flex items-center gap-3 text-sm">
+              <span className="rounded-md bg-muted/60 px-2.5 py-1 font-medium tabular-nums">
+                {t('exchanges.preview.selected', { count: selectedIds.size, total: filteredTrades.length })}
+              </span>
               {totalPnL !== 0 && (
-                <span className={totalPnL > 0 ? 'text-success' : 'text-destructive'}>
-                  {' • '}{t('exchanges.preview.totalPnL', { amount: formatNumber(totalPnL) })}
+                <span
+                  className={`rounded-md px-2.5 py-1 font-medium tabular-nums ${
+                    totalPnL > 0
+                      ? 'bg-success/10 text-success'
+                      : 'bg-destructive/10 text-destructive'
+                  }`}
+                >
+                  {t('exchanges.preview.totalPnL', { amount: formatNumber(totalPnL) })}
                 </span>
               )}
             </div>
@@ -221,7 +231,7 @@ export function TradePreviewModal({
         </DialogHeader>
 
         {/* Filters */}
-        <div className="flex gap-2 py-4 border-y">
+        <div className="flex flex-wrap items-center gap-3 px-6 py-3 border-y bg-muted/20">
           <Select value={filters.symbol} onValueChange={(value) => setFilters({ ...filters, symbol: value })}>
             <SelectTrigger className="w-40">
               <SelectValue placeholder={t('exchanges.preview.symbol')} />
