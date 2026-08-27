@@ -245,3 +245,46 @@ export function FalseBreak() {
     </DiagramFrame>
   );
 }
+
+/* ---------- Fibonacci: Extensão (3 cliques) ---------- */
+export function FibExtension() {
+  // fundo (1) -> topo (2) -> pullback (3) -> continuação
+  const levels: Array<[number, string]> = [
+    [118, '0'],
+    [98, '0,618'],
+    [86, '1'],
+    [66, '1,618'],
+    [48, '2,272'],
+    [36, '2,618'],
+    [24, '3,272'],
+    [12, '4,236'],
+  ];
+  return (
+    <DiagramFrame caption="Extensão: clique 1 no fundo, 2 no topo, 3 no pullback. Os níveis acima do topo são os alvos prováveis.">
+      {levels.map(([y, label]) => (
+        <g key={label}>
+          <line x1={118} y1={y} x2={300} y2={y} className="stroke-violet-400/45" strokeWidth={1} strokeDasharray="4 4" />
+          <Label x={302} y={y - 2} anchor="end" tone="violet">{label}</Label>
+        </g>
+      ))}
+      <Price points="8,166 30,150 46,158 66,126 86,86 104,102 118,118 138,84 160,58 186,40 214,26 250,16 292,10" />
+      <circle cx={46} cy={158} r={4} className="fill-emerald-400" />
+      <circle cx={86} cy={86} r={4} className="fill-violet-400" />
+      <circle cx={118} cy={118} r={4} className="fill-emerald-400" />
+      <Label x={30} y={174} tone="bull">1 · fundo</Label>
+      <Label x={72} y={78} tone="violet">2 · topo</Label>
+      <Label x={112} y={134} tone="bull">3 · pullback</Label>
+    </DiagramFrame>
+  );
+}
+
+/* ---------- Fibonacci: Retração ---------- */
+export function FibRetracement({ flip = false }: D) {
+  const Y = mk(flip);
+  // flip=false: depois de uma queda (topo -> fundo), alvo do repique.
+  const levels: Array<[number, string]> = [
+    [150, '0'],
+    [124, '0,382'),
+  ] as never;
+  return null as never;
+}
