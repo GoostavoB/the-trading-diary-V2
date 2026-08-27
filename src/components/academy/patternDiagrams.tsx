@@ -42,7 +42,7 @@ export function DoubleTop({ flip = false }: D) {
       <Guide x1={310} y1={Y(167.5)} x2={406} y2={Y(167.5)} tone={tone} />
       <Guide x1={250} y1={Y(202)} x2={406} y2={Y(202)} tone={tone} />
       <Label x={16} y={Y(127)} tone="violet">Neckline</Label>
-      <Label x={404} y={Y(160)} anchor="end" tone={tone}>Alvo 1</Label>
+      <Label x={404} y={flip ? 80 : 160} anchor="end" tone={tone}>Alvo 1</Label>
       <Label x={404} y={Y(228)} anchor="end" tone={tone}>Alvo 2</Label>
     </DiagramFrame>
   );
@@ -70,7 +70,7 @@ export function TripleTop({ flip = false }: D) {
       <Guide x1={314} y1={Y(167.5)} x2={406} y2={Y(167.5)} tone={tone} />
       <Guide x1={250} y1={Y(202)} x2={406} y2={Y(202)} tone={tone} />
       <Label x={16} y={Y(127)} tone="violet">Neckline</Label>
-      <Label x={404} y={Y(161)} anchor="end" tone={tone}>Alvo 1</Label>
+      <Label x={404} y={flip ? 80 : 161} anchor="end" tone={tone}>Alvo 1</Label>
       <Label x={404} y={Y(222)} anchor="end" tone={tone}>Alvo 2</Label>
     </DiagramFrame>
   );
@@ -104,7 +104,7 @@ export function HeadShoulders({ flip = false }: D) {
       <Label x={122} y={Y(48)}>Cabeça</Label>
       <Label x={196} y={Y(84)}>Ombro D</Label>
       <Label x={16} y={Y(131)} tone="violet">Neckline</Label>
-      <Label x={404} y={Y(164)} anchor="end" tone={tone}>Alvo 1</Label>
+      <Label x={404} y={flip ? 78 : 164} anchor="end" tone={tone}>Alvo 1</Label>
       <Label x={404} y={Y(230)} anchor="end" tone={tone}>Alvo 2</Label>
     </DiagramFrame>
   );
