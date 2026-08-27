@@ -331,21 +331,28 @@ export function SymmetricTriangle({ flip = false }: D) {
 /* ---------- Pivô ---------- */
 export function Pivot() {
   return (
-    <DiagramFrame caption="Pivô de alta: o preço sobe, faz um topo, recua — e o FUNDO do recuo para exatamente no nível do topo anterior, sem perdê-lo. Só então continua subindo.">
-      <Price points="20,232 56,196 90,160 112,178 130,160 150,124 172,110 190,112 214,140 240,158 250,160 272,132 300,104 330,84 356,108 372,110 392,88 406,74" />
-      {/* régua do topo A, onde o recuo seguinte para */}
-      <Guide x1={90} y1={160} x2={262} y2={160} />
-      <Guide x1={190} y1={112} x2={382} y2={112} />
-      <Dot x={90} y={160} tone="violet" />
-      <Dot x={250} y={160} tone="bull" />
-      <Dot x={190} y={112} tone="violet" />
-      <Dot x={366} y={111} tone="bull" />
-      <Label x={22} y={188}>Impulso</Label>
-      <Label x={96} y={152} tone="violet">Topo anterior</Label>
-      <Label x={196} y={104} tone="violet">Topo seguinte</Label>
-      <Label x={182} y={200} tone="bull">Fundo do recuo para no topo anterior</Label>
-      <Label x={210} y={250} anchor="middle" tone="bull">O padrão se repete a cada nova perna</Label>
+    <DiagramFrame caption="Pivô de alta: cada recuo desce até TOCAR o nível do topo anterior (a linha tracejada) e para ali — sem perdê-lo. Só depois vem o próximo impulso. É essa mecânica repetida que constrói a tendência.">
+      {/* três pivôs: topo A -> recuo até A -> topo B -> recuo até B -> topo C -> recuo até C */}
+      <Price points="20,238 90,170 150,170 210,120 270,120 330,70 372,70 406,44" />
+      {/* réguas horizontais dos topos, onde os recuos param */}
+      <Guide x1={90} y1={170} x2={200} y2={170} />
+      <Guide x1={210} y1={120} x2={320} y2={120} />
+      <Guide x1={330} y1={70} x2={410} y2={70} />
+      <Dot x={90} y={170} tone="violet" />
+      <Dot x={150} y={170} tone="bull" />
+      <Dot x={210} y={120} tone="violet" />
+      <Dot x={270} y={120} tone="bull" />
+      <Dot x={330} y={70} tone="violet" />
+      <Dot x={372} y={70} tone="bull" />
+      <Label x={26} y={222}>Impulso</Label>
+      <Label x={86} y={160} tone="violet">Topo 1</Label>
+      <Label x={206} y={110} tone="violet">Topo 2</Label>
+      <Label x={326} y={60} tone="violet">Topo 3</Label>
+      <Label x={150} y={192} anchor="middle" tone="bull">recuo toca o topo 1</Label>
+      <Label x={272} y={142} anchor="middle" tone="bull">recuo toca o topo 2</Label>
+      <Label x={210} y={250} anchor="middle" tone="muted">Enquanto os recuos respeitarem o topo anterior, a tendência segue válida</Label>
     </DiagramFrame>
+
   );
 }
 
