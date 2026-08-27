@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { SEO } from '@/components/SEO';
 import { PublicLSRGrid, PUBLIC_ASSETS } from '@/components/public/PublicLSRGrid';
 
@@ -212,8 +212,8 @@ const outro = {
 /* --------------------------------------------------------------------- page */
 
 export default function PublicLongShortRatio() {
-  const params = useParams();
-  const lang: Lang = params.lang === 'pt' ? 'pt' : 'en';
+  const { pathname } = useLocation();
+  const lang: Lang = pathname.startsWith('/pt/') ? 'pt' : 'en';
   const t = intro[lang];
   const o = outro[lang];
   const canonical = lang === 'pt' ? PT_URL : EN_URL;
