@@ -12,7 +12,7 @@ import { ConnectExchangeModal } from '@/components/exchanges/ConnectExchangeModa
 import { SyncHistoryWidget } from '@/components/exchanges/SyncHistoryWidget';
 import { TradePreviewModal } from '@/components/exchanges/TradePreviewModal';
 import { SyncTradesDialog } from '@/components/exchanges/SyncTradesDialog';
-import { ExchangeLogo } from '@/components/ExchangeLogo';
+import { ExchangeLogoChip } from '@/components/exchanges/ExchangeLogoChip';
 import { formatDistanceToNow } from 'date-fns';
 import AppLayout from '@/components/layout/AppLayout';
 import { useTranslation } from '@/hooks/useTranslation';
