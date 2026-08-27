@@ -273,19 +273,19 @@ export function TradePreviewModal({
 
         {/* Trade Table */}
         {isLoading ? (
-          <div className="flex items-center justify-center h-96">
+          <div className="flex items-center justify-center h-[55vh]">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : filteredTrades.length === 0 ? (
-          <div className="flex items-center justify-center h-96 text-muted-foreground">
+          <div className="flex items-center justify-center h-[55vh] text-muted-foreground">
             {t('exchanges.preview.noTrades')}
           </div>
         ) : (
-          <ScrollArea className="h-96">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">
+          <div className="flex-1 min-h-0 overflow-auto px-6 py-2">
+            <Table className="w-full min-w-[1180px]">
+              <TableHeader className="sticky top-0 z-10 bg-background">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="w-10">
                     <Checkbox
                       checked={selectedIds.size === filteredTrades.length && filteredTrades.length > 0}
                       onCheckedChange={
@@ -293,25 +293,26 @@ export function TradePreviewModal({
                       }
                     />
                   </TableHead>
-                  <TableHead>{t('exchanges.preview.date')}</TableHead>
-                  <TableHead>{t('exchanges.preview.symbol')}</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>{t('exchanges.preview.side')}</TableHead>
-                  <TableHead>{t('exchanges.preview.size')}</TableHead>
-                  <TableHead>Entry</TableHead>
-                  <TableHead>Exit</TableHead>
-                  <TableHead>{t('exchanges.preview.pnl')}</TableHead>
-                  <TableHead>Leverage</TableHead>
-                  <TableHead>Margin</TableHead>
-                  <TableHead>ROI</TableHead>
-                  <TableHead>{t('exchanges.preview.fee')}</TableHead>
+                  <TableHead className="whitespace-nowrap">{t('exchanges.preview.date')}</TableHead>
+                  <TableHead className="whitespace-nowrap">{t('exchanges.preview.symbol')}</TableHead>
+                  <TableHead className="whitespace-nowrap">Status</TableHead>
+                  <TableHead className="whitespace-nowrap">{t('exchanges.preview.side')}</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">{t('exchanges.preview.size')}</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">Entry</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">Exit</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">{t('exchanges.preview.pnl')}</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">Leverage</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">Margin</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">ROI</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">{t('exchanges.preview.fee')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredTrades.map((trade) => (
                   <TableRow
                     key={trade.id}
-                    className="hover:bg-muted/50 cursor-pointer"
+                    data-state={selectedIds.has(trade.id) ? 'selected' : undefined}
+                    className="hover:bg-muted/40 cursor-pointer"
                     onClick={() => handleToggleTrade(trade.id)}
                   >
                     <TableCell onClick={(e) => e.stopPropagation()}>
@@ -320,58 +321,85 @@ export function TradePreviewModal({
                         onCheckedChange={() => handleToggleTrade(trade.id)}
                       />
                     </TableCell>
-                    <TableCell className="text-sm">
-                      {format(new Date(getTradeTime(trade.trade_data)), 'MMM dd, HH:mm')}
+                    <TableCell className="text-sm whitespace-nowrap tabular-nums text-muted-foreground">
+                      {format(new Date(getTradeTime(trade.trade_data)), 'dd MMM · HH:mm')}
                     </TableCell>
-                    <TableCell className="font-mono text-sm">{trade.trade_data.symbol}</TableCell>
+                    <TableCell className="text-sm font-medium">
+                      <SymbolLabel symbol={trade.trade_data.symbol} />
+                    </TableCell>
                     <TableCell>
                       {trade.trade_data.already_imported ? (
-                        <Badge variant="outline" className="text-xs text-muted-foreground">Já importado</Badge>
+                        <Badge
+                          variant="outline"
+                          className="whitespace-nowrap rounded-full border-border/60 bg-muted/40 px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground"
+                        >
+                          {t('exchanges.preview.alreadyImported', 'Already imported')}
+                        </Badge>
                       ) : (
-                        <Badge variant="outline" className="text-xs text-success border-success/30">Novo</Badge>
+                        <Badge
+                          variant="outline"
+                          className="whitespace-nowrap rounded-full border-success/30 bg-success/10 px-2.5 py-0.5 text-[11px] font-medium text-success"
+                        >
+                          {t('exchanges.preview.new', 'New')}
+                        </Badge>
                       )}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={trade.trade_data.side === 'long' ? 'default' : 'destructive'}>
+                      <Badge
+                        variant="outline"
+                        className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-medium capitalize ${
+                          trade.trade_data.side === 'long'
+                            ? 'border-success/30 bg-success/10 text-success'
+                            : 'border-destructive/30 bg-destructive/10 text-destructive'
+                        }`}
+                      >
                         {trade.trade_data.side}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm">{trade.trade_data.position_size}</TableCell>
-                    <TableCell className="text-sm">${formatNumber(trade.trade_data.entry_price)}</TableCell>
-                    <TableCell className="text-sm">${formatNumber(trade.trade_data.exit_price)}</TableCell>
+                    <TableCell className="text-sm text-right tabular-nums">{trade.trade_data.position_size}</TableCell>
+                    <TableCell className="text-sm text-right tabular-nums">${formatNumber(trade.trade_data.entry_price)}</TableCell>
+                    <TableCell className="text-sm text-right tabular-nums">${formatNumber(trade.trade_data.exit_price)}</TableCell>
                     <TableCell
-                      className={
+                      className={`text-sm text-right tabular-nums font-medium ${
                         trade.trade_data.profit_loss > 0
-                          ? 'text-success font-medium'
+                          ? 'text-success'
                           : trade.trade_data.profit_loss < 0
-                          ? 'text-destructive font-medium'
-                          : ''
-                      }
+                          ? 'text-destructive'
+                          : 'text-muted-foreground'
+                      }`}
                     >
                       {trade.trade_data.profit_loss
                         ? `$${formatNumber(trade.trade_data.profit_loss)}`
-                        : '-'}
+                        : '—'}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {trade.trade_data.leverage ? `${trade.trade_data.leverage}x` : '-'}
+                    <TableCell className="text-sm text-right tabular-nums text-muted-foreground">
+                      {trade.trade_data.leverage ? `${trade.trade_data.leverage}x` : '—'}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {trade.trade_data.margin ? `$${formatNumber(trade.trade_data.margin)}` : '-'}
+                    <TableCell className="text-sm text-right tabular-nums text-muted-foreground">
+                      {trade.trade_data.margin ? `$${formatNumber(trade.trade_data.margin)}` : '—'}
                     </TableCell>
-                    <TableCell className={trade.trade_data.roi > 0 ? 'text-sm text-success' : trade.trade_data.roi < 0 ? 'text-sm text-destructive' : 'text-sm text-muted-foreground'}>
-                      {typeof trade.trade_data.roi === 'number' ? `${trade.trade_data.roi.toFixed(1)}%` : '-'}
+                    <TableCell
+                      className={`text-sm text-right tabular-nums ${
+                        trade.trade_data.roi > 0
+                          ? 'text-success'
+                          : trade.trade_data.roi < 0
+                          ? 'text-destructive'
+                          : 'text-muted-foreground'
+                      }`}
+                    >
+                      {typeof trade.trade_data.roi === 'number' ? `${trade.trade_data.roi.toFixed(1)}%` : '—'}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-sm text-right tabular-nums text-muted-foreground">
                       ${formatNumber(trade.trade_data.trading_fee || 0)}
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-          </ScrollArea>
+          </div>
         )}
 
-        <DialogFooter>
+        <DialogFooter className="px-6 py-4 border-t bg-muted/20">
           <Button variant="outline" onClick={onClose}>
             {t('common.cancel')}
           </Button>
