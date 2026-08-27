@@ -9,6 +9,7 @@ import { getStrategyFeeTarget } from '@/utils/feeClassification';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AlertTriangle } from 'lucide-react';
 import { BlurredValue, BlurredCurrency, BlurredPercent } from '@/components/ui/BlurredValue';
+import { SymbolLabel } from '@/components/common/SymbolLabel';
 
 interface TradeDetailsTableProps {
   trades: EnhancedTradeMetrics[];

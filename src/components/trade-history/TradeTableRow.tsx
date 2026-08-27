@@ -9,6 +9,7 @@ import { Trade } from '@/types/trade';
 import { getFinancialColor } from '@/lib/utils';
 import { TokenIcon } from '@/components/TokenIcon';
 import { BlurredCurrency, BlurredPercent } from '@/components/ui/BlurredValue';
+import { SymbolLabel } from '@/components/common/SymbolLabel';
 
 type ColumnKey = 'date' | 'symbol' | 'setup' | 'broker' | 'type' | 'entry' | 'exit' | 'size' | 'pnl' | 'roi' | 'fundingFee' | 'tradingFee';
 

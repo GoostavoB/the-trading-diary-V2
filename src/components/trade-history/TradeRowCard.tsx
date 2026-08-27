@@ -90,7 +90,7 @@ export const TradeRowCard = memo(({
               "font-semibold text-foreground",
               density === 'compact' ? 'text-xs' : 'text-[11px]'
             )}>
-              {trade.symbol}
+              <SymbolLabel symbol={trade.symbol} />
             </div>
             {/* Summary line: Broker • Setup • Notes icon */}
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
