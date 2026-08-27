@@ -327,3 +327,71 @@ export function FibRetracement({ flip = false }: D) {
   );
 }
 
+
+/* ---------- Exemplo prático: falso rompimento no triângulo descendente ---------- */
+export function FalseBreakTriangle() {
+  // LTA descendente no topo, suporte plano embaixo, estrutura ombro-cabeça-ombro dentro,
+  // último pico rompe a LTA, falha e desaba pelo suporte.
+  return (
+    <DiagramFrame caption="Triângulo descendente: último pico rompe a LTA, falha e o preço desaba pelo suporte plano.">
+      {/* LTA descendente */}
+      <Guide x1={30} y1={40} x2={220} y2={104} tone="muted" />
+      {/* Suporte plano */}
+      <Guide x1={30} y1={150} x2={200} y2={150} />
+      {/* Preço: ombro, cabeça, ombro; último pico fura a LTA e desaba */}
+      <Price points="8,70 34,52 56,120 78,64 100,126 122,78 142,132 162,84 182,96 196,150 214,162 232,168 246,146 262,152 286,168 310,174" />
+      {/* Marca o falso rompimento */}
+      <circle cx={182} cy={96} r={4} className="fill-amber-400" />
+      <Label x={188} y={90} tone="bear">Falso rompimento</Label>
+      {/* Reteste da LTA rompida como resistência */}
+      <circle cx={246} cy={146} r={3.5} className="fill-rose-400" />
+      <Label x={250} y={140} tone="bear">Reteste / pullback</Label>
+      <Label x={34} y={34}>LTA do triângulo</Label>
+      <Label x={34} y={146} tone="violet">Suporte plano</Label>
+      <Arrow x={276} y1={150} y2={172} tone="bear" />
+    </DiagramFrame>
+  );
+}
+
+/* ---------- Espelhamento de canal ---------- */
+export function ChannelMirror() {
+  return (
+    <DiagramFrame caption="Espelhamento: projeta a mesma amplitude do canal a partir do rompimento.">
+      {/* Canal original */}
+      <Guide x1={20} y1={140} x2={140} y2={60} tone="muted" />
+      <Guide x1={34} y1={162} x2={154} y2={82} tone="muted" />
+      {/* Canal espelhado */}
+      <Guide x1={140} y1={60} x2={260} y2={-20 + 200} tone="muted" />
+      <Guide x1={154} y1={82} x2={274} y2={42} tone="violet" />
+      <Guide x1={168} y1={104} x2={288} y2={24} tone="violet" />
+      {/* Preço */}
+      <Price points="8,150 30,136 44,148 66,118 80,130 102,96 118,108 138,72 158,84 182,60 202,72 226,44 246,56 272,28 296,20 310,14" />
+      <Label x={22} y={172}>Canal original</Label>
+      <Label x={196} y={100} tone="violet">Canal espelhado</Label>
+      <Label x={300} y={36} anchor="end" tone="violet">Alvo ≈ topo do canal espelhado</Label>
+    </DiagramFrame>
+  );
+}
+
+/* ---------- Parciais por espelhamento sucessivo ---------- */
+export function SuccessiveMirror() {
+  return (
+    <DiagramFrame caption="A cada nova consolidação, espelha de novo: parcial na metade e no fim de cada projeção.">
+      <Price points="8,168 40,128 58,140 74,120 96,84 112,94 128,76 150,44 166,54 182,38 206,10 236,6 268,4 310,4" />
+      {/* projeções sucessivas */}
+      <Guide x1={58} y1={140} x2={96} y2={84} tone="violet" />
+      <Guide x1={128} y1={76} x2={166} y2={20} tone="violet" />
+      <Guide x1={182} y1={38} x2={220} y2={-18 + 200} tone="muted" />
+      {/* marcações de parcial */}
+      <circle cx={77} cy={112} r={3.5} className="fill-indigo-400" />
+      <circle cx={96} cy={84} r={3.5} className="fill-emerald-400" />
+      <circle cx={147} cy={48} r={3.5} className="fill-indigo-400" />
+      <circle cx={166} cy={20} r={3.5} className="fill-emerald-400" />
+      <Label x={60} y={128} tone="violet">Metade</Label>
+      <Label x={100} y={80} tone="bull">Fim (parcial)</Label>
+      <Label x={130} y={64} tone="violet">Metade</Label>
+      <Label x={170} y={16} tone="bull">Fim (parcial)</Label>
+      <Label x={8} y={178}>Consolidações repetem a figura — e o processo</Label>
+    </DiagramFrame>
+  );
+}
