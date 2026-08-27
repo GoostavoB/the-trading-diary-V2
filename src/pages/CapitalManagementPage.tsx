@@ -338,7 +338,7 @@ const CapitalManagementPage = () => {
             </h2>
             <div className="relative">
               {/* Timeline line */}
-              <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-accent via-primary to-accent/20" />
+              <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-500 to-indigo-500/10" />
 
               {/* Timeline entries */}
               <div className="space-y-6">
