@@ -80,7 +80,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   // Sync with URL path changes
   useEffect(() => {
     const pathLang = getLanguageFromPath(location.pathname);
-    if (pathLang !== language && !isLoading) {
+    if (pathLang !== language) {
       setLanguage(pathLang);
       i18n.changeLanguage(pathLang);
       localStorage.setItem('app-language', pathLang);

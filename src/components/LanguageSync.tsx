@@ -24,20 +24,10 @@ export const LanguageSync = () => {
     }
   }, [location.pathname, language, changeLanguage]);
 
-  // Ensure the current path is valid for the selected language
-  useEffect(() => {
-    const pathLanguage = getLanguageFromPath(location.pathname);
-    
-    // If path doesn't match current language, update the URL
-    if (pathLanguage !== language) {
-      const basePath = getPathWithoutLanguage(location.pathname);
-      const newPath = getLocalizedPath(basePath, language);
-      
-      console.log(`Redirecting to localized path: ${newPath}`);
-      // Use replace to avoid adding to history
-      navigate(newPath, { replace: true });
-    }
-  }, [language]);
+  // NOTE: the URL is the single source of truth for language.
+  // A previous effect redirected the URL to match the language state, which
+  // fought with the effect above and caused a PT/EN flicker loop on /pt/* routes.
+
 
   return null; // This component doesn't render anything
 };
