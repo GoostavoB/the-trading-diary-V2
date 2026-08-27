@@ -2,726 +2,1128 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import { SEO } from '@/components/SEO';
-import { PremiumCard } from '@/components/ui/PremiumCard';
-import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, AlertTriangle } from 'lucide-react';
 import {
-  ArrowLeft,
-  AlertTriangle,
-  TrendingDown,
-  TrendingUp,
-  Repeat,
-  Target,
-  LogIn,
-  Brain,
-  Layers,
-  Triangle,
-  Ruler,
-  Crosshair,
-  Scaling,
-  Scissors,
-  Info,
-} from 'lucide-react';
-import {
-  DoubleTop,
-  TripleTop,
-  HeadShoulders,
-  Diamond,
-  DirectionalTriangle,
-  ChannelIntoLevel,
-  RoundedBottom,
-  Wedge,
-  Flag,
-  Pennant,
-  Pivot,
-  FalseBreak,
-  SymmetricTriangle,
-  FibExtension,
-  FibRetracement,
-  FalseBreakTriangle,
-  ChannelMirror,
-  SuccessiveMirror,
-} from '@/components/academy/patternDiagrams';
+  PivoAlta,
+  TopoDuplo,
+  FundoDuplo,
+  TopoTriplo,
+  FundoTriplo,
+  OCO,
+  OCOI,
+  Diamante,
+  FundoArredondado,
+  TrianguloAscendente,
+  TrianguloDescendente,
+  TrianguloSimetrico,
+  CanalAlta,
+  CanalBaixa,
+  CanalAltaEmResistencia,
+  CanalBaixaEmSuporte,
+  CunhaAscendente,
+  CunhaDescendente,
+  BandeiraAlta,
+  BandeiraBaixa,
+  FlamulaAlta,
+  FlamulaBaixa,
+  FalsoRompimento,
+  FalsoRompimentoTriangulo,
+  PullbackSuportePlano,
+  PullbackFibo,
+  EspelhamentoCanal,
+  EspelhamentoSucessivo,
+  FibRetracaoQueda,
+  FibRetracaoAlta,
+  FibExtensaoAlta,
+  FibExtensaoQueda,
+} from '@/components/academy/mockupDiagrams';
 
-type Pattern = {
-  name: string;
-  bias: 'bull' | 'bear';
-  diagram: React.ReactNode;
-  why: string;
-  entry: string;
-  target: string;
-  riskWarning?: string;
-  precisionNote?: string;
+/* ------------------------------------------------------------------ tokens */
+
+const C = {
+  page: '#08080b',
+  card: '#15151c',
+  purple: '#8f8ff0',
+  purpleSoft: '#c2c4fb',
+  green: '#34d399',
+  red: '#f87171',
+  teal: '#2dd4bf',
+  amber: '#f5b93b',
+  text: '#f2f1f5',
+  body: '#c2c0cb',
+  legend: '#d7d6de',
+  grid: '#5f5d70',
 };
 
-const topPatterns: Pattern[] = [
-  {
-    name: 'Topo Duplo',
-    bias: 'bear',
-    diagram: <DoubleTop />,
-    why: 'O preço testa uma resistência, é rejeitado, recua e volta a testar a mesma região — e falha de novo. O segundo teste mostra que o fluxo comprador já não consegue absorver a oferta parada ali. Quem comprou o repique fica preso, e a saída dessas posições vira o combustível da queda.',
-    entry: 'Short na rejeição do segundo topo (mais agressivo) ou no rompimento do suporte entre os dois topos — o neckline (mais conservador).',
-    target: 'Alvo 1: 50% da extensão do padrão (altura do topo até o neckline). Alvo 2: 100% da extensão.',
-  },
-  {
-    name: 'Topo Triplo',
-    bias: 'bear',
-    diagram: <TripleTop />,
-    why: 'A mesma lógica do topo duplo, com três toques. Cada rejeição adicional confirma que existe um vendedor grande defendendo aquele preço. Quanto mais toques, mais forte a zona — e mais gente comprada logo abaixo esperando o rompimento que nunca vem.',
-    entry: 'Short no terceiro toque com rejeição, ou no rompimento do neckline.',
-    target: 'Alvo 1: 50% da extensão. Alvo 2: 100% da extensão.',
-  },
-  {
-    name: 'OCO — Ombro-Cabeça-Ombro',
-    bias: 'bear',
-    diagram: <HeadShoulders />,
-    why: 'Numa tendência de alta, o mercado forma o ombro esquerdo, depois a cabeça (topo mais alto) e finalmente um ombro direito mais baixo. Esse topo mais baixo é a evidência objetiva: o comprador não conseguiu mais empurrar o preço para uma nova máxima. A força compradora acabou antes do preço cair.',
-    entry: 'Short no rompimento do neckline — a linha que liga os dois vales entre ombros e cabeça.',
-    target: 'Alvo 1: altura do PRÓPRIO OMBRO — medida do topo do ombro até o neckline, replicada para baixo a partir do rompimento. É uma distância menor, específica do ombro (não 50% da cabeça). Alvo 2: distância total da cabeça até o neckline, replicada a partir do rompimento.',
-  },
-  {
-    name: 'Diamante no Topo',
-    bias: 'bear',
-    diagram: <Diamond />,
-    why: 'Primeiro a volatilidade explode (topos mais altos e fundos mais baixos: indecisão e disputa), depois contrai (o mercado se acalma, mas em um nível esticado). A expansão mostra exaustão da tendência; a contração mostra que ninguém mais quer pagar mais caro. Quando quebra, quebra para o lado de quem ficou preso: os comprados.',
-    entry: 'Short no rompimento da parte inferior do diamante.',
-    target: 'Alvo único: a altura TOTAL do diamante — do pico à base, na parte mais larga — projetada a partir do ponto de rompimento. O diamante não é dividido em 50%/100% como os outros padrões; a convenção técnica usa um alvo único.',
-  },
-  {
-    name: 'Triângulo Descendente',
-    bias: 'bear',
-    diagram: <DirectionalTriangle />,
-    why: 'Os topos vão ficando cada vez mais baixos enquanto o suporte se mantém plano. Isso significa que o vendedor aceita vender cada vez mais barato — tem pressa — enquanto o comprador defende sempre no mesmo preço. É uma parede sendo martelada: cada teste consome as ordens de compra empilhadas ali até não sobrar nada.',
-    entry: 'Short no rompimento do suporte plano, preferencialmente com reteste pelo lado de baixo.',
-    target: 'Projeção espelhada da altura do triângulo a partir do ponto de rompimento.',
-  },
-  {
-    name: 'Canal de Alta em Resistência',
-    bias: 'bear',
-    diagram: <ChannelIntoLevel />,
-    why: 'O preço sobe fazendo topos e fundos ascendentes dentro de um canal, mas chega numa resistência relevante. Ali a tendência de curto prazo encontra oferta de timeframe maior. Sinal extra de fraqueza: se a amplitude entre topos e fundos vai diminuindo (canal estreitando), o movimento já está perdendo força antes mesmo do rompimento — uma alta saudável mantém amplitude constante ou crescente.',
-    entry: 'Short na perda da linha inferior do canal, dentro da zona de resistência.',
-    target: 'Alvo 1: 50% da altura do canal. Alvo 2: base do canal / próximo suporte relevante.',
-  },
-];
+const FONT = "'Space Grotesk', Inter, system-ui, sans-serif";
 
-const bottomPatterns: Pattern[] = [
-  {
-    name: 'Fundo Duplo',
-    bias: 'bull',
-    diagram: <DoubleTop flip />,
-    why: 'Espelho do topo duplo. O preço testa um suporte, sobe, volta a testar e não consegue fazer nova mínima. O vendedor perdeu capacidade de empurrar o preço para baixo, e os vendidos passam a ser os pressionados.',
-    entry: 'Long na formação do segundo fundo, ou no rompimento da resistência entre os dois fundos (neckline).',
-    target: 'Alvo 1: 50% da extensão. Alvo 2: 100% da extensão.',
-  },
-  {
-    name: 'Fundo Triplo',
-    bias: 'bull',
-    diagram: <TripleTop flip />,
-    why: 'Três defesas do mesmo suporte. Cada defesa confirma um comprador grande posicionado naquele preço. Quanto mais toques, mais relevante a zona.',
-    entry: 'Long no terceiro toque com rejeição, ou no rompimento do neckline.',
-    target: 'Alvo 1: 50% da extensão. Alvo 2: 100% da extensão.',
-  },
-  {
-    name: 'OCOI — Ombro-Cabeça-Ombro Invertido',
-    bias: 'bull',
-    diagram: <HeadShoulders flip />,
-    why: 'Ombro esquerdo, cabeça (fundo mais baixo) e ombro direito mais alto. Esse fundo mais alto é a assinatura da perda de força vendedora — o vendedor não consegue mais levar o preço para uma nova mínima. Antecipa o pivô de alta.',
-    entry: 'Long no rompimento do neckline — a linha que liga os dois picos entre ombros e cabeça.',
-    target: 'Alvo 1: altura do PRÓPRIO OMBRO — medida do fundo do ombro até o neckline, replicada para cima a partir do rompimento. É uma distância menor, específica do ombro (não 50% da cabeça). Alvo 2: distância total da cabeça até o neckline, replicada a partir do rompimento.',
-  },
-  {
-    name: 'Fundo Arredondado',
-    bias: 'bull',
-    diagram: <RoundedBottom />,
-    why: 'Reversão gradual em formato de "U" ou cuia. Não há um evento único: o sentimento migra lentamente de vendedor para comprador, com a pressão de venda secando aos poucos. É típico de ativos esquecidos que começam a ser acumulados sem pressa.',
-    entry: 'Long na confirmação do rompimento no fim da curva (a resistência formada pelo início da cuia).',
-    target: 'Alvo 1: 50% da extensão da curva. Alvo 2: 100% da extensão.',
-  },
-  {
-    name: 'Diamante no Fundo',
-    bias: 'bull',
-    diagram: <Diamond flip />,
-    why: 'Espelho do diamante no topo: expansão de volatilidade (capitulação e disputa) seguida de contração. Quando a contração resolve para cima, os vendidos presos viram combustível da alta.',
-    entry: 'Long no rompimento da parte superior do diamante.',
-    target: 'Alvo único: a altura TOTAL do diamante — do pico à base, na parte mais larga — projetada a partir do ponto de rompimento. O diamante não é dividido em 50%/100% como os outros padrões; a convenção técnica usa um alvo único.',
-  },
-  {
-    name: 'Triângulo Ascendente',
-    bias: 'bull',
-    diagram: <DirectionalTriangle flip />,
-    why: 'Fundos cada vez mais altos contra uma resistência plana. O comprador aceita pagar cada vez mais caro — tem pressa — enquanto o vendedor defende sempre o mesmo preço. A cada teste, as ordens de venda naquele nível vão sendo consumidas até romper.',
-    entry: 'Long no rompimento da resistência plana, preferencialmente com reteste por cima.',
-    target: 'Projeção espelhada da altura do triângulo a partir do rompimento.',
-  },
-  {
-    name: 'Canal de Baixa em Suporte',
-    bias: 'bull',
-    diagram: <ChannelIntoLevel flip />,
-    why: 'Espelho do canal de alta. O preço cai em canal ordenado até encontrar um suporte relevante de timeframe maior. Se a amplitude do canal vai estreitando, a queda já está sem força — o movimento vira mais realização do que venda agressiva.',
-    entry: 'Long no rompimento da linha superior do canal, dentro da zona de suporte.',
-    target: 'Alvo 1: 50% da altura do canal. Alvo 2: topo do canal / próxima resistência relevante.',
-  },
-];
+type Category = 'Reversão' | 'Continuação' | 'Ferramentas';
+type Bias = 'Long' | 'Short' | 'Alta' | 'Queda';
 
-const wedgePatterns: Pattern[] = [
-  {
-    name: 'Cunha Descendente',
-    bias: 'bull',
-    diagram: <Wedge />,
-    why: 'As duas linhas de tendência caem e convergem: os fundos caem menos do que os topos. Ou seja, a venda está perdendo amplitude a cada perna. A volatilidade se estreita até o mercado precisar escolher um lado — e a probabilidade maior é romper para cima.',
-    entry: 'Long no rompimento da linha superior da cunha.',
-    target: 'Projeção da altura da parte mais larga da cunha a partir do rompimento. Pode romper para baixo em minoria dos casos — respeite o stop.',
-  },
-  {
-    name: 'Cunha Ascendente',
-    bias: 'bear',
-    diagram: <Wedge flip />,
-    why: 'Espelho: as duas linhas sobem e convergem. Cada nova perna de alta é menor que a anterior — o comprador está sem fôlego, comprando só por inércia. Probabilidade maior de romper para baixo.',
-    entry: 'Short no rompimento da linha inferior da cunha.',
-    target: 'Projeção da altura da parte mais larga da cunha a partir do rompimento.',
-  },
-];
+const catColor: Record<Category, string> = {
+  'Reversão': C.purple,
+  'Continuação': C.teal,
+  'Ferramentas': C.amber,
+};
 
-const continuationPatterns: Pattern[] = [
-  {
-    name: 'Bandeira de Alta',
-    bias: 'bull',
-    diagram: <Flag />,
-    why: 'Depois de um movimento impulsivo forte (o mastro), o preço consolida num canal pequeno e apertado contra a tendência. Não é venda de verdade: é realização parcial e entrada de novos compradores em preço melhor. O canal apertado mostra que ninguém quer vender barato — o mercado está apenas descansando.',
-    entry: 'No rompimento do canal da bandeira, a favor do impulso original. Stop logo abaixo da bandeira — por isso o risco é pequeno.',
-    target: 'Alvo 1 (conservador): altura da própria bandeira projetada do rompimento. Alvo 2 (completo): altura do mastro projetada do rompimento — é o que dá o risco/retorno excelente.',
-    precisionNote:
-      'Nota de precisão: medir o mastro projetando-o a partir do TOPO da bandeira (não do ponto de rompimento) costuma cravar o alvo com mais precisão. A confiabilidade aumenta muito quando esse alvo coincide com um suporte ou resistência real já existente no gráfico — confluência de projeção + zona histórica. Sem confluência, a projeção ainda é útil, mas menos precisa. Use como referência de entrada ou saída — total ou parcial.',
-  },
-  {
-    name: 'Bandeira de Baixa',
-    bias: 'bear',
-    diagram: <Flag flip />,
-    why: 'Espelho exato em tendência de queda: impulso vendedor forte, depois um canal estreito subindo devagar. Quem tenta comprar o fundo fornece liquidez para o vendedor reposicionar.',
-    entry: 'Short no rompimento da parte inferior do canal da bandeira.',
-    target: 'Alvo 1: altura da bandeira. Alvo 2: altura do mastro projetada do rompimento.',
-    precisionNote:
-      'Nota de precisão: medir o mastro a partir do FUNDO da bandeira (não do rompimento) crava o alvo com mais precisão — no espelho de baixa, é a borda da bandeira mais próxima do mastro. A confiabilidade sobe quando esse alvo coincide com um suporte ou resistência real já existente no gráfico. Sem confluência, a projeção ainda é útil, mas menos precisa. Use como referência de entrada ou saída, total ou parcial.',
-  },
-  {
-    name: 'Flâmula de Alta',
-    bias: 'bull',
-    diagram: <Pennant />,
-    why: 'Igual à bandeira, mas a consolidação converge num triangulozinho simétrico em vez de um canal paralelo (às vezes com uma leve curvatura, tipo colherzinha). A convergência mostra compressão: compradores e vendedores vão apertando o spread até o impulso retomar.',
-    entry: 'No rompimento da flâmula, a favor do mastro.',
-    target: 'Alvo 1: altura da consolidação, projetada do rompimento. Alvo 2: o mastro que veio antes da flâmula tende a gerar um movimento de tamanho parecido depois do rompimento — mesma lógica da bandeira: mastro medido antes = projeção depois.',
-  },
-  {
-    name: 'Flâmula de Baixa',
-    bias: 'bear',
-    diagram: <Pennant flip />,
-    why: 'Espelho em tendência de queda: impulso forte para baixo, consolidação convergente e retomada da queda.',
-    entry: 'Short no rompimento da flâmula, a favor do mastro.',
-    target: 'Alvo 1: altura da consolidação, projetada do rompimento. Alvo 2: o mastro anterior à flâmula tende a gerar um movimento de tamanho parecido depois do rompimento — mesma régua, replicada para baixo.',
-  },
-  {
-    name: 'Triângulo Simétrico',
-    bias: 'bull',
-    diagram: <SymmetricTriangle />,
-    why: 'Duas linhas de tendência convergem — uma descendo (topos mais baixos) e outra subindo (fundos mais altos). A volatilidade vai sendo comprimida até o mercado escolher um lado. O viés não é tão claro quanto num triângulo ascendente/descendente: ele tende a continuar na direção da perna que o originou, mas isso é tendência, não certeza.',
-    entry: 'Operar no rompimento da borda do triângulo, a favor da perna que originou o padrão — se veio de alta, entra long; se veio de baixa, entra short.',
-    target: 'Alvo 1 (conservador): altura da abertura do triângulo, projetada a partir do rompimento. Alvo 2 (estendido): movimento de tamanho parecido com a perna de origem, como numa flâmula.',
-    riskWarning: 'Padrão bilateral e perigoso. O preço pode romper para qualquer lado, especialmente se falhar volume/contexto. Não opere só pela forma — exige confirmação de contexto (suporte/resistência de timeframe maior, volume, momentum) e stop apertado fora do triângulo.',
-  },
-];
+const biasColor: Record<Bias, string> = {
+  Long: C.green,
+  Alta: C.green,
+  Short: C.red,
+  Queda: C.red,
+};
 
-function PatternCard({ p }: { p: Pattern }) {
-  const isBull = p.bias === 'bull';
+function hexToRgba(hex: string, a: number) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+}
+
+function Chip({ label, color }: { label: string; color: string }) {
   return (
-    <PremiumCard
-      className={`p-5 border-l-4 ${isBull ? 'border-l-emerald-500/70' : 'border-l-rose-500/70'}`}
-      contentClassName="p-0"
+    <span
+      style={{
+        fontSize: 16,
+        fontWeight: 600,
+        padding: '7px 16px',
+        borderRadius: 999,
+        background: hexToRgba(color, 0.14),
+        color,
+      }}
     >
-      <div className="space-y-4">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <h3 className="text-lg font-semibold text-foreground">{p.name}</h3>
-          <div className="flex items-center gap-2">
-            <span
-              className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ${
-                isBull
-                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                  : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
-              }`}
-            >
-              {isBull ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
-              {isBull ? 'Long' : 'Short'}
-            </span>
-            <Badge
-              variant="outline"
-              className={
-                isBull
-                  ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-[11px]'
-                  : 'border-rose-500/30 bg-rose-500/10 text-rose-400 text-[11px]'
-              }
-            >
-              {isBull ? 'Viés de alta' : 'Viés de baixa'}
-            </Badge>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-5 items-start">
-          <div>{p.diagram}</div>
-
-          <div className="space-y-3">
-
-          <div className="flex gap-2.5">
-            <Brain className="h-4 w-4 text-indigo-400 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-indigo-300">Por que acontece</p>
-              <p className="text-sm text-muted-foreground leading-relaxed mt-1">{p.why}</p>
-            </div>
-          </div>
-          <div className="flex gap-2.5">
-            <LogIn className="h-4 w-4 text-violet-400 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-violet-300">Entrada</p>
-              <p className="text-sm text-muted-foreground leading-relaxed mt-1">{p.entry}</p>
-            </div>
-          </div>
-          <div className="flex gap-2.5">
-            <Target className="h-4 w-4 text-violet-400 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-violet-300">Alvo</p>
-              <p className="text-sm text-muted-foreground leading-relaxed mt-1">{p.target}</p>
-            </div>
-          </div>
-          {p.precisionNote && (
-            <div className="flex gap-2.5 rounded-xl border border-indigo-500/30 bg-indigo-500/[0.08] p-3">
-              <Info className="h-4 w-4 text-indigo-400 shrink-0 mt-0.5" />
-              <p className="text-sm text-indigo-200/90 leading-relaxed">{p.precisionNote}</p>
-            </div>
-          )}
-          {p.riskWarning && (
-            <div className="flex gap-2.5 rounded-xl border border-amber-500/30 bg-amber-500/[0.08] p-3">
-              <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
-              <p className="text-sm text-amber-200/90 leading-relaxed">{p.riskWarning}</p>
-            </div>
-          )}
-          </div>
-        </div>
-      </div>
-
-    </PremiumCard>
+      {label}
+    </span>
   );
 }
 
-function SectionHeading({
-  icon: Icon,
-  title,
-  subtitle,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  subtitle: string;
-}) {
+type LegendItem = { text: string; color?: string; kind?: 'dash' | 'square' | 'dot' | 'none' };
+
+function Legend({ items }: { items: LegendItem[] }) {
   return (
-    <div className="border-l-4 border-indigo-500 pl-4 flex items-start gap-3">
-      <Icon className="h-5 w-5 text-indigo-400 mt-0.5 shrink-0" />
-      <div>
-        <h2 className="text-lg sm:text-xl font-bold text-foreground">{title}</h2>
-        <p className="text-sm text-muted-foreground mt-1 max-w-3xl">{subtitle}</p>
-      </div>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px 22px', marginTop: 16 }}>
+      {items.map((it) => {
+        const color = it.color || C.legend;
+        const kind = it.kind || (it.color ? 'square' : 'none');
+        return (
+          <span
+            key={it.text}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600, color }}
+          >
+            {kind === 'dash' && (
+              <i style={{ width: 20, height: 0, borderTop: `2.5px dashed ${it.color || C.grid}`, display: 'inline-block' }} />
+            )}
+            {kind === 'square' && (
+              <i style={{ width: 12, height: 12, borderRadius: 3, background: color, display: 'inline-block' }} />
+            )}
+            {kind === 'dot' && (
+              <i style={{ width: 12, height: 12, borderRadius: '50%', background: color, display: 'inline-block' }} />
+            )}
+            {it.text}
+          </span>
+        );
+      })}
     </div>
   );
 }
+
+function Para({ children }: { children: React.ReactNode }) {
+  return <p style={{ fontSize: 18, lineHeight: 1.75, color: C.body, margin: '16px 0 0' }}>{children}</p>;
+}
+
+function Field({ label, color, children }: { label: string; color: string; children: React.ReactNode }) {
+  return (
+    <div style={{ marginTop: 18 }}>
+      <div
+        style={{
+          fontSize: 13,
+          fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.6px',
+          color,
+          marginBottom: 6,
+        }}
+      >
+        {label}
+      </div>
+      <p style={{ fontSize: 18, lineHeight: 1.7, color: C.body, margin: 0 }}>{children}</p>
+    </div>
+  );
+}
+
+function TargetsBox({ title, color, chips, note }: { title: string; color: string; chips?: string[]; note?: string }) {
+  return (
+    <div
+      style={{
+        marginTop: 18,
+        padding: '16px 20px',
+        borderRadius: 12,
+        background: hexToRgba(color, 0.08),
+        border: `1px solid ${hexToRgba(color, 0.25)}`,
+      }}
+    >
+      <div
+        style={{
+          fontSize: 14,
+          fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px',
+          color,
+          marginBottom: 10,
+        }}
+      >
+        {title}
+      </div>
+      {chips && (
+        <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', fontSize: 19, fontWeight: 600, color: C.text }}>
+          {chips.map((c) => (
+            <span key={c}>{c}</span>
+          ))}
+        </div>
+      )}
+      {note && <div style={{ fontSize: 18, fontWeight: 500, color: C.text }}>{note}</div>}
+    </div>
+  );
+}
+
+function Callout({ color, children }: { color: string; children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        marginTop: 18,
+        padding: '16px 20px',
+        borderRadius: 12,
+        background: hexToRgba(color, 0.08),
+        border: `1px solid ${hexToRgba(color, 0.25)}`,
+        fontSize: 17,
+        lineHeight: 1.7,
+        color: hexToRgba(color, 1),
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function Card({
+  category,
+  bias,
+  title,
+  diagram,
+  legend,
+  children,
+}: {
+  category?: Category;
+  bias?: Bias;
+  title: string;
+  diagram: React.ReactNode;
+  legend?: LegendItem[];
+  children?: React.ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        background: C.card,
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: 16,
+        padding: 26,
+        marginBottom: 24,
+      }}
+    >
+      {(category || bias) && (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+          {category && <Chip label={category} color={catColor[category]} />}
+          {bias && <Chip label={bias} color={biasColor[bias]} />}
+        </div>
+      )}
+      <div style={{ fontSize: 30, fontWeight: 600, marginBottom: 20, color: C.text }}>{title}</div>
+      {diagram}
+      {legend && <Legend items={legend} />}
+      {children}
+    </div>
+  );
+}
+
+function SectionTitle({ category, title, subtitle }: { category: Category; title: string; subtitle?: string }) {
+  return (
+    <div style={{ marginTop: 34, marginBottom: 14 }}>
+      <Chip label={category} color={catColor[category]} />
+      <h2 style={{ fontSize: 34, fontWeight: 600, margin: '18px 0 0', color: C.text }}>{title}</h2>
+      {subtitle && <p style={{ fontSize: 18, color: C.body, margin: '8px 0 0', maxWidth: 900 }}>{subtitle}</p>}
+    </div>
+  );
+}
+
+const legNeckline: LegendItem[] = [
+  { text: 'Neckline', kind: 'dash' },
+  { text: 'Seta replicada = alvo', color: C.purple },
+];
+
+/* -------------------------------------------------------------------- page */
 
 export default function AcademyPatterns() {
   return (
     <>
       <SEO
         title="Padrões Gráficos — Reversão e Continuação | Academy"
-        description="Lição completa de padrões gráficos: topo/fundo duplo e triplo, OCO e OCOI, diamantes, triângulos, cunhas, bandeiras e flâmulas — com a lógica de fluxo de ordens, regra de entrada e alvos."
+        description="Lição completa de padrões gráficos: topo/fundo duplo e triplo, OCO e OCOI, diamantes, triângulos, cunhas, bandeiras, flâmulas e Fibonacci — com lógica de fluxo de ordens, entrada e alvos."
         canonical="https://www.thetradingdiary.com/learn/chart-patterns"
         noindex={true}
       />
       <AppLayout>
-        <div className="max-w-6xl mx-auto space-y-10 pb-16">
-          <Link
-            to="/learn"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Voltar para Academy
-          </Link>
+        <div style={{ fontFamily: FONT, background: C.page, color: C.text, margin: '-1rem', padding: '32px 0 80px' }}>
+          <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 24px' }}>
+            <Link
+              to="/learn"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 15, color: C.body }}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Voltar para Academy
+            </Link>
 
-          {/* Hero */}
-          <PremiumCard className="p-6 lg:p-8" contentClassName="p-0">
-            <div className="max-w-3xl space-y-3">
-              <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-md">
-                <Layers className="h-3.5 w-3.5" />
-                Módulo 1 · Academy
+            {/* Hero */}
+            <div style={{ marginTop: 28 }}>
+              <div
+                style={{
+                  marginBottom: 8,
+                  fontSize: 16,
+                  fontWeight: 600,
+                  letterSpacing: 1.5,
+                  textTransform: 'uppercase',
+                  color: C.purple,
+                }}
+              >
+                The Trading Diary — Learn
               </div>
-              <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-                Padrões gráficos: a lógica por trás da forma
+              <h1
+                style={{
+                  fontSize: 58,
+                  fontWeight: 700,
+                  margin: '0 0 18px',
+                  lineHeight: 1.05,
+                  background: 'linear-gradient(135deg,#c2c4fb 0%,#8b8ff5 45%,#5b5bd6 100%)',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                }}
+              >
+                Padrões Gráficos
               </h1>
-              <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-                Um padrão não funciona porque desenha bonito. Funciona porque descreve o que compradores e vendedores
-                estão fazendo naquela região. Nesta lição você vê cada formação de reversão e continuação com o
-                diagrama, a explicação de fluxo de ordens, a regra de entrada e os alvos.
+              <p style={{ fontSize: 20, lineHeight: 1.7, color: C.body, maxWidth: 900, margin: '0 0 32px' }}>
+                Cada padrão tem um gráfico grande e isolado. As linhas de tendência seguem exatamente os topos e fundos
+                do preço, e os rótulos ficam numa legenda abaixo do gráfico — nunca em cima das linhas. Um padrão não
+                funciona porque desenha bonito: funciona porque descreve o que compradores e vendedores estão fazendo
+                naquela região.
               </p>
             </div>
-          </PremiumCard>
 
-          {/* Callout de manipulação */}
-          <div className="rounded-2xl border border-amber-500/30 bg-amber-500/[0.07] p-5 sm:p-6">
-            <div className="flex items-start gap-3">
-              <div className="h-9 w-9 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
-                <AlertTriangle className="h-5 w-5 text-amber-400" />
-              </div>
-              <div className="space-y-2">
-                <h2 className="text-base sm:text-lg font-bold text-amber-300">
-                  Antes de operar qualquer padrão, leia isto: rompimento falso e manipulação
+            {/* Aviso de manipulação */}
+            <div
+              style={{
+                background: hexToRgba(C.amber, 0.07),
+                border: `1px solid ${hexToRgba(C.amber, 0.3)}`,
+                borderRadius: 16,
+                padding: 26,
+                marginBottom: 24,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                <AlertTriangle className="h-5 w-5" style={{ color: C.amber }} />
+                <h2 style={{ fontSize: 24, fontWeight: 700, color: C.amber, margin: 0 }}>
+                  Antes de operar qualquer padrão: rompimento falso e manipulação
                 </h2>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Padrões gráficos são amplamente conhecidos — e é justamente isso que os torna alvo. Todo mundo coloca
-                  stop no mesmo lugar óbvio, e esse aglomerado de stops é liquidez. É muito comum o mercado romper
-                  primeiro na direção "errada", capturar esses stops, e só depois fazer o movimento real.
-                </p>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Isso é <strong className="text-foreground">especialmente comum</strong> quando o padrão ocorre numa
-                  região que também é suporte ou resistência diário/semanal. Quanto mais relevante o nível, maior a
-                  chance de manipulação antes do movimento verdadeiro.
-                </p>
-                <p className="text-sm text-amber-200/90 leading-relaxed">
-                  Regra prática: se o padrão não estiver apoiado por um suporte/resistência de timeframe maior
-                  (diário ou semanal), confiar no rompimento cru é mais arriscado. Analise o contexto antes — o padrão
-                  é o gatilho, não a tese.
-                </p>
               </div>
+              <p style={{ fontSize: 18, lineHeight: 1.75, color: C.body, margin: '10px 0 0' }}>
+                Padrões gráficos são amplamente conhecidos — e é justamente isso que os torna alvo. Todo mundo coloca
+                stop no mesmo lugar óbvio, e esse aglomerado de stops é liquidez. É muito comum o mercado romper
+                primeiro na direção "errada", capturar esses stops, e só depois fazer o movimento real.
+              </p>
+              <p style={{ fontSize: 18, lineHeight: 1.75, color: C.body, margin: '10px 0 0' }}>
+                Isso é <strong style={{ color: C.text }}>especialmente comum</strong> quando o padrão ocorre numa região
+                que também é suporte ou resistência diário/semanal. Quanto mais relevante o nível, maior a chance de
+                manipulação antes do movimento verdadeiro.
+              </p>
+              <p style={{ fontSize: 18, lineHeight: 1.75, color: hexToRgba(C.amber, 0.95), margin: '10px 0 0' }}>
+                Regra prática: se o padrão não estiver apoiado por um suporte/resistência de timeframe maior (diário ou
+                semanal), confiar no rompimento cru é mais arriscado. O padrão é o gatilho, não a tese.
+              </p>
             </div>
-            <div className="mt-5 max-w-md">
-              <FalseBreak />
-            </div>
-          </div>
 
-          {/* Conceitos gerais */}
-          <section className="space-y-4">
-            <SectionHeading
-              icon={Brain}
-              title="Dois conceitos que valem para todos os padrões"
-              subtitle="Antes das formações, dois blocos fundamentais que se repetem em tudo que vem a seguir."
+            {/* Conceitos gerais */}
+            <SectionTitle
+              category="Reversão"
+              title="Pivôs, Topos e Fundos"
+              subtitle="Antes das formações, o bloco básico que se repete em tudo que vem a seguir."
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <PremiumCard className="p-5" contentClassName="p-0">
-                <h3 className="text-base font-semibold mb-2">A entrada é sempre no rompimento da formação</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Nos padrões de reversão, a entrada válida é no topo ou no fundo da formação, no rompimento do nível
-                  que estrutura o padrão (neckline, suporte plano, linha do canal). Antes disso o padrão ainda é uma
-                  hipótese: nada garante que o preço não vá fazer mais um teste.
-                </p>
-              </PremiumCard>
-              <PremiumCard className="p-5" contentClassName="p-0">
-                <h3 className="text-base font-semibold mb-2">Pivô: o bloco básico de qualquer padrão</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                  Um pivô é um movimento de impulso seguido de um recuo. Cada topo, cada fundo e cada ombro de um
-                  padrão é um pivô. Aprender a marcar pivôs é o que permite enxergar as formações em tempo real, em
-                  vez de reconhecê-las só depois de prontas.
-                </p>
-                <Pivot />
-              </PremiumCard>
-            </div>
-          </section>
 
-          {/* Como operar os padrões: regras gerais */}
-          <section className="space-y-4">
-            <PremiumCard className="p-5 lg:p-6" contentClassName="p-0">
-              <div className="flex items-start gap-3 mb-4">
-                <div className="h-8 w-8 rounded-lg bg-indigo-500/15 flex items-center justify-center shrink-0">
-                  <Info className="h-4 w-4 text-indigo-400" />
+            <Card
+              category="Reversão"
+              bias="Long"
+              title="Pivô de Alta"
+              diagram={<PivoAlta />}
+              legend={[
+                { text: 'Topo anterior', kind: 'dash' },
+                { text: 'Toca, não ultrapassa', color: C.green, kind: 'dot' },
+              ]}
+            >
+              <Para>
+                Sobe, forma o topo (linha tracejada). Recua para um fundo mais alto, sobe além do topo anterior e recua
+                uma segunda vez — esse segundo fundo{' '}
+                <strong style={{ color: C.text }}>bate exatamente no nível do topo anterior, sem ultrapassá-lo</strong>.
+                É esse toque que confirma o pivô e transforma a antiga resistência em suporte.
+              </Para>
+              <Para>
+                Cada topo, cada fundo e cada ombro de um padrão é um pivô. Aprender a marcar pivôs é o que permite
+                enxergar as formações em tempo real, em vez de reconhecê-las só depois de prontas.
+              </Para>
+            </Card>
+
+            <Card
+              category="Reversão"
+              bias="Short"
+              title="Topo Duplo"
+              diagram={<TopoDuplo />}
+              legend={legNeckline}
+            >
+              <Para>
+                Os dois topos ficam dentro de ~2% um do outro. A seta que mede a altura do padrão (neckline até o topo)
+                é <strong style={{ color: C.purple }}>replicada com a mesma cor e o mesmo tamanho</strong> a partir do
+                rompimento do neckline.
+              </Para>
+              <Field label="Por que acontece" color={C.purple}>
+                O preço testa uma resistência, é rejeitado, recua e volta a testar a mesma região — e falha de novo. O
+                segundo teste mostra que o fluxo comprador já não consegue absorver a oferta parada ali. Quem comprou o
+                repique fica preso, e a saída dessas posições vira o combustível da queda.
+              </Field>
+              <Field label="Entrada" color={C.purple}>
+                Short na rejeição do segundo topo (mais agressivo) ou no rompimento do neckline (mais conservador).
+              </Field>
+              <Field label="Alvo" color={C.purple}>
+                Altura do padrão (neckline até o topo) replicada a partir do rompimento. Alvo parcial em 50% dessa
+                projeção.
+              </Field>
+            </Card>
+
+            <Card category="Reversão" bias="Long" title="Fundo Duplo" diagram={<FundoDuplo />} legend={legNeckline}>
+              <Para>
+                Espelho do topo duplo: a seta que mede a altura do neckline até o fundo é replicada, mesma cor e
+                tamanho, para cima a partir do rompimento.
+              </Para>
+              <Field label="Por que acontece" color={C.purple}>
+                O preço testa um suporte, sobe, volta a testar e não consegue fazer nova mínima. O vendedor perdeu
+                capacidade de empurrar o preço para baixo, e os vendidos passam a ser os pressionados.
+              </Field>
+              <Field label="Entrada" color={C.purple}>
+                Long na formação do segundo fundo, ou no rompimento da resistência entre os dois fundos (neckline).
+              </Field>
+              <Field label="Alvo" color={C.purple}>
+                Altura do padrão replicada para cima a partir do rompimento. Parcial em 50% da projeção.
+              </Field>
+            </Card>
+
+            <Card category="Reversão" bias="Short" title="Topo Triplo" diagram={<TopoTriplo />} legend={legNeckline}>
+              <Para>
+                Três topos na mesma região. Mesma lógica do topo duplo: a seta mostra de onde vem a medida e é
+                replicada no rompimento.
+              </Para>
+              <Field label="Por que acontece" color={C.purple}>
+                Cada rejeição adicional confirma que existe um vendedor grande defendendo aquele preço. Quanto mais
+                toques, mais forte a zona — e mais gente comprada logo abaixo esperando o rompimento que nunca vem.
+              </Field>
+              <Field label="Entrada" color={C.purple}>
+                Short no terceiro toque com rejeição, ou no rompimento do neckline.
+              </Field>
+              <Field label="Alvo" color={C.purple}>Altura do padrão replicada a partir do rompimento.</Field>
+            </Card>
+
+            <Card category="Reversão" bias="Long" title="Fundo Triplo" diagram={<FundoTriplo />} legend={legNeckline}>
+              <Para>
+                Mesma leitura do fundo duplo, com três fundos na mesma região confirmando o suporte antes do
+                rompimento.
+              </Para>
+              <Field label="Por que acontece" color={C.purple}>
+                Três defesas do mesmo suporte. Cada defesa confirma um comprador grande posicionado naquele preço.
+              </Field>
+              <Field label="Entrada" color={C.purple}>
+                Long no terceiro toque com rejeição, ou no rompimento do neckline.
+              </Field>
+              <Field label="Alvo" color={C.purple}>Altura do padrão replicada a partir do rompimento.</Field>
+            </Card>
+
+            <SectionTitle category="Reversão" title="OCO, Diamante e Fundo Arredondado" />
+
+            <Card
+              category="Reversão"
+              bias="Short"
+              title="Ombro-Cabeça-Ombro (OCO)"
+              diagram={<OCO />}
+              legend={[
+                { text: 'Ombro E · Cabeça · Ombro D' },
+                { text: 'Neckline', kind: 'dash' },
+                { text: 'Alvo 1 = altura do ombro', color: C.red },
+                { text: 'Alvo 2 = neckline → cabeça', color: C.purple },
+              ]}
+            >
+              <Para>
+                <strong style={{ color: C.text }}>Alvo 1</strong> é a altura do ombro, projetada a partir do
+                rompimento. <strong style={{ color: C.text }}>Alvo 2</strong>, maior, é a distância total do neckline
+                até a cabeça — mesmo ponto de rompimento, medidas diferentes.
+              </Para>
+              <Field label="Por que acontece" color={C.purple}>
+                Numa tendência de alta, o mercado forma o ombro esquerdo, depois a cabeça (topo mais alto) e finalmente
+                um ombro direito mais baixo. Esse topo mais baixo é a evidência objetiva: o comprador não conseguiu
+                mais empurrar o preço para uma nova máxima.
+              </Field>
+              <Field label="Entrada" color={C.purple}>
+                Short no rompimento do neckline — a linha que liga os dois vales entre ombros e cabeça.
+              </Field>
+            </Card>
+
+            <Card
+              category="Reversão"
+              bias="Long"
+              title="OCO Invertido (OCOI)"
+              diagram={<OCOI />}
+              legend={[
+                { text: 'Ombro E · Cabeça · Ombro D' },
+                { text: 'Neckline', kind: 'dash' },
+                { text: 'Alvo 1 = altura do ombro', color: C.green },
+                { text: 'Alvo 2 = neckline → cabeça', color: C.purple },
+              ]}
+            >
+              <Para>
+                Espelho do OCO. Mesma leitura de Alvo 1 (altura do próprio ombro) e Alvo 2 (neckline até a cabeça),
+                agora projetados para cima após o rompimento.
+              </Para>
+              <Field label="Por que acontece" color={C.purple}>
+                Ombro esquerdo, cabeça (fundo mais baixo) e ombro direito mais alto. Esse fundo mais alto é a
+                assinatura da perda de força vendedora.
+              </Field>
+              <Field label="Entrada" color={C.purple}>
+                Long no rompimento do neckline — a linha que liga os dois picos entre ombros e cabeça.
+              </Field>
+            </Card>
+
+            <Card
+              category="Reversão"
+              title="Diamante"
+              diagram={<Diamante />}
+              legend={[{ text: 'Envelope (topos e fundos cada vez maiores, depois cada vez menores)', kind: 'dash' }]}
+            >
+              <Para>
+                A onda vem da esquerda com oscilações cada vez maiores até o pico, depois volta a formar oscilações
+                cada vez menores — o contorno dos topos e fundos desenha um diamante. Diferente dos outros padrões de
+                reversão, <strong style={{ color: C.text }}>o diamante não tem uma medição de alvo padrão</strong> —
+                trate o rompimento como sinal direcional, não como projeção de preço.
+              </Para>
+              <Field label="Por que acontece" color={C.purple}>
+                Primeiro a volatilidade explode (indecisão e disputa), depois contrai num nível esticado. A expansão
+                mostra exaustão da tendência; a contração mostra que ninguém mais quer pagar mais caro. Quando quebra,
+                quebra para o lado de quem ficou preso.
+              </Field>
+              <Field label="Entrada" color={C.purple}>
+                No rompimento da borda do diamante — para baixo se o padrão está no topo, para cima se está no fundo.
+              </Field>
+            </Card>
+
+            <Card
+              category="Reversão"
+              bias="Long"
+              title="Fundo Arredondado"
+              diagram={<FundoArredondado />}
+              legend={[
+                { text: 'Resistência do início da cuia', kind: 'dash' },
+                { text: 'Rompimento no fim da curva', color: C.green },
+              ]}
+            >
+              <Para>
+                Reversão gradual em formato de "U" ou cuia. Não há um evento único: o sentimento migra lentamente de
+                vendedor para comprador, com a pressão de venda secando aos poucos. É típico de ativos esquecidos que
+                começam a ser acumulados sem pressa.
+              </Para>
+              <Field label="Entrada" color={C.purple}>
+                Long na confirmação do rompimento no fim da curva — a resistência formada pelo início da cuia.
+              </Field>
+              <Field label="Alvo" color={C.purple}>
+                Profundidade da cuia (resistência até o fundo) projetada a partir do rompimento; parcial em 50% dessa
+                projeção.
+              </Field>
+            </Card>
+
+            <SectionTitle category="Continuação" title="Triângulos" />
+
+            <Card
+              category="Continuação"
+              bias="Long"
+              title="Triângulo Ascendente"
+              diagram={<TrianguloAscendente />}
+              legend={[
+                { text: 'Resistência plana / Suporte ascendente', kind: 'dash' },
+                { text: 'Alvo = mesmo tamanho do mastro', color: C.green },
+              ]}
+            >
+              <Para>
+                A resistência é plana (todos os topos no mesmo nível) e o suporte sobe, tocando cada fundo. O comprador
+                aceita pagar cada vez mais caro — tem pressa — enquanto o vendedor defende sempre o mesmo preço. O
+                mastro que entra no triângulo é replicado, mesma cor e tamanho, no rompimento.
+              </Para>
+              <Field label="Entrada" color={C.purple}>
+                Long no rompimento da resistência plana, preferencialmente com reteste por cima.
+              </Field>
+              <TargetsBox
+                title="Potenciais alvos"
+                color={C.green}
+                chips={['0.5× mastro', '1× mastro', '1.5× mastro', '2× mastro']}
+              />
+            </Card>
+
+            <Card
+              category="Continuação"
+              bias="Short"
+              title="Triângulo Descendente"
+              diagram={<TrianguloDescendente />}
+              legend={[
+                { text: 'Suporte plano / Resistência descendente', kind: 'dash' },
+                { text: 'Alvo = mesmo tamanho do mastro', color: C.red },
+              ]}
+            >
+              <Para>
+                Espelho do ascendente: suporte plano, resistência caindo tocando cada topo. O vendedor aceita vender
+                cada vez mais barato enquanto o comprador defende sempre no mesmo preço — é uma parede sendo martelada
+                até não sobrar ordem. O mastro inicial é replicado no rompimento do suporte.
+              </Para>
+              <Field label="Entrada" color={C.purple}>
+                Short no rompimento do suporte plano, preferencialmente com reteste pelo lado de baixo.
+              </Field>
+              <TargetsBox
+                title="Potenciais alvos"
+                color={C.red}
+                chips={['0.5× mastro', '1× mastro', '1.5× mastro', '2× mastro']}
+              />
+            </Card>
+
+            <Card
+              category="Continuação"
+              bias="Long"
+              title="Triângulo Simétrico"
+              diagram={<TrianguloSimetrico />}
+              legend={[
+                { text: 'Resistência caindo / Suporte subindo', kind: 'dash' },
+                { text: 'Alvo = mesmo tamanho do mastro', color: C.green },
+              ]}
+            >
+              <Para>
+                As duas linhas convergem: resistência caindo tocando os topos, suporte subindo tocando os fundos. Ele
+                tende a continuar na direção da perna que o originou. O mastro é replicado no rompimento, para cima ou
+                para baixo conforme a direção.
+              </Para>
+              <Field label="Entrada" color={C.purple}>
+                No rompimento da borda do triângulo, a favor da perna que originou o padrão — se veio de alta, long; se
+                veio de baixa, short.
+              </Field>
+              <Callout color={C.amber}>
+                <strong>Padrão bilateral e perigoso.</strong> O preço pode romper para qualquer lado, especialmente se
+                falhar volume/contexto. Não opere só pela forma — exige confirmação de contexto (suporte/resistência de
+                timeframe maior, volume, momentum) e stop apertado fora do triângulo.
+              </Callout>
+              <TargetsBox
+                title="Potenciais alvos"
+                color={C.green}
+                chips={['0.5× mastro', '1× mastro', '1.5× mastro', '2× mastro']}
+              />
+            </Card>
+
+            <SectionTitle category="Continuação" title="Canais e Cunhas" />
+
+            <Card
+              category="Continuação"
+              bias="Long"
+              title="Canal de Alta"
+              diagram={<CanalAlta />}
+              legend={[
+                { text: 'Suporte e resistência paralelos', kind: 'dash' },
+                { text: 'Alvo = mesma largura do canal', color: C.green },
+              ]}
+            >
+              <Para>
+                Duas retas paralelas tocando os fundos e os topos. A largura do canal é medida e replicada, mesma cor e
+                tamanho, a partir do rompimento da resistência.
+              </Para>
+              <TargetsBox
+                title="Potenciais alvos"
+                color={C.green}
+                chips={['Meio canal', '1 canal', '1 canal e meio', '2 canais']}
+              />
+            </Card>
+
+            <Card
+              category="Continuação"
+              bias="Short"
+              title="Canal de Baixa"
+              diagram={<CanalBaixa />}
+              legend={[
+                { text: 'Suporte e resistência paralelos', kind: 'dash' },
+                { text: 'Alvo = mesma largura do canal', color: C.red },
+              ]}
+            >
+              <Para>Mesma leitura, invertida: a largura do canal é replicada a partir do rompimento do suporte.</Para>
+              <TargetsBox
+                title="Potenciais alvos"
+                color={C.red}
+                chips={['Meio canal', '1 canal', '1 canal e meio', '2 canais']}
+              />
+            </Card>
+
+            <Card
+              category="Reversão"
+              bias="Short"
+              title="Canal de Alta em Resistência"
+              diagram={<CanalAltaEmResistencia />}
+              legend={[
+                { text: 'Resistência de timeframe maior', color: C.red, kind: 'dash' },
+                { text: 'Canal de alta', kind: 'dash' },
+                { text: 'Perda do canal = entrada', color: C.red },
+              ]}
+            >
+              <Para>
+                O preço sobe fazendo topos e fundos ascendentes dentro de um canal, mas chega numa resistência
+                relevante. Ali a tendência de curto prazo encontra oferta de timeframe maior. Sinal extra de fraqueza:
+                se a amplitude entre topos e fundos vai diminuindo, o movimento já está perdendo força antes mesmo do
+                rompimento.
+              </Para>
+              <Field label="Entrada" color={C.purple}>
+                Short na perda da linha inferior do canal, dentro da zona de resistência.
+              </Field>
+              <Field label="Alvo" color={C.purple}>
+                Alvo 1: 50% da altura do canal. Alvo 2: base do canal / próximo suporte relevante.
+              </Field>
+            </Card>
+
+            <Card
+              category="Reversão"
+              bias="Long"
+              title="Canal de Baixa em Suporte"
+              diagram={<CanalBaixaEmSuporte />}
+              legend={[
+                { text: 'Suporte de timeframe maior', color: C.green, kind: 'dash' },
+                { text: 'Canal de baixa', kind: 'dash' },
+                { text: 'Rompimento do canal = entrada', color: C.green },
+              ]}
+            >
+              <Para>
+                Espelho do canal de alta. O preço cai em canal ordenado até encontrar um suporte relevante de timeframe
+                maior. Se a amplitude do canal vai estreitando, a queda já está sem força — o movimento vira mais
+                realização do que venda agressiva.
+              </Para>
+              <Field label="Entrada" color={C.purple}>
+                Long no rompimento da linha superior do canal, dentro da zona de suporte.
+              </Field>
+              <Field label="Alvo" color={C.purple}>
+                Alvo 1: 50% da altura do canal. Alvo 2: topo do canal / próxima resistência relevante.
+              </Field>
+            </Card>
+
+            <Card
+              category="Continuação"
+              bias="Short"
+              title="Cunha Ascendente"
+              diagram={<CunhaAscendente />}
+              legend={[
+                { text: 'Duas retas subindo, convergindo', kind: 'dash' },
+                { text: 'Alvo = mesmo tamanho da cunha', color: C.red },
+              ]}
+            >
+              <Para>
+                Cada nova perna de alta é menor que a anterior — o comprador está sem fôlego, comprando por inércia.
+                Sinal de reversão de baixa apesar da subida. A seta de rompimento aponta para baixo com o{' '}
+                <strong style={{ color: C.red }}>mesmo tamanho da altura da cunha</strong>.
+              </Para>
+              <Field label="Entrada" color={C.purple}>Short no rompimento da linha inferior da cunha.</Field>
+              <TargetsBox title="Potenciais alvos" color={C.red} chips={['0.5× cunha', '1× cunha', '1.5× cunha']} />
+            </Card>
+
+            <Card
+              category="Continuação"
+              bias="Long"
+              title="Cunha Descendente"
+              diagram={<CunhaDescendente />}
+              legend={[
+                { text: 'Duas retas caindo, convergindo', kind: 'dash' },
+                { text: 'Alvo = mesmo tamanho da cunha', color: C.green },
+              ]}
+            >
+              <Para>
+                Os fundos caem menos do que os topos: a venda está perdendo amplitude a cada perna. Mesma lógica
+                invertida — a seta de rompimento aponta para cima com o mesmo tamanho da altura da cunha.
+              </Para>
+              <Field label="Entrada" color={C.purple}>Long no rompimento da linha superior da cunha.</Field>
+              <TargetsBox title="Potenciais alvos" color={C.green} chips={['0.5× cunha', '1× cunha', '1.5× cunha']} />
+            </Card>
+
+            <SectionTitle category="Continuação" title="Bandeiras e Flâmulas" />
+
+            <Card
+              category="Continuação"
+              bias="Long"
+              title="Bandeira de Alta"
+              diagram={<BandeiraAlta />}
+              legend={[
+                { text: 'Mastro', color: C.green },
+                { text: 'Alvo 1 = altura da bandeira', color: C.amber },
+                { text: 'Alvo 2 = mastro replicado', color: C.green },
+              ]}
+            >
+              <Para>
+                <strong style={{ color: C.green }}>Mastro</strong> é o impulso inicial.{' '}
+                <strong style={{ color: C.amber }}>Alvo 1</strong> é a altura da bandeira, projetada a partir do
+                rompimento. <strong style={{ color: C.green }}>Alvo 2</strong>, mais ambicioso, é a altura do mastro
+                completo — mesma cor da medida original.
+              </Para>
+              <Field label="Entrada" color={C.purple}>
+                No rompimento do canal da bandeira, a favor do impulso original. Stop logo abaixo da bandeira — por
+                isso o risco é pequeno.
+              </Field>
+              <Callout color={C.purple}>
+                <strong>Nota de precisão:</strong> medir o mastro projetando-o a partir do TOPO da bandeira (não do
+                ponto de rompimento) costuma cravar o alvo com mais precisão. A confiabilidade aumenta muito quando
+                esse alvo coincide com um suporte ou resistência real já existente no gráfico — confluência de projeção
+                + zona histórica. Sem confluência, a projeção ainda é útil, mas menos precisa. Use como referência de
+                entrada ou saída — total ou parcial.
+              </Callout>
+              <TargetsBox
+                title="Alvo 2 = mesmo tamanho do mastro"
+                color={C.green}
+                note="Projeção igual à altura do mastro, na mesma cor da seta."
+              />
+            </Card>
+
+            <Card
+              category="Continuação"
+              bias="Short"
+              title="Bandeira de Baixa"
+              diagram={<BandeiraBaixa />}
+              legend={[
+                { text: 'Mastro', color: C.red },
+                { text: 'Alvo 1 = altura da bandeira', color: C.amber },
+                { text: 'Alvo 2 = mastro replicado', color: C.red },
+              ]}
+            >
+              <Para>
+                Mesma leitura invertida: Alvo 1 é a altura da bandeira, Alvo 2 é a altura do mastro completo, ambos
+                projetados para baixo a partir do rompimento.
+              </Para>
+              <Field label="Entrada" color={C.purple}>
+                Short no rompimento da parte inferior do canal da bandeira.
+              </Field>
+              <Callout color={C.purple}>
+                <strong>Nota de precisão:</strong> medir o mastro a partir do FUNDO da bandeira (não do rompimento)
+                crava o alvo com mais precisão. A confiabilidade sobe quando esse alvo coincide com um suporte ou
+                resistência real já existente no gráfico. Sem confluência, a projeção ainda é útil, mas menos precisa.
+              </Callout>
+              <TargetsBox
+                title="Alvo 2 = mesmo tamanho do mastro"
+                color={C.red}
+                note="Projeção igual à altura do mastro, na mesma cor da seta."
+              />
+            </Card>
+
+            <Card
+              category="Continuação"
+              bias="Long"
+              title="Flâmula de Alta"
+              diagram={<FlamulaAlta />}
+              legend={[
+                { text: 'Mastro', color: C.green },
+                { text: 'Alvo 1 = altura da flâmula', color: C.amber },
+                { text: 'Alvo 2 = mastro replicado', color: C.green },
+              ]}
+            >
+              <Para>
+                Igual à bandeira, mas a consolidação converge num triangulozinho simétrico em vez de um canal paralelo.
+                O mastro (subida antes da consolidação) é a base da projeção: o rompimento tende a repetir esse mesmo
+                movimento — mesma seta verde, replicada.
+              </Para>
+              <Field label="Entrada" color={C.purple}>No rompimento da flâmula, a favor do mastro.</Field>
+              <TargetsBox
+                title="Alvo 2 = mesmo tamanho do mastro"
+                color={C.green}
+                note="Projeção igual à altura do mastro, na mesma cor da seta."
+              />
+            </Card>
+
+            <Card
+              category="Continuação"
+              bias="Short"
+              title="Flâmula de Baixa"
+              diagram={<FlamulaBaixa />}
+              legend={[
+                { text: 'Mastro', color: C.red },
+                { text: 'Alvo 1 = altura da flâmula', color: C.amber },
+                { text: 'Alvo 2 = mastro replicado', color: C.red },
+              ]}
+            >
+              <Para>
+                Mesma leitura invertida: o mastro de queda inicial define o tamanho esperado do movimento após o
+                rompimento da flâmula.
+              </Para>
+              <Field label="Entrada" color={C.purple}>Short no rompimento da flâmula, a favor do mastro.</Field>
+              <TargetsBox
+                title="Alvo 2 = mesmo tamanho do mastro"
+                color={C.red}
+                note="Projeção igual à altura do mastro, na mesma cor da seta."
+              />
+            </Card>
+
+            <SectionTitle category="Ferramentas" title="Falso Rompimento e Pullback" />
+
+            <Card
+              category="Ferramentas"
+              title="Falso Rompimento (exemplo prático)"
+              diagram={<FalsoRompimento />}
+              legend={[
+                { text: 'Resistência e LTA (suporte) do triângulo', kind: 'dash' },
+                { text: 'Falso rompimento (rompe e volta)', color: '#fbbf24', kind: 'dot' },
+                { text: 'Entrada = reteste da LTA por baixo', color: C.purple, kind: 'dot' },
+              ]}
+            >
+              <Para>
+                Dentro do triângulo (resistência e LTA marcadas), o preço vem de cima e{' '}
+                <strong style={{ color: C.text }}>rompe a LTA para baixo</strong> — o ponto amarelo marca esse falso
+                rompimento. Ele volta e <strong style={{ color: C.purple }}>retesta a mesma LTA por baixo</strong> —
+                esse reteste é a entrada — antes de o preço seguir e romper a resistência do outro lado.
+              </Para>
+            </Card>
+
+            <Card
+              category="Ferramentas"
+              title="Estudo de caso: falso rompimento no triângulo descendente"
+              diagram={<FalsoRompimentoTriangulo />}
+              legend={[
+                { text: 'Suporte plano e LTB do triângulo', kind: 'dash' },
+                { text: 'Rompimento falso da linha de tendência', color: '#fbbf24', kind: 'dot' },
+                { text: 'Entrada no pullback', color: C.purple, kind: 'dot' },
+                { text: 'Perda do suporte plano', color: C.red },
+              ]}
+            >
+              <Para>
+                Triângulo descendente clássico: linha de tendência de baixa no topo e suporte plano embaixo. No último
+                pico, o preço rompe ACIMA da linha de tendência — e falha. O mercado varre os stops dos vendidos e as
+                compras de rompimento dos otimistas, e então desaba pelo suporte plano.
+              </Para>
+              <Field label="Como entrar no short depois do falso rompimento" color={C.purple}>
+                <strong style={{ color: C.text }}>Opção A — Reteste do suporte plano rompido:</strong> depois que o
+                preço perde o suporte plano do triângulo, espera o pullback voltar até esse mesmo nível — que agora
+                atua como resistência — e entra na rejeição.
+                <br />
+                <strong style={{ color: C.text }}>Opção B — Retração de Fibonacci:</strong> traça a retração do topo do
+                rompimento falso até o fundo seguinte e procura a entrada nos níveis centrais —{' '}
+                <strong style={{ color: C.text }}>0,5 e 0,618</strong>, o "coração do Fibo". É ali que o pullback
+                costuma terminar.
+                <br />
+                <strong style={{ color: C.text }}>Opção C — Reteste da linha de tendência:</strong> espera o preço
+                voltar até a própria LTA que foi rompida no falso rompimento e entra na rejeição.
+              </Field>
+              <Callout color={C.purple}>
+                Essa técnica não é exclusiva do triângulo descendente. Vale para <strong>qualquer padrão</strong>:
+                depois de um falso rompimento, a retração de Fibonacci ou o reteste da linha rompida oferecem a entrada
+                com o melhor risco/retorno — porque o stop fica logo acima do pavio do rompimento falso.
+              </Callout>
+            </Card>
+
+            <div
+              style={{
+                background: C.card,
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: 16,
+                padding: 26,
+                marginBottom: 24,
+              }}
+            >
+              <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+                <Chip label="Ferramentas" color={C.amber} />
+              </div>
+              <div style={{ fontSize: 30, fontWeight: 600, marginBottom: 20, color: C.text }}>Pullback / Reteste</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
+                <div>
+                  <PullbackSuportePlano />
+                  <div style={{ textAlign: 'center', marginTop: 10, fontSize: 16, fontWeight: 600, color: C.legend }}>
+                    Suporte plano
+                  </div>
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-foreground">
-                    Falso rompimento não é a única forma de operar — e padrões podem estar aninhados
-                  </h3>
-                </div>
-              </div>
-              <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
-                <p>
-                  O falso rompimento é <strong className="text-foreground">uma técnica de entrada</strong>, não a
-                  regra geral dos padrões. Se uma reversão se formou de forma completa e válida — por exemplo, um
-                  topo duplo limpo, com rejeição no segundo topo e rompimento do neckline — esse padrão por si só já
-                  é gatilho suficiente, sem precisar esperar um falso rompimento antes.
-                </p>
-                <p>
-                  Além disso, padrões podem aparecer <strong className="text-foreground">aninhados</strong> dentro de
-                  outros padrões maiores: um topo duplo pequeno pode se formar dentro de uma cunha ascendente maior,
-                  ou uma bandeira dentro de um canal de alta. Nesses casos, o padrão menor pode ser operado de forma
-                  independente — com seu próprio critério de entrada, stop e alvo — mesmo que o padrão maior ainda não
-                  tenha se resolvido.
-                </p>
-              </div>
-            </PremiumCard>
-          </section>
-
-
-
-          {/* Reversão */}
-          <section className="space-y-6">
-            <SectionHeading
-              icon={Repeat}
-              title="Padrões de reversão"
-              subtitle="Formações que sinalizam o fim de um movimento. Cada padrão de topo tem um espelho exato no fundo — mesma lógica, direção invertida."
-            />
-
-            <div className="flex items-center gap-2 pt-2">
-              <TrendingDown className="h-4 w-4 text-rose-400" />
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-rose-400">No topo — viés de baixa</h3>
-            </div>
-            <div className="grid grid-cols-1 gap-5">
-              {topPatterns.map((p) => (
-                <PatternCard key={p.name} p={p} />
-              ))}
-            </div>
-
-            <div className="flex items-center gap-2 pt-4">
-              <TrendingUp className="h-4 w-4 text-emerald-400" />
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-emerald-400">
-                No fundo — viés de alta (espelho de cada padrão acima)
-              </h3>
-            </div>
-            <div className="grid grid-cols-1 gap-5">
-              {bottomPatterns.map((p) => (
-                <PatternCard key={p.name} p={p} />
-              ))}
-            </div>
-          </section>
-
-          {/* Cunhas */}
-          <section className="space-y-5">
-            <SectionHeading
-              icon={Triangle}
-              title="Cunhas"
-              subtitle="Duas linhas convergentes na mesma direção. A convergência estreita a volatilidade e cria um viés probabilístico contrário à inclinação da cunha."
-            />
-            <div className="grid grid-cols-1 gap-5">
-              {wedgePatterns.map((p) => (
-                <PatternCard key={p.name} p={p} />
-              ))}
-            </div>
-          </section>
-
-          {/* Continuação */}
-          <section className="space-y-5">
-            <SectionHeading
-              icon={Layers}
-              title="Padrões de continuação"
-              subtitle="Pausas dentro de uma tendência. O preço não reverte — apenas descansa antes de continuar. São os padrões com melhor risco/retorno, porque o stop fica curto e o alvo é o tamanho do impulso anterior."
-            />
-            <div className="grid grid-cols-1 gap-5">
-              {continuationPatterns.map((p) => (
-                <PatternCard key={p.name} p={p} />
-              ))}
-            </div>
-          </section>
-
-          {/* Exemplo prático: falso rompimento */}
-          <section className="space-y-5">
-            <SectionHeading
-              icon={Crosshair}
-              title="Exemplo prático: falso rompimento"
-              subtitle="Estudo de caso no triângulo descendente — e uma técnica de entrada que vale para qualquer padrão, não só para este."
-            />
-            <PremiumCard className="p-5 lg:p-6" contentClassName="p-0">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <FalseBreakTriangle />
-                <div className="space-y-4">
-                  <div className="flex gap-2.5">
-                    <Brain className="h-4 w-4 text-indigo-400 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-indigo-300">O cenário</p>
-                      <p className="text-sm text-muted-foreground leading-relaxed mt-1">
-                        Triângulo descendente clássico: linha de tendência de baixa no topo, suporte plano embaixo e,
-                        dentro da formação, uma estrutura tipo ombro-cabeça-ombro. No último pico, o preço rompe
-                        ACIMA da linha de tendência — e falha. É o falso rompimento clássico: o mercado varre os
-                        stops dos vendidos e as compras de rompimento dos otimistas, e então desaba pelo suporte
-                        plano.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2.5">
-                    <LogIn className="h-4 w-4 text-violet-400 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-violet-300">
-                        Como entrar no short depois do falso rompimento
-                      </p>
-                      <ul className="text-sm text-muted-foreground leading-relaxed mt-1 space-y-2 list-disc pl-4">
-                        <li>
-                          <strong className="text-foreground">Opção A — Reteste do suporte plano rompido:</strong>{' '}
-                          depois que o preço perde o suporte plano do triângulo, espera o pullback voltar até esse
-                          mesmo nível — que agora atua como resistência — e entra na rejeição.
-                        </li>
-                        <li>
-                          <strong className="text-foreground">Opção B — Retração de Fibonacci:</strong> traça a
-                          retração do topo do rompimento falso até o fundo seguinte e procura a entrada nos níveis
-                          centrais — <span className="text-foreground font-medium">0,5 e 0,618</span>, o "coração do
-                          Fibo". É ali que o pullback costuma terminar.
-                        </li>
-                        <li>
-                          <strong className="text-foreground">Opção C — Reteste da linha de tendência:</strong> espera
-                          o preço voltar até a própria LTA que foi rompida no falso rompimento e entra na rejeição.
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                  <div className="flex gap-2.5 rounded-xl border border-indigo-500/30 bg-indigo-500/[0.08] p-3">
-                    <Info className="h-4 w-4 text-indigo-400 shrink-0 mt-0.5" />
-                    <p className="text-sm text-indigo-200/90 leading-relaxed">
-                      Essa técnica não é exclusiva do triângulo descendente. Ela vale para{' '}
-                      <strong>qualquer padrão</strong>: depois de um falso rompimento, a retração de Fibonacci ou o
-                      reteste da linha rompida oferecem a entrada com o melhor risco/retorno — porque o stop fica
-                      logo acima do pavio do rompimento falso.
-                    </p>
+                  <PullbackFibo />
+                  <div style={{ textAlign: 'center', marginTop: 10, fontSize: 16, fontWeight: 600, color: C.purple }}>
+                    Coração de Fibo (50–61.8%)
                   </div>
                 </div>
               </div>
-            </PremiumCard>
-          </section>
-
-          {/* Técnicas avançadas de alvo e gestão */}
-          <section className="space-y-5">
-            <SectionHeading
-              icon={Scaling}
-              title="Técnicas de alvo e gestão de saída"
-              subtitle="Duas ferramentas heurísticas para projetar alvos e escalar saídas em movimentos estendidos."
-            />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              <PremiumCard className="p-5" contentClassName="p-0">
-                <div className="space-y-3">
-                  <h3 className="text-base font-semibold">Espelhamento de canal</h3>
-                  <ChannelMirror />
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Quando o preço rompe um canal, uma técnica heurística de alvo é espelhar o próprio canal: copiar
-                    a mesma amplitude e inclinação a partir do ponto de rompimento. O topo do canal espelhado vira a
-                    região de alvo. É uma ferramenta <strong className="text-foreground">menos precisa</strong> do
-                    que a projeção do mastro da bandeira — trate como zona de atenção, não como número exato.
-                  </p>
-                </div>
-              </PremiumCard>
-              <PremiumCard className="p-5" contentClassName="p-0">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Scissors className="h-4 w-4 text-indigo-400" />
-                    <h3 className="text-base font-semibold">Parciais por espelhamento sucessivo</h3>
-                  </div>
-                  <SuccessiveMirror />
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Técnica de gestão para movimentos estendidos: durante a tendência, vá espelhando a mesma figura
-                    repetidamente. Faça uma parcial na <strong className="text-foreground">metade</strong> de cada
-                    projeção e outra no <strong className="text-foreground">fim</strong> dela. Quando a próxima
-                    bandeira/consolidação se formar, repita o processo — metade, depois fim — escalando as saídas ao
-                    longo de todo o movimento.
-                  </p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Alternativa discricionária: em vez de seguir mecanicamente, analise se o mercado está sinalizando
-                    reversão (perda de força, divergência, nível de timeframe maior). Se estiver, saia de vez em vez
-                    de continuar escalando.
-                  </p>
-                </div>
-              </PremiumCard>
+              <Para>
+                O reteste depois do rompimento pode acontecer em dois lugares: num{' '}
+                <strong style={{ color: C.text }}>suporte plano</strong> já testado antes, ou na zona de{' '}
+                <strong style={{ color: C.purple }}>50%–61.8% de Fibonacci</strong> traçada do movimento anterior.
+              </Para>
             </div>
-          </section>
 
-          {/* Ferramentas de projeção de alvo */}
-          <section className="space-y-5">
-            <SectionHeading
-              icon={Ruler}
-              title="Ferramentas de projeção de alvo — Fibonacci"
-              subtitle="Os padrões dizem para onde o preço tende a ir. O Fibonacci dá a régua: extensão projeta alvos de continuação, retração estima até onde o pullback pode ir."
+            <Card
+              category="Ferramentas"
+              title="Falso rompimento não é a única forma de operar — e padrões podem estar aninhados"
+              diagram={<PullbackFibo />}
+            >
+              <Para>
+                O falso rompimento é <strong style={{ color: C.text }}>uma técnica de entrada</strong>, não a regra
+                geral dos padrões. Se uma reversão se formou de forma completa e válida — por exemplo, um topo duplo
+                limpo, com rejeição no segundo topo e rompimento do neckline — esse padrão por si só já é gatilho
+                suficiente, sem precisar esperar um falso rompimento antes.
+              </Para>
+              <Para>
+                Além disso, padrões podem aparecer <strong style={{ color: C.text }}>aninhados</strong> dentro de
+                outros padrões maiores: um topo duplo pequeno pode se formar dentro de uma cunha ascendente maior, ou
+                uma bandeira dentro de um canal de alta. Nesses casos, o padrão menor pode ser operado de forma
+                independente — com seu próprio critério de entrada, stop e alvo — mesmo que o padrão maior ainda não
+                tenha se resolvido.
+              </Para>
+            </Card>
+
+            <SectionTitle category="Ferramentas" title="Espelhamento de Canal" />
+
+            <Card
+              category="Ferramentas"
+              title="Espelhamento de canal"
+              diagram={<EspelhamentoCanal />}
+              legend={[
+                { text: 'Canal original', kind: 'dash' },
+                { text: 'Canal espelhado a partir do rompimento = zona de alvo', color: C.purple, kind: 'dash' },
+              ]}
+            >
+              <Para>
+                Quando o preço rompe um canal, uma técnica heurística de alvo é espelhar o próprio canal: copiar a
+                mesma amplitude e inclinação a partir do ponto de rompimento. O topo do canal espelhado vira a região
+                de alvo. É uma ferramenta <strong style={{ color: C.text }}>menos precisa</strong> do que a projeção do
+                mastro da bandeira — trate como zona de atenção, não como número exato.
+              </Para>
+            </Card>
+
+            <Card
+              category="Ferramentas"
+              title="Parciais por Espelhamento Sucessivo"
+              diagram={<EspelhamentoSucessivo />}
+              legend={[{ text: 'Alvo 1, Alvo 2, Alvo 3 — mesma distância espelhada', color: C.purple }]}
+            >
+              <Para>
+                A distância de um movimento dentro do canal é medida e espelhada para o próximo, sucessivamente. Cada
+                alvo nasce da mesma distância medida no movimento anterior, projetada a partir do próximo pivô.
+              </Para>
+              <Para>
+                Na prática: faça uma parcial na <strong style={{ color: C.text }}>metade</strong> de cada projeção e
+                outra no <strong style={{ color: C.text }}>fim</strong> dela. Quando a próxima consolidação se formar,
+                repita o processo. Alternativa discricionária: se o mercado sinalizar reversão (perda de força,
+                divergência, nível de timeframe maior), saia de vez em vez de continuar escalando.
+              </Para>
+            </Card>
+
+            <SectionTitle category="Ferramentas" title="Fibonacci Retração" />
+
+            <Card
+              category="Ferramentas"
+              bias="Queda"
+              title="Retração em Tendência de Queda"
+              diagram={<FibRetracaoQueda />}
+              legend={[
+                { text: '0% (topo)' },
+                { text: '23.6% · 38.2% · 61.8%', color: C.purple },
+                { text: '50%', color: C.purpleSoft },
+                { text: '100% (fundo)' },
+              ]}
+            >
+              <Para>
+                Traçada do topo (0%) até o fundo (100%) do movimento de queda. O preço puxa de volta até um dos níveis
+                — geralmente 38.2%, 50% ou 61.8% — antes de continuar caindo. Os níveis centrais (0,5 e 0,618) são o
+                "coração do Fibo", a faixa de reação mais observada.
+              </Para>
+              <TargetsBox title="Níveis" color={C.purple} chips={['0', '0,382', '0,5', '0,618', '0,786', '1']} />
+            </Card>
+
+            <Card
+              category="Ferramentas"
+              bias="Alta"
+              title="Retração em Tendência de Alta"
+              diagram={<FibRetracaoAlta />}
+              legend={[
+                { text: '0% (fundo)' },
+                { text: '23.6% · 38.2% · 61.8%', color: C.purple },
+                { text: '50%', color: C.purpleSoft },
+                { text: '100% (topo)' },
+              ]}
+            >
+              <Para>
+                Espelho da anterior: traçada do fundo (0%) até o topo (100%) do movimento de alta, para localizar onde
+                o pullback tende a encontrar suporte.
+              </Para>
+              <TargetsBox title="Níveis" color={C.purple} chips={['0', '0,382', '0,5', '0,618', '0,786', '1']} />
+            </Card>
+
+            <SectionTitle
+              category="Ferramentas"
+              title="Fibonacci Extensão"
+              subtitle="Sempre: um clique no fundo, dois cliques no topo."
             />
 
-            <div className="grid grid-cols-1 gap-5">
-              <PremiumCard className="p-5" contentClassName="p-0">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-base font-bold">Fibonacci Extensão</h3>
-                    <Badge variant="outline" className="text-[11px] border-indigo-500/30 bg-indigo-500/10 text-indigo-300">
-                      Alvos de continuação
-                    </Badge>
-                  </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                    <div className="space-y-2">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Long — depois de uma alta</p>
-                      <FibExtension />
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-rose-400">Short — espelho para baixo</p>
-                      <FibExtension flip />
-                    </div>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <p className="text-muted-foreground leading-relaxed">
-                      Usada para projetar alvos de continuação. É uma ferramenta de 3 cliques:{' '}
-                      <span className="text-foreground font-medium">1</span> no fundo,{' '}
-                      <span className="text-foreground font-medium">2</span> no topo e{' '}
-                      <span className="text-foreground font-medium">3</span> no pullback (a retração antes da
-                      continuação). Importante: o <span className="text-foreground font-medium">nível 0 sai do topo</span>{' '}
-                      (clique 2), não do pullback — o clique 3 é só o ponto de referência para desenhar a extensão. No
-                      short é o espelho exato: clique 1 no topo, 2 no fundo (nível 0) e 3 no pullback, com os níveis
-                      projetados para baixo.
-                    </p>
-                    <div className="rounded-lg border border-indigo-500/20 bg-indigo-500/[0.05] p-3">
-                      <p className="text-[11px] uppercase tracking-wider text-indigo-300 font-semibold mb-1">Níveis</p>
-                      <p className="font-num tabular-nums text-sm text-foreground">
-                        0 · 0,618 · 1 · 1,618 · 2,272 · 2,618 · 3,272 · 4,236
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </PremiumCard>
+            <Card
+              category="Ferramentas"
+              bias="Alta"
+              title="Extensão em Tendência de Alta"
+              diagram={<FibExtensaoAlta />}
+              legend={[
+                { text: '1º clique — fundo · 2º clique — topo', color: C.purple, kind: 'dot' },
+                { text: '0% (no topo) · 61.8% · 100%', color: C.purpleSoft },
+              ]}
+            >
+              <Para>
+                Primeiro clique no fundo, segundo clique no topo, terceiro no pullback.{' '}
+                <strong style={{ color: C.text }}>O nível 0% fica no topo</strong> (o 2º clique) — não no pullback — e
+                os níveis de extensão se projetam a partir dele para cima.
+              </Para>
+              <TargetsBox
+                title="Níveis"
+                color={C.purple}
+                chips={['0', '0,618', '1', '1,618', '2,272', '2,618', '3,272', '4,236']}
+              />
+            </Card>
 
-              <PremiumCard className="p-5" contentClassName="p-0">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-base font-bold">Fibonacci Retração</h3>
-                    <Badge variant="outline" className="text-[11px] border-indigo-500/30 bg-indigo-500/10 text-indigo-300">
-                      Alvo do pullback
-                    </Badge>
-                  </div>
-                  <div className="space-y-5">
-                    <div className="space-y-2">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-rose-400">
-                        Depois de uma queda — traça do topo para o fundo
-                      </p>
-                      <FibRetracement />
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
-                        Depois de uma alta — traça do fundo para o topo
-                      </p>
-                      <FibRetracement flip />
-                    </div>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <p className="text-muted-foreground leading-relaxed">
-                      Usada para estimar até onde um pullback pode ir. Depois de uma{' '}
-                      <span className="text-foreground font-medium">queda</span>, traça de cima para baixo (do topo
-                      para o fundo) para achar o alvo do repique. Depois de uma{' '}
-                      <span className="text-foreground font-medium">alta</span>, o oposto: de baixo para cima (do fundo
-                      para o topo) para achar o alvo da correção. Os níveis centrais —{' '}
-                      <span className="text-foreground font-medium">0,5 e 0,618</span> — são a faixa de reação mais
-                      observada, o "coração do Fibo".
-                    </p>
-                    <div className="rounded-lg border border-indigo-500/20 bg-indigo-500/[0.05] p-3">
-                      <p className="text-[11px] uppercase tracking-wider text-indigo-300 font-semibold mb-1">Níveis</p>
-                      <p className="font-num tabular-nums text-sm text-foreground">0 · 0,382 · 0,5 · 0,618 · 0,786 · 1</p>
-                    </div>
-                  </div>
-                </div>
-              </PremiumCard>
-            </div>
-          </section>
+            <Card
+              category="Ferramentas"
+              bias="Queda"
+              title="Extensão em Tendência de Queda"
+              diagram={<FibExtensaoQueda />}
+              legend={[
+                { text: '1º clique — topo · 2º clique — fundo', color: C.purple, kind: 'dot' },
+                { text: '0% (no fundo) · 61.8% · 100%', color: C.purpleSoft },
+              ]}
+            >
+              <Para>
+                Mesma lógica para baixo: primeiro clique no topo, segundo clique no fundo. O 0% fica no fundo (o 2º
+                clique), e os níveis se projetam para baixo a partir dele.
+              </Para>
+              <TargetsBox
+                title="Níveis"
+                color={C.purple}
+                chips={['0', '0,618', '1', '1,618', '2,272', '2,618', '3,272', '4,236']}
+              />
+            </Card>
 
-          <PremiumCard className="p-5" contentClassName="p-0">
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <div
+              style={{
+                background: C.card,
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: 16,
+                padding: 26,
+                fontSize: 17,
+                lineHeight: 1.7,
+                color: C.body,
+              }}
+            >
               Este módulo continua sendo expandido. Próximas adições: retângulos, mais estudos de caso de falso
               rompimento e exemplos aplicados aos seus próprios trades.
-            </p>
-          </PremiumCard>
+            </div>
+          </div>
         </div>
       </AppLayout>
     </>
