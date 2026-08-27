@@ -316,8 +316,8 @@ const CapitalManagementPage = () => {
 
           <PremiumCard className="card-premium p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-ios-card bg-gradient-to-br from-secondary/20 to-secondary/5">
-                <History className="h-6 w-6 text-secondary-foreground" />
+              <div className="p-3 rounded-ios-card bg-indigo-500/15 border border-indigo-500/25">
+                <History className="h-6 w-6 text-indigo-400" />
               </div>
               <div>
                 <p className="text-xs text-space-400 uppercase tracking-wide font-medium">Average Addition</p>
