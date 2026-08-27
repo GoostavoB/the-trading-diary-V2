@@ -116,17 +116,12 @@ export function ConnectedAccountsList({ refreshKey = 0 }: ConnectedAccountsListP
               key={c.id}
               className="card-premium p-4 flex items-center gap-4"
             >
-              {/* Logo */}
-              <div className="h-10 w-10 rounded-ios bg-space-600 flex items-center justify-center shrink-0 overflow-hidden border border-space-500/40">
-                {c.meta?.logo ? (
-                  <img src={c.meta.logo} alt={c.broker_label || c.broker_slug}
-                    className="h-7 w-7 object-contain" />
-                ) : (
-                  <span className="font-num text-xs text-space-200">
-                    {(c.broker_label || c.broker_slug).slice(0, 2).toUpperCase()}
-                  </span>
-                )}
-              </div>
+              {/* Brand chip — theme-safe in light and dark mode */}
+              <ExchangeLogoChip
+                exchangeId={c.broker_slug}
+                exchangeName={c.broker_label || c.broker_slug}
+                size="md"
+              />
 
               {/* Identity */}
               <div className="flex-1 min-w-0">
