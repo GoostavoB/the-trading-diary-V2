@@ -280,11 +280,50 @@ export function FibExtension() {
 
 /* ---------- Fibonacci: Retração ---------- */
 export function FibRetracement({ flip = false }: D) {
-  const Y = mk(flip);
-  // flip=false: depois de uma queda (topo -> fundo), alvo do repique.
+  // flip=false: depois de uma QUEDA — traça do topo (0) para o fundo (1), alvo do repique.
+  // flip=true: depois de uma ALTA — traça do fundo (0) para o topo (1), alvo da correção.
+  const top = 40;
+  const bottom = 150;
+  const at = (r: number) => (flip ? bottom - r * (bottom - top) : top + r * (bottom - top));
   const levels: Array<[number, string]> = [
-    [150, '0'],
-    [124, '0,382'),
-  ] as never;
-  return null as never;
+    [0, '0'],
+    [0.382, '0,382'],
+    [0.5, '0,5'],
+    [0.618, '0,618'],
+    [0.786, '0,786'],
+    [1, '1'],
+  ];
+  const points = flip
+    ? '8,150 34,132 58,140 84,104 110,72 132,40 152,58 176,76 198,64 222,84 250,72 280,90 310,80'
+    : '8,40 34,58 58,50 84,86 110,118 132,150 152,132 176,114 198,126 222,106 250,118 280,100 310,110';
+  return (
+    <DiagramFrame
+      caption={
+        flip
+          ? 'Depois de uma ALTA: traça do fundo (0) para o topo (1) — os níveis marcam onde a correção tende a parar.'
+          : 'Depois de uma QUEDA: traça do topo (0) para o fundo (1) — os níveis marcam onde o repique tende a parar.'
+      }
+    >
+      {levels.map(([r, label]) => (
+        <g key={label}>
+          <line
+            x1={130}
+            y1={at(r)}
+            x2={300}
+            y2={at(r)}
+            className="stroke-violet-400/45"
+            strokeWidth={1}
+            strokeDasharray="4 4"
+          />
+          <Label x={302} y={at(r) - 2} anchor="end" tone="violet">{label}</Label>
+        </g>
+      ))}
+      <Price points={points} />
+      <circle cx={flip ? 8 : 8} cy={flip ? bottom : top} r={4} className="fill-violet-400" />
+      <circle cx={132} cy={flip ? top : bottom} r={4} className="fill-violet-400" />
+      <Label x={12} y={flip ? bottom - 8 : top - 6} tone="violet">{flip ? 'Início (0)' : 'Topo (0)'}</Label>
+      <Label x={70} y={flip ? top - 6 : bottom + 14} tone="violet">{flip ? 'Topo (1)' : 'Fundo (1)'}</Label>
+    </DiagramFrame>
+  );
 }
+
