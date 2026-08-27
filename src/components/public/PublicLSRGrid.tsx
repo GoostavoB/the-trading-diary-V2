@@ -6,7 +6,7 @@ import { useEffect, useState, useCallback } from 'react';
  * não há chamada ao backend, portanto nenhuma policy de RLS bloqueia visitantes anônimos.
  */
 
-export type PublicSignal = 'avoid-buy' | 'avoid-sell' | 'longs' | 'shorts' | 'neutral' | 'no-data';
+export type PublicSignal = 'avoid-buy' | 'avoid-sell' | 'no-data';
 
 export interface PublicAsset {
   symbol: string;
@@ -52,36 +52,25 @@ export interface PublicMetrics {
   history: { v: number }[];
 }
 
-const LEVEL_HIGH = 1.8;
-const LEVEL_LOW = 0.6;
-const TILT_LONG = 1.05;
-const TILT_SHORT = 0.95;
-
 export function getPublicSignal(m?: PublicMetrics): PublicSignal {
-  const ratio = m?.ratio ?? null;
-  if (ratio === null) return 'no-data';
-  if (ratio >= LEVEL_HIGH) return 'avoid-buy';
-  if (ratio <= LEVEL_LOW) return 'avoid-sell';
-  if (ratio >= TILT_LONG) return 'longs';
-  if (ratio <= TILT_SHORT) return 'shorts';
-  return 'neutral';
+  const longPct = m?.longPct ?? null;
+  const shortPct = m?.shortPct ?? null;
+  if (longPct === null || shortPct === null) return 'no-data';
+  if (longPct > shortPct) return 'avoid-buy';
+  if (shortPct > longPct) return 'avoid-sell';
+  // Empate técnico — tratado como cautela ao lado comprador por padrão.
+  return 'avoid-buy';
 }
 
 export const signalLabels: Record<'pt' | 'en', Record<PublicSignal, string>> = {
   pt: {
     'avoid-buy': 'Evite compras/LONG',
     'avoid-sell': 'Evite vendas/SHORT',
-    longs: 'Longs',
-    shorts: 'Shorts',
-    neutral: 'Neutro',
     'no-data': 'Sem dados',
   },
   en: {
     'avoid-buy': 'Avoid buying/Long',
     'avoid-sell': 'Avoid selling/Short',
-    longs: 'Longs',
-    shorts: 'Shorts',
-    neutral: 'Neutral',
     'no-data': 'No data',
   },
 };
@@ -89,9 +78,6 @@ export const signalLabels: Record<'pt' | 'en', Record<PublicSignal, string>> = {
 const signalClass: Record<PublicSignal, string> = {
   'avoid-buy': 'bg-rose-500/12 text-rose-300 border-rose-500/30',
   'avoid-sell': 'bg-emerald-500/12 text-emerald-300 border-emerald-500/30',
-  longs: 'bg-emerald-500/8 text-emerald-300/90 border-emerald-500/20',
-  shorts: 'bg-rose-500/8 text-rose-300/90 border-rose-500/20',
-  neutral: 'bg-white/5 text-muted-foreground border-border/40',
   'no-data': 'bg-white/5 text-muted-foreground border-border/40',
 };
 
