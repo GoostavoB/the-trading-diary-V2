@@ -201,7 +201,7 @@ const continuationPatterns: Pattern[] = [
     entry: 'Short no rompimento da parte inferior do canal da bandeira.',
     target: 'Alvo 1: altura da bandeira. Alvo 2: altura do mastro projetada do rompimento.',
     precisionNote:
-      'Nota de precisão: medir o mastro a partir do FUNDO da bandeira (não do rompimento) crava o alvo com mais precisão — no espelho de baixa, é a borda da bandeira mais próxima do mastro. Use como referência de entrada ou saída, total ou parcial.',
+      'Nota de precisão: medir o mastro a partir do FUNDO da bandeira (não do rompimento) crava o alvo com mais precisão — no espelho de baixa, é a borda da bandeira mais próxima do mastro. A confiabilidade sobe quando esse alvo coincide com um suporte ou resistência real já existente no gráfico. Sem confluência, a projeção ainda é útil, mas menos precisa. Use como referência de entrada ou saída, total ou parcial.',
   },
   {
     name: 'Flâmula de Alta',
