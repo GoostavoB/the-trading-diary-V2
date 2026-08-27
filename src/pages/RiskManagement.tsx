@@ -143,7 +143,10 @@ export default function RiskManagement() {
               <p className="text-sm text-space-300">Monitor and control your trading risk exposure</p>
             </div>
           </div>
-          <BlurToggleButton />
+          <div className="flex items-center gap-3">
+            <LeverageTableModal />
+            <BlurToggleButton />
+          </div>
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
