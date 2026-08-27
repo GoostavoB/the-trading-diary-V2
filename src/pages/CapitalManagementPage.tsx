@@ -346,11 +346,11 @@ const CapitalManagementPage = () => {
                   <div key={entry.id} className="relative flex gap-6 group">
                     {/* Timeline dot */}
                     <div className="relative z-10 flex-shrink-0">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center shadow-lg">
+                      <div className="w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/25">
                         <DollarSign className="h-7 w-7 text-white" />
                       </div>
                       {index === capitalLog.length - 1 && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent animate-pulse" />
+                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-indigo-400 animate-pulse" />
                       )}
                     </div>
 
