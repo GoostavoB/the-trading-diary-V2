@@ -71,6 +71,7 @@ const LogoGenerator = lazy(() => import("./pages/LogoGenerator"));
 // Phase 2: Leaderboard feature - temporarily disabled for backlog #34
 // const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 const LongShortRatio = lazy(() => import("./pages/LongShortRatio"));
+const PublicLongShortRatio = lazy(() => import("./pages/PublicLongShortRatio"));
 // const EconomicCalendar = lazy(() => import("./pages/EconomicCalendar"));
 const TaxReports = lazy(() => import("./pages/TaxReports"));
 // Phase 2: Trading Accounts module - temporarily disabled for backlog #18 (incomplete form)
