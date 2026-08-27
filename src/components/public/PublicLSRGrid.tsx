@@ -291,8 +291,8 @@ export function PublicLSRGrid({ lang }: { lang: 'pt' | 'en' }) {
                 const trendUp = history.length >= 2 ? history[history.length - 1].v >= history[0].v : null;
                 const trendColor = trendUp === null ? 'hsl(var(--muted-foreground))' : trendUp ? '#34d399' : '#f87171';
                 return (
-                  <div>
-                    <div className="h-10 -mx-1">
+                  <div className="overflow-hidden rounded-md">
+                    <div className="h-10 w-full overflow-hidden">
                       {history.length >= 2 ? (
                         <ResponsiveContainer width="100%" height="100%">
                           <AreaChart data={history} margin={{ top: 2, right: 4, bottom: 0, left: 4 }}>
