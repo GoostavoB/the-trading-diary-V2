@@ -201,6 +201,26 @@ export function Pennant({ flip = false }: D) {
   );
 }
 
+/* ---------- Triângulo Simétrico ---------- */
+export function SymmetricTriangle({ flip = false }: D) {
+  const Y = mk(flip);
+  // flip=false desenha com mastro de alta; flip=true inverte visualmente (mesma lógica bilateral)
+  return (
+    <DiagramFrame caption={flip ? 'Triângulo simétrico após perna de baixa — bilateral, viés contrário à origem' : 'Triângulo simétrico após perna de alta — bilateral, viés a favor da origem'}>
+      <Price points={pts('8,150 34,132 60,112 90,88 120,62 150,116 178,74 206,104 232,82 258,96 284,70 310,52', flip)} />
+      <Guide x1={120} y1={Y(62)} x2={284} y2={Y(88)} tone="muted" />
+      <Guide x1={150} y1={Y(116)} x2={284} y2={Y(94)} tone="muted" />
+      <Guide x1={300} y1={Y(40)} x2={310} y2={Y(40)} tone="bull" />
+      <Guide x1={300} y1={Y(20)} x2={310} y2={Y(20)} tone="bull" />
+      <Arrow x={300} y1={Y(70)} y2={Y(20)} tone="bull" />
+      <Label x={122} y={Y(56)}>Topos descendo</Label>
+      <Label x={152} y={Y(120)}>Fundos subindo</Label>
+      <Label x={308} y={Y(37)} anchor="end" tone="bull">Alvo 1 = abertura</Label>
+      <Label x={308} y={Y(17)} anchor="end" tone="bull">Alvo 2 = perna de origem</Label>
+    </DiagramFrame>
+  );
+}
+
 /* ---------- Pivô ---------- */
 export function Pivot() {
   return (
