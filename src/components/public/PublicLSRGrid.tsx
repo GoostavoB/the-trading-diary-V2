@@ -151,6 +151,7 @@ const copy = {
     updated: 'Atualizado',
     loading: 'Carregando dados ao vivo…',
     refresh: 'Atualizar agora',
+    trend: 'Tendência 4h',
   },
   en: {
     ratio: 'Long/short ratio',
@@ -160,6 +161,7 @@ const copy = {
     updated: 'Updated',
     loading: 'Loading live data…',
     refresh: 'Refresh now',
+    trend: '4h trend',
   },
 };
 
