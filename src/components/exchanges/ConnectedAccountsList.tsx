@@ -16,7 +16,7 @@ const StatusChip = ({ status }: { status: AggregatorConnection['status'] }) => {
   const config: Record<AggregatorConnection['status'], { label: string; cls: string; Icon: React.ElementType }> = {
     active:          { label: 'Active',         cls: 'chip-green',    Icon: CheckCircle2 },
     syncing:         { label: 'Syncing…',       cls: 'chip-electric', Icon: Loader2 },
-    pending:         { label: 'Pending',        cls: 'chip',          Icon: Clock },
+    pending:         { label: 'Pending review', cls: 'chip-orange',   Icon: Clock },
     requires_reauth: { label: 'Reauth needed',  cls: 'chip-orange',   Icon: AlertTriangle },
     error:           { label: 'Error',          cls: 'chip-red',      Icon: AlertTriangle },
     disconnected:    { label: 'Disconnected',   cls: 'chip',          Icon: AlertTriangle },
