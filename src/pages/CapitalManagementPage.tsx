@@ -204,7 +204,7 @@ const CapitalManagementPage = () => {
           </div>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2" size="lg">
+              <Button className="gap-2 bg-indigo-600 hover:bg-indigo-500 text-white border-0 shadow-lg shadow-indigo-600/20" size="lg">
                 <Plus className="h-5 w-5" />
                 Add Capital Entry
               </Button>
