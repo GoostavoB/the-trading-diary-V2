@@ -702,7 +702,9 @@ export function RiskCopilotDrawer() {
                   </button>
                 )}
               </div>
+              <MaxLeverageField />
               <GoalProgressBar pct={rc.monthlyGoalPct} profit={rc.monthlyProfit} goal={rc.monthlyGoal} formatAmount={formatAmount} />
+
               <GordurinhaCard isActive={rc.isGorduraActive} amount={rc.gorduraAmount} formatAmount={formatAmount} />
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
