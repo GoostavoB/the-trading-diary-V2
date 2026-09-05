@@ -509,7 +509,53 @@ function WinRateControl({
   );
 }
 
+/**
+ * Max leverage from the stop distance the trader already measured on the chart.
+ * One input (% distance entry -> stop), one output (max leverage), using the
+ * same reference table as the Leverage Table modal in Risk Control.
+ */
+function MaxLeverageField() {
+  const [value, setValue] = useState('');
+  const parsed = parseFloat(value.replace(',', '.'));
+  const row = value.trim() === '' ? null : maxLeverageForMove(parsed);
+  const invalid = value.trim() !== '' && !row;
+
+  return (
+    <div className="space-y-2 rounded-xl border border-border p-4">
+      <div className="flex items-center gap-1.5">
+        <Label className="text-sm font-semibold">Max leverage</Label>
+        <InfoTooltip text="Enter the distance from your entry to your technical stop, in % (unleveraged). The reference table returns the maximum leverage for that trade." />
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1">
+          <Input
+            inputMode="decimal"
+            placeholder="2.5"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            className="pr-8 font-mono"
+          />
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
+        </div>
+        <div className="min-w-[92px] text-center rounded-xl px-3 py-2 bg-indigo-500/15 border border-indigo-500/30">
+          <div className="text-2xl font-bold font-mono text-indigo-400 tabular-nums">
+            {row ? `${row.leverage}x` : '—'}
+          </div>
+        </div>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        {invalid
+          ? 'Enter a positive percentage, e.g. 2.5'
+          : row
+            ? `Stop distance ${row.range} → up to ${row.leverage}x.`
+            : 'Stop distance from your chart, no prices needed.'}
+      </p>
+    </div>
+  );
+}
+
 export function RiskCopilotDrawer() {
+
   const rc = useRiskCopilot();
   const { medals } = useMonthlyMedals();
   const { profiles, createProfile, deleteProfile, toggleFavorite, moveProfile } = useRiskProfiles();
