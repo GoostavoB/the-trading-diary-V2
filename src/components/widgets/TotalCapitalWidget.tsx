@@ -333,11 +333,13 @@ export const TotalCapitalWidget = memo(({
             </button>
           </div>
         ) : (
+          <div ref={chartRef} className="w-full h-14 md:h-16">
           <svg
             viewBox={`0 0 ${curve.W} ${curve.H}`}
-            className="w-full h-14 md:h-16 overflow-visible"
+            className="w-full h-full overflow-visible"
             preserveAspectRatio="none"
           >
+
             <defs>
               <linearGradient id="capitalFillPositive" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="hsl(var(--apple-green))" stopOpacity="0.35" />
