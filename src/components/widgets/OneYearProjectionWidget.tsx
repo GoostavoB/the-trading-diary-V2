@@ -1,6 +1,7 @@
 import { memo, useMemo, useState } from 'react';
 import { TrendingUp, TrendingDown, Calculator, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useElementSize } from '@/hooks/useElementSize';
 
 interface OneYearProjectionWidgetProps {
   id: string;
@@ -86,6 +87,10 @@ export const OneYearProjectionWidget = memo(({
   const [sliderIdx, setSliderIdx] = useState(5); // default = 1y
   const [mode, setMode] = useState<Mode>('compound');
 
+  // Measure the chart box so the viewBox matches real pixels 1:1 (prevents the
+  // stroke from being stretched into a scribble on wide screens).
+  const [chartRef, chartSize] = useElementSize<HTMLDivElement>({ width: 600, height: 96 });
+
   const horizon = HORIZONS[sliderIdx];
   const hasNoData = totalTrades === 0 || tradingDays === 0 || currentBalance <= 0;
 
@@ -136,7 +141,9 @@ export const OneYearProjectionWidget = memo(({
 
   // ── Curve points across the selected horizon ──
   const curve = useMemo(() => {
-    if (hasNoData) return { points: [] as { x: number; y: number }[], path: '', area: '', yMin: 0, yMax: 0, W: 100, H: 64 };
+    const W = Math.max(1, chartSize.width);
+    const H = Math.max(1, chartSize.height);
+    if (hasNoData) return { points: [] as { x: number; y: number }[], path: '', area: '', yMin: 0, yMax: 0, W, H };
 
     const days = horizon.tradingDays;
     // Sample once per trading day for performance
@@ -165,8 +172,6 @@ export const OneYearProjectionWidget = memo(({
     const yMin = Math.min(currentBalance, ...ys);
     const yMax = Math.max(currentBalance, ...ys);
     const yRange = (yMax - yMin) || 1;
-    const W = 100;
-    const H = 64;
     const path = pts.map((p, i) => {
       const x = p.x * W;
       const y = H - ((p.y - yMin) / yRange) * H;
@@ -175,7 +180,7 @@ export const OneYearProjectionWidget = memo(({
     const area = `${path} L${W} ${H} L0 ${H} Z`;
 
     return { points: pts, path, area, yMin, yMax, W, H };
-  }, [horizon, mode, model, currentBalance, hasNoData]);
+  }, [horizon, mode, model, currentBalance, hasNoData, chartSize.width, chartSize.height]);
 
   // ── Milestones inside yRange ──
   const milestones = useMemo(() => {
@@ -306,9 +311,10 @@ export const OneYearProjectionWidget = memo(({
 
       {/* ── Chart ── */}
       <div className="relative px-5 pb-2">
+        <div ref={chartRef} className="w-full h-20 md:h-24">
         <svg
           viewBox={`0 0 ${curve.W} ${curve.H}`}
-          className="w-full h-20 md:h-24"
+          className="w-full h-full"
           preserveAspectRatio="none"
         >
           <defs>
@@ -331,15 +337,15 @@ export const OneYearProjectionWidget = memo(({
                 y1={m.y}
                 y2={m.y}
                 stroke="hsl(var(--space-gray-400))"
-                strokeWidth="0.3"
-                strokeDasharray="1 1.5"
+                strokeWidth="1"
+                strokeDasharray="3 4"
                 opacity="0.55"
               />
               <text
-                x={curve.W - 1}
-                y={m.y - 1}
+                x={curve.W - 6}
+                y={Math.max(11, m.y - 4)}
                 fill="hsl(var(--space-gray-300))"
-                fontSize="3"
+                fontSize="10"
                 textAnchor="end"
                 className="font-num"
               >
@@ -357,7 +363,7 @@ export const OneYearProjectionWidget = memo(({
               d={curve.path}
               fill="none"
               stroke={isPositive ? 'hsl(var(--apple-green))' : 'hsl(var(--apple-red))'}
-              strokeWidth="1.4"
+              strokeWidth="2"
               strokeLinejoin="round"
               strokeLinecap="round"
             />
@@ -370,12 +376,13 @@ export const OneYearProjectionWidget = memo(({
             const y = curve.H - ((last.y - curve.yMin) / ((curve.yMax - curve.yMin) || 1)) * curve.H;
             return (
               <g>
-                <circle cx={x} cy={y} r="1.6" fill={isPositive ? 'hsl(var(--apple-green))' : 'hsl(var(--apple-red))'} />
-                <circle cx={x} cy={y} r="4" fill="none" stroke={isPositive ? 'hsl(var(--apple-green))' : 'hsl(var(--apple-red))'} strokeWidth="0.5" opacity="0.5" />
+                <circle cx={x} cy={y} r="3" fill={isPositive ? 'hsl(var(--apple-green))' : 'hsl(var(--apple-red))'} />
+                <circle cx={x} cy={y} r="8" fill="none" stroke={isPositive ? 'hsl(var(--apple-green))' : 'hsl(var(--apple-red))'} strokeWidth="1.5" opacity="0.5" />
               </g>
             );
           })()}
         </svg>
+        </div>
       </div>
 
       {/* ── Slider ── */}
