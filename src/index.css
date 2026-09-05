@@ -1403,3 +1403,9 @@
   .chart-fluid-sm { height: clamp(4.5rem, 6vw, 8rem); }
   .chart-fluid-md { height: clamp(9rem, 14vw, 18rem); }
 }
+
+/* Card-shaped links must never be underlined, even with link-underline a11y mode */
+.accessibility-link-underlines a.no-underline,
+.accessibility-link-underlines a.hover-lift,
+.card-premium a.no-underline,
+a.no-underline { text-decoration: none !important; }
