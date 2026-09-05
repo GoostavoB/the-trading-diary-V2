@@ -27,6 +27,7 @@ import { useMonthlyMedals } from '@/hooks/useMonthlyMedals';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { maxLeverageForMove } from '@/utils/leverageTable';
 
 const TIER_COLOR: Record<string, string> = {
   red: 'text-destructive',
