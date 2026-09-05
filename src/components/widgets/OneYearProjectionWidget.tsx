@@ -285,7 +285,7 @@ export const OneYearProjectionWidget = memo(({
             In {horizon.label}
           </div>
           <div className={cn(
-            'font-display text-4xl md:text-5xl font-bold tabular-nums tracking-tight leading-none mt-1',
+            'font-display text-fluid-hero font-bold tabular-nums tracking-tight leading-none mt-1',
             isPositive ? 'text-gradient-electric' : 'text-gradient-loss'
           )}>
             {formatCurrency(result.projectedBalance, true)}
@@ -295,7 +295,7 @@ export const OneYearProjectionWidget = memo(({
         <div className="text-right">
           <div className="text-fluid-xs text-space-300 uppercase tracking-wider">Growth</div>
           <div className={cn(
-            'font-num text-lg font-semibold tabular-nums mt-1',
+            'font-num text-fluid-lg font-semibold tabular-nums mt-1',
             isPositive ? 'text-apple-green' : 'text-apple-red'
           )}>
             {isPositive ? '+' : ''}{formatCurrency(result.projectedPnL, true)}

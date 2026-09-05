@@ -37,7 +37,7 @@ function ProfitFactorGauge({ value }: { value: number }) {
   return (
     <div className="space-y-2">
       <div className="flex items-baseline gap-2">
-        <span className="text-2xl font-black tabular-nums text-foreground">{value.toFixed(2)}</span>
+        <span className="text-fluid-2xl font-black tabular-nums text-foreground">{value.toFixed(2)}</span>
         <span className={cn("text-fluid-xs font-bold tracking-widest", zone.color)}>{zone.text}</span>
       </div>
       {/* Track */}
@@ -75,7 +75,7 @@ function WinRateBar({ winRate, totalTrades }: { winRate: number; totalTrades: nu
   return (
     <div className="space-y-2">
       <div className="flex items-baseline gap-2">
-        <span className="text-2xl font-black tabular-nums text-foreground">{winRate.toFixed(1)}%</span>
+        <span className="text-fluid-2xl font-black tabular-nums text-foreground">{winRate.toFixed(1)}%</span>
         <span className={cn("text-fluid-xs font-bold tracking-widest", band.color)}>{band.label}</span>
       </div>
       {/* Stacked bar */}
@@ -132,7 +132,7 @@ function AvgROIRing({ value }: { value: number }) {
       </div>
       <div>
         <div className={cn(
-          "text-2xl font-black tabular-nums leading-none",
+          "text-fluid-2xl font-black tabular-nums leading-none",
           isPos ? "text-emerald-400" : "text-rose-400"
         )}>
           {isPos ? '+' : ''}{value.toFixed(2)}%
@@ -153,7 +153,7 @@ function TradesDotGrid({ totalTrades, winRate }: { totalTrades: number; winRate:
 
   return (
     <div className="space-y-2">
-      <div className="text-2xl font-black tabular-nums text-foreground leading-none">{totalTrades}</div>
+      <div className="text-fluid-2xl font-black tabular-nums text-foreground leading-none">{totalTrades}</div>
       <div className="text-fluid-xs text-muted-foreground/50">total trades</div>
       {totalTrades > 0 && (
         <div className="flex flex-wrap gap-[3px] mt-1">
@@ -199,7 +199,7 @@ function PnLCard({ totalPnL, totalTrades }: { totalPnL: number; totalTrades: num
           Total P&L
         </div>
         <div className={cn(
-          "text-3xl font-black tabular-nums leading-none",
+          "text-fluid-2xl font-black tabular-nums leading-none",
           isPos ? "text-emerald-300" : "text-rose-300"
         )}>
           <BlurredCurrency amount={totalPnL} className="inline" />

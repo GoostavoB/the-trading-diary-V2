@@ -105,7 +105,7 @@ function StreakDisplay({
             )}
           </div>
           <div className={cn(
-            "text-3xl font-black tabular-nums leading-none font-num",
+            "text-fluid-2xl font-black tabular-nums leading-none font-num",
             isWin ? "text-gradient-electric" : "text-slate-300"
           )}>
             {streak.count}
@@ -238,7 +238,7 @@ function TradeCard({
 
       {/* PnL */}
       <div className={cn(
-        "text-lg font-black tabular-nums leading-none font-num",
+        "text-fluid-lg font-black tabular-nums leading-none font-num",
         isBest ? "text-gradient-electric" : "text-rose-300"
       )}>
         <BlurredCurrency amount={pnl} className="inline" />
@@ -351,7 +351,7 @@ function DayCard({
       </div>
 
       <div className={cn(
-        "text-base font-black tabular-nums font-num",
+        "text-fluid-base font-black tabular-nums font-num",
         !hasData
           ? "text-space-400"
           : (isBest ? "text-gradient-electric" : "text-orange-300")

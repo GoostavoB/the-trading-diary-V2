@@ -46,7 +46,7 @@ function RRScale({ value, avgWin, avgLoss }: { value: number; avgWin: number; av
   return (
     <div className="space-y-1.5" title={tooltip}>
       <div className="flex items-baseline gap-1.5">
-        <span className={cn('text-xl font-black tabular-nums font-num text-gradient-electric')}>
+        <span className={cn('text-fluid-xl font-black tabular-nums font-num text-gradient-electric')}>
           {value.toFixed(2)}
         </span>
         <span className="text-fluid-xs text-muted-foreground/50">: 1</span>
@@ -109,9 +109,9 @@ function WLBalance({
   return (
     <div className="space-y-1.5">
       <div className="flex items-baseline justify-between">
-        <span className="text-emerald-400 text-xl font-black tabular-nums font-num">{winCount}</span>
+        <span className="text-emerald-400 text-fluid-xl font-black tabular-nums font-num">{winCount}</span>
         <span className="text-fluid-xs text-muted-foreground/40 font-mono">W / L</span>
-        <span className="text-rose-400 text-xl font-black tabular-nums font-num">{lossCount}</span>
+        <span className="text-rose-400 text-fluid-xl font-black tabular-nums font-num">{lossCount}</span>
       </div>
 
       {/* Split bar with absolute counts */}
@@ -197,7 +197,7 @@ function DrawdownMeter({
   return (
     <div className="space-y-1.5">
       <div className="flex items-baseline gap-1.5">
-        <span className={cn('text-xl font-black tabular-nums font-num', color)}>
+        <span className={cn('text-fluid-xl font-black tabular-nums font-num', color)}>
           -{pct.toFixed(1)}%
         </span>
       </div>

@@ -138,7 +138,7 @@ export function MonthlyGoalWidget() {
         </div>
       ) : !hasGoal ? (
         <div className="px-5 pb-5 pt-2">
-          <div className="text-2xl font-display font-bold text-space-400">—</div>
+          <div className="text-fluid-2xl font-display font-bold text-space-400">—</div>
           <p className="mt-1.5 text-fluid-xs text-space-400">
             Set a monthly target — e.g. cover a fixed expense like rent — and this tracks your progress every month automatically.
           </p>
@@ -150,7 +150,7 @@ export function MonthlyGoalWidget() {
             <div>
               <div
                 className={cn(
-                  'font-display text-4xl md:text-5xl font-bold tabular-nums tracking-tight leading-none',
+                  'font-display text-fluid-hero font-bold tabular-nums tracking-tight leading-none',
                   pnlPositive ? 'text-gradient-electric' : 'text-gradient-loss',
                 )}
               >
