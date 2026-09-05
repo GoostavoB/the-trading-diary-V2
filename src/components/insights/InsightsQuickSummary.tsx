@@ -38,7 +38,7 @@ function ProfitFactorGauge({ value }: { value: number }) {
     <div className="space-y-2">
       <div className="flex items-baseline gap-2">
         <span className="text-2xl font-black tabular-nums text-foreground">{value.toFixed(2)}</span>
-        <span className={cn("text-[10px] font-bold tracking-widest", zone.color)}>{zone.text}</span>
+        <span className={cn("text-fluid-xs font-bold tracking-widest", zone.color)}>{zone.text}</span>
       </div>
       {/* Track */}
       <div className="relative h-1.5 w-full rounded-full overflow-hidden flex gap-px">
@@ -51,7 +51,7 @@ function ProfitFactorGauge({ value }: { value: number }) {
           style={{ left: `${pct}%` }}
         />
       </div>
-      <div className="flex justify-between text-[9px] text-muted-foreground/40 tracking-wider">
+      <div className="flex justify-between text-fluid-2xs text-muted-foreground/40 tracking-wider">
         <span>0</span><span>1</span><span>1.5</span><span>2</span><span>3+</span>
       </div>
     </div>
@@ -76,7 +76,7 @@ function WinRateBar({ winRate, totalTrades }: { winRate: number; totalTrades: nu
     <div className="space-y-2">
       <div className="flex items-baseline gap-2">
         <span className="text-2xl font-black tabular-nums text-foreground">{winRate.toFixed(1)}%</span>
-        <span className={cn("text-[10px] font-bold tracking-widest", band.color)}>{band.label}</span>
+        <span className={cn("text-fluid-xs font-bold tracking-widest", band.color)}>{band.label}</span>
       </div>
       {/* Stacked bar */}
       <div className="h-2 w-full rounded-full overflow-hidden bg-rose-500/20 relative">
@@ -85,7 +85,7 @@ function WinRateBar({ winRate, totalTrades }: { winRate: number; totalTrades: nu
           style={{ width: `${winRate}%` }}
         />
       </div>
-      <div className="flex items-center gap-3 text-[10px]">
+      <div className="flex items-center gap-3 text-fluid-xs">
         <span className="flex items-center gap-1">
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400/70" />
           <span className="text-muted-foreground/60">{wins} wins</span>
@@ -127,7 +127,7 @@ function AvgROIRing({ value }: { value: number }) {
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-[9px] font-bold text-muted-foreground/50">ROI</span>
+          <span className="text-fluid-2xs font-bold text-muted-foreground/50">ROI</span>
         </div>
       </div>
       <div>
@@ -137,7 +137,7 @@ function AvgROIRing({ value }: { value: number }) {
         )}>
           {isPos ? '+' : ''}{value.toFixed(2)}%
         </div>
-        <div className="text-[10px] text-muted-foreground/50 mt-1">avg per trade</div>
+        <div className="text-fluid-xs text-muted-foreground/50 mt-1">avg per trade</div>
       </div>
     </div>
   );
@@ -154,7 +154,7 @@ function TradesDotGrid({ totalTrades, winRate }: { totalTrades: number; winRate:
   return (
     <div className="space-y-2">
       <div className="text-2xl font-black tabular-nums text-foreground leading-none">{totalTrades}</div>
-      <div className="text-[10px] text-muted-foreground/50">total trades</div>
+      <div className="text-fluid-xs text-muted-foreground/50">total trades</div>
       {totalTrades > 0 && (
         <div className="flex flex-wrap gap-[3px] mt-1">
           {dots.map((type, i) => (
@@ -167,7 +167,7 @@ function TradesDotGrid({ totalTrades, winRate }: { totalTrades: number; winRate:
             />
           ))}
           {totalTrades > 35 && (
-            <span className="text-[9px] text-muted-foreground/40 self-center ml-1">+{totalTrades - 35}</span>
+            <span className="text-fluid-2xs text-muted-foreground/40 self-center ml-1">+{totalTrades - 35}</span>
           )}
         </div>
       )}
@@ -195,7 +195,7 @@ function PnLCard({ totalPnL, totalTrades }: { totalPnL: number; totalTrades: num
       )} />
 
       <div className="relative space-y-2">
-        <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
+        <div className="text-fluid-xs font-bold text-muted-foreground/60 uppercase tracking-widest">
           Total P&L
         </div>
         <div className={cn(
@@ -204,7 +204,7 @@ function PnLCard({ totalPnL, totalTrades }: { totalPnL: number; totalTrades: num
         )}>
           <BlurredCurrency amount={totalPnL} className="inline" />
         </div>
-        <div className="text-[10px] text-muted-foreground/40">
+        <div className="text-fluid-xs text-muted-foreground/40">
           across {totalTrades} trades
         </div>
         {/* Bottom accent line */}
@@ -239,7 +239,7 @@ export const InsightsQuickSummary = memo(({
 
       {/* 2 — Win Rate */}
       <div className={cardBase}>
-        <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-3">
+        <div className="text-fluid-xs font-bold text-muted-foreground/60 uppercase tracking-widest mb-3">
           {t('dashboard.winRate')}
         </div>
         <WinRateBar winRate={winRate} totalTrades={totalTrades} />
@@ -247,7 +247,7 @@ export const InsightsQuickSummary = memo(({
 
       {/* 3 — Profit Factor */}
       <div className={cardBase}>
-        <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-3">
+        <div className="text-fluid-xs font-bold text-muted-foreground/60 uppercase tracking-widest mb-3">
           {t('dashboard.profitFactor')}
         </div>
         <ProfitFactorGauge value={profitFactor} />
@@ -255,7 +255,7 @@ export const InsightsQuickSummary = memo(({
 
       {/* 4 — Avg ROI */}
       <div className={cardBase}>
-        <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-3">
+        <div className="text-fluid-xs font-bold text-muted-foreground/60 uppercase tracking-widest mb-3">
           {t('dashboard.avgROI')}
         </div>
         <AvgROIRing value={avgROI} />
@@ -263,7 +263,7 @@ export const InsightsQuickSummary = memo(({
 
       {/* 5 — Total Trades */}
       <div className={cardBase}>
-        <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-3">
+        <div className="text-fluid-xs font-bold text-muted-foreground/60 uppercase tracking-widest mb-3">
           {t('dashboard.totalTrades')}
         </div>
         <TradesDotGrid totalTrades={totalTrades} winRate={winRate} />

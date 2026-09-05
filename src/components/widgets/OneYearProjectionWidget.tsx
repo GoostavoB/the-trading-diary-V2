@@ -215,7 +215,7 @@ export const OneYearProjectionWidget = memo(({
     return (
       <div className="relative flex flex-col h-full overflow-hidden p-5">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-medium text-space-200 tracking-tight">
+          <span className="text-fluid-sm font-medium text-space-200 tracking-tight">
             Projection
           </span>
           <span className="chip">Need more data</span>
@@ -236,13 +236,13 @@ export const OneYearProjectionWidget = memo(({
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3 gap-3 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[11px] font-medium text-space-200 tracking-tight">
+          <span className="text-fluid-sm font-medium text-space-200 tracking-tight">
             Projection
           </span>
-          <span className="text-[10px] text-space-400">· drag to explore</span>
+          <span className="text-fluid-xs text-space-400">· drag to explore</span>
           {result.capped && (
             <span
-              className="chip chip-orange text-[10px] !py-0 !px-1.5"
+              className="chip chip-orange text-fluid-xs !py-0 !px-1.5"
               title="Projection capped at 50× starting balance / 95% drawdown. Small samples grossly overstate compounded growth — treat this as an upper envelope, not a target."
             >
               Capped for realism
@@ -255,7 +255,7 @@ export const OneYearProjectionWidget = memo(({
             type="button"
             onClick={() => setMode('compound')}
             className={cn(
-              'px-2.5 py-1 text-[11px] font-medium rounded-md transition-colors',
+              'px-2.5 py-1 text-fluid-sm font-medium rounded-md transition-colors',
               mode === 'compound'
                 ? 'bg-space-600 text-space-100'
                 : 'text-space-300 hover:text-space-100'
@@ -267,7 +267,7 @@ export const OneYearProjectionWidget = memo(({
             type="button"
             onClick={() => setMode('linear')}
             className={cn(
-              'px-2.5 py-1 text-[11px] font-medium rounded-md transition-colors',
+              'px-2.5 py-1 text-fluid-sm font-medium rounded-md transition-colors',
               mode === 'linear'
                 ? 'bg-space-600 text-space-100'
                 : 'text-space-300 hover:text-space-100'
@@ -281,7 +281,7 @@ export const OneYearProjectionWidget = memo(({
       {/* ── Hero row: horizon + projected balance ── */}
       <div className="px-5 pb-3 flex items-end justify-between gap-4">
         <div>
-          <div className="text-[10px] text-space-300 uppercase tracking-wider">
+          <div className="text-fluid-xs text-space-300 uppercase tracking-wider">
             In {horizon.label}
           </div>
           <div className={cn(
@@ -293,7 +293,7 @@ export const OneYearProjectionWidget = memo(({
         </div>
 
         <div className="text-right">
-          <div className="text-[10px] text-space-300 uppercase tracking-wider">Growth</div>
+          <div className="text-fluid-xs text-space-300 uppercase tracking-wider">Growth</div>
           <div className={cn(
             'font-num text-lg font-semibold tabular-nums mt-1',
             isPositive ? 'text-apple-green' : 'text-apple-red'
@@ -421,7 +421,7 @@ export const OneYearProjectionWidget = memo(({
               [&::-moz-range-thumb]:cursor-grab"
           />
           {/* Tick labels */}
-          <div className="mt-2 flex justify-between text-[9px] text-space-400 tabular-nums select-none">
+          <div className="mt-2 flex justify-between text-fluid-2xs text-space-400 tabular-nums select-none">
             {HORIZONS.map((h, i) => (
               <button
                 key={h.shortLabel}
@@ -442,31 +442,31 @@ export const OneYearProjectionWidget = memo(({
       {/* ── Footer breakdown ── */}
       <div className="grid grid-cols-4 gap-0 border-t border-space-500/40">
         <div className="px-3 py-2.5 border-r border-space-500/40">
-          <div className="flex items-center gap-1 text-[9px] text-space-300 uppercase tracking-wider">
+          <div className="flex items-center gap-1 text-fluid-2xs text-space-300 uppercase tracking-wider">
             <Calculator className="w-2.5 h-2.5" />
             Trades
           </div>
-          <div className="mt-0.5 font-num text-xs font-semibold text-space-100 tabular-nums">
+          <div className="mt-0.5 font-num text-fluid-xs font-semibold text-space-100 tabular-nums">
             {result.trades.toLocaleString()}
           </div>
         </div>
         <div className="px-3 py-2.5 border-r border-space-500/40">
-          <div className="text-[9px] text-space-300 uppercase tracking-wider">Pace</div>
-          <div className="mt-0.5 font-num text-xs font-semibold text-space-100 tabular-nums">
+          <div className="text-fluid-2xs text-space-300 uppercase tracking-wider">Pace</div>
+          <div className="mt-0.5 font-num text-fluid-xs font-semibold text-space-100 tabular-nums">
             {model.tradesPerDay.toFixed(1)}/day
           </div>
         </div>
         <div className="px-3 py-2.5 border-r border-space-500/40">
-          <div className="flex items-center gap-1 text-[9px] text-space-300 uppercase tracking-wider">
+          <div className="flex items-center gap-1 text-fluid-2xs text-space-300 uppercase tracking-wider">
             <Target className="w-2.5 h-2.5" />
             Risk/trade
           </div>
-          <div className="mt-0.5 font-num text-xs font-semibold text-apple-red tabular-nums">
+          <div className="mt-0.5 font-num text-fluid-xs font-semibold text-apple-red tabular-nums">
             {(model.riskPct * 100).toFixed(2)}%
           </div>
         </div>
         <div className="px-3 py-2.5">
-          <div className="flex items-center gap-1 text-[9px] text-space-300 uppercase tracking-wider">
+          <div className="flex items-center gap-1 text-fluid-2xs text-space-300 uppercase tracking-wider">
             {isPositive ? (
               <TrendingUp className="w-2.5 h-2.5 text-apple-green" />
             ) : (
@@ -475,7 +475,7 @@ export const OneYearProjectionWidget = memo(({
             EV/trade
           </div>
           <div className={cn(
-            'mt-0.5 font-num text-xs font-semibold tabular-nums',
+            'mt-0.5 font-num text-fluid-xs font-semibold tabular-nums',
             model.evPerTrade >= 0 ? 'text-apple-green' : 'text-apple-red'
           )}>
             {model.evPerTrade >= 0 ? '+' : ''}${model.evPerTrade.toFixed(2)}

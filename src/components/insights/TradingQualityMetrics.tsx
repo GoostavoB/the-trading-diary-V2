@@ -49,7 +49,7 @@ function RRScale({ value, avgWin, avgLoss }: { value: number; avgWin: number; av
         <span className={cn('text-xl font-black tabular-nums font-num text-gradient-electric')}>
           {value.toFixed(2)}
         </span>
-        <span className="text-[10px] text-muted-foreground/50">: 1</span>
+        <span className="text-fluid-xs text-muted-foreground/50">: 1</span>
       </div>
 
       {/* Horizontal scale: risk fixed left, reward grows right, with 1.5 marker */}
@@ -72,19 +72,19 @@ function RRScale({ value, avgWin, avgLoss }: { value: number; avgWin: number; av
           aria-hidden
         />
         <div
-          className="absolute -bottom-3 -translate-x-1/2 text-[8px] text-muted-foreground/50 font-mono"
+          className="absolute -bottom-3 -translate-x-1/2 text-fluid-2xs text-muted-foreground/50 font-mono"
           style={{ left: `${targetPct}%` }}
         >
           1.5
         </div>
       </div>
 
-      <div className="flex justify-between items-baseline pt-2 text-[9px] tabular-nums">
+      <div className="flex justify-between items-baseline pt-2 text-fluid-2xs tabular-nums">
         <span className="text-rose-400/80 font-num">Risk {formatUsd(avgLoss)}</span>
         <span className="text-emerald-400/80 font-num">Reward {formatUsd(avgWin)}</span>
       </div>
 
-      <div className={cn('inline-flex items-center text-[9px] font-semibold', tone)}>
+      <div className={cn('inline-flex items-center text-fluid-2xs font-semibold', tone)}>
         <span className={cn(chipClass, 'px-1.5 py-0.5 rounded-full')}>{status}</span>
       </div>
     </div>
@@ -110,7 +110,7 @@ function WLBalance({
     <div className="space-y-1.5">
       <div className="flex items-baseline justify-between">
         <span className="text-emerald-400 text-xl font-black tabular-nums font-num">{winCount}</span>
-        <span className="text-[10px] text-muted-foreground/40 font-mono">W / L</span>
+        <span className="text-fluid-xs text-muted-foreground/40 font-mono">W / L</span>
         <span className="text-rose-400 text-xl font-black tabular-nums font-num">{lossCount}</span>
       </div>
 
@@ -121,7 +121,7 @@ function WLBalance({
           style={{ width: `${winPct}%` }}
         >
           {winPct >= 18 && (
-            <span className="text-[8px] font-black text-emerald-950 tabular-nums">{winCount}</span>
+            <span className="text-fluid-2xs font-black text-emerald-950 tabular-nums">{winCount}</span>
           )}
         </div>
         <div
@@ -129,12 +129,12 @@ function WLBalance({
           style={{ width: `${100 - winPct}%` }}
         >
           {100 - winPct >= 18 && (
-            <span className="text-[8px] font-black text-rose-950 tabular-nums">{lossCount}</span>
+            <span className="text-fluid-2xs font-black text-rose-950 tabular-nums">{lossCount}</span>
           )}
         </div>
       </div>
 
-      <div className="flex justify-between text-[9px] text-muted-foreground/40 font-num">
+      <div className="flex justify-between text-fluid-2xs text-muted-foreground/40 font-num">
         <span>{winPct.toFixed(0)}% wins</span>
         <span>{(100 - winPct).toFixed(0)}% losses</span>
       </div>
@@ -142,7 +142,7 @@ function WLBalance({
       {monthDelta !== null && (
         <div
           className={cn(
-            'text-[9px] font-semibold',
+            'text-fluid-2xs font-semibold',
             monthDelta > 0 ? 'text-emerald-400' : monthDelta < 0 ? 'text-rose-400' : 'text-muted-foreground/50',
           )}
         >
@@ -154,7 +154,7 @@ function WLBalance({
       {currentStreak && currentStreak.count > 0 && (
         <span
           className={cn(
-            'inline-flex px-1.5 py-0.5 rounded-full text-[9px] font-semibold',
+            'inline-flex px-1.5 py-0.5 rounded-full text-fluid-2xs font-semibold',
             currentStreak.type === 'win' ? 'chip-green' : 'chip-red',
           )}
         >
@@ -203,7 +203,7 @@ function DrawdownMeter({
       </div>
 
       {dateSpan && (
-        <div className="text-[9px] text-muted-foreground/60 font-mono">{dateSpan}</div>
+        <div className="text-fluid-2xs text-muted-foreground/60 font-mono">{dateSpan}</div>
       )}
 
       {/* Risk meter — colored by severity */}
@@ -214,15 +214,15 @@ function DrawdownMeter({
         />
       </div>
 
-      <div className={cn('text-[9px] font-semibold tracking-wider', color)}>{label}</div>
+      <div className={cn('text-fluid-2xs font-semibold tracking-wider', color)}>{label}</div>
 
       {recoveredInDays !== null ? (
-        <div className="text-[9px] text-emerald-400/80">Recovered in: {recoveredInDays}d</div>
+        <div className="text-fluid-2xs text-emerald-400/80">Recovered in: {recoveredInDays}d</div>
       ) : inDrawdown ? (
-        <div className="text-[9px] text-amber-400/80">🔵 Currently in drawdown</div>
+        <div className="text-fluid-2xs text-amber-400/80">🔵 Currently in drawdown</div>
       ) : null}
 
-      <div className="text-[9px] text-muted-foreground/40">Target: keep under 10%</div>
+      <div className="text-fluid-2xs text-muted-foreground/40">Target: keep under 10%</div>
     </div>
   );
 }
@@ -253,7 +253,7 @@ function AvgWinLossCell({
   return (
     <div className="space-y-1.5">
       <div className="flex items-baseline justify-between">
-        <span className="text-[9px] text-emerald-400/70 tracking-wider">AVG WIN</span>
+        <span className="text-fluid-2xs text-emerald-400/70 tracking-wider">AVG WIN</span>
         <span
           className={cn(
             'text-sm font-black tabular-nums font-num',
@@ -272,7 +272,7 @@ function AvgWinLossCell({
       </div>
 
       <div className="flex items-baseline justify-between pt-1">
-        <span className="text-[9px] text-rose-400/70 tracking-wider">AVG LOSS</span>
+        <span className="text-fluid-2xs text-rose-400/70 tracking-wider">AVG LOSS</span>
         <span
           className={cn(
             'text-sm font-black tabular-nums font-num',
@@ -294,7 +294,7 @@ function AvgWinLossCell({
       <div className="pt-1.5 border-t border-white/5">
         <div
           className={cn(
-            'text-[10px] font-bold tabular-nums font-num',
+            'text-fluid-xs font-bold tabular-nums font-num',
             positive ? 'text-emerald-400' : 'text-rose-400',
           )}
         >
@@ -303,7 +303,7 @@ function AvgWinLossCell({
         </div>
         <div
           className={cn(
-            'text-[8px] mt-0.5',
+            'text-fluid-2xs mt-0.5',
             positive ? 'text-emerald-400/70' : 'text-rose-400/70',
           )}
         >
@@ -318,7 +318,7 @@ function AvgWinLossCell({
 function MetricCell({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="p-3 rounded-xl border border-white/6 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300">
-      <div className="text-[9px] font-bold tracking-widest text-space-300 uppercase mb-2.5">
+      <div className="text-fluid-2xs font-bold tracking-widest text-space-300 uppercase mb-2.5">
         {label}
       </div>
       {children}
@@ -471,10 +471,10 @@ export const TradingQualityMetrics = memo(
     return (
       <PremiumCard className="h-full flex flex-col" contentClassName="flex-1 p-3">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[10px] font-bold tracking-widest text-space-300 uppercase">
+          <span className="text-fluid-xs font-bold tracking-widest text-space-300 uppercase">
             Trading Quality
           </span>
-          <span className="text-[9px] text-muted-foreground/30">{totalTrades} trades</span>
+          <span className="text-fluid-2xs text-muted-foreground/30">{totalTrades} trades</span>
         </div>
 
         <div className="grid grid-cols-2 gap-2 flex-1">

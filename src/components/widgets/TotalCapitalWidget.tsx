@@ -253,7 +253,7 @@ export const TotalCapitalWidget = memo(({
     <div className="relative flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
-        <span className="text-[11px] font-medium text-space-200 tracking-tight">
+        <span className="text-fluid-sm font-medium text-space-200 tracking-tight">
           Total Capital
         </span>
         <span
@@ -279,7 +279,7 @@ export const TotalCapitalWidget = memo(({
         )}>
           {formatCurrency(currentCapital)}
         </div>
-        <div className="mt-1.5 flex items-center gap-2 text-xs text-space-300 tabular-nums">
+        <div className="mt-1.5 flex items-center gap-2 text-fluid-xs text-space-300 tabular-nums">
           <span>Started at</span>
           <span className="text-space-200 font-medium">{formatCurrency(initialCapital)}</span>
           <span className="text-space-500">·</span>
@@ -302,7 +302,7 @@ export const TotalCapitalWidget = memo(({
                 type="button"
                 onClick={() => setTimeframe(tf)}
                 className={cn(
-                  'px-2.5 py-1 text-[10px] font-medium rounded-md transition-colors tabular-nums',
+                  'px-2.5 py-1 text-fluid-xs font-medium rounded-md transition-colors tabular-nums',
                   timeframe === tf
                     ? 'bg-electric text-white'
                     : 'text-space-300 hover:text-space-100'
@@ -318,16 +318,16 @@ export const TotalCapitalWidget = memo(({
       {/* Sparkline area */}
       <div className="flex-1 px-5 pb-4 pt-2 flex items-end relative">
         {!hasTrades ? (
-          <div className="w-full h-14 md:h-16 flex items-center justify-center text-xs text-space-400">
+          <div className="w-full h-14 md:h-16 flex items-center justify-center text-fluid-xs text-space-400">
             No trades yet
           </div>
         ) : !hasFiltered ? (
-          <div className="w-full h-14 md:h-16 flex flex-col items-center justify-center gap-2 text-xs text-space-400">
+          <div className="w-full h-14 md:h-16 flex flex-col items-center justify-center gap-2 text-fluid-xs text-space-400">
             <span>No trades in this period</span>
             <button
               type="button"
               onClick={() => setTimeframe('ALL')}
-              className="text-[10px] text-electric hover:underline"
+              className="text-fluid-xs text-electric hover:underline"
             >
               Show all
             </button>
@@ -501,7 +501,7 @@ export const TotalCapitalWidget = memo(({
         {hover && (
           <div
             className={cn(
-              'pointer-events-none absolute z-10 px-2 py-1 rounded-md text-[10px] font-medium tabular-nums whitespace-nowrap shadow-lg',
+              'pointer-events-none absolute z-10 px-2 py-1 rounded-md text-fluid-xs font-medium tabular-nums whitespace-nowrap shadow-lg',
               'glass-thin border',
               hover.color === 'green'
                 ? 'border-apple-green/40 text-apple-green'
@@ -520,24 +520,24 @@ export const TotalCapitalWidget = memo(({
       {/* Micro stats row */}
       <div className="grid grid-cols-3 gap-0 border-t border-space-500/40 px-0">
         <div className="px-5 py-3 border-r border-space-500/40">
-          <div className="text-[10px] text-space-300 uppercase tracking-wider">Initial</div>
-          <div className="mt-0.5 font-num text-sm font-semibold text-space-100 tabular-nums">
+          <div className="text-fluid-xs text-space-300 uppercase tracking-wider">Initial</div>
+          <div className="mt-0.5 font-num text-fluid-sm font-semibold text-space-100 tabular-nums">
             {formatCurrency(initialCapital, { compact: true })}
           </div>
         </div>
         <div className="px-5 py-3 border-r border-space-500/40">
-          <div className="text-[10px] text-space-300 uppercase tracking-wider">Current</div>
+          <div className="text-fluid-xs text-space-300 uppercase tracking-wider">Current</div>
           <div className={cn(
-            'mt-0.5 font-num text-sm font-semibold tabular-nums',
+            'mt-0.5 font-num text-fluid-sm font-semibold tabular-nums',
             isPositive ? 'text-space-100' : 'text-apple-red'
           )}>
             {formatCurrency(currentCapital, { compact: true })}
           </div>
         </div>
         <div className="px-5 py-3">
-          <div className="text-[10px] text-space-300 uppercase tracking-wider">Growth</div>
+          <div className="text-fluid-xs text-space-300 uppercase tracking-wider">Growth</div>
           <div className={cn(
-            'mt-0.5 font-num text-sm font-semibold tabular-nums',
+            'mt-0.5 font-num text-fluid-sm font-semibold tabular-nums',
             isPositive ? 'text-apple-green' : 'text-apple-red'
           )}>
             {totalPnL >= 0 ? '+' : ''}{formatCurrency(totalPnL, { compact: true })}

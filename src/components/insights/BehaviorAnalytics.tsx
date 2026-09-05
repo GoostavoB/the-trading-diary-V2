@@ -193,11 +193,11 @@ export const BehaviorAnalytics = memo(({ trades, currentEquity, currentStreak }:
   // Streak chip
   const streakChip = currentStreak && currentStreak.count > 0 ? (
     currentStreak.type === 'win' ? (
-      <span className="chip-green text-[9px] px-1.5 py-0.5 rounded-full inline-flex items-center gap-1">
+      <span className="chip-green text-fluid-2xs px-1.5 py-0.5 rounded-full inline-flex items-center gap-1">
         <span>{currentStreak.count}W streak</span>
       </span>
     ) : (
-      <span className="chip-red text-[9px] px-1.5 py-0.5 rounded-full inline-flex items-center gap-1">
+      <span className="chip-red text-fluid-2xs px-1.5 py-0.5 rounded-full inline-flex items-center gap-1">
         <span>Cold {currentStreak.count}L</span>
       </span>
     )
@@ -220,7 +220,7 @@ export const BehaviorAnalytics = memo(({ trades, currentEquity, currentStreak }:
           <div className="card-premium p-2.5 flex flex-col items-center text-center min-h-0 gap-1">
             <div className="flex items-center gap-1">
               <Clock className="w-3.5 h-3.5 text-primary" />
-              <span className="text-[9px] text-muted-foreground">Holding time</span>
+              <span className="text-fluid-2xs text-muted-foreground">Holding time</span>
             </div>
             <span className={`text-sm font-bold font-num tabular-nums ${holdingStats.avgMin == null ? 'text-space-400' : ''}`}>
               {formatHoldingTime(holdingStats.avgMin)}
@@ -239,18 +239,18 @@ export const BehaviorAnalytics = memo(({ trades, currentEquity, currentStreak }:
                     <div className="h-full" style={{ width: `${holdingStats.buckets.swing}%`, backgroundColor: 'hsl(var(--apple-purple))' }} title={`Swing >8h: ${holdingStats.buckets.swing.toFixed(0)}%`} />
                   )}
                 </div>
-                <div className="flex items-center justify-between w-full text-[8px] text-space-300 font-num tabular-nums">
+                <div className="flex items-center justify-between w-full text-fluid-2xs text-space-300 font-num tabular-nums">
                   <span>Fastest: {holdingStats.minMin != null ? formatHoldingTime(holdingStats.minMin) : '—'}</span>
                   <span>Longest: {holdingStats.maxMin != null ? formatHoldingTime(holdingStats.maxMin) : '—'}</span>
                 </div>
                 {holdingStats.sweetSpot && (
-                  <span className="text-[8px] text-electric truncate w-full">
+                  <span className="text-fluid-2xs text-electric truncate w-full">
                     Sweet spot: {holdingStats.sweetSpot.label} ({holdingStats.sweetSpot.wr.toFixed(0)}% WR)
                   </span>
                 )}
               </>
             ) : (
-              <span className="text-[8px] text-space-400">Add timestamps to trades</span>
+              <span className="text-fluid-2xs text-space-400">Add timestamps to trades</span>
             )}
           </div>
 
@@ -258,7 +258,7 @@ export const BehaviorAnalytics = memo(({ trades, currentEquity, currentStreak }:
           <div className="card-premium p-2.5 flex flex-col items-center text-center min-h-0 gap-1">
             <div className="flex items-center gap-1">
               <DollarSign className="w-3.5 h-3.5 text-primary" />
-              <span className="text-[9px] text-muted-foreground">Position size</span>
+              <span className="text-fluid-2xs text-muted-foreground">Position size</span>
             </div>
             <span className="text-sm font-bold font-num tabular-nums">
               {sizeStats.avg > 0 ? formatCurrency(sizeStats.avg) : renderDash()}
@@ -272,21 +272,21 @@ export const BehaviorAnalytics = memo(({ trades, currentEquity, currentStreak }:
                   <div className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-electric border border-background" style={{ left: `calc(${avgPct}% - 4px)` }} title={`Avg ${formatCurrency(sizeStats.avg)}`} />
                   <div className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-apple-orange border border-background" style={{ left: 'calc(100% - 6px)' }} title={`Max ${formatCurrency(sizeStats.max)}`} />
                 </div>
-                <div className="flex items-center justify-between w-full text-[8px] text-space-300 font-num tabular-nums">
+                <div className="flex items-center justify-between w-full text-fluid-2xs text-space-300 font-num tabular-nums">
                   <span>{formatCurrency(sizeStats.min)}</span>
                   <span>{formatCurrency(sizeStats.max)}</span>
                 </div>
-                <div className="text-[8px] text-space-300 font-num tabular-nums w-full text-center">
+                <div className="text-fluid-2xs text-space-300 font-num tabular-nums w-full text-center">
                   {sizeStats.riskPct != null ? `Risk/trade: ${sizeStats.riskPct.toFixed(1)}%` : 'Risk/trade: —'}
                 </div>
                 {sizeStats.trendPct != null && Math.abs(sizeStats.trendPct) >= 5 && (
-                  <span className={`text-[8px] truncate w-full ${sizeStats.trendPct > 0 ? 'text-apple-orange' : 'text-apple-green'}`}>
+                  <span className={`text-fluid-2xs truncate w-full ${sizeStats.trendPct > 0 ? 'text-apple-orange' : 'text-apple-green'}`}>
                     {sizeStats.trendPct > 0 ? `Sizing up ↗ +${sizeStats.trendPct.toFixed(0)}%` : `Sizing down ↘ ${sizeStats.trendPct.toFixed(0)}%`}
                   </span>
                 )}
               </>
             ) : (
-              <span className="text-[8px] text-space-400">Need position data</span>
+              <span className="text-fluid-2xs text-space-400">Need position data</span>
             )}
           </div>
 
@@ -294,14 +294,14 @@ export const BehaviorAnalytics = memo(({ trades, currentEquity, currentStreak }:
           <div className="card-premium p-2.5 flex flex-col items-center text-center min-h-0 gap-1">
             <div className="flex items-center gap-1">
               <Activity className="w-3.5 h-3.5 text-primary" />
-              <span className="text-[9px] text-muted-foreground">Avg leverage</span>
+              <span className="text-fluid-2xs text-muted-foreground">Avg leverage</span>
             </div>
             <div className="flex items-center gap-1">
               <span className={`text-sm font-bold font-num tabular-nums ${leverageColor}`}>
                 {leverageStats.avg > 0 ? `${leverageStats.avg.toFixed(1)}x` : '—'}
               </span>
               {leverageStats.avg > 10 && (
-                <span className="chip-red text-[8px] px-1 py-0.5 rounded-full inline-flex items-center gap-0.5">
+                <span className="chip-red text-fluid-2xs px-1 py-0.5 rounded-full inline-flex items-center gap-0.5">
                   <AlertTriangle className="w-2.5 h-2.5" />
                   <span>HIGH</span>
                 </span>
@@ -321,15 +321,15 @@ export const BehaviorAnalytics = memo(({ trades, currentEquity, currentStreak }:
                     title={`${leverageStats.avg.toFixed(1)}x`}
                   />
                 </div>
-                <div className="flex items-center justify-between w-full text-[8px] text-space-300 font-num tabular-nums">
+                <div className="flex items-center justify-between w-full text-fluid-2xs text-space-300 font-num tabular-nums">
                   <span>1x</span>
                   <span>5x</span>
                   <span>20x+</span>
                 </div>
-                <span className="text-[8px] text-space-300 font-num tabular-nums w-full text-center">
+                <span className="text-fluid-2xs text-space-300 font-num tabular-nums w-full text-center">
                   Used 10x+: {leverageStats.highPct.toFixed(0)}%
                 </span>
-                <span className="text-[8px] text-space-300 w-full text-center">Recommended: under 10x</span>
+                <span className="text-fluid-2xs text-space-300 w-full text-center">Recommended: under 10x</span>
               </>
             )}
           </div>
@@ -339,11 +339,11 @@ export const BehaviorAnalytics = memo(({ trades, currentEquity, currentStreak }:
             <div className="p-2 rounded-lg bg-profit/10 border border-profit/30 flex flex-col items-center justify-center text-center min-h-0">
               <div className="flex items-center gap-1">
                 <TrendingUp className="w-3.5 h-3.5 text-profit" />
-                <span className="text-[9px] text-muted-foreground">Best day</span>
+                <span className="text-fluid-2xs text-muted-foreground">Best day</span>
               </div>
               <span className="text-xs font-bold text-profit truncate w-full">{bestWorstByDay.best.day}</span>
-              <span className="text-[10px] font-num tabular-nums text-apple-green">{formatCurrency(bestWorstByDay.best.totalPnL)}</span>
-              <span className="text-[8px] text-space-300 font-num tabular-nums">
+              <span className="text-fluid-xs font-num tabular-nums text-apple-green">{formatCurrency(bestWorstByDay.best.totalPnL)}</span>
+              <span className="text-fluid-2xs text-space-300 font-num tabular-nums">
                 {bestWorstByDay.best.tradeCount}t · {bestWorstByDay.best.wins}W/{bestWorstByDay.best.losses}L
               </span>
             </div>
@@ -351,16 +351,16 @@ export const BehaviorAnalytics = memo(({ trades, currentEquity, currentStreak }:
             <div className="p-2 rounded-lg bg-profit/10 border border-profit/30 flex flex-col items-center justify-center text-center min-h-0">
               <div className="flex items-center gap-1">
                 <TrendingUp className="w-3.5 h-3.5 text-profit" />
-                <span className="text-[9px] text-muted-foreground">Best week</span>
+                <span className="text-fluid-2xs text-muted-foreground">Best week</span>
               </div>
               <span className="text-xs font-bold text-profit truncate w-full">{bestWorstByWeek.best.key}</span>
-              <span className="text-[10px] font-num tabular-nums text-apple-green">{formatCurrency(bestWorstByWeek.best.pnl)}</span>
-              <span className="text-[8px] text-space-300 font-num tabular-nums">{bestWorstByWeek.best.trades}t · {bestWorstByWeek.best.wins}W</span>
+              <span className="text-fluid-xs font-num tabular-nums text-apple-green">{formatCurrency(bestWorstByWeek.best.pnl)}</span>
+              <span className="text-fluid-2xs text-space-300 font-num tabular-nums">{bestWorstByWeek.best.trades}t · {bestWorstByWeek.best.wins}W</span>
             </div>
           ) : (
             <div className="p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center justify-center text-center min-h-0">
               <TrendingUp className="w-3.5 h-3.5 text-space-400 mb-0.5" />
-              <span className="text-[9px] text-space-400 leading-tight">No daily breakdown yet — add trades on different days</span>
+              <span className="text-fluid-2xs text-space-400 leading-tight">No daily breakdown yet — add trades on different days</span>
             </div>
           )}
 
@@ -369,11 +369,11 @@ export const BehaviorAnalytics = memo(({ trades, currentEquity, currentStreak }:
             <div className="p-2 rounded-lg bg-loss/10 border border-loss/30 flex flex-col items-center justify-center text-center min-h-0">
               <div className="flex items-center gap-1">
                 <TrendingDown className="w-3.5 h-3.5 text-loss" />
-                <span className="text-[9px] text-muted-foreground">Worst day</span>
+                <span className="text-fluid-2xs text-muted-foreground">Worst day</span>
               </div>
               <span className="text-xs font-bold text-loss truncate w-full">{bestWorstByDay.worst.day}</span>
-              <span className="text-[10px] font-num tabular-nums text-apple-red">{formatCurrency(bestWorstByDay.worst.totalPnL)}</span>
-              <span className="text-[8px] text-space-300 font-num tabular-nums">
+              <span className="text-fluid-xs font-num tabular-nums text-apple-red">{formatCurrency(bestWorstByDay.worst.totalPnL)}</span>
+              <span className="text-fluid-2xs text-space-300 font-num tabular-nums">
                 {bestWorstByDay.worst.tradeCount}t · {bestWorstByDay.worst.wins}W/{bestWorstByDay.worst.losses}L
               </span>
             </div>
@@ -381,16 +381,16 @@ export const BehaviorAnalytics = memo(({ trades, currentEquity, currentStreak }:
             <div className="p-2 rounded-lg bg-loss/10 border border-loss/30 flex flex-col items-center justify-center text-center min-h-0">
               <div className="flex items-center gap-1">
                 <TrendingDown className="w-3.5 h-3.5 text-loss" />
-                <span className="text-[9px] text-muted-foreground">Worst week</span>
+                <span className="text-fluid-2xs text-muted-foreground">Worst week</span>
               </div>
               <span className="text-xs font-bold text-loss truncate w-full">{bestWorstByWeek.worst.key}</span>
-              <span className="text-[10px] font-num tabular-nums text-apple-red">{formatCurrency(bestWorstByWeek.worst.pnl)}</span>
-              <span className="text-[8px] text-space-300 font-num tabular-nums">{bestWorstByWeek.worst.trades}t · {bestWorstByWeek.worst.wins}W</span>
+              <span className="text-fluid-xs font-num tabular-nums text-apple-red">{formatCurrency(bestWorstByWeek.worst.pnl)}</span>
+              <span className="text-fluid-2xs text-space-300 font-num tabular-nums">{bestWorstByWeek.worst.trades}t · {bestWorstByWeek.worst.wins}W</span>
             </div>
           ) : (
             <div className="p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center justify-center text-center min-h-0">
               <TrendingDown className="w-3.5 h-3.5 text-space-400 mb-0.5" />
-              <span className="text-[9px] text-space-400 leading-tight">Add at least 2 trades on different days</span>
+              <span className="text-fluid-2xs text-space-400 leading-tight">Add at least 2 trades on different days</span>
             </div>
           )}
 
@@ -398,7 +398,7 @@ export const BehaviorAnalytics = memo(({ trades, currentEquity, currentStreak }:
           <div className="p-2 rounded-lg bg-muted/30 border border-border/50 flex flex-col items-center justify-center text-center min-h-0 gap-1">
             <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
             <span className="text-sm font-bold font-num tabular-nums">{trades.length}</span>
-            <span className="text-[9px] text-muted-foreground">Trades</span>
+            <span className="text-fluid-2xs text-muted-foreground">Trades</span>
             {streakChip}
           </div>
         </div>
@@ -408,8 +408,8 @@ export const BehaviorAnalytics = memo(({ trades, currentEquity, currentStreak }:
           <div className="glow-box-danger p-2 rounded-lg flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 text-apple-red flex-shrink-0 mt-0.5" />
             <div className="flex flex-col">
-              <span className="text-[10px] font-bold text-apple-red uppercase tracking-wide">Liquidation risk extreme</span>
-              <span className="text-[9px] text-space-300 leading-snug">
+              <span className="text-fluid-xs font-bold text-apple-red uppercase tracking-wide">Liquidation risk extreme</span>
+              <span className="text-fluid-2xs text-space-300 leading-snug">
                 At {leverageStats.avg.toFixed(1)}x avg leverage, a 5% adverse move wipes you out. Consider scaling down to under 10x.
               </span>
             </div>
