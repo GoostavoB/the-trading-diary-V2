@@ -98,19 +98,19 @@ function StreakDisplay({
 
       <div className="relative flex items-start justify-between">
         <div>
-          <div className="text-[10px] font-semibold text-space-400 mb-1 flex items-center gap-1.5">
+          <div className="text-fluid-xs font-semibold text-space-400 mb-1 flex items-center gap-1.5">
             {isWin ? 'Win Streak' : 'Loss Streak'}
             {isWin && streak.count > 0 && (
               <Flame className="h-3 w-3 text-amber-400/70" />
             )}
           </div>
           <div className={cn(
-            "text-3xl font-black tabular-nums leading-none font-num",
+            "text-fluid-2xl font-black tabular-nums leading-none font-num",
             isWin ? "text-gradient-electric" : "text-slate-300"
           )}>
             {streak.count}
           </div>
-          <div className="text-[10px] text-space-400 mt-1">
+          <div className="text-fluid-xs text-space-400 mt-1">
             {streak.count === 1 ? 'trade in a row' : 'trades in a row'}
             {rangeLabel && <span className="text-space-400/70"> · {rangeLabel}</span>}
           </div>
@@ -140,7 +140,7 @@ function StreakDisplay({
                 key={t.id || i}
                 title={tip}
                 className={cn(
-                  "px-1.5 py-0.5 rounded-md text-[9px] font-bold tabular-nums border whitespace-nowrap transition-all",
+                  "px-1.5 py-0.5 rounded-md text-fluid-2xs font-bold tabular-nums border whitespace-nowrap transition-all",
                   pnl >= 0
                     ? "bg-emerald-500/12 border-emerald-400/25 text-emerald-300"
                     : "bg-rose-500/12 border-rose-400/25 text-rose-300",
@@ -203,26 +203,26 @@ function TradeCard({
             : <AlertTriangle className="h-3 w-3 text-rose-400/80" />
           }
           <span className={cn(
-            "text-[10px] font-semibold",
+            "text-fluid-xs font-semibold",
             isBest ? "text-emerald-400/90" : "text-rose-400/90"
           )}>
             {isBest ? 'Best Trade' : 'Worst Trade'}
           </span>
           {isBest && isHistoricalRecord && (
-            <span className="ml-1 px-1.5 py-0.5 rounded-md text-[8.5px] font-bold bg-amber-500/15 border border-amber-400/30 text-amber-300">
+            <span className="ml-1 px-1.5 py-0.5 rounded-md text-fluid-2xs font-bold bg-amber-500/15 border border-amber-400/30 text-amber-300">
               Record
             </span>
           )}
         </div>
         {dateLong && (
-          <span className="text-[9.5px] text-space-400 font-mono tabular-nums">{dateLong}</span>
+          <span className="text-fluid-2xs text-space-400 font-mono tabular-nums">{dateLong}</span>
         )}
       </div>
 
       {/* Symbol + setup row */}
       <div className="flex items-center gap-1.5 flex-wrap mb-2">
         <span className={cn(
-          "inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border",
+          "inline-flex items-center px-2 py-0.5 rounded-md text-fluid-xs font-bold border",
           isBest
             ? "bg-emerald-400/10 border-emerald-400/20 text-emerald-300"
             : "bg-rose-400/10 border-rose-400/20 text-rose-300"
@@ -230,7 +230,7 @@ function TradeCard({
           {symbol}
         </span>
         {setup && (
-          <span className="chip chip-electric !py-0.5 !px-1.5 !text-[9.5px]">
+          <span className="chip chip-electric !py-0.5 !px-1.5 text-fluid-2xs">
             {setup}
           </span>
         )}
@@ -238,7 +238,7 @@ function TradeCard({
 
       {/* PnL */}
       <div className={cn(
-        "text-lg font-black tabular-nums leading-none font-num",
+        "text-fluid-lg font-black tabular-nums leading-none font-num",
         isBest ? "text-gradient-electric" : "text-rose-300"
       )}>
         <BlurredCurrency amount={pnl} className="inline" />
@@ -246,7 +246,7 @@ function TradeCard({
 
       {/* ROI + holding time */}
       <div className={cn(
-        "flex items-center gap-2 mt-1.5 text-[10px] font-semibold",
+        "flex items-center gap-2 mt-1.5 text-fluid-xs font-semibold",
         isBest ? "text-emerald-400/80" : "text-rose-400/80"
       )}>
         <span className="inline-flex items-center gap-1">
@@ -263,27 +263,27 @@ function TradeCard({
 
       {/* Entry → exit prices */}
       {hasPrices && (
-        <div className="mt-1.5 text-[10px] text-space-300 font-mono tabular-nums truncate">
+        <div className="mt-1.5 text-fluid-xs text-space-300 font-mono tabular-nums truncate">
           {formatPrice(trade.entry_price)} <ArrowRight className="inline h-2.5 w-2.5 mx-0.5 -mt-0.5 text-space-400" /> {formatPrice(trade.exit_price)}
         </div>
       )}
 
       {/* Worst-trade extras: oversize hint + lesson */}
       {!isBest && showOversize && (
-        <div className="mt-1.5 text-[9.5px] text-orange-300/90 font-semibold tabular-nums">
+        <div className="mt-1.5 text-fluid-2xs text-orange-300/90 font-semibold tabular-nums">
           {multiplier.toFixed(1)}x bigger than average loss
         </div>
       )}
       {!isBest && lesson && (
         <div className="mt-2 rounded-md border border-white/5 bg-white/[0.03] px-2 py-1.5">
-          <div className="text-[9px] font-semibold text-space-400 mb-0.5">Lesson</div>
-          <div className="text-[10px] text-space-300 leading-snug line-clamp-2">{lesson}</div>
+          <div className="text-fluid-2xs font-semibold text-space-400 mb-0.5">Lesson</div>
+          <div className="text-fluid-xs text-space-300 leading-snug line-clamp-2">{lesson}</div>
         </div>
       )}
       {!isBest && !lesson && (
         <Link
           to="/journal"
-          className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-rose-300/80 hover:text-rose-200 transition-colors"
+          className="mt-2 inline-flex items-center gap-1 text-fluid-xs font-semibold text-rose-300/80 hover:text-rose-200 transition-colors"
           onClick={(e) => e.stopPropagation()}
         >
           <Plus className="h-3 w-3" />
@@ -303,7 +303,7 @@ function TradeCard({
     <Link
       to="/journal"
       className={cn(
-        "relative rounded-xl p-3 overflow-hidden border block transition-all duration-300 hover-lift",
+        "relative rounded-xl p-3 sm:p-3.5 xl:p-4 overflow-hidden border block no-underline [text-decoration:none] transition-all duration-300 hover-lift",
         accentClasses
       )}
     >
@@ -344,14 +344,14 @@ function DayCard({
         : "border-orange-500/15 bg-orange-950/15"
     )}>
       <div className={cn(
-        "text-[10px] font-semibold mb-1.5",
+        "text-fluid-xs font-semibold mb-1.5",
         isBest ? "text-teal-400/80" : "text-orange-400/80"
       )}>
         {isBest ? 'Best Day' : 'Worst Day'}
       </div>
 
       <div className={cn(
-        "text-base font-black tabular-nums font-num",
+        "text-fluid-base font-black tabular-nums font-num",
         !hasData
           ? "text-space-400"
           : (isBest ? "text-gradient-electric" : "text-orange-300")
@@ -362,13 +362,13 @@ function DayCard({
       </div>
 
       {hasData && (
-        <div className="mt-1 text-[10px] text-space-300 font-mono tabular-nums">
+        <div className="mt-1 text-fluid-xs text-space-300 font-mono tabular-nums">
           {weekday}<span className="text-space-400"> · {monthDay}</span>
         </div>
       )}
 
       {hasData && tradeCount != null && tradeCount > 0 && (
-        <div className="mt-1 flex items-center gap-1.5 flex-wrap text-[9.5px]">
+        <div className="mt-1 flex items-center gap-1.5 flex-wrap text-fluid-2xs">
           <span className={cn(
             "px-1.5 py-0.5 rounded-md font-bold tabular-nums border",
             isBest
@@ -388,7 +388,7 @@ function DayCard({
       )}
 
       {hasData && topHourLabel && (
-        <div className="mt-1 text-[9px] text-space-400 truncate">
+        <div className="mt-1 text-fluid-2xs text-space-400 truncate">
           Most active: <span className="text-space-300 tabular-nums">{topHourLabel}</span>
         </div>
       )}
@@ -562,7 +562,7 @@ export const PerformanceHighlights = memo(({
             : bestDay
               ? (
                 <div className="rounded-xl p-3 border border-white/6 bg-white/[0.02] flex items-center justify-center">
-                  <span className="text-[10px] text-space-400 text-center">
+                  <span className="text-fluid-xs text-space-400 text-center">
                     Only one<br />trading day
                   </span>
                 </div>

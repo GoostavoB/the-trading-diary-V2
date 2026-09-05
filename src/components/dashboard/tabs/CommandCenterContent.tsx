@@ -9,7 +9,6 @@ import { TotalCapitalWidget } from '@/components/widgets/TotalCapitalWidget';
 import { OneYearProjectionWidget } from '@/components/widgets/OneYearProjectionWidget';
 import { MonthlyGoalWidget } from '@/components/widgets/MonthlyGoalWidget';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
-import { useIsMobile } from '@/hooks/use-mobile';
 import type { Trade } from '@/types/trade';
 import { calculateMaxDrawdown } from '@/utils/insightCalculations';
 import { calculateTradingDays } from '@/utils/tradingDays';
@@ -35,8 +34,7 @@ function calculateCurrentStreak(trades: Trade[]) {
 export function CommandCenterContent() {
     const { loading, processedTrades, capitalLog, initialInvestment } = useDashboard();
     const stats = useDashboardStats(processedTrades, capitalLog);
-    const isMobile = useIsMobile();
-    const { settings: userSettings } = useUserSettings();
+        const { settings: userSettings } = useUserSettings();
     const tradingDaysMode = userSettings?.trading_days_calculation_mode;
 
     const maxDrawdown = useMemo(
@@ -112,7 +110,7 @@ export function CommandCenterContent() {
             </div>
 
             {/* ── Row 4: Performance Highlights (full width on mobile, 2 cols on desktop) ── */}
-            <div className={isMobile ? 'contents' : 'grid grid-cols-2 gap-4'}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                 <PerformanceHighlights
                     trades={processedTrades}
                     bestTrade={bestTrade}

@@ -84,10 +84,10 @@ export function MonthlyGoalWidget() {
       <div className="flex items-center justify-between px-5 pt-5 pb-1">
         <div className="flex items-center gap-2">
           <Trophy className="w-4 h-4 text-apple-orange" />
-          <span className="text-[11px] font-medium text-space-200 tracking-tight">
+          <span className="text-fluid-sm font-medium text-space-200 tracking-tight">
             Monthly goal
           </span>
-          <span className="text-[11px] text-space-400">
+          <span className="text-fluid-sm text-space-400">
             · {currentMonth ? MONTH_LABEL(currentMonth.date) : '—'}
           </span>
         </div>
@@ -96,7 +96,7 @@ export function MonthlyGoalWidget() {
           <button
             type="button"
             onClick={startEdit}
-            className="flex items-center gap-1 text-[11px] text-space-300 hover:text-electric transition-colors"
+            className="flex items-center gap-1 text-fluid-sm text-space-300 hover:text-electric transition-colors"
           >
             <Pencil className="w-3 h-3" />
             {hasGoal ? 'Edit' : 'Set goal'}
@@ -107,7 +107,7 @@ export function MonthlyGoalWidget() {
       {isEditing ? (
         <div className="px-5 pb-5 pt-2 flex items-center gap-2">
           <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-space-300 text-sm">$</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-space-300 text-fluid-sm">$</span>
             <input
               type="number"
               inputMode="decimal"
@@ -115,7 +115,7 @@ export function MonthlyGoalWidget() {
               value={draftValue}
               onChange={(e) => setDraftValue(e.target.value)}
               placeholder="e.g. 500"
-              className="w-full glass-thin rounded-lg pl-6 pr-3 py-2 text-sm font-num tabular-nums text-space-100 outline-none focus:ring-1 focus:ring-electric"
+              className="w-full glass-thin rounded-lg pl-6 pr-3 py-2 text-fluid-sm font-num tabular-nums text-space-100 outline-none focus:ring-1 focus:ring-electric"
             />
           </div>
           <button
@@ -138,8 +138,8 @@ export function MonthlyGoalWidget() {
         </div>
       ) : !hasGoal ? (
         <div className="px-5 pb-5 pt-2">
-          <div className="text-2xl font-display font-bold text-space-400">—</div>
-          <p className="mt-1.5 text-xs text-space-400">
+          <div className="text-fluid-2xl font-display font-bold text-space-400">—</div>
+          <p className="mt-1.5 text-fluid-xs text-space-400">
             Set a monthly target — e.g. cover a fixed expense like rent — and this tracks your progress every month automatically.
           </p>
         </div>
@@ -150,14 +150,14 @@ export function MonthlyGoalWidget() {
             <div>
               <div
                 className={cn(
-                  'font-display text-4xl md:text-5xl font-bold tabular-nums tracking-tight leading-none',
+                  'font-display text-fluid-hero font-bold tabular-nums tracking-tight leading-none',
                   pnlPositive ? 'text-gradient-electric' : 'text-gradient-loss',
                 )}
               >
                 {pnl >= 0 ? '+' : ''}
                 {formatCurrency(pnl)}
               </div>
-              <div className="mt-1.5 flex items-center gap-2 text-xs text-space-300 tabular-nums flex-wrap">
+              <div className="mt-1.5 flex items-center gap-2 text-fluid-xs text-space-300 tabular-nums flex-wrap">
                 <span>of {formatCurrency(goalTarget as number, { compact: true })} goal</span>
                 <span className="text-space-500">·</span>
                 <span className="font-semibold text-space-100">{progressPct.toFixed(0)}%</span>
@@ -196,7 +196,7 @@ export function MonthlyGoalWidget() {
           </div>
 
           {onTrackToGold && (
-            <div className="mx-5 mb-3 px-3 py-2 rounded-lg glass-thin border border-apple-green/30 text-[11px] text-apple-green font-medium">
+            <div className="mx-5 mb-3 px-3 py-2 rounded-lg glass-thin border border-apple-green/30 text-fluid-sm text-apple-green font-medium">
               Goal hit for {currentMonth ? MONTH_SHORT(currentMonth.date) : 'this month'} — no need to keep pushing size to chase more.
             </div>
           )}
@@ -219,7 +219,7 @@ export function MonthlyGoalWidget() {
                 />
               ))}
             </div>
-            <div className="mt-1.5 flex justify-between text-[9px] text-space-400 uppercase tracking-wider tabular-nums">
+            <div className="mt-1.5 flex justify-between text-fluid-2xs text-space-400 uppercase tracking-wider tabular-nums">
               <span>0</span>
               <span style={{ marginLeft: `${TIER_THRESHOLDS.bronze * 100 - 8}%` }}>Bronze 50%</span>
               <span style={{ marginLeft: `${(TIER_THRESHOLDS.silver - TIER_THRESHOLDS.bronze) * 100 - 8}%` }}>Silver 75%</span>
@@ -230,14 +230,14 @@ export function MonthlyGoalWidget() {
           {/* Running average */}
           <div className="grid grid-cols-2 gap-0 border-t border-space-500/40">
             <div className="px-5 py-3 border-r border-space-500/40">
-              <div className="text-[10px] text-space-300 uppercase tracking-wider">Avg / month</div>
-              <div className="mt-0.5 font-num text-sm font-semibold text-space-100 tabular-nums">
+              <div className="text-fluid-xs text-space-300 uppercase tracking-wider">Avg / month</div>
+              <div className="mt-0.5 font-num text-fluid-sm font-semibold text-space-100 tabular-nums">
                 {monthsTracked > 0 ? formatCurrency(runningAverage, { compact: true }) : '—'}
               </div>
             </div>
             <div className="px-5 py-3">
-              <div className="text-[10px] text-space-300 uppercase tracking-wider">Months tracked</div>
-              <div className="mt-0.5 font-num text-sm font-semibold text-space-100 tabular-nums">
+              <div className="text-fluid-xs text-space-300 uppercase tracking-wider">Months tracked</div>
+              <div className="mt-0.5 font-num text-fluid-sm font-semibold text-space-100 tabular-nums">
                 {monthsTracked || '—'}
               </div>
             </div>
@@ -245,7 +245,7 @@ export function MonthlyGoalWidget() {
 
           {/* Trophy case: past months strip */}
           <div className="px-5 py-4 border-t border-space-500/40">
-            <div className="text-[10px] text-space-300 uppercase tracking-wider mb-2">Trophy case</div>
+            <div className="text-fluid-xs text-space-300 uppercase tracking-wider mb-2">Trophy case</div>
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
               {history.map((entry) => (
                 <div
@@ -270,7 +270,7 @@ export function MonthlyGoalWidget() {
                       <span className="w-1 h-1 rounded-full bg-space-500" />
                     )}
                   </div>
-                  <span className="text-[9px] text-space-400 tabular-nums">{MONTH_SHORT(entry.date)}</span>
+                  <span className="text-fluid-2xs text-space-400 tabular-nums">{MONTH_SHORT(entry.date)}</span>
                 </div>
               ))}
             </div>

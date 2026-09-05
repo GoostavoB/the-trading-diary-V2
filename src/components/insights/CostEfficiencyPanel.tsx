@@ -38,7 +38,7 @@ export const CostEfficiencyPanel = memo(({ trades }: CostEfficiencyPanelProps) =
             <h3 className="text-sm font-semibold">{t('insights.exchangeCostEfficiency')}</h3>
           </div>
           <Link to="/fee-analysis">
-            <Button variant="ghost" size="sm" className="h-6 px-2 text-xs gap-1">
+            <Button variant="ghost" size="sm" className="h-6 px-2 text-fluid-xs gap-1">
               {t('insights.viewFullAnalysis')}
               <ExternalLink className="h-3 w-3" />
             </Button>
@@ -57,7 +57,7 @@ export const CostEfficiencyPanel = memo(({ trades }: CostEfficiencyPanelProps) =
                 <ExchangeBadge source={exchange.broker} />
               </div>
               <span className="text-sm font-bold font-mono">{exchange.avgFeePercent.toFixed(3)}%</span>
-              <span className="text-[10px] text-muted-foreground">({exchange.tradeCount})</span>
+              <span className="text-fluid-xs text-muted-foreground">({exchange.tradeCount})</span>
             </div>
           ))}
         </div>
@@ -65,15 +65,15 @@ export const CostEfficiencyPanel = memo(({ trades }: CostEfficiencyPanelProps) =
         {/* Summary metrics in single row */}
         <div className="grid grid-cols-3 gap-2 p-2 rounded-lg bg-primary/5 border border-primary/20 mt-auto">
           <div className="text-center">
-            <span className="text-[10px] text-muted-foreground block">{t('insights.totalFeesPaid')}</span>
+            <span className="text-fluid-xs text-muted-foreground block">{t('insights.totalFeesPaid')}</span>
             <span className="text-xs font-bold text-loss">{formatCurrency(feeMetrics.totalFees)}</span>
           </div>
           <div className="text-center border-x border-border/50">
-            <span className="text-[10px] text-muted-foreground block">{t('insights.feeImpactOnPnL')}</span>
+            <span className="text-fluid-xs text-muted-foreground block">{t('insights.feeImpactOnPnL')}</span>
             <span className="text-xs font-bold text-yellow-500">{feeMetrics.feeImpactOnPnL.toFixed(2)}%</span>
           </div>
           <div className="text-center">
-            <span className="text-[10px] text-muted-foreground block">{t('insights.effectiveFeeRate')}</span>
+            <span className="text-fluid-xs text-muted-foreground block">{t('insights.effectiveFeeRate')}</span>
             <span className="text-xs font-bold font-mono">{feeMetrics.effectiveFeeRate.toFixed(3)}%</span>
           </div>
         </div>

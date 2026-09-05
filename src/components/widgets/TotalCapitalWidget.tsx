@@ -253,7 +253,7 @@ export const TotalCapitalWidget = memo(({
     <div className="relative flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
-        <span className="text-[11px] font-medium text-space-200 tracking-tight">
+        <span className="text-fluid-sm font-medium text-space-200 tracking-tight">
           Total Capital
         </span>
         <span
@@ -274,12 +274,12 @@ export const TotalCapitalWidget = memo(({
       {/* Hero number */}
       <div className="px-5 pb-1">
         <div className={cn(
-          'font-display text-5xl md:text-6xl font-bold tabular-nums tracking-tight leading-none',
+          'font-display text-fluid-hero font-bold tabular-nums tracking-tight leading-none',
           isPositive ? 'text-gradient-electric' : 'text-gradient-loss'
         )}>
           {formatCurrency(currentCapital)}
         </div>
-        <div className="mt-1.5 flex items-center gap-2 text-xs text-space-300 tabular-nums">
+        <div className="mt-1.5 flex items-center gap-2 text-fluid-xs text-space-300 tabular-nums">
           <span>Started at</span>
           <span className="text-space-200 font-medium">{formatCurrency(initialCapital)}</span>
           <span className="text-space-500">·</span>
@@ -302,7 +302,7 @@ export const TotalCapitalWidget = memo(({
                 type="button"
                 onClick={() => setTimeframe(tf)}
                 className={cn(
-                  'px-2.5 py-1 text-[10px] font-medium rounded-md transition-colors tabular-nums',
+                  'px-2.5 py-1 text-fluid-xs font-medium rounded-md transition-colors tabular-nums',
                   timeframe === tf
                     ? 'bg-electric text-white'
                     : 'text-space-300 hover:text-space-100'
@@ -318,22 +318,22 @@ export const TotalCapitalWidget = memo(({
       {/* Sparkline area */}
       <div className="flex-1 px-5 pb-4 pt-2 flex items-end relative">
         {!hasTrades ? (
-          <div className="w-full h-14 md:h-16 flex items-center justify-center text-xs text-space-400">
+          <div className="w-full chart-fluid-sm flex items-center justify-center text-fluid-xs text-space-400">
             No trades yet
           </div>
         ) : !hasFiltered ? (
-          <div className="w-full h-14 md:h-16 flex flex-col items-center justify-center gap-2 text-xs text-space-400">
+          <div className="w-full chart-fluid-sm flex flex-col items-center justify-center gap-2 text-fluid-xs text-space-400">
             <span>No trades in this period</span>
             <button
               type="button"
               onClick={() => setTimeframe('ALL')}
-              className="text-[10px] text-electric hover:underline"
+              className="text-fluid-xs text-electric hover:underline"
             >
               Show all
             </button>
           </div>
         ) : (
-          <div ref={chartRef} className="w-full h-14 md:h-16">
+          <div ref={chartRef} className="relative w-full chart-fluid-sm">
           <svg
             viewBox={`0 0 ${curve.W} ${curve.H}`}
             className="w-full h-full overflow-visible"
@@ -378,31 +378,20 @@ export const TotalCapitalWidget = memo(({
               />
             )}
 
-            {/* Goal line */}
+            {/* Goal line (label is rendered as an HTML badge below, so it stays legible) */}
             {goal && goal.inRange && (
-              <g>
-                <line
-                  x1={0}
-                  x2={curve.W}
-                  y1={goal.y}
-                  y2={goal.y}
-                  stroke="hsl(var(--electric))"
-                  strokeWidth="1"
-                  strokeDasharray="4 4"
-                  opacity="0.7"
-                />
-                <text
-                  x={curve.W - 6}
-                  y={Math.max(12, goal.y - 5)}
-                  textAnchor="end"
-                  fontSize="10"
-                  fill="hsl(var(--electric))"
-                  opacity="0.9"
-                >
-                  {goal.label}
-                </text>
-              </g>
+              <line
+                x1={0}
+                x2={curve.W}
+                y1={goal.y}
+                y2={goal.y}
+                stroke="hsl(var(--electric-blue))"
+                strokeWidth="1"
+                strokeDasharray="4 4"
+                opacity="0.7"
+              />
             )}
+
 
             {/* Peak markers (green) */}
             {markers.peaks.map(p => {
@@ -493,15 +482,27 @@ export const TotalCapitalWidget = memo(({
               );
             })()}
           </svg>
+
+          {/* Goal label as an HTML badge — always legible, never stretched by the SVG */}
+          {goal && goal.inRange && hasFiltered && (
+            <div
+              className="pointer-events-none absolute right-5 z-10 px-2 py-0.5 rounded-md glass-thin border border-[hsl(var(--electric-blue)/0.35)] text-electric text-fluid-2xs font-semibold tabular-nums whitespace-nowrap"
+              style={{ top: `calc(${(goal.y / curve.H) * 100}% - 1.6em)` }}
+            >
+              {goal.label}
+            </div>
+          )}
           </div>
 
         )}
+
+
 
         {/* Hover tooltip overlay (positioned in % so it tracks viewBox) */}
         {hover && (
           <div
             className={cn(
-              'pointer-events-none absolute z-10 px-2 py-1 rounded-md text-[10px] font-medium tabular-nums whitespace-nowrap shadow-lg',
+              'pointer-events-none absolute z-10 px-2 py-1 rounded-md text-fluid-xs font-medium tabular-nums whitespace-nowrap shadow-lg',
               'glass-thin border',
               hover.color === 'green'
                 ? 'border-apple-green/40 text-apple-green'
@@ -520,24 +521,24 @@ export const TotalCapitalWidget = memo(({
       {/* Micro stats row */}
       <div className="grid grid-cols-3 gap-0 border-t border-space-500/40 px-0">
         <div className="px-5 py-3 border-r border-space-500/40">
-          <div className="text-[10px] text-space-300 uppercase tracking-wider">Initial</div>
-          <div className="mt-0.5 font-num text-sm font-semibold text-space-100 tabular-nums">
+          <div className="text-fluid-xs text-space-300 uppercase tracking-wider">Initial</div>
+          <div className="mt-0.5 font-num text-fluid-sm font-semibold text-space-100 tabular-nums">
             {formatCurrency(initialCapital, { compact: true })}
           </div>
         </div>
         <div className="px-5 py-3 border-r border-space-500/40">
-          <div className="text-[10px] text-space-300 uppercase tracking-wider">Current</div>
+          <div className="text-fluid-xs text-space-300 uppercase tracking-wider">Current</div>
           <div className={cn(
-            'mt-0.5 font-num text-sm font-semibold tabular-nums',
+            'mt-0.5 font-num text-fluid-sm font-semibold tabular-nums',
             isPositive ? 'text-space-100' : 'text-apple-red'
           )}>
             {formatCurrency(currentCapital, { compact: true })}
           </div>
         </div>
         <div className="px-5 py-3">
-          <div className="text-[10px] text-space-300 uppercase tracking-wider">Growth</div>
+          <div className="text-fluid-xs text-space-300 uppercase tracking-wider">Growth</div>
           <div className={cn(
-            'mt-0.5 font-num text-sm font-semibold tabular-nums',
+            'mt-0.5 font-num text-fluid-sm font-semibold tabular-nums',
             isPositive ? 'text-apple-green' : 'text-apple-red'
           )}>
             {totalPnL >= 0 ? '+' : ''}{formatCurrency(totalPnL, { compact: true })}
