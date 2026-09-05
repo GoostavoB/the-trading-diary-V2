@@ -372,7 +372,7 @@ export const TotalCapitalWidget = memo(({
                 d={curve.path}
                 fill="none"
                 stroke={isPositive ? 'hsl(var(--apple-green))' : 'hsl(var(--apple-red))'}
-                strokeWidth="1.4"
+                strokeWidth="2"
                 strokeLinejoin="round"
                 strokeLinecap="round"
               />
@@ -387,15 +387,15 @@ export const TotalCapitalWidget = memo(({
                   y1={goal.y}
                   y2={goal.y}
                   stroke="hsl(var(--electric))"
-                  strokeWidth="0.6"
-                  strokeDasharray="2 2"
+                  strokeWidth="1"
+                  strokeDasharray="4 4"
                   opacity="0.7"
                 />
                 <text
-                  x={curve.W - 1}
-                  y={Math.max(4, goal.y - 1.5)}
+                  x={curve.W - 6}
+                  y={Math.max(12, goal.y - 5)}
                   textAnchor="end"
-                  fontSize="3.2"
+                  fontSize="10"
                   fill="hsl(var(--electric))"
                   opacity="0.9"
                 >
@@ -420,14 +420,14 @@ export const TotalCapitalWidget = memo(({
                   <circle
                     cx={cx}
                     cy={cy}
-                    r="3.5"
+                    r="7"
                     fill="hsl(var(--apple-green))"
                     opacity="0.18"
                   />
                   <circle
                     cx={cx}
                     cy={cy}
-                    r="1.6"
+                    r="3"
                     fill="hsl(var(--apple-green))"
                   />
                   <title>{tip}</title>
@@ -451,14 +451,14 @@ export const TotalCapitalWidget = memo(({
                   <circle
                     cx={cx}
                     cy={cy}
-                    r="3.5"
+                    r="7"
                     fill="hsl(var(--apple-red))"
                     opacity="0.18"
                   />
                   <circle
                     cx={cx}
                     cy={cy}
-                    r="1.6"
+                    r="3"
                     fill="hsl(var(--apple-red))"
                   />
                   <title>{tip}</title>
@@ -476,16 +476,16 @@ export const TotalCapitalWidget = memo(({
                   <circle
                     cx={x}
                     cy={y}
-                    r="2"
+                    r="4"
                     fill={isPositive ? 'hsl(var(--apple-green))' : 'hsl(var(--apple-red))'}
                   />
                   <circle
                     cx={x}
                     cy={y}
-                    r="5"
+                    r="9"
                     fill="none"
                     stroke={isPositive ? 'hsl(var(--apple-green))' : 'hsl(var(--apple-red))'}
-                    strokeWidth="1"
+                    strokeWidth="1.5"
                     opacity="0.5"
                     className="animate-pulse-subtle"
                   />
