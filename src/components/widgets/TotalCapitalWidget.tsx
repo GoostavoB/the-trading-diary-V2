@@ -378,31 +378,20 @@ export const TotalCapitalWidget = memo(({
               />
             )}
 
-            {/* Goal line */}
+            {/* Goal line (label is rendered as an HTML badge below, so it stays legible) */}
             {goal && goal.inRange && (
-              <g>
-                <line
-                  x1={0}
-                  x2={curve.W}
-                  y1={goal.y}
-                  y2={goal.y}
-                  stroke="hsl(var(--electric))"
-                  strokeWidth="1"
-                  strokeDasharray="4 4"
-                  opacity="0.7"
-                />
-                <text
-                  x={curve.W - 6}
-                  y={Math.max(12, goal.y - 5)}
-                  textAnchor="end"
-                  fontSize="10"
-                  fill="hsl(var(--electric))"
-                  opacity="0.9"
-                >
-                  {goal.label}
-                </text>
-              </g>
+              <line
+                x1={0}
+                x2={curve.W}
+                y1={goal.y}
+                y2={goal.y}
+                stroke="hsl(var(--electric-blue))"
+                strokeWidth="1"
+                strokeDasharray="4 4"
+                opacity="0.7"
+              />
             )}
+
 
             {/* Peak markers (green) */}
             {markers.peaks.map(p => {
