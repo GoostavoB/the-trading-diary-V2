@@ -482,9 +482,21 @@ export const TotalCapitalWidget = memo(({
               );
             })()}
           </svg>
+
+          {/* Goal label as an HTML badge — always legible, never stretched by the SVG */}
+          {goal && goal.inRange && hasFiltered && (
+            <div
+              className="pointer-events-none absolute right-5 z-10 px-2 py-0.5 rounded-md glass-thin border border-electric/30 text-electric text-fluid-2xs font-semibold tabular-nums whitespace-nowrap"
+              style={{ top: `calc(${(goal.y / curve.H) * 100}% - 1.6em)` }}
+            >
+              {goal.label}
+            </div>
+          )}
           </div>
 
         )}
+
+
 
         {/* Hover tooltip overlay (positioned in % so it tracks viewBox) */}
         {hover && (
