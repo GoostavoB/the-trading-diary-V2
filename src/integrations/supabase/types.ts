@@ -3733,6 +3733,7 @@ export type Database = {
           side_temp: string | null
           slippage_cost: number | null
           spread_cost: number | null
+          stop_loss: number | null
           sub_account_id: string | null
           symbol: string | null
           symbol_temp: string
@@ -3780,6 +3781,7 @@ export type Database = {
           side_temp?: string | null
           slippage_cost?: number | null
           spread_cost?: number | null
+          stop_loss?: number | null
           sub_account_id?: string | null
           symbol?: string | null
           symbol_temp: string
@@ -3827,6 +3829,7 @@ export type Database = {
           side_temp?: string | null
           slippage_cost?: number | null
           spread_cost?: number | null
+          stop_loss?: number | null
           sub_account_id?: string | null
           symbol?: string | null
           symbol_temp?: string
