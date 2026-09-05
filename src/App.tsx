@@ -26,6 +26,7 @@ import { usePageTracking } from "@/hooks/usePageTracking";
 import { ConversionTracking } from "@/components/ConversionTracking";
 import { LanguageSync } from "@/components/LanguageSync";
 import { HelmetProvider } from "react-helmet-async";
+import { lazyWithRetry } from "@/utils/lazyWithRetry";
 
 // Eagerly load critical pages (landing and auth)
 import Index from "./pages/Index";
@@ -65,7 +66,7 @@ const ExchangeConnections = lazy(() => import("./pages/ExchangeConnections"));
 const ExchangeTutorial = lazy(() => import("./pages/ExchangeTutorial"));
 const SpotWallet = lazy(() => import("./pages/SpotWallet"));
 const FeeAnalysis = lazy(() => import("./pages/FeeAnalysis"));
-const CapitalManagementPage = lazy(() => import("./pages/CapitalManagementPage"));
+const CapitalManagementPage = lazyWithRetry(() => import("./pages/CapitalManagementPage"));
 const LogoDownload = lazy(() => import("./pages/LogoDownload"));
 const LogoGenerator = lazy(() => import("./pages/LogoGenerator"));
 // Phase 2: Leaderboard feature - temporarily disabled for backlog #34

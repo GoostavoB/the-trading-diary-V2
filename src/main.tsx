@@ -10,12 +10,20 @@ import { registerSW } from 'virtual:pwa-register';
 // Set up global error tracking
 setupGlobalErrorHandling();
 
-// After a new deploy, an already-open tab holds references to chunks that no
-// longer exist — a lazy-route click then fails silently and looks "dead".
-// Vite fires `vite:preloadError` for that; reload once to fetch fresh assets.
-window.addEventListener("vite:preloadError", () => {
+// Recover once when an open tab references a route chunk removed by a deploy.
+// The session guard prevents a reload loop when the failure has another cause;
+// the app-level ErrorBoundary then provides visible recovery actions.
+const PRELOAD_RELOAD_KEY = 'vite-preload-reload-attempted';
+window.addEventListener("vite:preloadError", (event) => {
+    event.preventDefault();
+    if (sessionStorage.getItem(PRELOAD_RELOAD_KEY) === 'true') return;
+    sessionStorage.setItem(PRELOAD_RELOAD_KEY, 'true');
     window.location.reload();
 });
+
+window.addEventListener('load', () => {
+    sessionStorage.removeItem(PRELOAD_RELOAD_KEY);
+}, { once: true });
 
 createRoot(document.getElementById("root")!).render(<App />);
 
