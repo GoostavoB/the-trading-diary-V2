@@ -493,6 +493,8 @@ export const TotalCapitalWidget = memo(({
               );
             })()}
           </svg>
+          </div>
+
         )}
 
         {/* Hover tooltip overlay (positioned in % so it tracks viewBox) */}
