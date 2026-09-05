@@ -39,6 +39,7 @@ import Auth from "./pages/Auth";
 // Lazy load all other pages for better performance
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Upload = lazy(() => import("./pages/Upload"));
+const Trades = lazy(() => import("./pages/Trades"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Forecast = lazy(() => import("./pages/Forecast"));
 const Achievements = lazy(() => import("./pages/Achievements"));
