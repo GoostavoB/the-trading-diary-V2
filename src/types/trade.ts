@@ -10,6 +10,7 @@ export interface Trade {
   leverage: number | null;
   entry_price: number | null;
   exit_price: number | null;
+  stop_loss: number | null;
   position_size: number | null;
   margin: number | null;
   funding_fee: number | null;
