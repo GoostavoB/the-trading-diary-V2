@@ -303,7 +303,7 @@ function TradeCard({
     <Link
       to="/journal"
       className={cn(
-        "relative rounded-xl p-3 overflow-hidden border block transition-all duration-300 hover-lift",
+        "relative rounded-xl p-3 sm:p-3.5 xl:p-4 overflow-hidden border block no-underline [text-decoration:none] transition-all duration-300 hover-lift",
         accentClasses
       )}
     >

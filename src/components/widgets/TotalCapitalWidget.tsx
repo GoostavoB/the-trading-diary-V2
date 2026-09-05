@@ -333,7 +333,7 @@ export const TotalCapitalWidget = memo(({
             </button>
           </div>
         ) : (
-          <div ref={chartRef} className="w-full chart-fluid-sm">
+          <div ref={chartRef} className="relative w-full chart-fluid-sm">
           <svg
             viewBox={`0 0 ${curve.W} ${curve.H}`}
             className="w-full h-full overflow-visible"
@@ -486,7 +486,7 @@ export const TotalCapitalWidget = memo(({
           {/* Goal label as an HTML badge — always legible, never stretched by the SVG */}
           {goal && goal.inRange && hasFiltered && (
             <div
-              className="pointer-events-none absolute right-5 z-10 px-2 py-0.5 rounded-md glass-thin border border-electric/30 text-electric text-fluid-2xs font-semibold tabular-nums whitespace-nowrap"
+              className="pointer-events-none absolute right-5 z-10 px-2 py-0.5 rounded-md glass-thin border border-[hsl(var(--electric-blue)/0.35)] text-electric text-fluid-2xs font-semibold tabular-nums whitespace-nowrap"
               style={{ top: `calc(${(goal.y / curve.H) * 100}% - 1.6em)` }}
             >
               {goal.label}
