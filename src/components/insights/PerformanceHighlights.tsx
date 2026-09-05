@@ -230,7 +230,7 @@ function TradeCard({
           {symbol}
         </span>
         {setup && (
-          <span className="chip chip-electric !py-0.5 !px-1.5 !text-fluid-2xs">
+          <span className="chip chip-electric !py-0.5 !px-1.5 text-fluid-2xs">
             {setup}
           </span>
         )}
