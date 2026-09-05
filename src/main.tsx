@@ -13,17 +13,15 @@ setupGlobalErrorHandling();
 // Recover once when an open tab references a route chunk removed by a deploy.
 // The session guard prevents a reload loop when the failure has another cause;
 // the app-level ErrorBoundary then provides visible recovery actions.
-const PRELOAD_RELOAD_KEY = 'vite-preload-reload-attempted';
+const PRELOAD_RELOAD_KEY = 'vite-preload-reload-attempted-at';
+const PRELOAD_RELOAD_COOLDOWN_MS = 10_000;
 window.addEventListener("vite:preloadError", (event) => {
     event.preventDefault();
-    if (sessionStorage.getItem(PRELOAD_RELOAD_KEY) === 'true') return;
-    sessionStorage.setItem(PRELOAD_RELOAD_KEY, 'true');
+    const previousAttempt = Number(sessionStorage.getItem(PRELOAD_RELOAD_KEY) ?? 0);
+    if (Date.now() - previousAttempt < PRELOAD_RELOAD_COOLDOWN_MS) return;
+    sessionStorage.setItem(PRELOAD_RELOAD_KEY, String(Date.now()));
     window.location.reload();
 });
-
-window.addEventListener('load', () => {
-    sessionStorage.removeItem(PRELOAD_RELOAD_KEY);
-}, { once: true });
 
 createRoot(document.getElementById("root")!).render(<App />);
 
