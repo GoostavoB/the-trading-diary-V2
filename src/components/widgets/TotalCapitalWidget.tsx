@@ -318,11 +318,11 @@ export const TotalCapitalWidget = memo(({
       {/* Sparkline area */}
       <div className="flex-1 px-5 pb-4 pt-2 flex items-end relative">
         {!hasTrades ? (
-          <div className="w-full h-14 md:h-16 flex items-center justify-center text-fluid-xs text-space-400">
+          <div className="w-full chart-fluid-sm flex items-center justify-center text-fluid-xs text-space-400">
             No trades yet
           </div>
         ) : !hasFiltered ? (
-          <div className="w-full h-14 md:h-16 flex flex-col items-center justify-center gap-2 text-fluid-xs text-space-400">
+          <div className="w-full chart-fluid-sm flex flex-col items-center justify-center gap-2 text-fluid-xs text-space-400">
             <span>No trades in this period</span>
             <button
               type="button"
@@ -333,7 +333,7 @@ export const TotalCapitalWidget = memo(({
             </button>
           </div>
         ) : (
-          <div ref={chartRef} className="w-full h-14 md:h-16">
+          <div ref={chartRef} className="w-full chart-fluid-sm">
           <svg
             viewBox={`0 0 ${curve.W} ${curve.H}`}
             className="w-full h-full overflow-visible"
