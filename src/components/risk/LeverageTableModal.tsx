@@ -2,32 +2,8 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Table } from "lucide-react";
+import { LEVERAGE_ROWS } from "@/utils/leverageTable";
 
-/**
- * Static leverage reference table.
- * Maps the unleveraged percentage move (entry -> stop distance) to the
- * maximum sensible leverage. Hardcoded on purpose — it's a reference tool.
- */
-const LEVERAGE_ROWS: { range: string; leverage: string }[] = [
-  { range: "0.01% – 0.40%", leverage: "100x" },
-  { range: "0.41% – 0.60%", leverage: "90x" },
-  { range: "0.61% – 0.75%", leverage: "80x" },
-  { range: "0.76% – 0.90%", leverage: "70x" },
-  { range: "0.91% – 1.15%", leverage: "60x" },
-  { range: "1.16% – 1.45%", leverage: "50x" },
-  { range: "1.46% – 1.95%", leverage: "40x" },
-  { range: "1.96% – 2.80%", leverage: "30x" },
-  { range: "2.81% – 3.50%", leverage: "25x" },
-  { range: "3.55% – 4.45%", leverage: "20x" },
-  { range: "4.46% – 6.25%", leverage: "15x" },
-  { range: "6.26% – 9.40%", leverage: "10x" },
-  { range: "9.41% – 11.80%", leverage: "8x" },
-  { range: "11.81% – 16%", leverage: "6x" },
-  { range: "16.01% – 24%", leverage: "4x" },
-  { range: "24.01% – 32%", leverage: "3x" },
-  { range: "32.01% – 48%", leverage: "2x" },
-  { range: "48.01% – 98%", leverage: "1x" },
-];
 
 export function LeverageTableModal() {
   const [open, setOpen] = useState(false);
