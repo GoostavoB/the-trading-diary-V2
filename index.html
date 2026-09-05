@@ -363,9 +363,9 @@
     </style>
     
     <!-- Phase 6: Preload Critical Resources -->
-    <link rel="modulepreload" href="/src/main.tsx">
-    <link rel="modulepreload" href="/src/App.tsx">
-    <!-- Removed prefetch of /src/pages/{Dashboard,Upload}.tsx — these are auth-gated;
+    <!-- Vite injects modulepreloads for the entry automatically.
+         Manual preloads of /src/*.tsx get served as raw files (wrong MIME) in prod.
+         Removed prefetch of /src/pages/{Dashboard,Upload}.tsx — these are auth-gated;
          prefetching them on every public visit wastes bandwidth and pollutes LCP. -->
 
     <!-- (No hero image preload — Hero.tsx no longer renders bull-bear-realistic.png.
