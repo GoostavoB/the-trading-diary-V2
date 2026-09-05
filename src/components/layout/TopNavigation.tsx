@@ -44,6 +44,7 @@ export function TopNavigation() {
         {
             title: 'Trades',
             items: [
+                { title: 'All Trades', url: '/trades', icon: Receipt, description: 'Full trade log with equity curve' },
                 { title: 'Fee Analysis', url: '/fee-analysis', icon: Receipt, description: 'Analyze trading costs and commissions' },
                 { title: 'Risk Management', url: '/risk-management', icon: Shield, description: 'Position sizing and risk calculators' },
                 { title: 'Exchange Connections', url: '/exchanges', icon: Link2, description: 'Connect exchanges for automatic trade sync' },
