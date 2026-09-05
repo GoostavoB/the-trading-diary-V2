@@ -1,7 +1,9 @@
 import { memo, useMemo, useState } from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useElementSize } from '@/hooks/useElementSize';
 import type { Trade } from '@/types/trade';
+
 
 interface TotalCapitalWidgetProps {
   id: string;
@@ -59,6 +61,12 @@ export const TotalCapitalWidget = memo(({
   // Active timeframe tab
   const [timeframe, setTimeframe] = useState<Timeframe>('ALL');
 
+  // Measure the chart box so the SVG viewBox matches real pixels 1:1.
+  // Without this, a 100×48 viewBox stretched across a wide screen scales the
+  // stroke ~25× horizontally and the line renders as a scribbled mess.
+  const [chartRef, chartSize] = useElementSize<HTMLDivElement>({ width: 600, height: 64 });
+
+
   const formatCurrency = (n: number, opts?: { compact?: boolean }) => {
     if (opts?.compact) {
       const abs = Math.abs(n);
@@ -104,8 +112,9 @@ export const TotalCapitalWidget = memo(({
 
   // Build cumulative capital curve from filtered trades
   const curve = useMemo(() => {
-    const W = 100;
-    const H = 48;
+    const W = Math.max(1, chartSize.width);
+    const H = Math.max(1, chartSize.height);
+
     if (filteredTrades.length === 0) {
       return { path: '', area: '', drawdown: '', W, H, points: [] as CurvePoint[], yMin: 0, yRange: 1 };
     }
@@ -171,7 +180,7 @@ export const TotalCapitalWidget = memo(({
     const drawdown = `${forward} ${backward} Z`;
 
     return { path, area, drawdown, W, H, points: pts, yMin, yRange };
-  }, [filteredTrades, initialCapital]);
+  }, [filteredTrades, initialCapital, chartSize.width, chartSize.height]);
 
   // Find the top N best peaks and worst troughs in the curve.
   // Algorithm: a point qualifies if its delta from the previous point is a local extreme
