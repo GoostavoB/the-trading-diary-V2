@@ -52,7 +52,7 @@ export function LeverageTableModal() {
                   {row.range}
                 </span>
                 <span className="justify-self-end min-w-[120px] md:min-w-[140px] text-center rounded-xl px-4 py-2 text-2xl md:text-3xl font-bold tabular-nums bg-indigo-500/15 border border-indigo-500/30 text-indigo-400">
-                  {row.leverage}
+                  {row.leverage}x
                 </span>
               </div>
             ))}
