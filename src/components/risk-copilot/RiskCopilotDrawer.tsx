@@ -546,6 +546,28 @@ export function RiskCopilotDrawer() {
   };
 
   const selectedProfile = profiles.find((p) => p.id === selectedProfileId) || null;
+
+  const monthlyMedal = rc.monthlyGoal > 0
+    ? (rc.monthlyGoalPct >= 100 ? 'gold' : rc.monthlyGoalPct >= 80 ? 'silver' : rc.monthlyGoalPct >= 60 ? 'bronze' : null)
+    : null;
+  const goalMedals = [
+    ...(monthlyMedal
+      ? [{
+          id: 'monthly-current',
+          medal: monthlyMedal,
+          title: format(new Date(), 'MMMM/yy'),
+          period: `Monthly goal — ${format(new Date(), 'MMMM/yyyy')}`,
+        }]
+      : []),
+    ...riskGoals
+      .filter((g) => g.achieved)
+      .map((g) => ({
+        id: g.id,
+        medal: g.achieved as string,
+        title: g.name,
+        period: `${g.period_type === 'daily' ? 'Daily goal' : g.period_type === 'yearly' ? 'Yearly goal' : g.period_type === 'monthly' ? 'Monthly goal' : 'Custom goal'} — ${g.periodLabel}`,
+      })),
+  ];
   const displayedStopBase = rc.isGorduraActive ? rc.gorduraAmount : rc.capitalBase;
   const displayedRiskPct = selectedProfile ? selectedProfile.risk_pct : rc.authorizedStopPct;
   const displayedStopDollar = selectedProfile ? (displayedStopBase * selectedProfile.risk_pct) / 100 : rc.authorizedStopDollar;
