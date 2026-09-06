@@ -242,16 +242,28 @@ export function useRiskCopilot() {
   };
 
   const updateMonthlyGoal = async (goal: number) => {
-    if (!user || !subAccountId) return;
-    const { error } = await supabase
+    if (!user || !subAccountId) throw new Error('No active sub-account');
+    const value = Number.isFinite(goal) ? Math.max(0, goal) : 0;
+
+    // Update first (row almost always exists); insert only when nothing matched.
+    const { data: updated, error: updateError } = await supabase
       .from('user_settings')
-      .upsert(
-        { user_id: user.id, sub_account_id: subAccountId, monthly_goal_target: Math.max(0, goal) },
-        { onConflict: 'sub_account_id' }
-      );
-    if (error) throw error;
-    queryClient.invalidateQueries({ queryKey: ['risk-copilot-settings', subAccountId] });
+      .update({ monthly_goal_target: value })
+      .eq('sub_account_id', subAccountId)
+      .eq('user_id', user.id)
+      .select('id');
+    if (updateError) throw updateError;
+
+    if (!updated || updated.length === 0) {
+      const { error: insertError } = await supabase
+        .from('user_settings')
+        .insert({ user_id: user.id, sub_account_id: subAccountId, monthly_goal_target: value });
+      if (insertError) throw insertError;
+    }
+
+    await queryClient.invalidateQueries({ queryKey: ['risk-copilot-settings', subAccountId] });
   };
+
 
   const updateWinRateMode = async (mode: WinRateMode, manualPct?: number) => {
     if (!user || !subAccountId) return;
