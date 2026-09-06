@@ -316,6 +316,13 @@ export function GoalsSection({
   const { goals, createGoal, updateGoal, deleteGoal } = useRiskGoals();
   onGoalsChange?.(goals);
 
+  // The current month has its own goal instance (own name + own target).
+  const range = defaultRangeFor('monthly');
+  const currentMonthStart = format(range.start, 'yyyy-MM-dd');
+  const currentMonthGoal = goals.find(
+    (g) => g.period_type === 'monthly' && g.period_start === currentMonthStart
+  );
+
   return (
     <div className="space-y-2.5">
       <div className="flex items-center justify-between">
@@ -323,14 +330,34 @@ export function GoalsSection({
         <AddGoalDialog onCreate={createGoal} />
       </div>
 
-      <GoalBar
-        name={monthlyName}
-        periodLabel={monthlyPeriodLabel}
-        profit={monthlyProfit}
-        target={monthlyGoal}
-        formatAmount={formatAmount}
-        onSaveTarget={onSaveMonthlyGoal}
-      />
+      {!currentMonthGoal && (
+        <GoalBar
+          name={monthlyName}
+          periodLabel={monthlyPeriodLabel}
+          profit={monthlyProfit}
+          target={monthlyGoal}
+          formatAmount={formatAmount}
+          onSaveTarget={async (value) => {
+            await onSaveMonthlyGoal(value);
+            await createGoal({
+              name: monthlyName,
+              period_type: 'monthly',
+              period_start: currentMonthStart,
+              period_end: format(range.end, 'yyyy-MM-dd'),
+              target_amount: value,
+            });
+          }}
+          onRename={async (value) => {
+            await createGoal({
+              name: value,
+              period_type: 'monthly',
+              period_start: currentMonthStart,
+              period_end: format(range.end, 'yyyy-MM-dd'),
+              target_amount: monthlyGoal,
+            });
+          }}
+        />
+      )}
 
       {goals.map((g) => (
         <GoalBar
@@ -340,7 +367,10 @@ export function GoalsSection({
           profit={g.profit}
           target={g.target_amount}
           formatAmount={formatAmount}
-          onSaveTarget={(v) => updateGoal(g.id, { target_amount: v })}
+          onSaveTarget={async (v) => {
+            await updateGoal(g.id, { target_amount: v });
+            if (g.id === currentMonthGoal?.id) await onSaveMonthlyGoal(v);
+          }}
           onRename={(v) => updateGoal(g.id, { name: v })}
           onDelete={() => deleteGoal(g.id)}
         />
@@ -348,3 +378,4 @@ export function GoalsSection({
     </div>
   );
 }
+
