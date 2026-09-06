@@ -142,8 +142,10 @@ const AppRoutes = () => {
   return (
     <>
       <LanguageSync />
+      <ErrorBoundary key={location.pathname}>
       <Suspense fallback={<PageLoader />}>
         <Routes>
+
           {/* Landing pages by language - wrapped with default theme */}
           <Route path="/" element={<PublicPageThemeWrapper><Index /></PublicPageThemeWrapper>} />
           <Route path="/pt" element={<PublicPageThemeWrapper><IndexPt /></PublicPageThemeWrapper>} />
