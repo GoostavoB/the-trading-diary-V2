@@ -595,7 +595,7 @@ export function RiskCopilotDrawer() {
   const rc = useRiskCopilot();
   const { medals } = useMonthlyMedals();
   const { goals: riskGoals } = useRiskGoals();
-  const { profiles, createProfile, deleteProfile, toggleFavorite, moveProfile } = useRiskProfiles();
+  const { profiles, createProfile, updateProfile, deleteProfile, toggleFavorite, moveProfile } = useRiskProfiles();
   const { formatAmount } = useCurrency();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
@@ -611,10 +611,19 @@ export function RiskCopilotDrawer() {
   };
 
   const saveSettings = async () => {
-    await rc.updateKellyRange(floorInput, ceilingInput);
-    await rc.updateMonthlyGoal(parseFloat(goalInput) || 0);
-    toast.success('Risk settings saved');
+    try {
+      await rc.updateKellyRange(floorInput, ceilingInput);
+      await rc.updateMonthlyGoal(parseFloat(goalInput) || 0);
+      toast.success('Risk settings saved');
+      setSettingsOpen(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to save settings — nothing was saved');
+    }
+  };
+
+  const cancelSettings = () => {
     setSettingsOpen(false);
+    toast.info('Changes discarded');
   };
 
   const selectedProfile = profiles.find((p) => p.id === selectedProfileId) || null;
