@@ -495,6 +495,7 @@ const Settings = () => {
           </TabsContent>
 
           <TabsContent value="setups" className="space-y-6">
+            <TradeTagManager />
             <SignalSourceManager />
             <PremiumCard className="p-6 glass">
               <h2 className="text-xl font-semibold mb-4">Trade Setups</h2>
