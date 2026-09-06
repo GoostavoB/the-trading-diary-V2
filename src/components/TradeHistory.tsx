@@ -917,11 +917,23 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
 
               </div>
 
-              <TradeTagSelector
-                emotionTags={editingTrade.emotion_tags || []}
+              <div>
+                <Label>Emotional Tag</Label>
+                <Input
+                  value={editingTrade.emotional_tag || ''}
+                  onChange={(e) => setEditingTrade({ ...editingTrade, emotional_tag: e.target.value })}
+                  placeholder="e.g. Calm, FOMO, Confident"
+                  className="mt-1"
+                />
+              </div>
+
+              <TradeTagsFields
+                setupTags={editingTrade.setup_tags || []}
                 errorTags={editingTrade.error_tags || []}
-                onEmotionTagsChange={(tags) => setEditingTrade({ ...editingTrade, emotion_tags: tags })}
+                marketTags={editingTrade.market_tags || []}
+                onSetupTagsChange={(tags) => setEditingTrade({ ...editingTrade, setup_tags: tags })}
                 onErrorTagsChange={(tags) => setEditingTrade({ ...editingTrade, error_tags: tags })}
+                onMarketTagsChange={(tags) => setEditingTrade({ ...editingTrade, market_tags: tags })}
               />
 
               <div>
