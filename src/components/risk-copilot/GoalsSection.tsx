@@ -68,11 +68,21 @@ export function GoalBar({
 
   const save = async () => {
     const parsed = parseFloat(targetDraft.replace(',', '.'));
-    if (!isNaN(parsed) && parsed >= 0) await onSaveTarget(parsed);
-    if (onRename && nameDraft.trim() && nameDraft.trim() !== name) await onRename(nameDraft.trim());
-    toast.success('Goal updated');
-    setOpen(false);
+    if (isNaN(parsed) || parsed < 0) {
+      toast.error('Enter a valid target amount');
+      return;
+    }
+    try {
+      await onSaveTarget(parsed);
+      if (onRename && nameDraft.trim() && nameDraft.trim() !== name) await onRename(nameDraft.trim());
+      toast.success('Goal updated');
+      setOpen(false);
+    } catch (e) {
+      console.error('[GoalBar] save failed', e);
+      toast.error(e instanceof Error ? e.message : 'Could not save the goal');
+    }
   };
+
 
   return (
     <div className="rounded-xl border border-border bg-muted/10 p-3 space-y-2.5">
