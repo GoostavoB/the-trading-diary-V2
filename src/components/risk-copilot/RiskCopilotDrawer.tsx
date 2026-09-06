@@ -684,11 +684,16 @@ export function RiskCopilotDrawer() {
             <div className="text-sm text-muted-foreground text-center py-12">Loading...</div>
           ) : settingsOpen ? (
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <h3 className="text-base font-bold">Risk Settings</h3>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSettingsOpen(false)}>
-                  <X className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" className="h-8" onClick={cancelSettings}>
+                    Cancel
+                  </Button>
+                  <Button size="sm" className="h-8 gap-1.5" onClick={saveSettings}>
+                    <Check className="h-3.5 w-3.5" /> Save
+                  </Button>
+                </div>
               </div>
               <div className="space-y-3 rounded-xl border border-border p-4">
                 <div className="flex items-center justify-between">
@@ -716,12 +721,19 @@ export function RiskCopilotDrawer() {
                 <Label className="text-sm font-semibold">Monthly Goal</Label>
                 <Input type="number" value={goalInput} onChange={(e) => setGoalInput(e.target.value)} placeholder="0.00" />
               </div>
-              <Button className="w-full" onClick={saveSettings}>Save Settings</Button>
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1" onClick={cancelSettings}>Cancel</Button>
+                <Button className="flex-1" onClick={saveSettings}>Save Settings</Button>
+              </div>
               <div className="space-y-3 pt-2 border-t border-border">
-                <Label className="text-sm font-semibold">Risk Profiles</Label>
+                <div className="flex items-center gap-1.5">
+                  <Label className="text-sm font-semibold">Risk Profiles</Label>
+                  <InfoTooltip text="Tap the pencil to edit a profile's name or risk %. Changes here save instantly — they don't depend on the Save button above." />
+                </div>
                 <RiskProfileManager
                   profiles={profiles}
                   createProfile={createProfile}
+                  updateProfile={updateProfile}
                   deleteProfile={deleteProfile}
                   toggleFavorite={toggleFavorite}
                   moveProfile={moveProfile}
