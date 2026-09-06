@@ -124,7 +124,7 @@ export function GoalBar({
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-64 space-y-3" align="end">
-              {onRename && (
+              {(onRename || onSaveBoth) && (
                 <div className="space-y-1">
                   <Label className="text-xs text-muted-foreground">Goal name</Label>
                   <Input value={nameDraft} onChange={(e) => setNameDraft(e.target.value)} className="h-8 text-sm" />
