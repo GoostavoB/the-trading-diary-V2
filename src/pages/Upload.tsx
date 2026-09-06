@@ -26,6 +26,7 @@ import { BatchDuplicateDialog } from '@/components/BatchDuplicateDialog';
 import { SuccessFeedback } from '@/components/SuccessFeedback';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ImageAnnotator, Annotation } from '@/components/upload/ImageAnnotator';
+import { SignalSourceSelect } from '@/components/trades/SignalSourceSelect';
 import { BrokerSelect } from '@/components/upload/BrokerSelect';
 import { EnhancedFileUpload } from '@/components/upload/EnhancedFileUpload';
 import { MultiImageUpload } from '@/components/upload/MultiImageUpload';
@@ -170,6 +171,7 @@ const Upload = () => {
     closed_at: '',
     period_of_day: 'morning' as 'morning' | 'afternoon' | 'night',
     emotional_tag: '',
+    signal_source: '',
     notes: '',
     duration_minutes: ''
   });
@@ -231,6 +233,7 @@ const Upload = () => {
         closed_at: data.closed_at || '',
         period_of_day: data.period_of_day as 'morning' | 'afternoon' | 'night' || 'morning',
         emotional_tag: data.emotional_tag || '',
+        signal_source: data.signal_source || '',
         notes: data.notes || '',
         duration_minutes: data.duration_minutes?.toString() || ''
       });
@@ -881,6 +884,7 @@ const Upload = () => {
       roi: roi,
       profit_loss: pnl,
       emotional_tag: formData.emotional_tag,
+      signal_source: formData.signal_source?.trim() || 'Meu',
       notes: formData.notes,
       duration_minutes: parseFloat(formData.duration_minutes) || 0,
       trade_date: formData.opened_at || new Date().toISOString()
@@ -1315,6 +1319,16 @@ const Upload = () => {
                       ...formData,
                       broker: value
                     })} required />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium">Signal source</label>
+                  <div className="mt-1">
+                    <SignalSourceSelect value={formData.signal_source} onChange={value => setFormData({
+                      ...formData,
+                      signal_source: value
+                    })} />
                   </div>
                 </div>
 

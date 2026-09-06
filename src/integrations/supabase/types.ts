@@ -2924,6 +2924,27 @@ export type Database = {
         }
         Relationships: []
       }
+      signal_sources: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       social_notifications: {
         Row: {
           actor_avatar: string | null
@@ -3731,6 +3752,7 @@ export type Database = {
           setup: string | null
           side: string | null
           side_temp: string | null
+          signal_source: string | null
           slippage_cost: number | null
           spread_cost: number | null
           stop_loss: number | null
@@ -3779,6 +3801,7 @@ export type Database = {
           setup?: string | null
           side?: string | null
           side_temp?: string | null
+          signal_source?: string | null
           slippage_cost?: number | null
           spread_cost?: number | null
           stop_loss?: number | null
@@ -3827,6 +3850,7 @@ export type Database = {
           setup?: string | null
           side?: string | null
           side_temp?: string | null
+          signal_source?: string | null
           slippage_cost?: number | null
           spread_cost?: number | null
           stop_loss?: number | null
