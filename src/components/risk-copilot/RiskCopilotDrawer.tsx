@@ -28,6 +28,10 @@ import { useCurrency } from '@/contexts/CurrencyContext';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { maxLeverageForMove } from '@/utils/leverageTable';
+import { format } from 'date-fns';
+import { GoalsSection } from './GoalsSection';
+import { useRiskGoals } from '@/hooks/useRiskGoals';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const TIER_COLOR: Record<string, string> = {
   red: 'text-destructive',
@@ -249,65 +253,6 @@ function RiskProfileManager({
   );
 }
 
-function GoalProgressBar({
-  pct,
-  profit,
-  goal,
-  formatAmount,
-}: {
-  pct: number;
-  profit: number;
-  goal: number;
-  formatAmount: (n: number) => string;
-}) {
-  const barColor =
-    pct <= 0 ? 'bg-muted-foreground/20' :
-    pct < 70 ? 'bg-apple-red' :
-    pct < 90 ? 'bg-apple-orange' :
-    pct < 100 ? 'bg-apple-cyan' :
-    'bg-apple-green';
-  const markers = [
-    { threshold: 70, emoji: MEDAL_EMOJI.bronze },
-    { threshold: 90, emoji: MEDAL_EMOJI.silver },
-    { threshold: 100, emoji: MEDAL_EMOJI.gold },
-  ];
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-sm text-muted-foreground font-medium">
-          <Target className="h-4 w-4" /> Monthly Goal
-          <InfoTooltip text="Track this month's profit against your goal. Once you hit 100%, your base capital gets locked and protected — you can only risk the extra profit (the buffer), keeping your gains safe. The dots mark Bronze (70%), Silver (90%) and Gold (100%)." />
-        </div>
-        <span className="text-sm font-mono font-semibold">
-          {formatAmount(profit)} <span className="text-muted-foreground">/ {formatAmount(goal)}</span>
-        </span>
-      </div>
-      <div className="relative pt-4 pb-1">
-        <div className="h-3 rounded-full bg-muted/40 overflow-hidden">
-          <div
-            className={cn('h-full rounded-full transition-all', barColor)}
-            style={{ width: `${Math.max(0, Math.min(100, pct))}%` }}
-          />
-        </div>
-        {goal > 0 && markers.map((m) => (
-          <div
-            key={m.threshold}
-            className="absolute top-0 -translate-x-1/2"
-            style={{ left: `${m.threshold}%` }}
-          >
-            <span className={cn('text-base leading-none transition-opacity', pct >= m.threshold ? 'opacity-100' : 'opacity-25 grayscale')}>
-              {m.emoji}
-            </span>
-          </div>
-        ))}
-      </div>
-      <div className="text-xs text-muted-foreground font-mono text-center">
-        {pct.toFixed(0)}% of goal
-      </div>
-    </div>
-  );
-}
-
 function GordurinhaCard({
   isActive,
   amount,
@@ -341,8 +286,11 @@ function GordurinhaCard({
   );
 }
 
-function MedalsBoard({ medals }: { medals: { id: string; medal: string; monthLabel: string; pct_achieved: number }[] }) {
+interface GoalMedal { id: string; medal: string; title: string; period: string }
+
+function MedalsBoard({ medals, goalMedals }: { medals: { id: string; medal: string; monthLabel: string; pct_achieved: number }[]; goalMedals: GoalMedal[] }) {
   const [expanded, setExpanded] = useState(false);
+  const hasAny = medals.length > 0 || goalMedals.length > 0;
   return (
     <div className="space-y-2">
       <button
@@ -358,8 +306,23 @@ function MedalsBoard({ medals }: { medals: { id: string; medal: string; monthLab
           <ChevronDown className={cn('h-4 w-4 text-muted-foreground transition-transform', expanded && 'rotate-180')} />
         )}
       </button>
-      {medals.length > 0 ? (
+      {hasAny ? (
         <div className="flex gap-2 flex-wrap">
+          {goalMedals.map((g) => (
+            <TooltipProvider key={g.id} delayDuration={100}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex flex-col items-center gap-0.5 bg-muted/30 rounded-lg px-3 py-2 border border-border cursor-default">
+                    <span className="text-xl leading-none">{MEDAL_EMOJI[g.medal]}</span>
+                    <span className="text-[10px] text-muted-foreground font-mono max-w-[80px] truncate">{g.title}</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="text-xs">
+                  {g.title} — {g.period}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ))}
           {medals.map((m) => (
             <div key={m.id} className="flex flex-col items-center gap-0.5 bg-muted/30 rounded-lg px-3 py-2 border border-border">
               <span className="text-xl leading-none">{MEDAL_EMOJI[m.medal]}</span>
@@ -377,7 +340,7 @@ function MedalsBoard({ medals }: { medals: { id: string; medal: string; monthLab
           ))}
         </div>
       )}
-      {medals.length === 0 && (
+      {!hasAny && (
         <p className="text-[11px] text-muted-foreground text-center">Close your first goal-hit month to start your collection.</p>
       )}
       {expanded && medals.length > 0 && (
@@ -559,6 +522,7 @@ export function RiskCopilotDrawer() {
 
   const rc = useRiskCopilot();
   const { medals } = useMonthlyMedals();
+  const { goals: riskGoals } = useRiskGoals();
   const { profiles, createProfile, deleteProfile, toggleFavorite, moveProfile } = useRiskProfiles();
   const { formatAmount } = useCurrency();
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -786,7 +750,7 @@ export function RiskCopilotDrawer() {
                   <CapitalAdjustPopover mode="remove" capitalBase={rc.capitalBase} onConfirm={rc.addCapital} formatAmount={formatAmount} />
                 </div>
               </div>
-              <MedalsBoard medals={medals} />
+              <MedalsBoard medals={medals} goalMedals={goalMedals} />
             </>
           )}
         </div>
