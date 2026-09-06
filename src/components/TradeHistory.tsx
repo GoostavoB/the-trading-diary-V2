@@ -96,6 +96,7 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingTrade, setEditingTrade] = useState<Trade | null>(null);
+  const [originalTrade, setOriginalTrade] = useState<Trade | null>(null);
   const [selectedTradeIds, setSelectedTradeIds] = useState<Set<string>>(new Set());
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [tradeToShare, setTradeToShare] = useState<Trade | null>(null);
@@ -367,6 +368,7 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
 
   const handleEdit = (trade: Trade) => {
     setEditingTrade({ ...trade });
+    setOriginalTrade({ ...trade });
     setEditDialogOpen(true);
   };
 
@@ -376,9 +378,39 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
     const entry = editingTrade.entry_price;
     const exit = editingTrade.exit_price;
     const size = editingTrade.position_size;
+    const leverage = editingTrade.leverage || 1;
+    const side = editingTrade.side || 'long';
 
-    const pnl = (exit - entry) * size;
-    const roi = ((exit - entry) / entry) * 100;
+    const prev = originalTrade;
+    const num = (v: number | null | undefined) => (v == null ? null : Number(v));
+
+    // Did the user actually change anything that affects P&L?
+    const priceInputsChanged =
+      !prev ||
+      num(prev.entry_price) !== num(entry) ||
+      num(prev.exit_price) !== num(exit) ||
+      num(prev.position_size) !== num(size) ||
+      num(prev.leverage || 1) !== num(leverage) ||
+      (prev.side || 'long') !== side;
+
+    // The user can override the realized P&L directly (e.g. exchange value).
+    const pnlManuallyEdited = prev ? num(prev.profit_loss) !== num(editingTrade.profit_loss) : false;
+
+    let pnl = prev?.profit_loss ?? editingTrade.profit_loss ?? null;
+    let roi = prev?.roi ?? editingTrade.roi ?? null;
+
+    if (pnlManuallyEdited) {
+      pnl = num(editingTrade.profit_loss);
+      const margin = entry && size ? (entry * size) / (leverage || 1) : null;
+      roi = pnl != null && margin ? (pnl / margin) * 100 : roi;
+    } else if (priceInputsChanged) {
+      if (entry != null && exit != null && size != null) {
+        const direction = side === 'short' ? -1 : 1;
+        pnl = (exit - entry) * size * direction;
+        const margin = (entry * size) / (leverage || 1);
+        roi = margin ? (pnl / margin) * 100 : 0;
+      }
+    }
 
     const { error } = await supabase
       .from('trades')
@@ -387,8 +419,8 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
         entry_price: entry,
         exit_price: exit,
         position_size: size,
-        side: editingTrade.side,
-        leverage: editingTrade.leverage || 1,
+        side,
+        leverage,
         funding_fee: editingTrade.funding_fee || 0,
         trading_fee: editingTrade.trading_fee || 0,
         setup: editingTrade.setup || null,
@@ -409,10 +441,12 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
       toast.success('Trade updated successfully');
       setEditDialogOpen(false);
       setEditingTrade(null);
+      setOriginalTrade(null);
       fetchTrades();
       onTradesChange?.();
     }
   };
+
 
   if (loading) {
     return (
@@ -847,6 +881,20 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
                     onChange={(e) => setEditingTrade({ ...editingTrade, trading_fee: parseFloat(e.target.value) })}
                     className="mt-1"
                   />
+                </div>
+
+                <div>
+                  <Label>Realized P&L</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={editingTrade.profit_loss ?? ''}
+                    onChange={(e) => setEditingTrade({ ...editingTrade, profit_loss: e.target.value ? parseFloat(e.target.value) : null })}
+                    className="mt-1"
+                  />
+                  <p className="mt-1 text-fluid-xs text-muted-foreground">
+                    Kept as saved unless you change it or edit entry/exit/size/side.
+                  </p>
                 </div>
 
                 <div>
