@@ -884,6 +884,20 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
                 </div>
 
                 <div>
+                  <Label>Realized P&L</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={editingTrade.profit_loss ?? ''}
+                    onChange={(e) => setEditingTrade({ ...editingTrade, profit_loss: e.target.value ? parseFloat(e.target.value) : null })}
+                    className="mt-1"
+                  />
+                  <p className="mt-1 text-fluid-xs text-muted-foreground">
+                    Kept as saved unless you change it or edit entry/exit/size/side.
+                  </p>
+                </div>
+
+                <div>
                   <Label>Setup</Label>
                   <Input
                     value={editingTrade.setup || ''}
