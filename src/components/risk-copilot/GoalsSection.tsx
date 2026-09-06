@@ -44,6 +44,7 @@ export function GoalBar({
   formatAmount,
   onSaveTarget,
   onRename,
+  onSaveBoth,
   onDelete,
 }: {
   name: string;
@@ -53,6 +54,8 @@ export function GoalBar({
   formatAmount: (n: number) => string;
   onSaveTarget: (value: number) => Promise<void> | void;
   onRename?: (value: string) => Promise<void> | void;
+  /** When provided, name + target are persisted in a single operation. */
+  onSaveBoth?: (name: string, value: number) => Promise<void> | void;
   onDelete?: () => Promise<void> | void;
 }) {
   const [open, setOpen] = useState(false);
@@ -72,9 +75,14 @@ export function GoalBar({
       toast.error('Enter a valid target amount');
       return;
     }
+    const finalName = nameDraft.trim() || name;
     try {
-      await onSaveTarget(parsed);
-      if (onRename && nameDraft.trim() && nameDraft.trim() !== name) await onRename(nameDraft.trim());
+      if (onSaveBoth) {
+        await onSaveBoth(finalName, parsed);
+      } else {
+        await onSaveTarget(parsed);
+        if (onRename && finalName !== name) await onRename(finalName);
+      }
       toast.success('Goal updated');
       setOpen(false);
     } catch (e) {
@@ -82,6 +90,7 @@ export function GoalBar({
       toast.error(e instanceof Error ? e.message : 'Could not save the goal');
     }
   };
+
 
 
   return (
