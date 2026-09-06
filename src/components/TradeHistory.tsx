@@ -51,7 +51,7 @@ import { ExportTradesDialog } from '@/components/ExportTradesDialog';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { useDateRange } from '@/contexts/DateRangeContext';
 import { Skeleton } from '@/components/ui/skeleton';
-import { TradeTagSelector } from '@/components/trades/TradeTagSelector';
+import { TradeTagsFields } from '@/components/trades/TradeTagsFields';
 import { calculateTradePnL } from '@/utils/pnl';
 
 type ColumnKey = 'date' | 'symbol' | 'setup' | 'broker' | 'type' | 'entry' | 'exit' | 'size' | 'pnl' | 'roi' | 'fundingFee' | 'tradingFee' | 'error';
