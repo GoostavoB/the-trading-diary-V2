@@ -100,6 +100,12 @@ export function useRiskProfiles() {
     invalidate();
   };
 
+  const updateProfile = async (id: string, updates: { name?: string; risk_pct?: number }) => {
+    const { error } = await supabase.from('risk_profiles').update(updates).eq('id', id);
+    if (error) throw error;
+    invalidate();
+  };
+
   const toggleFavorite = async (id: string, isFavorite: boolean) => {
     const { error } = await supabase.from('risk_profiles').update({ is_favorite: isFavorite }).eq('id', id);
     if (error) throw error;
