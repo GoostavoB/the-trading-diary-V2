@@ -348,25 +348,20 @@ export function GoalsSection({
           formatAmount={formatAmount}
           onSaveTarget={async (value) => {
             await onSaveMonthlyGoal(value);
+          }}
+          onSaveBoth={async (goalName, value) => {
+            await onSaveMonthlyGoal(value);
             await createGoal({
-              name: monthlyName,
+              name: goalName,
               period_type: 'monthly',
               period_start: currentMonthStart,
               period_end: format(range.end, 'yyyy-MM-dd'),
               target_amount: value,
             });
           }}
-          onRename={async (value) => {
-            await createGoal({
-              name: value,
-              period_type: 'monthly',
-              period_start: currentMonthStart,
-              period_end: format(range.end, 'yyyy-MM-dd'),
-              target_amount: monthlyGoal,
-            });
-          }}
         />
       )}
+
 
       {goals.map((g) => (
         <GoalBar
