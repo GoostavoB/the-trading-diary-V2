@@ -5200,26 +5200,47 @@ export type Database = {
       }
       user_setups: {
         Row: {
+          author: string | null
           color: string | null
           created_at: string
+          description: string | null
+          entry_rules: string[]
           id: string
+          image_urls: string[]
+          indicators: string[]
           name: string
+          pitfalls: string | null
+          timeframe: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          author?: string | null
           color?: string | null
           created_at?: string
+          description?: string | null
+          entry_rules?: string[]
           id?: string
+          image_urls?: string[]
+          indicators?: string[]
           name: string
+          pitfalls?: string | null
+          timeframe?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          author?: string | null
           color?: string | null
           created_at?: string
+          description?: string | null
+          entry_rules?: string[]
           id?: string
+          image_urls?: string[]
+          indicators?: string[]
           name?: string
+          pitfalls?: string | null
+          timeframe?: string | null
           updated_at?: string
           user_id?: string
         }
