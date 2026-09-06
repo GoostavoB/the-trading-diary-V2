@@ -28,6 +28,10 @@ import { useCurrency } from '@/contexts/CurrencyContext';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { maxLeverageForMove } from '@/utils/leverageTable';
+import { format } from 'date-fns';
+import { GoalsSection } from './GoalsSection';
+import { useRiskGoals } from '@/hooks/useRiskGoals';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const TIER_COLOR: Record<string, string> = {
   red: 'text-destructive',
@@ -249,65 +253,6 @@ function RiskProfileManager({
   );
 }
 
-function GoalProgressBar({
-  pct,
-  profit,
-  goal,
-  formatAmount,
-}: {
-  pct: number;
-  profit: number;
-  goal: number;
-  formatAmount: (n: number) => string;
-}) {
-  const barColor =
-    pct <= 0 ? 'bg-muted-foreground/20' :
-    pct < 70 ? 'bg-apple-red' :
-    pct < 90 ? 'bg-apple-orange' :
-    pct < 100 ? 'bg-apple-cyan' :
-    'bg-apple-green';
-  const markers = [
-    { threshold: 70, emoji: MEDAL_EMOJI.bronze },
-    { threshold: 90, emoji: MEDAL_EMOJI.silver },
-    { threshold: 100, emoji: MEDAL_EMOJI.gold },
-  ];
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-sm text-muted-foreground font-medium">
-          <Target className="h-4 w-4" /> Monthly Goal
-          <InfoTooltip text="Track this month's profit against your goal. Once you hit 100%, your base capital gets locked and protected — you can only risk the extra profit (the buffer), keeping your gains safe. The dots mark Bronze (70%), Silver (90%) and Gold (100%)." />
-        </div>
-        <span className="text-sm font-mono font-semibold">
-          {formatAmount(profit)} <span className="text-muted-foreground">/ {formatAmount(goal)}</span>
-        </span>
-      </div>
-      <div className="relative pt-4 pb-1">
-        <div className="h-3 rounded-full bg-muted/40 overflow-hidden">
-          <div
-            className={cn('h-full rounded-full transition-all', barColor)}
-            style={{ width: `${Math.max(0, Math.min(100, pct))}%` }}
-          />
-        </div>
-        {goal > 0 && markers.map((m) => (
-          <div
-            key={m.threshold}
-            className="absolute top-0 -translate-x-1/2"
-            style={{ left: `${m.threshold}%` }}
-          >
-            <span className={cn('text-base leading-none transition-opacity', pct >= m.threshold ? 'opacity-100' : 'opacity-25 grayscale')}>
-              {m.emoji}
-            </span>
-          </div>
-        ))}
-      </div>
-      <div className="text-xs text-muted-foreground font-mono text-center">
-        {pct.toFixed(0)}% of goal
-      </div>
-    </div>
-  );
-}
-
 function GordurinhaCard({
   isActive,
   amount,
@@ -341,8 +286,11 @@ function GordurinhaCard({
   );
 }
 
-function MedalsBoard({ medals }: { medals: { id: string; medal: string; monthLabel: string; pct_achieved: number }[] }) {
+interface GoalMedal { id: string; medal: string; title: string; period: string }
+
+function MedalsBoard({ medals, goalMedals }: { medals: { id: string; medal: string; monthLabel: string; pct_achieved: number }[]; goalMedals: GoalMedal[] }) {
   const [expanded, setExpanded] = useState(false);
+  const hasAny = medals.length > 0 || goalMedals.length > 0;
   return (
     <div className="space-y-2">
       <button
@@ -358,8 +306,23 @@ function MedalsBoard({ medals }: { medals: { id: string; medal: string; monthLab
           <ChevronDown className={cn('h-4 w-4 text-muted-foreground transition-transform', expanded && 'rotate-180')} />
         )}
       </button>
-      {medals.length > 0 ? (
+      {hasAny ? (
         <div className="flex gap-2 flex-wrap">
+          {goalMedals.map((g) => (
+            <TooltipProvider key={g.id} delayDuration={100}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex flex-col items-center gap-0.5 bg-muted/30 rounded-lg px-3 py-2 border border-border cursor-default">
+                    <span className="text-xl leading-none">{MEDAL_EMOJI[g.medal]}</span>
+                    <span className="text-[10px] text-muted-foreground font-mono max-w-[80px] truncate">{g.title}</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="text-xs">
+                  {g.title} — {g.period}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ))}
           {medals.map((m) => (
             <div key={m.id} className="flex flex-col items-center gap-0.5 bg-muted/30 rounded-lg px-3 py-2 border border-border">
               <span className="text-xl leading-none">{MEDAL_EMOJI[m.medal]}</span>
@@ -377,7 +340,7 @@ function MedalsBoard({ medals }: { medals: { id: string; medal: string; monthLab
           ))}
         </div>
       )}
-      {medals.length === 0 && (
+      {!hasAny && (
         <p className="text-[11px] text-muted-foreground text-center">Close your first goal-hit month to start your collection.</p>
       )}
       {expanded && medals.length > 0 && (
@@ -559,6 +522,7 @@ export function RiskCopilotDrawer() {
 
   const rc = useRiskCopilot();
   const { medals } = useMonthlyMedals();
+  const { goals: riskGoals } = useRiskGoals();
   const { profiles, createProfile, deleteProfile, toggleFavorite, moveProfile } = useRiskProfiles();
   const { formatAmount } = useCurrency();
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -582,6 +546,28 @@ export function RiskCopilotDrawer() {
   };
 
   const selectedProfile = profiles.find((p) => p.id === selectedProfileId) || null;
+
+  const monthlyMedal = rc.monthlyGoal > 0
+    ? (rc.monthlyGoalPct >= 100 ? 'gold' : rc.monthlyGoalPct >= 80 ? 'silver' : rc.monthlyGoalPct >= 60 ? 'bronze' : null)
+    : null;
+  const goalMedals = [
+    ...(monthlyMedal
+      ? [{
+          id: 'monthly-current',
+          medal: monthlyMedal,
+          title: format(new Date(), 'MMMM/yy'),
+          period: `Monthly goal — ${format(new Date(), 'MMMM/yyyy')}`,
+        }]
+      : []),
+    ...riskGoals
+      .filter((g) => g.achieved)
+      .map((g) => ({
+        id: g.id,
+        medal: g.achieved as string,
+        title: g.name,
+        period: `${g.period_type === 'daily' ? 'Daily goal' : g.period_type === 'yearly' ? 'Yearly goal' : g.period_type === 'monthly' ? 'Monthly goal' : 'Custom goal'} — ${g.periodLabel}`,
+      })),
+  ];
   const displayedStopBase = rc.isGorduraActive ? rc.gorduraAmount : rc.capitalBase;
   const displayedRiskPct = selectedProfile ? selectedProfile.risk_pct : rc.authorizedStopPct;
   const displayedStopDollar = selectedProfile ? (displayedStopBase * selectedProfile.risk_pct) / 100 : rc.authorizedStopDollar;
@@ -669,9 +655,12 @@ export function RiskCopilotDrawer() {
                     Win Rate
                     <InfoTooltip text="Your authorized stop size scales automatically with your win rate: below 60% = no risk (Red Alert), 60-69% = Defense (floor risk), 70-79% = Standard (scales up), 80%+ = Sniper Elite (ceiling risk)." />
                   </div>
-                  <Badge variant="outline" className={cn('font-mono text-xs', TIER_COLOR[rc.tier])}>
-                    {rc.tierLabel}
-                  </Badge>
+                  <div className="flex items-center gap-1">
+                    <Badge variant="outline" className={cn('font-mono text-xs', TIER_COLOR[rc.tier])}>
+                      {rc.tierLabel}
+                    </Badge>
+                    <InfoTooltip text={`Risk level the system authorizes right now, based on your win rate. RED ALERT (below 60%) = stay out. DEFENSE (60-69%) = minimum size. STANDARD (70-79%) = size scales up gradually. SNIPER ELITE (80%+) = maximum size. You are on ${rc.tierLabel}.`} />
+                  </div>
                 </div>
                 <div className="flex items-end justify-between gap-3">
                   <div className={cn('text-5xl font-extrabold font-mono leading-none', TIER_COLOR[rc.tier])}>
@@ -686,15 +675,15 @@ export function RiskCopilotDrawer() {
                       canUseReal={rc.canUseRealWinRate}
                       onChange={rc.updateWinRateMode}
                     />
-                    <InfoTooltip text="Manual: you set your own win rate — starts at 70%. Real: calculated automatically from your last 20 closed trades (needs 4+ trades)." />
+                    <InfoTooltip text="Manual: you type the win rate you expect (starts at 70%). Real: we need at least 4 closed trades to calculate your true win rate — and your real position size — automatically from your last 20 trades." />
                   </div>
                 </div>
-                <div className="text-xs text-muted-foreground font-mono">
+                <div className="text-xs text-muted-foreground">
                   {rc.winRateMode === 'real'
-                    ? `Real — based on ${rc.sampleSize} closed trades`
+                    ? `Real win rate, calculated from your last ${rc.sampleSize} closed trades.`
                     : rc.canUseRealWinRate
-                      ? 'Manual — you have enough trades to switch to Real'
-                      : `Manual — ${4 - rc.sampleSize} more trade(s) to unlock Real`}
+                      ? 'Using the rate you typed. You already have enough trades — switch to Real for the calculated one.'
+                      : `Using the rate you typed. ${4 - rc.sampleSize} more closed trade(s) and we can calculate your real win rate and position size automatically.`}
                 </div>
                 {rc.bias && (
                   <div className="inline-flex items-center gap-1.5 text-xs font-mono bg-muted/40 border border-border rounded-md px-2.5 py-1.5">
@@ -708,14 +697,53 @@ export function RiskCopilotDrawer() {
                     <p className="text-sm text-destructive leading-relaxed">{rc.tierMessage}</p>
                   </div>
                 )}
-                <div className="rounded-2xl border border-border bg-gradient-to-b from-muted/30 to-muted/10 p-6 text-center space-y-1.5">
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <Label className="text-sm font-semibold">Risk Profiles</Label>
+                      <InfoTooltip text="Save your own risk % presets (e.g. Scalp 2%, Swing 5%). Tap one and the Authorized Stop below switches to that profile. Tap it again to go back to the automatic size." />
+                    </div>
+                    <Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1" onClick={openSettings}>
+                      <Pencil className="h-3 w-3" /> Manage
+                    </Button>
+                  </div>
+                  <RiskProfileCardsStrip
+                    profiles={profiles}
+                    selectedId={selectedProfileId}
+                    onSelect={setSelectedProfileId}
+                    capitalBase={displayedStopBase}
+                    formatAmount={formatAmount}
+                  />
+                  {profiles.length === 0 && (
+                    <button
+                      onClick={openSettings}
+                      className="w-full rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors"
+                    >
+                      + Create your first risk profile (Scalp, Swing, High Risk...)
+                    </button>
+                  )}
+                </div>
+
+                <div className={cn(
+                  'rounded-2xl border bg-gradient-to-b from-muted/30 to-muted/10 p-6 text-center space-y-1.5 transition-all',
+                  selectedProfile ? 'border-primary/60 ring-2 ring-primary/20' : 'border-border'
+                )}>
                   <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-                    {selectedProfile ? `Stop with "${selectedProfile.name}" profile` : 'Authorized Stop Today'}
+                    {selectedProfile ? `Authorized Stop · ${selectedProfile.name}` : 'Authorized Stop Today'}
                   </div>
                   <div className={cn('text-5xl font-extrabold font-mono', selectedProfile ? 'text-primary' : TIER_COLOR[rc.tier])}>
                     {formatAmount(displayedStopDollar)}
                   </div>
                   <div className="text-sm text-muted-foreground font-mono">({displayedRiskPct.toFixed(1)}%)</div>
+                  {selectedProfile && (
+                    <button
+                      className="text-[11px] text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                      onClick={() => setSelectedProfileId(null)}
+                    >
+                      Back to automatic size
+                    </button>
+                  )}
                   {rc.tier !== 'red' && (
                     <p className="text-xs text-muted-foreground pt-1.5 flex items-center justify-center gap-1">
                       <Info className="h-3 w-3" /> Target 1 = Partial + Move Stop to Breakeven
@@ -723,34 +751,15 @@ export function RiskCopilotDrawer() {
                   )}
                 </div>
               </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <Label className="text-sm font-semibold">Risk Profiles</Label>
-                    <InfoTooltip text="Save your own risk % presets (e.g. Scalp 2%, Swing 5%). Tap one to instantly see your stop size for that setup." />
-                  </div>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1" onClick={openSettings}>
-                    <Pencil className="h-3 w-3" /> Manage
-                  </Button>
-                </div>
-                <RiskProfileCardsStrip
-                  profiles={profiles}
-                  selectedId={selectedProfileId}
-                  onSelect={setSelectedProfileId}
-                  capitalBase={displayedStopBase}
-                  formatAmount={formatAmount}
-                />
-                {profiles.length === 0 && (
-                  <button
-                    onClick={openSettings}
-                    className="w-full rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors"
-                  >
-                    + Create your first risk profile (Scalp, Swing, High Risk...)
-                  </button>
-                )}
-              </div>
               <MaxLeverageField />
-              <GoalProgressBar pct={rc.monthlyGoalPct} profit={rc.monthlyProfit} goal={rc.monthlyGoal} formatAmount={formatAmount} />
+              <GoalsSection
+                monthlyName={format(new Date(), 'MMMM/yy')}
+                monthlyPeriodLabel={`Monthly goal — ${format(new Date(), 'MMMM/yyyy')}`}
+                monthlyProfit={rc.monthlyProfit}
+                monthlyGoal={rc.monthlyGoal}
+                onSaveMonthlyGoal={rc.updateMonthlyGoal}
+                formatAmount={formatAmount}
+              />
 
               <GordurinhaCard isActive={rc.isGorduraActive} amount={rc.gorduraAmount} formatAmount={formatAmount} />
               <div className="space-y-2">
@@ -763,7 +772,7 @@ export function RiskCopilotDrawer() {
                   <CapitalAdjustPopover mode="remove" capitalBase={rc.capitalBase} onConfirm={rc.addCapital} formatAmount={formatAmount} />
                 </div>
               </div>
-              <MedalsBoard medals={medals} />
+              <MedalsBoard medals={medals} goalMedals={goalMedals} />
             </>
           )}
         </div>
