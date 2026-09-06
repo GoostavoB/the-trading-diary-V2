@@ -137,6 +137,7 @@ export function useRiskProfiles() {
     isLoading,
     createProfile,
     deleteProfile,
+    updateProfile,
     toggleFavorite,
     moveProfile,
   };
