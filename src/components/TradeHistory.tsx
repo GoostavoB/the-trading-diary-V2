@@ -428,6 +428,8 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
         emotional_tag: editingTrade.emotional_tag || null,
         emotion_tags: editingTrade.emotion_tags || [],
         error_tags: editingTrade.error_tags || [],
+        setup_tags: editingTrade.setup_tags || [],
+        market_tags: editingTrade.market_tags || [],
         notes: editingTrade.notes || null,
         pnl,
         roi,
