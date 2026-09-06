@@ -224,6 +224,7 @@ export default function Analytics() {
                 <SetupPerformanceChart data={setupData} />
               </LazyChart>
               <SignalSourcePerformance trades={trades} />
+              <TagPerformance trades={trades} />
             </TabsContent>
 
             <TabsContent value="risk" className="space-y-6">
