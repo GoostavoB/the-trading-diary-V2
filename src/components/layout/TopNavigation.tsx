@@ -174,8 +174,10 @@ export function TopNavigation() {
             
                 {/* Market Ticker */}
             <div className="hidden lg:flex flex-1 items-center justify-center px-6">
-            <MarketTicker />
-            </div>
+            <SafeBoundary label="MarketTicker">
+              <MarketTicker />
+            </SafeBoundary>
+
             
 
 
