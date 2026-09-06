@@ -246,6 +246,9 @@ export const TradeRowCard = memo(({
         </div>
       </div>
 
+      {/* Tag badges */}
+      <TradeTagBadges trade={trade} className="mt-2 pl-8" />
+
       {/* Expanded panel */}
       {isExpanded && (
         <div
