@@ -40,6 +40,7 @@ import Auth from "./pages/Auth";
 const Dashboard = lazyWithRetry(() => import("./pages/Dashboard"));
 const Upload = lazyWithRetry(() => import("./pages/Upload"));
 const Trades = lazyWithRetry(() => import("./pages/Trades"));
+const SetupLab = lazyWithRetry(() => import("./pages/SetupLab"));
 const Analytics = lazyWithRetry(() => import("./pages/Analytics"));
 const Forecast = lazyWithRetry(() => import("./pages/Forecast"));
 const Achievements = lazyWithRetry(() => import("./pages/Achievements"));
@@ -193,6 +194,7 @@ const AppRoutes = () => {
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/upload" element={<ProtectedRoute><Upload /></ProtectedRoute>} />
           <Route path="/trades" element={<ProtectedRoute><Trades /></ProtectedRoute>} />
+          <Route path="/setup-lab" element={<ProtectedRoute><SetupLab /></ProtectedRoute>} />
           <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
           <Route path="/forecast" element={<ProtectedRoute><Forecast /></ProtectedRoute>} />
           <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
