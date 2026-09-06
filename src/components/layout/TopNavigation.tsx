@@ -177,6 +177,8 @@ export function TopNavigation() {
             <SafeBoundary label="MarketTicker">
               <MarketTicker />
             </SafeBoundary>
+            </div>
+
 
             
 
