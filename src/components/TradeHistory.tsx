@@ -51,7 +51,7 @@ import { ExportTradesDialog } from '@/components/ExportTradesDialog';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { useDateRange } from '@/contexts/DateRangeContext';
 import { Skeleton } from '@/components/ui/skeleton';
-import { TradeTagSelector } from '@/components/trades/TradeTagSelector';
+import { TradeTagsFields } from '@/components/trades/TradeTagsFields';
 import { calculateTradePnL } from '@/utils/pnl';
 
 type ColumnKey = 'date' | 'symbol' | 'setup' | 'broker' | 'type' | 'entry' | 'exit' | 'size' | 'pnl' | 'roi' | 'fundingFee' | 'tradingFee' | 'error';
@@ -428,6 +428,8 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
         emotional_tag: editingTrade.emotional_tag || null,
         emotion_tags: editingTrade.emotion_tags || [],
         error_tags: editingTrade.error_tags || [],
+        setup_tags: editingTrade.setup_tags || [],
+        market_tags: editingTrade.market_tags || [],
         notes: editingTrade.notes || null,
         pnl,
         roi,
@@ -917,11 +919,23 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
 
               </div>
 
-              <TradeTagSelector
-                emotionTags={editingTrade.emotion_tags || []}
+              <div>
+                <Label>Emotional Tag</Label>
+                <Input
+                  value={editingTrade.emotional_tag || ''}
+                  onChange={(e) => setEditingTrade({ ...editingTrade, emotional_tag: e.target.value })}
+                  placeholder="e.g. Calm, FOMO, Confident"
+                  className="mt-1"
+                />
+              </div>
+
+              <TradeTagsFields
+                setupTags={editingTrade.setup_tags || []}
                 errorTags={editingTrade.error_tags || []}
-                onEmotionTagsChange={(tags) => setEditingTrade({ ...editingTrade, emotion_tags: tags })}
+                marketTags={editingTrade.market_tags || []}
+                onSetupTagsChange={(tags) => setEditingTrade({ ...editingTrade, setup_tags: tags })}
                 onErrorTagsChange={(tags) => setEditingTrade({ ...editingTrade, error_tags: tags })}
+                onMarketTagsChange={(tags) => setEditingTrade({ ...editingTrade, market_tags: tags })}
               />
 
               <div>

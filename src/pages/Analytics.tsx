@@ -6,6 +6,7 @@ import { AssetPerformanceRadar } from "@/components/charts/AssetPerformanceRadar
 import { WinsByHourChart } from "@/components/charts/WinsByHourChart";
 import { SetupPerformanceChart } from "@/components/charts/SetupPerformanceChart";
 import { SignalSourcePerformance } from "@/components/analytics/SignalSourcePerformance";
+import { TagPerformance } from "@/components/analytics/TagPerformance";
 import { TradeComparison } from "@/components/TradeComparison";
 import { LazyChart } from "@/components/LazyChart";
 import { CapitalManagement } from "@/components/CapitalManagement";
@@ -224,6 +225,7 @@ export default function Analytics() {
                 <SetupPerformanceChart data={setupData} />
               </LazyChart>
               <SignalSourcePerformance trades={trades} />
+              <TagPerformance trades={trades} />
             </TabsContent>
 
             <TabsContent value="risk" className="space-y-6">

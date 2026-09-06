@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Trade } from '@/types/trade';
 import { TokenIcon } from '@/components/TokenIcon';
 import { SymbolLabel } from '@/components/common/SymbolLabel';
+import { TradeTagBadges } from '@/components/trades/TradeTagBadges';
 import { BlurredCurrency, BlurredPercent } from '@/components/ui/BlurredValue';
 import { getFinancialColor } from '@/lib/utils';
 import { cn } from '@/lib/utils';
@@ -245,6 +246,9 @@ export const TradeRowCard = memo(({
           </DropdownMenu>
         </div>
       </div>
+
+      {/* Tag badges */}
+      <TradeTagBadges trade={trade} className="mt-2 pl-8" />
 
       {/* Expanded panel */}
       {isExpanded && (

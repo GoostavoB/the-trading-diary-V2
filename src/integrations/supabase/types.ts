@@ -3780,6 +3780,7 @@ export type Database = {
           image_url: string | null
           leverage: number | null
           margin: number | null
+          market_tags: string[] | null
           notes: string | null
           opened_at: string | null
           period_of_day: string | null
@@ -3789,6 +3790,7 @@ export type Database = {
           roi: number | null
           screenshot_url: string | null
           setup: string | null
+          setup_tags: string[] | null
           side: string | null
           side_temp: string | null
           signal_source: string | null
@@ -3829,6 +3831,7 @@ export type Database = {
           image_url?: string | null
           leverage?: number | null
           margin?: number | null
+          market_tags?: string[] | null
           notes?: string | null
           opened_at?: string | null
           period_of_day?: string | null
@@ -3838,6 +3841,7 @@ export type Database = {
           roi?: number | null
           screenshot_url?: string | null
           setup?: string | null
+          setup_tags?: string[] | null
           side?: string | null
           side_temp?: string | null
           signal_source?: string | null
@@ -3878,6 +3882,7 @@ export type Database = {
           image_url?: string | null
           leverage?: number | null
           margin?: number | null
+          market_tags?: string[] | null
           notes?: string | null
           opened_at?: string | null
           period_of_day?: string | null
@@ -3887,6 +3892,7 @@ export type Database = {
           roi?: number | null
           screenshot_url?: string | null
           setup?: string | null
+          setup_tags?: string[] | null
           side?: string | null
           side_temp?: string | null
           signal_source?: string | null

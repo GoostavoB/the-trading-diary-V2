@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { X, Plus, Edit2, Check, Upload, Download, User, Bell, TrendingUp, Gift, DollarSign, ExternalLink, Shield } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SignalSourceManager } from '@/components/settings/SignalSourceManager';
+import { TradeTagManager } from '@/components/settings/TradeTagManager';
 import { NotificationPreferences } from '@/components/NotificationPreferences';
 import { DataManagement } from '@/components/DataManagement';
 import { CapitalManagement } from '@/components/CapitalManagement';
@@ -495,6 +496,7 @@ const Settings = () => {
           </TabsContent>
 
           <TabsContent value="setups" className="space-y-6">
+            <TradeTagManager />
             <SignalSourceManager />
             <PremiumCard className="p-6 glass">
               <h2 className="text-xl font-semibold mb-4">Trade Setups</h2>
