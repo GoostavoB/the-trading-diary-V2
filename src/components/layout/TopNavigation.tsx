@@ -9,6 +9,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { MarketTicker } from './MarketTicker';
+import { SafeBoundary } from '@/components/common/SafeBoundary';
    import { Logo } from '@/components/Logo';
 import { UserAccountMenu } from './UserAccountMenu';
 import { ThemeStudio } from '@/components/theme-studio/ThemeStudio';
@@ -174,8 +175,12 @@ export function TopNavigation() {
             
                 {/* Market Ticker */}
             <div className="hidden lg:flex flex-1 items-center justify-center px-6">
-            <MarketTicker />
+            <SafeBoundary label="MarketTicker">
+              <MarketTicker />
+            </SafeBoundary>
             </div>
+
+
             
 
 
