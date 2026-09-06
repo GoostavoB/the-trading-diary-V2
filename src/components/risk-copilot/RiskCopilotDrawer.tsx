@@ -163,18 +163,23 @@ function CapitalAdjustPopover({
 function RiskProfileManager({
   profiles,
   createProfile,
+  updateProfile,
   deleteProfile,
   toggleFavorite,
   moveProfile,
 }: {
   profiles: RiskProfile[];
   createProfile: (name: string, riskPct: number) => Promise<void>;
+  updateProfile: (id: string, updates: { name?: string; risk_pct?: number }) => Promise<void>;
   deleteProfile: (id: string) => Promise<void>;
   toggleFavorite: (id: string, isFavorite: boolean) => Promise<void>;
   moveProfile: (id: string, direction: 'up' | 'down') => Promise<void>;
 }) {
   const [newName, setNewName] = useState('');
   const [newPct, setNewPct] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editPct, setEditPct] = useState('');
   const sorted = [...profiles].sort((a, b) => (Number(b.is_favorite) - Number(a.is_favorite)) || a.sort_order - b.sort_order);
 
   const handleCreate = async () => {
@@ -183,6 +188,28 @@ function RiskProfileManager({
     await createProfile(newName.trim(), pct);
     setNewName('');
     setNewPct('');
+  };
+
+  const startEdit = (p: RiskProfile) => {
+    setEditingId(p.id);
+    setEditName(p.name);
+    setEditPct(String(p.risk_pct));
+  };
+
+  const saveEdit = async () => {
+    if (!editingId) return;
+    const pct = parseFloat(editPct);
+    if (!editName.trim() || !pct || pct <= 0) {
+      toast.error('Enter a name and a risk % greater than 0');
+      return;
+    }
+    try {
+      await updateProfile(editingId, { name: editName.trim(), risk_pct: pct });
+      toast.success('Profile updated');
+      setEditingId(null);
+    } catch {
+      toast.error('Failed to update profile');
+    }
   };
 
   return (
@@ -210,22 +237,67 @@ function RiskProfileManager({
               <ChevronDown className="h-3.5 w-3.5" />
             </button>
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold truncate">{p.name}</div>
-            <div className="text-xs text-muted-foreground font-mono">{p.risk_pct}% risk per trade</div>
-          </div>
-          <button
-            className={cn('h-8 w-8 flex items-center justify-center rounded-lg shrink-0', p.is_favorite ? 'text-apple-orange bg-apple-orange/10' : 'text-muted-foreground hover:text-apple-orange hover:bg-muted')}
-            onClick={() => toggleFavorite(p.id, !p.is_favorite)}
-          >
-            <Star className="h-4 w-4" fill={p.is_favorite ? 'currentColor' : 'none'} />
-          </button>
-          <button
-            className="h-8 w-8 flex items-center justify-center rounded-lg shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-            onClick={() => deleteProfile(p.id)}
-          >
-            <X className="h-4 w-4" />
-          </button>
+          {editingId === p.id ? (
+            <div className="flex-1 min-w-0 flex items-center gap-1.5">
+              <Input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="h-8 text-sm flex-[2]"
+                autoFocus
+                onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditingId(null); }}
+              />
+              <Input
+                type="number"
+                value={editPct}
+                onChange={(e) => setEditPct(e.target.value)}
+                className="h-8 text-sm w-20 font-mono"
+                placeholder="%"
+                onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditingId(null); }}
+              />
+              <button
+                className="h-8 w-8 flex items-center justify-center rounded-lg shrink-0 text-apple-green hover:bg-apple-green/10"
+                onClick={saveEdit}
+                title="Save changes"
+              >
+                <Check className="h-4 w-4" />
+              </button>
+              <button
+                className="h-8 w-8 flex items-center justify-center rounded-lg shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted"
+                onClick={() => setEditingId(null)}
+                title="Discard changes"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold truncate">{p.name}</div>
+                <div className="text-xs text-muted-foreground font-mono">{p.risk_pct}% risk per trade</div>
+              </div>
+              <button
+                className="h-8 w-8 flex items-center justify-center rounded-lg shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted"
+                onClick={() => startEdit(p)}
+                title="Edit name and risk %"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+              <button
+                className={cn('h-8 w-8 flex items-center justify-center rounded-lg shrink-0', p.is_favorite ? 'text-apple-orange bg-apple-orange/10' : 'text-muted-foreground hover:text-apple-orange hover:bg-muted')}
+                onClick={() => toggleFavorite(p.id, !p.is_favorite)}
+                title={p.is_favorite ? 'Remove from favorites' : 'Pin to top'}
+              >
+                <Star className="h-4 w-4" fill={p.is_favorite ? 'currentColor' : 'none'} />
+              </button>
+              <button
+                className="h-8 w-8 flex items-center justify-center rounded-lg shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                onClick={() => deleteProfile(p.id)}
+                title="Delete profile"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </>
+          )}
         </div>
       ))}
       <div className="rounded-xl border border-border p-3 space-y-2 bg-card">
@@ -523,7 +595,7 @@ export function RiskCopilotDrawer() {
   const rc = useRiskCopilot();
   const { medals } = useMonthlyMedals();
   const { goals: riskGoals } = useRiskGoals();
-  const { profiles, createProfile, deleteProfile, toggleFavorite, moveProfile } = useRiskProfiles();
+  const { profiles, createProfile, updateProfile, deleteProfile, toggleFavorite, moveProfile } = useRiskProfiles();
   const { formatAmount } = useCurrency();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
@@ -539,10 +611,19 @@ export function RiskCopilotDrawer() {
   };
 
   const saveSettings = async () => {
-    await rc.updateKellyRange(floorInput, ceilingInput);
-    await rc.updateMonthlyGoal(parseFloat(goalInput) || 0);
-    toast.success('Risk settings saved');
+    try {
+      await rc.updateKellyRange(floorInput, ceilingInput);
+      await rc.updateMonthlyGoal(parseFloat(goalInput) || 0);
+      toast.success('Risk settings saved');
+      setSettingsOpen(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to save settings — nothing was saved');
+    }
+  };
+
+  const cancelSettings = () => {
     setSettingsOpen(false);
+    toast.info('Changes discarded');
   };
 
   const selectedProfile = profiles.find((p) => p.id === selectedProfileId) || null;
@@ -603,11 +684,16 @@ export function RiskCopilotDrawer() {
             <div className="text-sm text-muted-foreground text-center py-12">Loading...</div>
           ) : settingsOpen ? (
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <h3 className="text-base font-bold">Risk Settings</h3>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSettingsOpen(false)}>
-                  <X className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" className="h-8" onClick={cancelSettings}>
+                    Cancel
+                  </Button>
+                  <Button size="sm" className="h-8 gap-1.5" onClick={saveSettings}>
+                    <Check className="h-3.5 w-3.5" /> Save
+                  </Button>
+                </div>
               </div>
               <div className="space-y-3 rounded-xl border border-border p-4">
                 <div className="flex items-center justify-between">
@@ -635,12 +721,19 @@ export function RiskCopilotDrawer() {
                 <Label className="text-sm font-semibold">Monthly Goal</Label>
                 <Input type="number" value={goalInput} onChange={(e) => setGoalInput(e.target.value)} placeholder="0.00" />
               </div>
-              <Button className="w-full" onClick={saveSettings}>Save Settings</Button>
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1" onClick={cancelSettings}>Cancel</Button>
+                <Button className="flex-1" onClick={saveSettings}>Save Settings</Button>
+              </div>
               <div className="space-y-3 pt-2 border-t border-border">
-                <Label className="text-sm font-semibold">Risk Profiles</Label>
+                <div className="flex items-center gap-1.5">
+                  <Label className="text-sm font-semibold">Risk Profiles</Label>
+                  <InfoTooltip text="Tap the pencil to edit a profile's name or risk %. Changes here save instantly — they don't depend on the Save button above." />
+                </div>
                 <RiskProfileManager
                   profiles={profiles}
                   createProfile={createProfile}
+                  updateProfile={updateProfile}
                   deleteProfile={deleteProfile}
                   toggleFavorite={toggleFavorite}
                   moveProfile={moveProfile}
