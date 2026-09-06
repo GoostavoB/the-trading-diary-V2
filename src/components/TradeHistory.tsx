@@ -96,6 +96,7 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingTrade, setEditingTrade] = useState<Trade | null>(null);
+  const [originalTrade, setOriginalTrade] = useState<Trade | null>(null);
   const [selectedTradeIds, setSelectedTradeIds] = useState<Set<string>>(new Set());
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [tradeToShare, setTradeToShare] = useState<Trade | null>(null);
