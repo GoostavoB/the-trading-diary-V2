@@ -368,6 +368,7 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
 
   const handleEdit = (trade: Trade) => {
     setEditingTrade({ ...trade });
+    setOriginalTrade({ ...trade });
     setEditDialogOpen(true);
   };
 
@@ -377,9 +378,39 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
     const entry = editingTrade.entry_price;
     const exit = editingTrade.exit_price;
     const size = editingTrade.position_size;
+    const leverage = editingTrade.leverage || 1;
+    const side = editingTrade.side || 'long';
 
-    const pnl = (exit - entry) * size;
-    const roi = ((exit - entry) / entry) * 100;
+    const prev = originalTrade;
+    const num = (v: number | null | undefined) => (v == null ? null : Number(v));
+
+    // Did the user actually change anything that affects P&L?
+    const priceInputsChanged =
+      !prev ||
+      num(prev.entry_price) !== num(entry) ||
+      num(prev.exit_price) !== num(exit) ||
+      num(prev.position_size) !== num(size) ||
+      num(prev.leverage || 1) !== num(leverage) ||
+      (prev.side || 'long') !== side;
+
+    // The user can override the realized P&L directly (e.g. exchange value).
+    const pnlManuallyEdited = prev ? num(prev.profit_loss) !== num(editingTrade.profit_loss) : false;
+
+    let pnl = prev?.profit_loss ?? editingTrade.profit_loss ?? null;
+    let roi = prev?.roi ?? editingTrade.roi ?? null;
+
+    if (pnlManuallyEdited) {
+      pnl = num(editingTrade.profit_loss);
+      const margin = entry && size ? (entry * size) / (leverage || 1) : null;
+      roi = pnl != null && margin ? (pnl / margin) * 100 : roi;
+    } else if (priceInputsChanged) {
+      if (entry != null && exit != null && size != null) {
+        const direction = side === 'short' ? -1 : 1;
+        pnl = (exit - entry) * size * direction;
+        const margin = (entry * size) / (leverage || 1);
+        roi = margin ? (pnl / margin) * 100 : 0;
+      }
+    }
 
     const { error } = await supabase
       .from('trades')
@@ -388,8 +419,8 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
         entry_price: entry,
         exit_price: exit,
         position_size: size,
-        side: editingTrade.side,
-        leverage: editingTrade.leverage || 1,
+        side,
+        leverage,
         funding_fee: editingTrade.funding_fee || 0,
         trading_fee: editingTrade.trading_fee || 0,
         setup: editingTrade.setup || null,
@@ -410,10 +441,12 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
       toast.success('Trade updated successfully');
       setEditDialogOpen(false);
       setEditingTrade(null);
+      setOriginalTrade(null);
       fetchTrades();
       onTradesChange?.();
     }
   };
+
 
   if (loading) {
     return (
