@@ -44,6 +44,7 @@ export function GoalBar({
   formatAmount,
   onSaveTarget,
   onRename,
+  onSaveBoth,
   onDelete,
 }: {
   name: string;
@@ -53,6 +54,8 @@ export function GoalBar({
   formatAmount: (n: number) => string;
   onSaveTarget: (value: number) => Promise<void> | void;
   onRename?: (value: string) => Promise<void> | void;
+  /** When provided, name + target are persisted in a single operation. */
+  onSaveBoth?: (name: string, value: number) => Promise<void> | void;
   onDelete?: () => Promise<void> | void;
 }) {
   const [open, setOpen] = useState(false);
@@ -72,9 +75,14 @@ export function GoalBar({
       toast.error('Enter a valid target amount');
       return;
     }
+    const finalName = nameDraft.trim() || name;
     try {
-      await onSaveTarget(parsed);
-      if (onRename && nameDraft.trim() && nameDraft.trim() !== name) await onRename(nameDraft.trim());
+      if (onSaveBoth) {
+        await onSaveBoth(finalName, parsed);
+      } else {
+        await onSaveTarget(parsed);
+        if (onRename && finalName !== name) await onRename(finalName);
+      }
       toast.success('Goal updated');
       setOpen(false);
     } catch (e) {
@@ -82,6 +90,7 @@ export function GoalBar({
       toast.error(e instanceof Error ? e.message : 'Could not save the goal');
     }
   };
+
 
 
   return (
@@ -115,7 +124,7 @@ export function GoalBar({
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-64 space-y-3" align="end">
-              {onRename && (
+              {(onRename || onSaveBoth) && (
                 <div className="space-y-1">
                   <Label className="text-xs text-muted-foreground">Goal name</Label>
                   <Input value={nameDraft} onChange={(e) => setNameDraft(e.target.value)} className="h-8 text-sm" />
@@ -316,6 +325,13 @@ export function GoalsSection({
   const { goals, createGoal, updateGoal, deleteGoal } = useRiskGoals();
   onGoalsChange?.(goals);
 
+  // The current month has its own goal instance (own name + own target).
+  const range = defaultRangeFor('monthly');
+  const currentMonthStart = format(range.start, 'yyyy-MM-dd');
+  const currentMonthGoal = goals.find(
+    (g) => g.period_type === 'monthly' && g.period_start === currentMonthStart
+  );
+
   return (
     <div className="space-y-2.5">
       <div className="flex items-center justify-between">
@@ -323,14 +339,29 @@ export function GoalsSection({
         <AddGoalDialog onCreate={createGoal} />
       </div>
 
-      <GoalBar
-        name={monthlyName}
-        periodLabel={monthlyPeriodLabel}
-        profit={monthlyProfit}
-        target={monthlyGoal}
-        formatAmount={formatAmount}
-        onSaveTarget={onSaveMonthlyGoal}
-      />
+      {!currentMonthGoal && (
+        <GoalBar
+          name={monthlyName}
+          periodLabel={monthlyPeriodLabel}
+          profit={monthlyProfit}
+          target={monthlyGoal}
+          formatAmount={formatAmount}
+          onSaveTarget={async (value) => {
+            await onSaveMonthlyGoal(value);
+          }}
+          onSaveBoth={async (goalName, value) => {
+            await onSaveMonthlyGoal(value);
+            await createGoal({
+              name: goalName,
+              period_type: 'monthly',
+              period_start: currentMonthStart,
+              period_end: format(range.end, 'yyyy-MM-dd'),
+              target_amount: value,
+            });
+          }}
+        />
+      )}
+
 
       {goals.map((g) => (
         <GoalBar
@@ -340,7 +371,10 @@ export function GoalsSection({
           profit={g.profit}
           target={g.target_amount}
           formatAmount={formatAmount}
-          onSaveTarget={(v) => updateGoal(g.id, { target_amount: v })}
+          onSaveTarget={async (v) => {
+            await updateGoal(g.id, { target_amount: v });
+            if (g.id === currentMonthGoal?.id) await onSaveMonthlyGoal(v);
+          }}
           onRename={(v) => updateGoal(g.id, { name: v })}
           onDelete={() => deleteGoal(g.id)}
         />
@@ -348,3 +382,4 @@ export function GoalsSection({
     </div>
   );
 }
+
