@@ -27,6 +27,7 @@ import { SuccessFeedback } from '@/components/SuccessFeedback';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ImageAnnotator, Annotation } from '@/components/upload/ImageAnnotator';
 import { SignalSourceSelect } from '@/components/trades/SignalSourceSelect';
+import { TradeTagsFields } from '@/components/trades/TradeTagsFields';
 import { BrokerSelect } from '@/components/upload/BrokerSelect';
 import { EnhancedFileUpload } from '@/components/upload/EnhancedFileUpload';
 import { MultiImageUpload } from '@/components/upload/MultiImageUpload';
@@ -172,6 +173,9 @@ const Upload = () => {
     period_of_day: 'morning' as 'morning' | 'afternoon' | 'night',
     emotional_tag: '',
     signal_source: '',
+    setup_tags: [] as string[],
+    error_tags: [] as string[],
+    market_tags: [] as string[],
     notes: '',
     duration_minutes: ''
   });
@@ -234,6 +238,9 @@ const Upload = () => {
         period_of_day: data.period_of_day as 'morning' | 'afternoon' | 'night' || 'morning',
         emotional_tag: data.emotional_tag || '',
         signal_source: data.signal_source || '',
+        setup_tags: (data as any).setup_tags || [],
+        error_tags: (data as any).error_tags || [],
+        market_tags: (data as any).market_tags || [],
         notes: data.notes || '',
         duration_minutes: data.duration_minutes?.toString() || ''
       });
@@ -885,6 +892,9 @@ const Upload = () => {
       profit_loss: pnl,
       emotional_tag: formData.emotional_tag,
       signal_source: formData.signal_source?.trim() || 'Meu',
+      setup_tags: formData.setup_tags,
+      error_tags: formData.error_tags,
+      market_tags: formData.market_tags,
       notes: formData.notes,
       duration_minutes: parseFloat(formData.duration_minutes) || 0,
       trade_date: formData.opened_at || new Date().toISOString()
@@ -1338,6 +1348,17 @@ const Upload = () => {
                     ...formData,
                     emotional_tag: e.target.value
                   })} placeholder="Confident, Fearful..." className="mt-1" />
+                </div>
+
+                <div className="md:col-span-2">
+                  <TradeTagsFields
+                    setupTags={formData.setup_tags}
+                    errorTags={formData.error_tags}
+                    marketTags={formData.market_tags}
+                    onSetupTagsChange={tags => setFormData({ ...formData, setup_tags: tags })}
+                    onErrorTagsChange={tags => setFormData({ ...formData, error_tags: tags })}
+                    onMarketTagsChange={tags => setFormData({ ...formData, market_tags: tags })}
+                  />
                 </div>
 
                 <div>
