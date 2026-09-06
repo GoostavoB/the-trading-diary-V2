@@ -9,6 +9,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { MarketTicker } from './MarketTicker';
+import { SafeBoundary } from '@/components/common/SafeBoundary';
    import { Logo } from '@/components/Logo';
 import { UserAccountMenu } from './UserAccountMenu';
 import { ThemeStudio } from '@/components/theme-studio/ThemeStudio';
