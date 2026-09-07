@@ -98,10 +98,17 @@ const SetupCard = ({
           <p className="text-sm text-muted-foreground line-clamp-2">{setup.description}</p>
         )}
 
+        {/* Azul escuro fixo, não o token --secondary: com o tema aplicado o badge
+            saía azul-claro com texto branco e não dava para ler. */}
         {setup.indicators.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {setup.indicators.map((ind) => (
-              <Badge key={ind} variant="secondary" className="text-xs">{ind}</Badge>
+              <Badge
+                key={ind}
+                className="text-xs border-transparent bg-blue-900 text-blue-50 hover:bg-blue-900/80"
+              >
+                {ind}
+              </Badge>
             ))}
           </div>
         )}

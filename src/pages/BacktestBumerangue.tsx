@@ -6,14 +6,41 @@ import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   ArrowLeft, ArrowUpRight, ArrowDownRight, Minus, Sparkles,
-  AlertTriangle, ShieldCheck, Clock,
+  AlertTriangle, ShieldCheck, Clock, Search,
 } from 'lucide-react';
 import { useBacktestData, type AtivoTF, type Bandeira, type RecenteTF } from '@/hooks/useBacktestData';
 
 const fmtUsd = (n: number) =>
   `${n < 0 ? '-' : ''}$${Math.abs(Math.round(n)).toLocaleString()}`;
+
+/**
+ * 70% é a linha de corte do setup: abaixo disso a célula não é operável e o
+ * indicador nem dispara. Colorir por essa régua deixa a tabela legível de
+ * relance — vermelho é o que saiu da faixa de operação.
+ */
+const CORTE_ACERTO = 70;
+
+/**
+ * Faixa de tinta da linha, pela POSIÇÃO no ranking: verde no topo, amarelo no
+ * meio, vermelho na última. É leitura relativa — diz quem está melhor que quem,
+ * não se o ativo é bom em termos absolutos. Quem responde isso é o número, que
+ * segue colorido pela régua dos 70%.
+ *
+ * Opacidade baixíssima de propósito: a tinta orienta, não compete com o texto.
+ */
+function tintaDaLinha(indice: number, total: number, alternada: boolean): string {
+  if (total <= 1) return alternada ? 'bg-muted/20' : '';
+  const t = indice / (total - 1);            // 0 no topo, 1 na última
+  const matiz = 145 - t * 145;               // 145 verde -> 55 amarelo -> 0 vermelho
+  const alpha = alternada ? 0.13 : 0.07;     // faixas alternadas, sutis
+  return `hsl(${matiz} 70% 45% / ${alpha})`;
+}
+const corAcerto = (pct: number) =>
+  pct >= CORTE_ACERTO ? 'text-emerald-500' : 'text-red-500';
 
 function BandeiraTag({ b }: { b?: { flag: Bandeira; delta: number | null } }) {
   if (!b || b.flag === 'novo')
@@ -60,11 +87,11 @@ function TagRecente({ r }: { r?: RecenteTF }) {
   return <span className="text-xs text-muted-foreground">em linha</span>;
 }
 
-function Metrica({ rotulo, valor, nota }: { rotulo: string; valor: string; nota?: string }) {
+function Metrica({ rotulo, valor, nota, cor }: { rotulo: string; valor: string; nota?: string; cor?: string }) {
   return (
     <div className="min-w-0">
       <div className="text-xs text-muted-foreground">{rotulo}</div>
-      <div className="text-xl font-semibold tabular-nums truncate">{valor}</div>
+      <div className={`text-xl font-semibold tabular-nums truncate ${cor ?? ''}`}>{valor}</div>
       {nota && <div className="text-xs text-muted-foreground mt-0.5">{nota}</div>}
     </div>
   );
@@ -73,18 +100,56 @@ function Metrica({ rotulo, valor, nota }: { rotulo: string; valor: string; nota?
 export default function BacktestBumerangue() {
   const { data, isLoading, error } = useBacktestData('bumerangue');
   const [tf, setTf] = useState<'4H' | '6H'>('4H');
+  const [busca, setBusca] = useState('');
+  const [estado, setEstado] = useState<'todos' | 'esquentando' | 'esfriando' | 'em linha'>('todos');
+  const [faixa, setFaixa] = useState<'todas' | '90' | '80' | '70' | 'abaixo'>('todas');
 
   const atual = data?.atual;
   const bloco = atual?.timeframes?.[tf];
 
-  const ativos = useMemo(() => {
-    if (!bloco) return [] as Array<[string, AtivoTF]>;
-    // Ordem por diferença da janela recente: o que está esfriando sobe para o
-    // topo, porque é a informação que muda a decisão de entrar num trade hoje.
-    const peso = (v: AtivoTF) =>
-      v.recente && v.recente.diferenca !== undefined ? v.recente.diferenca : 999;
-    return Object.entries(bloco.ativos).sort((a, b) => peso(a[1]) - peso(b[1]));
-  }, [bloco]);
+  /**
+   * Duas listas, não uma ordenada.
+   *
+   * Ativo com quatro trades nos últimos 180 dias não é "o pior do ranking" —
+   * é um ativo sobre o qual ainda não dá para dizer nada. Misturar os dois na
+   * mesma tabela faz o olho comparar coisas que não se comparam, então os sem
+   * amostra saem para uma tabela própria, marcada como backtest em andamento.
+   */
+  const { prontos, emAndamento } = useMemo(() => {
+    if (!bloco) return { prontos: [] as Array<[string, AtivoTF]>, emAndamento: [] as Array<[string, AtivoTF]> };
+
+    const nota = (v: AtivoTF) =>
+      v.recente?.acerto !== undefined ? v.recente.acerto : -1;
+
+    const termo = busca.trim().toUpperCase();
+    const passaBusca = (nome: string) => !termo || nome.includes(termo);
+
+    const todos = Object.entries(bloco.ativos);
+    const temAmostra = ([, v]: [string, AtivoTF]) => v.recente?.acerto !== undefined;
+
+    const prontos = todos
+      .filter(temAmostra)
+      .filter(([nome, v]) => {
+        if (!passaBusca(nome)) return false;
+        if (estado !== 'todos' && v.recente?.estado !== estado) return false;
+        if (faixa !== 'todas') {
+          const a = v.recente?.acerto ?? v.acerto;
+          if (faixa === 'abaixo' && a >= 70) return false;
+          if (faixa === '70' && (a < 70 || a >= 80)) return false;
+          if (faixa === '80' && (a < 80 || a >= 90)) return false;
+          if (faixa === '90' && a < 90) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => nota(b[1]) - nota(a[1]));
+
+    const emAndamento = todos
+      .filter((e) => !temAmostra(e))
+      .filter(([nome]) => passaBusca(nome))
+      .sort((a, b) => (b[1].recente?.trades ?? 0) - (a[1].recente?.trades ?? 0));
+
+    return { prontos, emAndamento };
+  }, [bloco, busca, estado, faixa]);
 
   if (isLoading) {
     return (
@@ -209,7 +274,12 @@ export default function BacktestBumerangue() {
         {/* ---------------- números do timeframe ---------------- */}
         <PremiumCard className="p-6">
           <div className="grid gap-5 grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
-            <Metrica rotulo="Taxa de acerto" valor={`${r.acerto}%`} nota={`${r.trades} trades`} />
+            <Metrica
+              rotulo="Taxa de acerto"
+              valor={`${r.acerto}%`}
+              nota={`${r.trades} trades`}
+              cor={corAcerto(r.acerto)}
+            />
             <Metrica rotulo="Sinais por mês" valor={`${r.sinais_por_mes}`} />
             <Metrica rotulo="Expectativa" valor={`${r.expectativa_r > 0 ? '+' : ''}${r.expectativa_r}R`} nota="por trade, líquido" />
             <Metrica rotulo="Média mensal" valor={fmtUsd(r.usd_media_mes)} nota={`risco $${atual.risco_por_trade_usd}/trade`} />
@@ -268,7 +338,7 @@ export default function BacktestBumerangue() {
                 ] as const).map(([rotulo, v]) => (
                   <div key={rotulo} className="rounded-lg border border-border/50 p-3">
                     <div className="text-xs text-muted-foreground">{rotulo}</div>
-                    <div className="text-lg font-semibold tabular-nums">{v.acerto}%</div>
+                    <div className={`text-lg font-semibold tabular-nums ${corAcerto(v.acerto)}`}>{v.acerto}%</div>
                     <div className="text-xs text-muted-foreground tabular-nums">
                       {v.trades} trades · ${v.usd_por_trade}/trade
                     </div>
@@ -287,27 +357,85 @@ export default function BacktestBumerangue() {
 
         {/* ---------------- ativo por ativo ---------------- */}
         <PremiumCard className="p-0 overflow-hidden">
-          <div className="p-6 pb-4">
-            <h2 className="font-semibold">Ativo por ativo · {tf}</h2>
-            <p className="text-xs text-muted-foreground mt-1">
-              <strong>Tendência</strong> compara os últimos 180 dias com a base de 3 anos, medindo
-              o mesmo stop calibrado — é a coluna que mostra o ativo esfriando ou esquentando
-              agora. <strong>vs. semana</strong> compara a base com a rodada anterior; ela se move
-              devagar, porque sete dias novos mudam pouco de mil e noventa e cinco.
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              Leia em termos relativos. Quando quase todos os ativos aquecem ao mesmo tempo, o que
-              mudou foi o mercado, não cada ativo — o sinal útil é quem destoa do conjunto.
-            </p>
+          <div className="p-6 pb-4 space-y-4">
+            <div>
+              <h2 className="font-semibold">Ativo por ativo · {tf}</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Ordenado pelo desempenho dos <strong>últimos 180 dias</strong>: maior acerto no
+                topo. <strong>Tendência</strong> compara essa janela curta com a base de 3 anos,
+                medindo o mesmo stop calibrado — é ela que mostra o ativo esfriando ou esquentando
+                agora. <strong>vs. semana</strong> compara a base com a rodada anterior; move
+                devagar, porque sete dias novos mudam pouco de mil e noventa e cinco.
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                A tinta da linha é <em>relativa</em> — verde no topo, vermelho no fim, só para
+                ordenar o olho. Quem diz se o número é bom em termos absolutos é a própria cor
+                dele: <span className="text-emerald-500">verde</span> em 70% ou mais, a linha de
+                corte do setup, e <span className="text-red-500">vermelho</span> abaixo dela, onde
+                a célula deixaria de ser operável.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                <Input
+                  value={busca}
+                  onChange={(e) => setBusca(e.target.value)}
+                  placeholder="Buscar ativo"
+                  className="h-8 w-40 pl-8 text-xs"
+                />
+              </div>
+
+              <div className="flex gap-1">
+                {([
+                  ['todos', 'Todos'],
+                  ['esquentando', 'Esquentando'],
+                  ['esfriando', 'Esfriando'],
+                  ['em linha', 'Em linha'],
+                ] as const).map(([v, label]) => (
+                  <Button
+                    key={v}
+                    size="sm"
+                    variant={estado === v ? 'default' : 'outline'}
+                    className="h-8 text-xs"
+                    onClick={() => setEstado(v)}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+
+              <div className="flex gap-1 ml-auto">
+                {([
+                  ['todas', 'Acerto: todos'],
+                  ['90', '90%+'],
+                  ['80', '80–90%'],
+                  ['70', '70–80%'],
+                  ['abaixo', 'Abaixo de 70%'],
+                ] as const).map(([v, label]) => (
+                  <Button
+                    key={v}
+                    size="sm"
+                    variant={faixa === v ? 'default' : 'outline'}
+                    className="h-8 text-xs"
+                    onClick={() => setFaixa(v)}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+            </div>
           </div>
+
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-y border-border/50 text-xs text-muted-foreground">
                   <th className="text-left font-medium px-6 py-2">Ativo</th>
                   <th className="text-right font-medium px-3 py-2">Trades</th>
-                  <th className="text-right font-medium px-3 py-2">Acerto (3 anos)</th>
                   <th className="text-right font-medium px-3 py-2">Últimos 180d</th>
+                  <th className="text-right font-medium px-3 py-2">Acerto (3 anos)</th>
                   <th className="text-right font-medium px-3 py-2">Tendência</th>
                   <th className="text-right font-medium px-3 py-2">vs. semana</th>
                   <th className="text-right font-medium px-3 py-2">Expectativa</th>
@@ -315,18 +443,31 @@ export default function BacktestBumerangue() {
                 </tr>
               </thead>
               <tbody>
-                {ativos.map(([nome, v]) => (
-                  <tr key={nome} className="border-b border-border/30 last:border-0">
+                {prontos.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="px-6 py-8 text-center text-sm text-muted-foreground">
+                      Nenhum ativo com esses filtros.
+                    </td>
+                  </tr>
+                )}
+                {prontos.map(([nome, v], i) => (
+                  <tr
+                    key={nome}
+                    className="border-b border-border/20 last:border-0"
+                    style={{ backgroundColor: tintaDaLinha(i, prontos.length, i % 2 === 1) }}
+                  >
                     <td className="px-6 py-2.5 font-medium">{nome}</td>
                     <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">{v.trades}</td>
-                    <td className="px-3 py-2.5 text-right tabular-nums font-medium">{v.acerto}%</td>
                     <td className="px-3 py-2.5 text-right tabular-nums">
                       {v.recente?.acerto !== undefined
-                        ? <span className="font-medium">{v.recente.acerto}%</span>
+                        ? <span className={`font-semibold ${corAcerto(v.recente.acerto)}`}>{v.recente.acerto}%</span>
                         : <span className="text-muted-foreground">—</span>}
                       {v.recente?.trades ? (
                         <span className="text-muted-foreground text-xs"> ({v.recente.trades})</span>
                       ) : null}
+                    </td>
+                    <td className={`px-3 py-2.5 text-right tabular-nums ${corAcerto(v.acerto)}`}>
+                      {v.acerto}%
                     </td>
                     <td className="px-3 py-2.5 text-right"><TagRecente r={v.recente} /></td>
                     <td className="px-3 py-2.5 text-right"><BandeiraTag b={v.bandeira} /></td>
@@ -342,6 +483,49 @@ export default function BacktestBumerangue() {
             </table>
           </div>
         </PremiumCard>
+
+        {emAndamento.length > 0 && (
+          <PremiumCard className="p-0 overflow-hidden">
+            <div className="p-6 pb-3">
+              <h2 className="font-semibold text-muted-foreground">Backtest em andamento</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Menos de 8 trades nos últimos 180 dias. Não é que estejam mal — é que ainda não
+                há amostra para dizer nada. Ficam fora do ranking acima até acumularem histórico,
+                para não comparar o que não se compara.
+              </p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-y border-border/50 text-xs text-muted-foreground">
+                    <th className="text-left font-medium px-6 py-2">Ativo</th>
+                    <th className="text-right font-medium px-3 py-2">Trades em 180d</th>
+                    <th className="text-right font-medium px-3 py-2">Acerto (3 anos)</th>
+                    <th className="text-right font-medium px-3 py-2">Trades (3 anos)</th>
+                    <th className="text-right font-medium px-6 py-2">Expectativa</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {emAndamento.map(([nome, v]) => (
+                    <tr key={nome} className="border-b border-border/20 last:border-0">
+                      <td className="px-6 py-2.5 font-medium text-muted-foreground">{nome}</td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">
+                        {v.recente?.trades ?? 0}
+                      </td>
+                      <td className={`px-3 py-2.5 text-right tabular-nums ${corAcerto(v.acerto)}`}>
+                        {v.acerto}%
+                      </td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">{v.trades}</td>
+                      <td className="px-6 py-2.5 text-right tabular-nums text-muted-foreground">
+                        {v.expectativa_r > 0 ? '+' : ''}{v.expectativa_r}R
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </PremiumCard>
+        )}
 
         <p className="text-xs text-muted-foreground">
           Todos os números são in-sample: o stop de cada célula foi escolhido varrendo candidatos
