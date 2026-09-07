@@ -829,6 +829,23 @@ export function RiskCopilotDrawer() {
                     {formatAmount(displayedStopDollar)}
                   </div>
                   <div className="text-sm text-muted-foreground font-mono">({displayedRiskPct.toFixed(1)}%)</div>
+                  {/* De onde sai o número. Sem isto o stop muda sozinho de uma
+                      semana para a outra e ninguém sabe por quê — ele acompanha
+                      o capital, e o capital acompanha o resultado dos trades. */}
+                  {!rc.isGorduraActive && (
+                    <p className="text-[11px] text-muted-foreground font-mono">
+                      {displayedRiskPct.toFixed(1)}% de {formatAmount(rc.capitalBase)}
+                      {rc.capitalResultado !== 0 && (
+                        <>
+                          {' '}— {formatAmount(rc.capitalAportado)} aportado
+                          <span className={rc.capitalResultado > 0 ? 'text-apple-green' : 'text-apple-red'}>
+                            {' '}{rc.capitalResultado > 0 ? '+' : '−'}{formatAmount(Math.abs(rc.capitalResultado))}
+                          </span>
+                          {' '}de resultado
+                        </>
+                      )}
+                    </p>
+                  )}
                   {selectedProfile && (
                     <button
                       className="text-[11px] text-muted-foreground underline underline-offset-2 hover:text-foreground"

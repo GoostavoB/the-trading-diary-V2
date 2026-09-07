@@ -37,6 +37,10 @@ export interface RiskCopilotState {
   tierMessage: string;
   bias: { side: 'long' | 'short'; winRate: number } | null;
   capitalBase: number;
+  /** Só os aportes, sem resultado. */
+  capitalAportado: number;
+  /** Resultado realizado acumulado, com taxas. */
+  capitalResultado: number;
   monthlyProfit: number;
   monthlyGoal: number;
   monthlyGoalPct: number;
@@ -137,11 +141,46 @@ export function useRiskCopilot() {
     enabled: !!user?.id && !!subAccountId,
   });
 
+  /**
+   * Resultado realizado acumulado, de todos os trades fechados.
+   *
+   * Precisa ser TODOS, não só os do mês: o capital de hoje é o aporte mais tudo
+   * o que já foi ganho e perdido desde o começo. Usa a mesma função de P&L do
+   * resto do app, com taxas incluídas — é o dinheiro que de fato entrou ou saiu
+   * da conta, não o número bruto que a corretora exibe.
+   */
+  const { data: allTrades = [], isLoading: allTradesLoading } = useQuery({
+    queryKey: ['risk-copilot-all-trades', user?.id, subAccountId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('trades')
+        .select('profit_loss, funding_fee, trading_fee')
+        .eq('user_id', user!.id)
+        .eq('sub_account_id', subAccountId!)
+        .is('deleted_at', null);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user?.id && !!subAccountId,
+  });
+
+  const realizedPnL = useMemo(
+    () => allTrades.reduce((sum, t) => sum + calculateTradePnL(t, { includeFees: true }), 0),
+    [allTrades]
+  );
+
   const capitalBase = useMemo(() => {
     const totalAdded = capitalLog.reduce((sum, e) => sum + (e.amount_added || 0), 0);
-    if (totalAdded > 0) return totalAdded;
-    return settings?.initial_investment || 0;
-  }, [capitalLog, settings]);
+    const aportes = totalAdded > 0 ? totalAdded : (settings?.initial_investment || 0);
+
+    // O capital de risco é o que existe na conta AGORA: aportes mais o resultado
+    // já realizado. Antes só os aportes contavam, então o stop autorizado ficava
+    // congelado no valor do primeiro dia -- ganhando ou perdendo, o mesmo $600.
+    // Como o stop é uma fração do capital, ele tem que subir quando a conta sobe
+    // e encolher quando ela cai; é isso que faz o risco ser percentual de verdade
+    // em vez de um número fixo disfarçado.
+    return Math.max(0, aportes + realizedPnL);
+  }, [capitalLog, settings, realizedPnL]);
 
   const monthlyProfit = useMemo(
     () => monthTrades.reduce((sum, t) => sum + calculateTradePnL(t, { includeFees: true }), 0),
@@ -198,6 +237,8 @@ export function useRiskCopilot() {
       tierMessage: TIER_MESSAGES[tier],
       bias,
       capitalBase,
+      capitalAportado: capitalLog.reduce((sum, e) => sum + (e.amount_added || 0), 0) || (settings?.initial_investment || 0),
+      capitalResultado: realizedPnL,
       monthlyProfit,
       monthlyGoal,
       monthlyGoalPct,
@@ -208,9 +249,9 @@ export function useRiskCopilot() {
       floorPct,
       ceilingPct,
     };
-  }, [last20Trades, settings, capitalBase, monthlyProfit]);
+  }, [last20Trades, settings, capitalBase, monthlyProfit, capitalLog, realizedPnL]);
 
-  const loading = settingsLoading || capitalLoading || tradesLoading || monthLoading;
+  const loading = settingsLoading || capitalLoading || tradesLoading || monthLoading || allTradesLoading;
 
   const addCapital = async (amount: number, notes?: string) => {
     if (!user || !subAccountId || amount === 0) return;
@@ -225,6 +266,7 @@ export function useRiskCopilot() {
     });
     if (error) throw error;
     queryClient.invalidateQueries({ queryKey: ['risk-copilot-capital-log', subAccountId] });
+    queryClient.invalidateQueries({ queryKey: ['risk-copilot-all-trades', user?.id, subAccountId] });
   };
 
   const updateKellyRange = async (floor: number, ceiling: number) => {

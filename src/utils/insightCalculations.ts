@@ -1,5 +1,6 @@
 import type { Trade } from '@/types/trade';
 import { calculateTradePnL } from './pnl';
+import { tradeNotional } from './tradeNotional';
 
 export interface TimeBasedPerformance {
   hour: number;
@@ -80,8 +81,7 @@ export const formatHoldingTime = (minutes: number | null): string => {
 export const calculateAvgPositionSize = (trades: Trade[]): number => {
   if (!trades || trades.length === 0) return 0;
   const totalSize = trades.reduce((sum, t) => {
-    const size = t.position_size || ((t.margin || 0) * (t.leverage || 1));
-    return sum + size;
+    return sum + tradeNotional(t);
   }, 0);
   return totalSize / trades.length;
 };
@@ -282,7 +282,7 @@ export const calculateFeeImpactMetrics = (trades: Trade[]) => {
   
   const feeImpactOnPnL = totalGrossPnL > 0 ? (totalFees / totalGrossPnL) * 100 : 0;
   const totalVolume = trades.reduce((sum, t) => {
-    return sum + (t.position_size || ((t.margin || 0) * (t.leverage || 1)));
+    return sum + tradeNotional(t);
   }, 0);
   
   const effectiveFeeRate = totalVolume > 0 ? (totalFees / totalVolume) * 100 : 0;

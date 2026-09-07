@@ -1,4 +1,5 @@
 import { Trade } from '@/types/trade';
+import { tradeNotional } from './tradeNotional';
 
 // Enhanced trade metrics with detailed fee analysis
 export interface EnhancedTradeMetrics {
@@ -44,7 +45,8 @@ export const calculateEnhancedMetrics = (trade: Trade): EnhancedTradeMetrics => 
   const margin = trade.margin || 0;
   const leverage = trade.leverage || 1;
   // Use position_size from trade if available, otherwise calculate from margin × leverage
-  const positionSize = trade.position_size || (margin * leverage);
+  // position_size e QUANTIDADE do ativo, nao dolares -- ver tradeNotional().
+  const positionSize = tradeNotional(trade);
   
   const tradingFee = Math.abs(trade.trading_fee || 0);
   const fundingFee = trade.funding_fee || 0;
