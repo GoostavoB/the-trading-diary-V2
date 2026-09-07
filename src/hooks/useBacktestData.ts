@@ -24,12 +24,29 @@ export interface ResumoTF {
   celulas_operaveis: number;
 }
 
+export type EstadoRecente = 'esfriando' | 'esquentando' | 'em linha' | 'amostra curta';
+
+export interface RecenteTF {
+  dias: number;
+  trades: number;
+  acerto?: number;
+  expectativa_r?: number;
+  diferenca?: number;
+  estado: EstadoRecente;
+}
+
 export interface AtivoTF {
   trades: number;
   acerto: number;
   expectativa_r: number;
   usd_total: number;
   bandeira?: { flag: Bandeira; delta: number | null };
+  /**
+   * Janela curta (180 dias) medida com o mesmo stop calibrado. É ela que mostra
+   * o ativo esfriando ou esquentando agora — a base de 3 anos é estável demais
+   * para acusar mudança de uma semana para a outra.
+   */
+  recente?: RecenteTF;
 }
 
 export interface EfeitoLSR {

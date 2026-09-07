@@ -10,7 +10,7 @@ import {
   ArrowLeft, ArrowUpRight, ArrowDownRight, Minus, Sparkles,
   AlertTriangle, ShieldCheck, Clock,
 } from 'lucide-react';
-import { useBacktestData, type AtivoTF, type Bandeira } from '@/hooks/useBacktestData';
+import { useBacktestData, type AtivoTF, type Bandeira, type RecenteTF } from '@/hooks/useBacktestData';
 
 const fmtUsd = (n: number) =>
   `${n < 0 ? '-' : ''}$${Math.abs(Math.round(n)).toLocaleString()}`;
@@ -40,6 +40,26 @@ function BandeiraTag({ b }: { b?: { flag: Bandeira; delta: number | null } }) {
   );
 }
 
+function TagRecente({ r }: { r?: RecenteTF }) {
+  if (!r || r.estado === 'amostra curta')
+    return <span className="text-xs text-muted-foreground">poucos trades</span>;
+  if (r.estado === 'esfriando')
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-red-500">
+        <ArrowDownRight className="h-3.5 w-3.5" />
+        esfriando {r.diferenca?.toFixed(1)}
+      </span>
+    );
+  if (r.estado === 'esquentando')
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-500">
+        <ArrowUpRight className="h-3.5 w-3.5" />
+        esquentando +{r.diferenca?.toFixed(1)}
+      </span>
+    );
+  return <span className="text-xs text-muted-foreground">em linha</span>;
+}
+
 function Metrica({ rotulo, valor, nota }: { rotulo: string; valor: string; nota?: string }) {
   return (
     <div className="min-w-0">
@@ -59,7 +79,11 @@ export default function BacktestBumerangue() {
 
   const ativos = useMemo(() => {
     if (!bloco) return [] as Array<[string, AtivoTF]>;
-    return Object.entries(bloco.ativos).sort((a, b) => b[1].acerto - a[1].acerto);
+    // Ordem por diferença da janela recente: o que está esfriando sobe para o
+    // topo, porque é a informação que muda a decisão de entrar num trade hoje.
+    const peso = (v: AtivoTF) =>
+      v.recente && v.recente.diferenca !== undefined ? v.recente.diferenca : 999;
+    return Object.entries(bloco.ativos).sort((a, b) => peso(a[1]) - peso(b[1]));
   }, [bloco]);
 
   if (isLoading) {
@@ -266,7 +290,14 @@ export default function BacktestBumerangue() {
           <div className="p-6 pb-4">
             <h2 className="font-semibold">Ativo por ativo · {tf}</h2>
             <p className="text-xs text-muted-foreground mt-1">
-              A seta compara com a rodada anterior. Move quando passa de 2 pontos percentuais.
+              <strong>Tendência</strong> compara os últimos 180 dias com a base de 3 anos, medindo
+              o mesmo stop calibrado — é a coluna que mostra o ativo esfriando ou esquentando
+              agora. <strong>vs. semana</strong> compara a base com a rodada anterior; ela se move
+              devagar, porque sete dias novos mudam pouco de mil e noventa e cinco.
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">
+              Leia em termos relativos. Quando quase todos os ativos aquecem ao mesmo tempo, o que
+              mudou foi o mercado, não cada ativo — o sinal útil é quem destoa do conjunto.
             </p>
           </div>
           <div className="overflow-x-auto">
@@ -275,7 +306,9 @@ export default function BacktestBumerangue() {
                 <tr className="border-y border-border/50 text-xs text-muted-foreground">
                   <th className="text-left font-medium px-6 py-2">Ativo</th>
                   <th className="text-right font-medium px-3 py-2">Trades</th>
-                  <th className="text-right font-medium px-3 py-2">Acerto</th>
+                  <th className="text-right font-medium px-3 py-2">Acerto (3 anos)</th>
+                  <th className="text-right font-medium px-3 py-2">Últimos 180d</th>
+                  <th className="text-right font-medium px-3 py-2">Tendência</th>
                   <th className="text-right font-medium px-3 py-2">vs. semana</th>
                   <th className="text-right font-medium px-3 py-2">Expectativa</th>
                   <th className="text-right font-medium px-6 py-2">Resultado</th>
@@ -287,6 +320,15 @@ export default function BacktestBumerangue() {
                     <td className="px-6 py-2.5 font-medium">{nome}</td>
                     <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">{v.trades}</td>
                     <td className="px-3 py-2.5 text-right tabular-nums font-medium">{v.acerto}%</td>
+                    <td className="px-3 py-2.5 text-right tabular-nums">
+                      {v.recente?.acerto !== undefined
+                        ? <span className="font-medium">{v.recente.acerto}%</span>
+                        : <span className="text-muted-foreground">—</span>}
+                      {v.recente?.trades ? (
+                        <span className="text-muted-foreground text-xs"> ({v.recente.trades})</span>
+                      ) : null}
+                    </td>
+                    <td className="px-3 py-2.5 text-right"><TagRecente r={v.recente} /></td>
                     <td className="px-3 py-2.5 text-right"><BandeiraTag b={v.bandeira} /></td>
                     <td className="px-3 py-2.5 text-right tabular-nums">
                       {v.expectativa_r > 0 ? '+' : ''}{v.expectativa_r}R

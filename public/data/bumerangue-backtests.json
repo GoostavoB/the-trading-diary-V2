@@ -1,7 +1,7 @@
 {
  "atual": {
   "setup": "bumerangue",
-  "gerado_em": "2026-09-07T03:10:07+00:00",
+  "gerado_em": "2026-09-07T03:36:41+00:00",
   "janela_dias": 1095,
   "risco_por_trade_usd": 100.0,
   "ativos": 23,
@@ -26,9 +26,17 @@
       "acerto": 78.4,
       "expectativa_r": 0.026,
       "usd_total": 331,
+      "recente": {
+       "dias": 180,
+       "trades": 17,
+       "acerto": 82.4,
+       "expectativa_r": 0.018,
+       "diferenca": 4.0,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "ETH": {
@@ -36,9 +44,17 @@
       "acerto": 82.1,
       "expectativa_r": 0.125,
       "usd_total": 1400,
+      "recente": {
+       "dias": 180,
+       "trades": 21,
+       "acerto": 90.5,
+       "expectativa_r": 0.201,
+       "diferenca": 8.4,
+       "estado": "esquentando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "SOL": {
@@ -46,9 +62,17 @@
       "acerto": 78.6,
       "expectativa_r": 0.08,
       "usd_total": 449,
+      "recente": {
+       "dias": 180,
+       "trades": 15,
+       "acerto": 86.7,
+       "expectativa_r": 0.137,
+       "diferenca": 8.1,
+       "estado": "esquentando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "BNB": {
@@ -56,9 +80,17 @@
       "acerto": 75.2,
       "expectativa_r": -0.026,
       "usd_total": -295,
+      "recente": {
+       "dias": 180,
+       "trades": 14,
+       "acerto": 85.7,
+       "expectativa_r": 0.148,
+       "diferenca": 10.5,
+       "estado": "esquentando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "TRX": {
@@ -66,9 +98,17 @@
       "acerto": 77.7,
       "expectativa_r": -0.075,
       "usd_total": -704,
+      "recente": {
+       "dias": 180,
+       "trades": 11,
+       "acerto": 81.8,
+       "expectativa_r": -0.057,
+       "diferenca": 4.1,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "ZEC": {
@@ -76,9 +116,17 @@
       "acerto": 74.3,
       "expectativa_r": 0.094,
       "usd_total": 695,
+      "recente": {
+       "dias": 180,
+       "trades": 13,
+       "acerto": 61.5,
+       "expectativa_r": -0.061,
+       "diferenca": -12.8,
+       "estado": "esfriando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "DOGE": {
@@ -86,9 +134,17 @@
       "acerto": 81.5,
       "expectativa_r": 0.102,
       "usd_total": 825,
+      "recente": {
+       "dias": 180,
+       "trades": 18,
+       "acerto": 94.4,
+       "expectativa_r": 0.297,
+       "diferenca": 12.9,
+       "estado": "esquentando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "LINK": {
@@ -96,9 +152,17 @@
       "acerto": 76.4,
       "expectativa_r": 0.056,
       "usd_total": 591,
+      "recente": {
+       "dias": 180,
+       "trades": 23,
+       "acerto": 82.6,
+       "expectativa_r": 0.123,
+       "diferenca": 6.2,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "ADA": {
@@ -106,9 +170,17 @@
       "acerto": 80.5,
       "expectativa_r": 0.106,
       "usd_total": 816,
+      "recente": {
+       "dias": 180,
+       "trades": 13,
+       "acerto": 76.9,
+       "expectativa_r": -0.034,
+       "diferenca": -3.6,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "BCH": {
@@ -116,9 +188,17 @@
       "acerto": 74.8,
       "expectativa_r": 0.065,
       "usd_total": 899,
+      "recente": {
+       "dias": 180,
+       "trades": 20,
+       "acerto": 80.0,
+       "expectativa_r": 0.104,
+       "diferenca": 5.2,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "ENA": {
@@ -126,9 +206,14 @@
       "acerto": 77.3,
       "expectativa_r": 0.148,
       "usd_total": 326,
+      "recente": {
+       "dias": 180,
+       "trades": 6,
+       "estado": "amostra curta"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "UNI": {
@@ -136,9 +221,17 @@
       "acerto": 78.0,
       "expectativa_r": 0.136,
       "usd_total": 1119,
+      "recente": {
+       "dias": 180,
+       "trades": 13,
+       "acerto": 76.9,
+       "expectativa_r": 0.099,
+       "diferenca": -1.1,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "LTC": {
@@ -146,9 +239,17 @@
       "acerto": 76.4,
       "expectativa_r": 0.052,
       "usd_total": 1022,
+      "recente": {
+       "dias": 180,
+       "trades": 33,
+       "acerto": 75.8,
+       "expectativa_r": 0.027,
+       "diferenca": -0.6,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "AVAX": {
@@ -156,9 +257,17 @@
       "acerto": 72.6,
       "expectativa_r": 0.043,
       "usd_total": 316,
+      "recente": {
+       "dias": 180,
+       "trades": 13,
+       "acerto": 76.9,
+       "expectativa_r": 0.129,
+       "diferenca": 4.3,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "SUI": {
@@ -166,9 +275,14 @@
       "acerto": 82.1,
       "expectativa_r": 0.405,
       "usd_total": 1578,
+      "recente": {
+       "dias": 180,
+       "trades": 4,
+       "estado": "amostra curta"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "SHIB": {
@@ -176,9 +290,17 @@
       "acerto": 75.6,
       "expectativa_r": 0.013,
       "usd_total": 98,
+      "recente": {
+       "dias": 180,
+       "trades": 14,
+       "acerto": 78.6,
+       "expectativa_r": -0.006,
+       "diferenca": 3.0,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "NEAR": {
@@ -186,9 +308,17 @@
       "acerto": 78.1,
       "expectativa_r": 0.188,
       "usd_total": 1369,
+      "recente": {
+       "dias": 180,
+       "trades": 13,
+       "acerto": 92.3,
+       "expectativa_r": 0.388,
+       "diferenca": 14.2,
+       "estado": "esquentando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "DOT": {
@@ -196,9 +326,14 @@
       "acerto": 78.0,
       "expectativa_r": 0.082,
       "usd_total": 337,
+      "recente": {
+       "dias": 180,
+       "trades": 4,
+       "estado": "amostra curta"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "POL": {
@@ -206,9 +341,17 @@
       "acerto": 75.0,
       "expectativa_r": -0.003,
       "usd_total": -45,
+      "recente": {
+       "dias": 180,
+       "trades": 41,
+       "acerto": 80.5,
+       "expectativa_r": 0.012,
+       "diferenca": 5.5,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "MATIC": {
@@ -216,9 +359,14 @@
       "acerto": 92.3,
       "expectativa_r": 0.153,
       "usd_total": 199,
+      "recente": {
+       "dias": 180,
+       "trades": 0,
+       "estado": "amostra curta"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "CAKE": {
@@ -226,9 +374,17 @@
       "acerto": 74.4,
       "expectativa_r": -0.037,
       "usd_total": -317,
+      "recente": {
+       "dias": 180,
+       "trades": 15,
+       "acerto": 93.3,
+       "expectativa_r": 0.158,
+       "diferenca": 18.9,
+       "estado": "esquentando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "INJ": {
@@ -236,9 +392,17 @@
       "acerto": 77.7,
       "expectativa_r": 0.137,
       "usd_total": 1406,
+      "recente": {
+       "dias": 180,
+       "trades": 24,
+       "acerto": 66.7,
+       "expectativa_r": -0.048,
+       "diferenca": -11.0,
+       "estado": "esfriando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "VIRTUAL": {
@@ -246,9 +410,17 @@
       "acerto": 78.9,
       "expectativa_r": 0.22,
       "usd_total": 834,
+      "recente": {
+       "dias": 180,
+       "trades": 20,
+       "acerto": 75.0,
+       "expectativa_r": 0.206,
+       "diferenca": -3.9,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      }
     },
@@ -2617,9 +2789,17 @@
       "acerto": 86.0,
       "expectativa_r": 0.111,
       "usd_total": 635,
+      "recente": {
+       "dias": 180,
+       "trades": 10,
+       "acerto": 80.0,
+       "expectativa_r": -0.098,
+       "diferenca": -6.0,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "ETH": {
@@ -2627,9 +2807,17 @@
       "acerto": 77.8,
       "expectativa_r": 0.108,
       "usd_total": 583,
+      "recente": {
+       "dias": 180,
+       "trades": 8,
+       "acerto": 100.0,
+       "expectativa_r": 0.399,
+       "diferenca": 22.2,
+       "estado": "esquentando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "SOL": {
@@ -2637,9 +2825,17 @@
       "acerto": 80.0,
       "expectativa_r": 0.117,
       "usd_total": 525,
+      "recente": {
+       "dias": 180,
+       "trades": 12,
+       "acerto": 75.0,
+       "expectativa_r": -0.006,
+       "diferenca": -5.0,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "BNB": {
@@ -2647,9 +2843,17 @@
       "acerto": 78.7,
       "expectativa_r": 0.114,
       "usd_total": 859,
+      "recente": {
+       "dias": 180,
+       "trades": 14,
+       "acerto": 71.4,
+       "expectativa_r": 0.085,
+       "diferenca": -7.3,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "TRX": {
@@ -2657,9 +2861,14 @@
       "acerto": 75.5,
       "expectativa_r": -0.053,
       "usd_total": -283,
+      "recente": {
+       "dias": 180,
+       "trades": 4,
+       "estado": "amostra curta"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "ZEC": {
@@ -2667,9 +2876,14 @@
       "acerto": 80.0,
       "expectativa_r": 0.108,
       "usd_total": 108,
+      "recente": {
+       "dias": 180,
+       "trades": 0,
+       "estado": "amostra curta"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "DOGE": {
@@ -2677,9 +2891,17 @@
       "acerto": 78.1,
       "expectativa_r": 0.172,
       "usd_total": 1099,
+      "recente": {
+       "dias": 180,
+       "trades": 13,
+       "acerto": 76.9,
+       "expectativa_r": 0.105,
+       "diferenca": -1.2,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "LINK": {
@@ -2687,9 +2909,17 @@
       "acerto": 80.6,
       "expectativa_r": 0.174,
       "usd_total": 1165,
+      "recente": {
+       "dias": 180,
+       "trades": 9,
+       "acerto": 77.8,
+       "expectativa_r": 0.12,
+       "diferenca": -2.8,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "ADA": {
@@ -2697,9 +2927,17 @@
       "acerto": 77.9,
       "expectativa_r": 0.008,
       "usd_total": 55,
+      "recente": {
+       "dias": 180,
+       "trades": 11,
+       "acerto": 63.6,
+       "expectativa_r": -0.287,
+       "diferenca": -14.3,
+       "estado": "esfriando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "BCH": {
@@ -2707,9 +2945,17 @@
       "acerto": 77.1,
       "expectativa_r": 0.085,
       "usd_total": 703,
+      "recente": {
+       "dias": 180,
+       "trades": 13,
+       "acerto": 84.6,
+       "expectativa_r": 0.112,
+       "diferenca": 7.5,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "UNI": {
@@ -2717,9 +2963,17 @@
       "acerto": 78.5,
       "expectativa_r": 0.131,
       "usd_total": 1035,
+      "recente": {
+       "dias": 180,
+       "trades": 9,
+       "acerto": 88.9,
+       "expectativa_r": 0.363,
+       "diferenca": 10.4,
+       "estado": "esquentando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "LTC": {
@@ -2727,9 +2981,17 @@
       "acerto": 79.0,
       "expectativa_r": 0.076,
       "usd_total": 798,
+      "recente": {
+       "dias": 180,
+       "trades": 12,
+       "acerto": 91.7,
+       "expectativa_r": 0.182,
+       "diferenca": 12.7,
+       "estado": "esquentando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "AVAX": {
@@ -2737,9 +2999,17 @@
       "acerto": 76.3,
       "expectativa_r": 0.141,
       "usd_total": 833,
+      "recente": {
+       "dias": 180,
+       "trades": 9,
+       "acerto": 88.9,
+       "expectativa_r": 0.287,
+       "diferenca": 12.6,
+       "estado": "esquentando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "SUI": {
@@ -2747,9 +3017,17 @@
       "acerto": 78.1,
       "expectativa_r": 0.155,
       "usd_total": 992,
+      "recente": {
+       "dias": 180,
+       "trades": 15,
+       "acerto": 73.3,
+       "expectativa_r": 0.021,
+       "diferenca": -4.8,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "SHIB": {
@@ -2757,9 +3035,17 @@
       "acerto": 75.3,
       "expectativa_r": 0.194,
       "usd_total": 1727,
+      "recente": {
+       "dias": 180,
+       "trades": 14,
+       "acerto": 71.4,
+       "expectativa_r": -0.125,
+       "diferenca": -3.9,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "NEAR": {
@@ -2767,9 +3053,17 @@
       "acerto": 78.6,
       "expectativa_r": 0.1,
       "usd_total": 702,
+      "recente": {
+       "dias": 180,
+       "trades": 13,
+       "acerto": 92.3,
+       "expectativa_r": 0.133,
+       "diferenca": 13.7,
+       "estado": "esquentando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "DOT": {
@@ -2777,9 +3071,17 @@
       "acerto": 72.3,
       "expectativa_r": -0.017,
       "usd_total": -79,
+      "recente": {
+       "dias": 180,
+       "trades": 12,
+       "acerto": 83.3,
+       "expectativa_r": 0.191,
+       "diferenca": 11.0,
+       "estado": "esquentando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "POL": {
@@ -2787,9 +3089,17 @@
       "acerto": 79.3,
       "expectativa_r": 0.11,
       "usd_total": 318,
+      "recente": {
+       "dias": 180,
+       "trades": 11,
+       "acerto": 81.8,
+       "expectativa_r": 0.075,
+       "diferenca": 2.5,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "MATIC": {
@@ -2797,9 +3107,14 @@
       "acerto": 75.0,
       "expectativa_r": 0.07,
       "usd_total": 56,
+      "recente": {
+       "dias": 180,
+       "trades": 0,
+       "estado": "amostra curta"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "CAKE": {
@@ -2807,9 +3122,17 @@
       "acerto": 77.2,
       "expectativa_r": 0.107,
       "usd_total": 612,
+      "recente": {
+       "dias": 180,
+       "trades": 10,
+       "acerto": 100.0,
+       "expectativa_r": 0.388,
+       "diferenca": 22.8,
+       "estado": "esquentando"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "INJ": {
@@ -2817,9 +3140,17 @@
       "acerto": 72.5,
       "expectativa_r": 0.236,
       "usd_total": 944,
+      "recente": {
+       "dias": 180,
+       "trades": 9,
+       "acerto": 66.7,
+       "expectativa_r": 0.187,
+       "diferenca": -5.8,
+       "estado": "em linha"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      },
      "VIRTUAL": {
@@ -2827,9 +3158,14 @@
       "acerto": 75.0,
       "expectativa_r": 0.801,
       "usd_total": 641,
+      "recente": {
+       "dias": 180,
+       "trades": 2,
+       "estado": "amostra curta"
+      },
       "bandeira": {
-       "flag": "novo",
-       "delta": null
+       "flag": "estavel",
+       "delta": 0.0
       }
      }
     },
@@ -5264,15 +5600,52 @@
   },
   "relatorio": {
    "texto": "91.0 sinais por mes somando 4H e 6H. 4H acerta 77.3% (1952 trades), 6H acerta 77.9% (1231 trades). Com risco de $100 por trade a media e $763 por mes, mediana $676.",
-   "positivas": [],
-   "negativas": [],
+   "positivas": [
+    "4H ETH ESQUENTANDO: 90.5% nos ultimos 180 dias contra 82.1% na base (+8.4, 21 trades)",
+    "4H SOL ESQUENTANDO: 86.7% nos ultimos 180 dias contra 78.6% na base (+8.1, 15 trades)",
+    "4H BNB ESQUENTANDO: 85.7% nos ultimos 180 dias contra 75.2% na base (+10.5, 14 trades)",
+    "4H DOGE ESQUENTANDO: 94.4% nos ultimos 180 dias contra 81.5% na base (+12.9, 18 trades)",
+    "4H NEAR ESQUENTANDO: 92.3% nos ultimos 180 dias contra 78.1% na base (+14.2, 13 trades)",
+    "4H CAKE ESQUENTANDO: 93.3% nos ultimos 180 dias contra 74.4% na base (+18.9, 15 trades)",
+    "6H ETH ESQUENTANDO: 100.0% nos ultimos 180 dias contra 77.8% na base (+22.2, 8 trades)",
+    "6H UNI ESQUENTANDO: 88.9% nos ultimos 180 dias contra 78.5% na base (+10.4, 9 trades)",
+    "6H LTC ESQUENTANDO: 91.7% nos ultimos 180 dias contra 79.0% na base (+12.7, 12 trades)",
+    "6H AVAX ESQUENTANDO: 88.9% nos ultimos 180 dias contra 76.3% na base (+12.6, 9 trades)",
+    "6H NEAR ESQUENTANDO: 92.3% nos ultimos 180 dias contra 78.6% na base (+13.7, 13 trades)",
+    "6H DOT ESQUENTANDO: 83.3% nos ultimos 180 dias contra 72.3% na base (+11.0, 12 trades)",
+    "6H CAKE ESQUENTANDO: 100.0% nos ultimos 180 dias contra 77.2% na base (+22.8, 10 trades)"
+   ],
+   "negativas": [
+    "4H ZEC ESFRIANDO: 61.5% nos ultimos 180 dias contra 74.3% na base (-12.8, 13 trades)",
+    "4H INJ ESFRIANDO: 66.7% nos ultimos 180 dias contra 77.7% na base (-11.0, 24 trades)",
+    "6H ADA ESFRIANDO: 63.6% nos ultimos 180 dias contra 77.9% na base (-14.3, 11 trades)"
+   ],
    "observacoes": [
-    "4H: primeira rodada, 77.3% de acerto em 1952 trades",
-    "6H: primeira rodada, 77.9% de acerto em 1231 trades",
+    "4H: acerto estavel em 77.3% (+0.0)",
+    "6H: acerto estavel em 77.9% (+0.0)",
     "LSR do BTC em 1.06, dentro da faixa neutra"
    ]
   },
-  "duracao_s": 0.8
+  "duracao_s": 1.2
  },
- "historico": []
+ "historico": [
+  {
+   "gerado_em": "2026-09-07T03:10:07+00:00",
+   "4H": {
+    "acerto": 77.3,
+    "trades": 1952,
+    "expectativa_r": 0.068,
+    "usd_media_mes": 360,
+    "celulas_operaveis": 99
+   },
+   "6H": {
+    "acerto": 77.9,
+    "trades": 1231,
+    "expectativa_r": 0.114,
+    "usd_media_mes": 403,
+    "celulas_operaveis": 90
+   },
+   "lsr": 1.0602
+  }
+ ]
 }

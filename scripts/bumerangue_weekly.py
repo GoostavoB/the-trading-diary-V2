@@ -25,6 +25,9 @@ KL   = "https://api.binance.com/api/v3/klines"
 LSRU = "https://fapi.binance.com/futures/data/globalLongShortAccountRatio"
 FEE, LOOK, MAX_WAIT = 0.001, 40, 8
 DIAS, RISCO = 1095, 100.0
+RECENTE_DIAS = 180           # janela curta, pra enxergar o ativo esfriando AGORA
+RECENTE_MIN_TRADES = 8       # abaixo disso nao da pra dizer nada
+RECENTE_LIMIAR = 8.0         # pontos percentuais de diferenca pra virar bandeira
 LSR_SHORT_MIN, LSR_LONG_MAX = 1.0, 1.8
 LIMIAR_FLAG = 2.0            # pontos percentuais para marcar alta/queda
 
@@ -225,17 +228,42 @@ def resumo(trades):
     }
 
 def por_ativo(trades):
+    """Duas leituras por ativo, e a segunda e a que importa no dia a dia.
+
+    A BASE sao os 3 anos inteiros -- estavel, mas surda: somar 7 dias novos a
+    1.095 move o acerto em centesimos de ponto, entao comparar semana a semana
+    a base nunca acusaria nada.
+
+    A RECENTE sao os ultimos 180 dias, medidos com o MESMO stop calibrado. E ela
+    que mostra o ativo esfriando ou esquentando agora, que e o que decide se vale
+    entrar no trade de hoje.
+    """
+    corte=(dt.datetime.now(dt.timezone.utc)-dt.timedelta(days=RECENTE_DIAS)).strftime("%Y-%m-%d")
     d={}
     for t in trades:
         k=t["ativo"]
-        d.setdefault(k,{"trades":0,"alvos":0,"R":0.0})
+        d.setdefault(k,{"trades":0,"alvos":0,"R":0.0,"r_trades":0,"r_alvos":0,"r_R":0.0})
         d[k]["trades"]+=1; d[k]["alvos"]+= 1 if t["o"]=="ALVO" else 0; d[k]["R"]+=t["R"]
+        if t["dia"] >= corte:
+            d[k]["r_trades"]+=1; d[k]["r_alvos"]+= 1 if t["o"]=="ALVO" else 0; d[k]["r_R"]+=t["R"]
     out={}
     for k,v in d.items():
-        out[k]={"trades":v["trades"],
-                "acerto":round(v["alvos"]/v["trades"]*100,1),
-                "expectativa_r":round(v["R"]/v["trades"],3),
-                "usd_total":round(RISCO*v["R"])}
+        base=round(v["alvos"]/v["trades"]*100,1)
+        item={"trades":v["trades"],"acerto":base,
+              "expectativa_r":round(v["R"]/v["trades"],3),
+              "usd_total":round(RISCO*v["R"])}
+        if v["r_trades"] >= RECENTE_MIN_TRADES:
+            rec=round(v["r_alvos"]/v["r_trades"]*100,1)
+            dif=round(rec-base,1)
+            item["recente"]={
+                "dias":RECENTE_DIAS,"trades":v["r_trades"],"acerto":rec,
+                "expectativa_r":round(v["r_R"]/v["r_trades"],3),"diferenca":dif,
+                "estado": "esfriando" if dif <= -RECENTE_LIMIAR else
+                          "esquentando" if dif >= RECENTE_LIMIAR else "em linha"}
+        else:
+            item["recente"]={"dias":RECENTE_DIAS,"trades":v["r_trades"],
+                             "estado":"amostra curta"}
+        out[k]=item
     return out
 
 def celulas_operaveis(master):
@@ -285,11 +313,22 @@ def relatorio(agora, antes):
             elif dc>=3: pos.append(f"{tf}: {dc} celulas novas entraram na faixa operavel")
         else:
             obs.append(f"{tf}: primeira rodada, {a['acerto']}% de acerto em {a['trades']} trades")
+    # Bandeiras de verdade: a janela recente contra a base de 3 anos.
     for tf in ("4H","6H"):
         for ativo,v in agora["timeframes"][tf]["ativos"].items():
+            rec=v.get("recente",{})
+            if rec.get("estado")=="esfriando":
+                neg.append(f"{tf} {ativo} ESFRIANDO: {rec['acerto']}% nos ultimos "
+                           f"{rec['dias']} dias contra {v['acerto']}% na base "
+                           f"({rec['diferenca']:+.1f}, {rec['trades']} trades)")
+            elif rec.get("estado")=="esquentando":
+                pos.append(f"{tf} {ativo} ESQUENTANDO: {rec['acerto']}% nos ultimos "
+                           f"{rec['dias']} dias contra {v['acerto']}% na base "
+                           f"({rec['diferenca']:+.1f}, {rec['trades']} trades)")
+            # semana a semana: so acusa quando a base realmente se mexe
             f=v.get("bandeira",{})
-            if f.get("flag")=="alta":  pos.append(f"{tf} {ativo}: {f['delta']:+.1f} pontos, agora {v['acerto']}%")
-            if f.get("flag")=="queda": neg.append(f"{tf} {ativo}: {f['delta']:+.1f} pontos, agora {v['acerto']}%")
+            if f.get("flag")=="alta":  pos.append(f"{tf} {ativo}: base subiu {f['delta']:+.1f} pontos, agora {v['acerto']}%")
+            if f.get("flag")=="queda": neg.append(f"{tf} {ativo}: base caiu {f['delta']:+.1f} pontos, agora {v['acerto']}%")
     lsr=agora.get("lsr",{})
     if lsr.get("atual") is not None:
         v=lsr["atual"]
