@@ -95,16 +95,21 @@ export function useRiskCopilot() {
   });
 
   const { data: capitalLog = [], isLoading: capitalLoading } = useQuery({
-    queryKey: ['risk-copilot-capital-log', subAccountId],
+    queryKey: ['risk-copilot-capital-log', user?.id, subAccountId],
     queryFn: async () => {
+      // Precisa ver as MESMAS linhas que a tela de Capital Management, que
+      // consulta sem filtro de subconta. Filtrar so por sub_account_id deixava
+      // de fora os aportes antigos, gravados antes das subcontas existirem --
+      // o aporte inicial de $3.000 sumia e o painel dizia "$770 aportado".
       const { data, error } = await supabase
         .from('capital_log')
         .select('amount_added')
-        .eq('sub_account_id', subAccountId!);
+        .eq('user_id', user!.id)
+        .or(`sub_account_id.is.null,sub_account_id.eq.${subAccountId}`);
       if (error) throw error;
       return data || [];
     },
-    enabled: !!subAccountId,
+    enabled: !!user?.id && !!subAccountId,
   });
 
   const { data: last20Trades = [], isLoading: tradesLoading } = useQuery({
@@ -255,7 +260,12 @@ export function useRiskCopilot() {
 
   const addCapital = async (amount: number, notes?: string) => {
     if (!user || !subAccountId || amount === 0) return;
-    const totalAfter = capitalBase + amount;
+    // total_after e o acumulado de APORTES, coerente com a tela de Capital
+    // Management. Somar o lucro aqui fazia a linha nova do extrato dizer 4553
+    // enquanto a anterior dizia 3000 -- duas contas diferentes na mesma coluna.
+    const aportesAteAgora = capitalLog.reduce((sum, e) => sum + (e.amount_added || 0), 0)
+      || (settings?.initial_investment || 0);
+    const totalAfter = aportesAteAgora + amount;
     const { error } = await supabase.from('capital_log').insert({
       user_id: user.id,
       sub_account_id: subAccountId,
@@ -265,7 +275,7 @@ export function useRiskCopilot() {
       log_date: new Date().toISOString().split('T')[0],
     });
     if (error) throw error;
-    queryClient.invalidateQueries({ queryKey: ['risk-copilot-capital-log', subAccountId] });
+    queryClient.invalidateQueries({ queryKey: ['risk-copilot-capital-log', user?.id, subAccountId] });
     queryClient.invalidateQueries({ queryKey: ['risk-copilot-all-trades', user?.id, subAccountId] });
   };
 
