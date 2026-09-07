@@ -59,11 +59,15 @@ export const calculateEnhancedMetrics = (trade: Trade): EnhancedTradeMetrics => 
   // Comprehensive fees (includes slippage and spread)
   const comprehensiveFees = totalFees + slippageCost + spreadCost;
   
-  // Calculate gross PnL (before fees)
-  const grossPnL = (trade.profit_loss || 0) + totalFees;
-  
-  // Net PnL (after fees) - this is what user actually received
-  const netPnL = trade.profit_loss || 0;
+  // `profit_loss` é o BRUTO — a mesma convenção declarada em utils/pnl.ts, que é
+  // o cálculo padrão do app e alimenta metas, dashboard e Risk Copilot.
+  //
+  // Este arquivo tinha a convenção INVERTIDA: tratava profit_loss como líquido e
+  // somava as taxas para chegar ao bruto. Com os dois utilitários discordando,
+  // um lançamento feito seguindo este arquivo tinha a taxa descontada duas vezes
+  // pelo outro — a meta mensal apareceu $140 menor do que era.
+  const grossPnL = trade.profit_loss || 0;
+  const netPnL = grossPnL - totalFees;
   
   // Gross return % (based on position size, before fees)
   const grossReturnPercent = positionSize > 0 ? (grossPnL / positionSize) * 100 : 0;
