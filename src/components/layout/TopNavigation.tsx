@@ -4,7 +4,7 @@ import {
     BarChart3, Plus, Receipt, Shield,
     LineChart, Target,
     Menu, X, Link2, History as HistoryIcon,
-    GraduationCap, Star, FlaskConical
+    GraduationCap, Star, FlaskConical, Activity
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -46,10 +46,16 @@ export function TopNavigation() {
             title: 'Trades',
             items: [
                 { title: 'All Trades', url: '/trades', icon: Receipt, description: 'Full trade log with equity curve' },
-                { title: 'Setup Lab', url: '/setup-lab', icon: FlaskConical, description: 'Document setups and track their real performance' },
                 { title: 'Fee Analysis', url: '/fee-analysis', icon: Receipt, description: 'Analyze trading costs and commissions' },
                 { title: 'Risk Management', url: '/risk-management', icon: Shield, description: 'Position sizing and risk calculators' },
                 { title: 'Exchange Connections', url: '/exchanges', icon: Link2, description: 'Connect exchanges for automatic trade sync' },
+            ]
+        },
+        {
+            title: 'Setup Lab',
+            items: [
+                { title: 'Laboratorio', url: '/setup-lab', icon: FlaskConical, description: 'Document setups and track their real performance' },
+                { title: 'Back Tests', url: '/back-tests', icon: Activity, description: 'Weekly backtests for each setup, with week-over-week flags' },
             ]
         },
         {
@@ -94,6 +100,8 @@ export function TopNavigation() {
         '/forecast': 'Target',
         '/market-data': 'LineChart',
         '/lsr-oi-grid': 'BarChart3',
+        '/setup-lab': 'FlaskConical',
+        '/back-tests': 'Activity',
         '/goals': 'Target',
         '/capital-management': 'Plus',
         '/dashboard?tab=history': 'History',

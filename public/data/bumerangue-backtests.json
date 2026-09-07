@@ -1,0 +1,5278 @@
+{
+ "atual": {
+  "setup": "bumerangue",
+  "gerado_em": "2026-09-07T03:10:07+00:00",
+  "janela_dias": 1095,
+  "risco_por_trade_usd": 100.0,
+  "ativos": 23,
+  "timeframes": {
+   "4H": {
+    "resumo": {
+     "trades": 1952,
+     "acerto": 77.3,
+     "expectativa_r": 0.068,
+     "sinais_por_mes": 55.8,
+     "usd_media_mes": 360,
+     "usd_mediana_mes": 345,
+     "pior_mes": -2527,
+     "melhor_mes": 2317,
+     "meses_negativos": 9,
+     "meses_total": 35,
+     "celulas_operaveis": 99
+    },
+    "ativos": {
+     "BTC": {
+      "trades": 125,
+      "acerto": 78.4,
+      "expectativa_r": 0.026,
+      "usd_total": 331,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "ETH": {
+      "trades": 112,
+      "acerto": 82.1,
+      "expectativa_r": 0.125,
+      "usd_total": 1400,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "SOL": {
+      "trades": 56,
+      "acerto": 78.6,
+      "expectativa_r": 0.08,
+      "usd_total": 449,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "BNB": {
+      "trades": 113,
+      "acerto": 75.2,
+      "expectativa_r": -0.026,
+      "usd_total": -295,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "TRX": {
+      "trades": 94,
+      "acerto": 77.7,
+      "expectativa_r": -0.075,
+      "usd_total": -704,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "ZEC": {
+      "trades": 74,
+      "acerto": 74.3,
+      "expectativa_r": 0.094,
+      "usd_total": 695,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "DOGE": {
+      "trades": 81,
+      "acerto": 81.5,
+      "expectativa_r": 0.102,
+      "usd_total": 825,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "LINK": {
+      "trades": 106,
+      "acerto": 76.4,
+      "expectativa_r": 0.056,
+      "usd_total": 591,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "ADA": {
+      "trades": 77,
+      "acerto": 80.5,
+      "expectativa_r": 0.106,
+      "usd_total": 816,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "BCH": {
+      "trades": 139,
+      "acerto": 74.8,
+      "expectativa_r": 0.065,
+      "usd_total": 899,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "ENA": {
+      "trades": 22,
+      "acerto": 77.3,
+      "expectativa_r": 0.148,
+      "usd_total": 326,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "UNI": {
+      "trades": 82,
+      "acerto": 78.0,
+      "expectativa_r": 0.136,
+      "usd_total": 1119,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "LTC": {
+      "trades": 195,
+      "acerto": 76.4,
+      "expectativa_r": 0.052,
+      "usd_total": 1022,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "AVAX": {
+      "trades": 73,
+      "acerto": 72.6,
+      "expectativa_r": 0.043,
+      "usd_total": 316,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "SUI": {
+      "trades": 39,
+      "acerto": 82.1,
+      "expectativa_r": 0.405,
+      "usd_total": 1578,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "SHIB": {
+      "trades": 78,
+      "acerto": 75.6,
+      "expectativa_r": 0.013,
+      "usd_total": 98,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "NEAR": {
+      "trades": 73,
+      "acerto": 78.1,
+      "expectativa_r": 0.188,
+      "usd_total": 1369,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "DOT": {
+      "trades": 41,
+      "acerto": 78.0,
+      "expectativa_r": 0.082,
+      "usd_total": 337,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "POL": {
+      "trades": 132,
+      "acerto": 75.0,
+      "expectativa_r": -0.003,
+      "usd_total": -45,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "MATIC": {
+      "trades": 13,
+      "acerto": 92.3,
+      "expectativa_r": 0.153,
+      "usd_total": 199,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "CAKE": {
+      "trades": 86,
+      "acerto": 74.4,
+      "expectativa_r": -0.037,
+      "usd_total": -317,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "INJ": {
+      "trades": 103,
+      "acerto": 77.7,
+      "expectativa_r": 0.137,
+      "usd_total": 1406,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "VIRTUAL": {
+      "trades": 38,
+      "acerto": 78.9,
+      "expectativa_r": 0.22,
+      "usd_total": 834,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     }
+    },
+    "modos": {
+     "BTC": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "ETH": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "SOL": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "BNB": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "TRX": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "ZEC": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "DOGE": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "LINK": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "ADA": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "BCH": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "ENA": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "UNI": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "LTC": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "AVAX": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "SUI": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "SHIB": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "NEAR": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "DOT": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "POL": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "MATIC": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "CAKE": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "INJ": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "VIRTUAL": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     }
+    },
+    "bandas": [
+     "0.50-1.00",
+     "1.00-1.50",
+     "1.50-2.00",
+     "2.00-3.00",
+     "3.00-4.00",
+     "4.00-5.00"
+    ],
+    "stops": [
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     5.0
+    ],
+    "tabela": {
+     "BTC": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 22,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 68.2,
+        "lucro": 0.7,
+        "rr": 0.7
+       },
+       "1.00-1.50": {
+        "n": 22,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 77.3,
+        "lucro": 1.24,
+        "rr": 0.62
+       },
+       "1.50-2.00": {
+        "n": 29,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 69.0,
+        "lucro": 1.71,
+        "rr": 0.57
+       },
+       "2.00-3.00": {
+        "n": 34,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 79.4,
+        "lucro": 2.46,
+        "rr": 0.62
+       },
+       "3.00-4.00": {
+        "n": 9,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 77.8,
+        "lucro": 3.4,
+        "rr": 1.36
+       },
+       "4.00-5.00": {
+        "n": 5,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 25,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 44.0,
+        "lucro": 0.74,
+        "rr": 0.74
+       },
+       "1.00-1.50": {
+        "n": 30,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 66.7,
+        "lucro": 1.19,
+        "rr": 0.59
+       },
+       "1.50-2.00": {
+        "n": 27,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 81.5,
+        "lucro": 1.75,
+        "rr": 0.5
+       },
+       "2.00-3.00": {
+        "n": 23,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 73.9,
+        "lucro": 2.45,
+        "rr": 0.98
+       },
+       "3.00-4.00": {
+        "n": 10,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 80.0,
+        "lucro": 3.36,
+        "rr": 0.96
+       },
+       "4.00-5.00": {
+        "n": 8,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 62.5,
+        "lucro": 4.34,
+        "rr": 0.87
+       }
+      }
+     },
+     "ETH": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 12,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 50.0,
+        "lucro": 0.77,
+        "rr": 0.51
+       },
+       "1.00-1.50": {
+        "n": 19,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 63.2,
+        "lucro": 1.17,
+        "rr": 0.78
+       },
+       "1.50-2.00": {
+        "n": 18,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 61.1,
+        "lucro": 1.7,
+        "rr": 0.68
+       },
+       "2.00-3.00": {
+        "n": 25,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 92.0,
+        "lucro": 2.61,
+        "rr": 0.65
+       },
+       "3.00-4.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 69.2,
+        "lucro": 3.44,
+        "rr": 0.69
+       },
+       "4.00-5.00": {
+        "n": 17,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 82.4,
+        "lucro": 4.42,
+        "rr": 0.88
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 31.2,
+        "lucro": 0.66,
+        "rr": 0.66
+       },
+       "1.00-1.50": {
+        "n": 24,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 83.3,
+        "lucro": 1.29,
+        "rr": 0.51
+       },
+       "1.50-2.00": {
+        "n": 15,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 80.0,
+        "lucro": 1.76,
+        "rr": 0.71
+       },
+       "2.00-3.00": {
+        "n": 31,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 74.2,
+        "lucro": 2.42,
+        "rr": 0.61
+       },
+       "3.00-4.00": {
+        "n": 21,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 66.7,
+        "lucro": 3.26,
+        "rr": 0.65
+       },
+       "4.00-5.00": {
+        "n": 6,
+        "status": "insuf"
+       }
+      }
+     },
+     "SOL": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 17,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 64.7,
+        "lucro": 0.73,
+        "rr": 0.73
+       },
+       "1.00-1.50": {
+        "n": 15,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 86.7,
+        "lucro": 1.36,
+        "rr": 0.55
+       },
+       "1.50-2.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 53.8,
+        "lucro": 1.68,
+        "rr": 0.56
+       },
+       "2.00-3.00": {
+        "n": 34,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 61.8,
+        "lucro": 2.43,
+        "rr": 0.61
+       },
+       "3.00-4.00": {
+        "n": 20,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 80.0,
+        "lucro": 3.36,
+        "rr": 0.67
+       },
+       "4.00-5.00": {
+        "n": 15,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 53.3,
+        "lucro": 4.47,
+        "rr": 0.89
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 15,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 66.7,
+        "lucro": 0.78,
+        "rr": 0.52
+       },
+       "1.00-1.50": {
+        "n": 15,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 66.7,
+        "lucro": 1.19,
+        "rr": 0.6
+       },
+       "1.50-2.00": {
+        "n": 21,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 71.4,
+        "lucro": 1.66,
+        "rr": 0.66
+       },
+       "2.00-3.00": {
+        "n": 28,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 67.9,
+        "lucro": 2.44,
+        "rr": 0.61
+       },
+       "3.00-4.00": {
+        "n": 24,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 45.8,
+        "lucro": 3.37,
+        "rr": 1.12
+       },
+       "4.00-5.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 69.2,
+        "lucro": 4.44,
+        "rr": 0.89
+       }
+      }
+     },
+     "BNB": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 38,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 68.4,
+        "lucro": 0.8,
+        "rr": 0.53
+       },
+       "1.00-1.50": {
+        "n": 21,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 71.4,
+        "lucro": 1.2,
+        "rr": 0.6
+       },
+       "1.50-2.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 100.0,
+        "lucro": 1.69,
+        "rr": 0.56
+       },
+       "2.00-3.00": {
+        "n": 31,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 74.2,
+        "lucro": 2.36,
+        "rr": 0.59
+       },
+       "3.00-4.00": {
+        "n": 17,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 64.7,
+        "lucro": 3.73,
+        "rr": 0.75
+       },
+       "4.00-5.00": {
+        "n": 3,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 36,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 69.4,
+        "lucro": 0.72,
+        "rr": 0.72
+       },
+       "1.00-1.50": {
+        "n": 24,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 70.8,
+        "lucro": 1.21,
+        "rr": 0.6
+       },
+       "1.50-2.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 68.8,
+        "lucro": 1.81,
+        "rr": 0.6
+       },
+       "2.00-3.00": {
+        "n": 24,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 70.8,
+        "lucro": 2.35,
+        "rr": 0.59
+       },
+       "3.00-4.00": {
+        "n": 6,
+        "status": "insuf"
+       },
+       "4.00-5.00": {
+        "n": 8,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 62.5,
+        "lucro": 4.46,
+        "rr": 1.11
+       }
+      }
+     },
+     "TRX": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 49,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 53.1,
+        "lucro": 0.73,
+        "rr": 0.73
+       },
+       "1.00-1.50": {
+        "n": 29,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 65.5,
+        "lucro": 1.21,
+        "rr": 0.6
+       },
+       "1.50-2.00": {
+        "n": 27,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 74.1,
+        "lucro": 1.71,
+        "rr": 0.57
+       },
+       "2.00-3.00": {
+        "n": 17,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 88.2,
+        "lucro": 2.18,
+        "rr": 0.54
+       },
+       "3.00-4.00": {
+        "n": 3,
+        "status": "insuf"
+       },
+       "4.00-5.00": {
+        "n": 2,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 33,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 75.8,
+        "lucro": 0.81,
+        "rr": 0.54
+       },
+       "1.00-1.50": {
+        "n": 33,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 69.7,
+        "lucro": 1.24,
+        "rr": 0.62
+       },
+       "1.50-2.00": {
+        "n": 17,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 64.7,
+        "lucro": 1.73,
+        "rr": 0.58
+       },
+       "2.00-3.00": {
+        "n": 17,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 76.5,
+        "lucro": 2.47,
+        "rr": 0.62
+       },
+       "3.00-4.00": {
+        "n": 3,
+        "status": "insuf"
+       },
+       "4.00-5.00": {
+        "n": 6,
+        "status": "insuf"
+       }
+      }
+     },
+     "ZEC": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 18,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 66.7,
+        "lucro": 0.71,
+        "rr": 0.71
+       },
+       "1.00-1.50": {
+        "n": 13,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 53.8,
+        "lucro": 1.25,
+        "rr": 0.62
+       },
+       "1.50-2.00": {
+        "n": 12,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 75.0,
+        "lucro": 1.76,
+        "rr": 0.7
+       },
+       "2.00-3.00": {
+        "n": 28,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 57.1,
+        "lucro": 2.45,
+        "rr": 0.82
+       },
+       "3.00-4.00": {
+        "n": 15,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 73.3,
+        "lucro": 3.59,
+        "rr": 0.9
+       },
+       "4.00-5.00": {
+        "n": 12,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 41.7,
+        "lucro": 4.37,
+        "rr": 1.75
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 5,
+        "status": "insuf"
+       },
+       "1.00-1.50": {
+        "n": 11,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 63.6,
+        "lucro": 1.28,
+        "rr": 0.51
+       },
+       "1.50-2.00": {
+        "n": 17,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 70.6,
+        "lucro": 1.64,
+        "rr": 0.66
+       },
+       "2.00-3.00": {
+        "n": 30,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 76.7,
+        "lucro": 2.33,
+        "rr": 0.58
+       },
+       "3.00-4.00": {
+        "n": 29,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 58.6,
+        "lucro": 3.5,
+        "rr": 0.7
+       },
+       "4.00-5.00": {
+        "n": 18,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 50.0,
+        "lucro": 4.73,
+        "rr": 1.35
+       }
+      }
+     },
+     "DOGE": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 19,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 42.1,
+        "lucro": 0.81,
+        "rr": 0.81
+       },
+       "1.00-1.50": {
+        "n": 19,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 73.7,
+        "lucro": 1.26,
+        "rr": 0.63
+       },
+       "1.50-2.00": {
+        "n": 14,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 78.6,
+        "lucro": 1.74,
+        "rr": 0.69
+       },
+       "2.00-3.00": {
+        "n": 26,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 65.4,
+        "lucro": 2.48,
+        "rr": 0.71
+       },
+       "3.00-4.00": {
+        "n": 19,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 63.2,
+        "lucro": 3.34,
+        "rr": 0.67
+       },
+       "4.00-5.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 50.0,
+        "lucro": 4.38,
+        "rr": 0.88
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 43.8,
+        "lucro": 0.71,
+        "rr": 0.71
+       },
+       "1.00-1.50": {
+        "n": 22,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 59.1,
+        "lucro": 1.22,
+        "rr": 0.61
+       },
+       "1.50-2.00": {
+        "n": 14,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 78.6,
+        "lucro": 1.8,
+        "rr": 0.52
+       },
+       "2.00-3.00": {
+        "n": 34,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 88.2,
+        "lucro": 2.57,
+        "rr": 0.51
+       },
+       "3.00-4.00": {
+        "n": 26,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 65.4,
+        "lucro": 3.69,
+        "rr": 0.74
+       },
+       "4.00-5.00": {
+        "n": 15,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 60.0,
+        "lucro": 4.43,
+        "rr": 0.89
+       }
+      }
+     },
+     "LINK": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 25,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 44.0,
+        "lucro": 0.73,
+        "rr": 0.73
+       },
+       "1.00-1.50": {
+        "n": 16,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 56.2,
+        "lucro": 1.21,
+        "rr": 0.6
+       },
+       "1.50-2.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 61.5,
+        "lucro": 1.67,
+        "rr": 0.56
+       },
+       "2.00-3.00": {
+        "n": 35,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 62.9,
+        "lucro": 2.59,
+        "rr": 0.65
+       },
+       "3.00-4.00": {
+        "n": 24,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 75.0,
+        "lucro": 3.65,
+        "rr": 0.73
+       },
+       "4.00-5.00": {
+        "n": 8,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 75.0,
+        "lucro": 4.77,
+        "rr": 0.95
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 17,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 76.5,
+        "lucro": 0.76,
+        "rr": 0.51
+       },
+       "1.00-1.50": {
+        "n": 16,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 62.5,
+        "lucro": 1.23,
+        "rr": 0.82
+       },
+       "1.50-2.00": {
+        "n": 12,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 50.0,
+        "lucro": 1.77,
+        "rr": 0.51
+       },
+       "2.00-3.00": {
+        "n": 32,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 78.1,
+        "lucro": 2.34,
+        "rr": 0.58
+       },
+       "3.00-4.00": {
+        "n": 25,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 76.0,
+        "lucro": 3.42,
+        "rr": 0.68
+       },
+       "4.00-5.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 69.2,
+        "lucro": 4.58,
+        "rr": 0.92
+       }
+      }
+     },
+     "ADA": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 21,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 42.9,
+        "lucro": 0.75,
+        "rr": 0.75
+       },
+       "1.00-1.50": {
+        "n": 20,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 85.0,
+        "lucro": 1.25,
+        "rr": 0.5
+       },
+       "1.50-2.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 87.5,
+        "lucro": 1.72,
+        "rr": 0.57
+       },
+       "2.00-3.00": {
+        "n": 25,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 68.0,
+        "lucro": 2.46,
+        "rr": 0.62
+       },
+       "3.00-4.00": {
+        "n": 19,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 68.4,
+        "lucro": 3.36,
+        "rr": 0.96
+       },
+       "4.00-5.00": {
+        "n": 9,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 66.7,
+        "lucro": 4.47,
+        "rr": 0.89
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 14,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 64.3,
+        "lucro": 0.83,
+        "rr": 0.83
+       },
+       "1.00-1.50": {
+        "n": 18,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 55.6,
+        "lucro": 1.28,
+        "rr": 0.51
+       },
+       "1.50-2.00": {
+        "n": 15,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 53.3,
+        "lucro": 1.82,
+        "rr": 0.61
+       },
+       "2.00-3.00": {
+        "n": 38,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 68.4,
+        "lucro": 2.62,
+        "rr": 0.52
+       },
+       "3.00-4.00": {
+        "n": 23,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 73.9,
+        "lucro": 3.51,
+        "rr": 0.7
+       },
+       "4.00-5.00": {
+        "n": 18,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 77.8,
+        "lucro": 4.41,
+        "rr": 0.88
+       }
+      }
+     },
+     "BCH": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 23,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 69.6,
+        "lucro": 0.73,
+        "rr": 0.73
+       },
+       "1.00-1.50": {
+        "n": 22,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 77.3,
+        "lucro": 1.29,
+        "rr": 0.64
+       },
+       "1.50-2.00": {
+        "n": 15,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 53.3,
+        "lucro": 1.83,
+        "rr": 0.61
+       },
+       "2.00-3.00": {
+        "n": 28,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 64.3,
+        "lucro": 2.37,
+        "rr": 0.68
+       },
+       "3.00-4.00": {
+        "n": 14,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 50.0,
+        "lucro": 3.43,
+        "rr": 0.98
+       },
+       "4.00-5.00": {
+        "n": 9,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 77.8,
+        "lucro": 4.43,
+        "rr": 0.89
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 68.8,
+        "lucro": 0.82,
+        "rr": 0.54
+       },
+       "1.00-1.50": {
+        "n": 24,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 70.8,
+        "lucro": 1.28,
+        "rr": 0.51
+       },
+       "1.50-2.00": {
+        "n": 24,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 70.8,
+        "lucro": 1.75,
+        "rr": 0.58
+       },
+       "2.00-3.00": {
+        "n": 26,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 73.1,
+        "lucro": 2.5,
+        "rr": 0.71
+       },
+       "3.00-4.00": {
+        "n": 23,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 82.6,
+        "lucro": 3.53,
+        "rr": 0.71
+       },
+       "4.00-5.00": {
+        "n": 11,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 72.7,
+        "lucro": 4.57,
+        "rr": 1.31
+       }
+      }
+     },
+     "ENA": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 5,
+        "status": "insuf"
+       },
+       "1.00-1.50": {
+        "n": 8,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 50.0,
+        "lucro": 1.19,
+        "rr": 0.6
+       },
+       "1.50-2.00": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "2.00-3.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 76.9,
+        "lucro": 2.61,
+        "rr": 0.65
+       },
+       "3.00-4.00": {
+        "n": 15,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 60.0,
+        "lucro": 3.45,
+        "rr": 0.69
+       },
+       "4.00-5.00": {
+        "n": 12,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 50.0,
+        "lucro": 4.38,
+        "rr": 0.88
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 8,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 37.5,
+        "lucro": 0.77,
+        "rr": 0.51
+       },
+       "1.00-1.50": {
+        "n": 6,
+        "status": "insuf"
+       },
+       "1.50-2.00": {
+        "n": 9,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 77.8,
+        "lucro": 1.73,
+        "rr": 0.69
+       },
+       "2.00-3.00": {
+        "n": 15,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 46.7,
+        "lucro": 2.39,
+        "rr": 0.68
+       },
+       "3.00-4.00": {
+        "n": 29,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 55.2,
+        "lucro": 3.3,
+        "rr": 0.66
+       },
+       "4.00-5.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 31.2,
+        "lucro": 4.31,
+        "rr": 1.23
+       }
+      }
+     },
+     "UNI": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 14,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 64.3,
+        "lucro": 0.67,
+        "rr": 0.67
+       },
+       "1.00-1.50": {
+        "n": 12,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 25.0,
+        "lucro": 1.15,
+        "rr": 0.57
+       },
+       "1.50-2.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 43.8,
+        "lucro": 1.7,
+        "rr": 0.57
+       },
+       "2.00-3.00": {
+        "n": 17,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 70.6,
+        "lucro": 2.5,
+        "rr": 0.71
+       },
+       "3.00-4.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 87.5,
+        "lucro": 3.55,
+        "rr": 0.71
+       },
+       "4.00-5.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 69.2,
+        "lucro": 4.35,
+        "rr": 0.87
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 9,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 0.0,
+        "lucro": 0.72,
+        "rr": 0.72
+       },
+       "1.00-1.50": {
+        "n": 18,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 50.0,
+        "lucro": 1.24,
+        "rr": 0.62
+       },
+       "1.50-2.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 68.8,
+        "lucro": 1.72,
+        "rr": 0.57
+       },
+       "2.00-3.00": {
+        "n": 32,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 78.1,
+        "lucro": 2.37,
+        "rr": 0.59
+       },
+       "3.00-4.00": {
+        "n": 27,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 66.7,
+        "lucro": 3.32,
+        "rr": 0.95
+       },
+       "4.00-5.00": {
+        "n": 17,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 76.5,
+        "lucro": 4.43,
+        "rr": 0.89
+       }
+      }
+     },
+     "LTC": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 28,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 53.6,
+        "lucro": 0.78,
+        "rr": 0.52
+       },
+       "1.00-1.50": {
+        "n": 24,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 75.0,
+        "lucro": 1.31,
+        "rr": 0.65
+       },
+       "1.50-2.00": {
+        "n": 28,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 78.6,
+        "lucro": 1.73,
+        "rr": 0.69
+       },
+       "2.00-3.00": {
+        "n": 25,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 72.0,
+        "lucro": 2.5,
+        "rr": 0.62
+       },
+       "3.00-4.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 76.9,
+        "lucro": 3.46,
+        "rr": 0.86
+       },
+       "4.00-5.00": {
+        "n": 5,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 21,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 57.1,
+        "lucro": 0.74,
+        "rr": 0.74
+       },
+       "1.00-1.50": {
+        "n": 35,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 77.1,
+        "lucro": 1.24,
+        "rr": 0.62
+       },
+       "1.50-2.00": {
+        "n": 22,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 81.8,
+        "lucro": 1.8,
+        "rr": 0.6
+       },
+       "2.00-3.00": {
+        "n": 27,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 70.4,
+        "lucro": 2.34,
+        "rr": 0.67
+       },
+       "3.00-4.00": {
+        "n": 21,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 81.0,
+        "lucro": 3.46,
+        "rr": 0.69
+       },
+       "4.00-5.00": {
+        "n": 8,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 50.0,
+        "lucro": 4.26,
+        "rr": 0.85
+       }
+      }
+     },
+     "AVAX": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 17,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 52.9,
+        "lucro": 0.66,
+        "rr": 0.66
+       },
+       "1.00-1.50": {
+        "n": 17,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 76.5,
+        "lucro": 1.39,
+        "rr": 0.7
+       },
+       "1.50-2.00": {
+        "n": 12,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 58.3,
+        "lucro": 1.67,
+        "rr": 0.67
+       },
+       "2.00-3.00": {
+        "n": 29,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 65.5,
+        "lucro": 2.51,
+        "rr": 0.5
+       },
+       "3.00-4.00": {
+        "n": 22,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 68.2,
+        "lucro": 3.56,
+        "rr": 0.89
+       },
+       "4.00-5.00": {
+        "n": 15,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 53.3,
+        "lucro": 4.25,
+        "rr": 1.06
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 11,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 36.4,
+        "lucro": 0.81,
+        "rr": 0.54
+       },
+       "1.00-1.50": {
+        "n": 16,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 50.0,
+        "lucro": 1.21,
+        "rr": 0.81
+       },
+       "1.50-2.00": {
+        "n": 15,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 66.7,
+        "lucro": 1.67,
+        "rr": 0.56
+       },
+       "2.00-3.00": {
+        "n": 32,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 71.9,
+        "lucro": 2.27,
+        "rr": 0.76
+       },
+       "3.00-4.00": {
+        "n": 24,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 70.8,
+        "lucro": 3.62,
+        "rr": 0.72
+       },
+       "4.00-5.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 62.5,
+        "lucro": 4.3,
+        "rr": 0.86
+       }
+      }
+     },
+     "SUI": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 11,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 36.4,
+        "lucro": 0.75,
+        "rr": 0.75
+       },
+       "1.00-1.50": {
+        "n": 14,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 92.9,
+        "lucro": 1.29,
+        "rr": 0.65
+       },
+       "1.50-2.00": {
+        "n": 15,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 66.7,
+        "lucro": 1.71,
+        "rr": 0.57
+       },
+       "2.00-3.00": {
+        "n": 21,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 52.4,
+        "lucro": 2.57,
+        "rr": 0.64
+       },
+       "3.00-4.00": {
+        "n": 15,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 66.7,
+        "lucro": 3.28,
+        "rr": 0.66
+       },
+       "4.00-5.00": {
+        "n": 14,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 71.4,
+        "lucro": 4.44,
+        "rr": 1.78
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 8,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 50.0,
+        "lucro": 0.71,
+        "rr": 0.71
+       },
+       "1.00-1.50": {
+        "n": 11,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 81.8,
+        "lucro": 1.27,
+        "rr": 0.51
+       },
+       "1.50-2.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 62.5,
+        "lucro": 1.75,
+        "rr": 0.5
+       },
+       "2.00-3.00": {
+        "n": 29,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 65.5,
+        "lucro": 2.5,
+        "rr": 0.62
+       },
+       "3.00-4.00": {
+        "n": 19,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 47.4,
+        "lucro": 3.4,
+        "rr": 0.68
+       },
+       "4.00-5.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 37.5,
+        "lucro": 4.39,
+        "rr": 0.88
+       }
+      }
+     },
+     "SHIB": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 21,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 47.6,
+        "lucro": 0.63,
+        "rr": 0.63
+       },
+       "1.00-1.50": {
+        "n": 19,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 78.9,
+        "lucro": 1.11,
+        "rr": 0.55
+       },
+       "1.50-2.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 56.2,
+        "lucro": 1.71,
+        "rr": 0.68
+       },
+       "2.00-3.00": {
+        "n": 22,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 77.3,
+        "lucro": 2.29,
+        "rr": 0.57
+       },
+       "3.00-4.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 53.8,
+        "lucro": 3.5,
+        "rr": 1.4
+       },
+       "4.00-5.00": {
+        "n": 9,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 55.6,
+        "lucro": 4.32,
+        "rr": 2.16
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 24,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 33.3,
+        "lucro": 0.73,
+        "rr": 0.73
+       },
+       "1.00-1.50": {
+        "n": 18,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 61.1,
+        "lucro": 1.2,
+        "rr": 0.6
+       },
+       "1.50-2.00": {
+        "n": 20,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 50.0,
+        "lucro": 1.76,
+        "rr": 0.5
+       },
+       "2.00-3.00": {
+        "n": 37,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 73.0,
+        "lucro": 2.5,
+        "rr": 0.62
+       },
+       "3.00-4.00": {
+        "n": 24,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 62.5,
+        "lucro": 3.3,
+        "rr": 0.66
+       },
+       "4.00-5.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 61.5,
+        "lucro": 4.41,
+        "rr": 1.1
+       }
+      }
+     },
+     "NEAR": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 12,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 58.3,
+        "lucro": 0.66,
+        "rr": 0.66
+       },
+       "1.00-1.50": {
+        "n": 16,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 62.5,
+        "lucro": 1.23,
+        "rr": 0.62
+       },
+       "1.50-2.00": {
+        "n": 12,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 83.3,
+        "lucro": 1.76,
+        "rr": 0.88
+       },
+       "2.00-3.00": {
+        "n": 21,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 76.2,
+        "lucro": 2.48,
+        "rr": 0.62
+       },
+       "3.00-4.00": {
+        "n": 12,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 66.7,
+        "lucro": 3.64,
+        "rr": 0.73
+       },
+       "4.00-5.00": {
+        "n": 20,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 60.0,
+        "lucro": 4.39,
+        "rr": 0.88
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 43.8,
+        "lucro": 0.79,
+        "rr": 0.53
+       },
+       "1.00-1.50": {
+        "n": 8,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 50.0,
+        "lucro": 1.21,
+        "rr": 0.8
+       },
+       "1.50-2.00": {
+        "n": 19,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 78.9,
+        "lucro": 1.63,
+        "rr": 0.81
+       },
+       "2.00-3.00": {
+        "n": 34,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 67.6,
+        "lucro": 2.6,
+        "rr": 0.52
+       },
+       "3.00-4.00": {
+        "n": 21,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 76.2,
+        "lucro": 3.53,
+        "rr": 0.71
+       },
+       "4.00-5.00": {
+        "n": 14,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 50.0,
+        "lucro": 4.33,
+        "rr": 0.87
+       }
+      }
+     },
+     "DOT": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 21,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 38.1,
+        "lucro": 0.71,
+        "rr": 0.71
+       },
+       "1.00-1.50": {
+        "n": 14,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 57.1,
+        "lucro": 1.23,
+        "rr": 0.62
+       },
+       "1.50-2.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 61.5,
+        "lucro": 1.67,
+        "rr": 0.56
+       },
+       "2.00-3.00": {
+        "n": 22,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 68.2,
+        "lucro": 2.43,
+        "rr": 0.81
+       },
+       "3.00-4.00": {
+        "n": 18,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 77.8,
+        "lucro": 3.22,
+        "rr": 0.64
+       },
+       "4.00-5.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 69.2,
+        "lucro": 4.39,
+        "rr": 1.26
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 21,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 57.1,
+        "lucro": 0.82,
+        "rr": 0.55
+       },
+       "1.00-1.50": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "1.50-2.00": {
+        "n": 23,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 60.9,
+        "lucro": 1.74,
+        "rr": 0.7
+       },
+       "2.00-3.00": {
+        "n": 32,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 59.4,
+        "lucro": 2.54,
+        "rr": 0.51
+       },
+       "3.00-4.00": {
+        "n": 23,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 78.3,
+        "lucro": 3.42,
+        "rr": 0.68
+       },
+       "4.00-5.00": {
+        "n": 17,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 41.2,
+        "lucro": 4.35,
+        "rr": 1.74
+       }
+      }
+     },
+     "POL": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 75.0,
+        "lucro": 0.8,
+        "rr": 0.53
+       },
+       "1.00-1.50": {
+        "n": 8,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 75.0,
+        "lucro": 1.2,
+        "rr": 0.8
+       },
+       "1.50-2.00": {
+        "n": 11,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 81.8,
+        "lucro": 1.72,
+        "rr": 0.57
+       },
+       "2.00-3.00": {
+        "n": 14,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 78.6,
+        "lucro": 2.54,
+        "rr": 0.51
+       },
+       "3.00-4.00": {
+        "n": 14,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 71.4,
+        "lucro": 3.36,
+        "rr": 0.67
+       },
+       "4.00-5.00": {
+        "n": 6,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 9,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 77.8,
+        "lucro": 0.7,
+        "rr": 0.7
+       },
+       "1.00-1.50": {
+        "n": 11,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 72.7,
+        "lucro": 1.3,
+        "rr": 0.52
+       },
+       "1.50-2.00": {
+        "n": 14,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 78.6,
+        "lucro": 1.81,
+        "rr": 0.72
+       },
+       "2.00-3.00": {
+        "n": 21,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 71.4,
+        "lucro": 2.43,
+        "rr": 0.61
+       },
+       "3.00-4.00": {
+        "n": 26,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 61.5,
+        "lucro": 3.38,
+        "rr": 0.68
+       },
+       "4.00-5.00": {
+        "n": 14,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 71.4,
+        "lucro": 4.51,
+        "rr": 0.9
+       }
+      }
+     },
+     "MATIC": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 5,
+        "status": "insuf"
+       },
+       "1.00-1.50": {
+        "n": 3,
+        "status": "insuf"
+       },
+       "1.50-2.00": {
+        "n": 6,
+        "status": "insuf"
+       },
+       "2.00-3.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 92.3,
+        "lucro": 2.84,
+        "rr": 0.57
+       },
+       "3.00-4.00": {
+        "n": 5,
+        "status": "insuf"
+       },
+       "4.00-5.00": {
+        "n": 4,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 8,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 50.0,
+        "lucro": 0.92,
+        "rr": 0.61
+       },
+       "1.00-1.50": {
+        "n": 6,
+        "status": "insuf"
+       },
+       "1.50-2.00": {
+        "n": 5,
+        "status": "insuf"
+       },
+       "2.00-3.00": {
+        "n": 10,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 50.0,
+        "lucro": 2.2,
+        "rr": 0.63
+       },
+       "3.00-4.00": {
+        "n": 6,
+        "status": "insuf"
+       },
+       "4.00-5.00": {
+        "n": 7,
+        "status": "insuf"
+       }
+      }
+     },
+     "CAKE": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 20,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 35.0,
+        "lucro": 0.68,
+        "rr": 0.68
+       },
+       "1.00-1.50": {
+        "n": 16,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 56.2,
+        "lucro": 1.23,
+        "rr": 0.61
+       },
+       "1.50-2.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 75.0,
+        "lucro": 1.83,
+        "rr": 0.61
+       },
+       "2.00-3.00": {
+        "n": 27,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 70.4,
+        "lucro": 2.35,
+        "rr": 0.67
+       },
+       "3.00-4.00": {
+        "n": 19,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 57.9,
+        "lucro": 3.56,
+        "rr": 1.19
+       },
+       "4.00-5.00": {
+        "n": 15,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 53.3,
+        "lucro": 4.69,
+        "rr": 0.94
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 29,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 62.1,
+        "lucro": 0.78,
+        "rr": 0.52
+       },
+       "1.00-1.50": {
+        "n": 16,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 50.0,
+        "lucro": 1.2,
+        "rr": 1.2
+       },
+       "1.50-2.00": {
+        "n": 14,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 71.4,
+        "lucro": 1.75,
+        "rr": 0.5
+       },
+       "2.00-3.00": {
+        "n": 29,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 79.3,
+        "lucro": 2.54,
+        "rr": 0.51
+       },
+       "3.00-4.00": {
+        "n": 20,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 45.0,
+        "lucro": 3.62,
+        "rr": 1.03
+       },
+       "4.00-5.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 61.5,
+        "lucro": 4.59,
+        "rr": 1.15
+       }
+      }
+     },
+     "INJ": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 11,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 54.5,
+        "lucro": 0.83,
+        "rr": 0.83
+       },
+       "1.00-1.50": {
+        "n": 14,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 64.3,
+        "lucro": 1.37,
+        "rr": 0.91
+       },
+       "1.50-2.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 3.5,
+        "wr": 84.6,
+        "lucro": 1.76,
+        "rr": 0.5
+       },
+       "2.00-3.00": {
+        "n": 29,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 62.1,
+        "lucro": 2.54,
+        "rr": 0.51
+       },
+       "3.00-4.00": {
+        "n": 21,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 57.1,
+        "lucro": 3.61,
+        "rr": 0.72
+       },
+       "4.00-5.00": {
+        "n": 20,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 50.0,
+        "lucro": 4.48,
+        "rr": 0.9
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 16,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 31.2,
+        "lucro": 0.74,
+        "rr": 0.74
+       },
+       "1.00-1.50": {
+        "n": 8,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 75.0,
+        "lucro": 1.31,
+        "rr": 0.65
+       },
+       "1.50-2.00": {
+        "n": 13,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 46.2,
+        "lucro": 1.73,
+        "rr": 0.69
+       },
+       "2.00-3.00": {
+        "n": 35,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 74.3,
+        "lucro": 2.39,
+        "rr": 0.6
+       },
+       "3.00-4.00": {
+        "n": 26,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 80.8,
+        "lucro": 3.45,
+        "rr": 0.69
+       },
+       "4.00-5.00": {
+        "n": 21,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 76.2,
+        "lucro": 4.55,
+        "rr": 1.14
+       }
+      }
+     },
+     "VIRTUAL": {
+      "SHORT": {
+       "0.50-1.00": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "1.00-1.50": {
+        "n": 11,
+        "status": "ok",
+        "stop": 1.0,
+        "wr": 45.5,
+        "lucro": 1.16,
+        "rr": 1.16
+       },
+       "1.50-2.00": {
+        "n": 3,
+        "status": "insuf"
+       },
+       "2.00-3.00": {
+        "n": 9,
+        "status": "ok",
+        "stop": 3.0,
+        "wr": 77.8,
+        "lucro": 2.35,
+        "rr": 0.78
+       },
+       "3.00-4.00": {
+        "n": 5,
+        "status": "insuf"
+       },
+       "4.00-5.00": {
+        "n": 9,
+        "status": "ok",
+        "stop": 4.0,
+        "wr": 77.8,
+        "lucro": 4.66,
+        "rr": 1.17
+       }
+      },
+      "LONG": {
+       "0.50-1.00": {
+        "n": 4,
+        "status": "insuf"
+       },
+       "1.00-1.50": {
+        "n": 11,
+        "status": "ok",
+        "stop": 2.0,
+        "wr": 63.6,
+        "lucro": 1.2,
+        "rr": 0.6
+       },
+       "1.50-2.00": {
+        "n": 6,
+        "status": "insuf"
+       },
+       "2.00-3.00": {
+        "n": 11,
+        "status": "ok",
+        "stop": 2.5,
+        "wr": 54.5,
+        "lucro": 2.5,
+        "rr": 1.0
+       },
+       "3.00-4.00": {
+        "n": 20,
+        "status": "ok",
+        "stop": 5.0,
+        "wr": 80.0,
+        "lucro": 3.53,
+        "rr": 0.71
+       },
+       "4.00-5.00": {
+        "n": 9,
+        "status": "ok",
+        "stop": 1.5,
+        "wr": 44.4,
+        "lucro": 4.67,
+        "rr": 3.11
+       }
+      }
+     }
+    }
+   },
+   "6H": {
+    "resumo": {
+     "trades": 1231,
+     "acerto": 77.9,
+     "expectativa_r": 0.114,
+     "sinais_por_mes": 35.2,
+     "usd_media_mes": 403,
+     "usd_mediana_mes": 331,
+     "pior_mes": -839,
+     "melhor_mes": 2018,
+     "meses_negativos": 10,
+     "meses_total": 35,
+     "celulas_operaveis": 90
+    },
+    "ativos": {
+     "BTC": {
+      "trades": 57,
+      "acerto": 86.0,
+      "expectativa_r": 0.111,
+      "usd_total": 635,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "ETH": {
+      "trades": 54,
+      "acerto": 77.8,
+      "expectativa_r": 0.108,
+      "usd_total": 583,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "SOL": {
+      "trades": 45,
+      "acerto": 80.0,
+      "expectativa_r": 0.117,
+      "usd_total": 525,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "BNB": {
+      "trades": 75,
+      "acerto": 78.7,
+      "expectativa_r": 0.114,
+      "usd_total": 859,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "TRX": {
+      "trades": 53,
+      "acerto": 75.5,
+      "expectativa_r": -0.053,
+      "usd_total": -283,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "ZEC": {
+      "trades": 10,
+      "acerto": 80.0,
+      "expectativa_r": 0.108,
+      "usd_total": 108,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "DOGE": {
+      "trades": 64,
+      "acerto": 78.1,
+      "expectativa_r": 0.172,
+      "usd_total": 1099,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "LINK": {
+      "trades": 67,
+      "acerto": 80.6,
+      "expectativa_r": 0.174,
+      "usd_total": 1165,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "ADA": {
+      "trades": 68,
+      "acerto": 77.9,
+      "expectativa_r": 0.008,
+      "usd_total": 55,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "BCH": {
+      "trades": 83,
+      "acerto": 77.1,
+      "expectativa_r": 0.085,
+      "usd_total": 703,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "UNI": {
+      "trades": 79,
+      "acerto": 78.5,
+      "expectativa_r": 0.131,
+      "usd_total": 1035,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "LTC": {
+      "trades": 105,
+      "acerto": 79.0,
+      "expectativa_r": 0.076,
+      "usd_total": 798,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "AVAX": {
+      "trades": 59,
+      "acerto": 76.3,
+      "expectativa_r": 0.141,
+      "usd_total": 833,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "SUI": {
+      "trades": 64,
+      "acerto": 78.1,
+      "expectativa_r": 0.155,
+      "usd_total": 992,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "SHIB": {
+      "trades": 89,
+      "acerto": 75.3,
+      "expectativa_r": 0.194,
+      "usd_total": 1727,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "NEAR": {
+      "trades": 70,
+      "acerto": 78.6,
+      "expectativa_r": 0.1,
+      "usd_total": 702,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "DOT": {
+      "trades": 47,
+      "acerto": 72.3,
+      "expectativa_r": -0.017,
+      "usd_total": -79,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "POL": {
+      "trades": 29,
+      "acerto": 79.3,
+      "expectativa_r": 0.11,
+      "usd_total": 318,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "MATIC": {
+      "trades": 8,
+      "acerto": 75.0,
+      "expectativa_r": 0.07,
+      "usd_total": 56,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "CAKE": {
+      "trades": 57,
+      "acerto": 77.2,
+      "expectativa_r": 0.107,
+      "usd_total": 612,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "INJ": {
+      "trades": 40,
+      "acerto": 72.5,
+      "expectativa_r": 0.236,
+      "usd_total": 944,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     },
+     "VIRTUAL": {
+      "trades": 8,
+      "acerto": 75.0,
+      "expectativa_r": 0.801,
+      "usd_total": 641,
+      "bandeira": {
+       "flag": "novo",
+       "delta": null
+      }
+     }
+    },
+    "modos": {
+     "BTC": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "ETH": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "SOL": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "BNB": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "TRX": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "ZEC": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "DOGE": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "LINK": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "ADA": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "BCH": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "ENA": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "UNI": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "LTC": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "AVAX": {
+      "SHORT": "cruz",
+      "LONG": "cruz"
+     },
+     "SUI": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "SHIB": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "NEAR": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "DOT": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "POL": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "MATIC": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "CAKE": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "INJ": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     },
+     "VIRTUAL": {
+      "SHORT": "cruz",
+      "LONG": "toque"
+     }
+    },
+    "bandas": [
+     "0.63-1.26",
+     "1.26-1.89",
+     "1.89-2.52",
+     "2.52-3.78",
+     "3.78-5.04",
+     "5.04-6.30"
+    ],
+    "stops": [
+     1.26,
+     1.89,
+     2.52,
+     3.15,
+     3.78,
+     4.41,
+     5.04,
+     6.3
+    ],
+    "tabela": {
+     "BTC": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 17,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 70.6,
+        "lucro": 1.04,
+        "rr": 0.55
+       },
+       "1.26-1.89": {
+        "n": 18,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 61.1,
+        "lucro": 1.53,
+        "rr": 0.61
+       },
+       "1.89-2.52": {
+        "n": 19,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 89.5,
+        "lucro": 2.29,
+        "rr": 0.52
+       },
+       "2.52-3.78": {
+        "n": 13,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 100.0,
+        "lucro": 2.98,
+        "rr": 0.79
+       },
+       "3.78-5.04": {
+        "n": 8,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 87.5,
+        "lucro": 4.31,
+        "rr": 0.86
+       },
+       "5.04-6.30": {
+        "n": 3,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 28,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 57.1,
+        "lucro": 0.9,
+        "rr": 0.71
+       },
+       "1.26-1.89": {
+        "n": 22,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 59.1,
+        "lucro": 1.54,
+        "rr": 0.61
+       },
+       "1.89-2.52": {
+        "n": 16,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 50.0,
+        "lucro": 2.2,
+        "rr": 0.58
+       },
+       "2.52-3.78": {
+        "n": 15,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 66.7,
+        "lucro": 2.91,
+        "rr": 0.58
+       },
+       "3.78-5.04": {
+        "n": 6,
+        "status": "insuf"
+       },
+       "5.04-6.30": {
+        "n": 4,
+        "status": "insuf"
+       }
+      }
+     },
+     "ETH": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 19,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 68.4,
+        "lucro": 1.0,
+        "rr": 0.53
+       },
+       "1.26-1.89": {
+        "n": 19,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 63.2,
+        "lucro": 1.62,
+        "rr": 0.64
+       },
+       "1.89-2.52": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "2.52-3.78": {
+        "n": 20,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 80.0,
+        "lucro": 3.17,
+        "rr": 0.5
+       },
+       "3.78-5.04": {
+        "n": 12,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 75.0,
+        "lucro": 4.63,
+        "rr": 0.92
+       },
+       "5.04-6.30": {
+        "n": 8,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 87.5,
+        "lucro": 5.41,
+        "rr": 0.86
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 18,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 61.1,
+        "lucro": 0.92,
+        "rr": 0.73
+       },
+       "1.26-1.89": {
+        "n": 14,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 71.4,
+        "lucro": 1.57,
+        "rr": 0.62
+       },
+       "1.89-2.52": {
+        "n": 8,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 62.5,
+        "lucro": 2.17,
+        "rr": 0.57
+       },
+       "2.52-3.78": {
+        "n": 23,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 60.9,
+        "lucro": 2.92,
+        "rr": 0.77
+       },
+       "3.78-5.04": {
+        "n": 11,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 63.6,
+        "lucro": 4.45,
+        "rr": 0.88
+       },
+       "5.04-6.30": {
+        "n": 6,
+        "status": "insuf"
+       }
+      }
+     },
+     "SOL": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 19,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 73.7,
+        "lucro": 1.02,
+        "rr": 0.54
+       },
+       "1.26-1.89": {
+        "n": 8,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 50.0,
+        "lucro": 1.71,
+        "rr": 0.54
+       },
+       "1.89-2.52": {
+        "n": 11,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 81.8,
+        "lucro": 2.22,
+        "rr": 0.59
+       },
+       "2.52-3.78": {
+        "n": 11,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 45.5,
+        "lucro": 3.26,
+        "rr": 0.52
+       },
+       "3.78-5.04": {
+        "n": 12,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 66.7,
+        "lucro": 4.21,
+        "rr": 0.96
+       },
+       "5.04-6.30": {
+        "n": 12,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 66.7,
+        "lucro": 5.56,
+        "rr": 0.88
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 14,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 64.3,
+        "lucro": 0.87,
+        "rr": 0.69
+       },
+       "1.26-1.89": {
+        "n": 15,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 86.7,
+        "lucro": 1.52,
+        "rr": 0.6
+       },
+       "1.89-2.52": {
+        "n": 12,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 66.7,
+        "lucro": 2.05,
+        "rr": 0.54
+       },
+       "2.52-3.78": {
+        "n": 23,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 56.5,
+        "lucro": 2.96,
+        "rr": 0.59
+       },
+       "3.78-5.04": {
+        "n": 16,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 68.8,
+        "lucro": 4.17,
+        "rr": 0.66
+       },
+       "5.04-6.30": {
+        "n": 9,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 66.7,
+        "lucro": 5.54,
+        "rr": 0.88
+       }
+      }
+     },
+     "BNB": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 22,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 68.2,
+        "lucro": 0.99,
+        "rr": 0.52
+       },
+       "1.26-1.89": {
+        "n": 14,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 85.7,
+        "lucro": 1.55,
+        "rr": 0.62
+       },
+       "1.89-2.52": {
+        "n": 10,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 60.0,
+        "lucro": 2.16,
+        "rr": 0.69
+       },
+       "2.52-3.78": {
+        "n": 23,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 82.6,
+        "lucro": 3.22,
+        "rr": 0.51
+       },
+       "3.78-5.04": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "5.04-6.30": {
+        "n": 3,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 20,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 55.0,
+        "lucro": 0.92,
+        "rr": 0.73
+       },
+       "1.26-1.89": {
+        "n": 14,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 71.4,
+        "lucro": 1.51,
+        "rr": 1.19
+       },
+       "1.89-2.52": {
+        "n": 8,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 75.0,
+        "lucro": 2.19,
+        "rr": 0.7
+       },
+       "2.52-3.78": {
+        "n": 15,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 53.3,
+        "lucro": 2.93,
+        "rr": 0.77
+       },
+       "3.78-5.04": {
+        "n": 16,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 75.0,
+        "lucro": 4.37,
+        "rr": 0.69
+       },
+       "5.04-6.30": {
+        "n": 4,
+        "status": "insuf"
+       }
+      }
+     },
+     "TRX": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 30,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 40.0,
+        "lucro": 0.94,
+        "rr": 0.75
+       },
+       "1.26-1.89": {
+        "n": 18,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 61.1,
+        "lucro": 1.53,
+        "rr": 0.61
+       },
+       "1.89-2.52": {
+        "n": 16,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 68.8,
+        "lucro": 2.12,
+        "rr": 0.67
+       },
+       "2.52-3.78": {
+        "n": 12,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 75.0,
+        "lucro": 3.13,
+        "rr": 0.62
+       },
+       "3.78-5.04": {
+        "n": 4,
+        "status": "insuf"
+       },
+       "5.04-6.30": {
+        "n": 1,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 32,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 65.6,
+        "lucro": 1.0,
+        "rr": 0.53
+       },
+       "1.26-1.89": {
+        "n": 21,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 76.2,
+        "lucro": 1.6,
+        "rr": 0.51
+       },
+       "1.89-2.52": {
+        "n": 10,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 50.0,
+        "lucro": 2.19,
+        "rr": 0.58
+       },
+       "2.52-3.78": {
+        "n": 11,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 72.7,
+        "lucro": 3.41,
+        "rr": 0.54
+       },
+       "3.78-5.04": {
+        "n": 9,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 77.8,
+        "lucro": 4.43,
+        "rr": 0.7
+       },
+       "5.04-6.30": {
+        "n": 2,
+        "status": "insuf"
+       }
+      }
+     },
+     "ZEC": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 10,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 50.0,
+        "lucro": 1.03,
+        "rr": 0.55
+       },
+       "1.26-1.89": {
+        "n": 12,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 50.0,
+        "lucro": 1.48,
+        "rr": 0.59
+       },
+       "1.89-2.52": {
+        "n": 12,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 66.7,
+        "lucro": 2.22,
+        "rr": 0.59
+       },
+       "2.52-3.78": {
+        "n": 6,
+        "status": "insuf"
+       },
+       "3.78-5.04": {
+        "n": 9,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 44.4,
+        "lucro": 4.4,
+        "rr": 0.7
+       },
+       "5.04-6.30": {
+        "n": 5,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 10,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 80.0,
+        "lucro": 1.02,
+        "rr": 0.54
+       },
+       "1.26-1.89": {
+        "n": 9,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 55.6,
+        "lucro": 1.77,
+        "rr": 0.94
+       },
+       "1.89-2.52": {
+        "n": 13,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 69.2,
+        "lucro": 2.16,
+        "rr": 0.86
+       },
+       "2.52-3.78": {
+        "n": 18,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 50.0,
+        "lucro": 3.03,
+        "rr": 0.96
+       },
+       "3.78-5.04": {
+        "n": 20,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 60.0,
+        "lucro": 4.43,
+        "rr": 0.7
+       },
+       "5.04-6.30": {
+        "n": 7,
+        "status": "insuf"
+       }
+      }
+     },
+     "DOGE": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 22,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 68.2,
+        "lucro": 1.0,
+        "rr": 0.53
+       },
+       "1.26-1.89": {
+        "n": 12,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 83.3,
+        "lucro": 1.69,
+        "rr": 0.67
+       },
+       "1.89-2.52": {
+        "n": 10,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 80.0,
+        "lucro": 2.02,
+        "rr": 1.07
+       },
+       "2.52-3.78": {
+        "n": 10,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 70.0,
+        "lucro": 3.01,
+        "rr": 0.8
+       },
+       "3.78-5.04": {
+        "n": 11,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 63.6,
+        "lucro": 4.25,
+        "rr": 1.13
+       },
+       "5.04-6.30": {
+        "n": 6,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 13,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 61.5,
+        "lucro": 1.12,
+        "rr": 0.88
+       },
+       "1.26-1.89": {
+        "n": 14,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 64.3,
+        "lucro": 1.57,
+        "rr": 0.62
+       },
+       "1.89-2.52": {
+        "n": 14,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 85.7,
+        "lucro": 2.31,
+        "rr": 0.52
+       },
+       "2.52-3.78": {
+        "n": 18,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 72.2,
+        "lucro": 3.0,
+        "rr": 0.59
+       },
+       "3.78-5.04": {
+        "n": 19,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 68.4,
+        "lucro": 4.35,
+        "rr": 0.69
+       },
+       "5.04-6.30": {
+        "n": 6,
+        "status": "insuf"
+       }
+      }
+     },
+     "LINK": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 15,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 66.7,
+        "lucro": 0.85,
+        "rr": 0.67
+       },
+       "1.26-1.89": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "1.89-2.52": {
+        "n": 16,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 81.2,
+        "lucro": 2.14,
+        "rr": 0.57
+       },
+       "2.52-3.78": {
+        "n": 18,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 66.7,
+        "lucro": 3.04,
+        "rr": 0.6
+       },
+       "3.78-5.04": {
+        "n": 12,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 83.3,
+        "lucro": 4.24,
+        "rr": 0.67
+       },
+       "5.04-6.30": {
+        "n": 11,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 72.7,
+        "lucro": 5.58,
+        "rr": 0.89
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 11,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 72.7,
+        "lucro": 0.92,
+        "rr": 0.73
+       },
+       "1.26-1.89": {
+        "n": 14,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 64.3,
+        "lucro": 1.52,
+        "rr": 0.6
+       },
+       "1.89-2.52": {
+        "n": 18,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 55.6,
+        "lucro": 2.23,
+        "rr": 0.59
+       },
+       "2.52-3.78": {
+        "n": 17,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 88.2,
+        "lucro": 3.1,
+        "rr": 0.7
+       },
+       "3.78-5.04": {
+        "n": 14,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 42.9,
+        "lucro": 4.42,
+        "rr": 1.17
+       },
+       "5.04-6.30": {
+        "n": 11,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 18.2,
+        "lucro": 5.83,
+        "rr": 0.93
+       }
+      }
+     },
+     "ADA": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 15,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 73.3,
+        "lucro": 0.95,
+        "rr": 0.5
+       },
+       "1.26-1.89": {
+        "n": 19,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 63.2,
+        "lucro": 1.63,
+        "rr": 0.52
+       },
+       "1.89-2.52": {
+        "n": 6,
+        "status": "insuf"
+       },
+       "2.52-3.78": {
+        "n": 13,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 76.9,
+        "lucro": 3.28,
+        "rr": 0.52
+       },
+       "3.78-5.04": {
+        "n": 9,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 55.6,
+        "lucro": 4.34,
+        "rr": 0.86
+       },
+       "5.04-6.30": {
+        "n": 7,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "1.26-1.89": {
+        "n": 13,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 61.5,
+        "lucro": 1.73,
+        "rr": 0.69
+       },
+       "1.89-2.52": {
+        "n": 17,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 76.5,
+        "lucro": 2.05,
+        "rr": 0.54
+       },
+       "2.52-3.78": {
+        "n": 23,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 82.6,
+        "lucro": 3.17,
+        "rr": 0.5
+       },
+       "3.78-5.04": {
+        "n": 18,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 50.0,
+        "lucro": 4.59,
+        "rr": 0.73
+       },
+       "5.04-6.30": {
+        "n": 14,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 57.1,
+        "lucro": 5.41,
+        "rr": 0.86
+       }
+      }
+     },
+     "BCH": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 15,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 66.7,
+        "lucro": 0.89,
+        "rr": 0.71
+       },
+       "1.26-1.89": {
+        "n": 10,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 80.0,
+        "lucro": 1.7,
+        "rr": 0.67
+       },
+       "1.89-2.52": {
+        "n": 11,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 72.7,
+        "lucro": 2.09,
+        "rr": 0.55
+       },
+       "2.52-3.78": {
+        "n": 14,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 71.4,
+        "lucro": 3.19,
+        "rr": 0.51
+       },
+       "3.78-5.04": {
+        "n": 10,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 70.0,
+        "lucro": 4.04,
+        "rr": 0.92
+       },
+       "5.04-6.30": {
+        "n": 11,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 81.8,
+        "lucro": 5.6,
+        "rr": 0.89
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 18,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 50.0,
+        "lucro": 0.86,
+        "rr": 0.68
+       },
+       "1.26-1.89": {
+        "n": 22,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 63.6,
+        "lucro": 1.53,
+        "rr": 0.81
+       },
+       "1.89-2.52": {
+        "n": 13,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 69.2,
+        "lucro": 2.19,
+        "rr": 0.58
+       },
+       "2.52-3.78": {
+        "n": 16,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 87.5,
+        "lucro": 3.21,
+        "rr": 0.51
+       },
+       "3.78-5.04": {
+        "n": 11,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 72.7,
+        "lucro": 4.41,
+        "rr": 0.88
+       },
+       "5.04-6.30": {
+        "n": 6,
+        "status": "insuf"
+       }
+      }
+     },
+     "ENA": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 4,
+        "status": "insuf"
+       },
+       "1.26-1.89": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "1.89-2.52": {
+        "n": 6,
+        "status": "insuf"
+       },
+       "2.52-3.78": {
+        "n": 14,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 57.1,
+        "lucro": 2.96,
+        "rr": 0.94
+       },
+       "3.78-5.04": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "5.04-6.30": {
+        "n": 8,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 62.5,
+        "lucro": 5.6,
+        "rr": 1.11
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 2,
+        "status": "insuf"
+       },
+       "1.26-1.89": {
+        "n": 6,
+        "status": "insuf"
+       },
+       "1.89-2.52": {
+        "n": 4,
+        "status": "insuf"
+       },
+       "2.52-3.78": {
+        "n": 15,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 66.7,
+        "lucro": 3.41,
+        "rr": 0.54
+       },
+       "3.78-5.04": {
+        "n": 17,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 64.7,
+        "lucro": 4.34,
+        "rr": 0.69
+       },
+       "5.04-6.30": {
+        "n": 9,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 55.6,
+        "lucro": 5.91,
+        "rr": 1.56
+       }
+      }
+     },
+     "UNI": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 8,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 75.0,
+        "lucro": 1.0,
+        "rr": 0.53
+       },
+       "1.26-1.89": {
+        "n": 11,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 54.5,
+        "lucro": 1.49,
+        "rr": 0.59
+       },
+       "1.89-2.52": {
+        "n": 8,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 75.0,
+        "lucro": 2.16,
+        "rr": 0.86
+       },
+       "2.52-3.78": {
+        "n": 18,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 83.3,
+        "lucro": 3.14,
+        "rr": 0.71
+       },
+       "3.78-5.04": {
+        "n": 9,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 66.7,
+        "lucro": 4.5,
+        "rr": 1.79
+       },
+       "5.04-6.30": {
+        "n": 4,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 12,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 25.0,
+        "lucro": 0.92,
+        "rr": 0.73
+       },
+       "1.26-1.89": {
+        "n": 16,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 75.0,
+        "lucro": 1.59,
+        "rr": 0.51
+       },
+       "1.89-2.52": {
+        "n": 13,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 69.2,
+        "lucro": 2.35,
+        "rr": 0.62
+       },
+       "2.52-3.78": {
+        "n": 13,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 76.9,
+        "lucro": 3.17,
+        "rr": 0.72
+       },
+       "3.78-5.04": {
+        "n": 16,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 81.2,
+        "lucro": 4.19,
+        "rr": 0.66
+       },
+       "5.04-6.30": {
+        "n": 13,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 53.8,
+        "lucro": 5.5,
+        "rr": 0.87
+       }
+      }
+     },
+     "LTC": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 12,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 58.3,
+        "lucro": 1.09,
+        "rr": 0.58
+       },
+       "1.26-1.89": {
+        "n": 20,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 70.0,
+        "lucro": 1.67,
+        "rr": 0.53
+       },
+       "1.89-2.52": {
+        "n": 14,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 85.7,
+        "lucro": 2.09,
+        "rr": 0.66
+       },
+       "2.52-3.78": {
+        "n": 16,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 75.0,
+        "lucro": 3.14,
+        "rr": 0.62
+       },
+       "3.78-5.04": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "5.04-6.30": {
+        "n": 3,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 20,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 50.0,
+        "lucro": 0.92,
+        "rr": 0.73
+       },
+       "1.26-1.89": {
+        "n": 16,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 75.0,
+        "lucro": 1.56,
+        "rr": 0.62
+       },
+       "1.89-2.52": {
+        "n": 15,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 66.7,
+        "lucro": 2.17,
+        "rr": 0.69
+       },
+       "2.52-3.78": {
+        "n": 24,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 87.5,
+        "lucro": 3.0,
+        "rr": 0.59
+       },
+       "3.78-5.04": {
+        "n": 15,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 80.0,
+        "lucro": 4.57,
+        "rr": 0.72
+       },
+       "5.04-6.30": {
+        "n": 7,
+        "status": "insuf"
+       }
+      }
+     },
+     "AVAX": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 8,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 87.5,
+        "lucro": 0.9,
+        "rr": 0.72
+       },
+       "1.26-1.89": {
+        "n": 9,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 77.8,
+        "lucro": 1.51,
+        "rr": 0.6
+       },
+       "1.89-2.52": {
+        "n": 13,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 61.5,
+        "lucro": 2.13,
+        "rr": 1.69
+       },
+       "2.52-3.78": {
+        "n": 18,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 66.7,
+        "lucro": 3.13,
+        "rr": 0.83
+       },
+       "3.78-5.04": {
+        "n": 9,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 33.3,
+        "lucro": 4.5,
+        "rr": 1.02
+       },
+       "5.04-6.30": {
+        "n": 11,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 81.8,
+        "lucro": 5.42,
+        "rr": 1.23
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 12,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 50.0,
+        "lucro": 0.92,
+        "rr": 0.73
+       },
+       "1.26-1.89": {
+        "n": 14,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 57.1,
+        "lucro": 1.61,
+        "rr": 0.51
+       },
+       "1.89-2.52": {
+        "n": 11,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 72.7,
+        "lucro": 2.22,
+        "rr": 0.59
+       },
+       "2.52-3.78": {
+        "n": 20,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 70.0,
+        "lucro": 2.98,
+        "rr": 0.59
+       },
+       "3.78-5.04": {
+        "n": 10,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 60.0,
+        "lucro": 4.43,
+        "rr": 0.7
+       },
+       "5.04-6.30": {
+        "n": 8,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 37.5,
+        "lucro": 5.77,
+        "rr": 0.92
+       }
+      }
+     },
+     "SUI": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 13,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 46.2,
+        "lucro": 0.93,
+        "rr": 0.74
+       },
+       "1.26-1.89": {
+        "n": 3,
+        "status": "insuf"
+       },
+       "1.89-2.52": {
+        "n": 11,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 81.8,
+        "lucro": 2.24,
+        "rr": 0.89
+       },
+       "2.52-3.78": {
+        "n": 15,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 53.3,
+        "lucro": 3.13,
+        "rr": 0.71
+       },
+       "3.78-5.04": {
+        "n": 13,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 76.9,
+        "lucro": 4.57,
+        "rr": 0.73
+       },
+       "5.04-6.30": {
+        "n": 10,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 40.0,
+        "lucro": 5.85,
+        "rr": 1.33
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 13,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 61.5,
+        "lucro": 0.96,
+        "rr": 0.51
+       },
+       "1.26-1.89": {
+        "n": 11,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 72.7,
+        "lucro": 1.63,
+        "rr": 0.65
+       },
+       "1.89-2.52": {
+        "n": 16,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 68.8,
+        "lucro": 2.24,
+        "rr": 0.51
+       },
+       "2.52-3.78": {
+        "n": 17,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 76.5,
+        "lucro": 3.19,
+        "rr": 0.63
+       },
+       "3.78-5.04": {
+        "n": 12,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 83.3,
+        "lucro": 4.52,
+        "rr": 0.72
+       },
+       "5.04-6.30": {
+        "n": 12,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 25.0,
+        "lucro": 5.85,
+        "rr": 1.86
+       }
+      }
+     },
+     "SHIB": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 14,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 50.0,
+        "lucro": 0.94,
+        "rr": 0.75
+       },
+       "1.26-1.89": {
+        "n": 14,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 78.6,
+        "lucro": 1.58,
+        "rr": 0.84
+       },
+       "1.89-2.52": {
+        "n": 10,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 70.0,
+        "lucro": 2.26,
+        "rr": 0.6
+       },
+       "2.52-3.78": {
+        "n": 12,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 75.0,
+        "lucro": 2.79,
+        "rr": 0.55
+       },
+       "3.78-5.04": {
+        "n": 4,
+        "status": "insuf"
+       },
+       "5.04-6.30": {
+        "n": 10,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 70.0,
+        "lucro": 5.61,
+        "rr": 2.97
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 16,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 68.8,
+        "lucro": 0.96,
+        "rr": 0.51
+       },
+       "1.26-1.89": {
+        "n": 20,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 55.0,
+        "lucro": 1.5,
+        "rr": 0.59
+       },
+       "1.89-2.52": {
+        "n": 16,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 87.5,
+        "lucro": 2.27,
+        "rr": 0.51
+       },
+       "2.52-3.78": {
+        "n": 27,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 70.4,
+        "lucro": 3.08,
+        "rr": 0.81
+       },
+       "3.78-5.04": {
+        "n": 11,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 45.5,
+        "lucro": 4.24,
+        "rr": 0.96
+       },
+       "5.04-6.30": {
+        "n": 9,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 44.4,
+        "lucro": 5.48,
+        "rr": 1.74
+       }
+      }
+     },
+     "NEAR": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 8,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 62.5,
+        "lucro": 0.86,
+        "rr": 0.68
+       },
+       "1.26-1.89": {
+        "n": 8,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 75.0,
+        "lucro": 1.5,
+        "rr": 0.8
+       },
+       "1.89-2.52": {
+        "n": 5,
+        "status": "insuf"
+       },
+       "2.52-3.78": {
+        "n": 18,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 72.2,
+        "lucro": 3.31,
+        "rr": 0.52
+       },
+       "3.78-5.04": {
+        "n": 17,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 64.7,
+        "lucro": 4.35,
+        "rr": 0.69
+       },
+       "5.04-6.30": {
+        "n": 8,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 75.0,
+        "lucro": 5.65,
+        "rr": 1.12
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 8,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 62.5,
+        "lucro": 0.86,
+        "rr": 0.68
+       },
+       "1.26-1.89": {
+        "n": 8,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 62.5,
+        "lucro": 1.59,
+        "rr": 0.5
+       },
+       "1.89-2.52": {
+        "n": 13,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 84.6,
+        "lucro": 2.2,
+        "rr": 0.58
+       },
+       "2.52-3.78": {
+        "n": 23,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 82.6,
+        "lucro": 3.11,
+        "rr": 0.62
+       },
+       "3.78-5.04": {
+        "n": 10,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 60.0,
+        "lucro": 4.54,
+        "rr": 0.9
+       },
+       "5.04-6.30": {
+        "n": 18,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 50.0,
+        "lucro": 5.74,
+        "rr": 0.91
+       }
+      }
+     },
+     "DOT": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 13,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 53.8,
+        "lucro": 0.87,
+        "rr": 0.69
+       },
+       "1.26-1.89": {
+        "n": 14,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 71.4,
+        "lucro": 1.6,
+        "rr": 0.51
+       },
+       "1.89-2.52": {
+        "n": 14,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 64.3,
+        "lucro": 2.25,
+        "rr": 0.6
+       },
+       "2.52-3.78": {
+        "n": 13,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 61.5,
+        "lucro": 3.25,
+        "rr": 0.65
+       },
+       "3.78-5.04": {
+        "n": 14,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 64.3,
+        "lucro": 4.25,
+        "rr": 0.84
+       },
+       "5.04-6.30": {
+        "n": 7,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 16,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 50.0,
+        "lucro": 0.99,
+        "rr": 0.53
+       },
+       "1.26-1.89": {
+        "n": 8,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 50.0,
+        "lucro": 1.55,
+        "rr": 0.82
+       },
+       "1.89-2.52": {
+        "n": 12,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 58.3,
+        "lucro": 2.22,
+        "rr": 1.17
+       },
+       "2.52-3.78": {
+        "n": 23,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 73.9,
+        "lucro": 2.93,
+        "rr": 0.58
+       },
+       "3.78-5.04": {
+        "n": 20,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 55.0,
+        "lucro": 4.26,
+        "rr": 0.85
+       },
+       "5.04-6.30": {
+        "n": 10,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 70.0,
+        "lucro": 5.72,
+        "rr": 0.91
+       }
+      }
+     },
+     "POL": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "1.26-1.89": {
+        "n": 11,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 90.9,
+        "lucro": 1.56,
+        "rr": 0.62
+       },
+       "1.89-2.52": {
+        "n": 8,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 75.0,
+        "lucro": 2.27,
+        "rr": 0.6
+       },
+       "2.52-3.78": {
+        "n": 10,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 70.0,
+        "lucro": 3.05,
+        "rr": 0.6
+       },
+       "3.78-5.04": {
+        "n": 5,
+        "status": "insuf"
+       },
+       "5.04-6.30": {
+        "n": 1,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 3,
+        "status": "insuf"
+       },
+       "1.26-1.89": {
+        "n": 12,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 66.7,
+        "lucro": 1.54,
+        "rr": 0.82
+       },
+       "1.89-2.52": {
+        "n": 8,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 62.5,
+        "lucro": 2.13,
+        "rr": 1.69
+       },
+       "2.52-3.78": {
+        "n": 15,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 66.7,
+        "lucro": 2.94,
+        "rr": 0.67
+       },
+       "3.78-5.04": {
+        "n": 10,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 60.0,
+        "lucro": 4.54,
+        "rr": 0.72
+       },
+       "5.04-6.30": {
+        "n": 10,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 60.0,
+        "lucro": 5.4,
+        "rr": 1.43
+       }
+      }
+     },
+     "MATIC": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 1,
+        "status": "insuf"
+       },
+       "1.26-1.89": {
+        "n": 2,
+        "status": "insuf"
+       },
+       "1.89-2.52": {
+        "n": 2,
+        "status": "insuf"
+       },
+       "2.52-3.78": {
+        "n": 10,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 60.0,
+        "lucro": 3.26,
+        "rr": 0.52
+       },
+       "3.78-5.04": {
+        "n": 3,
+        "status": "insuf"
+       },
+       "5.04-6.30": {
+        "n": 2,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 4,
+        "status": "insuf"
+       },
+       "1.26-1.89": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "1.89-2.52": {
+        "n": 8,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 75.0,
+        "lucro": 2.19,
+        "rr": 0.58
+       },
+       "2.52-3.78": {
+        "n": 4,
+        "status": "insuf"
+       },
+       "3.78-5.04": {
+        "n": 9,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 66.7,
+        "lucro": 4.54,
+        "rr": 0.72
+       },
+       "5.04-6.30": {
+        "n": 2,
+        "status": "insuf"
+       }
+      }
+     },
+     "CAKE": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 17,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 47.1,
+        "lucro": 0.78,
+        "rr": 0.62
+       },
+       "1.26-1.89": {
+        "n": 12,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 83.3,
+        "lucro": 1.47,
+        "rr": 0.78
+       },
+       "1.89-2.52": {
+        "n": 12,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 66.7,
+        "lucro": 2.37,
+        "rr": 0.63
+       },
+       "2.52-3.78": {
+        "n": 15,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 73.3,
+        "lucro": 3.28,
+        "rr": 0.52
+       },
+       "3.78-5.04": {
+        "n": 12,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 83.3,
+        "lucro": 4.19,
+        "rr": 0.67
+       },
+       "5.04-6.30": {
+        "n": 4,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 13,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 46.2,
+        "lucro": 0.96,
+        "rr": 0.51
+       },
+       "1.26-1.89": {
+        "n": 10,
+        "status": "ok",
+        "stop": 1.89,
+        "wr": 40.0,
+        "lucro": 1.54,
+        "rr": 0.82
+       },
+       "1.89-2.52": {
+        "n": 12,
+        "status": "ok",
+        "stop": 2.52,
+        "wr": 66.7,
+        "lucro": 2.12,
+        "rr": 0.84
+       },
+       "2.52-3.78": {
+        "n": 18,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 72.2,
+        "lucro": 3.16,
+        "rr": 0.84
+       },
+       "3.78-5.04": {
+        "n": 15,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 40.0,
+        "lucro": 4.24,
+        "rr": 1.34
+       },
+       "5.04-6.30": {
+        "n": 13,
+        "status": "ok",
+        "stop": 3.78,
+        "wr": 53.8,
+        "lucro": 5.67,
+        "rr": 1.5
+       }
+      }
+     },
+     "INJ": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 9,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 55.6,
+        "lucro": 0.93,
+        "rr": 0.74
+       },
+       "1.26-1.89": {
+        "n": 10,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 70.0,
+        "lucro": 1.6,
+        "rr": 0.51
+       },
+       "1.89-2.52": {
+        "n": 13,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 61.5,
+        "lucro": 2.22,
+        "rr": 0.5
+       },
+       "2.52-3.78": {
+        "n": 14,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 64.3,
+        "lucro": 2.97,
+        "rr": 0.59
+       },
+       "3.78-5.04": {
+        "n": 19,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 63.2,
+        "lucro": 4.5,
+        "rr": 0.71
+       },
+       "5.04-6.30": {
+        "n": 9,
+        "status": "ok",
+        "stop": 5.04,
+        "wr": 77.8,
+        "lucro": 5.93,
+        "rr": 1.18
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 14,
+        "status": "ok",
+        "stop": 1.26,
+        "wr": 50.0,
+        "lucro": 0.88,
+        "rr": 0.7
+       },
+       "1.26-1.89": {
+        "n": 4,
+        "status": "insuf"
+       },
+       "1.89-2.52": {
+        "n": 15,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 60.0,
+        "lucro": 2.22,
+        "rr": 0.5
+       },
+       "2.52-3.78": {
+        "n": 21,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 71.4,
+        "lucro": 2.96,
+        "rr": 0.94
+       },
+       "3.78-5.04": {
+        "n": 16,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 68.8,
+        "lucro": 4.16,
+        "rr": 0.66
+       },
+       "5.04-6.30": {
+        "n": 14,
+        "status": "ok",
+        "stop": 4.41,
+        "wr": 64.3,
+        "lucro": 5.48,
+        "rr": 1.24
+       }
+      }
+     },
+     "VIRTUAL": {
+      "SHORT": {
+       "0.63-1.26": {
+        "n": 4,
+        "status": "insuf"
+       },
+       "1.26-1.89": {
+        "n": 3,
+        "status": "insuf"
+       },
+       "1.89-2.52": {
+        "n": 2,
+        "status": "insuf"
+       },
+       "2.52-3.78": {
+        "n": 9,
+        "status": "ok",
+        "stop": 6.3,
+        "wr": 44.4,
+        "lucro": 3.15,
+        "rr": 0.5
+       },
+       "3.78-5.04": {
+        "n": 5,
+        "status": "insuf"
+       },
+       "5.04-6.30": {
+        "n": 3,
+        "status": "insuf"
+       }
+      },
+      "LONG": {
+       "0.63-1.26": {
+        "n": 4,
+        "status": "insuf"
+       },
+       "1.26-1.89": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "1.89-2.52": {
+        "n": 2,
+        "status": "insuf"
+       },
+       "2.52-3.78": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "3.78-5.04": {
+        "n": 7,
+        "status": "insuf"
+       },
+       "5.04-6.30": {
+        "n": 8,
+        "status": "ok",
+        "stop": 3.15,
+        "wr": 75.0,
+        "lucro": 5.41,
+        "rr": 1.72
+       }
+      }
+     }
+    }
+   }
+  },
+  "lsr": {
+   "atual": 1.0602,
+   "fonte": "Binance globalLongShortAccountRatio",
+   "historico_dias": 181,
+   "dias_novos_nesta_rodada": 30,
+   "limite_short": 1.0,
+   "limite_long": 1.8,
+   "serie": {
+    "2026-09-06": 1.0475,
+    "2026-09-05": 1.0165,
+    "2026-09-04": 0.7816,
+    "2026-09-03": 1.2148,
+    "2026-09-02": 1.2862,
+    "2026-09-01": 0.9948,
+    "2026-08-31": 1.0812,
+    "2026-08-30": 1.1877,
+    "2026-08-29": 1.1877,
+    "2026-08-28": 0.9201,
+    "2026-08-27": 1.0859,
+    "2026-08-26": 1.0008,
+    "2026-08-25": 0.9448,
+    "2026-08-24": 1.07,
+    "2026-08-23": 1.0072,
+    "2026-08-22": 1.0387,
+    "2026-08-21": 0.9554,
+    "2026-08-20": 1.0773,
+    "2026-08-19": 1.3776,
+    "2026-08-18": 1.4845,
+    "2026-08-17": 2.2216,
+    "2026-08-16": 2.0451,
+    "2026-08-15": 2.0826,
+    "2026-08-14": 1.8686,
+    "2026-08-13": 1.8531,
+    "2026-08-12": 1.8043,
+    "2026-08-11": 1.6042,
+    "2026-08-10": 1.1636,
+    "2026-08-09": 1.1459,
+    "2026-08-08": 1.16,
+    "2026-08-07": 1.14,
+    "2026-08-06": 1.24,
+    "2026-08-05": 1.27,
+    "2026-08-04": 1.35,
+    "2026-08-03": 1.64,
+    "2026-08-02": 1.93,
+    "2026-08-01": 2.13,
+    "2026-07-31": 2.08,
+    "2026-07-30": 1.27,
+    "2026-07-29": 1.41,
+    "2026-07-28": 1.85,
+    "2026-07-27": 1.55,
+    "2026-07-26": 1.68,
+    "2026-07-25": 1.73,
+    "2026-07-24": 1.77,
+    "2026-07-23": 1.54,
+    "2026-07-22": 1.26,
+    "2026-07-21": 1.02,
+    "2026-07-20": 1.26,
+    "2026-07-19": 1.41,
+    "2026-07-18": 1.57,
+    "2026-07-17": 1.78,
+    "2026-07-16": 1.34,
+    "2026-07-15": 1.24,
+    "2026-07-14": 1.37,
+    "2026-07-13": 1.64,
+    "2026-07-12": 1.24,
+    "2026-07-11": 1.2,
+    "2026-07-10": 1.18,
+    "2026-07-09": 1.43,
+    "2026-07-08": 1.67,
+    "2026-07-07": 1.5,
+    "2026-07-06": 1.52,
+    "2026-07-05": 1.46,
+    "2026-07-04": 1.5,
+    "2026-07-03": 1.57,
+    "2026-07-02": 1.52,
+    "2026-07-01": 1.75,
+    "2026-06-30": 2.74,
+    "2026-06-29": 2.12,
+    "2026-06-28": 1.95,
+    "2026-06-27": 1.91,
+    "2026-06-26": 1.86,
+    "2026-06-25": 2.05,
+    "2026-06-24": 2.12,
+    "2026-06-23": 1.94,
+    "2026-06-22": 1.41,
+    "2026-06-21": 1.45,
+    "2026-06-20": 1.45,
+    "2026-06-19": 1.68,
+    "2026-06-18": 1.66,
+    "2026-06-17": 1.38,
+    "2026-06-16": 1.35,
+    "2026-06-15": 1.21,
+    "2026-06-14": 1.31,
+    "2026-06-13": 1.36,
+    "2026-06-12": 1.4,
+    "2026-06-11": 1.48,
+    "2026-06-10": 1.81,
+    "2026-06-09": 2.14,
+    "2026-06-08": 1.54,
+    "2026-06-07": 1.88,
+    "2026-06-06": 1.76,
+    "2026-06-05": 2.03,
+    "2026-06-04": 1.63,
+    "2026-06-03": 1.92,
+    "2026-06-02": 2.02,
+    "2026-06-01": 1.91,
+    "2026-05-31": 1.59,
+    "2026-05-30": 1.62,
+    "2026-05-29": 1.67,
+    "2026-05-28": 1.94,
+    "2026-05-27": 1.72,
+    "2026-05-26": 1.27,
+    "2026-05-25": 1.08,
+    "2026-05-24": 1.3,
+    "2026-05-23": 1.62,
+    "2026-05-22": 1.49,
+    "2026-05-21": 1.38,
+    "2026-05-20": 1.3,
+    "2026-05-19": 1.51,
+    "2026-05-18": 1.61,
+    "2026-05-17": 1.49,
+    "2026-05-16": 1.47,
+    "2026-05-15": 1.29,
+    "2026-05-14": 0.85,
+    "2026-05-13": 1.15,
+    "2026-05-12": 0.88,
+    "2026-05-11": 0.83,
+    "2026-05-10": 0.8,
+    "2026-05-09": 0.83,
+    "2026-05-08": 0.84,
+    "2026-05-07": 0.8,
+    "2026-05-06": 0.68,
+    "2026-05-05": 0.55,
+    "2026-05-04": 0.67,
+    "2026-05-03": 0.7,
+    "2026-05-02": 0.7,
+    "2026-05-01": 0.71,
+    "2026-04-30": 1.04,
+    "2026-04-29": 1.0,
+    "2026-04-28": 1.08,
+    "2026-04-27": 0.96,
+    "2026-04-26": 0.88,
+    "2026-04-25": 0.93,
+    "2026-04-24": 0.81,
+    "2026-04-23": 0.75,
+    "2026-04-22": 0.61,
+    "2026-04-21": 0.94,
+    "2026-04-20": 0.99,
+    "2026-04-19": 1.02,
+    "2026-04-18": 0.9,
+    "2026-04-17": 0.65,
+    "2026-04-16": 0.94,
+    "2026-04-15": 0.96,
+    "2026-04-14": 0.75,
+    "2026-04-13": 1.06,
+    "2026-04-12": 1.08,
+    "2026-04-11": 0.87,
+    "2026-04-10": 0.84,
+    "2026-04-09": 1.06,
+    "2026-04-08": 1.07,
+    "2026-04-07": 1.48,
+    "2026-04-06": 1.16,
+    "2026-04-05": 1.71,
+    "2026-04-04": 1.69,
+    "2026-04-03": 1.78,
+    "2026-04-02": 2.14,
+    "2026-04-01": 1.52,
+    "2026-03-31": 1.89,
+    "2026-03-30": 1.63,
+    "2026-03-29": 2.2,
+    "2026-03-28": 2.43,
+    "2026-03-27": 2.39,
+    "2026-03-26": 1.84,
+    "2026-03-25": 1.19,
+    "2026-03-24": 1.52,
+    "2026-03-23": 1.18,
+    "2026-03-22": 1.6,
+    "2026-03-21": 1.33,
+    "2026-03-20": 1.45,
+    "2026-03-19": 1.57,
+    "2026-03-18": 1.22,
+    "2026-03-17": 1.0,
+    "2026-03-16": 0.88,
+    "2026-03-15": 1.08,
+    "2026-03-14": 1.22,
+    "2026-03-13": 0.87,
+    "2026-03-12": 1.12,
+    "2026-03-11": 1.11,
+    "2026-09-07": 1.0602
+   },
+   "efeito": {
+    "janela_dias": 137,
+    "trades_cruzados": 575,
+    "amostra_suficiente": true,
+    "sem_filtro": {
+     "trades": 575,
+     "acerto": 80.5,
+     "usd_por_trade": 9.5
+    },
+    "com_filtro": {
+     "trades": 403,
+     "acerto": 82.9,
+     "usd_por_trade": 11.99
+    },
+    "bloqueados": {
+     "trades": 172,
+     "acerto": 75.0,
+     "usd_por_trade": 3.69
+    }
+   }
+  },
+  "relatorio": {
+   "texto": "91.0 sinais por mes somando 4H e 6H. 4H acerta 77.3% (1952 trades), 6H acerta 77.9% (1231 trades). Com risco de $100 por trade a media e $763 por mes, mediana $676.",
+   "positivas": [],
+   "negativas": [],
+   "observacoes": [
+    "4H: primeira rodada, 77.3% de acerto em 1952 trades",
+    "6H: primeira rodada, 77.9% de acerto em 1231 trades",
+    "LSR do BTC em 1.06, dentro da faixa neutra"
+   ]
+  },
+  "duracao_s": 0.8
+ },
+ "historico": []
+}
