@@ -3,6 +3,20 @@
 `bumerangue_weekly.py` refaz o backtest inteiro e reescreve
 `public/data/bumerangue-backtests.json`, que é o que o Dashboard Bumerangue lê.
 
+## Quem roda isso
+
+`.github/workflows/bumerangue-weekly.yml`, toda segunda às 02:00 UTC (04:00 em
+Madri no verão, 03:00 no inverno — cron do GitHub é sempre UTC). Também dá para
+disparar à mão pela aba **Actions → Bumerangue — backtest semanal → Run workflow**.
+
+Roda no GitHub, e não numa rotina do Claude na nuvem, por um motivo concreto e
+medido: o ambiente de nuvem **bloqueia a saída** para `api.binance.com` e para o
+relay do Telegram (403 na política de egress do proxy). Sem velas o script não
+tem o que calcular, e nem o aviso de erro chega ao Telegram. O runner do GitHub
+tem internet aberta.
+
+Para rodar na sua máquina:
+
 ```bash
 python3 scripts/bumerangue_weekly.py public/data/bumerangue-backtests.json
 git add public/data/bumerangue-backtests.json && git commit && git push

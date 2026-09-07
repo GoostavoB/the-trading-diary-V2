@@ -1,0 +1,105 @@
+# Rodada semanal do backtest do Bumerangue.
+#
+# Roda aqui, e não numa rotina do Claude na nuvem, por um motivo concreto: o
+# ambiente de nuvem bloqueia a saída para api.binance.com e para o relay do
+# Telegram (403 na política de egress). O runner do GitHub tem internet aberta,
+# então é onde este trabalho consegue existir.
+#
+# Segunda-feira, 02:00 UTC = 04:00 em Madri no horário de verão, 03:00 no de
+# inverno. Cron do GitHub é sempre UTC e não acompanha horário de verão.
+
+name: Bumerangue — backtest semanal
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'
+  workflow_dispatch:        # permite disparar à mão pela aba Actions
+
+permissions:
+  contents: write           # necessário para o commit do JSON
+
+concurrency:
+  group: bumerangue-weekly
+  cancel-in-progress: false
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependência
+        run: pip install --quiet requests
+
+      - name: Rodar o backtest
+        id: backtest
+        run: |
+          python3 scripts/bumerangue_weekly.py public/data/bumerangue-backtests.json
+
+      - name: Conferir o resultado antes de commitar
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          d = json.load(open('public/data/bumerangue-backtests.json'))['atual']
+          erros = []
+          for tf in ('4H', '6H'):
+              n = d['timeframes'].get(tf, {}).get('resumo', {}).get('trades', 0)
+              if n <= 0:
+                  erros.append(f'{tf} sem trades')
+          if not d.get('relatorio', {}).get('texto'):
+              erros.append('relatorio vazio')
+          if erros:
+              sys.exit('Resultado inconsistente: ' + '; '.join(erros))
+          print(d['relatorio']['texto'])
+          PY
+
+      - name: Commitar e publicar
+        run: |
+          git config user.name  "GoostavoB"
+          git config user.email "gustavo.belfiore@gmail.com"
+          git add public/data/bumerangue-backtests.json
+          if git diff --staged --quiet; then
+            echo "Nada mudou nesta rodada — semana parada também é informação."
+          else
+            git commit -m "Bumerangue: rodada semanal de $(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+      - name: Mandar o relatório no Telegram
+        if: always()
+        run: |
+          python3 - <<'PY' > /tmp/mensagem.txt
+          import json, os
+          try:
+              d = json.load(open('public/data/bumerangue-backtests.json'))['atual']
+              r = d['relatorio']
+              def bloco(titulo, itens, icone):
+                  if not itens:
+                      return f'{icone} {titulo}: nenhuma nesta rodada'
+                  mostra = itens[:8]
+                  linhas = '\n'.join('- ' + i for i in mostra)
+                  extra = f'\ne mais {len(itens) - 8}' if len(itens) > 8 else ''
+                  return f'{icone} {titulo} ({len(itens)}):\n{linhas}{extra}'
+              print('🪃 RELATÓRIO SEMANAL DO BUMERANGUE')
+              print(r['texto'])
+              print()
+              print(bloco('Positivas', r['positivas'], '✅'))
+              print()
+              print(bloco('Negativas', r['negativas'], '⚠️'))
+              print()
+              print('Dashboard: https://thetradingdiary.com/back-tests/bumerangue')
+          except Exception as e:
+              print('🪃 RELATÓRIO SEMANAL DO BUMERANGUE')
+              print(f'A rodada semanal falhou: {type(e).__name__} — {e}')
+              print('Log: https://github.com/GoostavoB/build-your-site-067/actions')
+          PY
+          curl -sS --fail-with-body -X POST \
+            https://relay-production-6e45.up.railway.app/tradingview-webhook \
+            -H 'Content-Type: text/plain' \
+            --data-binary @/tmp/mensagem.txt

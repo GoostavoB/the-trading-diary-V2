@@ -205,7 +205,13 @@ def calibra(tf):
 
 # ---------------------------------------------------------------- agregacao
 def resumo(trades):
-    if not trades: return {}
+    """Sem trades, devolve a estrutura zerada em vez de {}. Um dicionario vazio
+    aqui vira KeyError la no relatorio(), a dezenas de linhas de distancia, e o
+    traceback nao diz nada sobre a causa real -- que e nao ter baixado vela."""
+    if not trades:
+        return {"trades":0,"acerto":0.0,"expectativa_r":0.0,"sinais_por_mes":0.0,
+                "usd_media_mes":0,"usd_mediana_mes":0,"pior_mes":0,"melhor_mes":0,
+                "meses_negativos":0,"meses_total":0}
     n=len(trades)
     ac=sum(1 for t in trades if t["o"]=="ALVO")/n*100
     R=sum(t["R"] for t in trades)/n
@@ -383,6 +389,12 @@ def main():
             v["bandeira"]=bandeira(v["acerto"], (ant_tf.get("ativos",{}).get(nome) or {}).get("acerto"))
         saida["timeframes"][tf]={"resumo":r,"ativos":ativos,"modos":modos,
                                  "bandas":keys,"stops":stops,"tabela":master}
+    if not todos:
+        raise SystemExit(
+            "ABORTADO: nenhum trade gerado em nenhum timeframe.\n"
+            "Quase sempre significa que as velas nao foram baixadas -- verifique se\n"
+            "api.binance.com esta acessivel deste ambiente. Nada foi escrito no JSON.")
+
     saida["lsr"]["efeito"]=efeito_lsr(todos,lsr)
     saida["relatorio"]=relatorio(saida,anterior)
     saida["duracao_s"]=round(time.time()-inicio,1)
