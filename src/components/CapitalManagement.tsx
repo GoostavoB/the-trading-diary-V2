@@ -157,7 +157,7 @@ export const CapitalManagement = () => {
             Capital Management
           </h3>
           <p className="text-sm text-muted-foreground mt-1">
-            Track capital additions for accurate ROI calculations
+            Aportes e retiradas. O saldo daqui, somado ao resultado dos trades, e o capital que dimensiona os stops.
           </p>
         </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -202,7 +202,7 @@ export const CapitalManagement = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="amount">
-                  {editingId ? 'New Total Capital' : 'Amount Added'}
+                  {editingId ? 'New Total Capital' : 'Amount added or withdrawn'}
                 </Label>
                 <Input
                   id="amount"
@@ -213,6 +213,12 @@ export const CapitalManagement = () => {
                   onChange={(e) => setAmountAdded(e.target.value)}
                   required
                 />
+                {!editingId && (
+                  <p className="text-xs text-muted-foreground">
+                    Use um valor negativo para registrar uma retirada (ex.: −500). O capital de
+                    risco e os stops do Risk Copilot acompanham este saldo.
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -295,8 +301,12 @@ export const CapitalManagement = () => {
               capitalLog.map((entry) => (
                 <TableRow key={entry.id}>
                   <TableCell>{format(new Date(entry.log_date), 'MMM dd, yyyy')}</TableCell>
-                  <TableCell className="font-medium text-accent">
-                    +<BlurredCurrency amount={entry.amount_added} className="inline" />
+                  {/* Aporte e retirada usam a mesma coluna: valor negativo e
+                      saque. O '+' fixo de antes fazia uma retirada de 500
+                      aparecer como "+-$500". */}
+                  <TableCell className={entry.amount_added < 0 ? 'font-medium text-apple-red' : 'font-medium text-accent'}>
+                    {entry.amount_added < 0 ? '−' : '+'}
+                    <BlurredCurrency amount={Math.abs(entry.amount_added)} className="inline" />
                   </TableCell>
                   <TableCell className="font-semibold">
                     <BlurredCurrency amount={entry.total_after} />
