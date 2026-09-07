@@ -142,7 +142,7 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
 
       // Search Filter
       if (debouncedSearchTerm) {
-        query = query.or(`symbol.ilike.%${debouncedSearchTerm}%,setup.ilike.%${debouncedSearchTerm}%,broker.ilike.%${debouncedSearchTerm}%`);
+        query = query.or(`symbol.ilike.%${debouncedSearchTerm}%,setup.ilike.%${debouncedSearchTerm}%,broker.ilike.%${debouncedSearchTerm}%,signal_source.ilike.%${debouncedSearchTerm}%`);
       }
 
       // Type Filter (Wins/Losses)
@@ -493,7 +493,7 @@ export const TradeHistory = memo(({ onTradesChange }: TradeHistoryProps = {}) =>
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by symbol, setup, or broker..."
+            placeholder="Buscar por ativo, setup, corretora ou fonte do sinal..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-9"

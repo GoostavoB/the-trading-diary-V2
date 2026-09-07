@@ -58,7 +58,7 @@ export const TradeFilters = ({
       <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
         <Input
-          placeholder="Search by symbol, setup, or broker..."
+          placeholder="Buscar por ativo, setup, corretora ou fonte do sinal..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           className="pl-10"

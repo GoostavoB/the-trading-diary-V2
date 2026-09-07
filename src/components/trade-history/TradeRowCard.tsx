@@ -1,6 +1,6 @@
 import { useState, memo } from 'react';
 import { format } from 'date-fns';
-import { ChevronDown, Eye, Share2, Pencil, Trash2, Undo, MoreVertical, FileText } from 'lucide-react';
+import { ChevronDown, Eye, Share2, Pencil, Trash2, Undo, MoreVertical, FileText, Radio, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -48,6 +48,10 @@ export const TradeRowCard = memo(({
 }: TradeRowCardProps) => {
   const isDeleted = !!trade.deleted_at;
   const hasNotes = !!trade.notes;
+  // Sem fonte, ou fonte igual a 'Meu', significa ideia propria -- e a
+  // convencao que o resto do app ja usa ("Trades without a source count as Meu").
+  const fonte = (trade.signal_source || '').trim();
+  const ehSinalDeTerceiro = fonte !== '' && fonte.toLowerCase() !== 'meu';
 
   return (
     <GlassCard
@@ -94,11 +98,26 @@ export const TradeRowCard = memo(({
             )}>
               <SymbolLabel symbol={trade.symbol} />
             </div>
-            {/* Summary line: Broker • Setup • Notes icon */}
+            {/* Corretora • Setup • Fonte do sinal • ícone de notas.
+                A fonte é o dado que dizia se a ideia foi minha ou de terceiro, e
+                estava sendo engolida — sem ela não dá para comparar depois o
+                desempenho do que eu opero por conta contra o que sigo de sinal. */}
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               {trade.broker && <span>{trade.broker}</span>}
               {trade.broker && trade.setup && <span>•</span>}
               {trade.setup && <span>{trade.setup}</span>}
+              {(trade.broker || trade.setup) && <span>•</span>}
+              {ehSinalDeTerceiro ? (
+                <span className="inline-flex items-center gap-1 text-apple-blue font-medium">
+                  <Radio className="h-3 w-3 shrink-0" />
+                  {trade.signal_source}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1">
+                  <User className="h-3 w-3 shrink-0" />
+                  Meu
+                </span>
+              )}
               {hasNotes && (
                 <>
                   <span>•</span>
