@@ -8,8 +8,9 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
 import { useMonthlyMedals } from '@/hooks/useMonthlyMedals';
+import { SurplusRolloverPanel } from './SurplusRolloverPanel';
+import { percentualDoRisco, type ResultadoCiclo } from '@/lib/surplusEngine';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -20,7 +21,7 @@ const MEDAL_LABEL: Record<string, string> = { gold: 'Gold', silver: 'Silver', br
 export function MonthCloseModal() {
   const { pendingClose, closeMonth } = useMonthlyMedals();
   const { formatAmount } = useCurrency();
-  const [reinvestPct, setReinvestPct] = useState(50);
+  const [rolagem, setRolagem] = useState<ResultadoCiclo | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   if (!pendingClose) return null;
@@ -28,7 +29,13 @@ export function MonthCloseModal() {
   const handleConfirm = async () => {
     setSubmitting(true);
     try {
-      await closeMonth(reinvestPct);
+      // O que persiste hoje e a fracao do surplus autorizada ao risco. Quando a
+      // tabela cycle_rollovers estiver aplicada (migracao surplus_rollover),
+      // gravar tambem saldoTrade e saldoCofre para o historico do ciclo.
+      const pctRisco = rolagem
+        ? percentualDoRisco(Math.max(0, pendingClose.profit - pendingClose.goal), rolagem.riscoAutorizado)
+        : 0;
+      await closeMonth(pctRisco);
       toast.success('Monthly cycle closed');
     } catch {
       toast.error('Failed to close the monthly cycle');
@@ -68,16 +75,11 @@ export function MonthCloseModal() {
             </div>
           )}
           {profit > 0 && (
-            <div className="space-y-2">
-              <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-                What do you want to do with this month's profit ({formatAmount(profit)})?
-              </div>
-              <Slider value={[reinvestPct]} onValueChange={(v) => setReinvestPct(v[0])} min={0} max={100} step={5} />
-              <div className="flex justify-between text-xs font-mono">
-                <span className="text-apple-green">Reinvest: {formatAmount(reinvestAmount)} ({reinvestPct}%)</span>
-                <span className="text-apple-orange">Withdraw: {formatAmount(withdrawAmount)} ({100 - reinvestPct}%)</span>
-              </div>
-            </div>
+            <SurplusRolloverPanel
+              saldoAtual={profit}
+              meta={pendingClose.goal}
+              onChange={setRolagem}
+            />
           )}
         </div>
         <DialogFooter>
