@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { calculateTradePnL } from '@/utils/pnl';
 
 export interface CapitalLogEntry {
   id: string;
@@ -40,7 +41,8 @@ export const calculatePeriodBasedROI = (
 } => {
   if (!capitalLog || capitalLog.length === 0) {
     // Fallback to simple ROI if no capital log exists
-    const totalPnL = trades.reduce((sum, t) => sum + (t.pnl || t.profit_loss || 0), 0);
+    // Liquido, nao bruto: e o que de fato entrou na conta. Ver utils/pnl.ts.
+    const totalPnL = trades.reduce((sum, t) => sum + calculateTradePnL(t, { includeFees: true }), 0);
     return {
       overallROI: 0,
       periods: [],
@@ -78,7 +80,7 @@ export const calculatePeriodBasedROI = (
 
     // Calculate profit for this period
     const periodProfit = periodTrades.reduce(
-      (sum, t) => sum + (t.pnl || t.profit_loss || 0),
+      (sum, t) => sum + calculateTradePnL(t, { includeFees: true }),
       0
     );
 

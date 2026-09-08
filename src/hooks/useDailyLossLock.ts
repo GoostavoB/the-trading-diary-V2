@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { tradeStationEvents } from '@/utils/tradeStationEvents';
+import { calculateTradePnL } from '@/utils/pnl';
 
 export const useDailyLossLock = (dailyLossLimit: number) => {
   const { user } = useAuth();
@@ -44,7 +45,9 @@ export const useDailyLossLock = (dailyLossLimit: number) => {
 
       if (data) {
         const totalPnL = data.reduce((sum, t) => {
-          const pnl = t.profit_loss || 0;
+          // Trava de perda diaria tem que olhar o liquido -- a taxa sai da conta
+          // igual, e ignorar isso deixa a trava frouxa justo num dia ruim.
+          const pnl = calculateTradePnL(t, { includeFees: true });
           const fundingFee = t.funding_fee || 0;
           const tradingFee = t.trading_fee || 0;
           return sum + (pnl - Math.abs(fundingFee) - Math.abs(tradingFee));
