@@ -20,9 +20,11 @@ import { Label } from '@/components/ui/label';
 import {
   Shield, Settings, Plus, Minus, Star, ChevronUp, ChevronDown, X,
   TrendingUp, TrendingDown, Trophy, AlertTriangle, Pencil, Check,
-  Lock, Sparkles, Target, Info, HelpCircle, ArrowUpRight,
+  Lock, Sparkles, Target, Info, HelpCircle, ArrowUpRight, ArrowRight,
+  Table as TableIcon,
 } from 'lucide-react';
 import { useRiskCopilot } from '@/hooks/useRiskCopilot';
+import { LeverageTableModal } from '@/components/risk/LeverageTableModal';
 import { useRiskProfiles, RiskProfile } from '@/hooks/useRiskProfiles';
 import { AccountBalancingPanel } from './AccountBalancingPanel';
 import { useMonthlyMedals } from '@/hooks/useMonthlyMedals';
@@ -559,34 +561,98 @@ function MaxLeverageField() {
   const invalid = value.trim() !== '' && !row;
 
   return (
-    <div className="space-y-2 rounded-xl border border-border p-4">
-      <div className="flex items-center gap-1.5">
-        <Label className="text-sm font-semibold">Max leverage</Label>
-        <InfoTooltip text="Enter the distance from your entry to your technical stop, in % (unleveraged). The reference table returns the maximum leverage for that trade." />
+    <div
+      className={cn(
+        'group relative overflow-hidden rounded-2xl border p-4 transition-all duration-300',
+        'bg-gradient-to-b from-white/[0.04] to-transparent',
+        row
+          ? 'border-indigo-500/40 shadow-[0_0_28px_-14px_hsl(243_75%_59%/0.8)]'
+          : 'border-border hover:border-indigo-500/30',
+      )}
+    >
+      {/* Fio de luz no topo, que acende ao passar o mouse. */}
+      <div
+        className={cn(
+          'pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-indigo-400/60 to-transparent',
+          'opacity-0 transition-opacity duration-300 group-hover:opacity-100',
+          row && 'opacity-100',
+        )}
+      />
+
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
+          <Label className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+            Alavancagem máxima
+          </Label>
+          <InfoTooltip text="Distância da entrada até o stop técnico, em % sem alavancagem. A tabela devolve a alavancagem máxima para esse trade." />
+        </div>
+
+        <LeverageTableModal
+          trigger={
+            <button
+              type="button"
+              className={cn(
+                'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium',
+                'border-border text-muted-foreground transition-all duration-200',
+                'hover:border-indigo-500/50 hover:bg-indigo-500/10 hover:text-indigo-300',
+                'active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40',
+              )}
+            >
+              <TableIcon className="h-3 w-3" />
+              Tabela
+            </button>
+          }
+        />
       </div>
-      <div className="flex items-center gap-3">
+
+      <div className="mt-3 flex items-center gap-3">
         <div className="relative flex-1">
           <Input
             inputMode="decimal"
-            placeholder="2.5"
+            placeholder="2,5"
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="pr-8 font-mono"
+            className={cn(
+              'h-12 pr-9 font-mono text-lg tabular-nums transition-colors',
+              'focus-visible:ring-indigo-500/40',
+              invalid && 'border-destructive/60',
+            )}
           />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
+          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
         </div>
-        <div className="min-w-[92px] text-center rounded-xl px-3 py-2 bg-indigo-500/15 border border-indigo-500/30">
-          <div className="text-2xl font-bold font-mono text-indigo-400 tabular-nums">
+
+        <ArrowRight
+          className={cn(
+            'h-4 w-4 shrink-0 transition-all duration-300',
+            row ? 'text-indigo-400 translate-x-0' : 'text-muted-foreground/40 -translate-x-1',
+          )}
+        />
+
+        <div
+          className={cn(
+            'min-w-[96px] rounded-xl border px-3 py-2.5 text-center transition-all duration-300',
+            row
+              ? 'border-indigo-500/40 bg-indigo-500/15 scale-100'
+              : 'border-border bg-muted/20 scale-95',
+          )}
+        >
+          <div
+            className={cn(
+              'text-2xl font-bold font-mono tabular-nums transition-colors',
+              row ? 'text-indigo-300' : 'text-muted-foreground/50',
+            )}
+          >
             {row ? `${row.leverage}x` : '—'}
           </div>
         </div>
       </div>
-      <p className="text-xs text-muted-foreground">
+
+      <p className="mt-2.5 text-[11px] leading-relaxed text-muted-foreground">
         {invalid
-          ? 'Enter a positive percentage, e.g. 2.5'
+          ? 'Digite uma porcentagem positiva, ex.: 2,5'
           : row
-            ? `Stop distance ${row.range} → up to ${row.leverage}x.`
-            : 'Stop distance from your chart, no prices needed.'}
+            ? <>Stop entre <span className="font-mono text-foreground">{row.range}</span> → até <span className="font-mono text-indigo-300">{row.leverage}x</span>.</>
+            : 'A distância do stop sai do gráfico — não precisa de preço.'}
       </p>
     </div>
   );
@@ -753,6 +819,9 @@ export function RiskCopilotDrawer() {
             </div>
           ) : (
             <>
+              {/* Alavancagem no topo: e a primeira conta que ele faz ao abrir
+                  um trade, entao e o primeiro campo do painel. */}
+              <MaxLeverageField />
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground font-medium">
@@ -872,7 +941,6 @@ export function RiskCopilotDrawer() {
                   )}
                 </div>
               </div>
-              <MaxLeverageField />
               <GoalsSection
                 monthlyName={format(new Date(), 'MMMM/yy')}
                 monthlyPeriodLabel={`Monthly goal — ${format(new Date(), 'MMMM/yyyy')}`}

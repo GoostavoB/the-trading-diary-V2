@@ -1,23 +1,34 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Table } from "lucide-react";
 import { LEVERAGE_ROWS } from "@/utils/leverageTable";
 
 
-export function LeverageTableModal() {
+interface LeverageTableModalProps {
+  /**
+   * Gatilho alternativo. O Risk Copilot precisa de um botao pequeno no topo,
+   * e a Risk Management do botao grande — mas a tabela tem que ser a MESMA,
+   * senao viram duas fontes de verdade que divergem na primeira alteracao.
+   */
+  trigger?: React.ReactNode;
+}
+
+export function LeverageTableModal({ trigger }: LeverageTableModalProps = {}) {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          size="lg"
-          className="gap-2 bg-indigo-600 hover:bg-indigo-500 text-white border-0 shadow-lg shadow-indigo-600/20"
-        >
-          <Table className="h-4 w-4" />
-          Leverage Table
-        </Button>
+        {trigger ?? (
+          <Button
+            size="lg"
+            className="gap-2 bg-indigo-600 hover:bg-indigo-500 text-white border-0 shadow-lg shadow-indigo-600/20"
+          >
+            <Table className="h-4 w-4" />
+            Leverage Table
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent className="w-[92vw] max-w-none h-[92vh] max-h-[92vh] overflow-hidden p-0 border-indigo-500/20 flex flex-col">
