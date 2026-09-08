@@ -1,6 +1,0 @@
-{
-  "version": "0.0.1",
-  "configurations": [
-    { "name": "ttd", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev", "--", "--port", "8099", "--strictPort"], "port": 8099 }
-  ]
-}
