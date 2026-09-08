@@ -264,7 +264,7 @@ export const TradeStationView = ({ onControlsReady }: TradeStationViewProps = {}
       })));
       
       // Calculate P&L with and without fees
-      const totalPnlWithoutFees = trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+      const totalPnlWithoutFees = trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0); // pnl-bruto-proposital: par bruto/liquido exibido lado a lado
       const totalPnlWithFees = trades.reduce((sum, t) => {
         const pnl = t.profit_loss || 0;
         const fundingFee = t.funding_fee || 0;

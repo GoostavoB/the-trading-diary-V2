@@ -27,6 +27,7 @@ import { useDateRange } from "@/contexts/DateRangeContext";
 import { Button } from "@/components/ui/button";
 import { layout, spacing, typography } from "@/styles/design-tokens";
 import { SkipToContent } from "@/components/SkipToContent";
+import { calculateTradePnL } from '@/utils/pnl';
 
 export default function Analytics() {
   const { dateRange, setDateRange, clearDateRange } = useDateRange();
@@ -98,7 +99,7 @@ export default function Analytics() {
       const asset = trade.symbol || 'Unknown';
       if (!byAsset[asset]) byAsset[asset] = { wins: 0, total: 0, profit: 0 };
       byAsset[asset].total++;
-      byAsset[asset].profit += trade.profit_loss ?? 0;
+      byAsset[asset].profit += calculateTradePnL(trade, { includeFees: true });
       if ((trade.profit_loss ?? 0) > 0) byAsset[asset].wins++;
     });
     return Object.entries(byAsset)
@@ -121,7 +122,7 @@ export default function Analytics() {
       const setup = trade.setup || 'No Setup';
       if (!bySetup[setup]) bySetup[setup] = { wins: 0, total: 0, profit: 0 };
       bySetup[setup].total++;
-      bySetup[setup].profit += trade.profit_loss ?? 0;
+      bySetup[setup].profit += calculateTradePnL(trade, { includeFees: true });
       if ((trade.profit_loss ?? 0) > 0) bySetup[setup].wins++;
     });
     return Object.entries(bySetup)

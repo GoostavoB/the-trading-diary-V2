@@ -20,7 +20,7 @@ export function TradeSummaryBar({
   overriddenDuplicateCount = 0
 }: TradeSummaryBarProps) {
   const approvedTrades = trades.filter((_, index) => approvedIndices.has(index));
-  const grossPnL = approvedTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+  const grossPnL = approvedTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0); // pnl-bruto-proposital: e o bruto pelo nome
   const winningTrades = approvedTrades.filter(t => (t.profit_loss || 0) > 0).length;
   const losingTrades = approvedTrades.filter(t => (t.profit_loss || 0) < 0).length;
   const winRate = approvedTrades.length > 0 ? winningTrades / approvedTrades.length * 100 : 0;

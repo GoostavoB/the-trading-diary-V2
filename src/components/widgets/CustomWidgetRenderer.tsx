@@ -7,6 +7,7 @@ import { Trash2, TrendingUp, TrendingDown, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { formatNumber, formatPercent } from '@/utils/formatNumber';
+import { calculateTradePnL } from '@/utils/pnl';
 
 interface CustomWidget {
   id: string;
@@ -92,7 +93,7 @@ export const CustomWidgetRenderer = ({ widget, onDelete, showAddToDashboard = fa
         return aggregation === 'avg' ? avgROI : avgROI;
       }
       case 'pnl':
-        return trades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+        return trades.reduce((sum, t) => sum + calculateTradePnL(t, { includeFees: true }), 0);
       case 'win_rate': {
         const wins = trades.filter(t => (t.profit_loss || 0) > 0).length;
         return (wins / trades.length) * 100;

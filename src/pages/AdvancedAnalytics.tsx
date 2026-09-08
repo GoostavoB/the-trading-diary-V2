@@ -13,6 +13,7 @@ import { Trade } from '@/types/trade';
 import { SEO } from '@/components/SEO';
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
 import { Loader2 } from 'lucide-react';
+import { calculateTradePnL } from '@/utils/pnl';
 
 export default function AdvancedAnalytics() {
   const { isFeatureLocked } = usePremiumFeatures();
@@ -51,7 +52,7 @@ export default function AdvancedAnalytics() {
     // Max drawdown
     let peak = 0, equity = 0, maxDD = 0;
     for (const t of trades) {
-      equity += t.profit_loss ?? 0;
+      equity += calculateTradePnL(t, { includeFees: true });
       if (equity > peak) peak = equity;
       const dd = peak > 0 ? ((equity - peak) / peak) * 100 : 0;
       if (dd < maxDD) maxDD = dd;
@@ -65,7 +66,7 @@ export default function AdvancedAnalytics() {
     // Cumulative PnL for charts
     let cum = 0;
     const pnlSeries = trades.map(t => {
-      cum += t.profit_loss ?? 0;
+      cum += calculateTradePnL(t, { includeFees: true });
       return { date: (t.trade_date ?? t.created_at).substring(0, 10), value: Math.round(cum * 100) / 100 };
     });
 

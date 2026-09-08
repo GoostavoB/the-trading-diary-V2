@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { formatCurrency, formatNumber } from "@/utils/formatNumber";
 import { PremiumFeatureLock } from "@/components/PremiumFeatureLock";
 import { usePremiumFeatures } from "@/hooks/usePremiumFeatures";
+import { calculateTradePnL } from '@/utils/pnl';
 
 const TaxReports = () => {
   const currentYear = new Date().getFullYear();
@@ -48,13 +49,17 @@ const TaxReports = () => {
     let totalLosses = 0;
 
     trades.forEach((trade) => {
-      if (!trade.closed_at || !trade.opened_at || !trade.profit_loss) return;
+      // `!trade.profit_loss` descartava tambem o trade que zerou exatamente,
+      // que existe e conta para o imposto. So a ausencia do dado deve excluir.
+      if (!trade.closed_at || !trade.opened_at || trade.profit_loss == null) return;
 
       const openDate = new Date(trade.opened_at);
       const closeDate = new Date(trade.closed_at);
       const daysHeld = Math.floor((closeDate.getTime() - openDate.getTime()) / (1000 * 60 * 60 * 24));
 
-      const pnl = trade.profit_loss;
+      // Imposto incide sobre o LIQUIDO. Somar o bruto infla a base tributavel
+      // -- no caso destes tres trades, em 18,7%.
+      const pnl = calculateTradePnL(trade, { includeFees: true });
 
       if (daysHeld <= 365) {
         shortTerm.push(trade);
@@ -69,8 +74,8 @@ const TaxReports = () => {
       }
     });
 
-    const shortTermGains = shortTerm.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
-    const longTermGains = longTerm.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+    const shortTermGains = shortTerm.reduce((sum, t) => sum + calculateTradePnL(t, { includeFees: true }), 0);
+    const longTermGains = longTerm.reduce((sum, t) => sum + calculateTradePnL(t, { includeFees: true }), 0);
 
     return {
       shortTerm,
@@ -338,8 +343,8 @@ const TaxReports = () => {
                                 {trade.side}
                               </Badge>
                             </TableCell>
-                            <TableCell className={`text-right font-medium ${(trade.profit_loss || 0) >= 0 ? "text-neon-green" : "text-neon-red"}`}>
-                              ${formatNumber(trade.profit_loss || 0)}
+                            <TableCell className={`text-right font-medium ${calculateTradePnL(trade, { includeFees: true }) >= 0 ? "text-neon-green" : "text-neon-red"}`}>
+                              ${formatNumber(calculateTradePnL(trade, { includeFees: true }))}
                             </TableCell>
                             <TableCell className="text-right">{daysHeld}d</TableCell>
                           </TableRow>
@@ -384,8 +389,8 @@ const TaxReports = () => {
                                 {trade.side}
                               </Badge>
                             </TableCell>
-                            <TableCell className={`text-right font-medium ${(trade.profit_loss || 0) >= 0 ? "text-neon-green" : "text-neon-red"}`}>
-                              ${formatNumber(trade.profit_loss || 0)}
+                            <TableCell className={`text-right font-medium ${calculateTradePnL(trade, { includeFees: true }) >= 0 ? "text-neon-green" : "text-neon-red"}`}>
+                              ${formatNumber(calculateTradePnL(trade, { includeFees: true }))}
                             </TableCell>
                             <TableCell className="text-right">{daysHeld}d</TableCell>
                           </TableRow>

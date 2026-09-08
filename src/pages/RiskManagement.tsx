@@ -1,13 +1,15 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RiskMetricsCard } from "@/components/risk/RiskMetricsCard";
 import { PositionSizeCalculator } from "@/components/risk/PositionSizeCalculator";
 import { StopLossCalculator } from "@/components/risk/StopLossCalculator";
 import { LeverageCalculator } from "@/components/risk/LeverageCalculator";
 import { DrawdownChart } from "@/components/risk/DrawdownChart";
 import { LeverageStopWidget } from "@/components/leverage-stop/LeverageStopWidget";
 import { LeverageTableModal } from "@/components/risk/LeverageTableModal";
+import { RiskOverview } from "@/components/risk/RiskOverview";
+import { useRiskCopilot } from "@/hooks/useRiskCopilot";
+import { curvaDeCapital } from "@/lib/riskInsights";
 import { BlurToggleButton } from "@/components/ui/BlurToggleButton";
 import { Shield, Calculator, TrendingDown, BarChart3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,7 +20,7 @@ import { pageMeta } from "@/utils/seoHelpers";
 
 export default function RiskManagement() {
   const { user } = useAuth();
-  const [drawdownData, setDrawdownData] = useState<any[]>([]);
+  const rc = useRiskCopilot();
 
   const { data: trades } = useQuery({
     queryKey: ['trades-risk', user?.id],
@@ -35,95 +37,33 @@ export default function RiskManagement() {
     enabled: !!user?.id,
   });
 
-  useEffect(() => {
-    if (trades && trades.length > 0) {
-      // Calculate drawdown data
-      let equity = 10000; // Starting equity
-      let peak = equity;
-      const data = [];
+  // A antiga aba Overview vivia daqui: um useEffect que montava a curva de
+  // equity a partir de $10.000 fixos, e um calculateRiskMetrics com exposicao
+  // diaria = media das perdas x 0,5, semanal = diaria x 3, mensal = diaria x 12
+  // e "Open Positions Risk" = a constante 250. O proprio arquivo dizia
+  // "Simulated calculations (in production, these would be more sophisticated)".
+  //
+  // Nada daquilo vinha dos dados do usuario, entao foi apagado em vez de
+  // corrigido. O que substitui esta em lib/riskInsights.ts, coberto por teste,
+  // e a regra la e: sem dado, a tela diz que nao sabe.
 
-      for (const trade of trades) {
-        equity += trade.profit_loss;
-        if (equity > peak) peak = equity;
-        const drawdown = ((equity - peak) / peak) * 100;
-        
-        data.push({
-          date: new Date(trade.trade_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          equity,
-          peak,
-          drawdown
-        });
-      }
+  const { data: aportes = [] } = useQuery({
+    queryKey: ['risk-capital-log', user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('capital_log')
+        .select('log_date, amount_added')
+        .order('log_date', { ascending: true });
+      return data ?? [];
+    },
+    enabled: !!user?.id,
+  });
 
-      setDrawdownData(data);
-    }
-  }, [trades]);
-
-  // Calculate risk metrics
-  const calculateRiskMetrics = () => {
-    if (!trades || trades.length === 0) {
-      return {
-        dailyRisk: 0,
-        weeklyRisk: 0,
-        monthlyRisk: 0,
-        openPositionsRisk: 0,
-        maxDrawdown: 0,
-        currentDrawdown: 0,
-        varValue: 0
-      };
-    }
-
-    const totalPnL = trades.reduce((sum, t) => sum + t.profit_loss, 0);
-    const losses = trades.filter(t => t.profit_loss < 0);
-    const avgLoss = losses.length > 0 ? Math.abs(losses.reduce((sum, t) => sum + t.profit_loss, 0) / losses.length) : 0;
-    
-    // Simulated calculations (in production, these would be more sophisticated)
-    const dailyRisk = avgLoss * 0.5; // Estimated daily risk
-    const weeklyRisk = dailyRisk * 3;
-    const monthlyRisk = dailyRisk * 12;
-    const openPositionsRisk = 250; // Simulated open positions risk
-    
-    // Calculate max drawdown
-    let equity = 10000;
-    let peak = equity;
-    let maxDrawdown = 0;
-    let currentDrawdown = 0;
-
-    trades.forEach(trade => {
-      equity += trade.profit_loss;
-      if (equity > peak) {
-        peak = equity;
-      }
-      const dd = ((equity - peak) / peak) * 100;
-      if (dd < maxDrawdown) maxDrawdown = dd;
-    });
-
-    currentDrawdown = ((equity - peak) / peak) * 100;
-
-    // Value at Risk (95% confidence)
-    const sortedLosses = losses.map(t => t.profit_loss).sort((a, b) => a - b);
-    const varIndex = Math.floor(sortedLosses.length * 0.05);
-    const varValue = sortedLosses[varIndex] || 0;
-
-    return {
-      dailyRisk,
-      weeklyRisk,
-      monthlyRisk,
-      openPositionsRisk,
-      maxDrawdown,
-      currentDrawdown,
-      varValue: Math.abs(varValue)
-    };
-  };
-
-  const metrics = calculateRiskMetrics();
-
-  const getRiskStatus = (value: number, maxValue: number): "safe" | "warning" | "danger" => {
-    const percentage = (value / maxValue) * 100;
-    if (percentage < 50) return "safe";
-    if (percentage < 80) return "warning";
-    return "danger";
-  };
+  // Curva sobre o capital REAL, com aportes na data em que entraram.
+  const curva = useMemo(
+    () => (trades?.length ? curvaDeCapital(trades as never, aportes as never) : []),
+    [trades, aportes],
+  );
 
   return (
     <>
@@ -167,78 +107,32 @@ export default function RiskManagement() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <RiskMetricsCard
-                title="Daily Risk Exposure"
-                value={metrics.dailyRisk}
-                maxValue={300}
-                status={getRiskStatus(metrics.dailyRisk, 300)}
-                description="Maximum acceptable loss per day"
-                unit="$"
-                learnMoreHref="/user-guide#daily-risk"
-              />
-              <RiskMetricsCard
-                title="Weekly Risk Exposure"
-                value={metrics.weeklyRisk}
-                maxValue={1000}
-                status={getRiskStatus(metrics.weeklyRisk, 1000)}
-                description="Cumulative risk over 7 days"
-                unit="$"
-                learnMoreHref="/user-guide#weekly-risk"
-              />
-              <RiskMetricsCard
-                title="Monthly Risk Exposure"
-                value={metrics.monthlyRisk}
-                maxValue={3000}
-                status={getRiskStatus(metrics.monthlyRisk, 3000)}
-                description="Total risk for current month"
-                unit="$"
-                learnMoreHref="/user-guide#monthly-risk"
-              />
-              <RiskMetricsCard
-                title="Open Positions Risk"
-                value={metrics.openPositionsRisk}
-                maxValue={500}
-                status={getRiskStatus(metrics.openPositionsRisk, 500)}
-                description="Total risk from active positions"
-                unit="$"
-              />
-              <RiskMetricsCard
-                title="Current Drawdown"
-                value={Math.abs(metrics.currentDrawdown)}
-                maxValue={20}
-                status={getRiskStatus(Math.abs(metrics.currentDrawdown), 20)}
-                description="Distance from equity peak"
-                unit="%"
-                learnMoreHref="/user-guide#current-drawdown"
-              />
-              <RiskMetricsCard
-                title="Value at Risk (95%)"
-                value={metrics.varValue}
-                maxValue={500}
-                status={getRiskStatus(metrics.varValue, 500)}
-                description="Maximum expected loss (95% confidence)"
-                unit="$"
-                learnMoreHref="/user-guide#var"
-              />
-            </div>
+            <RiskOverview />
           </TabsContent>
 
           <TabsContent value="calculator" className="space-y-6">
             <LeverageStopWidget />
+            {/* Chegam preenchidas com o capital e o risco reais. Antes as tres
+                pediam "Account Size" com placeholder 10000, e o usuario digitava
+                na mao um numero que o app ja conhecia. */}
             <div className="grid lg:grid-cols-2 gap-6 mt-8">
-              <PositionSizeCalculator />
-              <StopLossCalculator />
+              <PositionSizeCalculator capitalReal={rc.capitalBase} riscoPadraoPct={rc.authorizedStopPct} />
+              <StopLossCalculator capitalReal={rc.capitalBase} riscoPadraoPct={rc.authorizedStopPct} />
             </div>
-            <LeverageCalculator />
+            <LeverageCalculator capitalReal={rc.capitalBase} riscoPadraoPct={rc.authorizedStopPct} />
           </TabsContent>
 
           <TabsContent value="drawdown">
-            {drawdownData.length > 0 ? (
+            {curva.length > 0 ? (
               <DrawdownChart
-                data={drawdownData}
-                maxDrawdown={metrics.maxDrawdown}
-                currentDrawdown={metrics.currentDrawdown}
+                data={curva.map((p) => ({
+                  date: p.data,
+                  equity: p.capital,
+                  peak: p.pico,
+                  drawdown: p.quedaPct,
+                }))}
+                maxDrawdown={curva.reduce((pior, p) => Math.min(pior, p.quedaPct), 0)}
+                currentDrawdown={curva[curva.length - 1].quedaPct}
               />
             ) : (
               <div className="text-center py-16 card-premium rounded-ios-card">

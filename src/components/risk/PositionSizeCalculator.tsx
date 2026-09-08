@@ -6,9 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calculator, TrendingUp, DollarSign } from "lucide-react";
 
-export function PositionSizeCalculator() {
-  const [accountSize, setAccountSize] = useState<string>('10000');
-  const [riskPercentage, setRiskPercentage] = useState<string>('1');
+interface PositionSizeCalculatorProps {
+  /** Capital real do usuario. Sem isto a calculadora pede o numero que o app ja sabe. */
+  capitalReal?: number;
+  /** Risco por trade do perfil ativo, em %. */
+  riscoPadraoPct?: number;
+}
+
+export function PositionSizeCalculator({ capitalReal, riscoPadraoPct }: PositionSizeCalculatorProps = {}) {
+  const [accountSize, setAccountSize] = useState<string>(capitalReal && capitalReal > 0 ? String(Math.round(capitalReal)) : '10000');
+  const [riskPercentage, setRiskPercentage] = useState<string>(riscoPadraoPct ? String(riscoPadraoPct) : '1');
   const [entryPrice, setEntryPrice] = useState<string>('');
   const [stopLoss, setStopLoss] = useState<string>('');
   const [result, setResult] = useState<any>(null);

@@ -163,7 +163,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
             // In a future refactor, this calculation logic should be extracted to a utility or hook.
 
             // Calculate P&L without fees
-            const totalPnlWithoutFees = mappedTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+            const totalPnlWithoutFees = mappedTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0); // pnl-bruto-proposital: par bruto/liquido
 
             // Calculate P&L with fees
             const totalPnlWithFees = mappedTrades.reduce((sum, t) => {

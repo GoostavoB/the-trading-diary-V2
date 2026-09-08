@@ -7,8 +7,15 @@ import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Info, AlertTriangle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-export function LeverageCalculator() {
-  const [accountSize, setAccountSize] = useState<string>('10000');
+interface LeverageCalculatorProps {
+  /** Capital real do usuario. Sem isto a calculadora pede o numero que o app ja sabe. */
+  capitalReal?: number;
+  /** Risco por trade do perfil ativo, em %. */
+  riscoPadraoPct?: number;
+}
+
+export function LeverageCalculator({ capitalReal, riscoPadraoPct }: LeverageCalculatorProps = {}) {
+  const [accountSize, setAccountSize] = useState<string>(capitalReal && capitalReal > 0 ? String(Math.round(capitalReal)) : '10000');
   const [leverage, setLeverage] = useState<string>('10');
   const [positionSize, setPositionSize] = useState<string>('');
   const [entryPrice, setEntryPrice] = useState<string>('');

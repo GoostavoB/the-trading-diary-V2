@@ -7,6 +7,7 @@ import { formatPercent } from "@/utils/formatNumber";
 import { Trade } from "@/types/trade";
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
 import { useCurrency } from '@/contexts/CurrencyContext';
+import { calculateTradePnL } from '@/utils/pnl';
 
 interface TotalBalanceCardProps {
   balance: number;
@@ -31,7 +32,7 @@ export const TotalBalanceCard = memo(({
     .reduce((acc, trade, index) => {
       const prevValue = index > 0 ? acc[index - 1].value : 0;
       acc.push({
-        value: prevValue + (trade.profit_loss || 0),
+        value: prevValue + calculateTradePnL(trade, { includeFees: true }),
         date: trade.trade_date
       });
       return acc;

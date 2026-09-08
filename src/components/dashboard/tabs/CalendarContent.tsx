@@ -5,6 +5,7 @@ import { TradingQualityMetrics } from '@/components/insights/TradingQualityMetri
 import { DashboardSkeleton } from '@/components/DashboardSkeleton';
 import { useMemo } from 'react';
 import { calculateMaxDrawdown } from '@/utils/insightCalculations';
+import { calculateTradePnL } from '@/utils/pnl';
 
 export function CalendarContent() {
   const { loading, processedTrades, initialInvestment } = useDashboard();
@@ -14,10 +15,10 @@ export function CalendarContent() {
     const losingTrades = processedTrades.filter(t => (t.profit_loss || 0) <= 0);
 
     const avgWin = winningTrades.length > 0
-      ? winningTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / winningTrades.length
+      ? winningTrades.reduce((sum, t) => sum + calculateTradePnL(t, { includeFees: true }), 0) / winningTrades.length
       : 0;
     const avgLoss = losingTrades.length > 0
-      ? Math.abs(losingTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0) / losingTrades.length)
+      ? Math.abs(losingTrades.reduce((sum, t) => sum + calculateTradePnL(t, { includeFees: true }), 0) / losingTrades.length)
       : 0;
 
     // True max drawdown: largest peak-to-trough decline in cumulative P&L.

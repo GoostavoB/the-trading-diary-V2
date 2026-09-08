@@ -5,6 +5,7 @@ import { formatPercent } from "@/utils/formatNumber";
 import { Trade } from "@/types/trade";
 import { TokenIcon } from "@/components/TokenIcon";
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
+import { calculateTradePnL } from '@/utils/pnl';
 
 interface AssetMover {
   symbol: string;
@@ -31,7 +32,7 @@ const TopMoversCardComponent = ({ trades, className }: TopMoversCardProps) => {
       if (!assetData[symbol]) {
         assetData[symbol] = { symbol, pnl: 0, change: 0, trades: 0 };
       }
-      assetData[symbol].pnl += trade.profit_loss || 0;
+      assetData[symbol].pnl += calculateTradePnL(trade, { includeFees: true });
       assetData[symbol].trades += 1;
     });
 

@@ -2,6 +2,7 @@ import { memo, useMemo, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info, Star } from 'lucide-react';
 import { useThemeMode } from '@/hooks/useThemeMode';
+import { calculateTradePnL } from '@/utils/pnl';
 
 interface Trade {
   trade_date: string;
@@ -34,9 +35,9 @@ const TradingHeatmapComponent = ({ trades }: TradingHeatmapProps) => {
       }
 
       data[key].total += 1;
-      data[key].pnl += trade.profit_loss || 0;
+      data[key].pnl += calculateTradePnL(trade, { includeFees: true });
       data[key].roi += trade.roi || 0;
-      if ((trade.profit_loss || 0) > 0) {
+      if (calculateTradePnL(trade, { includeFees: true }) > 0) {
         data[key].wins += 1;
       }
     });

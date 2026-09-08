@@ -133,7 +133,7 @@ export const useDynamicRiskEngine = () => {
   };
 
   const dreState: DREState = useMemo(() => {
-    const todayPnL = todayTrades.reduce((sum, t) => sum + (t.profit_loss || 0), 0);
+    const todayPnL = todayTrades.reduce((sum, t) => sum + calculateTradePnL(t, { includeFees: true }), 0);
     const surplus = todayPnL - dailyGoal;
     const tier = getTier(surplus);
     const allowedRisk = getAllowedRisk(surplus);
@@ -143,9 +143,10 @@ export const useDynamicRiskEngine = () => {
       const pnlBefore = runningPnL;
       const surplusBefore = pnlBefore - dailyGoal;
       const allowedAtTime = getAllowedRisk(surplusBefore);
-      runningPnL += t.profit_loss || 0;
+      runningPnL += calculateTradePnL(t, { includeFees: true });
 
-      const loss = (t.profit_loss || 0) < 0 ? Math.abs(t.profit_loss || 0) : 0;
+      const liq = calculateTradePnL(t, { includeFees: true });
+      const loss = liq < 0 ? Math.abs(liq) : 0;
       const respectedDRE = loss <= allowedAtTime || loss === 0;
 
       return {
