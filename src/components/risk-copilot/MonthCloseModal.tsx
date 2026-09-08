@@ -49,7 +49,10 @@ export function MonthCloseModal() {
   const withdrawAmount = profit > 0 ? profit - reinvestAmount : 0;
 
   return (
-    <Dialog open onOpenChange={() => {}}>
+    /* `open` fixo em true e o componente sumindo por `return null` faz o
+       Dialog ser DESMONTADO em vez de fechado. Amarrar ao pendingClose deixa
+       o Radix rodar o ciclo de fechamento e devolver o body ao normal. */
+    <Dialog open={!!pendingClose} onOpenChange={() => {}}>
       <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Cycle Close — {format(pendingClose.month, 'MMMM yyyy')}</DialogTitle>

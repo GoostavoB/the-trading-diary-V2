@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { TopNavigation } from './TopNavigation';
 import { useReminderNotifications } from '@/hooks/useReminderNotifications';
+import { useOverlayLockGuard } from '@/hooks/useOverlayLockGuard';
 import { ThemeUnlockNotification } from '@/components/theme-studio/ThemeUnlockNotification';
 import { MobileNav } from '@/components/mobile/MobileNav';
 import { QuickAddTrade } from '@/components/mobile/QuickAddTrade';
@@ -22,6 +23,8 @@ const AppLayout = ({
   onGamificationToggle
 }: AppLayoutProps) => {
   useReminderNotifications();
+  // Impede que um overlay que nao desmontou deixe a pagina inteira sem clique.
+  useOverlayLockGuard();
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">

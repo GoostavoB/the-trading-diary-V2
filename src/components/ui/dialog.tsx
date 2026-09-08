@@ -4,6 +4,19 @@ import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+/* ATENCAO: nao devolva as animacoes de SAIDA (data-[state=closed]:animate-out
+   e companhia) sem ler isto.
+
+   O Radix so desmonta o overlay quando a animacao de saida dispara
+   `animationend`. Numa aba que nao esta sendo pintada -- o usuario trocou de
+   aba ou de aplicativo enquanto o modal fechava -- a animacao fica congelada em
+   currentTime 0 e o evento nunca chega. O overlay `fixed inset-0` fica no DOM
+   para sempre, por cima de tudo, e o <body> fica com pointer-events: none.
+   A pagina parece normal e nao aceita mais nenhum clique, sem erro no console.
+
+   Sem animacao de saida o Presence desmonta na hora e nada trava. A entrada
+   continua animada, que e a que se percebe. */
+
 const Dialog = DialogPrimitive.Root;
 
 const DialogTrigger = DialogPrimitive.Trigger;
@@ -19,7 +32,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=open]:fade-in-0",
       className,
     )}
     {...props}
@@ -36,7 +49,7 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
         className,
       )}
       {...props}
