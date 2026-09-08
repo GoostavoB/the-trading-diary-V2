@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useRiskCopilot } from '@/hooks/useRiskCopilot';
 import { useRiskProfiles, RiskProfile } from '@/hooks/useRiskProfiles';
+import { AccountBalancingPanel } from './AccountBalancingPanel';
 import { useMonthlyMedals } from '@/hooks/useMonthlyMedals';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { cn } from '@/lib/utils';
@@ -629,6 +630,15 @@ export function RiskCopilotDrawer() {
 
   const selectedProfile = profiles.find((p) => p.id === selectedProfileId) || null;
 
+  // O balanceamento e ditado pelo perfil mais agressivo que existe, nao pelo que
+  // esta selecionado agora: a conta precisa comportar o pior caso que o usuario
+  // se autorizou, mesmo que hoje ele esteja operando pequeno.
+  const perfisPct = profiles.map((p) => p.risk_pct).filter((v) => v > 0);
+  const perfilMaisAgressivo = profiles.reduce<typeof profiles[number] | null>(
+    (maior, p) => (p.risk_pct > 0 && (!maior || p.risk_pct > maior.risk_pct) ? p : maior),
+    null,
+  );
+
   const monthlyMedal = rc.monthlyGoal > 0
     ? (rc.monthlyGoalPct >= 100 ? 'gold' : rc.monthlyGoalPct >= 80 ? 'silver' : rc.monthlyGoalPct >= 60 ? 'bronze' : null)
     : null;
@@ -883,6 +893,11 @@ export function RiskCopilotDrawer() {
                   <CapitalAdjustPopover mode="remove" capitalBase={rc.capitalBase} onConfirm={rc.addCapital} formatAmount={formatAmount} />
                 </div>
               </div>
+              <AccountBalancingPanel
+                capitalTotal={rc.capitalBase}
+                perfisPct={perfisPct}
+                nomeMaiorPerfil={perfilMaisAgressivo?.name}
+              />
               <MedalsBoard medals={medals} goalMedals={goalMedals} />
 
               {/* O drawer mostra o capital e deixa aportar, mas o extrato --

@@ -103,3 +103,71 @@ export function percentualDoRisco(surplus: number, risco: number): number {
   if (surplus <= 0) return 0;
   return Math.min(100, Math.max(0, (risco / surplus) * 100));
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BALANCEAMENTO DE CONTAS — quanto deixar exposto na corretora
+
+   Mesma relação `risco ÷ trava` da rolagem de surplus, aplicada a outra
+   pergunta: dado o capital total e o perfil de risco mais agressivo que o
+   usuário configurou, quanto precisa ficar na conta de trade para que uma
+   liquidação a 70% custe exatamente o risco autorizado — e quanto sobra para
+   ficar fora de alcance.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+export interface EntradaBalanceamento {
+  /** Capital consolidado: conta de trade + fundo protegido. */
+  capitalTotal: number;
+  /** Percentuais de risco dos perfis ativos, ex.: [5, 8, 15, 20]. */
+  perfisPct: number[];
+  /** Trava de stop da corretora, como fração. */
+  travaStop?: number;
+  /** Saldo que está hoje na conta de trade, se conhecido. */
+  saldoTradeAtual?: number;
+}
+
+export interface ResultadoBalanceamento {
+  /** O perfil mais agressivo, que dita o dimensionamento. */
+  maiorRiscoPct: number;
+  /** Risco em dólares desse perfil sobre o capital total. */
+  riscoMaximo: number;
+  /** Quanto manter na conta de trade. */
+  contaDeTrade: number;
+  /** Quanto blindar fora dela. */
+  fundoProtegido: number;
+  /** Há excesso na conta de trade a transferir? */
+  precisaTransferir: boolean;
+  excedente: number;
+  /**
+   * Perda numa liquidação total da conta de trade. Maior que o risco
+   * autorizado, porque a conta guarda mais do que ele — é o preço de a trava
+   * ser uma regra de dimensionamento e não um limite da corretora.
+   */
+  perdaEmLiquidacaoTotal: number;
+}
+
+export function calcularBalanceamento(e: EntradaBalanceamento): ResultadoBalanceamento {
+  const trava = e.travaStop && e.travaStop > 0 && e.travaStop <= 1 ? e.travaStop : TRAVA_STOP_PADRAO;
+  const capital = Math.max(0, e.capitalTotal || 0);
+
+  // Sem perfil configurado não há o que dimensionar: devolve tudo protegido em
+  // vez de assumir um percentual qualquer.
+  const validos = (e.perfisPct || []).filter((p) => p > 0);
+  const maiorRiscoPct = validos.length ? Math.max(...validos) : 0;
+
+  const riscoMaximo = capital * (maiorRiscoPct / 100);
+  const contaDeTrade = riscoMaximo / trava;
+  const fundoProtegido = Math.max(0, capital - contaDeTrade);
+
+  const saldoHoje = e.saldoTradeAtual ?? contaDeTrade;
+  const excedente = Math.max(0, saldoHoje - contaDeTrade);
+
+  return {
+    maiorRiscoPct,
+    riscoMaximo,
+    contaDeTrade,
+    fundoProtegido,
+    precisaTransferir: excedente > 0.005,
+    excedente,
+    perdaEmLiquidacaoTotal: contaDeTrade,
+  };
+}
