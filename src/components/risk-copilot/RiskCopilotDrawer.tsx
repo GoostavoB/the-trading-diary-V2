@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Sheet,
   SheetContent,
@@ -19,7 +20,7 @@ import { Label } from '@/components/ui/label';
 import {
   Shield, Settings, Plus, Minus, Star, ChevronUp, ChevronDown, X,
   TrendingUp, TrendingDown, Trophy, AlertTriangle, Pencil, Check,
-  Lock, Sparkles, Target, Info, HelpCircle,
+  Lock, Sparkles, Target, Info, HelpCircle, ArrowUpRight,
 } from 'lucide-react';
 import { useRiskCopilot } from '@/hooks/useRiskCopilot';
 import { useRiskProfiles, RiskProfile } from '@/hooks/useRiskProfiles';
@@ -883,6 +884,20 @@ export function RiskCopilotDrawer() {
                 </div>
               </div>
               <MedalsBoard medals={medals} goalMedals={goalMedals} />
+
+              {/* O drawer mostra o capital e deixa aportar, mas o extrato --
+                  data, valor e a nota de cada aporte -- vive na pagina de
+                  Capital Management. Sem este link nao havia como chegar la
+                  a partir daqui, que e onde a duvida sobre o numero nasce. */}
+              <div className="pt-2 border-t border-border/50">
+                <Link
+                  to="/capital-management"
+                  className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Ver extrato de aportes e retiradas
+                  <ArrowUpRight className="h-3 w-3" />
+                </Link>
+              </div>
             </>
           )}
         </div>
