@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { AlertTriangle, Info, Landmark, ShieldCheck } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,12 +26,14 @@ interface Props {
  * que uma perda na trava de 70% custe exatamente o risco do perfil mais
  * agressivo, e o resto sai de alcance.
  *
- * Duas coisas que a fórmula sozinha não conta e que o painel mostra junto:
- * a trava de 70% é regra de dimensionamento do usuário e não um limite que a
- * corretora respeite — numa liquidação a conta de trade vai inteira; e o
- * limite calculado costuma ser menor que a margem que os trades reais usaram,
- * o que torna a regra inaplicável até que o tamanho das posições ou o perfil
- * mudem. Sem esses dois avisos o painel promete uma proteção que não existe.
+ * A trava de 70% é peça do sistema de proteção de capital do usuário, não um
+ * limite da corretora — e é ele quem a faz valer, respeitando o stop. Por isso
+ * o painel diz de que depende a promessa em vez de apresentá-la como garantida,
+ * e aponta para onde a disciplina de stop é medida.
+ *
+ * O painel também compara o limite calculado com a maior margem que os trades
+ * reais usaram: quando não cabe, a regra não vale como está, e saber disso
+ * importa mais do que fazer a transferência.
  */
 export function AccountBalancingPanel({ capitalTotal, perfisPct, nomeMaiorPerfil }: Props) {
   const { user } = useAuth();
@@ -178,11 +181,16 @@ export function AccountBalancingPanel({ capitalTotal, perfisPct, nomeMaiorPerfil
         <div className="flex gap-2 pt-1 border-t border-border/50">
           <Info className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            A trava de {(TRAVA_STOP_PADRAO * 100).toFixed(0)}% é uma regra sua de dimensionamento, não um
-            limite que a corretora respeite. Numa liquidação a conta de trade vai inteira:{' '}
-            <span className="font-mono">{formatAmount(r.perdaEmLiquidacaoTotal)}</span>, não{' '}
-            <span className="font-mono">{formatAmount(r.riscoMaximo)}</span>. O que o fundo protege é o
-            resto — e isso ele protege de verdade.
+            Os {(TRAVA_STOP_PADRAO * 100).toFixed(0)}% são a sua trava, não da corretora — quem faz ela
+            valer é você respeitar o stop. Enquanto vale, a perda máxima é{' '}
+            <span className="font-mono">{formatAmount(r.riscoMaximo)}</span>. Se um trade passar do stop,
+            a conta de trade vai inteira:{' '}
+            <span className="font-mono">{formatAmount(r.perdaEmLiquidacaoTotal)}</span>. O fundo protege
+            o resto nos dois casos.{' '}
+            <Link to="/risk-management" className="underline underline-offset-2 hover:text-foreground">
+              Ver se você tem respeitado o stop
+            </Link>
+            .
           </p>
         </div>
       </div>
