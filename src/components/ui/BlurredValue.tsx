@@ -80,6 +80,46 @@ export const BlurredCurrency = ({
   );
 };
 
+// ── Dinheiro em tres moedas: dolar, euro e real ────────────────────────────
+// A linha de cima e a moeda selecionada no topo do app; abaixo vem as outras
+// duas de [USD, EUR, BRL] com a bandeirinha. Opt-in: so onde a gente pedir,
+// para nao rebentar o layout das tabelas que usam BlurredCurrency inline.
+const BANDEIRA: Record<string, string> = { USD: '\u{1F1FA}\u{1F1F8}', EUR: '\u{1F1EA}\u{1F1FA}', BRL: '\u{1F1E7}\u{1F1F7}' };
+const TRIO = ['USD', 'EUR', 'BRL'];
+
+export const MultiCurrency = ({
+  amount,
+  className,
+  showToggle = false,
+  secondaryClassName,
+}: {
+  amount: number;
+  className?: string;
+  showToggle?: boolean;
+  secondaryClassName?: string;
+}) => {
+  const { currency, formatIn } = useCurrency();
+  const principal = TRIO.includes(currency.code) ? currency.code : 'USD';
+  const outras = TRIO.filter(c => c !== principal);
+
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="inline-flex items-center gap-1.5">
+        <BlurredValue value={formatIn(principal, amount)} className={className} showToggle={showToggle} />
+        <span aria-hidden className="text-[0.7em] leading-none opacity-80">{BANDEIRA[principal]}</span>
+      </div>
+      <div className={cn("flex flex-col gap-0.5 text-fluid-xs text-muted-foreground/60 tabular-nums", secondaryClassName)}>
+        {outras.map(code => (
+          <span key={code} className="inline-flex items-center gap-1.5">
+            <BlurredValue value={formatIn(code, amount)} />
+            <span aria-hidden className="text-[0.85em] leading-none opacity-80">{BANDEIRA[code]}</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Helper component for percentage values
 export const BlurredPercent = ({ 
   value, 

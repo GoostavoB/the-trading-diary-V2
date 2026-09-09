@@ -53,6 +53,8 @@ interface CurrencyContextType {
   setCurrency: (currency: Currency) => void;
   convertAmount: (amount: number, fromCurrency?: string) => number;
   formatAmount: (amount: number, options?: Intl.NumberFormatOptions) => string;
+  /** Formata um valor em USD numa moeda ESPECIFICA, ignorando a moeda selecionada. */
+  formatIn: (code: string, amountUSD: number) => string;
   lastUpdate: string | null;
   isLoading: boolean;
 }
@@ -202,12 +204,34 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
     return `${sign}${currency.symbol}${absValue.toFixed(2)}`;
   };
 
+  /**
+   * Formata um valor (que esta em USD) numa moeda especifica, independente da
+   * moeda selecionada no topo. Serve para mostrar dolar, euro e real juntos.
+   */
+  const formatIn = (code: string, amountUSD: number): string => {
+    const alvo = SUPPORTED_CURRENCIES.find(c => c.code === code);
+    if (!alvo) return formatAmount(amountUSD);
+    const v = amountUSD * alvo.rate;
+    const sign = v < 0 ? '-' : '';
+    const abs = Math.abs(v);
+    if (code === 'BTC' || code === 'ETH') return `${sign}${alvo.symbol}${abs.toFixed(8)}`;
+    // Sem abreviar e sem cortar centavos, de proposito: o real fica ~5x maior que
+    // o dolar, entao a regra de "K" do formatAmount transformava R$19.011,42 em
+    // "R$19.0K". Aqui o numero e para ser lido, nao estimado.
+    const n = new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(abs);
+    return `${sign}${alvo.symbol}${n}`;
+  };
+
   return (
     <CurrencyContext.Provider value={{ 
       currency, 
       setCurrency, 
       convertAmount, 
       formatAmount,
+      formatIn,
       lastUpdate: exchangeRates?.timestamp || null,
       isLoading,
     }}>

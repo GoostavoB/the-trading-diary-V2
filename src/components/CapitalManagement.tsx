@@ -14,7 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { BlurredCurrency } from '@/components/ui/BlurredValue';
+import { BlurredCurrency, MultiCurrency } from '@/components/ui/BlurredValue';
 
 interface CapitalLogEntry {
   id: string;
@@ -254,7 +254,7 @@ export const CapitalManagement = () => {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Current Capital</p>
-              <p className="text-2xl font-bold"><BlurredCurrency amount={currentCapital} /></p>
+              <div className="text-2xl font-bold"><MultiCurrency amount={currentCapital} /></div>
             </div>
           </div>
         </PremiumCard>
@@ -266,7 +266,7 @@ export const CapitalManagement = () => {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Total Added</p>
-              <p className="text-2xl font-bold"><BlurredCurrency amount={totalAdded} /></p>
+              <div className="text-2xl font-bold"><MultiCurrency amount={totalAdded} /></div>
             </div>
           </div>
         </PremiumCard>

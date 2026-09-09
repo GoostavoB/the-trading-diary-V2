@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/useTranslation';
-import { BlurredCurrency } from '@/components/ui/BlurredValue';
+import { BlurredCurrency, MultiCurrency } from '@/components/ui/BlurredValue';
 import { formatPercent } from '@/utils/formatNumber';
 
 interface InsightsQuickSummaryProps {
@@ -202,7 +202,7 @@ function PnLCard({ totalPnL, totalTrades }: { totalPnL: number; totalTrades: num
           "text-fluid-2xl font-black tabular-nums leading-none",
           isPos ? "text-emerald-300" : "text-rose-300"
         )}>
-          <BlurredCurrency amount={totalPnL} className="inline" />
+          <MultiCurrency amount={totalPnL} className="inline" />
         </div>
         <div className="text-fluid-xs text-muted-foreground/40">
           across {totalTrades} trades
