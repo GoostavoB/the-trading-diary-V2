@@ -9,6 +9,13 @@ const TIER_COLOR: Record<Exclude<GoalTier, null>, string> = {
   gold: 'hsl(var(--apple-orange))',
 };
 
+// A medalha em si, para aparecer EM CIMA da barra em cada marca.
+const TIER_MEDAL: Record<Exclude<GoalTier, null>, string> = {
+  bronze: '\u{1F949}',
+  silver: '\u{1F948}',
+  gold: '\u{1F947}',
+};
+
 const TIER_LABEL: Record<Exclude<GoalTier, null>, string> = {
   bronze: 'Bronze',
   silver: 'Silver',
@@ -78,8 +85,23 @@ export function MonthlyGoalWidget() {
   const progressPct = Math.max(0, Math.min(100, progress * 100));
   const onTrackToGold = hasGoal && tier === 'gold';
 
+  const cor = tier ? TIER_COLOR[tier] : null;
+
   return (
-    <div className="card-premium p-0 overflow-hidden">
+    <div
+      className="card-premium p-0 overflow-hidden relative"
+      style={cor ? { borderColor: `${cor}66`, boxShadow: `0 0 0 1px ${cor}22, 0 0 24px -6px ${cor}55` } : undefined}
+    >
+      {/* Faixa que varre da esquerda para a direita na cor da medalha do mes.
+          So existe quando ha medalha — sem conquista, sem brilho. */}
+      {cor && (
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px overflow-hidden">
+          <div
+            className="h-full w-1/3 animate-shimmer"
+            style={{ background: `linear-gradient(90deg, transparent, ${cor}, transparent)` }}
+          />
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-5 pb-1">
         <div className="flex items-center gap-2">
@@ -195,35 +217,89 @@ export function MonthlyGoalWidget() {
             </span>
           </div>
 
+          {tier && (
+            <div
+              className="mx-5 mb-3 px-3 py-2.5 rounded-lg flex items-center gap-2.5 text-fluid-sm font-medium"
+              style={{ background: `${TIER_COLOR[tier]}18`, border: `1px solid ${TIER_COLOR[tier]}44`, color: TIER_COLOR[tier] }}
+            >
+              <span className="text-fluid-lg leading-none">{TIER_MEDAL[tier]}</span>
+              <span>
+                <strong>{TIER_LABEL[tier]} conquistado</strong>
+                {' — '}
+                {progressPct.toFixed(0)}% da meta de {currentMonth ? MONTH_SHORT(currentMonth.date) : 'este mes'}
+                {tier !== 'gold' && (
+                  <span className="opacity-70">
+                    {'. Faltam '}
+                    {formatCurrency((goalTarget as number) * (tier === 'bronze' ? TIER_THRESHOLDS.silver : TIER_THRESHOLDS.gold) - pnl, { compact: true })}
+                    {' para '}
+                    {tier === 'bronze' ? 'Silver' : 'Gold'}.
+                  </span>
+                )}
+              </span>
+            </div>
+          )}
+
           {onTrackToGold && (
             <div className="mx-5 mb-3 px-3 py-2 rounded-lg glass-thin border border-apple-green/30 text-fluid-sm text-apple-green font-medium">
               Goal hit for {currentMonth ? MONTH_SHORT(currentMonth.date) : 'this month'} — no need to keep pushing size to chase more.
             </div>
           )}
 
-          {/* Progress bar with tier markers */}
+          {/* Barra de progresso com a MEDALHA em cima de cada marca.
+              As marcas ficam posicionadas em percentual, e o rotulo abaixo alinhado
+              com elas — antes era um empilhamento de margin-left que nao batia com
+              a linha e deixava o texto ilegivel no cinza escuro. */}
           <div className="px-5 pb-4">
-            <div className="relative h-2.5 rounded-full bg-space-700/50 overflow-hidden">
-              <div
-                className={cn(
-                  'absolute inset-y-0 left-0 rounded-full transition-all duration-500',
-                  pnlPositive ? 'bg-gradient-to-r from-electric to-apple-cyan' : 'bg-apple-red',
-                )}
-                style={{ width: `${progressPct}%` }}
-              />
-              {(['bronze', 'silver', 'gold'] as const).map((t) => (
+            <div className="relative h-2.5 rounded-full bg-space-700/50 mb-5">
+              <div className="absolute inset-0 rounded-full overflow-hidden">
                 <div
-                  key={t}
-                  className="absolute top-0 bottom-0 w-px bg-space-900/60"
-                  style={{ left: `${TIER_THRESHOLDS[t] * 100}%` }}
+                  className={cn(
+                    'absolute inset-y-0 left-0 rounded-full transition-all duration-700',
+                    pnlPositive ? 'bg-gradient-to-r from-electric to-apple-cyan' : 'bg-apple-red',
+                  )}
+                  style={{ width: `${progressPct}%` }}
                 />
-              ))}
-            </div>
-            <div className="mt-1.5 flex justify-between text-fluid-2xs text-space-400 uppercase tracking-wider tabular-nums">
-              <span>0</span>
-              <span style={{ marginLeft: `${TIER_THRESHOLDS.bronze * 100 - 8}%` }}>Bronze 50%</span>
-              <span style={{ marginLeft: `${(TIER_THRESHOLDS.silver - TIER_THRESHOLDS.bronze) * 100 - 8}%` }}>Silver 75%</span>
-              <span>Gold 100%</span>
+              </div>
+              {(['bronze', 'silver', 'gold'] as const).map((t) => {
+                const marca = TIER_THRESHOLDS[t] * 100;
+                const batido = progressPct >= marca;
+                return (
+                  <div
+                    key={t}
+                    className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col items-center"
+                    style={{ left: `${marca}%` }}
+                  >
+                    <span
+                      className={cn(
+                        'flex items-center justify-center rounded-full transition-all duration-500 leading-none',
+                        batido ? 'w-6 h-6 text-[13px]' : 'w-4 h-4 text-[9px] grayscale opacity-45',
+                      )}
+                      style={{
+                        background: batido ? `${TIER_COLOR[t]}26` : 'hsl(var(--space-700))',
+                        border: `1px solid ${batido ? TIER_COLOR[t] : 'hsl(var(--space-500))'}`,
+                        boxShadow: batido ? `0 0 12px -2px ${TIER_COLOR[t]}` : undefined,
+                      }}
+                      title={`${TIER_LABEL[t]} — ${marca}%`}
+                    >
+                      {TIER_MEDAL[t]}
+                    </span>
+                    <span
+                      className={cn(
+                        'absolute top-full mt-1.5 whitespace-nowrap text-fluid-2xs uppercase tracking-wider tabular-nums transition-colors',
+                        batido ? 'font-semibold' : 'text-space-300',
+                      )}
+                      style={{
+                        // A marca de 100% encosta na borda direita; centralizar o
+                        // rotulo nela cortava o "%". Puxa para dentro nos extremos.
+                        transform: marca >= 100 ? 'translateX(-32%)' : marca <= 0 ? 'translateX(32%)' : undefined,
+                        ...(batido ? { color: TIER_COLOR[t] } : {}),
+                      }}
+                    >
+                      {TIER_LABEL[t]} {marca}%
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
