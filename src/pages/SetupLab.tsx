@@ -52,9 +52,6 @@ const SetupImages = ({ paths }: { paths: string[] }) => {
           className="h-20 w-32 rounded-lg overflow-hidden border border-border block"
         >
           {urls[path] ? (
-            <img src={path} alt="Setup example chart" className="hidden" />
-          ) : null}
-          {urls[path] ? (
             <img src={urls[path]} alt="Setup example chart" className="h-full w-full object-cover" />
           ) : (
             <div className="h-full w-full bg-muted animate-pulse" />
