@@ -1,15 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
-import { SEO } from '@/components/SEO';
 import { PremiumCard } from '@/components/ui/PremiumCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, FlaskConical, Pencil, Trash2, User, Clock, TrendingUp, TrendingDown } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
-import { useSetupLibrary, useSignedSetupImages, TradingSetup } from '@/hooks/useSetupLibrary';
-import { SetupForm } from '@/components/setups/SetupForm';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,171 +13,260 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { FlaskConical, Plus, Pencil, Trash2, AlertTriangle, Clock, User } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { cn } from '@/lib/utils';
+import { SetupForm } from '@/components/setups/SetupForm';
+import { TradingSetup, useSetupLibrary, useSignedSetupImages } from '@/hooks/useSetupLibrary';
+import type { Trade } from '@/types/trade';
 
-const useSetupPerformance = (userId: string | undefined) => {
-  return useQuery({
-    queryKey: ['setup-performance', userId],
-    enabled: !!userId,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('trades')
-        .select('setup, pnl')
-        .eq('user_id', userId)
-        .is('deleted_at', null)
-        .not('setup', 'is', null);
-      if (error) throw error;
+const formatCurrency = (value: number) =>
+  `${value < 0 ? '-' : ''}$${Math.abs(value).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 
-      const bySetup: Record<string, { trades: number; wins: number; totalPnl: number }> = {};
-      for (const row of data || []) {
-        const name = row.setup as string;
-        if (!bySetup[name]) bySetup[name] = { trades: 0, wins: 0, totalPnl: 0 };
-        bySetup[name].trades += 1;
-        const pnl = row.pnl || 0;
-        if (pnl > 0) bySetup[name].wins += 1;
-        bySetup[name].totalPnl += pnl;
-      }
-      return bySetup;
-    },
-  });
-};
+interface SetupStats {
+  trades: number;
+  wins: number;
+  losses: number;
+  winRate: number;
+  totalPnl: number;
+  avgPnl: number;
+}
 
-const SetupCard = ({
-  setup,
-  stats,
-  onEdit,
-  onDelete,
-}: {
-  setup: TradingSetup;
-  stats?: { trades: number; wins: number; totalPnl: number };
-  onEdit: () => void;
-  onDelete: () => void;
-}) => {
-  const signedUrls = useSignedSetupImages(setup.image_urls.slice(0, 1));
-  const cover = setup.image_urls[0] ? signedUrls[setup.image_urls[0]] : undefined;
-  const winRate = stats && stats.trades > 0 ? Math.round((stats.wins / stats.trades) * 100) : null;
+const SetupImages = ({ paths }: { paths: string[] }) => {
+  const urls = useSignedSetupImages(paths);
+  if (paths.length === 0) return null;
 
   return (
-    <PremiumCard className="p-0 overflow-hidden flex flex-col">
-      {cover ? (
-        <img src={cover} alt={setup.name} className="h-32 w-full object-cover" />
-      ) : (
-        <div className="h-32 w-full bg-muted/40 flex items-center justify-center">
-          <FlaskConical className="h-8 w-8 text-muted-foreground/40" />
-        </div>
-      )}
-      <div className="p-4 flex flex-col gap-3 flex-1">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold leading-tight">{setup.name}</h3>
-          <div className="flex gap-1 shrink-0">
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onEdit} aria-label="Edit setup">
-              <Pencil className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onDelete} aria-label="Delete setup">
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-          {setup.author && (
-            <span className="flex items-center gap-1"><User className="h-3 w-3" />{setup.author}</span>
-          )}
-          {setup.timeframe && (
-            <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{setup.timeframe}</span>
-          )}
-        </div>
-
-        {setup.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2">{setup.description}</p>
-        )}
-
-        {/* Azul escuro fixo, não o token --secondary: com o tema aplicado o badge
-            saía azul-claro com texto branco e não dava para ler. */}
-        {setup.indicators.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {setup.indicators.map((ind) => (
-              <Badge
-                key={ind}
-                className="text-xs border-transparent bg-blue-900 text-blue-50 hover:bg-blue-900/80"
-              >
-                {ind}
-              </Badge>
-            ))}
-          </div>
-        )}
-
-        <div className="mt-auto pt-2 border-t border-border/50 flex items-center justify-between">
-          {stats && stats.trades > 0 ? (
-            <>
-              <div className="text-xs text-muted-foreground">{stats.trades} trade{stats.trades !== 1 ? 's' : ''}</div>
-              <div className="flex items-center gap-3 text-sm">
-                <span className="font-medium">{winRate}% win rate</span>
-                <span className={`flex items-center gap-1 font-medium ${stats.totalPnl >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                  {stats.totalPnl >= 0 ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
-                  {stats.totalPnl >= 0 ? '+' : ''}{stats.totalPnl.toFixed(2)}
-                </span>
-              </div>
-            </>
+    <div className="flex flex-wrap gap-2 mt-3">
+      {paths.map((path) => (
+        <a
+          key={path}
+          href={urls[path] || '#'}
+          target="_blank"
+          rel="noreferrer"
+          className="h-20 w-32 rounded-lg overflow-hidden border border-border block"
+        >
+          {urls[path] ? (
+            <img src={urls[path]} alt="Setup example chart" className="h-full w-full object-cover" />
           ) : (
-            <div className="text-xs text-muted-foreground">No trades linked yet</div>
+            <div className="h-full w-full bg-muted animate-pulse" />
           )}
-        </div>
-      </div>
-    </PremiumCard>
+        </a>
+      ))}
+    </div>
   );
 };
 
 export default function SetupLab() {
   const { user } = useAuth();
   const { setups, loading, saveSetup, deleteSetup, uploadImage } = useSetupLibrary();
-  const { data: performance } = useSetupPerformance(user?.id);
-
   const [formOpen, setFormOpen] = useState(false);
-  const [editingSetup, setEditingSetup] = useState<TradingSetup | null>(null);
+  const [editing, setEditing] = useState<TradingSetup | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const { data: trades = [] } = useQuery({
+    queryKey: ['setup-lab-trades', user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('trades')
+        .select('*')
+        .eq('user_id', user!.id)
+        .is('deleted_at', null);
+      if (error) throw error;
+      return (data || []) as unknown as Trade[];
+    },
+  });
+
+  const statsBySetup = useMemo(() => {
+    const map = new Map<string, SetupStats>();
+
+    setups.forEach((setup) => {
+      const key = setup.name.toLowerCase();
+      const matching = trades.filter((trade) => {
+        const single = (trade.setup || '').toLowerCase();
+        const tags = (trade.setup_tags || []).map((t) => (t || '').toLowerCase());
+        return single === key || tags.includes(key);
+      });
+
+      const totalPnl = matching.reduce((sum, t) => sum + Number(t.profit_loss ?? t.pnl ?? 0), 0);
+      const wins = matching.filter((t) => Number(t.profit_loss ?? t.pnl ?? 0) > 0).length;
+      const losses = matching.filter((t) => Number(t.profit_loss ?? t.pnl ?? 0) < 0).length;
+
+      map.set(setup.id, {
+        trades: matching.length,
+        wins,
+        losses,
+        winRate: matching.length > 0 ? (wins / matching.length) * 100 : 0,
+        totalPnl,
+        avgPnl: matching.length > 0 ? totalPnl / matching.length : 0,
+      });
+    });
+
+    return map;
+  }, [setups, trades]);
+
+  const openNew = () => {
+    setEditing(null);
+    setFormOpen(true);
+  };
+
+  const openEdit = (setup: TradingSetup) => {
+    setEditing(setup);
+    setFormOpen(true);
+  };
 
   return (
     <AppLayout>
-      <SEO title="Setup Lab" description="Document your trading setups and track their real performance" />
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="container mx-auto px-4 py-6 space-y-6">
+        <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <FlaskConical className="h-6 w-6 text-primary" />
               Setup Lab
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Document your setups, link them to trades, and track their real performance.
+              Your setup library — rules, indicators, example charts and live performance.
             </p>
           </div>
-          <Button onClick={() => { setEditingSetup(null); setFormOpen(true); }} className="gap-2">
+          <Button onClick={openNew} className="gap-2">
             <Plus className="h-4 w-4" />
             New setup
           </Button>
         </div>
 
         {loading ? (
-          <div className="text-sm text-muted-foreground">Loading setups…</div>
+          <PremiumCard className="p-6 glass">
+            <p className="text-sm text-muted-foreground">Loading setups…</p>
+          </PremiumCard>
         ) : setups.length === 0 ? (
-          <PremiumCard className="p-10 text-center">
-            <FlaskConical className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
-            <p className="text-muted-foreground mb-4">No setups yet. Document your first one to start tracking its real win rate.</p>
-            <Button onClick={() => { setEditingSetup(null); setFormOpen(true); }} className="gap-2">
+          <PremiumCard className="p-10 glass text-center">
+            <FlaskConical className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+            <p className="text-lg mb-1">No setups yet</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Document a setup once, then tag your trades with it to track how it performs.
+            </p>
+            <Button onClick={openNew} className="gap-2">
               <Plus className="h-4 w-4" />
               Create your first setup
             </Button>
           </PremiumCard>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {setups.map((setup) => (
-              <SetupCard
-                key={setup.id}
-                setup={setup}
-                stats={performance?.[setup.name]}
-                onEdit={() => { setEditingSetup(setup); setFormOpen(true); }}
-                onDelete={() => setDeletingId(setup.id)}
-              />
-            ))}
+          <div className="grid gap-4 lg:grid-cols-2">
+            {setups.map((setup) => {
+              const stats = statsBySetup.get(setup.id);
+              const hasTrades = !!stats && stats.trades > 0;
+
+              return (
+                <PremiumCard key={setup.id} className="p-5 glass">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h2 className="text-lg font-semibold">{setup.name}</h2>
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mt-1">
+                        <span className="flex items-center gap-1">
+                          <User className="h-3 w-3" />
+                          {setup.author || '—'}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {setup.timeframe || '—'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button size="icon" variant="ghost" onClick={() => openEdit(setup)} aria-label="Edit setup">
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setDeletingId(setup.id)}
+                        aria-label="Delete setup"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {setup.indicators.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-3">
+                      {setup.indicators.map((indicator) => (
+                        <Badge key={indicator} variant="secondary" className="text-xs">
+                          {indicator}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+
+                  {setup.description && (
+                    <p className="text-sm text-muted-foreground mt-3 whitespace-pre-line">{setup.description}</p>
+                  )}
+
+                  {setup.entry_rules.length > 0 && (
+                    <div className="mt-3">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Entry rules</p>
+                      <ul className="list-disc pl-5 space-y-1 text-sm">
+                        {setup.entry_rules.map((rule, index) => (
+                          <li key={index}>{rule}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {setup.pitfalls && (
+                    <div className="mt-3 rounded-lg border border-apple-orange/30 bg-apple-orange/10 p-3">
+                      <p className="text-xs font-medium flex items-center gap-1 mb-1">
+                        <AlertTriangle className="h-3 w-3 text-apple-orange" />
+                        Notes and pitfalls
+                      </p>
+                      <p className="text-sm text-muted-foreground whitespace-pre-line">{setup.pitfalls}</p>
+                    </div>
+                  )}
+
+                  <SetupImages paths={setup.image_urls} />
+
+                  <div className="grid grid-cols-4 gap-2 mt-4 pt-4 border-t border-border/60">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Trades</p>
+                      <p className="font-num tabular-nums font-semibold">{stats?.trades ?? 0}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Win rate</p>
+                      <p className="font-num tabular-nums font-semibold">
+                        {hasTrades ? `${stats!.winRate.toFixed(1)}%` : <span className="text-space-400">—</span>}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Avg P&amp;L</p>
+                      <p
+                        className={cn(
+                          'font-num tabular-nums font-semibold',
+                          hasTrades && (stats!.avgPnl >= 0 ? 'text-apple-green' : 'text-apple-red')
+                        )}
+                      >
+                        {hasTrades ? formatCurrency(stats!.avgPnl) : <span className="text-space-400">—</span>}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Total P&amp;L</p>
+                      <p
+                        className={cn(
+                          'font-num tabular-nums font-semibold',
+                          hasTrades && (stats!.totalPnl >= 0 ? 'text-apple-green' : 'text-apple-red')
+                        )}
+                      >
+                        {hasTrades ? formatCurrency(stats!.totalPnl) : <span className="text-space-400">—</span>}
+                      </p>
+                    </div>
+                  </div>
+                </PremiumCard>
+              );
+            })}
           </div>
         )}
       </div>
@@ -192,7 +274,7 @@ export default function SetupLab() {
       <SetupForm
         open={formOpen}
         onOpenChange={setFormOpen}
-        setup={editingSetup}
+        setup={editing}
         onSave={saveSetup}
         onUploadImage={uploadImage}
       />
@@ -202,13 +284,16 @@ export default function SetupLab() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this setup?</AlertDialogTitle>
             <AlertDialogDescription>
-              This removes it from your library. Trades already tagged with this setup name are not affected.
+              Trades already tagged with this setup keep their tag text, but the documentation is removed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => { if (deletingId) deleteSetup(deletingId); setDeletingId(null); }}
+              onClick={() => {
+                if (deletingId) deleteSetup(deletingId);
+                setDeletingId(null);
+              }}
             >
               Delete
             </AlertDialogAction>

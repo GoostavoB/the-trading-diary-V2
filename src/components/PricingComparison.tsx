@@ -87,7 +87,8 @@ const PricingComparison = () => {
           scrollTrigger: {
             trigger: category,
             start: 'top 85%',
-            toggleActions: 'play none none none',
+            end: 'top 65%',
+            scrub: 0.5,
           }
         });
       });
@@ -101,7 +102,8 @@ const PricingComparison = () => {
           scrollTrigger: {
             trigger: row,
             start: 'top 90%',
-            toggleActions: 'play none none none',
+            end: 'top 75%',
+            scrub: 0.5,
           }
         });
       });

@@ -7,16 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Shield, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-interface StopLossCalculatorProps {
-  /** Capital real do usuario. Sem isto a calculadora pede o numero que o app ja sabe. */
-  capitalReal?: number;
-  /** Risco por trade do perfil ativo, em %. */
-  riscoPadraoPct?: number;
-}
-
-export function StopLossCalculator({ capitalReal, riscoPadraoPct }: StopLossCalculatorProps = {}) {
-  const [accountSize, setAccountSize] = useState<string>(capitalReal && capitalReal > 0 ? String(Math.round(capitalReal)) : '10000');
-  const [riskPercentage, setRiskPercentage] = useState<string>(riscoPadraoPct ? String(riscoPadraoPct) : '1');
+export function StopLossCalculator() {
+  const [accountSize, setAccountSize] = useState<string>('10000');
+  const [riskPercentage, setRiskPercentage] = useState<string>('1');
   const [entryPrice, setEntryPrice] = useState<string>('');
   const [positionSize, setPositionSize] = useState<string>('');
   const [result, setResult] = useState<any>(null);
