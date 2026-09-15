@@ -7,8 +7,11 @@ export const OfflineIndicator = () => {
   const [showIndicator, setShowIndicator] = useState(false);
 
   useEffect(() => {
+    const OFFLINE_TOAST_ID = 'offline-status';
+
     const handleOnline = () => {
       setIsOnline(true);
+      toast.dismiss(OFFLINE_TOAST_ID);
       toast.success('Back online! 🎉', {
         description: 'Your connection has been restored',
       });
@@ -18,6 +21,7 @@ export const OfflineIndicator = () => {
     const handleOffline = () => {
       setIsOnline(false);
       toast.error('You are offline', {
+        id: OFFLINE_TOAST_ID,
         description: 'Some features may be limited',
         duration: Infinity,
       });
