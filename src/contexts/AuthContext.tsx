@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { lovable } from '@/integrations/lovable';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -193,38 +192,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signInWithGoogle = async (): Promise<{ error: any }> => {
     try {
-      const lovableAppOrigin = 'https://the-trading-diary.lovable.app';
-      const redirectUri = `${window.location.origin}/auth`;
-      const isCustomDomain = window.location.origin !== lovableAppOrigin && !window.location.hostname.includes('lovable.app');
+      const redirectTo = `${window.location.origin}/auth`;
 
-      if (isCustomDomain) {
-        const state = [...crypto.getRandomValues(new Uint8Array(16))]
-          .map((b) => b.toString(16).padStart(2, '0'))
-          .join('');
-
-        const params = new URLSearchParams({
-          provider: 'google',
-          redirect_uri: redirectUri,
-          state,
-        });
-
-        window.location.href = `${lovableAppOrigin}/~oauth/initiate?${params.toString()}`;
-        return { error: null };
-      }
-
-      const result = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: redirectUri,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo },
       });
 
-      if (result.error) {
-        toast.error(result.error.message || 'Sign in failed');
-        return { error: result.error };
+      if (error) {
+        toast.error(error.message || 'Sign in failed');
+        return { error };
       }
 
-      if (!result.redirected) {
-        navigate('/dashboard');
-      }
-
+      // supabase.auth.signInWithOAuth navigates the browser to Google itself;
+      // nothing else to do here, the redirect back to /auth completes the flow.
       return { error: null };
     } catch (e) {
       const error = e instanceof Error ? e : new Error(String(e));
