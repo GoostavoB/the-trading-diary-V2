@@ -57,6 +57,7 @@ const CryptoTradingFAQ = lazyWithRetry(() => import("./pages/CryptoTradingFAQ"))
 const Journal = lazyWithRetry(() => import("./pages/Journal"));
 // const TradeAnalysis = lazyWithRetry(() => import("./pages/TradeAnalysis"));
 const Goals = lazyWithRetry(() => import("./pages/Goals"));
+const SetupLab = lazyWithRetry(() => import("./pages/SetupLab"));
 const RiskManagement = lazyWithRetry(() => import("./pages/RiskManagement"));
 const Reports = lazyWithRetry(() => import("./pages/Reports"));
 const Psychology = lazyWithRetry(() => import("./pages/Psychology"));
@@ -206,6 +207,7 @@ const AppRoutes = () => {
           {/* [Phase 2] Trade Analysis — module incomplete, roadmap Sprint 3 */}
           {/* <Route path="/trade-analysis" element={<ProtectedRoute><TradeAnalysis /></ProtectedRoute>} /> */}
           <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
+          <Route path="/setup-lab" element={<ProtectedRoute><SetupLab /></ProtectedRoute>} />
           <Route path="/risk-management" element={<ProtectedRoute><RiskManagement /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
           <Route path="/psychology" element={<ProtectedRoute><Psychology /></ProtectedRoute>} />
