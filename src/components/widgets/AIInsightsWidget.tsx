@@ -2,7 +2,6 @@ import { memo, useMemo } from 'react';
 import { WidgetProps } from '@/types/widget';
 import { Trade } from '@/types/trade';
 import { Sparkles, TrendingUp, TrendingDown, Clock, Target, Award } from 'lucide-react';
-import { calculateTradePnL } from '@/utils/pnl';
 
 interface AIInsightsWidgetProps extends WidgetProps {
   trades: Trade[];
@@ -17,7 +16,7 @@ export const AIInsightsWidget = memo(({ trades }: AIInsightsWidgetProps) => {
     trades.forEach(t => {
       const sym = t.symbol || 'Unknown';
       if (!byAsset[sym]) byAsset[sym] = { pnl: 0, count: 0 };
-      byAsset[sym].pnl += calculateTradePnL(t, { includeFees: true });
+      byAsset[sym].pnl += t.profit_loss ?? 0;
       byAsset[sym].count++;
     });
     const assetEntries = Object.entries(byAsset);

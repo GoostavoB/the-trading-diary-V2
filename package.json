@@ -5,15 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/check-pnl-convention.mjs && vite build",
+    "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "auto-fix": "tsx scripts/auto-fix/index.ts",
-    "check:pnl": "node scripts/check-pnl-convention.mjs"
+    "auto-fix": "tsx scripts/auto-fix/index.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

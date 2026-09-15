@@ -6,15 +6,12 @@ import { PremiumCard } from '@/components/ui/PremiumCard';
 import { BlurredCurrency } from '@/components/ui/BlurredValue';
 import { Loader2, TrendingUp, TrendingDown, Target, Zap, AlertTriangle, CheckCircle2, Flame } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { calculateTradePnL } from '@/utils/pnl';
 
 // ─────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────
 interface TradeRow {
   profit_loss: number | null;
-  trading_fee: number | null;
-  funding_fee: number | null;
   roi: number | null;
   trade_date: string;
 }
@@ -109,7 +106,7 @@ export function SmartCapitalProjection() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('trades')
-        .select('profit_loss, trading_fee, funding_fee, roi, trade_date')
+        .select('profit_loss, roi, trade_date')
         .eq('user_id', user!.id)
         .is('deleted_at', null)
         .order('trade_date', { ascending: true });
@@ -154,32 +151,18 @@ export function SmartCapitalProjection() {
         ? capitalLog.reduce((s, e) => s + (e.amount_added || 0), 0)
         : (settings?.initial_investment ?? 0);
 
-    // Tudo aqui usa o LIQUIDO, via calculateTradePnL -- o mesmo calculo da meta
-    // mensal, do dashboard e do Risk Copilot. Esta pagina somava profit_loss
-    // cru, que e o bruto, e mostrava $963 de lucro quando o que entrou na conta
-    // foram $783. A diferenca eram as taxas, que num trade alavancado sao
-    // grandes: 15% do lucro bruto no BTC, 31% no ETH.
-    //
-    // O erro nao ficava so no card de P&L: media de ganho, media de perda, R:R,
-    // expectativa e as tres projecoes mensais herdavam todas o numero inflado.
-    const liquido = (t: TradeRow) => calculateTradePnL(t, { includeFees: true });
-
-    const totalPnL = trades.reduce((s, t) => s + liquido(t), 0);
-    // O bruto e as taxas ficam a vista: sem eles, o usuario ve o numero mudar
-    // de $963 para $783 e nao sabe pra onde foi a diferenca.
-    const totalBruto = trades.reduce((s, t) => s + calculateTradePnL(t, { includeFees: false }), 0);
-    const totalTaxas = totalBruto - totalPnL;
+    const totalPnL = trades.reduce((s, t) => s + (t.profit_loss ?? 0), 0);
     const currentCapital = initialCapital + totalPnL;
 
-    const wins = trades.filter(t => liquido(t) > 0);
-    const losses = trades.filter(t => liquido(t) < 0);
+    const wins = trades.filter(t => (t.profit_loss ?? 0) > 0);
+    const losses = trades.filter(t => (t.profit_loss ?? 0) < 0);
 
     const winRate = wins.length / trades.length;
     const avgWin = wins.length
-      ? wins.reduce((s, t) => s + liquido(t), 0) / wins.length
+      ? wins.reduce((s, t) => s + (t.profit_loss ?? 0), 0) / wins.length
       : 0;
     const avgLoss = losses.length
-      ? losses.reduce((s, t) => s + liquido(t), 0) / losses.length
+      ? losses.reduce((s, t) => s + (t.profit_loss ?? 0), 0) / losses.length
       : 0; // already negative
 
     // Risk:Reward = |avgWin| / |avgLoss|
@@ -220,8 +203,6 @@ export function SmartCapitalProjection() {
       initialCapital,
       currentCapital,
       totalPnL,
-      totalBruto,
-      totalTaxas,
       winRate: winRate * 100,
       avgWin,
       avgLoss,
@@ -289,27 +270,13 @@ export function SmartCapitalProjection() {
             positive: calc.currentCapital >= calc.initialCapital,
           },
           {
-            label: 'Total P&L (líquido)',
+            label: 'Total P&L',
             value: (
               <span className={calc.totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}>
                 <BlurredCurrency amount={calc.totalPnL} />
               </span>
             ),
-            sub: (
-              <span className="flex flex-col gap-0.5">
-                <span>
-                  bruto <BlurredCurrency amount={calc.totalBruto} className="inline" /> − taxas{' '}
-                  <span className="text-red-400">
-                    <BlurredCurrency amount={calc.totalTaxas} className="inline" />
-                  </span>
-                </span>
-                {calc.totalBruto > 0 && (
-                  <span className="text-[10px]">
-                    a corretagem levou {fmtPct((calc.totalTaxas / calc.totalBruto) * 100)} do lucro bruto
-                  </span>
-                )}
-              </span>
-            ),
+            sub: calc.totalPnL >= 0 ? '✓ Profitable overall' : '↓ Currently in drawdown',
             positive: calc.totalPnL >= 0,
           },
           {

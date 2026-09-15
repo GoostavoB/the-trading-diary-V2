@@ -1,5 +1,4 @@
 import { Trade } from '@/types/trade';
-import { calculateTradePnL } from '@/utils/pnl';
 
 export interface MonteCarloParams {
   initialCapital: number;
@@ -43,7 +42,7 @@ export const runMonteCarloSimulation = (
 ): MonteCarloResult => {
   // Calculate historical statistics
   const returns = trades
-    .map(t => calculateTradePnL(t, { includeFees: true }) / (t.margin || 1))
+    .map(t => (t.profit_loss || 0) / (t.margin || 1))
     .filter(r => !isNaN(r) && isFinite(r));
 
   if (returns.length === 0) {

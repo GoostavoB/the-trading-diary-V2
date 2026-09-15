@@ -40,9 +40,6 @@ import Auth from "./pages/Auth";
 const Dashboard = lazyWithRetry(() => import("./pages/Dashboard"));
 const Upload = lazyWithRetry(() => import("./pages/Upload"));
 const Trades = lazyWithRetry(() => import("./pages/Trades"));
-const SetupLab = lazyWithRetry(() => import("./pages/SetupLab"));
-const BackTests = lazyWithRetry(() => import("./pages/BackTests"));
-const BacktestBumerangue = lazyWithRetry(() => import("./pages/BacktestBumerangue"));
 const Analytics = lazyWithRetry(() => import("./pages/Analytics"));
 const Forecast = lazyWithRetry(() => import("./pages/Forecast"));
 const Achievements = lazyWithRetry(() => import("./pages/Achievements"));
@@ -60,6 +57,7 @@ const CryptoTradingFAQ = lazyWithRetry(() => import("./pages/CryptoTradingFAQ"))
 const Journal = lazyWithRetry(() => import("./pages/Journal"));
 // const TradeAnalysis = lazyWithRetry(() => import("./pages/TradeAnalysis"));
 const Goals = lazyWithRetry(() => import("./pages/Goals"));
+const SetupLab = lazyWithRetry(() => import("./pages/SetupLab"));
 const RiskManagement = lazyWithRetry(() => import("./pages/RiskManagement"));
 const Reports = lazyWithRetry(() => import("./pages/Reports"));
 const Psychology = lazyWithRetry(() => import("./pages/Psychology"));
@@ -196,9 +194,6 @@ const AppRoutes = () => {
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/upload" element={<ProtectedRoute><Upload /></ProtectedRoute>} />
           <Route path="/trades" element={<ProtectedRoute><Trades /></ProtectedRoute>} />
-          <Route path="/setup-lab" element={<ProtectedRoute><SetupLab /></ProtectedRoute>} />
-          <Route path="/back-tests" element={<ProtectedRoute><BackTests /></ProtectedRoute>} />
-          <Route path="/back-tests/bumerangue" element={<ProtectedRoute><BacktestBumerangue /></ProtectedRoute>} />
           <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
           <Route path="/forecast" element={<ProtectedRoute><Forecast /></ProtectedRoute>} />
           <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
@@ -212,6 +207,7 @@ const AppRoutes = () => {
           {/* [Phase 2] Trade Analysis — module incomplete, roadmap Sprint 3 */}
           {/* <Route path="/trade-analysis" element={<ProtectedRoute><TradeAnalysis /></ProtectedRoute>} /> */}
           <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
+          <Route path="/setup-lab" element={<ProtectedRoute><SetupLab /></ProtectedRoute>} />
           <Route path="/risk-management" element={<ProtectedRoute><RiskManagement /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
           <Route path="/psychology" element={<ProtectedRoute><Psychology /></ProtectedRoute>} />
